@@ -1,3 +1,5 @@
 # Observations
 
-Placeholder for future observation vocabulary, payload helpers, and shared constants.
+Observation writer, lineage helpers, and synthetic/dev persistence helpers.
+
+The package is importable as `tom_v3_observations`.

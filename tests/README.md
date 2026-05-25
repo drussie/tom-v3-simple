@@ -1,3 +1,9 @@
 # Tests
 
-Placeholder for future contract, integration, worker, and viewer tests.
+Backend API and observation writer tests.
+
+Run with:
+
+```bash
+.venv/bin/python -m pytest -q
+```

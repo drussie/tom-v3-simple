@@ -32,6 +32,8 @@ Create the documentation spine, architecture contracts, observation-store schema
 
 Create the first backend service, database migrations, schema types, and API routes for media, runs, observations, artifacts, lineage, and annotations.
 
+Status: complete.
+
 ### 0C: Worker + Synthetic Observation Seeder
 
 Create a worker path that seeds synthetic media/runs/observations/artifacts to exercise the store without real model integration.

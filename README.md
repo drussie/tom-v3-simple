@@ -20,11 +20,13 @@ The core invariant:
 
 ## Current Milestone
 
-Current phase: Milestone 0A - Repo Memory + Architecture / Schema Foundation.
+Current phase: Milestone 0B - Backend / API Foundation.
 
-This milestone creates the repo-backed memory, architecture documentation, schema direction, and handoff structure future agents should follow.
+Milestone 0A created the repo-backed memory, architecture documentation, schema direction, and handoff structure future agents should follow.
 
-No real model pipeline, YOLO integration, TOM v1 integration, bounce detection, or full frontend is implemented in this milestone.
+Milestone 0B adds the first FastAPI backend, SQLAlchemy storage models, Alembic migration, schema contracts, observation writer, query API, and synthetic/dev insertion path.
+
+No real model pipeline, YOLO integration, TOM v1 integration, bounce detection, or frontend evidence viewer is implemented yet.
 
 ## Docs Entrypoint
 
@@ -34,7 +36,7 @@ Start with [docs/CONTROL_ROOM_INDEX.md](docs/CONTROL_ROOM_INDEX.md).
 
 ```text
 apps/
-  api/       Placeholder for the future backend API.
+  api/       FastAPI backend foundation.
   worker/    Placeholder for future processing and seeding workers.
   web/       Placeholder for the future visual evidence viewer.
 packages/
@@ -43,7 +45,22 @@ packages/
   video/           Media indexing and video utilities.
   observations/    Observation vocabulary and helpers.
   visualization/   Viewer-oriented utilities.
-migrations/        Future database migrations.
-tests/             Future test coverage.
+migrations/        Alembic database migrations.
+tests/             Backend API and observation writer tests.
 docs/              Durable project memory and architecture contracts.
+```
+
+## Backend Quickstart
+
+```bash
+python3 -m venv .venv
+.venv/bin/python -m pip install -e '.[dev]'
+.venv/bin/python -m pytest -q
+```
+
+Optional local Postgres:
+
+```bash
+docker compose up -d postgres
+TOM_V3_DATABASE_URL=postgresql+psycopg://tom_v3:tom_v3@localhost:5432/tom_v3 .venv/bin/alembic upgrade head
 ```

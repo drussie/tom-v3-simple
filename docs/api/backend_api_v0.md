@@ -1,0 +1,132 @@
+# Backend API v0
+
+## Purpose
+
+Backend API v0 provides the first TOM v3 Simple persistence and query surface for media, processing runs, observations, lineage, evidence artifacts, and human annotations.
+
+The API records observations and evidence. It does not resolve final tennis outcomes.
+
+## Run Locally
+
+```bash
+python3 -m venv .venv
+.venv/bin/python -m pip install -e '.[dev]'
+TOM_V3_CREATE_DB_ON_STARTUP=true .venv/bin/uvicorn apps.api.main:app --reload
+```
+
+For migration-managed local Postgres:
+
+```bash
+docker compose up -d postgres
+TOM_V3_DATABASE_URL=postgresql+psycopg://tom_v3:tom_v3@localhost:5432/tom_v3 .venv/bin/alembic upgrade head
+```
+
+## Health
+
+- `GET /health`
+
+Returns:
+
+```json
+{"status": "ok"}
+```
+
+## Media
+
+- `POST /media`
+- `GET /media/{media_id}`
+
+`POST /media` registers metadata only in v0. It does not upload files or run ffprobe.
+
+## Models and Runtime Configs
+
+- `POST /models`
+- `GET /models/{model_id}`
+- `POST /runtime-configs`
+- `GET /runtime-configs/{runtime_config_id}`
+
+Synthetic/dev models are valid model registry entries.
+
+## Runs and Steps
+
+- `POST /media/{media_id}/runs`
+- `GET /runs/{run_id}`
+- `POST /runs/{run_id}/steps`
+- `GET /runs/{run_id}/steps`
+
+Run and step status values:
+
+- queued
+- running
+- completed
+- failed
+- partial
+
+## Observations
+
+- `POST /observations`
+- `POST /observations/batch`
+- `POST /observations/query`
+- `GET /observations/{observation_id}`
+- `GET /observations/{observation_id}/lineage`
+- `GET /observations/{observation_id}/artifacts`
+- `GET /observations/{observation_id}/annotations`
+
+All observation writes go through the central observation writer.
+
+Supported typed extensions:
+
+- `gameplay`
+- `atomic`
+- `derived`
+
+Minimum query filters:
+
+- `media_id`
+- `run_id`
+- `observation_family`
+- `observation_type`
+- `frame_start_gte`
+- `frame_end_lte`
+- `timestamp_start_gte`
+- `timestamp_end_lte`
+- `confidence_gte`
+- `confidence_lte`
+- `gameplay_label`
+- `tracklet_id`
+
+## Artifacts
+
+- `POST /artifacts`
+- `GET /artifacts/{artifact_id}`
+
+Artifacts are metadata records in v0. They may point to placeholder URIs.
+
+## Annotations
+
+- `POST /annotations`
+- `GET /observations/{observation_id}/annotations`
+
+Annotations do not mutate observations.
+
+## Dev Synthetic Path
+
+- `POST /dev/synthetic-run`
+
+This dev-only endpoint creates:
+
+- media asset
+- runtime config
+- synthetic model registry entry
+- processing run
+- processing step
+- gameplay observation
+- non-gameplay observation
+- atomic ball observation
+- atomic player observation
+- tracklet and track points
+- derived bounce_candidate placeholder
+- lineage links
+- evidence artifact placeholder
+
+This endpoint proves backend persistence only. It is not the Milestone 0C worker seeder.

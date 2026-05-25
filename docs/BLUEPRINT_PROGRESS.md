@@ -2,7 +2,7 @@
 
 ## Current Progress Gauge
 
-Current: ~20-25%
+Current: ~40-45%
 
 ## Current
 
@@ -13,6 +13,12 @@ Current: ~20-25%
 - Gameplay/non-gameplay layer is first-class.
 - Visual evidence viewer is first-class.
 - GitHub-as-memory workflow is selected.
+- Backend app exists.
+- Initial database migrations exist.
+- Core schema models exist.
+- Observation writer exists.
+- Media, run, model, runtime config, observation, artifact, and annotation APIs exist.
+- Synthetic/dev insertion path exists.
 
 ## After Milestone 0A
 
@@ -28,3 +34,22 @@ Expected: ~30%
 Status: complete.
 
 The repo now has durable project memory, architecture docs, schema contracts, milestone docs, a handoff file, an agent report, and lightweight tracked skeleton directories for future implementation work.
+
+## After Milestone 0B
+
+Expected: ~40-45%
+
+- Backend app exists.
+- Initial database migrations exist.
+- Core schema models exist.
+- Observation writer exists.
+- Media and run APIs exist.
+- Observation query/detail APIs exist.
+- Synthetic/dev insertion path exists.
+- Docs and implementation log are updated.
+
+## Milestone 0B Status
+
+Status: complete.
+
+The repo now has a tested backend/API foundation for media, runs, models, runtime configs, observations, lineage, artifacts, annotations, and dev synthetic persistence.
