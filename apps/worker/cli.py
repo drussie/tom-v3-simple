@@ -1,0 +1,81 @@
+import argparse
+import json
+from collections.abc import Callable
+
+from sqlalchemy import create_engine
+from sqlalchemy.orm import Session, sessionmaker
+from tom_v3_observations.synthetic import BASELINE_SCENARIO_NAME, verify_synthetic_run
+from tom_v3_storage.db_models import Base
+
+from apps.worker.config import settings
+from apps.worker.pipelines.synthetic_seed import seed_synthetic_run
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(prog="tom-v3-worker")
+    subcommands = parser.add_subparsers(dest="command", required=True)
+
+    seed_parser = subcommands.add_parser(
+        "seed-synthetic-run",
+        help="Seed a rich synthetic run for viewer/API development.",
+    )
+    seed_parser.add_argument("--scenario", default=BASELINE_SCENARIO_NAME)
+    seed_parser.add_argument(
+        "--source-uri",
+        default="file:///dev/synthetic-tennis-clip.mp4",
+    )
+    seed_parser.add_argument("--run-name", default="synthetic-baseline-run")
+    seed_parser.add_argument(
+        "--reuse-media",
+        action="store_true",
+        help="Reuse an existing media asset with the same source URI and checksum.",
+    )
+    seed_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+        help="Do not create tables before seeding.",
+    )
+    seed_parser.set_defaults(handler=_handle_seed)
+
+    verify_parser = subcommands.add_parser(
+        "verify-synthetic-run",
+        help="Verify that a seeded run has viewer-ready synthetic evidence.",
+    )
+    verify_parser.add_argument("--run-id", required=True)
+    verify_parser.add_argument("--skip-create-db", action="store_true")
+    verify_parser.set_defaults(handler=_handle_verify)
+
+    args = parser.parse_args()
+    with _session_factory(create_db=not args.skip_create_db)() as session:
+        result = args.handler(session, args)
+    print(json.dumps(result, indent=2, sort_keys=True))
+    if result.get("ok") is False:
+        raise SystemExit(1)
+
+
+def _session_factory(create_db: bool) -> Callable[[], Session]:
+    connect_args = {}
+    if settings.database_url.startswith("sqlite"):
+        connect_args["check_same_thread"] = False
+    engine = create_engine(settings.database_url, connect_args=connect_args, future=True)
+    if create_db:
+        Base.metadata.create_all(engine)
+    return sessionmaker(bind=engine, autoflush=False, expire_on_commit=False, future=True)
+
+
+def _handle_seed(session: Session, args: argparse.Namespace) -> dict[str, object]:
+    return seed_synthetic_run(
+        session=session,
+        scenario_name=args.scenario,
+        source_uri=args.source_uri,
+        run_name=args.run_name,
+        reuse_media=args.reuse_media,
+    )
+
+
+def _handle_verify(session: Session, args: argparse.Namespace) -> dict[str, object]:
+    return verify_synthetic_run(session, args.run_id)
+
+
+if __name__ == "__main__":
+    main()

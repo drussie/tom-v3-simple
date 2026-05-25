@@ -375,8 +375,17 @@ def test_dev_synthetic_run_and_tracklet_query(client: TestClient) -> None:
     synthetic = client.post("/dev/synthetic-run")
     assert synthetic.status_code == 200
     body = synthetic.json()
-    assert len(body["observation_ids"]) == 5
-    assert body["artifact_count"] == 1
+    assert body["scenario"] == "baseline-tennis-clip"
+    assert body["seed_version"] == "0C"
+    assert body["verification"]["ok"] is True
+    assert len(body["observation_ids_by_type"]["view_state"]) == 4
+    assert len(body["observation_ids_by_type"]["ball_detection"]) >= 7
+    assert len(body["observation_ids_by_type"]["player_detection"]) >= 8
+    assert len(body["observation_ids_by_type"]["homography_placeholder"]) == 3
+    assert len(body["observation_ids_by_type"]["bounce_candidate"]) == 1
+    assert len(body["observation_ids_by_type"]["tracking_gap_candidate"]) == 1
+    assert body["artifact_count"] >= 6
+    assert body["track_point_count"] >= 15
 
     tracklet_query = client.post(
         "/observations/query",
@@ -384,3 +393,23 @@ def test_dev_synthetic_run_and_tracklet_query(client: TestClient) -> None:
     )
     assert tracklet_query.status_code == 200
     assert tracklet_query.json()["count"] >= 1
+
+    uncertain_query = client.post(
+        "/observations/query",
+        json={"run_id": body["run_id"], "gameplay_label": "uncertain"},
+    )
+    assert uncertain_query.status_code == 200
+    assert uncertain_query.json()["count"] == 1
+
+    candidate_id = body["candidate_observation_ids"]["bounce_candidate"]
+    detail = client.get(f"/observations/{candidate_id}")
+    assert detail.status_code == 200
+    assert detail.json()["derived"]["derived_kind"] == "bounce_candidate"
+
+    lineage = client.get(f"/observations/{candidate_id}/lineage")
+    assert lineage.status_code == 200
+    assert len(lineage.json()["parents"]) >= 4
+
+    artifacts = client.get(f"/observations/{candidate_id}/artifacts")
+    assert artifacts.status_code == 200
+    assert len(artifacts.json()) >= 3

@@ -20,13 +20,15 @@ The core invariant:
 
 ## Current Milestone
 
-Current phase: Milestone 0B - Backend / API Foundation.
+Current phase: Milestone 0C - Worker + Rich Synthetic Observation Seeder.
 
 Milestone 0A created the repo-backed memory, architecture documentation, schema direction, and handoff structure future agents should follow.
 
 Milestone 0B adds the first FastAPI backend, SQLAlchemy storage models, Alembic migration, schema contracts, observation writer, query API, and synthetic/dev insertion path.
 
-No real model pipeline, YOLO integration, TOM v1 integration, bounce detection, or frontend evidence viewer is implemented yet.
+Milestone 0C adds the first worker CLI and a rich synthetic observation seeding flow that feeds the future visual evidence viewer without real model integration.
+
+No real model pipeline, YOLO integration, TOM v1 integration, real bounce detection, or frontend evidence viewer is implemented yet.
 
 ## Docs Entrypoint
 
@@ -37,7 +39,7 @@ Start with [docs/CONTROL_ROOM_INDEX.md](docs/CONTROL_ROOM_INDEX.md).
 ```text
 apps/
   api/       FastAPI backend foundation.
-  worker/    Placeholder for future processing and seeding workers.
+  worker/    Worker CLI and rich synthetic seeding entrypoint.
   web/       Placeholder for the future visual evidence viewer.
 packages/
   schema/          Shared schema contracts.

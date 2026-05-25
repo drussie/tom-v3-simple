@@ -25,21 +25,29 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 0 - Observation Store + Visual Foundation](milestones/milestone_0_observation_store_visual_foundation.md)
 - [Milestone 0A - Repo Memory + Architecture / Schema Foundation](milestones/milestone_0a_repo_memory_architecture_schema.md)
 - [Milestone 0B - Backend / API Foundation](milestones/milestone_0b_backend_api_foundation.md)
+- [Milestone 0C - Worker + Synthetic Observation Seeder](milestones/milestone_0c_worker_synthetic_observation_seeder.md)
 
 ## Handoffs
 
 - [Milestone 0A Handoff](handoffs/milestone_0a_repo_memory_architecture_schema_handoff.md)
 - [Milestone 0B Handoff](handoffs/milestone_0b_backend_api_foundation_handoff.md)
+- [Milestone 0C Handoff](handoffs/milestone_0c_worker_synthetic_observation_seeder_handoff.md)
 
 ## Agent Reports
 
 - [Milestone 0A Agent Report](agent_reports/milestone_0a_repo_memory_architecture_schema_report.md)
 - [Milestone 0B Agent Report](agent_reports/milestone_0b_backend_api_foundation_report.md)
+- [Milestone 0C Agent Report](agent_reports/milestone_0c_worker_synthetic_observation_seeder_report.md)
 
 ## API and Schema
 
 - [Backend API v0](api/backend_api_v0.md)
 - [Database Schema v0](schema/database_schema_v0.md)
+
+## Worker
+
+- [Synthetic Seeder v0](worker/synthetic_seeder_v0.md)
+- [Baseline Synthetic Scenario v0](worker/synthetic_scenario_baseline_v0.md)
 
 ## Core Vocabulary
 

@@ -57,3 +57,39 @@ Milestone 0B created:
 - Central observation writer used by single and batch observation endpoints.
 - Query endpoint with media, run, type, frame, timestamp, confidence, gameplay label, and tracklet filters.
 - Tests covering core persistence and API behavior.
+
+## Milestone 0C - Worker + Rich Synthetic Observation Seeder
+
+Status: complete
+
+### Goal
+
+Create a worker-side synthetic pipeline that produces enough persisted evidence for the future visual evidence viewer.
+
+### Non-goals
+
+- No YOLO integration.
+- No TOM v1 integration.
+- No real video decoding.
+- No real ffprobe media indexing.
+- No real homography calculation.
+- No real bounce detection.
+- No real player tracking.
+- No frontend evidence viewer.
+- No adjudication.
+- No truth/fact/promotion/refusal concepts.
+
+### Notes
+
+Milestone 0C created:
+
+- Worker CLI commands `seed-synthetic-run` and `verify-synthetic-run`.
+- Baseline synthetic tennis scenario.
+- Shared rich seeding code reused by the worker and API dev route.
+- Viewer-ready gameplay, non-gameplay, and uncertain view-state bands.
+- Ball, near-player, and far-player tracklets with track points and coverage gaps.
+- Homography placeholder observations, including a missing interval.
+- Derived bounce, tracking-gap, and hit candidates.
+- Lineage links from candidates to supporting observations.
+- Placeholder evidence artifact metadata.
+- Tests covering worker seeding and queryability.

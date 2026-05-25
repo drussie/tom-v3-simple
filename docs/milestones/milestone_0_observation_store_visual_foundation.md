@@ -38,6 +38,8 @@ Status: complete.
 
 Create a worker path that seeds synthetic media/runs/observations/artifacts to exercise the store without real model integration.
 
+Status: complete.
+
 ### 0D: Visual Evidence Viewer
 
 Create the first web viewer that can query synthetic observations and display timeline bands, tracks, gaps, details, artifacts, and lineage.

@@ -2,7 +2,7 @@
 
 ## Current Progress Gauge
 
-Current: ~40-45%
+Current: ~50-55%
 
 ## Current
 
@@ -46,6 +46,11 @@ Expected: ~40-45%
 - Media and run APIs exist.
 - Observation query/detail APIs exist.
 - Synthetic/dev insertion path exists.
+- Worker CLI exists.
+- Rich synthetic run generation exists outside the API route.
+- Synthetic evidence is visual-viewer-ready.
+- Track coverage and missingness are represented.
+- Candidate observations have lineage and artifacts.
 - Docs and implementation log are updated.
 
 ## Milestone 0B Status
@@ -53,3 +58,22 @@ Expected: ~40-45%
 Status: complete.
 
 The repo now has a tested backend/API foundation for media, runs, models, runtime configs, observations, lineage, artifacts, annotations, and dev synthetic persistence.
+
+## After Milestone 0C
+
+Expected: ~50-55%
+
+- Worker package has executable entrypoints.
+- Rich synthetic run generation exists outside the API route.
+- Synthetic evidence is visual-viewer-ready.
+- Track coverage and missingness are represented.
+- Gameplay/non-gameplay/uncertain bands are persisted.
+- Candidate observations have lineage and artifacts.
+- API dev route reuses shared seeding code.
+- Tests validate the worker/seeder path.
+
+## Milestone 0C Status
+
+Status: complete.
+
+The repo now has a worker CLI and shared synthetic seeder that creates viewer-ready baseline observations for Milestone 0D.

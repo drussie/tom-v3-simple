@@ -113,20 +113,20 @@ Annotations do not mutate observations.
 
 - `POST /dev/synthetic-run`
 
-This dev-only endpoint creates:
+This dev-only endpoint reuses the shared worker/seeding library and creates:
 
 - media asset
 - runtime config
 - synthetic model registry entry
 - processing run
-- processing step
-- gameplay observation
-- non-gameplay observation
-- atomic ball observation
-- atomic player observation
-- tracklet and track points
-- derived bounce_candidate placeholder
+- processing steps
+- gameplay, non_gameplay, and uncertain observations
+- atomic ball observations
+- atomic near-player and far-player observations
+- tracklets and track points
+- homography placeholder observations
+- derived bounce_candidate, hit_candidate, and tracking_gap_candidate placeholders
 - lineage links
-- evidence artifact placeholder
+- evidence artifact placeholders
 
-This endpoint proves backend persistence only. It is not the Milestone 0C worker seeder.
+This endpoint proves backend persistence and uses the same shared synthetic seed function as the worker CLI. It is still dev-only.

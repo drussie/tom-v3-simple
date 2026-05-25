@@ -4,8 +4,8 @@
 
 - Project name: TOM v3 Simple
 - Repo: drussie/tom-v3-simple
-- Current phase: Milestone 0B
-- Current goal: backend/API foundation
+- Current phase: Milestone 0C
+- Current goal: worker + rich synthetic observation seeder
 
 ## Mission
 
@@ -13,7 +13,7 @@ A lightweight tennis video observation platform that accepts model output as ope
 
 ## Implementation Status
 
-- Implementation status: backend/API foundation exists; no real pipeline yet
+- Implementation status: backend/API and worker-side synthetic pipeline foundation exist; no real ML pipeline yet
 - Model integration status: none
 - TOM v1 gameplay detector: known asset, not integrated yet
 - YOLO/YOLO26: not integrated yet
@@ -21,7 +21,8 @@ A lightweight tennis video observation platform that accepts model output as ope
 - API: FastAPI backend foundation implemented
 - Observation writer: implemented with typed extension rows, lineage, artifacts, and idempotency
 - Frontend: not implemented yet
-- Worker: not implemented yet; dev-only synthetic insertion path exists in API
+- Worker: CLI entrypoint and rich synthetic seeding path implemented
+- Synthetic data: baseline scenario creates viewer-ready observations, tracklets, gaps, candidates, lineage, and artifacts
 
 ## Milestone 0A Result
 
@@ -35,6 +36,12 @@ Status: complete
 
 Milestone 0B establishes the FastAPI backend foundation, database models, initial Alembic migration, Pydantic schema contracts, central observation writer, query/detail/lineage/artifact/annotation APIs, dev-only synthetic persistence path, and backend tests.
 
+## Milestone 0C Result
+
+Status: complete
+
+Milestone 0C establishes the worker CLI, reusable rich synthetic seeding pipeline, baseline tennis scenario, explicit missingness/coverage metadata, homography placeholders, derived candidates, lineage, artifact metadata, verification helper, and worker tests.
+
 ## Next Milestone
 
-Recommended next handoff: Milestone 0C - Worker + Synthetic Observation Seeder.
+Recommended next handoff: Milestone 0D - Visual Evidence Viewer Foundation.
