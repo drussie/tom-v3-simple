@@ -2,7 +2,7 @@
 
 ## Current Progress Gauge
 
-Current: ~75% through Blueprint 2
+Current: ~90% through Blueprint 2
 
 ## Current
 
@@ -63,6 +63,10 @@ Current: ~75% through Blueprint 2
 - Candidate tracklets are searchable by run, source run, family, subject, frame range, confidence, gaps, point count, and review annotations.
 - Tracklet evidence bundles include annotation summaries.
 - Viewer review controls can add annotations to tracklet, track point, and source detection observations.
+- Tracklet review dataset export service exists.
+- Candidate tracklet evidence can be exported by tracklet ids or by structured query filters.
+- Export artifacts are persisted as local JSON files with `evidence_artifact` metadata and checksums.
+- Query-based exports can persist `query_result` memory.
 
 ## After Milestone 0A
 
@@ -309,3 +313,19 @@ Expected: ~75% through Blueprint 2
 Status: complete.
 
 The repo now has structured tracklet candidate query, evidence-bundle annotation summaries, and a viewer review flow that writes human annotations without mutating source observations, candidate track points, candidate tracklets, lineage, or artifacts.
+
+## After Milestone 2D
+
+Expected: ~90% through Blueprint 2
+
+- Tracklet evidence bundles can be exported into durable review dataset artifacts.
+- Reviewed candidate evidence can be packaged for future evaluation or training workflows.
+- Export rows preserve media, run, model, config, lineage, artifact, and annotation provenance.
+- Export artifacts carry explicit candidate-only and no-adjudication warnings.
+- Export does not mutate source observations.
+
+## Milestone 2D Status
+
+Status: complete.
+
+The repo now has a JSON review dataset export path for candidate tracklet evidence, available through both worker CLI and API, with persisted export artifact metadata and optional query result memory for query-based exports.

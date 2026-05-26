@@ -380,3 +380,48 @@ Expected behavior:
 - saving a review annotation refreshes the evidence bundle
 
 Review annotations are additional evidence. They do not mutate candidate observations or source detections.
+
+## 17. Export Tracklet Review Dataset
+
+Milestone 2D adds a portable JSON export for candidate tracklet review evidence.
+
+Export by query:
+
+```bash
+python -m apps.worker.cli export-tracklet-review-dataset \
+  --query-json '{"has_annotation":true}' \
+  --output-root .data/exports \
+  --format json
+```
+
+Export one selected tracklet:
+
+```bash
+python -m apps.worker.cli export-tracklet-review-dataset \
+  --tracklet-id <TRACKLET_ID> \
+  --output-root .data/exports
+```
+
+The command prints:
+
+- `export_id`
+- `artifact_id`
+- export file path and URI
+- checksum
+- selected tracklet ids
+- optional `query_result_id`
+- candidate-only warning fields
+
+The JSON file is written under:
+
+```text
+.data/exports/tracklets/{export_id}/tracklet_review_dataset.json
+```
+
+Expected behavior:
+
+- export JSON exists
+- `tracklet_review_dataset_export` evidence artifact row exists
+- query exports create a `query_result` row
+- export includes tracklet evidence bundles, lineage, frame artifact metadata, and annotations when requested
+- export warnings state that candidate evidence and annotations are not adjudicated labels

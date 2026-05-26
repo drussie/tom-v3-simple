@@ -4,8 +4,8 @@
 
 - Project name: TOM v3 Simple
 - Repo: drussie/tom-v3-simple
-- Current phase: Milestone 2C
-- Current goal: tracklet query and review
+- Current phase: Milestone 2D
+- Current goal: tracklet evidence export / review dataset foundation
 
 ## Mission
 
@@ -25,6 +25,7 @@ A lightweight tennis video observation platform that accepts model output as ope
 - Tracklet builder: implemented with deterministic candidate grouping, first-class track observations, track point observations, and lineage from persisted detections
 - Tracklet evidence bundle: implemented as a dynamic API/viewer path for cross-run tracklet evidence inspection
 - Tracklet query/review: implemented with structured query filters, annotation summaries, and viewer review controls
+- Tracklet review dataset export: implemented with JSON export artifacts, evidence artifact metadata, optional query result memory, API endpoint, and worker CLI
 - Observation writer: implemented with typed extension rows, lineage, artifacts, and idempotency
 - Worker synthetic seeder: implemented
 - Visual evidence viewer: implemented in `apps/web` with detection bbox overlay and frame artifact image support
@@ -116,6 +117,12 @@ Status: complete
 
 Milestone 2C adds structured `POST /tracklets/query`, review annotation summaries in evidence bundles, and viewer controls for adding review annotations to tracklet candidate observations, track point candidate observations, and source detection observations without mutating the underlying evidence.
 
+## Milestone 2D Result
+
+Status: complete
+
+Milestone 2D adds `POST /tracklets/export-review-dataset`, worker `export-tracklet-review-dataset`, JSON review dataset artifacts under `.data/exports`, persisted `tracklet_review_dataset_export` artifact metadata, optional query result rows for query-based exports, and docs/tests for packaging candidate tracklet evidence without mutating observations.
+
 ## Next Milestone
 
-Recommended next handoff: Milestone 2D - Tracklet Evidence Export / Review Dataset Foundation, unless YOLO26 runtime/assets become available and real detector integration is prioritized.
+Recommended next handoff: Milestone 2E - Blueprint 2 Completion Review / Temporal Evidence Hardening, unless YOLO26 runtime/assets become available and real detector integration is prioritized.

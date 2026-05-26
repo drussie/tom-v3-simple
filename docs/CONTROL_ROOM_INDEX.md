@@ -36,6 +36,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 1F / 2A - Tracklet Foundation From Persisted Detections](milestones/milestone_1f_tracklet_foundation_from_persisted_detections.md)
 - [Milestone 2B - Tracklet Viewer / Multi-Run Evidence Bundle](milestones/milestone_2b_tracklet_viewer_multirun_evidence_bundle.md)
 - [Milestone 2C - Tracklet Query and Review](milestones/milestone_2c_tracklet_query_and_review.md)
+- [Milestone 2D - Tracklet Evidence Export / Review Dataset Foundation](milestones/milestone_2d_tracklet_evidence_export_review_dataset.md)
 
 ## Handoffs
 
@@ -52,6 +53,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 1F Handoff](handoffs/milestone_1f_tracklet_foundation_from_persisted_detections_handoff.md)
 - [Milestone 2B Handoff](handoffs/milestone_2b_tracklet_viewer_multirun_evidence_bundle_handoff.md)
 - [Milestone 2C Handoff](handoffs/milestone_2c_tracklet_query_and_review_handoff.md)
+- [Milestone 2D Handoff](handoffs/milestone_2d_tracklet_evidence_export_review_dataset_handoff.md)
 
 ## Agent Reports
 
@@ -68,6 +70,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 2A Tracklet Repair Agent Report](agent_reports/milestone_1f_tracklet_foundation_from_persisted_detections_report.md)
 - [Milestone 2B Agent Report](agent_reports/milestone_2b_tracklet_viewer_multirun_evidence_bundle_report.md)
 - [Milestone 2C Agent Report](agent_reports/milestone_2c_tracklet_query_and_review_report.md)
+- [Milestone 2D Agent Report](agent_reports/milestone_2d_tracklet_evidence_export_review_dataset_report.md)
 
 ## Blueprints
 
@@ -109,6 +112,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Tracklet Evidence Bundle v0](tracklets/tracklet_evidence_bundle_v0.md)
 - [Tracklet Query v0](tracklets/tracklet_query_v0.md)
 - [Tracklet Review Annotations v0](tracklets/tracklet_review_annotations_v0.md)
+- [Tracklet Review Dataset Export v0](tracklets/tracklet_review_dataset_export_v0.md)
 
 ## Development
 

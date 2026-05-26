@@ -5,8 +5,11 @@ from collections.abc import Callable
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 from tom_v3_observations.synthetic import BASELINE_SCENARIO_NAME, verify_synthetic_run
+from tom_v3_schema.exports import TrackletReviewDatasetExportRequest
+from tom_v3_schema.tracklets import TrackletQueryFilters
 from tom_v3_storage.db_models import Base
 
+from apps.api.services.tracklet_review_export import export_tracklet_review_dataset
 from apps.worker.config import settings
 from apps.worker.pipelines.synthetic_seed import seed_synthetic_run
 from apps.worker.services.detection_adapter import run_detection_adapter
@@ -199,6 +202,38 @@ def main() -> None:
     tracklet_parser.add_argument("--skip-create-db", action="store_true")
     tracklet_parser.set_defaults(handler=_handle_build_tracklets)
 
+    export_parser = subcommands.add_parser(
+        "export-tracklet-review-dataset",
+        help="Export candidate tracklet evidence bundles as a review dataset artifact.",
+    )
+    export_parser.add_argument(
+        "--tracklet-id",
+        action="append",
+        dest="tracklet_ids",
+        default=[],
+        help="Tracklet candidate id to export. May be supplied more than once.",
+    )
+    export_parser.add_argument(
+        "--query-json",
+        help="Structured tracklet query JSON. Reuses the tracklet query service.",
+    )
+    export_parser.add_argument("--output-root", default=".data/exports")
+    export_parser.add_argument("--format", default="json", choices=["json"])
+    export_parser.add_argument(
+        "--include-frame-artifacts",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+    )
+    export_parser.add_argument(
+        "--include-annotations",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+    )
+    export_parser.add_argument("--query-name")
+    export_parser.add_argument("--created-by", default="tom-v3-worker")
+    export_parser.add_argument("--skip-create-db", action="store_true")
+    export_parser.set_defaults(handler=_handle_export_tracklet_review_dataset)
+
     args = parser.parse_args()
     with _session_factory(create_db=not args.skip_create_db)() as session:
         result = args.handler(session, args)
@@ -388,6 +423,23 @@ def _handle_build_tracklets(session: Session, args: argparse.Namespace) -> dict[
         include_ball=args.include_ball,
         include_players=args.include_players,
     )
+
+
+def _handle_export_tracklet_review_dataset(
+    session: Session, args: argparse.Namespace
+) -> dict[str, object]:
+    query = TrackletQueryFilters(**json.loads(args.query_json)) if args.query_json else None
+    request = TrackletReviewDatasetExportRequest(
+        tracklet_ids=args.tracklet_ids,
+        query=query,
+        include_frame_artifacts=args.include_frame_artifacts,
+        include_annotations=args.include_annotations,
+        format=args.format,
+        output_root=args.output_root,
+        query_name=args.query_name,
+        created_by=args.created_by,
+    )
+    return export_tracklet_review_dataset(session, request).model_dump()
 
 
 if __name__ == "__main__":

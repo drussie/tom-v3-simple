@@ -170,6 +170,7 @@ The endpoint is a read model over stored evidence. It does not create observatio
 ## Tracklet Evidence
 
 - `POST /tracklets/query`
+- `POST /tracklets/export-review-dataset`
 - `GET /tracklets/{tracklet_id}/evidence-bundle`
 
 `POST /tracklets/query` returns structured candidate tracklet search results. Filters include media id, tracklet run id, source detection run id, track family, subject ref, frame/timestamp ranges, confidence, track point count, gap count, and review annotation labels.
@@ -192,3 +193,22 @@ Example:
 The endpoint is read-only and does not persist a saved bundle in v0.
 
 Tracklet review annotations use the existing `POST /annotations` endpoint. They target tracklet candidate, track point candidate, or source detection observation ids and are returned in evidence bundle annotation summaries.
+
+`POST /tracklets/export-review-dataset` writes selected tracklet evidence bundles to a local JSON export artifact. Selection may use explicit `tracklet_ids` or a structured `query` object that reuses `POST /tracklets/query` filtering.
+
+Example:
+
+```json
+{
+  "query": {
+    "track_family": "ball",
+    "has_annotation": true
+  },
+  "include_frame_artifacts": true,
+  "include_annotations": true,
+  "format": "json",
+  "output_root": ".data/exports"
+}
+```
+
+The response includes `export_id`, `artifact_id`, file URI/path, checksum, selected tracklet ids, optional `query_result_id`, and warning fields. The endpoint persists a `tracklet_review_dataset_export` evidence artifact and does not mutate observations or save the full export payload in Postgres.

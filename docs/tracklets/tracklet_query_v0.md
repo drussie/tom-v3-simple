@@ -73,3 +73,15 @@ The response includes:
 ## Rule
 
 Tracklet query returns candidate evidence for review. It does not rank correctness or adjudicate track quality.
+
+## Export Reuse
+
+Milestone 2D uses the same structured filters for review dataset exports.
+
+```bash
+python -m apps.worker.cli export-tracklet-review-dataset \
+  --query-json '{"track_family":"ball","has_annotation":true}' \
+  --output-root .data/exports
+```
+
+The export service calls the query service instead of duplicating filter logic.

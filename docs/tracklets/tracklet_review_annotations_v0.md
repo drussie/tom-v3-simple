@@ -58,3 +58,9 @@ Recommended payload:
 ## Immutability
 
 Annotations do not mutate source detections, track point candidates, tracklet candidates, lineage, or frame artifacts. They are additional review evidence.
+
+## Export Behavior
+
+Milestone 2D review dataset exports include annotations by default.
+
+Exported annotations remain review evidence. They are not converted into adjudicated labels, and the export carries explicit candidate-only and no-adjudication warnings.

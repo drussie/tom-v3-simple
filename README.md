@@ -14,7 +14,7 @@ The core invariant:
 
 ## Current Status
 
-Milestone 2C adds tracklet query and review on top of persisted ball/player detections and candidate tracklets:
+Milestone 2D adds tracklet evidence export / review dataset artifacts on top of persisted ball/player detections and candidate tracklets:
 
 - repo memory and architecture contracts
 - FastAPI backend/API foundation
@@ -51,6 +51,7 @@ Milestone 2C adds tracklet query and review on top of persisted ball/player dete
 - structured tracklet query API
 - annotation summaries for tracklet evidence bundles
 - viewer review controls for annotating tracklet candidates, track point candidates, and source detections
+- review dataset export service, API, and worker CLI for packaging candidate tracklet evidence as JSON artifacts
 
 Portable TOM v1 detector assets/source and YOLO26 runtime/assets are not present in this repo state. No sophisticated tracking, pose processing, court homography, or real bounce detection is implemented yet.
 
@@ -239,6 +240,24 @@ curl -X POST http://127.0.0.1:8000/tracklets/query \
 ```
 
 The viewer Tracklet Evidence panel can add review annotations to the selected tracklet candidate, track point candidate, or source detection observation. These annotations are persisted as `human_annotation` rows and do not mutate the underlying evidence.
+
+Export candidate tracklet review evidence:
+
+```bash
+python -m apps.worker.cli export-tracklet-review-dataset \
+  --query-json '{"track_family":"ball","has_annotation":true}' \
+  --output-root .data/exports
+```
+
+Or export explicit tracklets:
+
+```bash
+python -m apps.worker.cli export-tracklet-review-dataset \
+  --tracklet-id <TRACKLET_ID> \
+  --output-root .data/exports
+```
+
+The export writes `.data/exports/tracklets/{export_id}/tracklet_review_dataset.json`, persists a `tracklet_review_dataset_export` evidence artifact with checksum, and includes candidate-only and no-adjudication warnings. Exports package evidence; they do not create adjudicated labels.
 
 ## Validation
 

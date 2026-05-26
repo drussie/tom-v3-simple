@@ -73,6 +73,10 @@ Milestone 2C adds annotation summaries to the bundle. Review annotations may tar
 
 The bundle returns both the flat annotation list and per-target summaries so the viewer can show review state without mutating any evidence rows.
 
+## Export Use
+
+Milestone 2D review dataset exports package these dynamic bundles into local JSON artifacts. The export path may include or omit frame artifact metadata and annotations, but it does not persist a new saved bundle table.
+
 ## Non-Goals
 
 - No new grouping algorithm.

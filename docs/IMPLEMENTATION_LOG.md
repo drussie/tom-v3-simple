@@ -492,3 +492,40 @@ Milestone 2C created:
 - Viewer review controls in the Tracklet Evidence panel.
 - Same-origin web proxy for creating annotations from the viewer.
 - Tests covering query filters, endpoint shape, annotations, and evidence bundle refresh behavior.
+
+## Milestone 2D - Tracklet Evidence Export / Review Dataset Foundation
+
+Status: complete
+
+### Goal
+
+Package selected candidate tracklet evidence into durable local export artifacts without mutating observations or treating review annotations as adjudicated labels.
+
+### Non-goals
+
+- No model training.
+- No data labeling platform.
+- No reviewer identity/auth system.
+- No pose detection.
+- No court homography.
+- No bounce detection.
+- No hit detection.
+- No rally segmentation.
+- No point reconstruction.
+- No scoring.
+- No real YOLO runtime integration.
+- No adjudication.
+
+### Notes
+
+Milestone 2D created:
+
+- Tracklet review dataset export request/response schemas.
+- Export service that accepts explicit tracklet ids or structured tracklet query filters.
+- Reuse of the Milestone 2C tracklet query service for query-based exports.
+- JSON export files under `.data/exports/tracklets/{export_id}/`.
+- Persisted `tracklet_review_dataset_export` evidence artifact rows with checksums.
+- Optional `query_result` rows for query-based exports.
+- API endpoint `POST /tracklets/export-review-dataset`.
+- Worker command `export-tracklet-review-dataset`.
+- Tests covering direct exports, query exports, warning fields, artifact metadata, annotation/frame-artifact inclusion controls, API, and worker handler behavior.
