@@ -4,8 +4,8 @@
 
 - Project name: TOM v3 Simple
 - Repo: drussie/tom-v3-simple
-- Current phase: Milestone 2E
-- Current goal: Blueprint 2 completion review / temporal evidence hardening
+- Current phase: Milestone 3A
+- Current goal: YOLO runtime environment / runtime probe foundation
 
 ## Mission
 
@@ -16,7 +16,7 @@ A lightweight tennis video observation platform that accepts model output as ope
 - Implementation status: persisted ball/player observations can be inspected visually and grouped into candidate tracklets
 - Model integration status: fixture gameplay and fixture detection adapters implemented for deterministic dev/test output
 - TOM v1 gameplay detector: known asset, portable source/assets not available in this repo/environment; integration stub documented
-- YOLO/YOLO26: runtime/assets not available in this repo/environment; unavailable stub documented
+- YOLO/YOLO26: optional runtime probe implemented; runtime/assets are not required in the base environment and real detection persistence is not integrated yet
 - Database: initial SQLAlchemy models and Alembic migration implemented
 - API: FastAPI backend foundation implemented
 - Media indexing: implemented for local files via ffprobe, sha256 checksum, local storage copy/register mode, and frame/time summary
@@ -27,6 +27,7 @@ A lightweight tennis video observation platform that accepts model output as ope
 - Tracklet query/review: implemented with structured query filters, annotation summaries, and viewer review controls
 - Tracklet review dataset export: implemented with JSON export artifacts, evidence artifact metadata, optional query result memory, API endpoint, and worker CLI
 - Blueprint 2 status: complete; temporal evidence can be built, inspected, queried, reviewed, and exported as candidate evidence
+- Blueprint 3 status: started; optional YOLO runtime environment boundary, dependency probe, and device resolver are implemented
 - Observation writer: implemented with typed extension rows, lineage, artifacts, and idempotency
 - Worker synthetic seeder: implemented
 - Visual evidence viewer: implemented in `apps/web` with detection bbox overlay and frame artifact image support
@@ -130,10 +131,16 @@ Status: complete
 
 Milestone 2E closes Blueprint 2 with a completion review, invariant audit, naming transition documentation, runbook cleanup, and validation pass. Blueprint 2 is now complete: persisted detections can become candidate tracklets with source lineage, multi-run evidence bundles, structured query, review annotations, and review dataset exports.
 
+## Milestone 3A Result
+
+Status: complete
+
+Milestone 3A starts Blueprint 3 with an optional YOLO runtime environment path. The base `tom_v3` environment stays lightweight; `requirements-yolo.txt`, `probe_yolo_runtime`, `resolve_yolo_device`, clear unavailable diagnostics, worker `yolo-runtime-probe`, model weights ignore rules, tests, and docs prepare for future real YOLO observation adapters without persisting real YOLO detections yet.
+
 ## Naming Transition
 
 The implementation branch/file names may reference "1F" because the milestone was originally planned as a Blueprint 1 extension. After Blueprint 1 was declared complete, the same work was reclassified as Blueprint 2A because temporal grouping begins a new conceptual layer.
 
 ## Next Milestone
 
-Recommended next blueprint: Blueprint 3 - Real Model Runtime / YOLO Observation Adapter, unless the user chooses Blueprint 3 - Pose Observation / Movement Evidence Layer.
+Recommended next milestone: Milestone 3B - YOLO Model Registry and Weights Validation.

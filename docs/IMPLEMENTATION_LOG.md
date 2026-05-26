@@ -562,3 +562,36 @@ Milestone 2E completed:
 - 1F to 2A naming transition documentation.
 - Current state, progress, control room, README, runbook, and tracklet/viewer docs updates.
 - Final validation pass for backend, worker, web, migrations, synthetic smoke, and local Blueprint 2 smoke path.
+
+## Milestone 3A - YOLO Runtime Environment / Runtime Probe Foundation
+
+Status: complete
+
+### Goal
+
+Start Blueprint 3 by adding a safe optional YOLO runtime environment boundary, runtime probe, and device resolver without adding real inference or persistence.
+
+### Non-goals
+
+- No real YOLO detection persistence.
+- No model weights loading.
+- No pose detection.
+- No court homography.
+- No bounce detection.
+- No hit detection.
+- No rally segmentation.
+- No point reconstruction.
+- No scoring.
+- No adjudication.
+
+### Notes
+
+Milestone 3A created:
+
+- `requirements-yolo.txt` for optional Ultralytics/OpenCV runtime dependencies.
+- YOLO runtime import guard, availability diagnostics, and clear unavailable exceptions.
+- Device resolver for `auto`, `cpu`, `mps`, `cuda`, `cuda:0`, and `0`.
+- Worker command `yolo-runtime-probe`.
+- Git ignore rules for model assets and weight formats.
+- Blueprint 3, runtime environment, milestone, handoff, and report docs.
+- Tests using mocked imports/devices so base `tom_v3` stays independent from Ultralytics, Torch, OpenCV, CUDA, and MPS.

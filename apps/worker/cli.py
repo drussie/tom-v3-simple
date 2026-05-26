@@ -4,6 +4,7 @@ from collections.abc import Callable
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
+from tom_v3_model_adapters.yolo_runtime import probe_yolo_runtime
 from tom_v3_observations.synthetic import BASELINE_SCENARIO_NAME, verify_synthetic_run
 from tom_v3_schema.exports import TrackletReviewDatasetExportRequest
 from tom_v3_schema.tracklets import TrackletQueryFilters
@@ -234,6 +235,27 @@ def main() -> None:
     export_parser.add_argument("--skip-create-db", action="store_true")
     export_parser.set_defaults(handler=_handle_export_tracklet_review_dataset)
 
+    yolo_probe_parser = subcommands.add_parser(
+        "yolo-runtime-probe",
+        help="Inspect optional YOLO runtime dependencies and device resolution.",
+    )
+    yolo_probe_parser.add_argument(
+        "--device",
+        default="auto",
+        help="Requested YOLO device: auto, cpu, mps, cuda, cuda:0, or 0.",
+    )
+    yolo_probe_parser.add_argument(
+        "--no-mps",
+        action="store_true",
+        help="Disable MPS when resolving --device auto or explicit mps.",
+    )
+    yolo_probe_parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Reserved for compatibility. Worker output is JSON by default.",
+    )
+    yolo_probe_parser.set_defaults(handler=_handle_yolo_runtime_probe, skip_create_db=True)
+
     args = parser.parse_args()
     with _session_factory(create_db=not args.skip_create_db)() as session:
         result = args.handler(session, args)
@@ -440,6 +462,13 @@ def _handle_export_tracklet_review_dataset(
         created_by=args.created_by,
     )
     return export_tracklet_review_dataset(session, request).model_dump()
+
+
+def _handle_yolo_runtime_probe(session: Session, args: argparse.Namespace) -> dict[str, object]:
+    return probe_yolo_runtime(
+        requested_device=args.device,
+        allow_mps=not args.no_mps,
+    )
 
 
 if __name__ == "__main__":

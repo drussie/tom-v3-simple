@@ -2,7 +2,7 @@
 
 ## Current Progress Gauge
 
-Current: 100% through Blueprint 2
+Current: ~15-20% through Blueprint 3
 
 ## Current
 
@@ -70,6 +70,12 @@ Current: 100% through Blueprint 2
 - Blueprint 2 completion review exists.
 - Temporal evidence invariants are documented and validated.
 - Blueprint 2 is complete.
+- Blueprint 3 has started.
+- Base `tom_v3` does not require Ultralytics, Torch, or OpenCV imports.
+- Optional YOLO dependency path exists in `requirements-yolo.txt`.
+- YOLO runtime probe and device resolver exist.
+- Worker `yolo-runtime-probe` reports optional dependency and device availability.
+- Model weights and runtime assets are ignored by git.
 
 ## After Milestone 0A
 
@@ -349,3 +355,21 @@ Expected: 100% through Blueprint 2
 Status: complete.
 
 Blueprint 2 is complete. TOM v3 can build candidate tracklets from persisted detections, preserve source lineage, inspect evidence across runs, query and review candidates, and export review datasets without adding pose, homography, bounce, hit, rally, point, scoring, or adjudication.
+
+## After Milestone 3A
+
+Expected: ~15-20% through Blueprint 3
+
+- Base `tom_v3` remains lightweight.
+- Optional YOLO dependency install path exists.
+- Runtime probe can report Ultralytics, Torch, OpenCV, CUDA, and MPS availability.
+- Device resolver can choose `cpu`, `mps`, or `cuda:0` safely.
+- Missing runtime dependencies produce clear actionable diagnostics.
+- Documentation explains how to create and validate `tom_v3_yolo`.
+- No real YOLO detections are persisted yet.
+
+## Milestone 3A Status
+
+Status: complete.
+
+The repo now has a clean optional YOLO runtime boundary with `requirements-yolo.txt`, import guards, runtime diagnostics, device resolution, worker probe command, weights ignore policy, tests, and docs. Blueprint 3 is prepared for model registry and weights validation without adding real inference, pose, homography, bounce, hit, rally, point, scoring, or adjudication.

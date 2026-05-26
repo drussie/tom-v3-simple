@@ -14,7 +14,7 @@ The core invariant:
 
 ## Current Status
 
-Blueprint 2 is complete. TOM v3 Simple can build, inspect, query, review, and export candidate temporal evidence on top of persisted ball/player detections:
+Blueprint 2 is complete and Blueprint 3 has started. TOM v3 Simple can build, inspect, query, review, and export candidate temporal evidence on top of persisted ball/player detections, and now has an optional YOLO runtime probe foundation:
 
 - repo memory and architecture contracts
 - FastAPI backend/API foundation
@@ -53,12 +53,15 @@ Blueprint 2 is complete. TOM v3 Simple can build, inspect, query, review, and ex
 - viewer review controls for annotating tracklet candidates, track point candidates, and source detections
 - review dataset export service, API, and worker CLI for packaging candidate tracklet evidence as JSON artifacts
 - Blueprint 2 completion review and invariant audit
+- optional `requirements-yolo.txt` dependency path for a separate `tom_v3_yolo` environment
+- YOLO runtime probe and device resolver for Ultralytics, Torch, OpenCV, CUDA, and MPS diagnostics
+- model asset and weight ignore policy
 
-Portable TOM v1 detector assets/source and YOLO26 runtime/assets are not present in this repo state. No sophisticated tracking, pose processing, court homography, or real bounce detection is implemented yet.
+Portable TOM v1 detector assets/source and YOLO26 model weights are not present in this repo state. Real YOLO inference is not integrated yet. No sophisticated tracking, pose processing, court homography, or real bounce detection is implemented yet.
 
 Blueprint 2 did not add pose, homography, bounce detection, hit detection, rally/point reconstruction, scoring, identity proof, or adjudication.
 
-Recommended next blueprint: Blueprint 3 - Real Model Runtime / YOLO Observation Adapter. An alternative is Blueprint 3 - Pose Observation / Movement Evidence Layer if the next priority is movement evidence. Pose remains outside Blueprint 2.
+Recommended next milestone: Milestone 3B - YOLO Model Registry and Weights Validation. Pose remains outside Blueprint 3 and is reserved for a later blueprint.
 
 ## Repo Structure
 
@@ -264,6 +267,26 @@ python -m apps.worker.cli export-tracklet-review-dataset \
 
 The export writes `.data/exports/tracklets/{export_id}/tracklet_review_dataset.json`, persists a `tracklet_review_dataset_export` evidence artifact with checksum, and includes candidate-only and no-adjudication warnings. Exports package evidence; they do not create adjudicated labels.
 
+Probe the optional YOLO runtime:
+
+```bash
+python -m apps.worker.cli yolo-runtime-probe
+python -m apps.worker.cli yolo-runtime-probe --device cpu
+```
+
+For real YOLO runtime work, keep the base `tom_v3` environment clean and create a separate optional environment:
+
+```bash
+conda create -n tom_v3_yolo python=3.11 -y
+conda activate tom_v3_yolo
+python -m pip install --upgrade pip
+pip install -e ".[dev]"
+pip install -r requirements-yolo.txt
+python -m apps.worker.cli yolo-runtime-probe
+```
+
+Model weights are local assets, not source code. The repo ignores `model_assets/`, `weights/`, `*.pt`, `*.pth`, `*.onnx`, and `*.engine`.
+
 ## Validation
 
 Run the consolidated checks:
@@ -297,6 +320,7 @@ make extract-frame-artifacts RUN_ID=<detection_run_id>
 make build-tracklets DETECTION_RUN_ID=<detection_run_id>
 make seed
 make smoke
+make yolo-runtime-probe
 make all-checks
 ```
 
@@ -312,6 +336,7 @@ Useful runbooks:
 - [Frame Artifacts v0](docs/media/frame_artifacts_v0.md)
 - [Gameplay Adapter v0](docs/model_adapters/gameplay_adapter_v0.md)
 - [Detection Adapter v0](docs/model_adapters/detection_adapter_v0.md)
+- [YOLO Runtime Environment v0](docs/model_adapters/yolo_runtime_environment_v0.md)
 - [Detection Overlay Viewer v0](docs/web/detection_overlay_viewer_v0.md)
 - [Frame Artifact Overlay v0](docs/web/frame_artifact_overlay_v0.md)
 - [Tracklet Foundation v0](docs/tracklets/tracklet_foundation_v0.md)

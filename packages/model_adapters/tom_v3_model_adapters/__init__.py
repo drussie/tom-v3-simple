@@ -24,6 +24,15 @@ from tom_v3_model_adapters.gameplay import (
     TomV1GameplayAdapter,
     get_gameplay_adapter,
 )
+from tom_v3_model_adapters.yolo_runtime import (
+    ResolvedYoloDevice,
+    YoloDeviceUnavailable,
+    YoloRuntimeUnavailable,
+    YoloWeightsUnavailable,
+    probe_yolo_runtime,
+    resolve_yolo_device,
+    try_import_yolo_runtime,
+)
 
 __all__ = [
     "BBox",
@@ -40,10 +49,17 @@ __all__ = [
     "GameplayAdapterResult",
     "GameplaySegmentObservation",
     "Point",
+    "ResolvedYoloDevice",
     "TomV1AdapterUnavailable",
     "TomV1GameplayAdapter",
     "YoloDetectionAdapter",
     "YoloDetectionAdapterUnavailable",
+    "YoloDeviceUnavailable",
+    "YoloRuntimeUnavailable",
+    "YoloWeightsUnavailable",
     "get_detection_adapter",
     "get_gameplay_adapter",
+    "probe_yolo_runtime",
+    "resolve_yolo_device",
+    "try_import_yolo_runtime",
 ]

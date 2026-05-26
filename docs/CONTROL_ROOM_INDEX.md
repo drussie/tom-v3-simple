@@ -38,6 +38,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 2C - Tracklet Query and Review](milestones/milestone_2c_tracklet_query_and_review.md)
 - [Milestone 2D - Tracklet Evidence Export / Review Dataset Foundation](milestones/milestone_2d_tracklet_evidence_export_review_dataset.md)
 - [Milestone 2E - Blueprint 2 Completion Review](milestones/milestone_2e_blueprint_2_completion_review.md)
+- [Milestone 3A - YOLO Runtime Environment / Runtime Probe Foundation](milestones/milestone_3a_yolo_runtime_environment_probe.md)
 
 ## Handoffs
 
@@ -56,6 +57,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 2C Handoff](handoffs/milestone_2c_tracklet_query_and_review_handoff.md)
 - [Milestone 2D Handoff](handoffs/milestone_2d_tracklet_evidence_export_review_dataset_handoff.md)
 - [Milestone 2E Handoff](handoffs/milestone_2e_blueprint_2_completion_review_handoff.md)
+- [Milestone 3A Handoff](handoffs/milestone_3a_yolo_runtime_environment_probe_handoff.md)
 
 ## Agent Reports
 
@@ -74,11 +76,13 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 2C Agent Report](agent_reports/milestone_2c_tracklet_query_and_review_report.md)
 - [Milestone 2D Agent Report](agent_reports/milestone_2d_tracklet_evidence_export_review_dataset_report.md)
 - [Milestone 2E Agent Report](agent_reports/milestone_2e_blueprint_2_completion_review_report.md)
+- [Milestone 3A Agent Report](agent_reports/milestone_3a_yolo_runtime_environment_probe_report.md)
 
 ## Blueprints
 
 - [Blueprint 2 - Temporal Evidence Tracklet Candidate System](blueprints/tom_v3_blueprint_2_temporal_evidence_tracklet_candidate_system.md)
 - [Blueprint 2 Completion Review](blueprints/tom_v3_blueprint_2_completion_review.md)
+- [Blueprint 3 - Real Model Runtime / YOLO Observation Adapter](blueprints/tom_v3_blueprint_3_real_model_runtime_yolo_observation_adapter.md)
 
 ## API and Schema
 
@@ -96,6 +100,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [TOM v1 Gameplay Adapter Assessment](model_adapters/tom_v1_gameplay_adapter_assessment.md)
 - [Detection Adapter v0](model_adapters/detection_adapter_v0.md)
 - [YOLO26 Detection Adapter Assessment](model_adapters/yolo26_detection_adapter_assessment.md)
+- [YOLO Runtime Environment v0](model_adapters/yolo_runtime_environment_v0.md)
 
 ## Worker
 

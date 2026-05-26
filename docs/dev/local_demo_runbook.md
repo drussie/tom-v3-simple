@@ -480,3 +480,44 @@ Expected behavior:
 - export warnings preserve candidate-only and no-adjudication semantics
 
 This flow is fixture/dev evidence unless a future real model adapter is supplied. It does not require real YOLO and does not add pose, homography, bounce, hit, rally, point, scoring, or adjudication.
+
+## 19. Optional YOLO Runtime Probe
+
+Milestone 3A starts Blueprint 3 by adding a runtime probe for a separate optional YOLO environment. The base `tom_v3` environment should continue to run without Ultralytics, Torch, or OpenCV installed.
+
+Probe the current environment:
+
+```bash
+python -m apps.worker.cli yolo-runtime-probe
+```
+
+Expected base behavior:
+
+- the command returns JSON
+- missing optional packages are reported in `missing_packages`
+- `status` is `unavailable` when YOLO runtime packages are absent
+- the command does not import heavy YOLO dependencies at normal app startup
+
+Create the optional YOLO environment only when working on real runtime milestones:
+
+```bash
+conda create -n tom_v3_yolo python=3.11 -y
+conda activate tom_v3_yolo
+python -m pip install --upgrade pip
+pip install -e ".[dev]"
+pip install -r requirements-yolo.txt
+python -m apps.worker.cli yolo-runtime-probe
+```
+
+Torch installation can be platform-specific. If CUDA or MPS support is needed, follow the Torch installation guidance for the target machine before running the probe.
+
+Device examples:
+
+```bash
+python -m apps.worker.cli yolo-runtime-probe --device cpu
+python -m apps.worker.cli yolo-runtime-probe --device mps
+python -m apps.worker.cli yolo-runtime-probe --device cuda:0
+python -m apps.worker.cli yolo-runtime-probe --device auto --no-mps
+```
+
+Milestone 3A does not persist real YOLO detections. It only validates runtime availability, device resolution, and optional dependency boundaries.

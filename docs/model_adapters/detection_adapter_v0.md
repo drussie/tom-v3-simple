@@ -102,6 +102,40 @@ See:
 docs/model_adapters/yolo26_detection_adapter_assessment.md
 ```
 
+## YOLO Runtime Probe
+
+Milestone 3A adds an optional runtime environment probe without enabling real inference.
+
+The base `tom_v3` environment does not require Ultralytics, Torch, or OpenCV. Optional runtime dependencies live in:
+
+```text
+requirements-yolo.txt
+```
+
+Probe the current environment:
+
+```bash
+python -m apps.worker.cli yolo-runtime-probe
+```
+
+The probe reports:
+
+- Ultralytics availability/version
+- Torch availability/version
+- OpenCV availability/version
+- CUDA availability
+- MPS availability
+- requested and resolved device
+- missing optional packages
+
+See:
+
+```text
+docs/model_adapters/yolo_runtime_environment_v0.md
+```
+
+Real YOLO detection persistence remains out of scope until a future Blueprint 3 milestone supplies validated model weights and runtime configuration.
+
 ## Persistence
 
 The worker service creates:

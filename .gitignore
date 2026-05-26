@@ -15,3 +15,9 @@ tom_v3_dev.db
 node_modules/
 .next/
 *.tsbuildinfo
+model_assets/
+weights/
+*.pt
+*.pth
+*.onnx
+*.engine
