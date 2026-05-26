@@ -260,7 +260,7 @@ Expected behavior:
 
 ## 14. Build Candidate Tracklets From Detection Observations
 
-Milestone 1F adds candidate temporal grouping from persisted detection observations.
+Milestone 2A adds candidate temporal grouping from persisted detection observations with first-class tracklet and track point observation rows.
 
 Run:
 
@@ -281,9 +281,10 @@ http://127.0.0.1:3000/runs/<TRACKLET_RUN_ID>
 Expected behavior:
 
 - candidate ball/player tracklet coverage rows are visible
-- track points are present in the viewer payload
-- each track point references a source detection observation id
-- source detections can be queried with `tracklet_id`
+- track point candidate observations are present in the viewer payload
+- each track point stores `source_detection_observation_id` in payload metadata
+- lineage links source detections to track points and track points to tracklets
+- `tracklet_id` queries return tracklet candidate and track point candidate observations
 
 Example query:
 

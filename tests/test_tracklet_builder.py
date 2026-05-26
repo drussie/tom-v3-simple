@@ -8,6 +8,8 @@ from tom_v3_schema.observations import ObservationQueryFilters
 from tom_v3_storage.db_models import (
     Base,
     ModelRegistry,
+    Observation,
+    ObservationLineage,
     ProcessingRun,
     ProcessingStep,
     RuntimeConfig,
@@ -127,9 +129,29 @@ def test_tracklet_builder_groups_fixture_detections_into_candidates(
         tracklet.metadata_jsonb["frame_time_owner"] == "media_indexing"
         for tracklet in tracklets
     )
+    for tracklet in tracklets:
+        assert tracklet.observation_id is not None
+        observation = db_session.get(Observation, tracklet.observation_id)
+        assert observation is not None
+        assert observation.observation_family == "track"
+        assert observation.observation_type in {
+            "ball_tracklet_candidate",
+            "player_tracklet_candidate",
+        }
+        assert observation.observation_type not in {
+            "ball_detection",
+            "player_detection",
+        }
+        assert observation.granularity == "tracklet"
+        assert observation.coordinate_space == "image_pixels"
+        assert observation.payload_jsonb["track_status"] == "candidate"
+        assert observation.payload_jsonb["identity_status"] == "unverified"
+        assert observation.payload_jsonb["frame_time_owner"] == "media_indexing"
+        assert observation.payload_jsonb["source_detection_run_id"] == detection_result["run_id"]
+        assert observation.payload_jsonb["track_point_count"] == len(tracklet.points)
 
 
-def test_track_points_reference_source_detection_observations(
+def test_track_points_have_candidate_observations_and_source_links(
     db_session: Session,
     tmp_path,
 ) -> None:
@@ -148,12 +170,134 @@ def test_track_points_reference_source_detection_observations(
     ).all()
 
     assert len(points) == 9
-    assert all(point.observation_id in detection_result["observation_ids"] for point in points)
-    assert all(point.timestamp_ms == point.observation.timestamp_start_ms for point in points)
-    assert all(point.frame_number == point.observation.frame_start for point in points)
-    assert all(point.payload_jsonb["frame_time_owner"] == "media_indexing" for point in points)
-    assert all(point.payload_jsonb["track_status"] == "candidate" for point in points)
-    assert all("bbox" in point.payload_jsonb for point in points)
+    for point in points:
+        assert point.observation_id is not None
+        assert point.observation_id not in detection_result["observation_ids"]
+        point_observation = db_session.get(Observation, point.observation_id)
+        assert point_observation is not None
+        assert point_observation.observation_family == "track"
+        assert point_observation.observation_type == "track_point_candidate"
+        assert point_observation.observation_type not in {
+            "ball_detection",
+            "player_detection",
+        }
+        assert point_observation.granularity == "frame"
+        assert point_observation.coordinate_space == "image_pixels"
+
+        source_id = point.payload_jsonb["source_detection_observation_id"]
+        assert source_id in detection_result["observation_ids"]
+        assert point_observation.payload_jsonb["source_detection_observation_id"] == source_id
+        source_observation = db_session.get(Observation, source_id)
+        assert source_observation is not None
+        assert source_observation.observation_type in {
+            "ball_detection",
+            "player_detection",
+        }
+        assert point.timestamp_ms == source_observation.timestamp_start_ms
+        assert point.frame_number == source_observation.frame_start
+        assert point_observation.timestamp_start_ms == source_observation.timestamp_start_ms
+        assert point_observation.frame_start == source_observation.frame_start
+        assert point.payload_jsonb["frame_time_owner"] == "media_indexing"
+        assert point.payload_jsonb["track_status"] == "candidate"
+        assert point.payload_jsonb["identity_status"] == "unverified"
+        assert point_observation.payload_jsonb["frame_time_owner"] == "media_indexing"
+        assert point_observation.payload_jsonb["track_status"] == "candidate"
+        assert point_observation.payload_jsonb["identity_status"] == "unverified"
+        assert point_observation.payload_jsonb["is_interpolated"] is False
+        assert "bbox" in point.payload_jsonb
+
+
+def test_tracklet_lineage_links_source_to_points_and_points_to_tracklet(
+    db_session: Session,
+    tmp_path,
+) -> None:
+    detection_result = seed_detection_run(db_session, tmp_path)
+    result = build_tracklets_from_detection_run(
+        session=db_session,
+        detection_run_id=str(detection_result["run_id"]),
+        max_gap_frames=30,
+    )
+
+    points = db_session.scalars(
+        select(TrackPoint)
+        .join(Tracklet)
+        .where(Tracklet.run_id == result["tracklet_run_id"])
+        .order_by(TrackPoint.frame_number)
+    ).all()
+
+    for point in points:
+        source_id = point.payload_jsonb["source_detection_observation_id"]
+        tracked_from = db_session.scalars(
+            select(ObservationLineage).where(
+                ObservationLineage.parent_observation_id == source_id,
+                ObservationLineage.child_observation_id == point.observation_id,
+                ObservationLineage.relationship_type == "tracked_from",
+            )
+        ).all()
+        assert len(tracked_from) == 1
+        assert tracked_from[0].payload_jsonb["frame_number"] == point.frame_number
+        assert tracked_from[0].payload_jsonb["sequence_index"] == point.payload_jsonb[
+            "sequence_index"
+        ]
+        assert tracked_from[0].payload_jsonb["frame_time_owner"] == "media_indexing"
+
+        grouped_from = db_session.scalars(
+            select(ObservationLineage).where(
+                ObservationLineage.parent_observation_id == point.observation_id,
+                ObservationLineage.child_observation_id == point.tracklet.observation_id,
+                ObservationLineage.relationship_type == "grouped_from",
+            )
+        ).all()
+        assert len(grouped_from) == 1
+        assert grouped_from[0].payload_jsonb["tracklet_id"] == point.tracklet_id
+        assert grouped_from[0].payload_jsonb["sequence_index"] == point.payload_jsonb[
+            "sequence_index"
+        ]
+        assert grouped_from[0].payload_jsonb["frame_time_owner"] == "media_indexing"
+
+
+def test_tracklet_observation_range_is_derived_from_source_detections(
+    db_session: Session,
+    tmp_path,
+) -> None:
+    detection_result = seed_detection_run(db_session, tmp_path)
+    result = build_tracklets_from_detection_run(
+        session=db_session,
+        detection_run_id=str(detection_result["run_id"]),
+        max_gap_frames=30,
+    )
+
+    tracklets = db_session.scalars(
+        select(Tracklet).where(Tracklet.run_id == result["tracklet_run_id"])
+    ).all()
+    assert tracklets
+    for tracklet in tracklets:
+        point_source_ids = [
+            point.payload_jsonb["source_detection_observation_id"] for point in tracklet.points
+        ]
+        source_observations = [
+            db_session.get(Observation, source_id) for source_id in point_source_ids
+        ]
+        assert all(source is not None for source in source_observations)
+        source_frames = [
+            source.frame_start for source in source_observations if source is not None
+        ]
+        source_timestamps = [
+            source.timestamp_start_ms
+            for source in source_observations
+            if source is not None
+        ]
+        tracklet_observation = db_session.get(Observation, tracklet.observation_id)
+        assert tracklet_observation is not None
+        assert tracklet.frame_start == min(source_frames)
+        assert tracklet.frame_end == max(source_frames)
+        assert tracklet_observation.frame_start == min(source_frames)
+        assert tracklet_observation.frame_end == max(source_frames)
+        assert tracklet_observation.timestamp_start_ms == min(source_timestamps)
+        assert tracklet_observation.timestamp_end_ms == max(source_timestamps)
+        assert tracklet_observation.payload_jsonb["track_status"] == "candidate"
+        assert tracklet_observation.payload_jsonb["identity_status"] == "unverified"
+        assert tracklet_observation.payload_jsonb["frame_time_owner"] == "media_indexing"
 
 
 def test_max_gap_frames_starts_new_tracklets(
@@ -198,7 +342,19 @@ def test_tracklet_run_is_viewer_and_query_compatible(
         ObservationQueryFilters(tracklet_id=result["tracklet_ids"][0]),
     )
     assert source_query.count >= 1
-    assert source_query.observations[0].id in detection_result["observation_ids"]
+    assert {
+        observation.observation_type for observation in source_query.observations
+    }.issubset(
+        {
+            "ball_tracklet_candidate",
+            "player_tracklet_candidate",
+            "track_point_candidate",
+        }
+    )
+    assert all(
+        observation.id not in detection_result["observation_ids"]
+        for observation in source_query.observations
+    )
 
 
 def test_worker_cli_imports_tracklet_command() -> None:

@@ -72,7 +72,7 @@ The first viewer renders:
 
 Rows are built from observation rows and tracklet metadata created by the synthetic baseline scenario.
 
-Milestone 1F also lets the viewer open tracklet-builder runs. These runs may contain no new observation rows, but they include candidate `tracklet` and `track_point` rows that render as track coverage rows. Source detection observations remain linked through `track_point.observation_id` and can be queried separately by `tracklet_id`.
+Milestone 2A lets the viewer open tracklet-builder runs with first-class track observations. These runs include `ball_tracklet_candidate` / `player_tracklet_candidate` observations, `track_point_candidate` observations, candidate `tracklet` and `track_point` rows, and lineage from source detections to track points and from track points to tracklets.
 
 ## Detection Overlay
 

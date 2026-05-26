@@ -14,7 +14,7 @@ The core invariant:
 
 ## Current Status
 
-Milestone 1F adds candidate tracklet grouping on top of persisted ball/player detections:
+Milestone 2A repairs candidate tracklet grouping on top of persisted ball/player detections:
 
 - repo memory and architecture contracts
 - FastAPI backend/API foundation
@@ -44,7 +44,8 @@ Milestone 1F adds candidate tracklet grouping on top of persisted ball/player de
 - viewer frame images behind persisted detection bboxes when available
 - deterministic tracklet builder from persisted detections
 - worker command to persist candidate tracklet and track point rows
-- track points linked back to source detection observations
+- first-class tracklet and track point observation spine rows
+- lineage from source detections to track points and from track points to tracklets
 
 Portable TOM v1 detector assets/source and YOLO26 runtime/assets are not present in this repo state. No sophisticated tracking, pose processing, court homography, or real bounce detection is implemented yet.
 
@@ -214,7 +215,7 @@ http://127.0.0.1:3000/runs/<RUN_ID>
 
 For a detection adapter run, the viewer shows a detection overlay. The panel uses persisted `image_pixels` bbox payloads and media dimensions; when frame artifacts exist, it displays the extracted frame image behind the bboxes. If no frame artifact is available, it displays an honest frame-space canvas.
 
-For a tracklet builder run, the viewer shows candidate tracklet coverage rows and track points. Source detection observations remain linked through `track_point.observation_id` and can be queried by `tracklet_id`.
+For a tracklet builder run, the viewer shows candidate tracklet coverage rows, track point candidate observations, and lineage. Source detection observations remain linked through `observation_lineage` and `track_point.payload_jsonb.source_detection_observation_id`.
 
 ## Validation
 

@@ -214,7 +214,7 @@ Milestone 1D adds visual overlay support for persisted detection observations. T
 
 Milestone 1E adds optional frame artifact extraction. Extracted `frame_image` and `detection_frame_image` artifacts can be displayed behind the same persisted bbox overlay.
 
-Milestone 1F adds candidate tracklet grouping from persisted detection observations. The tracklet builder consumes a detection run and writes tracklet/track point rows without mutating detection observations.
+Milestone 2A adds candidate tracklet grouping from persisted detection observations. The tracklet builder consumes a detection run and writes tracklet/track point candidate observations plus tracklet/track point rows without mutating detection observations.
 
 The overlay is a visual evidence layer only. It does not create temporal groupings, infer events, or alter the persisted observations.
 

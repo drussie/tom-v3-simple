@@ -33,7 +33,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 1C - YOLO26 Ball / Player Observation Adapter](milestones/milestone_1c_yolo26_ball_player_observation_adapter.md)
 - [Milestone 1D - Detection Overlay / Visual Observation Layer](milestones/milestone_1d_detection_overlay_visual_observation_layer.md)
 - [Milestone 1E - Detection Artifact / Frame Extraction Foundation](milestones/milestone_1e_detection_artifact_frame_extraction_foundation.md)
-- [Milestone 1F - Tracklet Foundation From Persisted Detections](milestones/milestone_1f_tracklet_foundation_from_persisted_detections.md)
+- [Milestone 1F / 2A - Tracklet Foundation From Persisted Detections](milestones/milestone_1f_tracklet_foundation_from_persisted_detections.md)
 
 ## Handoffs
 
@@ -61,7 +61,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 1C Agent Report](agent_reports/milestone_1c_yolo26_ball_player_observation_adapter_report.md)
 - [Milestone 1D Agent Report](agent_reports/milestone_1d_detection_overlay_visual_observation_layer_report.md)
 - [Milestone 1E Agent Report](agent_reports/milestone_1e_detection_artifact_frame_extraction_foundation_report.md)
-- [Milestone 1F Agent Report](agent_reports/milestone_1f_tracklet_foundation_from_persisted_detections_report.md)
+- [Milestone 2A Tracklet Repair Agent Report](agent_reports/milestone_1f_tracklet_foundation_from_persisted_detections_report.md)
 
 ## API and Schema
 

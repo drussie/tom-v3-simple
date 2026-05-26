@@ -1,17 +1,19 @@
-# TOM v3 Simple - Milestone 1F Tracklet Foundation From Persisted Detections
+# TOM v3 Simple - Milestone 1F / 2A Tracklet Foundation From Persisted Detections
 
 ## Goal
 
-Create the first temporal grouping foundation from already-persisted detection observations.
+Create the first temporal grouping foundation from already-persisted detection observations, repaired under Milestone 2A so tracklets and track points are first-class observations.
 
 Target flow:
 
 ```text
 persisted ball/player detections
 -> tracklet candidate builder
+-> tracklet candidate observation rows
+-> track point candidate observation rows
 -> tracklet rows
 -> track_point rows
--> explicit source links to detection observations
+-> observation_lineage rows
 -> viewer/query inspection
 ```
 
@@ -25,7 +27,10 @@ Milestone 1F adds:
 - grouping for near-player, far-player, and player-unknown detections
 - `tracklet` rows
 - `track_point` rows
-- source detection observation links through track points
+- `ball_tracklet_candidate` and `player_tracklet_candidate` observation rows
+- `track_point_candidate` observation rows
+- `tracked_from` lineage from source detections to track point observations
+- `grouped_from` lineage from track point observations to tracklet observations
 - runtime config, model registry, processing run, and processing step records
 - viewer/query compatibility tests
 - docs and report
@@ -74,7 +79,10 @@ Milestone 1F is complete because:
 - player detections produce near-player/far-player/player-unknown candidates
 - tracklet rows are persisted
 - track point rows are persisted
-- track points reference source detection observation ids
+- tracklet rows reference tracklet candidate observation ids
+- track point rows reference track point candidate observation ids
+- source detection ids are preserved in track point payload metadata
+- observation lineage links source detections to track points and track points to tracklets
 - track point frame/time values come from source observations
 - tracklet metadata marks candidate/unverified status
 - processing run, step, runtime config, and model registry records are created

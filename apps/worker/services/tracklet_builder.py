@@ -12,6 +12,7 @@ from tom_v3_storage.db_models import (
     MediaAsset,
     ModelRegistry,
     Observation,
+    ObservationLineage,
     ProcessingRun,
     ProcessingStep,
     RuntimeConfig,
@@ -98,6 +99,9 @@ def build_tracklets_from_detection_run(
             session=session,
             media=media,
             run=run,
+            model=model,
+            runtime_config=runtime_config,
+            step=step,
             detections_by_track=grouped,
             source_detection_run_id=detection_run_id,
             grouping_method=grouping_method,
@@ -329,6 +333,9 @@ def _persist_tracklets(
     session: Session,
     media: MediaAsset,
     run: ProcessingRun,
+    model: ModelRegistry,
+    runtime_config: RuntimeConfig,
+    step: ProcessingStep,
     detections_by_track: dict[tuple[str, str], list[list[DetectionSource]]],
     source_detection_run_id: str,
     grouping_method: str,
@@ -342,6 +349,8 @@ def _persist_tracklets(
                 session=session,
                 media=media,
                 run=run,
+                model=model,
+                runtime_config=runtime_config,
                 track_family=track_family,
                 subject_ref=subject_ref,
                 group=group,
@@ -351,7 +360,16 @@ def _persist_tracklets(
                 max_gap_frames=max_gap_frames,
                 max_center_distance_px=max_center_distance_px,
             )
-            _create_track_points(session, tracklet, group)
+            _create_track_points(
+                session=session,
+                tracklet=tracklet,
+                group=group,
+                media=media,
+                run=run,
+                model=model,
+                runtime_config=runtime_config,
+                step=step,
+            )
             tracklets.append(tracklet)
     session.commit()
     for tracklet in tracklets:
@@ -363,6 +381,8 @@ def _create_tracklet(
     session: Session,
     media: MediaAsset,
     run: ProcessingRun,
+    model: ModelRegistry,
+    runtime_config: RuntimeConfig,
     track_family: str,
     subject_ref: str,
     group: list[DetectionSource],
@@ -372,33 +392,42 @@ def _create_tracklet(
     max_gap_frames: int,
     max_center_distance_px: float | None,
 ) -> Tracklet:
-    frames = [
-        source.observation.frame_start
-        for source in group
-        if source.observation.frame_start is not None
-    ]
-    confidence_values = [
-        source.observation.confidence
-        for source in group
-        if source.observation.confidence is not None
-    ]
-    frame_start = min(frames) if frames else None
-    frame_end = max(frames) if frames else None
-    confidence = fmean(confidence_values) if confidence_values else None
+    summary = _tracklet_summary(group)
+    observation = _create_tracklet_observation(
+        session=session,
+        media=media,
+        run=run,
+        model=model,
+        runtime_config=runtime_config,
+        track_family=track_family,
+        subject_ref=subject_ref,
+        source_detection_run_id=source_detection_run_id,
+        grouping_method=grouping_method,
+        max_gap_frames=max_gap_frames,
+        max_center_distance_px=max_center_distance_px,
+        summary=summary,
+    )
     tracklet = Tracklet(
         media_id=media.id,
         run_id=run.id,
         track_family=track_family,
         subject_ref=subject_ref,
-        frame_start=frame_start,
-        frame_end=frame_end,
-        confidence=confidence,
-        observation_id=group[0].observation.id if group else None,
+        frame_start=summary["frame_start"],
+        frame_end=summary["frame_end"],
+        confidence=summary["tracklet_confidence"],
+        observation_id=observation.id,
         metadata_jsonb={
             "track_status": "candidate",
             "grouping_method": grouping_method,
             "source_detection_run_id": source_detection_run_id,
             "source_observation_count": len(group),
+            "track_point_count": len(group),
+            "gap_count": summary["gap_count"],
+            "max_gap_frames_observed": summary["max_gap_frames_observed"],
+            "mean_source_confidence": summary["mean_source_confidence"],
+            "min_source_confidence": summary["min_source_confidence"],
+            "max_source_confidence": summary["max_source_confidence"],
+            "tracklet_confidence": summary["tracklet_confidence"],
             "frame_time_owner": "media_indexing",
             "identity_status": "unverified",
             "group_index": group_index,
@@ -408,11 +437,11 @@ def _create_tracklet(
             "coverage_segments": [
                 {
                     "state": "candidate",
-                    "frame_start": frame_start,
-                    "frame_end": frame_end,
+                    "frame_start": summary["frame_start"],
+                    "frame_end": summary["frame_end"],
                 }
             ]
-            if frame_start is not None and frame_end is not None
+            if summary["frame_start"] is not None and summary["frame_end"] is not None
             else [],
         },
     )
@@ -425,17 +454,31 @@ def _create_track_points(
     session: Session,
     tracklet: Tracklet,
     group: list[DetectionSource],
+    media: MediaAsset,
+    run: ProcessingRun,
+    model: ModelRegistry,
+    runtime_config: RuntimeConfig,
+    step: ProcessingStep,
 ) -> None:
     points: list[TrackPoint] = []
-    for source in group:
+    for sequence_index, source in enumerate(group):
         observation = source.observation
         frame = observation.frame_start
         if frame is None:
             continue
+        point_observation = _create_track_point_observation(
+            session=session,
+            media=media,
+            run=run,
+            model=model,
+            runtime_config=runtime_config,
+            source=source,
+            sequence_index=sequence_index,
+        )
         points.append(
             TrackPoint(
                 tracklet_id=tracklet.id,
-                observation_id=observation.id,
+                observation_id=point_observation.id,
                 frame_number=frame,
                 timestamp_ms=observation.timestamp_start_ms,
                 x=source.center["x"],
@@ -444,18 +487,223 @@ def _create_track_points(
                 height=source.bbox["height"],
                 confidence=observation.confidence,
                 payload_jsonb={
-                    "source_observation_id": observation.id,
+                    "source_detection_observation_id": observation.id,
                     "source_observation_type": observation.observation_type,
                     "source_label": source.label,
                     "bbox": source.bbox,
                     "center": source.center,
+                    "source_confidence": observation.confidence,
+                    "point_confidence": observation.confidence,
+                    "sequence_index": sequence_index,
+                    "is_interpolated": False,
                     "frame_time_owner": "media_indexing",
                     "track_status": "candidate",
                     "identity_status": "unverified",
                 },
             )
         )
+        _create_lineage(
+            session=session,
+            parent_observation_id=observation.id,
+            child_observation_id=point_observation.id,
+            relationship_type="tracked_from",
+            processing_step_id=step.id,
+            payload={
+                "frame_number": frame,
+                "sequence_index": sequence_index,
+                "frame_time_owner": "media_indexing",
+            },
+        )
+        _create_lineage(
+            session=session,
+            parent_observation_id=point_observation.id,
+            child_observation_id=tracklet.observation_id,
+            relationship_type="grouped_from",
+            processing_step_id=step.id,
+            payload={
+                "tracklet_id": tracklet.id,
+                "sequence_index": sequence_index,
+                "frame_time_owner": "media_indexing",
+            },
+        )
     session.add_all(points)
+
+
+def _tracklet_summary(group: list[DetectionSource]) -> dict[str, Any]:
+    frames = [
+        source.observation.frame_start
+        for source in group
+        if source.observation.frame_start is not None
+    ]
+    frame_ends = [
+        source.observation.frame_end
+        if source.observation.frame_end is not None
+        else source.observation.frame_start
+        for source in group
+        if source.observation.frame_start is not None
+    ]
+    timestamp_starts = [
+        source.observation.timestamp_start_ms
+        for source in group
+        if source.observation.timestamp_start_ms is not None
+    ]
+    timestamp_ends = [
+        source.observation.timestamp_end_ms
+        if source.observation.timestamp_end_ms is not None
+        else source.observation.timestamp_start_ms
+        for source in group
+        if source.observation.timestamp_start_ms is not None
+    ]
+    confidence_values = [
+        source.observation.confidence
+        for source in group
+        if source.observation.confidence is not None
+    ]
+    sorted_frames = sorted(frames)
+    frame_gaps = [
+        current_frame - previous_frame
+        for previous_frame, current_frame in zip(
+            sorted_frames, sorted_frames[1:], strict=False
+        )
+    ]
+    mean_confidence = fmean(confidence_values) if confidence_values else None
+    return {
+        "source_observation_count": len(group),
+        "track_point_count": len(frames),
+        "frame_start": min(frames) if frames else None,
+        "frame_end": max(frame_ends) if frame_ends else None,
+        "timestamp_start_ms": min(timestamp_starts) if timestamp_starts else None,
+        "timestamp_end_ms": max(timestamp_ends) if timestamp_ends else None,
+        "gap_count": len([gap for gap in frame_gaps if gap > 1]),
+        "max_gap_frames_observed": max(frame_gaps) if frame_gaps else 0,
+        "mean_source_confidence": mean_confidence,
+        "min_source_confidence": min(confidence_values) if confidence_values else None,
+        "max_source_confidence": max(confidence_values) if confidence_values else None,
+        "tracklet_confidence": mean_confidence,
+    }
+
+
+def _create_tracklet_observation(
+    session: Session,
+    media: MediaAsset,
+    run: ProcessingRun,
+    model: ModelRegistry,
+    runtime_config: RuntimeConfig,
+    track_family: str,
+    subject_ref: str,
+    source_detection_run_id: str,
+    grouping_method: str,
+    max_gap_frames: int,
+    max_center_distance_px: float | None,
+    summary: dict[str, Any],
+) -> Observation:
+    observation_type = (
+        "ball_tracklet_candidate"
+        if track_family == "ball"
+        else "player_tracklet_candidate"
+    )
+    observation = Observation(
+        media_id=media.id,
+        run_id=run.id,
+        observation_family="track",
+        observation_type=observation_type,
+        granularity="tracklet",
+        frame_start=summary["frame_start"],
+        frame_end=summary["frame_end"],
+        timestamp_start_ms=summary["timestamp_start_ms"],
+        timestamp_end_ms=summary["timestamp_end_ms"],
+        confidence=summary["tracklet_confidence"],
+        model_id=model.id,
+        runtime_config_id=runtime_config.id,
+        coordinate_space="image_pixels",
+        payload_jsonb={
+            "track_status": "candidate",
+            "identity_status": "unverified",
+            "track_family": track_family,
+            "subject_ref": subject_ref,
+            "grouping_method": grouping_method,
+            "source_detection_run_id": source_detection_run_id,
+            "source_observation_count": summary.get("source_observation_count", 0),
+            "track_point_count": summary.get("track_point_count", 0),
+            "gap_count": summary["gap_count"],
+            "max_gap_frames_observed": summary["max_gap_frames_observed"],
+            "mean_source_confidence": summary["mean_source_confidence"],
+            "min_source_confidence": summary["min_source_confidence"],
+            "max_source_confidence": summary["max_source_confidence"],
+            "tracklet_confidence": summary["tracklet_confidence"],
+            "max_gap_frames": max_gap_frames,
+            "max_center_distance_px": max_center_distance_px,
+            "frame_time_owner": "media_indexing",
+        },
+    )
+    session.add(observation)
+    session.flush()
+    return observation
+
+
+def _create_track_point_observation(
+    session: Session,
+    media: MediaAsset,
+    run: ProcessingRun,
+    model: ModelRegistry,
+    runtime_config: RuntimeConfig,
+    source: DetectionSource,
+    sequence_index: int,
+) -> Observation:
+    source_observation = source.observation
+    observation = Observation(
+        media_id=media.id,
+        run_id=run.id,
+        observation_family="track",
+        observation_type="track_point_candidate",
+        granularity="frame",
+        frame_start=source_observation.frame_start,
+        frame_end=source_observation.frame_end,
+        timestamp_start_ms=source_observation.timestamp_start_ms,
+        timestamp_end_ms=source_observation.timestamp_end_ms,
+        confidence=source_observation.confidence,
+        model_id=model.id,
+        runtime_config_id=runtime_config.id,
+        coordinate_space="image_pixels",
+        payload_jsonb={
+            "source_detection_observation_id": source_observation.id,
+            "source_observation_type": source_observation.observation_type,
+            "source_label": source.label,
+            "bbox": source.bbox,
+            "center": source.center,
+            "source_confidence": source_observation.confidence,
+            "point_confidence": source_observation.confidence,
+            "sequence_index": sequence_index,
+            "is_interpolated": False,
+            "frame_time_owner": "media_indexing",
+            "track_status": "candidate",
+            "identity_status": "unverified",
+        },
+    )
+    session.add(observation)
+    session.flush()
+    return observation
+
+
+def _create_lineage(
+    session: Session,
+    parent_observation_id: str,
+    child_observation_id: str | None,
+    relationship_type: str,
+    processing_step_id: str,
+    payload: dict[str, Any],
+) -> None:
+    if child_observation_id is None:
+        raise TrackletBuilderError("child observation id is required for tracklet lineage")
+    session.add(
+        ObservationLineage(
+            parent_observation_id=parent_observation_id,
+            child_observation_id=child_observation_id,
+            relationship_type=relationship_type,
+            processing_step_id=processing_step_id,
+            payload_jsonb=payload,
+        )
+    )
 
 
 def _mark_completed(

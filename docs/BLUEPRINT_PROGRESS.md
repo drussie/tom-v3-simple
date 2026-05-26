@@ -2,7 +2,7 @@
 
 ## Current Progress Gauge
 
-Current: ~15% through the MVP+ temporal-evidence extension
+Current: ~25% through the MVP+ temporal-evidence extension
 
 ## Current
 
@@ -54,7 +54,9 @@ Current: ~15% through the MVP+ temporal-evidence extension
 - Tracklet builder service exists.
 - Persisted detections can be grouped into candidate tracklets.
 - Tracklet and track point rows are persisted.
-- Track points link back to source detection observations.
+- Tracklet candidates have first-class observation spine rows.
+- Track point candidates have first-class observation spine rows.
+- Observation lineage links source detections to track points and track points to tracklets.
 
 ## After Milestone 0A
 
@@ -243,7 +245,6 @@ Expected: ~15% through the MVP+ temporal-evidence extension
 - Tracklet foundation exists.
 - Persisted detections can be grouped into tracklet candidates.
 - `tracklet` and `track_point` rows are created from source observations.
-- Track points link back to source ball/player detections.
 - Existing viewer can show basic tracklet coverage/evidence.
 - TOM v3 still does not claim identity, bounce, hit, rally, or point state.
 
@@ -252,3 +253,21 @@ Expected: ~15% through the MVP+ temporal-evidence extension
 Status: complete.
 
 The repo now has a deterministic tracklet-builder run path that creates candidate temporal groupings from persisted detection observations without mutating the source detection run or adding higher-level tennis event interpretation.
+
+## After Milestone 2A
+
+Expected: ~25% through the MVP+ temporal-evidence extension
+
+- Tracklet candidates have observation spine rows.
+- Track point candidates have observation spine rows.
+- `tracklet.observation_id` points to a tracklet candidate observation.
+- `track_point.observation_id` points to a track point candidate observation.
+- Source detections are linked through `tracked_from` lineage.
+- Track points are linked to tracklets through `grouped_from` lineage.
+- Viewer/query paths can inspect candidate track observations.
+
+## Milestone 2A Status
+
+Status: complete.
+
+The existing 1F branch now satisfies the Blueprint 2 persistence contract: candidate tracklets and track points are first-class observations with lineage to source detections and grouping observations.

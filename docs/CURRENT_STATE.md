@@ -4,8 +4,8 @@
 
 - Project name: TOM v3 Simple
 - Repo: drussie/tom-v3-simple
-- Current phase: Milestone 1F
-- Current goal: tracklet foundation from persisted detections
+- Current phase: Milestone 2A
+- Current goal: tracklet / track point observation spine and lineage repair
 
 ## Mission
 
@@ -22,7 +22,7 @@ A lightweight tennis video observation platform that accepts model output as ope
 - Media indexing: implemented for local files via ffprobe, sha256 checksum, local storage copy/register mode, and frame/time summary
 - Gameplay adapter: implemented with `BaseGameplayAdapter`, fixture adapter, TOM v1 unavailable stub, worker service, and worker CLI
 - Detection adapter: implemented with `BaseDetectionAdapter`, fixture adapter, YOLO unavailable stub, worker service, and worker CLI
-- Tracklet builder: implemented with deterministic candidate grouping from persisted detections
+- Tracklet builder: implemented with deterministic candidate grouping, first-class track observations, track point observations, and lineage from persisted detections
 - Observation writer: implemented with typed extension rows, lineage, artifacts, and idempotency
 - Worker synthetic seeder: implemented
 - Visual evidence viewer: implemented in `apps/web` with detection bbox overlay and frame artifact image support
@@ -96,6 +96,12 @@ Status: complete
 
 Milestone 1F establishes a deterministic tracklet builder that consumes persisted detection observations, creates a new tracklet-builder processing run, persists candidate `tracklet` and `track_point` rows, links track points back to source detection observations, and exposes tracklet evidence through the existing viewer/query paths.
 
+## Milestone 2A Result
+
+Status: complete
+
+Milestone 2A repairs the tracklet persistence contract on the existing 1F branch. Tracklet candidates and track point candidates now have their own observation spine rows, `tracklet.observation_id` and `track_point.observation_id` point to those track observations, and source detections are connected with `tracked_from` and `grouped_from` `observation_lineage` rows.
+
 ## Next Milestone
 
-Recommended next handoff: Milestone 1G - Tracklet Viewer / Multi-Run Evidence Bundle, unless YOLO26 runtime/assets become available and real detector integration is prioritized.
+Recommended next handoff: Milestone 2B - Tracklet Viewer / Multi-Run Evidence Bundle, unless YOLO26 runtime/assets become available and real detector integration is prioritized.

@@ -381,6 +381,41 @@ Milestone 1F created:
 - Ball tracklet candidates from persisted `ball_detection` observations.
 - Player tracklet candidates from persisted `player_detection` observations grouped by source labels.
 - `tracklet` rows with candidate/unverified metadata.
-- `track_point` rows linked to source detection observation ids.
+- Initial `track_point` rows linked to source detection observation ids.
 - Viewer/query compatibility tests for tracklet builder runs.
 - Tracklet foundation docs, milestone doc, handoff, and report.
+
+## Milestone 2A - Tracklet / Track Point Observation Spine + Lineage Repair
+
+Status: complete
+
+### Goal
+
+Repair the tracklet builder persistence contract so tracklet candidates and track point candidates are first-class observations with explicit lineage to source detections.
+
+### Non-goals
+
+- No complex tracker logic.
+- No pose detection.
+- No court homography.
+- No bounce detection.
+- No hit detection.
+- No rally segmentation.
+- No point reconstruction.
+- No scoring.
+- No real YOLO runtime integration.
+- No adjudication.
+- No truth/fact/promotion/refusal concepts.
+
+### Notes
+
+Milestone 2A repaired:
+
+- Tracklet candidate observation spine rows with `observation_family = track`.
+- Track point candidate observation spine rows with `observation_family = track`.
+- `tracklet.observation_id` now points to the tracklet candidate observation.
+- `track_point.observation_id` now points to the track point candidate observation.
+- Source detection observation ids are stored in track point payload metadata.
+- `tracked_from` lineage links source detections to track point candidate observations.
+- `grouped_from` lineage links track point candidate observations to tracklet candidate observations.
+- Tests now assert the observation spine and lineage contract directly.

@@ -2,16 +2,18 @@
 
 ## Purpose
 
-Tracklet Foundation v0 groups already-persisted detection observations into candidate temporal groupings.
+Tracklet Foundation v0 is the Milestone 2A implementation for candidate temporal grouping from persisted detection observations.
 
 Target flow:
 
 ```text
 persisted ball/player detections
 -> deterministic tracklet builder
+-> tracklet candidate observation rows
+-> track_point candidate observation rows
 -> tracklet rows
 -> track_point rows
--> source links back to detection observations
+-> observation_lineage rows
 -> viewer/query inspection
 ```
 
@@ -43,9 +45,44 @@ The first policy is intentionally deterministic and simple:
   - `far_player`
   - `player_unknown`
 - If a frame gap exceeds `max_gap_frames`, a new tracklet candidate starts.
-- `max_center_distance_px` is recorded in config/metadata for future use, but the first implementation does not run a sophisticated tracker.
+- `max_center_distance_px` is recorded in config/metadata for future use, but this implementation does not run a sophisticated tracker.
 
-## Persistence
+## Observation Spine Contract
+
+Every tracklet candidate is represented by a new `observation` row:
+
+- `observation_family = track`
+- `observation_type = ball_tracklet_candidate | player_tracklet_candidate`
+- `granularity = tracklet`
+- `coordinate_space = image_pixels`
+- `frame_start/frame_end` from source detection frame range
+- `timestamp_start_ms/timestamp_end_ms` from source detection timestamps
+- `confidence` from mean source confidence
+- `payload_jsonb.track_status = candidate`
+- `payload_jsonb.identity_status = unverified`
+- `payload_jsonb.frame_time_owner = media_indexing`
+
+The `tracklet.observation_id` field points to this new tracklet candidate observation. It does not point directly to a source detection observation.
+
+Every track point is also represented by a new `observation` row:
+
+- `observation_family = track`
+- `observation_type = track_point_candidate`
+- `granularity = frame`
+- `coordinate_space = image_pixels`
+- `frame_start/frame_end` from the source detection observation
+- `timestamp_start_ms/timestamp_end_ms` from the source detection observation
+- `confidence` from the source detection confidence
+- `payload_jsonb.source_detection_observation_id`
+- `payload_jsonb.sequence_index`
+- `payload_jsonb.is_interpolated = false`
+- `payload_jsonb.track_status = candidate`
+- `payload_jsonb.identity_status = unverified`
+- `payload_jsonb.frame_time_owner = media_indexing`
+
+The `track_point.observation_id` field points to this new track point candidate observation. It does not point directly to a source detection observation.
+
+## Tracklet Rows
 
 Each candidate writes a `tracklet` row:
 
@@ -54,36 +91,53 @@ Each candidate writes a `tracklet` row:
 - `frame_start`
 - `frame_end`
 - `confidence`
-- `observation_id` as representative source detection observation
+- `observation_id = tracklet candidate observation id`
 - `metadata_jsonb.track_status = candidate`
 - `metadata_jsonb.identity_status = unverified`
 - `metadata_jsonb.frame_time_owner = media_indexing`
 - `metadata_jsonb.source_detection_run_id`
 - `metadata_jsonb.source_observation_count`
+- `metadata_jsonb.track_point_count`
+- `metadata_jsonb.gap_count`
+- `metadata_jsonb.max_gap_frames_observed`
+
+## Track Point Rows
 
 Each source detection writes a `track_point` row:
 
-- `observation_id = source detection observation id`
+- `observation_id = track_point_candidate observation id`
 - `frame_number = source observation frame_start`
 - `timestamp_ms = source observation timestamp_start_ms`
 - `x/y` from detection center
 - `width/height` from detection bbox
 - `confidence` from source observation confidence
-- `payload_jsonb.source_observation_id`
+- `payload_jsonb.source_detection_observation_id`
+- `payload_jsonb.source_observation_type`
+- `payload_jsonb.source_label`
+- `payload_jsonb.sequence_index`
 - `payload_jsonb.frame_time_owner = media_indexing`
 
-## Source Links
+## Lineage
 
-The current schema does not provide a direct lineage table for `tracklet` or `track_point` rows because `observation_lineage` links observation rows only.
+Milestone 2A repairs tracklet provenance by writing explicit `observation_lineage` rows:
 
-Milestone 1F therefore uses:
+1. Source detection to track point:
 
-- `tracklet.observation_id` for a representative source detection
-- `track_point.observation_id` for exact source detection linkage
-- `track_point.payload_jsonb.source_observation_id`
-- `tracklet.metadata_jsonb.source_detection_run_id`
+```text
+parent_observation_id = source detection observation id
+child_observation_id = track_point_candidate observation id
+relationship_type = tracked_from
+```
 
-This is explicit source linkage, but not a full lineage graph for tracklets yet.
+2. Track point to tracklet:
+
+```text
+parent_observation_id = track_point_candidate observation id
+child_observation_id = tracklet_candidate observation id
+relationship_type = grouped_from
+```
+
+The current schema does not have a `sequence_index` column on `observation_lineage`, so sequence indexes are stored in `payload_jsonb.sequence_index`.
 
 ## Worker CLI
 
@@ -126,9 +180,9 @@ Open the tracklet builder run in the existing viewer:
 http://127.0.0.1:3000/runs/<TRACKLET_RUN_ID>
 ```
 
-The viewer shows tracklet coverage rows and track points because `GET /viewer/runs/{run_id}` already includes tracklets for the selected run.
+The viewer shows tracklet coverage rows, track point candidate observations, and lineage for the selected track run because `GET /viewer/runs/{run_id}` includes observations, tracklets, points, and lineage for the selected run.
 
-Source detection observations can be queried through:
+Observations for a tracklet can be queried through:
 
 ```json
 {
@@ -136,7 +190,9 @@ Source detection observations can be queried through:
 }
 ```
 
-Known limitation: the viewer is still a single-run view. It shows the tracklet run's tracklets and points, but does not yet combine the source detection run observations, frame artifacts, and tracklet run into one evidence bundle.
+That query returns the tracklet candidate observation and track point candidate observations. Source detection observations are reachable through `observation_lineage` and `track_point.payload_jsonb.source_detection_observation_id`.
+
+Known limitation: the viewer is still a single-run view. It shows the tracklet run's candidate observations, tracklets, points, and lineage, but does not yet combine the source detection run observations, frame artifacts, and tracklet run into one evidence bundle.
 
 ## Non-Goals
 
