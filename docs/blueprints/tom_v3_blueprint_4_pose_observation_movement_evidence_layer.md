@@ -4,7 +4,7 @@
 
 Status: in progress
 
-Milestone 4A is complete. It establishes the pose runtime and schema foundation.
+Milestones 4A and 4B are complete. They establish the pose runtime/schema foundation and pose adapter normalization foundation.
 
 ## Mission
 
@@ -52,6 +52,22 @@ Milestone 4A adds:
 - tests for pose persistence, frame/time ownership, keypoint summaries, and queryability
 
 4A does not add real pose inference, pose overlay rendering, movement interpretation, or event candidates.
+
+## Milestone 4B Result
+
+Milestone 4B adds:
+
+- fake/serialized pose frame result input contract
+- COCO17 keypoint normalization using the skeleton registry
+- missing keypoint preservation
+- keypoint summary and pose confidence handling
+- bbox normalization with explicit invalid-bbox warnings
+- crop-local to full-frame keypoint projection
+- subject association candidate passthrough
+- pose adapter result skeleton
+- tests proving normalized output can instantiate `PoseObservationCreate`
+
+4B does not add real pose inference, pose observation worker persistence, pose overlay rendering, movement interpretation, or event candidates.
 
 ## Observation Boundary
 

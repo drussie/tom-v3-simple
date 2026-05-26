@@ -56,3 +56,7 @@ The registry validates:
 ## Contract
 
 The skeleton registry describes the shape of model output evidence. It does not interpret actions, movement, skill, or biomechanics.
+
+## Normalization Use
+
+Milestone 4B uses this registry to assign COCO17 names and indices to fake/serialized pose keypoints during normalization. The normalizer skips a pose when keypoint count does not match the registered skeleton instead of silently padding or truncating.

@@ -809,3 +809,41 @@ Milestone 4A created:
 - Observation writer support for a pose typed extension under `observation_family = pose`.
 - Synthetic pose insertion helper that creates fixture model/runtime/run/step records and writes first-class pose observation spine rows plus typed pose rows.
 - Tests covering skeleton validation, keypoint validation, pose persistence, media-owned frame/time, keypoint summary statistics, unassociated subject mode, model/runtime metadata, and existing observation query/detail compatibility.
+
+## Milestone 4B - Pose Adapter Normalization Foundation
+
+Status: complete
+
+### Goal
+
+Normalize fake or serialized pose model output into TOM v3 pose observation payloads without running real pose inference or interpreting movement.
+
+### Non-goals
+
+- No real pose runtime or adapter inference.
+- No pose observation worker persistence pipeline.
+- No pose overlay viewer.
+- No movement interpretation.
+- No serve, split-step, or biomechanics conclusions.
+- No court homography.
+- No bounce detection.
+- No hit detection.
+- No rally segmentation.
+- No point reconstruction.
+- No scoring.
+- No adjudication.
+
+### Notes
+
+Milestone 4B created:
+
+- Pose normalization module in `tom_v3_model_adapters`.
+- `NormalizedPoseObservation`, `PoseNormalizationResult`, and `PoseAdapterResult`.
+- `PoseNormalizationAdapter` and `FixturePoseAdapter` skeletons.
+- COCO17 keypoint normalization using the skeleton registry.
+- Missing keypoint preservation and keypoint summary computation.
+- Bbox normalization with explicit invalid-bbox warnings that keep valid keypoints.
+- Pose/keypoint/bbox confidence handling.
+- Crop-local to full-frame coordinate projection.
+- Subject association candidate passthrough.
+- Focused tests covering normalization behavior and `PoseObservationCreate` compatibility.

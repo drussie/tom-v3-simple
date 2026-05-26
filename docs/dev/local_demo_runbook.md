@@ -790,3 +790,37 @@ indexed media
 ```
 
 It does not create movement conclusions, source-detection crop inference, homography, bounce/hit/rally/point/scoring evidence, or adjudication.
+
+## 26. Validate Pose Adapter Normalization
+
+Milestone 4B adds normalization for fake or serialized pose output. It still does not run real pose inference or render pose overlays.
+
+Run focused normalization checks:
+
+```bash
+pytest tests/test_pose_normalization.py -q
+```
+
+Expected behavior:
+
+- Fake full-frame pose output normalizes to `PoseObservationCreate`-compatible payloads.
+- COCO17 keypoint names and indices come from the skeleton registry.
+- Missing keypoints remain `present = false`.
+- Keypoint summary counts and confidence statistics are computed.
+- Invalid bbox input records a warning but keeps otherwise valid keypoint evidence.
+- Crop-local keypoints can project to full-frame coordinates.
+- Subject association defaults to unassociated and can pass through candidate context.
+- Adapter diagnostics say normalization only, no real pose inference.
+
+The normalization path is:
+
+```text
+fake / serialized pose frame result
+-> COCO17 skeleton registry
+-> normalized keypoint evidence
+-> bbox / crop / subject context
+-> PoseObservationCreate-compatible payload
+-> PoseAdapterResult
+```
+
+It does not create pose processing runs, persist real model output, infer movement, create homography, create tennis-event candidates, or adjudicate results.

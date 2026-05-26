@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Milestone 4A defines the pose runtime and model metadata contract without running real pose inference.
+Milestone 4A defines the pose runtime and model metadata contract without running real pose inference. Milestone 4B adds normalization-only adapter diagnostics for fake or serialized pose output.
 
 ## Model Registry Metadata
 
@@ -58,6 +58,17 @@ The pose runtime config payload is shaped as:
 
 Future real pose adapters can reuse the Blueprint 3 discipline: optional runtime dependency path, explicit local weights, fingerprinting, model registry metadata, and guarded inference.
 
+## Normalization Adapter Diagnostics
+
+The 4B normalization adapter result includes:
+
+- adapter name/version
+- input pose count
+- normalized pose count
+- skipped pose count
+- warnings
+- `note = normalization only, no real pose inference`
+
 ## Non-Goals
 
-Milestone 4A does not add real pose runtime, pose weights validation, crop projection, overlay rendering, movement interpretation, or tennis-event candidates.
+Milestones 4A and 4B do not add real pose runtime, pose weights validation, overlay rendering, movement interpretation, or tennis-event candidates.

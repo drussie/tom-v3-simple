@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Milestone 4A adds first-class pose observation persistence.
+Milestone 4A adds first-class pose observation persistence. Milestone 4B adds normalization that can produce `PoseObservationCreate`-compatible payloads from fake or serialized pose frame results.
 
 Pose observations use the central observation spine plus a typed `pose_observation` row.
 
@@ -97,6 +97,20 @@ Future milestones may use candidate associations to player detections, tracklets
 Pose observations are queryable through the existing observation query path by media id, run id, frame range, confidence, family, and type.
 
 Future pose-specific filters may add keypoint missing count, skeleton format, and association status.
+
+## Normalization Compatibility
+
+The Milestone 4B pose normalizer emits the same fields used by this schema:
+
+- COCO17 `keypoints_jsonb`
+- keypoint summary counts and confidence statistics
+- pose confidence
+- bbox fields
+- crop fields when crop projection is used
+- subject association candidate fields
+- raw model payload and normalization metadata
+
+Invalid bbox input does not discard valid keypoints; bbox fields are stored as null and a normalization warning is reported.
 
 ## Non-Goals
 

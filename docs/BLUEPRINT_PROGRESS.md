@@ -2,7 +2,7 @@
 
 ## Current Progress Gauge
 
-Current: ~15-20% through Blueprint 4
+Current: ~35-40% through Blueprint 4
 
 ## Current
 
@@ -107,6 +107,11 @@ Current: ~15-20% through Blueprint 4
 - Synthetic/fake pose observations can be inserted with first-class observation spine rows.
 - Pose observations use media-owned frame/time.
 - Pose runtime config and model registry metadata contracts are documented.
+- Pose adapter normalization exists for fake/serialized pose frame results.
+- COCO17 keypoint names/indices are assigned from the skeleton registry during normalization.
+- Missing keypoints are preserved as missing evidence.
+- Bbox, confidence, crop projection, and subject association candidate normalization are tested.
+- Normalized pose output can instantiate `PoseObservationCreate`.
 - No real pose inference, pose overlay viewer, movement interpretation, homography, bounce, hit, rally, point, scoring, or adjudication has been added.
 
 ## After Milestone 0A
@@ -518,3 +523,21 @@ Expected: ~15-20% through Blueprint 4
 Status: complete.
 
 The repo now has a Blueprint 4 pose evidence foundation: COCO17 skeleton metadata, keypoint validation helpers, pose schema models, a `pose_observation` table, writer support for pose typed extensions, and synthetic pose insertion tests that preserve media-owned frame/time. Pose remains observation evidence only.
+
+## After Milestone 4B
+
+Expected: ~35-40% through Blueprint 4
+
+- Fake or serialized pose model output can normalize into TOM v3 pose payloads.
+- COCO17 keypoint order and schema validation are reused.
+- Full-frame pose output normalization exists.
+- Crop-local to full-frame coordinate projection exists.
+- Pose confidence and keypoint summary computation are tested.
+- Normalized pose payloads are persistence-ready.
+- No real pose runtime, pose overlay viewer, movement interpretation, homography, bounce, hit, rally, point, scoring, or adjudication is added.
+
+## Milestone 4B Status
+
+Status: complete.
+
+The repo now has a pose adapter normalization foundation. Fake/serialized pose frame results can become `PoseObservationCreate`-compatible normalized pose observations with COCO17 keypoints, missing-keypoint preservation, bbox/confidence handling, crop projection, subject association candidate passthrough, and normalization-only adapter diagnostics.
