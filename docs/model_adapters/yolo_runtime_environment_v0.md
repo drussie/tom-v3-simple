@@ -122,16 +122,21 @@ Milestone 3E adds the optional local real-YOLO smoke workflow. See:
 docs/model_adapters/yolo_real_runtime_smoke_v0.md
 ```
 
+Milestone 3F closes Blueprint 3 with a completion review and invariant audit. See:
+
+```text
+docs/blueprints/tom_v3_blueprint_3_completion_review.md
+```
+
 ## Out of Scope
 
-Milestone 3A did not add:
+Milestone 3A did not add, and Blueprint 3 still does not add:
 
-- real YOLO inference
-- real detection persistence
-- model weight validation
 - pose
 - homography
 - bounce detection
 - hit detection
 - rally/point/scoring
 - adjudication
+
+Real frame-level YOLO inference and detection persistence were added later in Blueprint 3 behind optional runtime dependencies and registered local weights.

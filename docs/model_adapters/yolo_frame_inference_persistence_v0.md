@@ -18,6 +18,8 @@ indexed media
 
 This milestone does not add YOLO tracking mode, tracklet creation inside the adapter, pose, homography, bounce/hit detection, rally/point/scoring, or adjudication.
 
+Milestone 3F closes Blueprint 3 and confirms this persistence path as the completed real-model-runtime contract.
+
 ## Frame Ownership
 
 Media indexing owns frame/time.
@@ -174,3 +176,13 @@ The debug artifact is intentionally small and does not store massive raw model o
 - production GPU worker
 - remote weight download
 - adjudication
+
+## Blueprint 3 Completion
+
+Blueprint 3 completion is documented in:
+
+```text
+docs/blueprints/tom_v3_blueprint_3_completion_review.md
+```
+
+The completion review confirms that YOLO-origin detections remain normal TOM v3 atomic observations and that downstream viewer, frame artifact, tracklet, review, and export contracts do not require a YOLO-specific branch.

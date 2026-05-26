@@ -740,3 +740,38 @@ Milestone 3E created:
 - Optional tracklet-builder compatibility step after YOLO detection.
 - Docs for runtime probe, weights registration, media indexing, YOLO detection, frame artifacts, viewer overlay inspection, tracklet compatibility, and evidence bundle inspection.
 - Tests covering smoke plan and skip behavior without real YOLO packages or weights.
+
+## Milestone 3F - Blueprint 3 Completion Review / Real Model Runtime Hardening
+
+Status: complete
+
+### Goal
+
+Close Blueprint 3 with a completion review, invariant audit, documentation cleanup, validation pass, and next-blueprint recommendation.
+
+### Non-goals
+
+- No new inference algorithms.
+- No YOLO tracking mode.
+- No tracklet generation inside YOLO.
+- No pose detection.
+- No court homography.
+- No bounce detection.
+- No hit detection.
+- No rally segmentation.
+- No point reconstruction.
+- No scoring.
+- No adjudication.
+
+### Notes
+
+Milestone 3F created:
+
+- Blueprint 3 completion review doc.
+- Milestone 3F milestone, handoff, and agent report docs.
+- Completion statement declaring Blueprint 3 complete.
+- Invariant audit mapping runtime, weights, normalization, persistence, failure, smoke, viewer, and tracklet compatibility coverage to existing tests.
+- Runbook and README updates for the complete optional YOLO runtime flow.
+- Control-room index, current-state, blueprint-progress, and model adapter docs updates.
+
+Blueprint 3 is complete. It closes with optional YOLO runtime support, local weights validation, model registry metadata, YOLO-like output normalization, frame-level provider persistence, local smoke/viewer validation, and Blueprint 2 compatibility while preserving the observation-only boundary.

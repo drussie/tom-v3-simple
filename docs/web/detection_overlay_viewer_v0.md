@@ -127,7 +127,9 @@ Refresh the viewer to see frame imagery behind bbox overlays.
 ## Known Limitations
 
 - No video playback overlay is implemented.
-- Real YOLO runtime validation is optional and local-only; fixture detection remains the default demo path.
+- Real YOLO runtime validation is optional and local-only; fixture detection remains the default base-environment demo path.
 - Detection observations are not converted into tracks.
 - The overlay visualizes only frame-level bbox observations.
 - Frame artifact serving is local-development only.
+
+Blueprint 3 completion confirms that YOLO-origin detections use this same overlay path; there is no separate YOLO viewer.

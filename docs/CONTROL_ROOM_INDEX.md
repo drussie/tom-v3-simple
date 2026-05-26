@@ -43,6 +43,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 3C - YOLO Detection Adapter Normalization](milestones/milestone_3c_yolo_detection_adapter_normalization.md)
 - [Milestone 3D - YOLO Frame Inference / Observation Persistence](milestones/milestone_3d_yolo_frame_inference_observation_persistence.md)
 - [Milestone 3E - Real YOLO Runtime Local Smoke / Viewer Validation](milestones/milestone_3e_real_yolo_runtime_local_smoke_viewer_validation.md)
+- [Milestone 3F - Blueprint 3 Completion Review](milestones/milestone_3f_blueprint_3_completion_review.md)
 
 ## Handoffs
 
@@ -66,6 +67,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 3C Handoff](handoffs/milestone_3c_yolo_detection_adapter_normalization_handoff.md)
 - [Milestone 3D Handoff](handoffs/milestone_3d_yolo_frame_inference_observation_persistence_handoff.md)
 - [Milestone 3E Handoff](handoffs/milestone_3e_real_yolo_runtime_local_smoke_viewer_validation_handoff.md)
+- [Milestone 3F Handoff](handoffs/milestone_3f_blueprint_3_completion_review_handoff.md)
 
 ## Agent Reports
 
@@ -89,12 +91,14 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 3C Agent Report](agent_reports/milestone_3c_yolo_detection_adapter_normalization_report.md)
 - [Milestone 3D Agent Report](agent_reports/milestone_3d_yolo_frame_inference_observation_persistence_report.md)
 - [Milestone 3E Agent Report](agent_reports/milestone_3e_real_yolo_runtime_local_smoke_viewer_validation_report.md)
+- [Milestone 3F Agent Report](agent_reports/milestone_3f_blueprint_3_completion_review_report.md)
 
 ## Blueprints
 
 - [Blueprint 2 - Temporal Evidence Tracklet Candidate System](blueprints/tom_v3_blueprint_2_temporal_evidence_tracklet_candidate_system.md)
 - [Blueprint 2 Completion Review](blueprints/tom_v3_blueprint_2_completion_review.md)
 - [Blueprint 3 - Real Model Runtime / YOLO Observation Adapter](blueprints/tom_v3_blueprint_3_real_model_runtime_yolo_observation_adapter.md)
+- [Blueprint 3 Completion Review](blueprints/tom_v3_blueprint_3_completion_review.md)
 
 ## API and Schema
 

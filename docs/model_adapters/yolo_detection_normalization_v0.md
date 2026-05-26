@@ -116,6 +116,12 @@ Milestone 3D connects `run()` to frame-level YOLO inference behind guarded provi
 
 Milestone 3E adds a local smoke helper for validating that optional real runtime path when local weights and sample media are available.
 
+Milestone 3F closes Blueprint 3 and records the normalization invariant audit in:
+
+```text
+docs/blueprints/tom_v3_blueprint_3_completion_review.md
+```
+
 ## Persistence Compatibility
 
 Normalized payloads include the fields expected by existing detection persistence and viewer overlay contracts:

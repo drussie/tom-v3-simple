@@ -729,3 +729,32 @@ If `--run-tracklets` created tracklets, inspect one with:
 ```text
 GET /tracklets/<tracklet_id>/evidence-bundle
 ```
+
+## 24. Blueprint 3 Complete Local Path
+
+Milestone 3F closes Blueprint 3. The complete local real-model-runtime path is:
+
+```text
+create/activate tom_v3_yolo
+-> install requirements-yolo.txt
+-> yolo-runtime-probe
+-> place local weights under model_assets/yolo or weights/yolo
+-> register-yolo-model
+-> index-media
+-> run-detection-adapter --adapter yolo
+-> extract-frame-artifacts
+-> open /runs/<detection_run_id>
+-> optional build-tracklets
+-> evidence bundle / query / review / export
+```
+
+This path is optional and local-gated. It depends on installed YOLO runtime packages, local weights, and sample media.
+
+Default TOM v3 validation does not require real YOLO:
+
+```bash
+python -m apps.worker.cli yolo-runtime-probe
+python -m apps.worker.cli smoke-real-yolo-local --plan-only
+```
+
+Blueprint 3 remains observation-only. YOLO-origin detections are persisted model outputs, not correctness claims. Tracklets are built only by the existing Blueprint 2 tracklet builder after detections are persisted.

@@ -182,6 +182,12 @@ Milestone 3E documents the local real-YOLO smoke flow that uses this registry ro
 docs/model_adapters/yolo_real_runtime_smoke_v0.md
 ```
 
+Milestone 3F closes Blueprint 3 and confirms the registry/weights invariant coverage:
+
+```text
+docs/blueprints/tom_v3_blueprint_3_completion_review.md
+```
+
 ## Out of Scope
 
 - optimized full-video YOLO inference

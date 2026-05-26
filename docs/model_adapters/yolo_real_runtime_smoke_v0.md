@@ -21,6 +21,8 @@ tom_v3_yolo environment
 
 This smoke path validates workflow and compatibility. It does not add new model intelligence.
 
+Milestone 3F closes Blueprint 3 and treats this smoke path as the local validation surface for real YOLO runtime work.
+
 ## Optional Environment
 
 Create a separate environment for real YOLO runtime work:
@@ -203,3 +205,13 @@ It does not mean the detection is correct, the object is proven, identity is kno
 - production GPU worker
 - remote or automatic weights download
 - adjudication
+
+## Blueprint 3 Completion
+
+Blueprint 3 is complete as of Milestone 3F. The real local smoke remains optional and local-gated; base TOM v3 validation continues to run without real YOLO dependencies or weights.
+
+See:
+
+```text
+docs/blueprints/tom_v3_blueprint_3_completion_review.md
+```

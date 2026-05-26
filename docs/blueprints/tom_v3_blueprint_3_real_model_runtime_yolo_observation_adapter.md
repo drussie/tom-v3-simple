@@ -2,7 +2,7 @@
 
 ## Status
 
-Status: in progress
+Status: complete
 
 Milestone 3A establishes the optional YOLO runtime environment boundary.
 
@@ -13,6 +13,8 @@ Milestone 3C establishes YOLO-like output normalization.
 Milestone 3D establishes the guarded frame-level inference and observation persistence bridge.
 
 Milestone 3E establishes the optional local real-YOLO smoke and viewer validation workflow.
+
+Milestone 3F closes Blueprint 3 with a completion review and invariant audit.
 
 ## Mission
 
@@ -113,6 +115,27 @@ Milestone 3E adds:
 
 3E validates the developer workflow. It does not add new inference behavior.
 
+## Milestone 3F Result
+
+Milestone 3F adds:
+
+- Blueprint 3 completion review
+- real model runtime invariant audit
+- documentation and runbook cleanup
+- control-room index updates
+- completion statement
+- next-blueprint recommendation
+
+3F closes Blueprint 3. It does not add new runtime behavior.
+
+## Blueprint 3 Completion Statement
+
+Blueprint 3 Status: COMPLETE
+
+Blueprint 3 proved that TOM v3 can safely introduce optional real YOLO / Ultralytics runtime without contaminating the base environment, validate and register model weights, normalize YOLO-like outputs into TOM v3 detection payloads, persist YOLO-origin ball/player observations through the existing detection pipeline, document a real local YOLO smoke path, and keep downstream viewer, tracklet, review, and export contracts unchanged.
+
+Blueprint 3 did not add pose, homography, bounce, hit, rally, point, scoring, identity proof, YOLO tracking mode, or adjudication.
+
 ## What Blueprint 3 Will Not Prove
 
 Blueprint 3 does not prove that a detection is correct.
@@ -145,10 +168,10 @@ A hit happened.
 A rally or point exists.
 ```
 
-## Next Milestone
+## Next Blueprint
 
-Recommended next milestone:
+Recommended next blueprint:
 
 ```text
-Milestone 3F - Blueprint 3 Completion Review / Real Model Runtime Hardening
+Blueprint 4 - Pose Observation / Movement Evidence Layer
 ```

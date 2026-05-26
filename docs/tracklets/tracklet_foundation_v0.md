@@ -180,6 +180,8 @@ The command prints:
 
 The source detection run can come from the fixture adapter or the guarded YOLO adapter. Milestone 3E documents an optional real-YOLO smoke path that runs YOLO detection first and then calls this same `build-tracklets` command. The tracklet builder does not use YOLO tracking mode and does not change its grouping policy based on the detector source.
 
+Milestone 3F closes Blueprint 3 and confirms this as the compatibility boundary: YOLO-origin detections feed tracklet building only after they have been persisted as normal TOM v3 detection observations.
+
 ## Viewer / Query Behavior
 
 Open the tracklet builder run in the existing viewer:

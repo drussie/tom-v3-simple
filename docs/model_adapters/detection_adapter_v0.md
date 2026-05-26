@@ -195,6 +195,8 @@ python -m apps.worker.cli smoke-real-yolo-local --plan-only
 
 When optional runtime packages, local weights, and media are available, this helper runs the end-to-end YOLO detection smoke and can optionally build candidate tracklets after detection.
 
+Milestone 3F closes Blueprint 3. The YOLO path is now the completed real-model-runtime bridge, while fixture detection remains the deterministic base demo path.
+
 ## Persistence
 
 The worker service creates:
@@ -326,3 +328,4 @@ The overlay is a visual evidence layer only. It does not create temporal groupin
 - rally segmentation
 - point reconstruction
 - production deployment
+- adjudication

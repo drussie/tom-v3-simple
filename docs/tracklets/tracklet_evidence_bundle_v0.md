@@ -85,6 +85,8 @@ Milestone 2E confirms that evidence bundles are the cross-run inspection layer f
 
 Milestone 3E validates that YOLO-origin detection runs use the same persisted `ball_detection` / `player_detection` observation contract as fixture runs. Tracklet evidence bundles can therefore expose YOLO-origin source detections through the same source detection, frame artifact, and lineage fields.
 
+Milestone 3F closes Blueprint 3 with this compatibility intact. Evidence bundles do not need YOLO-specific response fields.
+
 ## Non-Goals
 
 - No new grouping algorithm.

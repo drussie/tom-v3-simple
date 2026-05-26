@@ -311,7 +311,7 @@ def _xyxy_to_bbox(xyxy: Any) -> tuple[float, float, float, float] | None:
     if not isinstance(xyxy, list | tuple) or len(xyxy) != 4:
         return None
     try:
-        x1, y1, x2, y2 = [float(value) for value in xyxy]
+        x1, y1, x2, y2 = (float(value) for value in xyxy)
     except (TypeError, ValueError):
         return None
     width = x2 - x1

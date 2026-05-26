@@ -2,7 +2,7 @@
 
 ## Current Progress Gauge
 
-Current: ~90-95% through Blueprint 3
+Current: Blueprint 3 complete
 
 ## Current
 
@@ -70,7 +70,7 @@ Current: ~90-95% through Blueprint 3
 - Blueprint 2 completion review exists.
 - Temporal evidence invariants are documented and validated.
 - Blueprint 2 is complete.
-- Blueprint 3 has started.
+- Blueprint 3 is complete.
 - Base `tom_v3` does not require Ultralytics, Torch, or OpenCV imports.
 - Optional YOLO dependency path exists in `requirements-yolo.txt`.
 - YOLO runtime probe and device resolver exist.
@@ -96,6 +96,9 @@ Current: ~90-95% through Blueprint 3
 - Smoke plan covers runtime probe, weights registration, media indexing, YOLO detection, frame artifacts, viewer inspection, and optional tracklet building.
 - Missing runtime, weights, or media produce structured skipped smoke output.
 - Blueprint 2 tracklet compatibility is documented for YOLO detection runs.
+- Blueprint 3 completion review exists.
+- Real model runtime invariants are documented and mapped to test coverage.
+- Blueprint 3 is complete.
 
 ## After Milestone 0A
 
@@ -470,3 +473,21 @@ Expected: ~90-95% through Blueprint 3
 Status: complete.
 
 The repo now has an optional local real-YOLO smoke workflow through worker `smoke-real-yolo-local` and `scripts/smoke_real_yolo_local.py`. The helper can plan the workflow without assets, skips cleanly when optional runtime or weights are missing, and documents how YOLO-origin detections flow into the existing viewer and Blueprint 2 candidate tracklet path.
+
+## After Milestone 3F
+
+Expected: 100% through Blueprint 3
+
+- Blueprint 3 completion review exists.
+- Blueprint 3 status is complete.
+- Real model runtime invariants are documented and mapped to existing tests.
+- The local runbook describes the complete base-env and optional `tom_v3_yolo` paths.
+- The YOLO observation persistence boundary is clear.
+- Viewer and Blueprint 2 tracklet compatibility are documented.
+- Next blueprint boundary is clear.
+
+## Milestone 3F Status
+
+Status: complete.
+
+Blueprint 3 is complete. TOM v3 can keep YOLO runtime optional, validate and register local weights, normalize YOLO-like model outputs, persist YOLO-origin atomic detection observations through the existing detection pipeline, inspect them through the existing viewer/frame artifact path, and feed Blueprint 2 candidate tracklet/review/export workflows without adding pose, homography, bounce, hit, rally, point, scoring, YOLO tracking mode, or adjudication.
