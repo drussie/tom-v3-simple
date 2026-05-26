@@ -77,6 +77,10 @@ The bundle returns both the flat annotation list and per-target summaries so the
 
 Milestone 2D review dataset exports package these dynamic bundles into local JSON artifacts. The export path may include or omit frame artifact metadata and annotations, but it does not persist a new saved bundle table.
 
+## Blueprint 2 Completion
+
+Milestone 2E confirms that evidence bundles are the cross-run inspection layer for Blueprint 2. They explain candidate evidence; they do not confirm identity, trajectory, bounce, hit, rally, point, or score.
+
 ## Non-Goals
 
 - No new grouping algorithm.

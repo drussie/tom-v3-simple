@@ -425,3 +425,58 @@ Expected behavior:
 - query exports create a `query_result` row
 - export includes tracklet evidence bundles, lineage, frame artifact metadata, and annotations when requested
 - export warnings state that candidate evidence and annotations are not adjudicated labels
+
+## 18. Blueprint 2 Full Local Smoke Path
+
+Blueprint 2 is complete when this local fixture/dev path works without real YOLO:
+
+```text
+index media
+-> run fixture detection adapter
+-> extract frame artifacts
+-> build candidate tracklets
+-> query tracklets
+-> inspect evidence bundle
+-> add review annotation
+-> export review dataset
+-> inspect output artifact
+```
+
+Recommended command sequence:
+
+```bash
+python -m apps.worker.cli index-media --source-path /path/to/video.mp4
+python -m apps.worker.cli run-detection-adapter --media-id <MEDIA_ID> --adapter fixture --frame-sample-rate 5 --max-frames 4 --output-debug-artifact
+python -m apps.worker.cli extract-frame-artifacts --run-id <DETECTION_RUN_ID> --max-frames 2 --output-root .data/artifacts
+python -m apps.worker.cli build-tracklets --detection-run-id <DETECTION_RUN_ID> --max-gap-frames 30
+```
+
+Then:
+
+```bash
+curl -X POST http://127.0.0.1:8000/tracklets/query \
+  -H 'Content-Type: application/json' \
+  -d '{"source_detection_run_id":"<DETECTION_RUN_ID>","limit":50}'
+
+curl http://127.0.0.1:8000/tracklets/<TRACKLET_ID>/evidence-bundle
+
+curl -X POST http://127.0.0.1:8000/annotations \
+  -H 'Content-Type: application/json' \
+  -d '{"observation_id":"<TRACKLET_OBSERVATION_ID>","annotation_type":"bad_tracklet","payload_jsonb":{"annotation_label":"bad_tracklet","review_context":"blueprint_2_smoke","review_status":"reviewed"},"created_by":"local-reviewer"}'
+
+python -m apps.worker.cli export-tracklet-review-dataset \
+  --query-json '{"has_annotation":true}' \
+  --output-root .data/exports \
+  --format json
+```
+
+Expected behavior:
+
+- tracklet query returns candidate tracklets
+- evidence bundle reconstructs source detection to track point to tracklet lineage
+- annotation persists as review evidence
+- export JSON exists
+- export artifact metadata exists
+- export warnings preserve candidate-only and no-adjudication semantics
+
+This flow is fixture/dev evidence unless a future real model adapter is supplied. It does not require real YOLO and does not add pose, homography, bounce, hit, rally, point, scoring, or adjudication.

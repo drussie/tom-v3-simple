@@ -59,3 +59,7 @@ Avoid language that implies a confirmed trajectory, identity, event, rally, poin
 - The source detection overlay and tracklet coverage are not yet fused into one multi-run timeline.
 - Review annotations use a local/dev reviewer value until auth exists.
 - Frame images appear only when frame artifacts have already been extracted.
+
+## Blueprint 2 Completion
+
+Milestone 2E confirms the Tracklet Evidence panel as sufficient for Blueprint 2 closeout. It provides focused cross-run evidence inspection without claiming a confirmed track, identity, bounce, hit, rally, point, or score.

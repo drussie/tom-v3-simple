@@ -4,6 +4,12 @@
 
 Tracklet Foundation v0 is the Milestone 2A implementation for candidate temporal grouping from persisted detection observations.
 
+## Naming Transition
+
+The implementation branch/file names may reference "1F" because the milestone was originally planned as a Blueprint 1 extension. After Blueprint 1 was declared complete, the same work was reclassified as Blueprint 2A because temporal grouping begins a new conceptual layer.
+
+The canonical name is Milestone 2A - Tracklet Candidate Foundation from Persisted Detections.
+
 Target flow:
 
 ```text
@@ -209,6 +215,10 @@ POST /tracklets/query
 ```
 
 The query endpoint can filter by run, source run, family, subject, frame range, confidence, point count, gap count, and review labels. Review annotations target observation ids and do not change tracklet, track point, source detection, lineage, or artifact rows.
+
+Milestone 2D adds review dataset export for selected candidate tracklets.
+
+Milestone 2E closes Blueprint 2. The complete temporal evidence layer now supports candidate tracklet building, lineage, multi-run evidence bundles, query, review annotations, and export artifacts.
 
 ## Non-Goals
 

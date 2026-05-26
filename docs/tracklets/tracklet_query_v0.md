@@ -85,3 +85,7 @@ python -m apps.worker.cli export-tracklet-review-dataset \
 ```
 
 The export service calls the query service instead of duplicating filter logic.
+
+## Blueprint 2 Completion
+
+Milestone 2E confirms tracklet query as a structured review filter layer. Query results are candidate evidence summaries; they do not create new observations or adjudicated results.

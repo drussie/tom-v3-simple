@@ -2,7 +2,7 @@
 
 ## Current Progress Gauge
 
-Current: ~90% through Blueprint 2
+Current: 100% through Blueprint 2
 
 ## Current
 
@@ -67,6 +67,9 @@ Current: ~90% through Blueprint 2
 - Candidate tracklet evidence can be exported by tracklet ids or by structured query filters.
 - Export artifacts are persisted as local JSON files with `evidence_artifact` metadata and checksums.
 - Query-based exports can persist `query_result` memory.
+- Blueprint 2 completion review exists.
+- Temporal evidence invariants are documented and validated.
+- Blueprint 2 is complete.
 
 ## After Milestone 0A
 
@@ -329,3 +332,20 @@ Expected: ~90% through Blueprint 2
 Status: complete.
 
 The repo now has a JSON review dataset export path for candidate tracklet evidence, available through both worker CLI and API, with persisted export artifact metadata and optional query result memory for query-based exports.
+
+## After Milestone 2E
+
+Expected: 100% through Blueprint 2
+
+- Blueprint 2 completion review exists.
+- Blueprint 2 status is complete.
+- The 1F to 2A naming transition is documented.
+- Temporal evidence invariants are documented and validated.
+- Local runbook includes the complete Blueprint 2 flow.
+- Next blueprint boundary is clear.
+
+## Milestone 2E Status
+
+Status: complete.
+
+Blueprint 2 is complete. TOM v3 can build candidate tracklets from persisted detections, preserve source lineage, inspect evidence across runs, query and review candidates, and export review datasets without adding pose, homography, bounce, hit, rally, point, scoring, or adjudication.

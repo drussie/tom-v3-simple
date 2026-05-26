@@ -4,8 +4,8 @@
 
 - Project name: TOM v3 Simple
 - Repo: drussie/tom-v3-simple
-- Current phase: Milestone 2D
-- Current goal: tracklet evidence export / review dataset foundation
+- Current phase: Milestone 2E
+- Current goal: Blueprint 2 completion review / temporal evidence hardening
 
 ## Mission
 
@@ -26,6 +26,7 @@ A lightweight tennis video observation platform that accepts model output as ope
 - Tracklet evidence bundle: implemented as a dynamic API/viewer path for cross-run tracklet evidence inspection
 - Tracklet query/review: implemented with structured query filters, annotation summaries, and viewer review controls
 - Tracklet review dataset export: implemented with JSON export artifacts, evidence artifact metadata, optional query result memory, API endpoint, and worker CLI
+- Blueprint 2 status: complete; temporal evidence can be built, inspected, queried, reviewed, and exported as candidate evidence
 - Observation writer: implemented with typed extension rows, lineage, artifacts, and idempotency
 - Worker synthetic seeder: implemented
 - Visual evidence viewer: implemented in `apps/web` with detection bbox overlay and frame artifact image support
@@ -123,6 +124,16 @@ Status: complete
 
 Milestone 2D adds `POST /tracklets/export-review-dataset`, worker `export-tracklet-review-dataset`, JSON review dataset artifacts under `.data/exports`, persisted `tracklet_review_dataset_export` artifact metadata, optional query result rows for query-based exports, and docs/tests for packaging candidate tracklet evidence without mutating observations.
 
+## Milestone 2E Result
+
+Status: complete
+
+Milestone 2E closes Blueprint 2 with a completion review, invariant audit, naming transition documentation, runbook cleanup, and validation pass. Blueprint 2 is now complete: persisted detections can become candidate tracklets with source lineage, multi-run evidence bundles, structured query, review annotations, and review dataset exports.
+
+## Naming Transition
+
+The implementation branch/file names may reference "1F" because the milestone was originally planned as a Blueprint 1 extension. After Blueprint 1 was declared complete, the same work was reclassified as Blueprint 2A because temporal grouping begins a new conceptual layer.
+
 ## Next Milestone
 
-Recommended next handoff: Milestone 2E - Blueprint 2 Completion Review / Temporal Evidence Hardening, unless YOLO26 runtime/assets become available and real detector integration is prioritized.
+Recommended next blueprint: Blueprint 3 - Real Model Runtime / YOLO Observation Adapter, unless the user chooses Blueprint 3 - Pose Observation / Movement Evidence Layer.

@@ -529,3 +529,36 @@ Milestone 2D created:
 - API endpoint `POST /tracklets/export-review-dataset`.
 - Worker command `export-tracklet-review-dataset`.
 - Tests covering direct exports, query exports, warning fields, artifact metadata, annotation/frame-artifact inclusion controls, API, and worker handler behavior.
+
+## Milestone 2E - Blueprint 2 Completion Review / Temporal Evidence Hardening
+
+Status: complete
+
+### Goal
+
+Close Blueprint 2 with a completion review, invariant audit, naming cleanup, runbook validation, and final documentation pass.
+
+### Non-goals
+
+- No real YOLO runtime integration.
+- No pose detection.
+- No court homography.
+- No bounce detection.
+- No hit detection.
+- No rally segmentation.
+- No point reconstruction.
+- No scoring.
+- No production deployment or auth.
+- No adjudication.
+
+### Notes
+
+Milestone 2E completed:
+
+- Blueprint 2 completion review doc.
+- Blueprint 2 status update to complete.
+- Invariant audit mapping temporal evidence guarantees to existing tests.
+- Focused cross-flow invariant test proving query/review/export do not mutate source detection observations.
+- 1F to 2A naming transition documentation.
+- Current state, progress, control room, README, runbook, and tracklet/viewer docs updates.
+- Final validation pass for backend, worker, web, migrations, synthetic smoke, and local Blueprint 2 smoke path.

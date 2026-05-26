@@ -14,7 +14,7 @@ The core invariant:
 
 ## Current Status
 
-Milestone 2D adds tracklet evidence export / review dataset artifacts on top of persisted ball/player detections and candidate tracklets:
+Blueprint 2 is complete. TOM v3 Simple can build, inspect, query, review, and export candidate temporal evidence on top of persisted ball/player detections:
 
 - repo memory and architecture contracts
 - FastAPI backend/API foundation
@@ -52,8 +52,13 @@ Milestone 2D adds tracklet evidence export / review dataset artifacts on top of 
 - annotation summaries for tracklet evidence bundles
 - viewer review controls for annotating tracklet candidates, track point candidates, and source detections
 - review dataset export service, API, and worker CLI for packaging candidate tracklet evidence as JSON artifacts
+- Blueprint 2 completion review and invariant audit
 
 Portable TOM v1 detector assets/source and YOLO26 runtime/assets are not present in this repo state. No sophisticated tracking, pose processing, court homography, or real bounce detection is implemented yet.
+
+Blueprint 2 did not add pose, homography, bounce detection, hit detection, rally/point reconstruction, scoring, identity proof, or adjudication.
+
+Recommended next blueprint: Blueprint 3 - Real Model Runtime / YOLO Observation Adapter. An alternative is Blueprint 3 - Pose Observation / Movement Evidence Layer if the next priority is movement evidence. Pose remains outside Blueprint 2.
 
 ## Repo Structure
 

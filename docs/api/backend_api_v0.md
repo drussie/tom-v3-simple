@@ -212,3 +212,5 @@ Example:
 ```
 
 The response includes `export_id`, `artifact_id`, file URI/path, checksum, selected tracklet ids, optional `query_result_id`, and warning fields. The endpoint persists a `tracklet_review_dataset_export` evidence artifact and does not mutate observations or save the full export payload in Postgres.
+
+Together, `POST /tracklets/query`, `GET /tracklets/{tracklet_id}/evidence-bundle`, `POST /annotations`, and `POST /tracklets/export-review-dataset` form the completed Blueprint 2 temporal evidence API surface.

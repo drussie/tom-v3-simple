@@ -38,4 +38,8 @@ The UI uses candidate/review/evidence language. A review annotation is not a cor
 
 - There is no production review queue.
 - Annotation labels are documented and offered in the viewer, but no enum migration is added.
-- Query results are not saved to `query_result` in this milestone.
+- The review viewer itself does not save query results. Milestone 2D export can save `query_result` rows for query-based review dataset exports.
+
+## Blueprint 2 Completion
+
+Milestone 2E confirms viewer review controls as the Blueprint 2 review surface. Review annotations are non-mutating evidence and remain separate from candidate tracklet, track point, and source detection observations.

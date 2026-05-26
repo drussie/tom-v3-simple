@@ -156,3 +156,7 @@ This row is a memory bridge for the export. It does not persist the full export 
 ## Rule
 
 An export is a portable evidence package. It is not a source of adjudicated labels.
+
+## Blueprint 2 Completion
+
+Milestone 2E confirms review dataset export as the final Blueprint 2 evidence packaging layer. It packages candidate tracklets, track point candidates, source detections, frame artifact metadata, lineage, and review annotations for reuse while preserving candidate-only semantics.

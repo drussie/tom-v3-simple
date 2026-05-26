@@ -37,6 +37,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 2B - Tracklet Viewer / Multi-Run Evidence Bundle](milestones/milestone_2b_tracklet_viewer_multirun_evidence_bundle.md)
 - [Milestone 2C - Tracklet Query and Review](milestones/milestone_2c_tracklet_query_and_review.md)
 - [Milestone 2D - Tracklet Evidence Export / Review Dataset Foundation](milestones/milestone_2d_tracklet_evidence_export_review_dataset.md)
+- [Milestone 2E - Blueprint 2 Completion Review](milestones/milestone_2e_blueprint_2_completion_review.md)
 
 ## Handoffs
 
@@ -54,6 +55,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 2B Handoff](handoffs/milestone_2b_tracklet_viewer_multirun_evidence_bundle_handoff.md)
 - [Milestone 2C Handoff](handoffs/milestone_2c_tracklet_query_and_review_handoff.md)
 - [Milestone 2D Handoff](handoffs/milestone_2d_tracklet_evidence_export_review_dataset_handoff.md)
+- [Milestone 2E Handoff](handoffs/milestone_2e_blueprint_2_completion_review_handoff.md)
 
 ## Agent Reports
 
@@ -71,10 +73,12 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 2B Agent Report](agent_reports/milestone_2b_tracklet_viewer_multirun_evidence_bundle_report.md)
 - [Milestone 2C Agent Report](agent_reports/milestone_2c_tracklet_query_and_review_report.md)
 - [Milestone 2D Agent Report](agent_reports/milestone_2d_tracklet_evidence_export_review_dataset_report.md)
+- [Milestone 2E Agent Report](agent_reports/milestone_2e_blueprint_2_completion_review_report.md)
 
 ## Blueprints
 
 - [Blueprint 2 - Temporal Evidence Tracklet Candidate System](blueprints/tom_v3_blueprint_2_temporal_evidence_tracklet_candidate_system.md)
+- [Blueprint 2 Completion Review](blueprints/tom_v3_blueprint_2_completion_review.md)
 
 ## API and Schema
 
