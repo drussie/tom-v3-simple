@@ -2,7 +2,7 @@
 
 ## Current Progress Gauge
 
-Current: ~50-55%
+Current: ~65%
 
 ## Current
 
@@ -19,6 +19,13 @@ Current: ~50-55%
 - Observation writer exists.
 - Media, run, model, runtime config, observation, artifact, and annotation APIs exist.
 - Synthetic/dev insertion path exists.
+- Worker CLI exists.
+- Rich synthetic run generation exists outside the API route.
+- Synthetic evidence is visual-viewer-ready.
+- Track coverage and missingness are represented.
+- Candidate observations have lineage and artifacts.
+- Visual evidence viewer foundation exists.
+- Viewer data is loaded from backend/API contracts.
 
 ## After Milestone 0A
 
@@ -77,3 +84,22 @@ Expected: ~50-55%
 Status: complete.
 
 The repo now has a worker CLI and shared synthetic seeder that creates viewer-ready baseline observations for Milestone 0D.
+
+## After Milestone 0D
+
+Expected: ~65%
+
+- `apps/web` has a working visual evidence viewer foundation.
+- The viewer can load a run by run id.
+- The viewer shows gameplay/non-gameplay/uncertain bands.
+- The viewer shows ball, near-player, and far-player track coverage rows.
+- The viewer shows homography valid/missing intervals.
+- The viewer shows candidate markers.
+- The viewer shows observation detail, lineage, and artifact metadata.
+- Missingness is visible.
+
+## Milestone 0D Status
+
+Status: complete.
+
+The repo now has a backend-composed viewer run endpoint and a Next.js web app that renders persisted synthetic evidence without adding real ML or a frontend-only evidence model.

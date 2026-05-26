@@ -11,3 +11,6 @@ tom_v3_dev.db
 *.db
 *.egg-info/
 .DS_Store
+node_modules/
+.next/
+*.tsbuildinfo

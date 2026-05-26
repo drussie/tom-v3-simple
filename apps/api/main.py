@@ -5,7 +5,16 @@ from fastapi import FastAPI
 
 from apps.api.config import settings
 from apps.api.db import init_database
-from apps.api.routers import annotations, artifacts, dev, media, observations, registry, runs
+from apps.api.routers import (
+    annotations,
+    artifacts,
+    dev,
+    media,
+    observations,
+    registry,
+    runs,
+    viewer,
+)
 
 
 def create_app() -> FastAPI:
@@ -33,6 +42,7 @@ def create_app() -> FastAPI:
     app.include_router(artifacts.router)
     app.include_router(annotations.router)
     app.include_router(dev.router)
+    app.include_router(viewer.router)
     return app
 
 

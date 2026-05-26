@@ -93,3 +93,38 @@ Milestone 0C created:
 - Lineage links from candidates to supporting observations.
 - Placeholder evidence artifact metadata.
 - Tests covering worker seeding and queryability.
+
+## Milestone 0D - Visual Evidence Viewer Foundation
+
+Status: complete
+
+### Goal
+
+Build the first frontend surface that can load a TOM v3 run and show persisted evidence visually.
+
+### Non-goals
+
+- No YOLO integration.
+- No TOM v1 integration.
+- No real video processing.
+- No real tracking implementation.
+- No real homography calculation.
+- No real bounce detection.
+- No production auth.
+- No deployment work.
+- No adjudication.
+- No truth/fact/promotion/refusal concepts.
+
+### Notes
+
+Milestone 0D created:
+
+- Next.js web app under `apps/web`.
+- Thin backend viewer endpoint `GET /viewer/runs/{run_id}` that composes existing run, media, observation, tracklet, lineage, artifact, and annotation rows.
+- Timeline rendering for gameplay/non_gameplay/uncertain view-state bands.
+- Track coverage rows for ball, near-player, and far-player tracklets.
+- Homography valid/missing row from persisted placeholder observations.
+- Clickable candidate markers for derived candidates.
+- Observation detail, lineage, artifact, and annotation panels.
+- Tests covering the viewer API composition route.
+- Frontend lint/build validation.

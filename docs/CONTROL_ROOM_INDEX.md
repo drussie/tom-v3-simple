@@ -26,18 +26,21 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 0A - Repo Memory + Architecture / Schema Foundation](milestones/milestone_0a_repo_memory_architecture_schema.md)
 - [Milestone 0B - Backend / API Foundation](milestones/milestone_0b_backend_api_foundation.md)
 - [Milestone 0C - Worker + Synthetic Observation Seeder](milestones/milestone_0c_worker_synthetic_observation_seeder.md)
+- [Milestone 0D - Visual Evidence Viewer Foundation](milestones/milestone_0d_visual_evidence_viewer_foundation.md)
 
 ## Handoffs
 
 - [Milestone 0A Handoff](handoffs/milestone_0a_repo_memory_architecture_schema_handoff.md)
 - [Milestone 0B Handoff](handoffs/milestone_0b_backend_api_foundation_handoff.md)
 - [Milestone 0C Handoff](handoffs/milestone_0c_worker_synthetic_observation_seeder_handoff.md)
+- [Milestone 0D Handoff](handoffs/milestone_0d_visual_evidence_viewer_foundation_handoff.md)
 
 ## Agent Reports
 
 - [Milestone 0A Agent Report](agent_reports/milestone_0a_repo_memory_architecture_schema_report.md)
 - [Milestone 0B Agent Report](agent_reports/milestone_0b_backend_api_foundation_report.md)
 - [Milestone 0C Agent Report](agent_reports/milestone_0c_worker_synthetic_observation_seeder_report.md)
+- [Milestone 0D Agent Report](agent_reports/milestone_0d_visual_evidence_viewer_foundation_report.md)
 
 ## API and Schema
 
@@ -48,6 +51,10 @@ Use this index as the durable navigation point for project memory, architecture 
 
 - [Synthetic Seeder v0](worker/synthetic_seeder_v0.md)
 - [Baseline Synthetic Scenario v0](worker/synthetic_scenario_baseline_v0.md)
+
+## Web
+
+- [Visual Evidence Viewer v0](web/visual_evidence_viewer_v0.md)
 
 ## Core Vocabulary
 

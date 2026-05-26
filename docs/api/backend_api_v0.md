@@ -130,3 +130,20 @@ This dev-only endpoint reuses the shared worker/seeding library and creates:
 - evidence artifact placeholders
 
 This endpoint proves backend persistence and uses the same shared synthetic seed function as the worker CLI. It is still dev-only.
+
+## Viewer Composition
+
+- `GET /viewer/runs/{run_id}`
+
+This endpoint composes existing persisted rows for the visual evidence viewer:
+
+- run metadata
+- media metadata
+- processing steps
+- observations with typed gameplay, atomic, or derived detail
+- tracklets and track points
+- lineage rows
+- evidence artifact metadata
+- human annotations
+
+The endpoint is a read model over stored evidence. It does not create observations or add new interpretation logic.

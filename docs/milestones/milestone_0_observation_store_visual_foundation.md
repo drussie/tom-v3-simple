@@ -44,6 +44,8 @@ Status: complete.
 
 Create the first web viewer that can query synthetic observations and display timeline bands, tracks, gaps, details, artifacts, and lineage.
 
+Status: complete.
+
 ### 0E: QA / Integration / Docs Finalization
 
 Run integration checks across backend, worker, and viewer. Update docs and handoffs for the next milestone.
