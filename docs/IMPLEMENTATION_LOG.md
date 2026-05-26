@@ -236,3 +236,39 @@ Milestone 1B created:
 - Worker gameplay adapter service that creates runtime config, model registry, processing run, processing step, and typed gameplay observations.
 - Worker commands `run-gameplay-adapter` and `index-and-run-gameplay`.
 - Viewer compatibility tests for gameplay adapter runs.
+
+## Milestone 1C - YOLO26 Ball / Player Observation Adapter
+
+Status: complete
+
+### Goal
+
+Implement the first ball/player detector adapter seam and persist detector output as TOM v3 atomic observations.
+
+### Non-goals
+
+- No tracking.
+- No pose detection.
+- No court homography.
+- No bounce detection.
+- No hit detection.
+- No rally segmentation.
+- No point reconstruction.
+- No scoring.
+- No streaming ingestion.
+- No production deployment.
+- No adjudication.
+- No truth/fact/promotion/refusal concepts.
+
+### Notes
+
+Milestone 1C created:
+
+- Detection adapter interface in `tom_v3_model_adapters.detection`.
+- Deterministic fixture detection adapter for dev/test output.
+- YOLO adapter stub that clearly reports unavailable runtime/assets.
+- YOLO26/Ultralytics portability assessment doc.
+- Worker detection adapter service that creates runtime config, model registry, processing run, processing step, and typed atomic observations.
+- Worker commands `run-detection-adapter` and `index-and-run-detection`.
+- Optional scoped lineage from detections to gameplay/view-state observations.
+- Query and viewer payload compatibility tests for detection adapter runs.

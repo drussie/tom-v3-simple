@@ -9,6 +9,7 @@ from tom_v3_storage.db_models import Base
 
 from apps.worker.config import settings
 from apps.worker.pipelines.synthetic_seed import seed_synthetic_run
+from apps.worker.services.detection_adapter import run_detection_adapter
 from apps.worker.services.gameplay_adapter import run_gameplay_adapter
 from apps.worker.services.media_indexer import index_media
 
@@ -104,6 +105,55 @@ def main() -> None:
     index_gameplay_parser.add_argument("--skip-create-db", action="store_true")
     index_gameplay_parser.set_defaults(handler=_handle_index_and_run_gameplay)
 
+    detection_parser = subcommands.add_parser(
+        "run-detection-adapter",
+        help="Run a ball/player detection adapter for an indexed media asset.",
+    )
+    detection_parser.add_argument("--media-id", required=True)
+    detection_parser.add_argument("--adapter", default="fixture", choices=["fixture", "yolo"])
+    detection_parser.add_argument("--model-path")
+    detection_parser.add_argument("--device")
+    detection_parser.add_argument("--image-size", type=int)
+    detection_parser.add_argument("--confidence-threshold", type=float, default=0.25)
+    detection_parser.add_argument("--frame-sample-rate", type=int, default=30)
+    detection_parser.add_argument("--max-frames", type=int, default=5)
+    detection_parser.add_argument("--gameplay-run-id")
+    detection_parser.add_argument("--run-name", default="detection-adapter-run")
+    detection_parser.add_argument("--config-name", default="detection-adapter-config")
+    detection_parser.add_argument("--config-version", default="v0")
+    detection_parser.add_argument("--output-debug-artifact", action="store_true")
+    detection_parser.add_argument("--skip-create-db", action="store_true")
+    detection_parser.set_defaults(handler=_handle_run_detection_adapter)
+
+    index_detection_parser = subcommands.add_parser(
+        "index-and-run-detection",
+        help="Index a local media file, then run a detection adapter.",
+    )
+    index_detection_parser.add_argument("--source-path", required=True)
+    index_detection_parser.add_argument(
+        "--copy-to-storage",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+    )
+    index_detection_parser.add_argument("--media-name")
+    index_detection_parser.add_argument("--storage-root", default=".data/media")
+    index_detection_parser.add_argument(
+        "--adapter", default="fixture", choices=["fixture", "yolo"]
+    )
+    index_detection_parser.add_argument("--model-path")
+    index_detection_parser.add_argument("--device")
+    index_detection_parser.add_argument("--image-size", type=int)
+    index_detection_parser.add_argument("--confidence-threshold", type=float, default=0.25)
+    index_detection_parser.add_argument("--frame-sample-rate", type=int, default=30)
+    index_detection_parser.add_argument("--max-frames", type=int, default=5)
+    index_detection_parser.add_argument("--gameplay-run-id")
+    index_detection_parser.add_argument("--run-name", default="detection-adapter-run")
+    index_detection_parser.add_argument("--config-name", default="detection-adapter-config")
+    index_detection_parser.add_argument("--config-version", default="v0")
+    index_detection_parser.add_argument("--output-debug-artifact", action="store_true")
+    index_detection_parser.add_argument("--skip-create-db", action="store_true")
+    index_detection_parser.set_defaults(handler=_handle_index_and_run_detection)
+
     args = parser.parse_args()
     with _session_factory(create_db=not args.skip_create_db)() as session:
         result = args.handler(session, args)
@@ -197,6 +247,62 @@ def _handle_index_and_run_gameplay(
         output_debug_artifact=args.output_debug_artifact,
         window_seconds=args.window_seconds,
         stride_seconds=args.stride_seconds,
+    )
+    return {
+        "indexed_media": {
+            "media_id": media.id,
+            "source_uri": media.source_uri,
+            "stored_uri": media.metadata_jsonb.get("stored_uri"),
+            "checksum": media.checksum,
+        },
+        **result,
+    }
+
+
+def _handle_run_detection_adapter(session: Session, args: argparse.Namespace) -> dict[str, object]:
+    return run_detection_adapter(
+        session=session,
+        media_id=args.media_id,
+        adapter_name=args.adapter,
+        run_name=args.run_name,
+        config_name=args.config_name,
+        config_version=args.config_version,
+        model_path=args.model_path,
+        device=args.device,
+        image_size=args.image_size,
+        confidence_threshold=args.confidence_threshold,
+        frame_sample_rate=args.frame_sample_rate,
+        max_frames=args.max_frames,
+        gameplay_run_id=args.gameplay_run_id,
+        output_debug_artifact=args.output_debug_artifact,
+    )
+
+
+def _handle_index_and_run_detection(
+    session: Session, args: argparse.Namespace
+) -> dict[str, object]:
+    media = index_media(
+        session=session,
+        source_path=args.source_path,
+        copy_to_storage=args.copy_to_storage,
+        media_name=args.media_name,
+        storage_root=args.storage_root,
+    )
+    result = run_detection_adapter(
+        session=session,
+        media_id=media.id,
+        adapter_name=args.adapter,
+        run_name=args.run_name,
+        config_name=args.config_name,
+        config_version=args.config_version,
+        model_path=args.model_path,
+        device=args.device,
+        image_size=args.image_size,
+        confidence_threshold=args.confidence_threshold,
+        frame_sample_rate=args.frame_sample_rate,
+        max_frames=args.max_frames,
+        gameplay_run_id=args.gameplay_run_id,
+        output_debug_artifact=args.output_debug_artifact,
     )
     return {
         "indexed_media": {

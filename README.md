@@ -14,7 +14,7 @@ The core invariant:
 
 ## Current Status
 
-Milestone 1B adds the first gameplay/view-state adapter seam on top of the real media substrate:
+Milestone 1C adds the first ball/player detection adapter seam on top of the real media substrate:
 
 - repo memory and architecture contracts
 - FastAPI backend/API foundation
@@ -32,8 +32,12 @@ Milestone 1B adds the first gameplay/view-state adapter seam on top of the real 
 - fixture gameplay adapter for deterministic dev/test output
 - TOM v1 gameplay adapter integration stub and portability assessment
 - worker command to persist gameplay/non_gameplay/uncertain observations
+- detection adapter interface
+- fixture detector for deterministic ball/player dev/test output
+- YOLO26 detection adapter unavailable stub and portability assessment
+- worker command to persist ball_detection/player_detection atomic observations
 
-Portable TOM v1 detector assets/source are not present in this repo state. No YOLO integration, ball/player tracking, pose processing, court homography, or real bounce detection is implemented yet.
+Portable TOM v1 detector assets/source and YOLO26 runtime/assets are not present in this repo state. No tracking, pose processing, court homography, or real bounce detection is implemented yet.
 
 ## Repo Structure
 
@@ -46,7 +50,7 @@ packages/
   schema/          Shared schema contracts.
   storage/         Storage adapters and persistence helpers.
   video/           ffprobe metadata and frame/time mapping utilities.
-  model_adapters/  Gameplay adapter interface and fixture adapter.
+  model_adapters/  Gameplay and detection adapter interfaces and fixtures.
   observations/    Observation writer, lineage, and synthetic helpers.
   visualization/   Viewer-oriented utilities placeholder.
 migrations/        Alembic database migrations.
@@ -129,6 +133,22 @@ Open the returned `run_id` in the viewer:
 http://127.0.0.1:3000/runs/<RUN_ID>
 ```
 
+Run the detection adapter fixture for indexed media:
+
+```bash
+python -m apps.worker.cli run-detection-adapter \
+  --media-id <MEDIA_ID> \
+  --adapter fixture
+```
+
+Or index and run detection in one local command:
+
+```bash
+python -m apps.worker.cli index-and-run-detection \
+  --source-path /path/to/video.mp4 \
+  --adapter fixture
+```
+
 Seed synthetic evidence:
 
 ```bash
@@ -190,6 +210,8 @@ make migrate
 make index-media SOURCE_PATH=/path/to/video.mp4
 make run-gameplay MEDIA_ID=<media_id>
 make index-and-run-gameplay SOURCE_PATH=/path/to/video.mp4
+make run-detection MEDIA_ID=<media_id>
+make index-and-run-detection SOURCE_PATH=/path/to/video.mp4
 make seed
 make smoke
 make all-checks
@@ -205,4 +227,5 @@ Useful runbooks:
 - [Local Demo Runbook](docs/dev/local_demo_runbook.md)
 - [Media Indexing v0](docs/media/media_indexing_v0.md)
 - [Gameplay Adapter v0](docs/model_adapters/gameplay_adapter_v0.md)
+- [Detection Adapter v0](docs/model_adapters/detection_adapter_v0.md)
 - [Repo Branch Hygiene](docs/dev/repo_branch_hygiene.md)

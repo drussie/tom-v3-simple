@@ -1,0 +1,222 @@
+# TOM v3 Simple - Detection Adapter v0
+
+## Purpose
+
+Detection Adapter v0 is the TOM v3 interface for ball/player detector output.
+
+It turns detector output into persisted atomic observations:
+
+```text
+indexed media_asset
+-> optional gameplay scope
+-> detection adapter
+-> ball_detection / player_detection observations
+-> ObservationWriter
+-> query API and viewer observation list/detail
+```
+
+Ball/player detections are observations. They are not tracking, identity assignment, bounce detection, or adjudication.
+
+## Package
+
+Adapter interface:
+
+```text
+packages/model_adapters/tom_v3_model_adapters/detection.py
+```
+
+Worker persistence service:
+
+```text
+apps/worker/services/detection_adapter.py
+```
+
+## Adapter Contract
+
+Primary classes:
+
+- `DetectionAdapterInput`
+- `DetectionObservation`
+- `DetectionAdapterResult`
+- `BaseDetectionAdapter`
+- `FixtureDetectionAdapter`
+- `YoloDetectionAdapter`
+
+Adapter input includes:
+
+- media id
+- source URI
+- local path when available
+- FPS
+- frame count
+- duration
+- width and height
+- runtime config payload
+- frame/time summary from media indexing
+- optional gameplay segments
+- media metadata
+
+Adapter output includes:
+
+- adapter name and version
+- detection observations
+- optional artifact metadata
+- diagnostics
+
+## Frame/Time Rule
+
+Media indexing owns frame/time.
+
+Detection adapters must use indexed media FPS, frame count, duration, and frame/time summary. Every detection observation stores `frame_start`, `frame_end`, `timestamp_start_ms`, and `timestamp_end_ms` derived from TOM v3 media metadata.
+
+## Fixture Adapter
+
+`FixtureDetectionAdapter` is deterministic and development-only.
+
+For sampled frames, it emits:
+
+- one `ball_detection`
+- one near-player-like `player_detection`
+- one far-player-like `player_detection`
+
+It supports:
+
+- `frame_sample_rate`
+- `max_frames`
+
+The fixture payload marks itself as fixture output and includes `frame_time_owner: media_indexing`.
+
+## YOLO Adapter Stub
+
+`YoloDetectionAdapter` exists behind the same interface but intentionally raises a clear unavailable error when the runtime or model file is unavailable.
+
+The current repo/environment does not contain:
+
+- Ultralytics package
+- YOLO26 model weights
+- known ball/player model path
+
+See:
+
+```text
+docs/model_adapters/yolo26_detection_adapter_assessment.md
+```
+
+## Persistence
+
+The worker service creates:
+
+- `runtime_config`
+- `model_registry`
+- `processing_run`
+- `processing_step`
+- one `observation` row per detection
+- one typed `atomic_observation` row per detection
+
+Ball detections write:
+
+- `observation_family=atomic`
+- `observation_type=ball_detection`
+- `atomic_kind=ball_detection`
+- `coordinate_space=image_pixels`
+
+Player detections write:
+
+- `observation_family=atomic`
+- `observation_type=player_detection`
+- `atomic_kind=player_detection`
+- `coordinate_space=image_pixels`
+
+Atomic payload includes:
+
+- bbox
+- center
+- class label
+- class id
+- detector metadata
+- `frame_time_owner=media_indexing`
+
+If a gameplay run is supplied, detections are linked to overlapping gameplay/view-state observations with `scoped_by` lineage.
+
+## Worker Commands
+
+Run fixture detection on indexed media:
+
+```bash
+python -m apps.worker.cli run-detection-adapter \
+  --media-id <MEDIA_ID> \
+  --adapter fixture \
+  --frame-sample-rate 30 \
+  --max-frames 5
+```
+
+Index a local file and run fixture detection:
+
+```bash
+python -m apps.worker.cli index-and-run-detection \
+  --source-path /path/to/video.mp4 \
+  --adapter fixture
+```
+
+Use a gameplay scope:
+
+```bash
+python -m apps.worker.cli run-detection-adapter \
+  --media-id <MEDIA_ID> \
+  --adapter fixture \
+  --gameplay-run-id <GAMEPLAY_RUN_ID>
+```
+
+The command prints:
+
+- media id
+- run id
+- model id
+- runtime config id
+- processing step id
+- detection count
+- counts by label
+- counts by observation type
+- observation ids
+
+## Query Examples
+
+Query balls:
+
+```json
+{
+  "run_id": "<DETECTION_RUN_ID>",
+  "observation_type": "ball_detection"
+}
+```
+
+Query players by confidence:
+
+```json
+{
+  "run_id": "<DETECTION_RUN_ID>",
+  "observation_type": "player_detection",
+  "confidence_gte": 0.5
+}
+```
+
+## Viewer Compatibility
+
+The existing viewer route works unchanged:
+
+```text
+GET /viewer/runs/{run_id}
+```
+
+Milestone 1C does not add overlays. Detection observations appear in the observation list and detail panel with atomic payload JSON.
+
+## Out of Scope
+
+- tracking
+- pose detection
+- court homography
+- bounce detection
+- hit detection
+- rally segmentation
+- point reconstruction
+- production deployment

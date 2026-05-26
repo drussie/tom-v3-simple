@@ -22,6 +22,7 @@ class StepStatus(StrEnum):
 
 
 class ModelFamily(StrEnum):
+    detection = "detection"
     gameplay = "gameplay"
     ball = "ball"
     player = "player"

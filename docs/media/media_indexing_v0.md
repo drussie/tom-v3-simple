@@ -16,6 +16,8 @@ This prepares future gameplay, detection, tracking, pose, homography, and candid
 
 Milestone 1B uses this contract for gameplay adapter output. The fixture gameplay adapter derives segment timestamps from indexed media FPS through TOM v3 frame/time utilities.
 
+Milestone 1C uses this contract for detection adapter output. Fixture ball/player detections derive per-frame timestamps from indexed media FPS through TOM v3 frame/time utilities.
+
 ## Core Rule
 
 Media indexing owns frame/time.

@@ -2,7 +2,7 @@
 
 ## Current Progress Gauge
 
-Current: ~90%
+Current: ~95%
 
 ## Current
 
@@ -39,6 +39,11 @@ Current: ~90%
 - TOM v1 portability assessment exists.
 - Worker `run-gameplay-adapter` exists.
 - Existing viewer can show gameplay bands from adapter runs.
+- Detection adapter interface exists.
+- Fixture detection adapter produces persisted ball/player atomic observations.
+- YOLO26/Ultralytics portability assessment exists.
+- Worker `run-detection-adapter` exists.
+- Query/viewer paths can inspect detection observations.
 
 ## After Milestone 0A
 
@@ -168,3 +173,21 @@ Expected: ~90%
 Status: complete.
 
 The repo now has a stable TOM v3 gameplay adapter interface, fixture adapter, TOM v1 unavailable stub, worker CLI commands, persistence flow, viewer compatibility tests, and model adapter docs.
+
+## After Milestone 1C
+
+Expected: ~95%
+
+- First ball/player detection adapter seam exists.
+- YOLO26/Ultralytics portability status is documented.
+- Fixture detection adapter provides deterministic dev/test output.
+- Detection adapter runs create model, config, run, and step records.
+- Detection adapter output persists typed atomic observations.
+- Query API can retrieve ball_detection and player_detection observations.
+- Existing viewer payload includes detection observations.
+
+## Milestone 1C Status
+
+Status: complete.
+
+The repo now has a TOM v3 detection adapter interface, fixture detector, YOLO unavailable stub, worker CLI commands, atomic observation persistence flow, query/viewer compatibility tests, and model adapter docs.

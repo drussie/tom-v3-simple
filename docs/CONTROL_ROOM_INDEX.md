@@ -30,6 +30,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 0E - Integration / QA / Repo Consolidation](milestones/milestone_0e_integration_qa_repo_consolidation.md)
 - [Milestone 1A - Real Media Indexing](milestones/milestone_1a_real_media_indexing.md)
 - [Milestone 1B - TOM v1 Gameplay Detector Adapter](milestones/milestone_1b_tom_v1_gameplay_detector_adapter.md)
+- [Milestone 1C - YOLO26 Ball / Player Observation Adapter](milestones/milestone_1c_yolo26_ball_player_observation_adapter.md)
 
 ## Handoffs
 
@@ -40,6 +41,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 0E Handoff](handoffs/milestone_0e_integration_qa_repo_consolidation_handoff.md)
 - [Milestone 1A Handoff](handoffs/milestone_1a_real_media_indexing_handoff.md)
 - [Milestone 1B Handoff](handoffs/milestone_1b_tom_v1_gameplay_detector_adapter_handoff.md)
+- [Milestone 1C Handoff](handoffs/milestone_1c_yolo26_ball_player_observation_adapter_handoff.md)
 
 ## Agent Reports
 
@@ -50,6 +52,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 0E Agent Report](agent_reports/milestone_0e_integration_qa_repo_consolidation_report.md)
 - [Milestone 1A Agent Report](agent_reports/milestone_1a_real_media_indexing_report.md)
 - [Milestone 1B Agent Report](agent_reports/milestone_1b_tom_v1_gameplay_detector_adapter_report.md)
+- [Milestone 1C Agent Report](agent_reports/milestone_1c_yolo26_ball_player_observation_adapter_report.md)
 
 ## API and Schema
 
@@ -64,6 +67,8 @@ Use this index as the durable navigation point for project memory, architecture 
 
 - [Gameplay Adapter v0](model_adapters/gameplay_adapter_v0.md)
 - [TOM v1 Gameplay Adapter Assessment](model_adapters/tom_v1_gameplay_adapter_assessment.md)
+- [Detection Adapter v0](model_adapters/detection_adapter_v0.md)
+- [YOLO26 Detection Adapter Assessment](model_adapters/yolo26_detection_adapter_assessment.md)
 
 ## Worker
 

@@ -154,3 +154,54 @@ http://127.0.0.1:3000/runs/<RUN_ID>
 The viewer should show the gameplay/non_gameplay/uncertain band from persisted gameplay observations.
 
 The real TOM v1 detector is not wired in this repo state. `--adapter tom-v1` is present as an integration stub and reports that portable TOM v1 assets/source are unavailable.
+
+## 12. Run Detection Adapter On Indexed Media
+
+Milestone 1C adds a worker-driven ball/player detection adapter path.
+
+Run the deterministic fixture detector:
+
+```bash
+python -m apps.worker.cli run-detection-adapter \
+  --media-id <MEDIA_ID> \
+  --adapter fixture \
+  --frame-sample-rate 30 \
+  --max-frames 5
+```
+
+Or index and run detection in one command:
+
+```bash
+python -m apps.worker.cli index-and-run-detection \
+  --source-path /path/to/video.mp4 \
+  --adapter fixture
+```
+
+Use gameplay scope if you have a gameplay adapter run:
+
+```bash
+python -m apps.worker.cli run-detection-adapter \
+  --media-id <MEDIA_ID> \
+  --adapter fixture \
+  --gameplay-run-id <GAMEPLAY_RUN_ID>
+```
+
+Query ball detections:
+
+```bash
+curl -X POST http://127.0.0.1:8000/observations/query \
+  -H 'Content-Type: application/json' \
+  -d '{"run_id":"<DETECTION_RUN_ID>","observation_type":"ball_detection"}'
+```
+
+Query player detections:
+
+```bash
+curl -X POST http://127.0.0.1:8000/observations/query \
+  -H 'Content-Type: application/json' \
+  -d '{"run_id":"<DETECTION_RUN_ID>","observation_type":"player_detection"}'
+```
+
+The viewer can open the detection `run_id` and show ball/player detections in the observation list and detail panel.
+
+The real YOLO26 detector is not wired in this repo state. `--adapter yolo` is present as an integration stub and reports that runtime/assets are unavailable.
