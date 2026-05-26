@@ -13,6 +13,7 @@ from apps.worker.services.detection_adapter import run_detection_adapter
 from apps.worker.services.frame_artifacts import extract_frame_artifacts_for_run
 from apps.worker.services.gameplay_adapter import run_gameplay_adapter
 from apps.worker.services.media_indexer import index_media
+from apps.worker.services.tracklet_builder import build_tracklets_from_detection_run
 
 
 def main() -> None:
@@ -173,6 +174,30 @@ def main() -> None:
     frame_artifacts_parser.add_argument("--overwrite", action="store_true")
     frame_artifacts_parser.add_argument("--skip-create-db", action="store_true")
     frame_artifacts_parser.set_defaults(handler=_handle_extract_frame_artifacts)
+
+    tracklet_parser = subcommands.add_parser(
+        "build-tracklets",
+        help="Build candidate tracklets from persisted detection observations.",
+    )
+    tracklet_parser.add_argument("--detection-run-id", required=True)
+    tracklet_parser.add_argument("--run-name", default="tracklet-builder-run")
+    tracklet_parser.add_argument("--config-name", default="tracklet-builder-config")
+    tracklet_parser.add_argument("--config-version", default="v0")
+    tracklet_parser.add_argument("--max-gap-frames", type=int, default=30)
+    tracklet_parser.add_argument("--max-center-distance-px", type=float, default=120.0)
+    tracklet_parser.add_argument("--grouping-method", default="simple-frame-gap")
+    tracklet_parser.add_argument(
+        "--include-ball",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+    )
+    tracklet_parser.add_argument(
+        "--include-players",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+    )
+    tracklet_parser.add_argument("--skip-create-db", action="store_true")
+    tracklet_parser.set_defaults(handler=_handle_build_tracklets)
 
     args = parser.parse_args()
     with _session_factory(create_db=not args.skip_create_db)() as session:
@@ -347,6 +372,21 @@ def _handle_extract_frame_artifacts(
         output_root=args.output_root,
         image_format=args.image_format,
         overwrite=args.overwrite,
+    )
+
+
+def _handle_build_tracklets(session: Session, args: argparse.Namespace) -> dict[str, object]:
+    return build_tracklets_from_detection_run(
+        session=session,
+        detection_run_id=args.detection_run_id,
+        run_name=args.run_name,
+        config_name=args.config_name,
+        config_version=args.config_version,
+        max_gap_frames=args.max_gap_frames,
+        max_center_distance_px=args.max_center_distance_px,
+        grouping_method=args.grouping_method,
+        include_ball=args.include_ball,
+        include_players=args.include_players,
     )
 
 

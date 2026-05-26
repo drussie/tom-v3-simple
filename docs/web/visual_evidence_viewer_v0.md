@@ -72,6 +72,8 @@ The first viewer renders:
 
 Rows are built from observation rows and tracklet metadata created by the synthetic baseline scenario.
 
+Milestone 1F also lets the viewer open tracklet-builder runs. These runs may contain no new observation rows, but they include candidate `tracklet` and `track_point` rows that render as track coverage rows. Source detection observations remain linked through `track_point.observation_id` and can be queried separately by `tracklet_id`.
+
 ## Detection Overlay
 
 Milestone 1D adds a detection overlay panel. It extracts persisted `ball_detection` and `player_detection` observations from the viewer run payload, reads bbox payloads from the observation spine or atomic extension, and scales them using persisted media dimensions.
@@ -136,4 +138,5 @@ http://127.0.0.1:3000/runs/<run_id>
 - The annotation panel is read-only in v0.
 - Detection overlays use a coordinate canvas when no frame image artifact is available.
 - Local artifact content serving is development-only.
+- The viewer is still a single-run view; it does not yet combine a detection run and tracklet-builder run into one evidence bundle.
 - Production deployment, auth, and streaming are out of scope.

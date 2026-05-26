@@ -257,3 +257,40 @@ Expected behavior:
 - if extraction was not run, the coordinate canvas fallback still renders
 
 `ffmpeg` is required for frame extraction. If it is unavailable, the command reports that `ffmpeg` must be installed.
+
+## 14. Build Candidate Tracklets From Detection Observations
+
+Milestone 1F adds candidate temporal grouping from persisted detection observations.
+
+Run:
+
+```bash
+python -m apps.worker.cli build-tracklets \
+  --detection-run-id <DETECTION_RUN_ID> \
+  --max-gap-frames 30
+```
+
+The command creates a new tracklet-builder run and prints a `tracklet_run_id`.
+
+Open:
+
+```text
+http://127.0.0.1:3000/runs/<TRACKLET_RUN_ID>
+```
+
+Expected behavior:
+
+- candidate ball/player tracklet coverage rows are visible
+- track points are present in the viewer payload
+- each track point references a source detection observation id
+- source detections can be queried with `tracklet_id`
+
+Example query:
+
+```bash
+curl -X POST http://127.0.0.1:8000/observations/query \
+  -H 'Content-Type: application/json' \
+  -d '{"tracklet_id":"<TRACKLET_ID>"}'
+```
+
+Tracklet builder output is candidate temporal grouping only. It does not establish identity, bounce, hit, rally, or point state.

@@ -14,7 +14,7 @@ The core invariant:
 
 ## Current Status
 
-Milestone 1E adds frame artifact extraction on top of persisted ball/player observations and overlays:
+Milestone 1F adds candidate tracklet grouping on top of persisted ball/player detections:
 
 - repo memory and architecture contracts
 - FastAPI backend/API foundation
@@ -42,8 +42,11 @@ Milestone 1E adds frame artifact extraction on top of persisted ball/player obse
 - ffmpeg-backed frame artifact extraction
 - local frame artifact metadata persisted as evidence artifacts
 - viewer frame images behind persisted detection bboxes when available
+- deterministic tracklet builder from persisted detections
+- worker command to persist candidate tracklet and track point rows
+- track points linked back to source detection observations
 
-Portable TOM v1 detector assets/source and YOLO26 runtime/assets are not present in this repo state. No tracking, pose processing, court homography, or real bounce detection is implemented yet.
+Portable TOM v1 detector assets/source and YOLO26 runtime/assets are not present in this repo state. No sophisticated tracking, pose processing, court homography, or real bounce detection is implemented yet.
 
 ## Repo Structure
 
@@ -167,6 +170,14 @@ python -m apps.worker.cli extract-frame-artifacts \
   --output-root .data/artifacts
 ```
 
+Build candidate tracklets from a detection run:
+
+```bash
+python -m apps.worker.cli build-tracklets \
+  --detection-run-id <DETECTION_RUN_ID> \
+  --max-gap-frames 30
+```
+
 Seed synthetic evidence:
 
 ```bash
@@ -203,6 +214,8 @@ http://127.0.0.1:3000/runs/<RUN_ID>
 
 For a detection adapter run, the viewer shows a detection overlay. The panel uses persisted `image_pixels` bbox payloads and media dimensions; when frame artifacts exist, it displays the extracted frame image behind the bboxes. If no frame artifact is available, it displays an honest frame-space canvas.
 
+For a tracklet builder run, the viewer shows candidate tracklet coverage rows and track points. Source detection observations remain linked through `track_point.observation_id` and can be queried by `tracklet_id`.
+
 ## Validation
 
 Run the consolidated checks:
@@ -233,6 +246,7 @@ make index-and-run-gameplay SOURCE_PATH=/path/to/video.mp4
 make run-detection MEDIA_ID=<media_id>
 make index-and-run-detection SOURCE_PATH=/path/to/video.mp4
 make extract-frame-artifacts RUN_ID=<detection_run_id>
+make build-tracklets DETECTION_RUN_ID=<detection_run_id>
 make seed
 make smoke
 make all-checks
@@ -252,4 +266,5 @@ Useful runbooks:
 - [Detection Adapter v0](docs/model_adapters/detection_adapter_v0.md)
 - [Detection Overlay Viewer v0](docs/web/detection_overlay_viewer_v0.md)
 - [Frame Artifact Overlay v0](docs/web/frame_artifact_overlay_v0.md)
+- [Tracklet Foundation v0](docs/tracklets/tracklet_foundation_v0.md)
 - [Repo Branch Hygiene](docs/dev/repo_branch_hygiene.md)

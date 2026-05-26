@@ -4,8 +4,8 @@
 
 - Project name: TOM v3 Simple
 - Repo: drussie/tom-v3-simple
-- Current phase: Milestone 1E
-- Current goal: detection artifact / frame extraction foundation
+- Current phase: Milestone 1F
+- Current goal: tracklet foundation from persisted detections
 
 ## Mission
 
@@ -13,7 +13,7 @@ A lightweight tennis video observation platform that accepts model output as ope
 
 ## Implementation Status
 
-- Implementation status: persisted ball/player observations can be inspected over coordinate overlays and extracted frame artifacts
+- Implementation status: persisted ball/player observations can be inspected visually and grouped into candidate tracklets
 - Model integration status: fixture gameplay and fixture detection adapters implemented for deterministic dev/test output
 - TOM v1 gameplay detector: known asset, portable source/assets not available in this repo/environment; integration stub documented
 - YOLO/YOLO26: runtime/assets not available in this repo/environment; unavailable stub documented
@@ -22,6 +22,7 @@ A lightweight tennis video observation platform that accepts model output as ope
 - Media indexing: implemented for local files via ffprobe, sha256 checksum, local storage copy/register mode, and frame/time summary
 - Gameplay adapter: implemented with `BaseGameplayAdapter`, fixture adapter, TOM v1 unavailable stub, worker service, and worker CLI
 - Detection adapter: implemented with `BaseDetectionAdapter`, fixture adapter, YOLO unavailable stub, worker service, and worker CLI
+- Tracklet builder: implemented with deterministic candidate grouping from persisted detections
 - Observation writer: implemented with typed extension rows, lineage, artifacts, and idempotency
 - Worker synthetic seeder: implemented
 - Visual evidence viewer: implemented in `apps/web` with detection bbox overlay and frame artifact image support
@@ -89,6 +90,12 @@ Status: complete
 
 Milestone 1E establishes ffmpeg-based frame extraction, worker `extract-frame-artifacts`, local `.data/artifacts` storage, persisted `frame_image` and `detection_frame_image` artifact metadata, a local artifact content route, and viewer support for displaying extracted frame imagery behind persisted detection bboxes.
 
+## Milestone 1F Result
+
+Status: complete
+
+Milestone 1F establishes a deterministic tracklet builder that consumes persisted detection observations, creates a new tracklet-builder processing run, persists candidate `tracklet` and `track_point` rows, links track points back to source detection observations, and exposes tracklet evidence through the existing viewer/query paths.
+
 ## Next Milestone
 
-Recommended next handoff: Milestone 1F - Tracklet Foundation from Persisted Detections, unless YOLO26 runtime/assets become available and real detector integration is prioritized.
+Recommended next handoff: Milestone 1G - Tracklet Viewer / Multi-Run Evidence Bundle, unless YOLO26 runtime/assets become available and real detector integration is prioritized.

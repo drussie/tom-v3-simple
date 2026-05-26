@@ -2,7 +2,7 @@
 
 ## Current Progress Gauge
 
-Current: ~105% / MVP+ foundation
+Current: ~15% through the MVP+ temporal-evidence extension
 
 ## Current
 
@@ -51,6 +51,10 @@ Current: ~105% / MVP+ foundation
 - Worker `extract-frame-artifacts` exists.
 - Frame image artifacts are persisted as evidence artifacts.
 - Viewer can display frame artifacts behind persisted detection bboxes.
+- Tracklet builder service exists.
+- Persisted detections can be grouped into candidate tracklets.
+- Tracklet and track point rows are persisted.
+- Track points link back to source detection observations.
 
 ## After Milestone 0A
 
@@ -231,3 +235,20 @@ Expected: ~105% / MVP+ foundation
 Status: complete.
 
 The repo now has ffmpeg-backed frame artifact extraction, local artifact metadata persistence, artifact file serving for local development, and viewer support for drawing persisted detection bboxes over extracted frame imagery.
+
+## After Milestone 1F
+
+Expected: ~15% through the MVP+ temporal-evidence extension
+
+- Tracklet foundation exists.
+- Persisted detections can be grouped into tracklet candidates.
+- `tracklet` and `track_point` rows are created from source observations.
+- Track points link back to source ball/player detections.
+- Existing viewer can show basic tracklet coverage/evidence.
+- TOM v3 still does not claim identity, bounce, hit, rally, or point state.
+
+## Milestone 1F Status
+
+Status: complete.
+
+The repo now has a deterministic tracklet-builder run path that creates candidate temporal groupings from persisted detection observations without mutating the source detection run or adding higher-level tennis event interpretation.

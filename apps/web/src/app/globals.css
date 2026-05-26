@@ -535,6 +535,11 @@ pre {
   color: var(--blue);
 }
 
+.timeline-segment.state-candidate {
+  background: var(--violet-soft);
+  color: var(--violet);
+}
+
 .timeline-segment.state-unknown {
   background: var(--violet-soft);
   color: var(--violet);

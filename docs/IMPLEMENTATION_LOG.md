@@ -348,3 +348,39 @@ Milestone 1E created:
 - Viewer frame artifact matching and image display behind persisted bboxes.
 - Coordinate canvas fallback when no frame artifact exists.
 - Tests covering extraction, metadata, artifact content, and viewer payload behavior.
+
+## Milestone 1F - Tracklet Foundation From Persisted Detections
+
+Status: complete
+
+### Goal
+
+Create candidate temporal groupings from already-persisted ball/player detection observations.
+
+### Non-goals
+
+- No sophisticated tracking.
+- No optical flow.
+- No pose detection.
+- No court homography.
+- No bounce detection.
+- No hit detection.
+- No rally segmentation.
+- No point reconstruction.
+- No scoring.
+- No adjudication.
+- No truth/fact/promotion/refusal concepts.
+
+### Notes
+
+Milestone 1F created:
+
+- Deterministic tracklet builder service in `apps.worker.services.tracklet_builder`.
+- Worker command `build-tracklets`.
+- Tracklet-builder runtime config, model registry, processing run, and processing step records.
+- Ball tracklet candidates from persisted `ball_detection` observations.
+- Player tracklet candidates from persisted `player_detection` observations grouped by source labels.
+- `tracklet` rows with candidate/unverified metadata.
+- `track_point` rows linked to source detection observation ids.
+- Viewer/query compatibility tests for tracklet builder runs.
+- Tracklet foundation docs, milestone doc, handoff, and report.
