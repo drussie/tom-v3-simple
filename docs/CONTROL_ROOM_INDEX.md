@@ -29,6 +29,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 0D - Visual Evidence Viewer Foundation](milestones/milestone_0d_visual_evidence_viewer_foundation.md)
 - [Milestone 0E - Integration / QA / Repo Consolidation](milestones/milestone_0e_integration_qa_repo_consolidation.md)
 - [Milestone 1A - Real Media Indexing](milestones/milestone_1a_real_media_indexing.md)
+- [Milestone 1B - TOM v1 Gameplay Detector Adapter](milestones/milestone_1b_tom_v1_gameplay_detector_adapter.md)
 
 ## Handoffs
 
@@ -38,6 +39,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 0D Handoff](handoffs/milestone_0d_visual_evidence_viewer_foundation_handoff.md)
 - [Milestone 0E Handoff](handoffs/milestone_0e_integration_qa_repo_consolidation_handoff.md)
 - [Milestone 1A Handoff](handoffs/milestone_1a_real_media_indexing_handoff.md)
+- [Milestone 1B Handoff](handoffs/milestone_1b_tom_v1_gameplay_detector_adapter_handoff.md)
 
 ## Agent Reports
 
@@ -47,6 +49,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 0D Agent Report](agent_reports/milestone_0d_visual_evidence_viewer_foundation_report.md)
 - [Milestone 0E Agent Report](agent_reports/milestone_0e_integration_qa_repo_consolidation_report.md)
 - [Milestone 1A Agent Report](agent_reports/milestone_1a_real_media_indexing_report.md)
+- [Milestone 1B Agent Report](agent_reports/milestone_1b_tom_v1_gameplay_detector_adapter_report.md)
 
 ## API and Schema
 
@@ -56,6 +59,11 @@ Use this index as the durable navigation point for project memory, architecture 
 ## Media
 
 - [Media Indexing v0](media/media_indexing_v0.md)
+
+## Model Adapters
+
+- [Gameplay Adapter v0](model_adapters/gameplay_adapter_v0.md)
+- [TOM v1 Gameplay Adapter Assessment](model_adapters/tom_v1_gameplay_adapter_assessment.md)
 
 ## Worker
 

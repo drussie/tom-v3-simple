@@ -14,7 +14,7 @@ The core invariant:
 
 ## Current Status
 
-Milestone 1A adds the first real media substrate on top of the consolidated Milestone 0 foundation:
+Milestone 1B adds the first gameplay/view-state adapter seam on top of the real media substrate:
 
 - repo memory and architecture contracts
 - FastAPI backend/API foundation
@@ -28,8 +28,12 @@ Milestone 1A adds the first real media substrate on top of the consolidated Mile
 - sha256 checksum persistence
 - local storage copy/register modes
 - centralized frame/time mapping utilities
+- gameplay adapter interface
+- fixture gameplay adapter for deterministic dev/test output
+- TOM v1 gameplay adapter integration stub and portability assessment
+- worker command to persist gameplay/non_gameplay/uncertain observations
 
-No real model pipeline, YOLO integration, TOM v1 integration, gameplay classification, real tracking, real homography calculation, pose processing, or real bounce detection is implemented yet.
+Portable TOM v1 detector assets/source are not present in this repo state. No YOLO integration, ball/player tracking, pose processing, court homography, or real bounce detection is implemented yet.
 
 ## Repo Structure
 
@@ -42,6 +46,7 @@ packages/
   schema/          Shared schema contracts.
   storage/         Storage adapters and persistence helpers.
   video/           ffprobe metadata and frame/time mapping utilities.
+  model_adapters/  Gameplay adapter interface and fixture adapter.
   observations/    Observation writer, lineage, and synthetic helpers.
   visualization/   Viewer-oriented utilities placeholder.
 migrations/        Alembic database migrations.
@@ -100,6 +105,28 @@ uvicorn apps.api.main:app --reload
 curl -X POST http://127.0.0.1:8000/media/register-file \
   -H "Content-Type: application/json" \
   -d '{"source_path":"/path/to/video.mp4","copy_to_storage":true}'
+```
+
+Run the gameplay adapter fixture for indexed media:
+
+```bash
+python -m apps.worker.cli run-gameplay-adapter \
+  --media-id <MEDIA_ID> \
+  --adapter fixture
+```
+
+Or index and run in one local command:
+
+```bash
+python -m apps.worker.cli index-and-run-gameplay \
+  --source-path /path/to/video.mp4 \
+  --adapter fixture
+```
+
+Open the returned `run_id` in the viewer:
+
+```text
+http://127.0.0.1:3000/runs/<RUN_ID>
 ```
 
 Seed synthetic evidence:
@@ -161,6 +188,8 @@ make test
 make lint
 make migrate
 make index-media SOURCE_PATH=/path/to/video.mp4
+make run-gameplay MEDIA_ID=<media_id>
+make index-and-run-gameplay SOURCE_PATH=/path/to/video.mp4
 make seed
 make smoke
 make all-checks
@@ -175,4 +204,5 @@ Useful runbooks:
 - [Local Environment Setup](docs/dev/local_environment_setup.md)
 - [Local Demo Runbook](docs/dev/local_demo_runbook.md)
 - [Media Indexing v0](docs/media/media_indexing_v0.md)
+- [Gameplay Adapter v0](docs/model_adapters/gameplay_adapter_v0.md)
 - [Repo Branch Hygiene](docs/dev/repo_branch_hygiene.md)

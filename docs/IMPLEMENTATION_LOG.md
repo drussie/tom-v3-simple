@@ -201,3 +201,38 @@ Milestone 1A created:
 - Worker CLI command `index-media`.
 - Tests for checksum, storage copy/register modes, ffprobe parsing/errors, frame/time utilities, API registration, and worker media indexing service.
 - Media indexing docs, milestone doc, handoff, and report.
+
+## Milestone 1B - TOM v1 Gameplay Detector Adapter
+
+Status: complete
+
+### Goal
+
+Implement the first gameplay/view-state adapter seam and persist adapter output as TOM v3 observations.
+
+### Non-goals
+
+- No YOLO integration.
+- No ball tracking.
+- No player tracking.
+- No pose tracking.
+- No court homography.
+- No real bounce detection.
+- No point/rally reconstruction.
+- No scoring.
+- No streaming ingestion.
+- No production deployment.
+- No adjudication.
+- No truth/fact/promotion/refusal concepts.
+
+### Notes
+
+Milestone 1B created:
+
+- Gameplay adapter interface in `tom_v3_model_adapters.gameplay`.
+- Deterministic fixture gameplay adapter for dev/test output.
+- TOM v1 adapter stub that clearly reports unavailable portable assets/source.
+- TOM v1 portability assessment doc.
+- Worker gameplay adapter service that creates runtime config, model registry, processing run, processing step, and typed gameplay observations.
+- Worker commands `run-gameplay-adapter` and `index-and-run-gameplay`.
+- Viewer compatibility tests for gameplay adapter runs.

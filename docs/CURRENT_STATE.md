@@ -4,8 +4,8 @@
 
 - Project name: TOM v3 Simple
 - Repo: drussie/tom-v3-simple
-- Current phase: Milestone 1A
-- Current goal: real media indexing + video registration foundation
+- Current phase: Milestone 1B
+- Current goal: TOM v3 gameplay adapter interface + fixture persistence path
 
 ## Mission
 
@@ -13,13 +13,14 @@ A lightweight tennis video observation platform that accepts model output as ope
 
 ## Implementation Status
 
-- Implementation status: real media indexing foundation exists; no real ML pipeline yet
-- Model integration status: none
-- TOM v1 gameplay detector: known asset, not integrated yet
+- Implementation status: gameplay adapter seam exists; first persisted gameplay/view-state adapter path exists
+- Model integration status: fixture gameplay adapter implemented for deterministic dev/test output
+- TOM v1 gameplay detector: known asset, portable source/assets not available in this repo/environment; integration stub documented
 - YOLO/YOLO26: not integrated yet
 - Database: initial SQLAlchemy models and Alembic migration implemented
 - API: FastAPI backend foundation implemented
 - Media indexing: implemented for local files via ffprobe, sha256 checksum, local storage copy/register mode, and frame/time summary
+- Gameplay adapter: implemented with `BaseGameplayAdapter`, fixture adapter, TOM v1 unavailable stub, worker service, and worker CLI
 - Observation writer: implemented with typed extension rows, lineage, artifacts, and idempotency
 - Worker synthetic seeder: implemented
 - Visual evidence viewer: implemented in `apps/web`
@@ -63,6 +64,12 @@ Status: complete
 
 Milestone 1A establishes real local media registration and indexing with ffprobe metadata extraction, sha256 checksums, local storage copy/register modes, frame/time mapping utilities, `POST /media/register-file`, worker `index-media`, tests, and media indexing docs.
 
+## Milestone 1B Result
+
+Status: complete
+
+Milestone 1B establishes the gameplay adapter interface, TOM v1 portability assessment, fixture gameplay adapter, TOM v1 unavailable stub, worker `run-gameplay-adapter`, worker `index-and-run-gameplay`, persisted gameplay observations through `ObservationWriter`, and viewer-compatible gameplay bands.
+
 ## Next Milestone
 
-Recommended next handoff: Milestone 1B - TOM v1 Gameplay Detector Adapter.
+Recommended next handoff: Milestone 1C - YOLO26 Ball/Player Observation Adapter.

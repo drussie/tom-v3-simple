@@ -124,3 +124,33 @@ curl -X POST http://127.0.0.1:8000/media/register-file \
     "storage_root": ".data/media"
   }'
 ```
+
+## 11. Run Gameplay Adapter On Indexed Media
+
+Milestone 1B adds a worker-driven gameplay adapter path.
+
+Run the deterministic fixture adapter:
+
+```bash
+python -m apps.worker.cli run-gameplay-adapter \
+  --media-id <MEDIA_ID> \
+  --adapter fixture
+```
+
+Or index and run in one command:
+
+```bash
+python -m apps.worker.cli index-and-run-gameplay \
+  --source-path /path/to/video.mp4 \
+  --adapter fixture
+```
+
+The command prints a `run_id`. Start the backend and web app, then open:
+
+```text
+http://127.0.0.1:3000/runs/<RUN_ID>
+```
+
+The viewer should show the gameplay/non_gameplay/uncertain band from persisted gameplay observations.
+
+The real TOM v1 detector is not wired in this repo state. `--adapter tom-v1` is present as an integration stub and reports that portable TOM v1 assets/source are unavailable.

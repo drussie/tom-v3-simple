@@ -14,6 +14,8 @@ The media indexing path turns a local video file into a durable `media_asset` wi
 
 This prepares future gameplay, detection, tracking, pose, homography, and candidate adapters to reference one shared media timeline.
 
+Milestone 1B uses this contract for gameplay adapter output. The fixture gameplay adapter derives segment timestamps from indexed media FPS through TOM v3 frame/time utilities.
+
 ## Core Rule
 
 Media indexing owns frame/time.

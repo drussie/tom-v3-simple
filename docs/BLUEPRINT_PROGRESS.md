@@ -2,7 +2,7 @@
 
 ## Current Progress Gauge
 
-Current: ~85%
+Current: ~90%
 
 ## Current
 
@@ -34,6 +34,11 @@ Current: ~85%
 - Media checksum and local storage copy/register modes exist.
 - Central frame/time mapping utilities exist.
 - Worker `index-media` exists.
+- Gameplay adapter interface exists.
+- Fixture gameplay adapter produces persisted view-state observations.
+- TOM v1 portability assessment exists.
+- Worker `run-gameplay-adapter` exists.
+- Existing viewer can show gameplay bands from adapter runs.
 
 ## After Milestone 0A
 
@@ -146,3 +151,20 @@ Expected: ~85%
 Status: complete.
 
 The repo now has real media indexing for local files, durable media registration, storage metadata, checksum persistence, frame/time summaries, API/worker entrypoints, tests, and docs.
+
+## After Milestone 1B
+
+Expected: ~90%
+
+- First gameplay/view-state adapter seam exists.
+- TOM v1 portability status is documented.
+- Fixture gameplay adapter provides deterministic dev/test output.
+- Gameplay adapter runs create model, config, run, and step records.
+- Gameplay adapter output persists typed gameplay observations.
+- Existing viewer can display gameplay/non_gameplay/uncertain bands from adapter runs.
+
+## Milestone 1B Status
+
+Status: complete.
+
+The repo now has a stable TOM v3 gameplay adapter interface, fixture adapter, TOM v1 unavailable stub, worker CLI commands, persistence flow, viewer compatibility tests, and model adapter docs.
