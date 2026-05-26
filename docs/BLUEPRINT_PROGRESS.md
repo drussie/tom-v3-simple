@@ -2,7 +2,7 @@
 
 ## Current Progress Gauge
 
-Current: ~55-60% through Blueprint 3
+Current: ~75-80% through Blueprint 3
 
 ## Current
 
@@ -86,6 +86,12 @@ Current: ~55-60% through Blueprint 3
 - `xyxy` boxes convert to TOM v3 bbox/center payloads.
 - Unmapped classes and invalid boxes are counted without emitting observations.
 - YOLO adapter skeleton can normalize fake frame results without real inference.
+- YOLO frame inference provider boundary exists.
+- Fake YOLO provider can drive deterministic persistence tests.
+- Guarded Ultralytics provider can run frame-level prediction when optional runtime and weights are available.
+- Worker detection adapter can persist mocked YOLO detections as atomic `ball_detection` and `player_detection` observations.
+- YOLO runs can use registered model metadata and weights checksum validation.
+- Failed YOLO runs do not persist fixture fallback detections.
 
 ## After Milestone 0A
 
@@ -422,3 +428,22 @@ Expected: ~55-60% through Blueprint 3
 Status: complete.
 
 The repo now has YOLO detection normalization foundations. YOLO-like frame result dictionaries can be transformed into TOM v3-compatible detection payloads and adapter results, ready for future observation persistence once real frame inference is introduced.
+
+## After Milestone 3D
+
+Expected: ~75-80% through Blueprint 3
+
+- YOLO frame inference path exists behind the existing detection adapter interface.
+- Real or mocked Ultralytics-style frame results can become `DetectionAdapterResult` output.
+- The existing worker detection persistence path can write YOLO-origin `ball_detection` and `player_detection` observations.
+- Persisted YOLO-origin observations use media-owned frame/time.
+- Missing runtime, weights, checksum, or device failures do not create fake detections.
+- Fixture adapter behavior remains unchanged.
+- Existing viewer/query paths can inspect persisted YOLO-origin detections.
+- No tracklets are created inside the YOLO adapter.
+
+## Milestone 3D Status
+
+Status: complete.
+
+The repo now has a guarded YOLO frame inference and persistence bridge. Mocked provider tests prove YOLO-style frame outputs can be normalized and persisted as TOM v3 atomic detection observations through the existing worker path, while optional real Ultralytics runtime remains isolated behind import guards and registered local weights.

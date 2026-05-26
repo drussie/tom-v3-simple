@@ -153,11 +153,21 @@ class YoloDetectionAdapter(BaseDetectionAdapter):
         device: str | None = None,
         image_size: int | None = None,
         confidence_threshold: float | None = None,
+        iou_threshold: float | None = None,
+        max_det: int | None = None,
+        model_registry_id: str | None = None,
+        result_provider: Any | None = None,
+        frame_source: Any | None = None,
     ) -> None:
         self.model_path = model_path
         self.device = device
         self.image_size = image_size
         self.confidence_threshold = confidence_threshold
+        self.iou_threshold = iou_threshold
+        self.max_det = max_det
+        self.model_registry_id = model_registry_id
+        self.result_provider = result_provider
+        self.frame_source = frame_source
 
     def normalize_frame_result(
         self,
@@ -203,18 +213,78 @@ class YoloDetectionAdapter(BaseDetectionAdapter):
         return build_detection_adapter_result_from_normalized(normalization_result)
 
     def run(self, adapter_input: DetectionAdapterInput) -> DetectionAdapterResult:
-        missing: list[str] = []
-        if find_spec("ultralytics") is None:
-            missing.append("ultralytics package")
-        if not self.model_path:
-            missing.append("model_path")
-        elif not Path(self.model_path).expanduser().is_file():
-            missing.append(f"model file not found: {Path(self.model_path).expanduser()}")
-        missing_text = ", ".join(missing) if missing else "portable YOLO26 runtime"
-        raise YoloDetectionAdapterUnavailable(
-            "YOLO26/Ultralytics detection runtime is not available for TOM v3 in this "
-            f"repo/environment: {missing_text}. Use --adapter fixture for development "
-            "until model assets and runtime are supplied behind this interface."
+        from tom_v3_model_adapters.yolo_inference import (
+            YoloFrameInferenceError,
+            run_yolo_frame_inference,
+        )
+
+        runtime_config = adapter_input.runtime_config
+        weights_path = self.model_path or runtime_config.get("weights_path")
+        model_registry_id = self.model_registry_id or runtime_config.get("model_registry_id")
+        if self.result_provider is None:
+            missing: list[str] = []
+            if find_spec("ultralytics") is None:
+                missing.append("ultralytics package")
+            if not weights_path:
+                missing.append("weights_path")
+            elif not Path(str(weights_path)).expanduser().is_file():
+                missing.append(f"model file not found: {Path(str(weights_path)).expanduser()}")
+            if missing:
+                missing_text = ", ".join(missing)
+                raise YoloDetectionAdapterUnavailable(
+                    "YOLO26/Ultralytics detection runtime is not available for TOM v3 in this "
+                    f"repo/environment: {missing_text}. Use --adapter fixture for development "
+                    "or register local weights before running --adapter yolo."
+                )
+
+        inference_metadata = {
+            "imgsz": self.image_size or runtime_config.get("image_size"),
+            "conf": (
+                self.confidence_threshold
+                if self.confidence_threshold is not None
+                else runtime_config.get("confidence_threshold", 0.25)
+            ),
+            "iou": (
+                self.iou_threshold
+                if self.iou_threshold is not None
+                else runtime_config.get("iou")
+            ),
+            "max_det": self.max_det if self.max_det is not None else runtime_config.get("max_det"),
+            "device": self.device or runtime_config.get("device") or "cpu",
+            "weights_path": weights_path,
+        }
+        try:
+            adapter_result, summary = run_yolo_frame_inference(
+                media_path=adapter_input.local_path,
+                fps=adapter_input.fps,
+                frame_count=adapter_input.frame_count,
+                width=adapter_input.width,
+                height=adapter_input.height,
+                frame_sample_rate=int(runtime_config.get("frame_sample_rate") or 30),
+                max_frames=runtime_config.get("max_frames"),
+                class_mapping=runtime_config.get("class_map"),
+                model_registry_id=str(model_registry_id) if model_registry_id else None,
+                runtime_config_id=runtime_config.get("runtime_config_id"),
+                weights_sha256=runtime_config.get("weights_sha256"),
+                inference_metadata=inference_metadata,
+                result_provider=self.result_provider,
+                frame_source=self.frame_source,
+            )
+        except YoloFrameInferenceError as exc:
+            raise YoloDetectionAdapterUnavailable(str(exc)) from exc
+
+        return DetectionAdapterResult(
+            adapter_name=self.name,
+            adapter_version="frame-inference-v0",
+            detections=adapter_result.detections,
+            diagnostics={
+                **adapter_result.diagnostics,
+                **summary,
+                "adapter_type": "yolo",
+                "model_registry_id": model_registry_id,
+                "weights_sha256": runtime_config.get("weights_sha256"),
+                "note": "YOLO model outputs persisted as observations only",
+            },
         )
 
 
@@ -224,6 +294,11 @@ def get_detection_adapter(
     device: str | None = None,
     image_size: int | None = None,
     confidence_threshold: float | None = None,
+    iou_threshold: float | None = None,
+    max_det: int | None = None,
+    model_registry_id: str | None = None,
+    yolo_result_provider: Any | None = None,
+    yolo_frame_source: Any | None = None,
 ) -> BaseDetectionAdapter:
     normalized = adapter_name.strip().lower()
     if normalized == "fixture":
@@ -234,6 +309,11 @@ def get_detection_adapter(
             device=device,
             image_size=image_size,
             confidence_threshold=confidence_threshold,
+            iou_threshold=iou_threshold,
+            max_det=max_det,
+            model_registry_id=model_registry_id,
+            result_provider=yolo_result_provider,
+            frame_source=yolo_frame_source,
         )
     raise DetectionAdapterError(f"unknown detection adapter: {adapter_name}")
 

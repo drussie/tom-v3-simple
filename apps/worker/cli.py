@@ -123,9 +123,12 @@ def main() -> None:
     detection_parser.add_argument("--media-id", required=True)
     detection_parser.add_argument("--adapter", default="fixture", choices=["fixture", "yolo"])
     detection_parser.add_argument("--model-path")
+    detection_parser.add_argument("--model-registry-id")
     detection_parser.add_argument("--device")
     detection_parser.add_argument("--image-size", type=int)
     detection_parser.add_argument("--confidence-threshold", type=float, default=0.25)
+    detection_parser.add_argument("--iou-threshold", type=float, default=0.7)
+    detection_parser.add_argument("--max-det", type=int, default=50)
     detection_parser.add_argument("--frame-sample-rate", type=int, default=30)
     detection_parser.add_argument("--max-frames", type=int, default=5)
     detection_parser.add_argument("--gameplay-run-id")
@@ -152,9 +155,12 @@ def main() -> None:
         "--adapter", default="fixture", choices=["fixture", "yolo"]
     )
     index_detection_parser.add_argument("--model-path")
+    index_detection_parser.add_argument("--model-registry-id")
     index_detection_parser.add_argument("--device")
     index_detection_parser.add_argument("--image-size", type=int)
     index_detection_parser.add_argument("--confidence-threshold", type=float, default=0.25)
+    index_detection_parser.add_argument("--iou-threshold", type=float, default=0.7)
+    index_detection_parser.add_argument("--max-det", type=int, default=50)
     index_detection_parser.add_argument("--frame-sample-rate", type=int, default=30)
     index_detection_parser.add_argument("--max-frames", type=int, default=5)
     index_detection_parser.add_argument("--gameplay-run-id")
@@ -396,9 +402,12 @@ def _handle_run_detection_adapter(session: Session, args: argparse.Namespace) ->
         config_name=args.config_name,
         config_version=args.config_version,
         model_path=args.model_path,
+        model_registry_id=args.model_registry_id,
         device=args.device,
         image_size=args.image_size,
         confidence_threshold=args.confidence_threshold,
+        iou_threshold=args.iou_threshold,
+        max_det=args.max_det,
         frame_sample_rate=args.frame_sample_rate,
         max_frames=args.max_frames,
         gameplay_run_id=args.gameplay_run_id,
@@ -424,9 +433,12 @@ def _handle_index_and_run_detection(
         config_name=args.config_name,
         config_version=args.config_version,
         model_path=args.model_path,
+        model_registry_id=args.model_registry_id,
         device=args.device,
         image_size=args.image_size,
         confidence_threshold=args.confidence_threshold,
+        iou_threshold=args.iou_threshold,
+        max_det=args.max_det,
         frame_sample_rate=args.frame_sample_rate,
         max_frames=args.max_frames,
         gameplay_run_id=args.gameplay_run_id,

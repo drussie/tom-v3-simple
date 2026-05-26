@@ -104,15 +104,15 @@ Unmapped boxes are counted and reported, but no detection payload is emitted for
 
 3C does not persist unmapped classes as observations.
 
-## Adapter Skeleton
+## Adapter Integration
 
-`YoloDetectionAdapter` exposes normalization-only methods:
+Milestone 3C introduced normalization-only methods:
 
 - `normalize_frame_result`
 - `normalize_results`
 - `build_adapter_result_from_normalized`
 
-`run()` still raises the existing unavailable-runtime error. Real inference belongs to a later milestone.
+Milestone 3D connects `run()` to frame-level YOLO inference behind guarded provider interfaces. Tests use a fake provider; real runtime use still requires optional Ultralytics/OpenCV dependencies and registered local weights.
 
 ## Persistence Compatibility
 
@@ -127,12 +127,12 @@ Normalized payloads include the fields expected by existing detection persistenc
 - `coordinate_space = image_pixels`
 - `frame_time_owner = media_indexing`
 
-Future milestones can use this normalization output before writing `ball_detection` and `player_detection` observations.
+Milestone 3D uses this normalization output before writing `ball_detection` and `player_detection` observations through the existing detection persistence path.
 
 ## Out of Scope
 
-- full YOLO video inference
-- persisted YOLO detections
+- optimized full-video YOLO inference
+- YOLO tracking mode
 - tracklets
 - pose
 - homography

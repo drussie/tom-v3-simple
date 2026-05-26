@@ -668,3 +668,40 @@ Milestone 3C created:
 - Adapter result conversion for existing detection persistence contracts.
 - YOLO adapter skeleton methods for normalization-only behavior.
 - Tests covering mapping, bbox conversion, invalid input, summary counts, metadata, and adapter skeleton compatibility.
+
+## Milestone 3D - YOLO Frame Inference / Observation Persistence
+
+Status: complete
+
+### Goal
+
+Connect frame-level YOLO-style outputs to the existing TOM v3 detection persistence path.
+
+### Non-goals
+
+- No optimized video-stream inference.
+- No YOLO tracking mode.
+- No tracklet generation inside YOLO.
+- No pose detection.
+- No court homography.
+- No bounce detection.
+- No hit detection.
+- No rally segmentation.
+- No point reconstruction.
+- No scoring.
+- No adjudication.
+
+### Notes
+
+Milestone 3D created:
+
+- YOLO frame inference provider and frame source interfaces.
+- `FakeYoloResultProvider` for deterministic tests without optional runtime packages.
+- Guarded `UltralyticsYoloResultProvider` and OpenCV frame source for optional real runtime use.
+- Media-owned frame sampling shared with the detection adapter contract.
+- YOLO adapter `run()` implementation that uses 3C normalization.
+- Worker detection adapter support for registered YOLO model metadata, weights checksum validation, IoU/max-det settings, and model registry ids.
+- Payload enrichment for source runtime, model registry id, weights sha256, and inference settings.
+- Worker CLI options for `--model-registry-id`, `--iou-threshold`, and `--max-det`.
+- Tests proving mocked YOLO outputs persist as atomic `ball_detection` and `player_detection` observations through the existing worker service.
+- Failure tests proving unavailable YOLO runs do not persist fallback detections.

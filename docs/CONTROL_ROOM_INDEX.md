@@ -41,6 +41,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 3A - YOLO Runtime Environment / Runtime Probe Foundation](milestones/milestone_3a_yolo_runtime_environment_probe.md)
 - [Milestone 3B - YOLO Model Registry and Weights Validation](milestones/milestone_3b_yolo_model_registry_weights_validation.md)
 - [Milestone 3C - YOLO Detection Adapter Normalization](milestones/milestone_3c_yolo_detection_adapter_normalization.md)
+- [Milestone 3D - YOLO Frame Inference / Observation Persistence](milestones/milestone_3d_yolo_frame_inference_observation_persistence.md)
 
 ## Handoffs
 
@@ -62,6 +63,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 3A Handoff](handoffs/milestone_3a_yolo_runtime_environment_probe_handoff.md)
 - [Milestone 3B Handoff](handoffs/milestone_3b_yolo_model_registry_weights_validation_handoff.md)
 - [Milestone 3C Handoff](handoffs/milestone_3c_yolo_detection_adapter_normalization_handoff.md)
+- [Milestone 3D Handoff](handoffs/milestone_3d_yolo_frame_inference_observation_persistence_handoff.md)
 
 ## Agent Reports
 
@@ -83,6 +85,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 3A Agent Report](agent_reports/milestone_3a_yolo_runtime_environment_probe_report.md)
 - [Milestone 3B Agent Report](agent_reports/milestone_3b_yolo_model_registry_weights_validation_report.md)
 - [Milestone 3C Agent Report](agent_reports/milestone_3c_yolo_detection_adapter_normalization_report.md)
+- [Milestone 3D Agent Report](agent_reports/milestone_3d_yolo_frame_inference_observation_persistence_report.md)
 
 ## Blueprints
 
@@ -109,6 +112,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [YOLO Runtime Environment v0](model_adapters/yolo_runtime_environment_v0.md)
 - [YOLO Model Registry and Weights v0](model_adapters/yolo_model_registry_weights_v0.md)
 - [YOLO Detection Normalization v0](model_adapters/yolo_detection_normalization_v0.md)
+- [YOLO Frame Inference Persistence v0](model_adapters/yolo_frame_inference_persistence_v0.md)
 
 ## Worker
 

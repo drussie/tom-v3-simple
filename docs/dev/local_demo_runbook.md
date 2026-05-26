@@ -220,7 +220,7 @@ http://127.0.0.1:3000/runs/<DETECTION_RUN_ID>
 
 Click a `ball_detection` or `player_detection` row in the observation list, or click a bbox in the overlay, to update the selected observation detail, lineage, artifact, and annotation panels.
 
-The real YOLO26 detector is not wired in this repo state. `--adapter yolo` is present as an integration stub and reports that runtime/assets are unavailable.
+The YOLO adapter is wired behind an optional frame-level runtime path as of Milestone 3D. Use the fixture adapter for base-environment demos; use `--adapter yolo` only after probing the optional runtime and registering local weights.
 
 ## 13. Extract Frame Artifacts For Detection Overlay
 
@@ -625,3 +625,46 @@ Expected behavior:
 - `source_runtime = ultralytics_yolo`
 - no model inference
 - no observations persisted
+
+## 22. Run YOLO Frame Inference Persistence
+
+Milestone 3D connects the YOLO adapter to the existing detection persistence path.
+
+The base environment test path uses mocked providers. Real local runtime use requires:
+
+- optional `tom_v3_yolo` environment
+- Ultralytics/Torch/OpenCV availability from `yolo-runtime-probe`
+- a registered local model weights row
+- an indexed media asset
+
+Register weights as shown in section 20, then run:
+
+```bash
+python -m apps.worker.cli run-detection-adapter \
+  --media-id <MEDIA_ID> \
+  --adapter yolo \
+  --model-registry-id <MODEL_REGISTRY_ID> \
+  --device cpu \
+  --image-size 640 \
+  --confidence-threshold 0.25 \
+  --iou-threshold 0.7 \
+  --max-det 50 \
+  --frame-sample-rate 30 \
+  --max-frames 3 \
+  --output-debug-artifact
+```
+
+Expected behavior when optional runtime and weights are available:
+
+- a detection processing run is created
+- YOLO-origin `ball_detection` and/or `player_detection` observations are persisted
+- payloads include bbox, center, label, confidence, source runtime, model registry id, weights sha256, and media-owned frame/time metadata
+- the existing detection viewer can inspect the run
+
+Expected behavior when runtime or weights are unavailable:
+
+- the command fails clearly
+- the run/step is marked failed when created
+- no fixture detections are persisted as a fallback
+
+This path does not create tracklets. Build candidate tracklets explicitly with `build-tracklets` after reviewing a detection run.

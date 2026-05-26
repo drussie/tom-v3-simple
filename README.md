@@ -34,7 +34,7 @@ Blueprint 2 is complete and Blueprint 3 has started. TOM v3 Simple can build, in
 - worker command to persist gameplay/non_gameplay/uncertain observations
 - detection adapter interface
 - fixture detector for deterministic ball/player dev/test output
-- YOLO26 detection adapter unavailable stub and portability assessment
+- YOLO detection adapter guarded runtime path and YOLO26 portability assessment
 - worker command to persist ball_detection/player_detection atomic observations
 - detection overlay transform and coordinate-space bbox panel
 - selected detection highlighting in the viewer
@@ -57,13 +57,14 @@ Blueprint 2 is complete and Blueprint 3 has started. TOM v3 Simple can build, in
 - YOLO runtime probe and device resolver for Ultralytics, Torch, OpenCV, CUDA, and MPS diagnostics
 - YOLO weights validation and model registry registration without inference
 - YOLO-like output normalization into TOM v3-compatible detection payloads
+- YOLO frame inference provider boundary and mocked YOLO detection persistence through the existing detection adapter path
 - model asset and weight ignore policy
 
-Portable TOM v1 detector assets/source and YOLO26 model weights are not present in this repo state. Real YOLO inference is not integrated yet. No sophisticated tracking, pose processing, court homography, or real bounce detection is implemented yet.
+Portable TOM v1 detector assets/source and YOLO26 model weights are not present in this repo state. Real YOLO inference now has a guarded frame-level provider path, but local runtime validation still requires optional YOLO packages and explicitly registered local weights. No sophisticated tracking, pose processing, court homography, or real bounce detection is implemented yet.
 
 Blueprint 2 did not add pose, homography, bounce detection, hit detection, rally/point reconstruction, scoring, identity proof, or adjudication.
 
-Recommended next milestone: Milestone 3D - YOLO Frame Inference / Observation Persistence. Pose remains outside Blueprint 3 and is reserved for a later blueprint.
+Recommended next milestone: Milestone 3E - Real YOLO Runtime Local Smoke / Viewer Validation. Pose remains outside Blueprint 3 and is reserved for a later blueprint.
 
 ## Repo Structure
 
@@ -319,6 +320,25 @@ result = normalize_yolo_frame_result({
 print(result.as_dict())
 PY
 ```
+
+Run the guarded YOLO detection path when optional runtime packages and registered weights are available:
+
+```bash
+python -m apps.worker.cli run-detection-adapter \
+  --media-id <MEDIA_ID> \
+  --adapter yolo \
+  --model-registry-id <MODEL_REGISTRY_ID> \
+  --device cpu \
+  --image-size 640 \
+  --confidence-threshold 0.25 \
+  --iou-threshold 0.7 \
+  --max-det 50 \
+  --frame-sample-rate 30 \
+  --max-frames 3 \
+  --output-debug-artifact
+```
+
+If runtime packages or weights are unavailable, the YOLO path fails clearly and does not fall back to fixture detections. Mocked provider tests cover persistence in the base environment without real Ultralytics or weights.
 
 ## Validation
 

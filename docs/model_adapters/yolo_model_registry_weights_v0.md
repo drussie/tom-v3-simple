@@ -4,7 +4,7 @@
 
 Milestone 3B validates local YOLO model weights and records reproducible model metadata before real inference is introduced.
 
-This milestone does not run YOLO inference and does not persist detections.
+Milestone 3D uses this registry metadata when running the guarded frame-level YOLO adapter. Registration itself still does not run inference and does not persist detections.
 
 ## Local Weights Policy
 
@@ -144,9 +144,9 @@ When `--probe-model` is supplied and Ultralytics is available, the helper attemp
 
 If runtime packages are unavailable, registration can still proceed with weights identity and class map metadata.
 
-## Future Runtime Config Preview
+## Runtime Config Shape
 
-Future real inference runtime config should include:
+Frame-level YOLO inference runtime config includes:
 
 ```json
 {
@@ -162,7 +162,7 @@ Future real inference runtime config should include:
 }
 ```
 
-## Normalization Next Step
+## Normalization and Persistence
 
 Milestone 3C uses this class map to normalize YOLO-like frame results into TOM v3-compatible detection payloads. See:
 
@@ -170,10 +170,16 @@ Milestone 3C uses this class map to normalize YOLO-like frame results into TOM v
 docs/model_adapters/yolo_detection_normalization_v0.md
 ```
 
+Milestone 3D can use a registered `model_registry_id` to resolve weights path, weights sha256, and class map before persisting model outputs as atomic detection observations. See:
+
+```text
+docs/model_adapters/yolo_frame_inference_persistence_v0.md
+```
+
 ## Out of Scope
 
-- real YOLO inference
-- detection observation persistence
+- optimized full-video YOLO inference
+- YOLO tracking mode
 - pose
 - homography
 - bounce or hit detection

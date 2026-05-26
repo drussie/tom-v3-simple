@@ -10,7 +10,9 @@ Milestone 3B establishes local weights validation and YOLO model registry metada
 
 Milestone 3C establishes YOLO-like output normalization.
 
-Real YOLO detection persistence is not implemented yet.
+Milestone 3D establishes the guarded frame-level inference and observation persistence bridge.
+
+Real local runtime smoke remains optional and depends on local YOLO packages and registered weights.
 
 ## Mission
 
@@ -81,6 +83,22 @@ Milestone 3C adds:
 
 3C prepares data for persistence compatibility only. It does not run full-media inference and does not create observations.
 
+## Milestone 3D Result
+
+Milestone 3D adds:
+
+- frame-level YOLO inference provider interface
+- fake provider for deterministic tests
+- guarded Ultralytics provider and OpenCV frame source
+- media-owned frame sampling
+- adapter `run()` path from YOLO result provider to 3C normalization
+- worker persistence of mocked YOLO outputs through the existing detection adapter service
+- `--model-registry-id`, `--iou-threshold`, and `--max-det` worker options
+- registered model metadata and weights checksum validation before YOLO runs
+- failed-run handling that does not persist fixture fallback detections
+
+3D proves the persistence bridge. It does not require real Ultralytics or real weights in CI.
+
 ## What Blueprint 3 Will Not Prove
 
 Blueprint 3 does not prove that a detection is correct.
@@ -118,5 +136,5 @@ A rally or point exists.
 Recommended next milestone:
 
 ```text
-Milestone 3D - YOLO Frame Inference / Observation Persistence
+Milestone 3E - Real YOLO Runtime Local Smoke / Viewer Validation
 ```

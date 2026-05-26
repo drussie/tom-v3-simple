@@ -86,15 +86,16 @@ It supports:
 
 The fixture payload marks itself as fixture output and includes `frame_time_owner: media_indexing`.
 
-## YOLO Adapter Stub
+## YOLO Adapter
 
-`YoloDetectionAdapter` exists behind the same interface but intentionally raises a clear unavailable error when the runtime or model file is unavailable.
+`YoloDetectionAdapter` exists behind the same interface. It supports a guarded frame-level inference path added in Milestone 3D.
 
-The current repo/environment does not contain:
+The base repo/environment does not require:
 
 - Ultralytics package
-- YOLO26 model weights
-- known ball/player model path
+- Torch
+- OpenCV
+- YOLO model weights
 
 See:
 
@@ -134,8 +135,6 @@ See:
 docs/model_adapters/yolo_runtime_environment_v0.md
 ```
 
-Real YOLO detection persistence remains out of scope until a future Blueprint 3 milestone supplies validated model weights and runtime configuration.
-
 Milestone 3B supplies the validated model weights and registry foundation, but still does not run inference:
 
 ```bash
@@ -170,6 +169,24 @@ result = normalize_yolo_frame_result(
 
 Normalization creates persistence-ready payloads only. It does not run a model or write observations.
 
+Milestone 3D adds frame-level inference and persistence behind the same worker path. Real runtime use requires optional dependencies and registered local weights:
+
+```bash
+python -m apps.worker.cli run-detection-adapter \
+  --media-id <MEDIA_ID> \
+  --adapter yolo \
+  --model-registry-id <MODEL_REGISTRY_ID> \
+  --device cpu \
+  --image-size 640 \
+  --confidence-threshold 0.25 \
+  --iou-threshold 0.7 \
+  --max-det 50 \
+  --frame-sample-rate 30 \
+  --max-frames 3
+```
+
+If runtime packages, device, or weights are unavailable, the YOLO path fails clearly and does not fall back to fixture detections. Tests use a fake provider to validate persistence without requiring real Ultralytics or weights.
+
 ## Persistence
 
 The worker service creates:
@@ -201,6 +218,11 @@ Atomic payload includes:
 - center
 - class label
 - class id
+- label and confidence
+- source runtime when supplied
+- model registry id when supplied
+- weights sha256 when supplied
+- inference settings when supplied
 - detector metadata
 - `frame_time_owner=media_indexing`
 

@@ -13,6 +13,7 @@ from tom_v3_model_adapters.detection import (
     DetectionObservation,
     get_detection_adapter,
 )
+from tom_v3_model_adapters.yolo_weights import validate_yolo_weights
 from tom_v3_observations.writer import ObservationWriter
 from tom_v3_schema.artifacts import EvidenceArtifactCreate
 from tom_v3_schema.observations import (
@@ -44,17 +45,44 @@ def run_detection_adapter(
     config_name: str = "detection-adapter-config",
     config_version: str = "v0",
     model_path: str | None = None,
+    model_registry_id: str | None = None,
     device: str | None = None,
     image_size: int | None = None,
     confidence_threshold: float = 0.25,
+    iou_threshold: float | None = 0.7,
+    max_det: int | None = 50,
     frame_sample_rate: int = 30,
     max_frames: int | None = 5,
     gameplay_run_id: str | None = None,
     output_debug_artifact: bool = False,
+    yolo_result_provider: Any | None = None,
+    yolo_frame_source: Any | None = None,
 ) -> dict[str, Any]:
     media = session.get(MediaAsset, media_id)
     if media is None:
         raise DetectionAdapterRunError(f"media asset not found: {media_id}")
+
+    normalized_adapter_name = adapter_name.strip().lower()
+    registered_model: ModelRegistry | None = None
+    model_metadata: dict[str, Any] = {}
+    class_map: dict[str, Any] | None = None
+    weights_sha256: str | None = None
+    if model_registry_id is not None:
+        registered_model = session.get(ModelRegistry, model_registry_id)
+        if registered_model is None:
+            raise DetectionAdapterRunError(f"model registry row not found: {model_registry_id}")
+        model_metadata = registered_model.metadata_jsonb or {}
+        if normalized_adapter_name in {"yolo", "yolo26", "ultralytics"}:
+            model_path = model_path or model_metadata.get("weights_resolved_path")
+            model_path = model_path or model_metadata.get("weights_path")
+            class_map = model_metadata.get("class_map")
+            weights_sha256 = model_metadata.get("weights_sha256")
+            if model_path:
+                validate_yolo_weights(
+                    weights_path=model_path,
+                    allowed_roots=None,
+                    required_sha256=weights_sha256,
+                )
 
     adapter = get_detection_adapter(
         adapter_name,
@@ -62,6 +90,11 @@ def run_detection_adapter(
         device=device,
         image_size=image_size,
         confidence_threshold=confidence_threshold,
+        iou_threshold=iou_threshold,
+        max_det=max_det,
+        model_registry_id=model_registry_id,
+        yolo_result_provider=yolo_result_provider,
+        yolo_frame_source=yolo_frame_source,
     )
     gameplay_segments = _load_gameplay_segments(session, gameplay_run_id)
     runtime_config = _create_runtime_config(
@@ -70,14 +103,19 @@ def run_detection_adapter(
         config_name=config_name,
         config_version=config_version,
         model_path=model_path,
+        model_registry_id=model_registry_id,
         device=device,
         image_size=image_size,
         confidence_threshold=confidence_threshold,
+        iou_threshold=iou_threshold,
+        max_det=max_det,
         frame_sample_rate=frame_sample_rate,
         max_frames=max_frames,
         gameplay_run_id=gameplay_run_id,
+        class_map=class_map,
+        weights_sha256=weights_sha256,
     )
-    model = _get_or_create_model(
+    model = registered_model or _get_or_create_model(
         session=session,
         adapter_name=adapter_name,
         adapter_runtime_name=adapter.name,
@@ -104,8 +142,8 @@ def run_detection_adapter(
             gameplay_run_id=gameplay_run_id,
             output_debug_artifact=output_debug_artifact,
         )
-    except Exception:
-        _mark_failed(session, run, step)
+    except Exception as exc:
+        _mark_failed(session, run, step, str(exc))
         raise
 
     _mark_completed(session, run, step, result)
@@ -136,12 +174,17 @@ def _create_runtime_config(
     config_name: str,
     config_version: str,
     model_path: str | None,
+    model_registry_id: str | None,
     device: str | None,
     image_size: int | None,
     confidence_threshold: float,
+    iou_threshold: float | None,
+    max_det: int | None,
     frame_sample_rate: int,
     max_frames: int | None,
     gameplay_run_id: str | None,
+    class_map: dict[str, Any] | None,
+    weights_sha256: str | None,
 ) -> RuntimeConfig:
     runtime_config = RuntimeConfig(
         config_name=config_name,
@@ -149,12 +192,19 @@ def _create_runtime_config(
         payload_jsonb={
             "adapter": adapter_name,
             "model_path": model_path,
+            "weights_path": model_path,
+            "model_registry_id": model_registry_id,
+            "weights_sha256": weights_sha256,
             "device": device,
             "image_size": image_size,
             "confidence_threshold": confidence_threshold,
+            "iou": iou_threshold,
+            "iou_threshold": iou_threshold,
+            "max_det": max_det,
             "frame_sample_rate": frame_sample_rate,
             "max_frames": max_frames,
             "gameplay_scope_run_id": gameplay_run_id,
+            "class_map": class_map,
             "frame_time_owner": "media_indexing",
         },
     )
@@ -275,6 +325,8 @@ def _adapter_input(
     gameplay_segments: list[dict[str, Any]],
 ) -> DetectionAdapterInput:
     metadata = media.metadata_jsonb or {}
+    runtime_payload = dict(runtime_config.payload_jsonb or {})
+    runtime_payload["runtime_config_id"] = runtime_config.id
     return DetectionAdapterInput(
         media_id=media.id,
         source_uri=media.source_uri,
@@ -284,7 +336,7 @@ def _adapter_input(
         duration_ms=media.duration_ms,
         width=media.width,
         height=media.height,
-        runtime_config=runtime_config.payload_jsonb,
+        runtime_config=runtime_payload,
         frame_time_summary=metadata.get("frame_time_index", {}),
         gameplay_segments=gameplay_segments,
         metadata=metadata,
@@ -379,6 +431,7 @@ def _detection_payload(
     gameplay_run_id: str | None,
     parent_gameplay: dict[str, Any] | None,
 ) -> dict[str, Any]:
+    inference = detection.metadata.get("inference") or {}
     return {
         "adapter_name": result.adapter_name,
         "adapter_version": result.adapter_version,
@@ -390,6 +443,12 @@ def _detection_payload(
         "center": detection.center.as_dict(),
         "class_id": detection.class_id,
         "class_label": detection.class_label,
+        "source_runtime": detection.metadata.get("source_runtime"),
+        "source_result_index": detection.metadata.get("source_result_index"),
+        "model_registry_id": detection.metadata.get("model_registry_id"),
+        "runtime_config_id": detection.metadata.get("runtime_config_id"),
+        "weights_sha256": inference.get("weights_sha256"),
+        "inference": inference,
         "metadata": detection.metadata,
         "gameplay_scope_run_id": gameplay_run_id,
         "gameplay_scope": parent_gameplay,
@@ -403,11 +462,18 @@ def _atomic_payload(
     gameplay_run_id: str | None,
     parent_gameplay: dict[str, Any] | None,
 ) -> dict[str, Any]:
+    inference = detection.metadata.get("inference") or {}
     return {
         "bbox": detection.bbox.as_dict(),
         "center": detection.center.as_dict(),
         "class_label": detection.class_label,
         "class_id": detection.class_id,
+        "source_runtime": detection.metadata.get("source_runtime"),
+        "source_result_index": detection.metadata.get("source_result_index"),
+        "model_registry_id": detection.metadata.get("model_registry_id"),
+        "runtime_config_id": detection.metadata.get("runtime_config_id"),
+        "weights_sha256": inference.get("weights_sha256"),
+        "inference": inference,
         "detector": {
             "adapter_name": result.adapter_name,
             "adapter_version": result.adapter_version,
@@ -428,6 +494,7 @@ def _debug_artifact(
     result: DetectionAdapterResult,
     index: int,
 ) -> EvidenceArtifactCreate:
+    inference = detection.metadata.get("inference") or {}
     return EvidenceArtifactCreate(
         media_id=media.id,
         run_id=run.id,
@@ -442,6 +509,13 @@ def _debug_artifact(
             "adapter_version": result.adapter_version,
             "label": detection.label,
             "bbox": detection.bbox.as_dict(),
+            "center": detection.center.as_dict(),
+            "source_runtime": detection.metadata.get("source_runtime"),
+            "model_registry_id": detection.metadata.get("model_registry_id"),
+            "weights_sha256": inference.get("weights_sha256"),
+            "inference": inference,
+            "diagnostics": result.diagnostics,
+            "note": "model outputs are persisted as observations only",
             "placeholder": True,
         },
     )
@@ -515,12 +589,25 @@ def _mark_completed(
     session.commit()
 
 
-def _mark_failed(session: Session, run: ProcessingRun, step: ProcessingStep) -> None:
+def _mark_failed(
+    session: Session,
+    run: ProcessingRun,
+    step: ProcessingStep,
+    error_message: str,
+) -> None:
     now = datetime.now(UTC)
     run.run_status = "failed"
     run.completed_at = now
+    run.metadata_jsonb = {
+        **run.metadata_jsonb,
+        "error": error_message,
+    }
     step.step_status = "failed"
     step.completed_at = now
+    step.metadata_jsonb = {
+        **step.metadata_jsonb,
+        "error": error_message,
+    }
     session.commit()
 
 
