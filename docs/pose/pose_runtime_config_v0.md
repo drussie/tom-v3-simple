@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Milestone 4A defines the pose runtime and model metadata contract without running real pose inference. Milestone 4B adds normalization-only adapter diagnostics for fake or serialized pose output.
+Milestone 4A defines the pose runtime and model metadata contract without running real pose inference. Milestone 4B adds normalization-only adapter diagnostics for fake or serialized pose output. Milestone 4C creates fixture pose runtime config rows for worker persistence runs.
 
 ## Model Registry Metadata
 
@@ -26,6 +26,17 @@ Metadata should include:
 - milestone provenance
 
 Milestone 4A fixture insertion creates a fixture pose model registry row with COCO17 metadata and no real weights.
+
+Milestone 4C worker persistence creates or reuses a fixture pose adapter model row with:
+
+```text
+model_family = pose
+model_runtime = fixture
+model_task = pose
+skeleton_format = coco17
+normalization_only = true
+no_real_pose_inference = true
+```
 
 ## Runtime Config Shape
 
@@ -58,6 +69,16 @@ The pose runtime config payload is shaped as:
 
 Future real pose adapters can reuse the Blueprint 3 discipline: optional runtime dependency path, explicit local weights, fingerprinting, model registry metadata, and guarded inference.
 
+Milestone 4C worker runtime configs add:
+
+- `frame_sample_rate`
+- `max_frames`
+- `source_detection_run_id`
+- `link_source_detections`
+- `normalization_only = true`
+- `no_real_pose_inference = true`
+- `milestone = 4C`
+
 ## Normalization Adapter Diagnostics
 
 The 4B normalization adapter result includes:
@@ -71,4 +92,4 @@ The 4B normalization adapter result includes:
 
 ## Non-Goals
 
-Milestones 4A and 4B do not add real pose runtime, pose weights validation, overlay rendering, movement interpretation, or tennis-event candidates.
+Milestones 4A, 4B, and 4C do not add real pose runtime, pose weights validation, overlay rendering, movement interpretation, or tennis-event candidates.

@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Milestone 4A adds first-class pose observation persistence. Milestone 4B adds normalization that can produce `PoseObservationCreate`-compatible payloads from fake or serialized pose frame results.
+Milestone 4A adds first-class pose observation persistence. Milestone 4B adds normalization that can produce `PoseObservationCreate`-compatible payloads from fake or serialized pose frame results. Milestone 4C adds a worker pose processing-run path that persists normalized fixture poses and source candidate lineage.
 
 Pose observations use the central observation spine plus a typed `pose_observation` row.
 
@@ -90,7 +90,14 @@ association_status = unassociated
 association_method = full_frame_pose
 ```
 
-Future milestones may use candidate associations to player detections, tracklets, or track points.
+Milestone 4C persists candidate associations to source `player_detection` observations when supplied. Candidate tracklet and track point association fields are supported by the schema and reserved for later fixture/runtime paths.
+
+Source detection linkage uses:
+
+```text
+player_detection observation -> player_pose_observation
+relationship_type = pose_from_subject_detection_candidate
+```
 
 ## Queryability
 
@@ -111,6 +118,16 @@ The Milestone 4B pose normalizer emits the same fields used by this schema:
 - raw model payload and normalization metadata
 
 Invalid bbox input does not discard valid keypoints; bbox fields are stored as null and a normalization warning is reported.
+
+## Worker Persistence Compatibility
+
+Worker `run-pose-adapter` writes normalized fixture poses through `ObservationWriter`:
+
+```bash
+python -m apps.worker.cli run-pose-adapter --media-id <media_id> --adapter fixture
+```
+
+Source-detection-linked fixture mode copies frame/time from source `player_detection` observations and records lineage without proving identity.
 
 ## Non-Goals
 

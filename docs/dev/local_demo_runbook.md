@@ -824,3 +824,75 @@ fake / serialized pose frame result
 ```
 
 It does not create pose processing runs, persist real model output, infer movement, create homography, create tennis-event candidates, or adjudicate results.
+
+## 27. Validate Pose Persistence and Lineage
+
+Milestone 4C adds a fixture pose worker persistence path. It still does not run real pose inference or render pose overlays.
+
+Run focused checks:
+
+```bash
+pytest tests/test_pose_persistence_lineage.py -q
+```
+
+After indexing media, persist unassociated fixture pose observations:
+
+```bash
+python -m apps.worker.cli run-pose-adapter \
+  --media-id <media_id> \
+  --adapter fixture \
+  --frame-sample-rate 30 \
+  --max-frames 3
+```
+
+Expected behavior:
+
+- `pose_run_id` is returned.
+- `processing_step_id` is returned.
+- `pose_observation_count` is greater than zero when sampled frames exist.
+- `lineage_count = 0` for unassociated full-frame fixture poses.
+- Persisted observations use `observation_family = pose`.
+- Persisted observations use `observation_type = player_pose_observation`.
+- Typed `pose_observation` rows store full COCO17 keypoint evidence.
+
+To link pose evidence to source player detections, first run a detection adapter:
+
+```bash
+python -m apps.worker.cli run-detection-adapter \
+  --media-id <media_id> \
+  --adapter fixture \
+  --frame-sample-rate 30 \
+  --max-frames 2
+```
+
+Then run the pose adapter in source-linked mode:
+
+```bash
+python -m apps.worker.cli run-pose-adapter \
+  --media-id <media_id> \
+  --adapter fixture \
+  --source-detection-run-id <detection_run_id> \
+  --link-source-detections \
+  --max-frames 3
+```
+
+Expected behavior:
+
+- Pose frame/time values come from the source `player_detection` observation.
+- Source association fields are persisted as candidate context.
+- `observation_lineage.relationship_type = pose_from_subject_detection_candidate`.
+- Invalid explicit source ids fail clearly instead of creating placeholder source rows.
+
+The persistence path is:
+
+```text
+indexed media
+-> fixture pose adapter
+-> normalized pose payload
+-> pose processing_run / processing_step
+-> observation spine row
+-> pose_observation typed row
+-> optional source player_detection lineage
+```
+
+This does not create movement conclusions, source identity, homography, bounce/hit/rally/point/scoring evidence, or adjudication.

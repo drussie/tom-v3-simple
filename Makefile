@@ -20,10 +20,12 @@ MODEL_NAME ?=
 MODEL_VERSION ?= v0
 REQUIRED_SHA256 ?=
 RUN_TRACKLETS ?= false
+SOURCE_DETECTION_RUN_ID ?=
+LINK_SOURCE_DETECTIONS ?= false
 
 export TOM_V3_DATABASE_URL
 
-.PHONY: install web-install test lint migrate api seed verify index-media run-gameplay index-and-run-gameplay run-detection index-and-run-detection extract-frame-artifacts build-tracklets export-tracklet-review-dataset yolo-runtime-probe register-yolo-model smoke-real-yolo-local web web-build web-lint smoke all-checks
+.PHONY: install web-install test lint migrate api seed verify index-media run-gameplay index-and-run-gameplay run-detection index-and-run-detection extract-frame-artifacts build-tracklets run-pose export-tracklet-review-dataset yolo-runtime-probe register-yolo-model smoke-real-yolo-local web web-build web-lint smoke all-checks
 
 install:
 	$(PYTHON) -m pip install -e ".[dev]"
@@ -77,6 +79,10 @@ extract-frame-artifacts:
 build-tracklets:
 	@if [ -z "$(DETECTION_RUN_ID)" ]; then echo "DETECTION_RUN_ID is required: make build-tracklets DETECTION_RUN_ID=<run_id>"; exit 1; fi
 	$(PYTHON) -m apps.worker.cli build-tracklets --detection-run-id "$(DETECTION_RUN_ID)" --max-gap-frames "$(MAX_GAP_FRAMES)"
+
+run-pose:
+	@if [ -z "$(MEDIA_ID)" ]; then echo "MEDIA_ID is required: make run-pose MEDIA_ID=<media_id>"; exit 1; fi
+	$(PYTHON) -m apps.worker.cli run-pose-adapter --media-id "$(MEDIA_ID)" --adapter fixture --frame-sample-rate "$(FRAME_SAMPLE_RATE)" --max-frames "$(MAX_FRAMES)" $(if $(SOURCE_DETECTION_RUN_ID),--source-detection-run-id "$(SOURCE_DETECTION_RUN_ID)",) $(if $(filter true,$(LINK_SOURCE_DETECTIONS)),--link-source-detections,--no-link-source-detections)
 
 export-tracklet-review-dataset:
 	@if [ -z "$(TRACKLET_ID)" ] && [ -z "$(QUERY_JSON)" ]; then echo "TRACKLET_ID or QUERY_JSON is required"; exit 1; fi

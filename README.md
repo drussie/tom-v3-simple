@@ -14,7 +14,7 @@ The core invariant:
 
 ## Current Status
 
-Blueprints 1, 2, and 3 are complete. Blueprint 4 is in progress with pose evidence schema and normalization foundations. TOM v3 Simple can build, inspect, query, review, and export candidate temporal evidence on top of persisted ball/player detections, has an optional YOLO / Ultralytics runtime path for ball/player observation adapters, and now has first-class pose observation persistence and normalization contracts:
+Blueprints 1, 2, and 3 are complete. Blueprint 4 is in progress with pose evidence schema, normalization, persistence, and lineage foundations. TOM v3 Simple can build, inspect, query, review, and export candidate temporal evidence on top of persisted ball/player detections, has an optional YOLO / Ultralytics runtime path for ball/player observation adapters, and now has first-class pose observation persistence and normalization contracts:
 
 - repo memory and architecture contracts
 - FastAPI backend/API foundation
@@ -66,6 +66,8 @@ Blueprints 1, 2, and 3 are complete. Blueprint 4 is in progress with pose eviden
 - fake/serialized pose output normalization into `PoseObservationCreate`-compatible payloads
 - crop-local to full-frame pose keypoint projection
 - synthetic/fake pose observation insertion for schema and persistence validation
+- worker fixture pose persistence with processing run/step provenance
+- source `player_detection` candidate lineage to pose observations
 - model asset and weight ignore policy
 
 Portable TOM v1 detector assets/source and YOLO26 model weights are not present in this repo state. Real YOLO inference now has a guarded frame-level provider path and optional local smoke workflow, but local runtime validation still requires optional YOLO packages and explicitly registered local weights. Pose currently has schema/persistence and normalization foundations only; no real pose runtime, pose overlay viewer, movement interpretation, court homography, or real bounce detection is implemented yet.
@@ -74,9 +76,9 @@ Blueprint 2 did not add pose, homography, bounce detection, hit detection, rally
 
 Blueprint 3 did not add pose, homography, bounce detection, hit detection, rally/point reconstruction, scoring, identity proof, YOLO tracking mode, or adjudication.
 
-Blueprint 4A/4B did not add real pose inference, pose overlay rendering, movement interpretation, serve/hit/split-step/biomechanics conclusions, homography, rally/point reconstruction, scoring, or adjudication.
+Blueprint 4A/4B/4C did not add real pose inference, pose overlay rendering, movement interpretation, serve/hit/split-step/biomechanics conclusions, homography, rally/point reconstruction, scoring, or adjudication.
 
-Recommended next milestone: Milestone 4C - Pose Observation Persistence and Lineage.
+Recommended next milestone: Milestone 4D - Pose Overlay Viewer.
 
 ## Repo Structure
 
@@ -376,6 +378,47 @@ pytest tests/test_pose_schema.py tests/test_pose_observation_persistence.py test
 
 These focused tests create fixture pose model/runtime records, write a synthetic `player_pose_observation` spine row plus typed `pose_observation` row, normalize fake pose frame results into `PoseObservationCreate`-compatible payloads, and verify COCO17 keypoint summaries and media-owned frame/time. They do not run pose inference or render a pose overlay.
 
+## 27. Validate Pose Persistence and Lineage
+
+Milestone 4C adds worker pose persistence for normalized fixture output. It still does not run real pose inference or render pose overlays.
+
+Run focused persistence checks:
+
+```bash
+pytest tests/test_pose_persistence_lineage.py -q
+```
+
+Run the fixture pose worker command after indexing media:
+
+```bash
+python -m apps.worker.cli run-pose-adapter \
+  --media-id <media_id> \
+  --adapter fixture \
+  --frame-sample-rate 30 \
+  --max-frames 3
+```
+
+To link pose evidence to persisted source player detections:
+
+```bash
+python -m apps.worker.cli run-pose-adapter \
+  --media-id <media_id> \
+  --adapter fixture \
+  --source-detection-run-id <detection_run_id> \
+  --link-source-detections \
+  --max-frames 3
+```
+
+Expected behavior:
+
+- A pose `processing_run` and `processing_step` are created.
+- `player_pose_observation` spine rows and typed `pose_observation` rows are persisted.
+- Full-frame fixture poses remain unassociated.
+- Source-detection-linked poses use `pose_from_subject_detection_candidate` lineage.
+- Source-detection-linked poses copy source detection frame/time values.
+
+This does not create movement conclusions, homography, bounce/hit/rally/point/scoring evidence, or adjudication.
+
 ## Validation
 
 Run the consolidated checks:
@@ -407,6 +450,7 @@ make run-detection MEDIA_ID=<media_id>
 make index-and-run-detection SOURCE_PATH=/path/to/video.mp4
 make extract-frame-artifacts RUN_ID=<detection_run_id>
 make build-tracklets DETECTION_RUN_ID=<detection_run_id>
+make run-pose MEDIA_ID=<media_id>
 make seed
 make smoke
 make yolo-runtime-probe
@@ -438,6 +482,7 @@ Useful runbooks:
 - [Pose Observation Schema v0](docs/pose/pose_observation_schema_v0.md)
 - [Pose Runtime Config v0](docs/pose/pose_runtime_config_v0.md)
 - [Pose Adapter Normalization v0](docs/pose/pose_adapter_normalization_v0.md)
+- [Pose Persistence and Lineage v0](docs/pose/pose_persistence_lineage_v0.md)
 - [Detection Overlay Viewer v0](docs/web/detection_overlay_viewer_v0.md)
 - [Frame Artifact Overlay v0](docs/web/frame_artifact_overlay_v0.md)
 - [Tracklet Foundation v0](docs/tracklets/tracklet_foundation_v0.md)

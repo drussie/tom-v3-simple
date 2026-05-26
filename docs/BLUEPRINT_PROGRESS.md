@@ -2,7 +2,7 @@
 
 ## Current Progress Gauge
 
-Current: ~35-40% through Blueprint 4
+Current: ~55-60% through Blueprint 4
 
 ## Current
 
@@ -112,6 +112,12 @@ Current: ~35-40% through Blueprint 4
 - Missing keypoints are preserved as missing evidence.
 - Bbox, confidence, crop projection, and subject association candidate normalization are tested.
 - Normalized pose output can instantiate `PoseObservationCreate`.
+- Pose processing service exists.
+- Worker `run-pose-adapter` can persist fixture pose observations.
+- Pose processing runs and steps are created for fixture pose runs.
+- Normalized pose payloads are persisted through `ObservationWriter`.
+- Source `player_detection` observations can link to pose observations through `pose_from_subject_detection_candidate` lineage.
+- Unassociated full-frame fixture poses persist with no lineage.
 - No real pose inference, pose overlay viewer, movement interpretation, homography, bounce, hit, rally, point, scoring, or adjudication has been added.
 
 ## After Milestone 0A
@@ -541,3 +547,22 @@ Expected: ~35-40% through Blueprint 4
 Status: complete.
 
 The repo now has a pose adapter normalization foundation. Fake/serialized pose frame results can become `PoseObservationCreate`-compatible normalized pose observations with COCO17 keypoints, missing-keypoint preservation, bbox/confidence handling, crop projection, subject association candidate passthrough, and normalization-only adapter diagnostics.
+
+## After Milestone 4C
+
+Expected: ~55-60% through Blueprint 4
+
+- Normalized pose payloads can be persisted through an explicit pose processing service.
+- A pose `processing_run` and `processing_step` are created.
+- Pose observations are written through `ObservationWriter`.
+- Pose observations preserve media-owned frame/time.
+- Pose observations can link to source `player_detection` observations.
+- Candidate tracklet and track point relationship names are reserved for future pose context.
+- Lineage rows explain the source evidence chain.
+- No real pose runtime, pose overlay viewer, movement interpretation, homography, bounce, hit, rally, point, scoring, or adjudication is added.
+
+## Milestone 4C Status
+
+Status: complete.
+
+The repo now has a pose persistence and lineage foundation. Worker `run-pose-adapter` creates fixture pose runs, persists typed `pose_observation` rows through the central observation writer, preserves media-owned frame/time, and links source `player_detection` observations to pose observations with `pose_from_subject_detection_candidate` lineage when candidate subject context is supplied.

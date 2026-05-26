@@ -4,7 +4,7 @@
 
 Status: in progress
 
-Milestones 4A and 4B are complete. They establish the pose runtime/schema foundation and pose adapter normalization foundation.
+Milestones 4A, 4B, and 4C are complete. They establish the pose runtime/schema foundation, pose adapter normalization foundation, and pose observation persistence/lineage foundation.
 
 ## Mission
 
@@ -69,6 +69,23 @@ Milestone 4B adds:
 
 4B does not add real pose inference, pose observation worker persistence, pose overlay rendering, movement interpretation, or event candidates.
 
+## Milestone 4C Result
+
+Milestone 4C adds:
+
+- fixture pose worker persistence service
+- worker `run-pose-adapter`
+- pose `processing_run` and `processing_step` records
+- normalized fixture pose persistence through `ObservationWriter`
+- first-class `pose` observation spine rows
+- typed `pose_observation` rows
+- media-owned frame/time preservation
+- source `player_detection` candidate lineage using `pose_from_subject_detection_candidate`
+- reserved relationship names for candidate tracklet and track point pose context
+- tests for unassociated poses, source detection lineage, invalid explicit source ids, and CLI behavior
+
+4C does not add real pose inference, pose overlay rendering, movement interpretation, or event candidates.
+
 ## Observation Boundary
 
 A pose observation means:
@@ -89,7 +106,7 @@ A biomechanical conclusion is valid.
 A rally or point exists.
 ```
 
-## Out of Scope For Blueprint 4A
+## Out of Scope For Blueprint 4A-4C
 
 - real pose inference
 - pose overlay viewer
@@ -107,5 +124,5 @@ A rally or point exists.
 Recommended next milestone:
 
 ```text
-Milestone 4B - Pose Adapter Normalization Foundation
+Milestone 4D - Pose Overlay Viewer
 ```

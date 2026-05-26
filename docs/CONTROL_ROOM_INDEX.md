@@ -46,6 +46,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 3F - Blueprint 3 Completion Review](milestones/milestone_3f_blueprint_3_completion_review.md)
 - [Milestone 4A - Pose Runtime / Schema Foundation](milestones/milestone_4a_pose_runtime_schema_foundation.md)
 - [Milestone 4B - Pose Adapter Normalization Foundation](milestones/milestone_4b_pose_adapter_normalization_foundation.md)
+- [Milestone 4C - Pose Observation Persistence and Lineage](milestones/milestone_4c_pose_observation_persistence_lineage.md)
 
 ## Handoffs
 
@@ -72,6 +73,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 3F Handoff](handoffs/milestone_3f_blueprint_3_completion_review_handoff.md)
 - [Milestone 4A Handoff](handoffs/milestone_4a_pose_runtime_schema_foundation_handoff.md)
 - [Milestone 4B Handoff](handoffs/milestone_4b_pose_adapter_normalization_foundation_handoff.md)
+- [Milestone 4C Handoff](handoffs/milestone_4c_pose_observation_persistence_lineage_handoff.md)
 
 ## Agent Reports
 
@@ -98,6 +100,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 3F Agent Report](agent_reports/milestone_3f_blueprint_3_completion_review_report.md)
 - [Milestone 4A Agent Report](agent_reports/milestone_4a_pose_runtime_schema_foundation_report.md)
 - [Milestone 4B Agent Report](agent_reports/milestone_4b_pose_adapter_normalization_foundation_report.md)
+- [Milestone 4C Agent Report](agent_reports/milestone_4c_pose_observation_persistence_lineage_report.md)
 
 ## Blueprints
 
@@ -156,6 +159,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Pose Observation Schema v0](pose/pose_observation_schema_v0.md)
 - [Pose Runtime Config v0](pose/pose_runtime_config_v0.md)
 - [Pose Adapter Normalization v0](pose/pose_adapter_normalization_v0.md)
+- [Pose Persistence and Lineage v0](pose/pose_persistence_lineage_v0.md)
 
 ## Development
 
@@ -177,6 +181,8 @@ Preferred TOM v3 vocabulary:
 - track_point
 - gameplay_observation
 - view_state_observation
+- pose_observation
+- keypoint_evidence
 - evidence_artifact
 - human_annotation
 - query_result

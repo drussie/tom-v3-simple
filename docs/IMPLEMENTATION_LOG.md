@@ -847,3 +847,40 @@ Milestone 4B created:
 - Crop-local to full-frame coordinate projection.
 - Subject association candidate passthrough.
 - Focused tests covering normalization behavior and `PoseObservationCreate` compatibility.
+
+## Milestone 4C - Pose Observation Persistence and Lineage
+
+Status: complete
+
+### Goal
+
+Persist normalized pose payloads through a worker pose processing-run path and connect pose observations to source subject evidence when candidate context is supplied.
+
+### Non-goals
+
+- No real pose runtime or adapter inference.
+- No pose overlay viewer.
+- No movement interpretation.
+- No serve, split-step, or biomechanics conclusions.
+- No court homography.
+- No bounce detection.
+- No hit detection.
+- No rally segmentation.
+- No point reconstruction.
+- No scoring.
+- No adjudication.
+
+### Notes
+
+Milestone 4C created:
+
+- Pose adapter worker service in `apps/worker/services/pose_adapter.py`.
+- Worker command `run-pose-adapter`.
+- Fixture pose model registry metadata for persistence runs.
+- Pose runtime config payloads with frame sampling and source detection linkage metadata.
+- Pose `processing_run` and `processing_step` records.
+- Persistence of normalized fixture pose payloads through `ObservationWriter`.
+- First-class `pose` observation spine rows plus typed `pose_observation` rows.
+- `pose_from_subject_detection_candidate` lineage from source `player_detection` observations to pose observations.
+- Reserved relationship enum values for candidate tracklet and track point pose context.
+- Tests for unassociated fixture pose persistence, source detection lineage, invalid explicit source ids, and CLI smoke behavior.

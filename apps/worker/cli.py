@@ -21,6 +21,7 @@ from apps.worker.services.detection_adapter import run_detection_adapter
 from apps.worker.services.frame_artifacts import extract_frame_artifacts_for_run
 from apps.worker.services.gameplay_adapter import run_gameplay_adapter
 from apps.worker.services.media_indexer import index_media
+from apps.worker.services.pose_adapter import run_pose_adapter
 from apps.worker.services.real_yolo_smoke import run_real_yolo_local_smoke
 from apps.worker.services.tracklet_builder import build_tracklets_from_detection_run
 from apps.worker.services.yolo_model_registry import register_yolo_model
@@ -214,6 +215,26 @@ def main() -> None:
     )
     tracklet_parser.add_argument("--skip-create-db", action="store_true")
     tracklet_parser.set_defaults(handler=_handle_build_tracklets)
+
+    pose_parser = subcommands.add_parser(
+        "run-pose-adapter",
+        help="Run a fixture pose adapter for an indexed media asset.",
+    )
+    pose_parser.add_argument("--media-id", required=True)
+    pose_parser.add_argument("--adapter", default="fixture", choices=["fixture"])
+    pose_parser.add_argument("--frame-sample-rate", type=int, default=30)
+    pose_parser.add_argument("--max-frames", type=int, default=3)
+    pose_parser.add_argument("--source-detection-run-id")
+    pose_parser.add_argument(
+        "--link-source-detections",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+    )
+    pose_parser.add_argument("--run-name", default="fixture-pose-run")
+    pose_parser.add_argument("--config-name", default="pose-adapter-config")
+    pose_parser.add_argument("--config-version", default="v0")
+    pose_parser.add_argument("--skip-create-db", action="store_true")
+    pose_parser.set_defaults(handler=_handle_run_pose_adapter)
 
     export_parser = subcommands.add_parser(
         "export-tracklet-review-dataset",
@@ -524,6 +545,21 @@ def _handle_build_tracklets(session: Session, args: argparse.Namespace) -> dict[
         grouping_method=args.grouping_method,
         include_ball=args.include_ball,
         include_players=args.include_players,
+    )
+
+
+def _handle_run_pose_adapter(session: Session, args: argparse.Namespace) -> dict[str, object]:
+    return run_pose_adapter(
+        session=session,
+        media_id=args.media_id,
+        adapter_name=args.adapter,
+        run_name=args.run_name,
+        config_name=args.config_name,
+        config_version=args.config_version,
+        frame_sample_rate=args.frame_sample_rate,
+        max_frames=args.max_frames,
+        source_detection_run_id=args.source_detection_run_id,
+        link_source_detections=args.link_source_detections,
     )
 
 

@@ -93,10 +93,14 @@ class DerivedKind(StrEnum):
 class RelationshipType(StrEnum):
     derived_from = "derived_from"
     tracked_from = "tracked_from"
+    grouped_from = "grouped_from"
     scoped_by = "scoped_by"
     projected_using = "projected_using"
     rendered_from = "rendered_from"
     grouped_with = "grouped_with"
+    pose_from_subject_detection_candidate = "pose_from_subject_detection_candidate"
+    subject_context_candidate = "subject_context_candidate"
+    pose_from_track_point_candidate = "pose_from_track_point_candidate"
 
 
 class CoordinateSpace(StrEnum):

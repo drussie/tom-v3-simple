@@ -4,7 +4,7 @@
 
 Milestone 4B adds normalization for fake or serialized pose model output.
 
-The normalizer converts model-shaped pose output into `PoseObservationCreate`-compatible payloads. It does not run a pose model, persist observations through a worker pipeline, render a pose overlay, or interpret movement.
+The normalizer converts model-shaped pose output into `PoseObservationCreate`-compatible payloads. Milestone 4C uses this normalizer from a fixture worker persistence path. The normalizer itself does not run a pose model, render a pose overlay, or interpret movement.
 
 ## Location
 
@@ -111,6 +111,12 @@ association_method = full_frame_pose
 
 Input `subject_context` can pass through candidate association fields for a player detection, tracklet, or track point. These fields are context only; they do not establish identity.
 
+Milestone 4C persists source `player_detection` candidate context as observation lineage:
+
+```text
+relationship_type = pose_from_subject_detection_candidate
+```
+
 ## Adapter Skeleton
 
 The module includes:
@@ -126,11 +132,14 @@ Diagnostics include counts, warnings, and the note:
 normalization only, no real pose inference
 ```
 
+## Worker Persistence
+
+The normalized output can be persisted by worker `run-pose-adapter`. Full-frame fixture mode remains unassociated. Source-detection-linked fixture mode uses persisted `player_detection` observations as candidate subject context and preserves their frame/time values.
+
 ## Non-Goals
 
 - No real pose inference.
 - No pose model loading.
-- No pose observation worker pipeline.
 - No pose overlay viewer.
 - No movement interpretation.
 - No serve, hit, split-step, or biomechanics conclusions.
