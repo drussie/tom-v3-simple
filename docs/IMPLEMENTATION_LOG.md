@@ -309,3 +309,42 @@ Milestone 1D created:
 - Safe empty states for missing media dimensions and missing bbox payloads.
 - Viewer contract test coverage for detection bbox payloads and frame/time ownership.
 - Detection overlay docs, milestone doc, handoff, and agent report.
+
+## Milestone 1E - Detection Artifact / Frame Extraction Foundation
+
+Status: complete
+
+### Goal
+
+Add frame image artifacts so persisted detection observations can be inspected over real extracted frame imagery.
+
+### Non-goals
+
+- No real YOLO inference.
+- No tracking.
+- No pose detection.
+- No court homography.
+- No bounce detection.
+- No hit detection.
+- No rally segmentation.
+- No point reconstruction.
+- No scoring.
+- No production object storage.
+- No streaming.
+- No adjudication.
+- No truth/fact/promotion/refusal concepts.
+
+### Notes
+
+Milestone 1E created:
+
+- ffmpeg frame extraction primitive in `tom_v3_video.frame_extract`.
+- Worker frame artifact extraction service.
+- Worker command `extract-frame-artifacts`.
+- Local `.data/artifacts/media/{media_id}/frames` storage layout.
+- Shared `frame_image` and targeted `detection_frame_image` artifact rows.
+- Metadata with frame number, timestamp, frame-time owner, extraction method/version, source media, output path, image format, and checksum.
+- Local API content route `GET /artifacts/{artifact_id}/content`.
+- Viewer frame artifact matching and image display behind persisted bboxes.
+- Coordinate canvas fallback when no frame artifact exists.
+- Tests covering extraction, metadata, artifact content, and viewer payload behavior.

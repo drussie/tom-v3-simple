@@ -227,10 +227,16 @@ export interface DetectionOverlayItem {
   isSelected: boolean;
 }
 
+export interface FrameArtifactImage {
+  artifact: EvidenceArtifact;
+  match: "selected_observation" | "same_frame";
+}
+
 export interface DetectionOverlayModel {
   items: DetectionOverlayItem[];
   frameItems: DetectionOverlayItem[];
   selectedFrame: number | null;
+  frameArtifact: FrameArtifactImage | null;
   missingBboxObservationIds: string[];
   unavailableReason: string | null;
   mediaWidth: number | null;

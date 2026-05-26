@@ -44,8 +44,14 @@ export function EvidenceViewer({ viewerRun }: EvidenceViewerProps) {
       : [];
   const selectedFrame = selectedObservation?.frame_start ?? selectedObservation?.frame_end ?? null;
   const detectionOverlay = useMemo(
-    () => buildDetectionOverlayModel(viewerRun.media, model.observations, selectedObservationId),
-    [model.observations, selectedObservationId, viewerRun.media]
+    () =>
+      buildDetectionOverlayModel(
+        viewerRun.media,
+        model.observations,
+        viewerRun.artifacts,
+        selectedObservationId
+      ),
+    [model.observations, selectedObservationId, viewerRun.artifacts, viewerRun.media]
   );
 
   return (

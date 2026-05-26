@@ -4,8 +4,8 @@
 
 - Project name: TOM v3 Simple
 - Repo: drussie/tom-v3-simple
-- Current phase: Milestone 1D
-- Current goal: detection overlay / visual observation layer
+- Current phase: Milestone 1E
+- Current goal: detection artifact / frame extraction foundation
 
 ## Mission
 
@@ -13,7 +13,7 @@ A lightweight tennis video observation platform that accepts model output as ope
 
 ## Implementation Status
 
-- Implementation status: detection adapter seam exists; persisted ball/player atomic observations are visually inspectable in the viewer
+- Implementation status: persisted ball/player observations can be inspected over coordinate overlays and extracted frame artifacts
 - Model integration status: fixture gameplay and fixture detection adapters implemented for deterministic dev/test output
 - TOM v1 gameplay detector: known asset, portable source/assets not available in this repo/environment; integration stub documented
 - YOLO/YOLO26: runtime/assets not available in this repo/environment; unavailable stub documented
@@ -24,7 +24,7 @@ A lightweight tennis video observation platform that accepts model output as ope
 - Detection adapter: implemented with `BaseDetectionAdapter`, fixture adapter, YOLO unavailable stub, worker service, and worker CLI
 - Observation writer: implemented with typed extension rows, lineage, artifacts, and idempotency
 - Worker synthetic seeder: implemented
-- Visual evidence viewer: implemented in `apps/web` with detection bbox overlay support
+- Visual evidence viewer: implemented in `apps/web` with detection bbox overlay and frame artifact image support
 - Synthetic data: baseline scenario creates viewer-ready observations, tracklets, gaps, candidates, lineage, and artifacts
 - Local setup: documented with `.env.example`, Makefile, and dev runbooks
 - Branch/default branch: `main` is restored as the GitHub default branch
@@ -83,6 +83,12 @@ Status: complete
 
 Milestone 1D establishes the detection overlay viewer transform, coordinate-space bbox overlay components, selected frame behavior, selected detection highlighting, detection timeline row, safe empty states for missing media dimensions or bbox payloads, and docs/tests for the overlay contract.
 
+## Milestone 1E Result
+
+Status: complete
+
+Milestone 1E establishes ffmpeg-based frame extraction, worker `extract-frame-artifacts`, local `.data/artifacts` storage, persisted `frame_image` and `detection_frame_image` artifact metadata, a local artifact content route, and viewer support for displaying extracted frame imagery behind persisted detection bboxes.
+
 ## Next Milestone
 
-Recommended next handoff: Milestone 1E - Detection Artifact / Frame Extraction Foundation.
+Recommended next handoff: Milestone 1F - Tracklet Foundation from Persisted Detections, unless YOLO26 runtime/assets become available and real detector integration is prioritized.

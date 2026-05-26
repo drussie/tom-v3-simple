@@ -76,7 +76,7 @@ Rows are built from observation rows and tracklet metadata created by the synthe
 
 Milestone 1D adds a detection overlay panel. It extracts persisted `ball_detection` and `player_detection` observations from the viewer run payload, reads bbox payloads from the observation spine or atomic extension, and scales them using persisted media dimensions.
 
-If no real video frame is available, the panel renders an `image_pixels` coordinate canvas. This keeps the viewer honest while still answering where the detection was observed.
+Milestone 1E adds frame artifact support. If a matching extracted frame artifact exists, the panel displays the frame image behind the persisted bboxes. If no real frame image is available, the panel renders an `image_pixels` coordinate canvas. This keeps the viewer honest while still answering where the detection was observed.
 
 Selecting a detection observation shows all bboxes on the same frame and highlights the selected bbox. Selecting a bbox updates the existing observation detail, lineage, artifact, and annotation panels.
 
@@ -134,6 +134,6 @@ http://127.0.0.1:3000/runs/<run_id>
 - No real video file is required or played.
 - Placeholder artifact URIs are displayed as metadata.
 - The annotation panel is read-only in v0.
-- Real frame extraction is not implemented.
-- Detection overlays use a coordinate canvas when no frame image is available.
+- Detection overlays use a coordinate canvas when no frame image artifact is available.
+- Local artifact content serving is development-only.
 - Production deployment, auth, and streaming are out of scope.

@@ -289,6 +289,14 @@ pre {
   position: absolute;
 }
 
+.detection-frame-image {
+  height: 100%;
+  inset: 0;
+  object-fit: fill;
+  position: absolute;
+  width: 100%;
+}
+
 .frame-space-label {
   background: rgba(255, 255, 255, 0.9);
   border: 1px solid rgba(255, 255, 255, 0.72);
@@ -387,6 +395,12 @@ pre {
   display: grid;
   gap: 8px;
   grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+}
+
+.frame-artifact-state {
+  color: var(--muted);
+  font-size: 12px;
+  margin: 0;
 }
 
 .detection-frame-row {

@@ -2,7 +2,7 @@
 
 ## Current Progress Gauge
 
-Current: ~100% for the TOM v3 Simple observation-platform MVP loop
+Current: ~105% / MVP+ foundation
 
 ## Current
 
@@ -47,6 +47,10 @@ Current: ~100% for the TOM v3 Simple observation-platform MVP loop
 - Detection overlay viewer transform exists.
 - Persisted ball/player bboxes are visually inspectable in the viewer.
 - Detection observations can be selected and highlighted in the overlay.
+- Frame extraction service exists.
+- Worker `extract-frame-artifacts` exists.
+- Frame image artifacts are persisted as evidence artifacts.
+- Viewer can display frame artifacts behind persisted detection bboxes.
 
 ## After Milestone 0A
 
@@ -210,3 +214,20 @@ Expected: ~100% for the TOM v3 Simple observation-platform MVP loop
 Status: complete.
 
 The repo now has a data-driven detection overlay layer that renders persisted bbox observations from the viewer payload without adding tracking, event inference, or a frontend-only detection model.
+
+## After Milestone 1E
+
+Expected: ~105% / MVP+ foundation
+
+- Selected detection frames can have real frame image artifacts.
+- Frame extraction service exists.
+- Frame artifact metadata is persisted as evidence artifact rows.
+- Viewer displays real frame imagery when available.
+- Coordinate canvas fallback still works.
+- TOM v3 remains observation-only.
+
+## Milestone 1E Status
+
+Status: complete.
+
+The repo now has ffmpeg-backed frame artifact extraction, local artifact metadata persistence, artifact file serving for local development, and viewer support for drawing persisted detection bboxes over extracted frame imagery.

@@ -221,3 +221,39 @@ http://127.0.0.1:3000/runs/<DETECTION_RUN_ID>
 Click a `ball_detection` or `player_detection` row in the observation list, or click a bbox in the overlay, to update the selected observation detail, lineage, artifact, and annotation panels.
 
 The real YOLO26 detector is not wired in this repo state. `--adapter yolo` is present as an integration stub and reports that runtime/assets are unavailable.
+
+## 13. Extract Frame Artifacts For Detection Overlay
+
+Milestone 1E adds frame artifact extraction so detection bboxes can be inspected over extracted frame imagery.
+
+Run:
+
+```bash
+python -m apps.worker.cli extract-frame-artifacts \
+  --run-id <DETECTION_RUN_ID> \
+  --max-frames 2 \
+  --output-root .data/artifacts
+```
+
+The command writes images under:
+
+```text
+.data/artifacts/media/{media_id}/frames/
+```
+
+It also persists `frame_image` and `detection_frame_image` evidence artifact rows.
+
+Open:
+
+```text
+http://127.0.0.1:3000/runs/<DETECTION_RUN_ID>
+```
+
+Expected behavior:
+
+- if extraction succeeded, the selected detection frame image appears behind the bbox overlay
+- persisted bboxes still render from observation payloads
+- the artifact panel shows frame artifact metadata for selected detection observations
+- if extraction was not run, the coordinate canvas fallback still renders
+
+`ffmpeg` is required for frame extraction. If it is unavailable, the command reports that `ffmpeg` must be installed.

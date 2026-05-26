@@ -115,8 +115,11 @@ Minimum query filters:
 
 - `POST /artifacts`
 - `GET /artifacts/{artifact_id}`
+- `GET /artifacts/{artifact_id}/content`
 
 Artifacts are metadata records in v0. They may point to placeholder URIs.
+
+`GET /artifacts/{artifact_id}/content` serves local artifact files for development inspection, such as extracted frame images from Milestone 1E. This is not a production object storage or auth design.
 
 ## Annotations
 

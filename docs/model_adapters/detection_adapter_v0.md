@@ -212,6 +212,8 @@ Detection observations appear in the observation list and detail panel with atom
 
 Milestone 1D adds visual overlay support for persisted detection observations. The viewer reads bbox payloads from `observation.payload_jsonb` or `observation.atomic.payload_jsonb`, scales them by media dimensions, and renders them in an `image_pixels` coordinate panel.
 
+Milestone 1E adds optional frame artifact extraction. Extracted `frame_image` and `detection_frame_image` artifacts can be displayed behind the same persisted bbox overlay.
+
 The overlay is a visual evidence layer only. It does not create tracks, infer events, or alter the persisted observations.
 
 ## Out of Scope

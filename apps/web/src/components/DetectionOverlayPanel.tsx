@@ -1,5 +1,6 @@
 import { DetectionLegend } from "./DetectionLegend";
 import { DetectionOverlayCanvas } from "./DetectionOverlayCanvas";
+import { getApiBaseUrl } from "../lib/api";
 import type { DetectionOverlayModel } from "../lib/types";
 import { formatConfidence } from "../lib/timeline";
 
@@ -15,6 +16,10 @@ export function DetectionOverlayPanel({
   const mediaWidth = model.mediaWidth;
   const mediaHeight = model.mediaHeight;
   const selectedFrame = model.selectedFrame;
+  const frameArtifactUrl =
+    model.frameArtifact === null
+      ? null
+      : `${getApiBaseUrl()}/artifacts/${model.frameArtifact.artifact.id}/content`;
   const canRender =
     model.unavailableReason === null &&
     mediaWidth !== null &&
@@ -38,6 +43,7 @@ export function DetectionOverlayPanel({
 
         {canRender ? (
           <DetectionOverlayCanvas
+            frameImageUrl={frameArtifactUrl}
             items={model.frameItems}
             mediaHeight={mediaHeight}
             mediaWidth={mediaWidth}
@@ -47,6 +53,18 @@ export function DetectionOverlayPanel({
         ) : (
           <p className="empty-state">{model.unavailableReason}</p>
         )}
+
+        {canRender ? (
+          <p className="frame-artifact-state">
+            {model.frameArtifact === null
+              ? "No frame image artifact is available for this frame; showing image_pixels coordinate canvas."
+              : `Showing ${model.frameArtifact.artifact.artifact_type} artifact for ${
+                  model.frameArtifact.match === "selected_observation"
+                    ? "selected observation"
+                    : "selected frame"
+                }.`}
+          </p>
+        ) : null}
 
         <DetectionLegend />
         <DetectionFrameList items={model.frameItems} onSelectObservation={onSelectObservation} />

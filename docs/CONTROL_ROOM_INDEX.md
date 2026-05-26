@@ -32,6 +32,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 1B - TOM v1 Gameplay Detector Adapter](milestones/milestone_1b_tom_v1_gameplay_detector_adapter.md)
 - [Milestone 1C - YOLO26 Ball / Player Observation Adapter](milestones/milestone_1c_yolo26_ball_player_observation_adapter.md)
 - [Milestone 1D - Detection Overlay / Visual Observation Layer](milestones/milestone_1d_detection_overlay_visual_observation_layer.md)
+- [Milestone 1E - Detection Artifact / Frame Extraction Foundation](milestones/milestone_1e_detection_artifact_frame_extraction_foundation.md)
 
 ## Handoffs
 
@@ -44,6 +45,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 1B Handoff](handoffs/milestone_1b_tom_v1_gameplay_detector_adapter_handoff.md)
 - [Milestone 1C Handoff](handoffs/milestone_1c_yolo26_ball_player_observation_adapter_handoff.md)
 - [Milestone 1D Handoff](handoffs/milestone_1d_detection_overlay_visual_observation_layer_handoff.md)
+- [Milestone 1E Handoff](handoffs/milestone_1e_detection_artifact_frame_extraction_foundation_handoff.md)
 
 ## Agent Reports
 
@@ -56,6 +58,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 1B Agent Report](agent_reports/milestone_1b_tom_v1_gameplay_detector_adapter_report.md)
 - [Milestone 1C Agent Report](agent_reports/milestone_1c_yolo26_ball_player_observation_adapter_report.md)
 - [Milestone 1D Agent Report](agent_reports/milestone_1d_detection_overlay_visual_observation_layer_report.md)
+- [Milestone 1E Agent Report](agent_reports/milestone_1e_detection_artifact_frame_extraction_foundation_report.md)
 
 ## API and Schema
 
@@ -65,6 +68,7 @@ Use this index as the durable navigation point for project memory, architecture 
 ## Media
 
 - [Media Indexing v0](media/media_indexing_v0.md)
+- [Frame Artifacts v0](media/frame_artifacts_v0.md)
 
 ## Model Adapters
 
@@ -82,6 +86,7 @@ Use this index as the durable navigation point for project memory, architecture 
 
 - [Visual Evidence Viewer v0](web/visual_evidence_viewer_v0.md)
 - [Detection Overlay Viewer v0](web/detection_overlay_viewer_v0.md)
+- [Frame Artifact Overlay v0](web/frame_artifact_overlay_v0.md)
 
 ## Development
 

@@ -18,6 +18,8 @@ Milestone 1B uses this contract for gameplay adapter output. The fixture gamepla
 
 Milestone 1C uses this contract for detection adapter output. Fixture ball/player detections derive per-frame timestamps from indexed media FPS through TOM v3 frame/time utilities.
 
+Milestone 1E uses this contract for frame artifacts. Frame extraction seeks to timestamps derived from indexed media FPS and stores `frame_time_owner = media_indexing` in artifact metadata.
+
 ## Core Rule
 
 Media indexing owns frame/time.
@@ -180,3 +182,13 @@ Still out of scope:
 - bounce detection
 - streaming ingestion
 - production object storage
+
+## Frame Artifact Extension
+
+Frame artifact extraction is documented separately:
+
+```text
+docs/media/frame_artifacts_v0.md
+```
+
+That path uses the same media-owned frame/time mapping and writes local frame image metadata as evidence artifacts.

@@ -3,16 +3,20 @@ import type {
   DetectionOverlayItem,
   DetectionOverlayModel,
   DetectionPoint,
+  EvidenceArtifact,
+  FrameArtifactImage,
   JsonRecord,
   MediaAsset,
   Observation
 } from "./types";
 
 const detectionTypes = new Set(["ball_detection", "player_detection"]);
+const frameArtifactTypes = new Set(["frame_image", "detection_frame_image"]);
 
 export function buildDetectionOverlayModel(
   media: MediaAsset | null,
   observations: Observation[],
+  artifacts: EvidenceArtifact[],
   selectedObservationId: string | null
 ): DetectionOverlayModel {
   const { items, missingBboxObservationIds } = extractDetectionOverlayItems(observations);
@@ -22,11 +26,13 @@ export function buildDetectionOverlayModel(
 
   const mediaWidth = validDimension(media?.width) ? media?.width ?? null : null;
   const mediaHeight = validDimension(media?.height) ? media?.height ?? null : null;
+  const frameArtifact = selectFrameArtifact(artifacts, selectedObservationId, selectedFrame);
 
   return {
     items: markSelected(items, selectedObservationId),
     frameItems: markSelected(selectedItems, selectedObservationId),
     selectedFrame,
+    frameArtifact,
     missingBboxObservationIds,
     unavailableReason: unavailableReason(mediaWidth, mediaHeight, items),
     mediaWidth,
@@ -95,6 +101,10 @@ export function isDetectionObservation(observation: Observation): boolean {
   );
 }
 
+export function isFrameImageArtifact(artifact: EvidenceArtifact): boolean {
+  return frameArtifactTypes.has(artifact.artifact_type);
+}
+
 function selectDetectionFrame(
   items: DetectionOverlayItem[],
   observations: Observation[],
@@ -132,6 +142,29 @@ function unavailableReason(
     return "No persisted detection observations with bbox payloads are available for this run.";
   }
   return null;
+}
+
+function selectFrameArtifact(
+  artifacts: EvidenceArtifact[],
+  selectedObservationId: string | null,
+  selectedFrame: number | null
+): FrameArtifactImage | null {
+  const frameArtifacts = artifacts.filter(isFrameImageArtifact);
+  if (selectedObservationId !== null) {
+    const targeted = frameArtifacts.find(
+      (artifact) => artifact.target_observation_id === selectedObservationId
+    );
+    if (targeted !== undefined) {
+      return { artifact: targeted, match: "selected_observation" };
+    }
+  }
+
+  if (selectedFrame === null) {
+    return null;
+  }
+
+  const sameFrame = frameArtifacts.find((artifact) => artifact.frame_start === selectedFrame);
+  return sameFrame === undefined ? null : { artifact: sameFrame, match: "same_frame" };
 }
 
 function isDetectionType(value: string): value is "ball_detection" | "player_detection" {

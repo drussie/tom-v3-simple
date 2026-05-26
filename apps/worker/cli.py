@@ -10,6 +10,7 @@ from tom_v3_storage.db_models import Base
 from apps.worker.config import settings
 from apps.worker.pipelines.synthetic_seed import seed_synthetic_run
 from apps.worker.services.detection_adapter import run_detection_adapter
+from apps.worker.services.frame_artifacts import extract_frame_artifacts_for_run
 from apps.worker.services.gameplay_adapter import run_gameplay_adapter
 from apps.worker.services.media_indexer import index_media
 
@@ -153,6 +154,25 @@ def main() -> None:
     index_detection_parser.add_argument("--output-debug-artifact", action="store_true")
     index_detection_parser.add_argument("--skip-create-db", action="store_true")
     index_detection_parser.set_defaults(handler=_handle_index_and_run_detection)
+
+    frame_artifacts_parser = subcommands.add_parser(
+        "extract-frame-artifacts",
+        help="Extract frame image artifacts for detection observations in a run.",
+    )
+    frame_artifacts_parser.add_argument("--run-id", required=True)
+    frame_artifacts_parser.add_argument("--observation-id")
+    frame_artifacts_parser.add_argument(
+        "--observation-type",
+        action="append",
+        choices=["ball_detection", "player_detection"],
+        help="Limit extraction to an observation type. May be supplied more than once.",
+    )
+    frame_artifacts_parser.add_argument("--max-frames", type=int)
+    frame_artifacts_parser.add_argument("--output-root", default=".data/artifacts")
+    frame_artifacts_parser.add_argument("--image-format", default="jpg")
+    frame_artifacts_parser.add_argument("--overwrite", action="store_true")
+    frame_artifacts_parser.add_argument("--skip-create-db", action="store_true")
+    frame_artifacts_parser.set_defaults(handler=_handle_extract_frame_artifacts)
 
     args = parser.parse_args()
     with _session_factory(create_db=not args.skip_create_db)() as session:
@@ -313,6 +333,21 @@ def _handle_index_and_run_detection(
         },
         **result,
     }
+
+
+def _handle_extract_frame_artifacts(
+    session: Session, args: argparse.Namespace
+) -> dict[str, object]:
+    return extract_frame_artifacts_for_run(
+        session=session,
+        run_id=args.run_id,
+        observation_id=args.observation_id,
+        observation_types=args.observation_type,
+        max_frames=args.max_frames,
+        output_root=args.output_root,
+        image_format=args.image_format,
+        overwrite=args.overwrite,
+    )
 
 
 if __name__ == "__main__":

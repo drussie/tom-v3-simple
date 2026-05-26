@@ -14,7 +14,7 @@ The core invariant:
 
 ## Current Status
 
-Milestone 1D adds a detection overlay layer on top of persisted ball/player observations:
+Milestone 1E adds frame artifact extraction on top of persisted ball/player observations and overlays:
 
 - repo memory and architecture contracts
 - FastAPI backend/API foundation
@@ -39,8 +39,11 @@ Milestone 1D adds a detection overlay layer on top of persisted ball/player obse
 - detection overlay transform and coordinate-space bbox panel
 - selected detection highlighting in the viewer
 - detection timeline row and safe missing-bbox states
+- ffmpeg-backed frame artifact extraction
+- local frame artifact metadata persisted as evidence artifacts
+- viewer frame images behind persisted detection bboxes when available
 
-Portable TOM v1 detector assets/source and YOLO26 runtime/assets are not present in this repo state. No tracking, pose processing, court homography, frame extraction, or real bounce detection is implemented yet.
+Portable TOM v1 detector assets/source and YOLO26 runtime/assets are not present in this repo state. No tracking, pose processing, court homography, or real bounce detection is implemented yet.
 
 ## Repo Structure
 
@@ -155,6 +158,15 @@ python -m apps.worker.cli index-and-run-detection \
   --adapter fixture
 ```
 
+Extract frame artifacts for a detection run:
+
+```bash
+python -m apps.worker.cli extract-frame-artifacts \
+  --run-id <DETECTION_RUN_ID> \
+  --max-frames 2 \
+  --output-root .data/artifacts
+```
+
 Seed synthetic evidence:
 
 ```bash
@@ -189,7 +201,7 @@ Open:
 http://127.0.0.1:3000/runs/<RUN_ID>
 ```
 
-For a detection adapter run, the viewer shows a coordinate-space detection overlay. The panel uses persisted `image_pixels` bbox payloads and media dimensions; if no real frame image is available, it displays an honest frame-space canvas instead.
+For a detection adapter run, the viewer shows a detection overlay. The panel uses persisted `image_pixels` bbox payloads and media dimensions; when frame artifacts exist, it displays the extracted frame image behind the bboxes. If no frame artifact is available, it displays an honest frame-space canvas.
 
 ## Validation
 
@@ -220,6 +232,7 @@ make run-gameplay MEDIA_ID=<media_id>
 make index-and-run-gameplay SOURCE_PATH=/path/to/video.mp4
 make run-detection MEDIA_ID=<media_id>
 make index-and-run-detection SOURCE_PATH=/path/to/video.mp4
+make extract-frame-artifacts RUN_ID=<detection_run_id>
 make seed
 make smoke
 make all-checks
@@ -234,7 +247,9 @@ Useful runbooks:
 - [Local Environment Setup](docs/dev/local_environment_setup.md)
 - [Local Demo Runbook](docs/dev/local_demo_runbook.md)
 - [Media Indexing v0](docs/media/media_indexing_v0.md)
+- [Frame Artifacts v0](docs/media/frame_artifacts_v0.md)
 - [Gameplay Adapter v0](docs/model_adapters/gameplay_adapter_v0.md)
 - [Detection Adapter v0](docs/model_adapters/detection_adapter_v0.md)
 - [Detection Overlay Viewer v0](docs/web/detection_overlay_viewer_v0.md)
+- [Frame Artifact Overlay v0](docs/web/frame_artifact_overlay_v0.md)
 - [Repo Branch Hygiene](docs/dev/repo_branch_hygiene.md)

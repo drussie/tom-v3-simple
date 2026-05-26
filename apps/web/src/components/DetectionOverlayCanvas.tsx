@@ -8,6 +8,7 @@ interface DetectionOverlayCanvasProps {
   mediaWidth: number;
   mediaHeight: number;
   selectedFrame: number;
+  frameImageUrl: string | null;
   onSelectObservation: (observationId: string) => void;
 }
 
@@ -16,6 +17,7 @@ export function DetectionOverlayCanvas({
   mediaWidth,
   mediaHeight,
   selectedFrame,
+  frameImageUrl,
   onSelectObservation
 }: DetectionOverlayCanvasProps) {
   return (
@@ -24,6 +26,13 @@ export function DetectionOverlayCanvas({
       className="detection-canvas"
       style={{ aspectRatio: `${mediaWidth} / ${mediaHeight}` }}
     >
+      {frameImageUrl !== null ? (
+        <img
+          alt={`Extracted frame artifact for frame ${selectedFrame}`}
+          className="detection-frame-image"
+          src={frameImageUrl}
+        />
+      ) : null}
       <div className="detection-canvas-grid" />
       <div className="frame-space-label">
         <strong>image_pixels</strong>

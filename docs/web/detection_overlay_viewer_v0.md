@@ -62,6 +62,8 @@ height = bbox.height / media.height
 
 The coordinate panel is an honest frame-space visualization. If no real frame image is available, the viewer shows an `image_pixels` coordinate canvas instead of pretending a frame was extracted.
 
+Milestone 1E adds frame artifact support. When a matching `frame_image` or `detection_frame_image` artifact exists, the viewer displays that extracted image behind the same persisted bboxes.
+
 ## Selection Behavior
 
 When the selected observation is a detection:
@@ -112,10 +114,20 @@ Start the backend and web app, then open:
 http://127.0.0.1:3000/runs/<DETECTION_RUN_ID>
 ```
 
+Extract frame artifacts:
+
+```bash
+python -m apps.worker.cli extract-frame-artifacts \
+  --run-id <DETECTION_RUN_ID> \
+  --max-frames 2
+```
+
+Refresh the viewer to see frame imagery behind bbox overlays.
+
 ## Known Limitations
 
-- No frame extraction pipeline is implemented.
 - No video playback overlay is implemented.
 - No real YOLO26 inference is implemented in this repo state.
 - Detection observations are not converted into tracks.
 - The overlay visualizes only frame-level bbox observations.
+- Frame artifact serving is local-development only.
