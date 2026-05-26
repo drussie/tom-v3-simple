@@ -31,6 +31,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 1A - Real Media Indexing](milestones/milestone_1a_real_media_indexing.md)
 - [Milestone 1B - TOM v1 Gameplay Detector Adapter](milestones/milestone_1b_tom_v1_gameplay_detector_adapter.md)
 - [Milestone 1C - YOLO26 Ball / Player Observation Adapter](milestones/milestone_1c_yolo26_ball_player_observation_adapter.md)
+- [Milestone 1D - Detection Overlay / Visual Observation Layer](milestones/milestone_1d_detection_overlay_visual_observation_layer.md)
 
 ## Handoffs
 
@@ -42,6 +43,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 1A Handoff](handoffs/milestone_1a_real_media_indexing_handoff.md)
 - [Milestone 1B Handoff](handoffs/milestone_1b_tom_v1_gameplay_detector_adapter_handoff.md)
 - [Milestone 1C Handoff](handoffs/milestone_1c_yolo26_ball_player_observation_adapter_handoff.md)
+- [Milestone 1D Handoff](handoffs/milestone_1d_detection_overlay_visual_observation_layer_handoff.md)
 
 ## Agent Reports
 
@@ -53,6 +55,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 1A Agent Report](agent_reports/milestone_1a_real_media_indexing_report.md)
 - [Milestone 1B Agent Report](agent_reports/milestone_1b_tom_v1_gameplay_detector_adapter_report.md)
 - [Milestone 1C Agent Report](agent_reports/milestone_1c_yolo26_ball_player_observation_adapter_report.md)
+- [Milestone 1D Agent Report](agent_reports/milestone_1d_detection_overlay_visual_observation_layer_report.md)
 
 ## API and Schema
 
@@ -78,6 +81,7 @@ Use this index as the durable navigation point for project memory, architecture 
 ## Web
 
 - [Visual Evidence Viewer v0](web/visual_evidence_viewer_v0.md)
+- [Detection Overlay Viewer v0](web/detection_overlay_viewer_v0.md)
 
 ## Development
 

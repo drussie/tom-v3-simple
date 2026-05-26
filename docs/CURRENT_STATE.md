@@ -4,8 +4,8 @@
 
 - Project name: TOM v3 Simple
 - Repo: drussie/tom-v3-simple
-- Current phase: Milestone 1C
-- Current goal: YOLO26 ball/player observation adapter interface + fixture persistence path
+- Current phase: Milestone 1D
+- Current goal: detection overlay / visual observation layer
 
 ## Mission
 
@@ -13,7 +13,7 @@ A lightweight tennis video observation platform that accepts model output as ope
 
 ## Implementation Status
 
-- Implementation status: detection adapter seam exists; persisted ball/player atomic observation path exists
+- Implementation status: detection adapter seam exists; persisted ball/player atomic observations are visually inspectable in the viewer
 - Model integration status: fixture gameplay and fixture detection adapters implemented for deterministic dev/test output
 - TOM v1 gameplay detector: known asset, portable source/assets not available in this repo/environment; integration stub documented
 - YOLO/YOLO26: runtime/assets not available in this repo/environment; unavailable stub documented
@@ -24,7 +24,7 @@ A lightweight tennis video observation platform that accepts model output as ope
 - Detection adapter: implemented with `BaseDetectionAdapter`, fixture adapter, YOLO unavailable stub, worker service, and worker CLI
 - Observation writer: implemented with typed extension rows, lineage, artifacts, and idempotency
 - Worker synthetic seeder: implemented
-- Visual evidence viewer: implemented in `apps/web`
+- Visual evidence viewer: implemented in `apps/web` with detection bbox overlay support
 - Synthetic data: baseline scenario creates viewer-ready observations, tracklets, gaps, candidates, lineage, and artifacts
 - Local setup: documented with `.env.example`, Makefile, and dev runbooks
 - Branch/default branch: `main` is restored as the GitHub default branch
@@ -77,6 +77,12 @@ Status: complete
 
 Milestone 1C establishes the detection adapter interface, YOLO26 portability assessment, fixture detection adapter, YOLO unavailable stub, worker `run-detection-adapter`, worker `index-and-run-detection`, persisted ball/player atomic observations through `ObservationWriter`, optional scoped lineage to gameplay observations, and query/viewer-compatible detection evidence.
 
+## Milestone 1D Result
+
+Status: complete
+
+Milestone 1D establishes the detection overlay viewer transform, coordinate-space bbox overlay components, selected frame behavior, selected detection highlighting, detection timeline row, safe empty states for missing media dimensions or bbox payloads, and docs/tests for the overlay contract.
+
 ## Next Milestone
 
-Recommended next handoff: Milestone 1D - Detection Overlay / Visual Observation Layer.
+Recommended next handoff: Milestone 1E - Detection Artifact / Frame Extraction Foundation.

@@ -28,10 +28,13 @@ Key files:
 - `src/components/CandidateMarkers.tsx`
 - `src/components/ObservationList.tsx`
 - `src/components/ObservationDetailPanel.tsx`
+- `src/components/DetectionOverlayPanel.tsx`
+- `src/components/DetectionOverlayCanvas.tsx`
 - `src/components/LineagePanel.tsx`
 - `src/components/ArtifactPanel.tsx`
 - `src/components/AnnotationPanel.tsx`
 - `src/lib/api.ts`
+- `src/lib/detections.ts`
 - `src/lib/viewerData.ts`
 - `src/lib/timeline.ts`
 - `src/lib/types.ts`
@@ -65,8 +68,17 @@ The first viewer renders:
 - Far player: gap, tracked, tracked
 - Homography: valid, missing, valid
 - Candidates: `bounce_candidate`, `tracking_gap_candidate`, and `hit_candidate`
+- Detections: `ball_detection` and `player_detection` markers when persisted bboxes exist
 
 Rows are built from observation rows and tracklet metadata created by the synthetic baseline scenario.
+
+## Detection Overlay
+
+Milestone 1D adds a detection overlay panel. It extracts persisted `ball_detection` and `player_detection` observations from the viewer run payload, reads bbox payloads from the observation spine or atomic extension, and scales them using persisted media dimensions.
+
+If no real video frame is available, the panel renders an `image_pixels` coordinate canvas. This keeps the viewer honest while still answering where the detection was observed.
+
+Selecting a detection observation shows all bboxes on the same frame and highlights the selected bbox. Selecting a bbox updates the existing observation detail, lineage, artifact, and annotation panels.
 
 ## Detail Panels
 
@@ -122,5 +134,6 @@ http://127.0.0.1:3000/runs/<run_id>
 - No real video file is required or played.
 - Placeholder artifact URIs are displayed as metadata.
 - The annotation panel is read-only in v0.
-- The viewer focuses on baseline synthetic evidence shape.
+- Real frame extraction is not implemented.
+- Detection overlays use a coordinate canvas when no frame image is available.
 - Production deployment, auth, and streaming are out of scope.

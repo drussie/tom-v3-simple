@@ -272,3 +272,40 @@ Milestone 1C created:
 - Worker commands `run-detection-adapter` and `index-and-run-detection`.
 - Optional scoped lineage from detections to gameplay/view-state observations.
 - Query and viewer payload compatibility tests for detection adapter runs.
+
+## Milestone 1D - Detection Overlay / Visual Observation Layer
+
+Status: complete
+
+### Goal
+
+Make persisted ball/player detection observations visually inspectable in the existing TOM v3 viewer.
+
+### Non-goals
+
+- No real YOLO inference.
+- No tracking.
+- No pose detection.
+- No court homography.
+- No bounce detection.
+- No hit detection.
+- No rally segmentation.
+- No point reconstruction.
+- No scoring.
+- No production streaming.
+- No adjudication.
+- No truth/fact/promotion/refusal concepts.
+
+### Notes
+
+Milestone 1D created:
+
+- Detection overlay transform in `apps/web/src/lib/detections.ts`.
+- Detection overlay panel, canvas, and legend components.
+- Coordinate-space bbox rendering from persisted `ball_detection` and `player_detection` payloads.
+- Selected frame behavior for detection observations.
+- Highlighting for the selected detection bbox.
+- Detection timeline row using persisted frame numbers.
+- Safe empty states for missing media dimensions and missing bbox payloads.
+- Viewer contract test coverage for detection bbox payloads and frame/time ownership.
+- Detection overlay docs, milestone doc, handoff, and agent report.

@@ -2,7 +2,7 @@
 
 ## Current Progress Gauge
 
-Current: ~95%
+Current: ~100% for the TOM v3 Simple observation-platform MVP loop
 
 ## Current
 
@@ -44,6 +44,9 @@ Current: ~95%
 - YOLO26/Ultralytics portability assessment exists.
 - Worker `run-detection-adapter` exists.
 - Query/viewer paths can inspect detection observations.
+- Detection overlay viewer transform exists.
+- Persisted ball/player bboxes are visually inspectable in the viewer.
+- Detection observations can be selected and highlighted in the overlay.
 
 ## After Milestone 0A
 
@@ -191,3 +194,19 @@ Expected: ~95%
 Status: complete.
 
 The repo now has a TOM v3 detection adapter interface, fixture detector, YOLO unavailable stub, worker CLI commands, atomic observation persistence flow, query/viewer compatibility tests, and model adapter docs.
+
+## After Milestone 1D
+
+Expected: ~100% for the TOM v3 Simple observation-platform MVP loop
+
+- Persisted ball/player detections are visually inspectable.
+- Existing viewer can render detection bboxes on a coordinate-space media panel.
+- Detection observations can be selected from the timeline/list and highlighted in the overlay.
+- Missing video playback does not block inspection.
+- TOM v3 remains observation-only.
+
+## Milestone 1D Status
+
+Status: complete.
+
+The repo now has a data-driven detection overlay layer that renders persisted bbox observations from the viewer payload without adding tracking, event inference, or a frontend-only detection model.

@@ -198,3 +198,41 @@ export interface CandidateMarker {
   confidence: number | null;
   observationId: string;
 }
+
+export interface DetectionBBox {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+export interface DetectionPoint {
+  x: number;
+  y: number;
+}
+
+export interface DetectionOverlayItem {
+  id: string;
+  observationId: string;
+  observationType: "ball_detection" | "player_detection";
+  label: string;
+  frameNumber: number;
+  timestampMs: number | null;
+  confidence: number | null;
+  bbox: DetectionBBox;
+  center: DetectionPoint | null;
+  classLabel: string | null;
+  classId: number | string | null;
+  metadata: JsonRecord;
+  isSelected: boolean;
+}
+
+export interface DetectionOverlayModel {
+  items: DetectionOverlayItem[];
+  frameItems: DetectionOverlayItem[];
+  selectedFrame: number | null;
+  missingBboxObservationIds: string[];
+  unavailableReason: string | null;
+  mediaWidth: number | null;
+  mediaHeight: number | null;
+}

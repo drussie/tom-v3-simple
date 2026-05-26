@@ -14,7 +14,7 @@ The core invariant:
 
 ## Current Status
 
-Milestone 1C adds the first ball/player detection adapter seam on top of the real media substrate:
+Milestone 1D adds a detection overlay layer on top of persisted ball/player observations:
 
 - repo memory and architecture contracts
 - FastAPI backend/API foundation
@@ -36,8 +36,11 @@ Milestone 1C adds the first ball/player detection adapter seam on top of the rea
 - fixture detector for deterministic ball/player dev/test output
 - YOLO26 detection adapter unavailable stub and portability assessment
 - worker command to persist ball_detection/player_detection atomic observations
+- detection overlay transform and coordinate-space bbox panel
+- selected detection highlighting in the viewer
+- detection timeline row and safe missing-bbox states
 
-Portable TOM v1 detector assets/source and YOLO26 runtime/assets are not present in this repo state. No tracking, pose processing, court homography, or real bounce detection is implemented yet.
+Portable TOM v1 detector assets/source and YOLO26 runtime/assets are not present in this repo state. No tracking, pose processing, court homography, frame extraction, or real bounce detection is implemented yet.
 
 ## Repo Structure
 
@@ -138,7 +141,10 @@ Run the detection adapter fixture for indexed media:
 ```bash
 python -m apps.worker.cli run-detection-adapter \
   --media-id <MEDIA_ID> \
-  --adapter fixture
+  --adapter fixture \
+  --frame-sample-rate 30 \
+  --max-frames 5 \
+  --output-debug-artifact
 ```
 
 Or index and run detection in one local command:
@@ -182,6 +188,8 @@ Open:
 ```text
 http://127.0.0.1:3000/runs/<RUN_ID>
 ```
+
+For a detection adapter run, the viewer shows a coordinate-space detection overlay. The panel uses persisted `image_pixels` bbox payloads and media dimensions; if no real frame image is available, it displays an honest frame-space canvas instead.
 
 ## Validation
 
@@ -228,4 +236,5 @@ Useful runbooks:
 - [Media Indexing v0](docs/media/media_indexing_v0.md)
 - [Gameplay Adapter v0](docs/model_adapters/gameplay_adapter_v0.md)
 - [Detection Adapter v0](docs/model_adapters/detection_adapter_v0.md)
+- [Detection Overlay Viewer v0](docs/web/detection_overlay_viewer_v0.md)
 - [Repo Branch Hygiene](docs/dev/repo_branch_hygiene.md)

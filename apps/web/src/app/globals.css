@@ -239,6 +239,183 @@ pre {
   overflow-wrap: anywhere;
 }
 
+.detection-overlay-body {
+  display: grid;
+  gap: 12px;
+}
+
+.overlay-summary,
+.detection-legend {
+  align-items: center;
+  color: var(--muted);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.overlay-summary span,
+.detection-legend span {
+  align-items: center;
+  background: var(--surface-strong);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  display: inline-flex;
+  gap: 6px;
+  min-height: 26px;
+  padding: 0 8px;
+}
+
+.detection-canvas {
+  background:
+    linear-gradient(90deg, rgba(49, 95, 149, 0.08) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(49, 95, 149, 0.08) 1px, transparent 1px),
+    #10191b;
+  background-size: 10% 10%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  min-height: 260px;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+.detection-canvas-grid {
+  background:
+    linear-gradient(90deg, transparent 49.8%, rgba(255, 255, 255, 0.24) 50%, transparent 50.2%),
+    linear-gradient(0deg, transparent 49.8%, rgba(255, 255, 255, 0.24) 50%, transparent 50.2%);
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+.frame-space-label {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 6px;
+  display: grid;
+  gap: 2px;
+  left: 10px;
+  padding: 7px 9px;
+  position: absolute;
+  top: 10px;
+  z-index: 2;
+}
+
+.frame-space-label strong,
+.frame-space-label span {
+  font-size: 11px;
+}
+
+.frame-space-label span {
+  color: var(--muted);
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+}
+
+.detection-box {
+  background: transparent;
+  border: 2px solid var(--blue);
+  border-radius: 4px;
+  color: var(--ink);
+  min-height: 16px;
+  min-width: 16px;
+  padding: 0;
+  position: absolute;
+  z-index: 3;
+}
+
+.detection-box.ball {
+  border-color: var(--rose);
+}
+
+.detection-box.player {
+  border-color: var(--blue);
+}
+
+.detection-box.selected {
+  box-shadow:
+    0 0 0 2px #ffffff,
+    0 0 0 5px var(--amber);
+  z-index: 5;
+}
+
+.detection-box span {
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  display: inline-grid;
+  font-size: 11px;
+  font-weight: 800;
+  gap: 2px;
+  left: -2px;
+  max-width: 160px;
+  min-width: 64px;
+  padding: 3px 5px;
+  position: absolute;
+  top: calc(100% + 3px);
+  white-space: nowrap;
+}
+
+.detection-box em {
+  color: var(--muted);
+  font-style: normal;
+  font-weight: 700;
+}
+
+.legend-swatch {
+  border: 2px solid var(--blue);
+  border-radius: 3px;
+  display: inline-block;
+  height: 12px;
+  width: 16px;
+}
+
+.legend-swatch.ball {
+  border-color: var(--rose);
+}
+
+.legend-swatch.player {
+  border-color: var(--blue);
+}
+
+.legend-swatch.selected {
+  border-color: var(--amber);
+  box-shadow: 0 0 0 2px #ffffff;
+}
+
+.detection-frame-list {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+}
+
+.detection-frame-row {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--ink);
+  display: grid;
+  gap: 3px;
+  min-height: 64px;
+  padding: 8px 10px;
+  text-align: left;
+}
+
+.detection-frame-row.selected {
+  border-color: var(--amber);
+  box-shadow: inset 3px 0 0 var(--amber);
+}
+
+.detection-frame-row strong,
+.detection-frame-row span {
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.detection-frame-row span {
+  color: var(--muted);
+}
+
 .timeline-panel {
   overflow: hidden;
 }
@@ -332,6 +509,16 @@ pre {
 .timeline-segment.state-low_confidence {
   background: var(--rose-soft);
   color: var(--rose);
+}
+
+.timeline-segment.state-ball_detection {
+  background: var(--rose-soft);
+  color: var(--rose);
+}
+
+.timeline-segment.state-player_detection {
+  background: var(--blue-soft);
+  color: var(--blue);
 }
 
 .timeline-segment.state-unknown {

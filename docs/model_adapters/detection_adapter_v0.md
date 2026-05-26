@@ -208,7 +208,11 @@ The existing viewer route works unchanged:
 GET /viewer/runs/{run_id}
 ```
 
-Milestone 1C does not add overlays. Detection observations appear in the observation list and detail panel with atomic payload JSON.
+Detection observations appear in the observation list and detail panel with atomic payload JSON.
+
+Milestone 1D adds visual overlay support for persisted detection observations. The viewer reads bbox payloads from `observation.payload_jsonb` or `observation.atomic.payload_jsonb`, scales them by media dimensions, and renders them in an `image_pixels` coordinate panel.
+
+The overlay is a visual evidence layer only. It does not create tracks, infer events, or alter the persisted observations.
 
 ## Out of Scope
 

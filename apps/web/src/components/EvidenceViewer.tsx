@@ -5,9 +5,11 @@ import { useEffect, useMemo, useState } from "react";
 import { ArtifactPanel } from "./ArtifactPanel";
 import { AnnotationPanel } from "./AnnotationPanel";
 import { LineagePanel } from "./LineagePanel";
+import { DetectionOverlayPanel } from "./DetectionOverlayPanel";
 import { ObservationDetailPanel } from "./ObservationDetailPanel";
 import { ObservationList } from "./ObservationList";
 import { Timeline } from "./Timeline";
+import { buildDetectionOverlayModel } from "../lib/detections";
 import { buildViewerModel } from "../lib/viewerData";
 import type { ViewerRun } from "../lib/types";
 import { formatFrameRange } from "../lib/timeline";
@@ -41,6 +43,10 @@ export function EvidenceViewer({ viewerRun }: EvidenceViewerProps) {
       ? model.annotationsByObservation.get(selectedObservationId) ?? []
       : [];
   const selectedFrame = selectedObservation?.frame_start ?? selectedObservation?.frame_end ?? null;
+  const detectionOverlay = useMemo(
+    () => buildDetectionOverlayModel(viewerRun.media, model.observations, selectedObservationId),
+    [model.observations, selectedObservationId, viewerRun.media]
+  );
 
   return (
     <main className="viewer-shell">
@@ -64,6 +70,10 @@ export function EvidenceViewer({ viewerRun }: EvidenceViewerProps) {
       <div className="viewer-grid">
         <div className="main-column">
           <MediaPanel viewerRun={viewerRun} selectedFrame={selectedFrame} />
+          <DetectionOverlayPanel
+            model={detectionOverlay}
+            onSelectObservation={setSelectedObservationId}
+          />
           <Timeline
             candidates={model.candidates}
             onSelectObservation={setSelectedObservationId}

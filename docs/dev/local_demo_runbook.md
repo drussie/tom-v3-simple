@@ -204,4 +204,20 @@ curl -X POST http://127.0.0.1:8000/observations/query \
 
 The viewer can open the detection `run_id` and show ball/player detections in the observation list and detail panel.
 
+Milestone 1D adds a detection overlay for the same detection `run_id`. The viewer now shows:
+
+- a coordinate-space media/frame panel
+- persisted ball/player bboxes scaled by media dimensions
+- labels and confidence values
+- selected detection highlighting
+- safe empty states when media dimensions or bbox payloads are unavailable
+
+Open:
+
+```text
+http://127.0.0.1:3000/runs/<DETECTION_RUN_ID>
+```
+
+Click a `ball_detection` or `player_detection` row in the observation list, or click a bbox in the overlay, to update the selected observation detail, lineage, artifact, and annotation panels.
+
 The real YOLO26 detector is not wired in this repo state. `--adapter yolo` is present as an integration stub and reports that runtime/assets are unavailable.
