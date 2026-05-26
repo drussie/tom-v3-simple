@@ -74,6 +74,8 @@ Rows are built from observation rows and tracklet metadata created by the synthe
 
 Milestone 2A lets the viewer open tracklet-builder runs with first-class track observations. These runs include `ball_tracklet_candidate` / `player_tracklet_candidate` observations, `track_point_candidate` observations, candidate `tracklet` and `track_point` rows, and lineage from source detections to track points and from track points to tracklets.
 
+Milestone 2B adds a Tracklet Evidence panel. Selecting a tracklet candidate calls `GET /tracklets/{tracklet_id}/evidence-bundle` and displays source detection observations, matched frame artifacts, and lineage from the source detection run without turning the whole page into a full multi-run timeline.
+
 ## Detection Overlay
 
 Milestone 1D adds a detection overlay panel. It extracts persisted `ball_detection` and `player_detection` observations from the viewer run payload, reads bbox payloads from the observation spine or atomic extension, and scales them using persisted media dimensions.

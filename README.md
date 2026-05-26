@@ -14,7 +14,7 @@ The core invariant:
 
 ## Current Status
 
-Milestone 2A repairs candidate tracklet grouping on top of persisted ball/player detections:
+Milestone 2B adds multi-run tracklet evidence inspection on top of persisted ball/player detections:
 
 - repo memory and architecture contracts
 - FastAPI backend/API foundation
@@ -46,6 +46,8 @@ Milestone 2A repairs candidate tracklet grouping on top of persisted ball/player
 - worker command to persist candidate tracklet and track point rows
 - first-class tracklet and track point observation spine rows
 - lineage from source detections to track points and from track points to tracklets
+- dynamic tracklet evidence bundle API
+- viewer panel for tracklet candidate, track point candidate, source detection, frame artifact, and lineage inspection
 
 Portable TOM v1 detector assets/source and YOLO26 runtime/assets are not present in this repo state. No sophisticated tracking, pose processing, court homography, or real bounce detection is implemented yet.
 
@@ -217,6 +219,14 @@ For a detection adapter run, the viewer shows a detection overlay. The panel use
 
 For a tracklet builder run, the viewer shows candidate tracklet coverage rows, track point candidate observations, and lineage. Source detection observations remain linked through `observation_lineage` and `track_point.payload_jsonb.source_detection_observation_id`.
 
+The tracklet evidence bundle endpoint exposes the cross-run evidence path:
+
+```text
+GET /tracklets/<TRACKLET_ID>/evidence-bundle
+```
+
+When a tracklet builder run is open in the viewer, selecting a tracklet loads that bundle and shows source detection evidence from the detection run.
+
 ## Validation
 
 Run the consolidated checks:
@@ -268,4 +278,6 @@ Useful runbooks:
 - [Detection Overlay Viewer v0](docs/web/detection_overlay_viewer_v0.md)
 - [Frame Artifact Overlay v0](docs/web/frame_artifact_overlay_v0.md)
 - [Tracklet Foundation v0](docs/tracklets/tracklet_foundation_v0.md)
+- [Tracklet Evidence Bundle v0](docs/tracklets/tracklet_evidence_bundle_v0.md)
+- [Tracklet Evidence Viewer v0](docs/web/tracklet_evidence_viewer_v0.md)
 - [Repo Branch Hygiene](docs/dev/repo_branch_hygiene.md)

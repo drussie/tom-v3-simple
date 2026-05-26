@@ -166,3 +166,11 @@ This endpoint composes existing persisted rows for the visual evidence viewer:
 - human annotations
 
 The endpoint is a read model over stored evidence. It does not create observations or add new interpretation logic.
+
+## Tracklet Evidence
+
+- `GET /tracklets/{tracklet_id}/evidence-bundle`
+
+This endpoint composes a dynamic multi-run evidence bundle for one tracklet candidate. It includes the tracklet candidate observation, track point candidate observations, source detection observations, frame artifacts when available, lineage rows, run/config/model summaries, and annotations.
+
+The endpoint is read-only and does not persist a saved bundle in v0.

@@ -9,10 +9,13 @@ import { DetectionOverlayPanel } from "./DetectionOverlayPanel";
 import { ObservationDetailPanel } from "./ObservationDetailPanel";
 import { ObservationList } from "./ObservationList";
 import { Timeline } from "./Timeline";
+import { TrackletEvidencePanel } from "./TrackletEvidencePanel";
 import { buildDetectionOverlayModel } from "../lib/detections";
-import { buildViewerModel } from "../lib/viewerData";
-import type { ViewerRun } from "../lib/types";
+import { fetchTrackletEvidenceBundle } from "../lib/api";
+import { resolveTrackletIdForObservation } from "../lib/trackletEvidence";
+import type { TrackletEvidenceBundle, ViewerRun } from "../lib/types";
 import { formatFrameRange } from "../lib/timeline";
+import { buildViewerModel } from "../lib/viewerData";
 
 interface EvidenceViewerProps {
   viewerRun: ViewerRun;
@@ -23,10 +26,50 @@ export function EvidenceViewer({ viewerRun }: EvidenceViewerProps) {
   const [selectedObservationId, setSelectedObservationId] = useState<string | null>(
     model.defaultObservationId
   );
+  const selectedTrackletId = useMemo(
+    () => resolveTrackletIdForObservation(viewerRun.tracklets, selectedObservationId),
+    [selectedObservationId, viewerRun.tracklets]
+  );
+  const [trackletBundle, setTrackletBundle] = useState<TrackletEvidenceBundle | null>(null);
+  const [trackletBundleError, setTrackletBundleError] = useState<string | null>(null);
+  const [isTrackletBundleLoading, setIsTrackletBundleLoading] = useState(false);
 
   useEffect(() => {
     setSelectedObservationId(model.defaultObservationId);
   }, [model.defaultObservationId]);
+
+  useEffect(() => {
+    if (selectedTrackletId === null) {
+      setTrackletBundle(null);
+      setTrackletBundleError(null);
+      return;
+    }
+
+    let cancelled = false;
+    setIsTrackletBundleLoading(true);
+    setTrackletBundleError(null);
+    fetchTrackletEvidenceBundle(selectedTrackletId)
+      .then((bundle) => {
+        if (!cancelled) {
+          setTrackletBundle(bundle);
+        }
+      })
+      .catch((error: unknown) => {
+        if (!cancelled) {
+          setTrackletBundle(null);
+          setTrackletBundleError(error instanceof Error ? error.message : "Unable to load bundle");
+        }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setIsTrackletBundleLoading(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedTrackletId]);
 
   const selectedObservation =
     selectedObservationId !== null ? model.observationsById.get(selectedObservationId) ?? null : null;
@@ -86,6 +129,18 @@ export function EvidenceViewer({ viewerRun }: EvidenceViewerProps) {
             range={model.range}
             rows={model.rows}
             selectedObservationId={selectedObservationId}
+          />
+          <TrackletEvidencePanel
+            bundle={trackletBundle}
+            error={trackletBundleError}
+            isLoading={isTrackletBundleLoading}
+            onSelectObservation={setSelectedObservationId}
+            onSelectTracklet={(tracklet) => {
+              setSelectedObservationId(tracklet.observation_id);
+            }}
+            selectedObservationId={selectedObservationId}
+            selectedTrackletId={selectedTrackletId}
+            tracklets={viewerRun.tracklets}
           />
           <ObservationList
             observations={model.observations}

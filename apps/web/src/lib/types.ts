@@ -242,3 +242,79 @@ export interface DetectionOverlayModel {
   mediaWidth: number | null;
   mediaHeight: number | null;
 }
+
+export interface RuntimeConfigSummary {
+  id: string;
+  config_name: string;
+  config_version: string;
+  payload_jsonb: JsonRecord;
+  created_at: string | null;
+}
+
+export interface ModelRegistrySummary {
+  id: string;
+  name: string;
+  version: string;
+  model_family: string;
+  source: string | null;
+  metadata_jsonb: JsonRecord;
+  created_at: string | null;
+}
+
+export interface TrackletEvidenceSourceDetection {
+  observation: Observation;
+  frame_artifacts: EvidenceArtifact[];
+}
+
+export interface TrackletEvidencePoint {
+  typed: TrackPoint;
+  observation: Observation | null;
+  sequence_index: number | string | null;
+  frame_number: number;
+  timestamp_ms: number | null;
+  bbox: unknown;
+  center: unknown;
+  source_detection_observation_id: string | null;
+  source_detection: Observation | null;
+  lineage_to_source: LineageRow | null;
+  lineage_to_tracklet: LineageRow | null;
+  frame_artifacts: EvidenceArtifact[];
+}
+
+export interface TrackletEvidenceBundle {
+  tracklet: {
+    typed: Omit<Tracklet, "points">;
+    observation: Observation | null;
+  };
+  media: MediaAsset | null;
+  runs: {
+    tracklet_run: ProcessingRun | null;
+    source_detection_run: ProcessingRun | null;
+  };
+  runtime_configs: {
+    tracklet_runtime_config: RuntimeConfigSummary | null;
+    source_detection_runtime_config: RuntimeConfigSummary | null;
+  };
+  model_registry: {
+    tracklet_builder_model: ModelRegistrySummary | null;
+    source_detection_model: ModelRegistrySummary | null;
+  };
+  track_points: TrackletEvidencePoint[];
+  source_detections: TrackletEvidenceSourceDetection[];
+  frame_artifacts: EvidenceArtifact[];
+  lineage: LineageRow[];
+  annotations: HumanAnnotation[];
+  summary: {
+    track_status: string | null;
+    identity_status: string | null;
+    track_point_count: number;
+    source_detection_count: number;
+    frame_start: number | null;
+    frame_end: number | null;
+    timestamp_start_ms: number | null;
+    timestamp_end_ms: number | null;
+    gap_count: number | null;
+    confidence: number | null;
+    warning: string;
+  };
+}

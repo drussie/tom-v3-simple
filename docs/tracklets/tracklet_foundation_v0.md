@@ -194,6 +194,14 @@ That query returns the tracklet candidate observation and track point candidate 
 
 Known limitation: the viewer is still a single-run view. It shows the tracklet run's candidate observations, tracklets, points, and lineage, but does not yet combine the source detection run observations, frame artifacts, and tracklet run into one evidence bundle.
 
+Milestone 2B adds that cross-run inspection through:
+
+```text
+GET /tracklets/{tracklet_id}/evidence-bundle
+```
+
+The evidence bundle keeps the viewer opened on the tracklet builder run while showing source detection observations and frame artifacts from the source detection run in a focused panel.
+
 ## Non-Goals
 
 - No sophisticated multi-object tracking.

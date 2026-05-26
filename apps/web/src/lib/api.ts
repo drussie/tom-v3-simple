@@ -1,4 +1,4 @@
-import type { ViewerRun } from "./types";
+import type { TrackletEvidenceBundle, ViewerRun } from "./types";
 
 const defaultApiBaseUrl = "http://127.0.0.1:8000";
 
@@ -16,4 +16,18 @@ export async function fetchViewerRun(runId: string): Promise<ViewerRun> {
   }
 
   return (await response.json()) as ViewerRun;
+}
+
+export async function fetchTrackletEvidenceBundle(
+  trackletId: string
+): Promise<TrackletEvidenceBundle> {
+  const response = await fetch(`/api/tracklets/${trackletId}/evidence-bundle`, {
+    cache: "no-store"
+  });
+
+  if (!response.ok) {
+    throw new Error(`Unable to load tracklet evidence bundle ${trackletId}: ${response.status}`);
+  }
+
+  return (await response.json()) as TrackletEvidenceBundle;
 }

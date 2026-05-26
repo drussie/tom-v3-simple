@@ -295,3 +295,37 @@ curl -X POST http://127.0.0.1:8000/observations/query \
 ```
 
 Tracklet builder output is candidate temporal grouping only. It does not establish identity, bounce, hit, rally, or point state.
+
+## 15. Inspect A Tracklet Evidence Bundle
+
+Milestone 2B adds a multi-run evidence bundle for a selected tracklet candidate.
+
+After building tracklets, call:
+
+```bash
+curl http://127.0.0.1:8000/tracklets/<TRACKLET_ID>/evidence-bundle
+```
+
+The bundle includes:
+
+- typed tracklet row and tracklet candidate observation
+- track point rows and track point candidate observations
+- source detection observations from the detection run
+- frame artifacts when extraction has already run
+- `tracked_from` and `grouped_from` lineage rows
+
+Open the tracklet builder run:
+
+```text
+http://127.0.0.1:3000/runs/<TRACKLET_RUN_ID>
+```
+
+Expected behavior:
+
+- selecting a tracklet loads the Tracklet Evidence panel
+- track point candidates are listed
+- selecting a track point shows its source detection evidence
+- frame artifacts appear when available
+- missing frame artifacts fall back to bbox/source metadata
+
+The evidence bundle is read-only and descriptive. It does not establish a confirmed track, identity, bounce, hit, rally, or point state.

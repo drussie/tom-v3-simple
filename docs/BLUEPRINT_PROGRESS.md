@@ -2,7 +2,7 @@
 
 ## Current Progress Gauge
 
-Current: ~25% through the MVP+ temporal-evidence extension
+Current: ~55-60% through Blueprint 2
 
 ## Current
 
@@ -57,6 +57,8 @@ Current: ~25% through the MVP+ temporal-evidence extension
 - Tracklet candidates have first-class observation spine rows.
 - Track point candidates have first-class observation spine rows.
 - Observation lineage links source detections to track points and track points to tracklets.
+- Tracklet evidence bundle service exists.
+- Viewer can inspect source detection evidence from a tracklet builder run.
 
 ## After Milestone 0A
 
@@ -271,3 +273,19 @@ Expected: ~25% through the MVP+ temporal-evidence extension
 Status: complete.
 
 The existing 1F branch now satisfies the Blueprint 2 persistence contract: candidate tracklets and track points are first-class observations with lineage to source detections and grouping observations.
+
+## After Milestone 2B
+
+Expected: ~55-60% through Blueprint 2
+
+- A tracklet evidence bundle combines tracklet run evidence with source detection run evidence.
+- Viewer can inspect a tracklet candidate and see its source detections.
+- Viewer can drill from tracklet to track point to source detection.
+- Frame artifacts are shown when available.
+- Multi-run evidence remains descriptive and observation-only.
+
+## Milestone 2B Status
+
+Status: complete.
+
+The repo now has a dynamic tracklet evidence bundle endpoint and a lightweight viewer panel for tracklet candidate, track point candidate, source detection, frame artifact, and lineage inspection across runs.

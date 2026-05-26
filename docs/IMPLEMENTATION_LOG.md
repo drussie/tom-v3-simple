@@ -419,3 +419,39 @@ Milestone 2A repaired:
 - `tracked_from` lineage links source detections to track point candidate observations.
 - `grouped_from` lineage links track point candidate observations to tracklet candidate observations.
 - Tests now assert the observation spine and lineage contract directly.
+
+## Milestone 2B - Tracklet Viewer / Multi-Run Evidence Bundle
+
+Status: complete
+
+### Goal
+
+Make tracklet candidate evidence inspectable across the tracklet builder run and the source detection run.
+
+### Non-goals
+
+- No new tracking algorithm.
+- No pose detection.
+- No court homography.
+- No bounce detection.
+- No hit detection.
+- No rally segmentation.
+- No point reconstruction.
+- No scoring.
+- No real YOLO runtime integration.
+- No production object storage.
+- No adjudication.
+- No truth/fact/promotion/refusal concepts.
+
+### Notes
+
+Milestone 2B created:
+
+- Dynamic tracklet evidence bundle service.
+- API endpoint `GET /tracklets/{tracklet_id}/evidence-bundle`.
+- Source detection lookup through `tracked_from` lineage and track point payload metadata.
+- Track point to tracklet lookup through `grouped_from` lineage.
+- Frame artifact matching for targeted and same-frame artifacts.
+- Web Tracklet Evidence panel in the existing run viewer.
+- Viewer drilldown from tracklet candidate to track point candidate to source detection.
+- Tests covering bundle service, endpoint shape, lineage reconstruction, and artifact availability.
