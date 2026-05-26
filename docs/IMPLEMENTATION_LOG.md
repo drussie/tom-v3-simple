@@ -128,3 +128,39 @@ Milestone 0D created:
 - Observation detail, lineage, artifact, and annotation panels.
 - Tests covering the viewer API composition route.
 - Frontend lint/build validation.
+
+## Milestone 0E - Integration / QA / Repo Consolidation
+
+Status: complete
+
+### Goal
+
+Consolidate TOM v3 Simple Milestone 0 into a coherent, runnable foundation.
+
+### Non-goals
+
+- No YOLO integration.
+- No TOM v1 integration.
+- No real video decoding.
+- No real ffprobe media indexing.
+- No real tracking implementation.
+- No real homography calculation.
+- No real bounce detection.
+- No streaming ingestion.
+- No production auth.
+- No deployment work.
+- No adjudication.
+- No truth/fact/promotion/refusal concepts.
+
+### Notes
+
+Milestone 0E created:
+
+- Local environment setup docs.
+- Local demo runbook.
+- Branch/default-branch hygiene guidance.
+- `.env.example`.
+- Root Makefile for common commands.
+- Synthetic viewer smoke script.
+- Milestone 0 integration smoke test.
+- Updated README, docs index, current state, blueprint progress, implementation log, milestone docs, handoff, and report.

@@ -23,9 +23,16 @@ SessionDep = Annotated[Session, Depends(get_session)]
 
 @router.get("/runs/{run_id}")
 def get_viewer_run(run_id: str, session: SessionDep) -> dict[str, Any]:
+    payload = build_viewer_run_payload(session, run_id)
+    if payload is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="run not found")
+    return payload
+
+
+def build_viewer_run_payload(session: Session, run_id: str) -> dict[str, Any] | None:
     run = session.get(ProcessingRun, run_id)
     if run is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="run not found")
+        return None
 
     media = session.get(MediaAsset, run.media_id)
     steps = session.scalars(

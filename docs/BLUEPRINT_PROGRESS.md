@@ -2,7 +2,7 @@
 
 ## Current Progress Gauge
 
-Current: ~65%
+Current: ~75-80%
 
 ## Current
 
@@ -26,6 +26,9 @@ Current: ~65%
 - Candidate observations have lineage and artifacts.
 - Visual evidence viewer foundation exists.
 - Viewer data is loaded from backend/API contracts.
+- Milestone 0 local setup and demo runbooks exist.
+- Makefile commands exist for common local workflows.
+- Integration smoke validation exists for synthetic viewer data.
 
 ## After Milestone 0A
 
@@ -103,3 +106,21 @@ Expected: ~65%
 Status: complete.
 
 The repo now has a backend-composed viewer run endpoint and a Next.js web app that renders persisted synthetic evidence without adding real ML or a frontend-only evidence model.
+
+## After Milestone 0E
+
+Expected: ~75-80%
+
+- Milestone 0 is consolidated.
+- Repo docs are current and easy to follow.
+- Local environment setup is documented.
+- Local demo commands are documented and tested.
+- Backend, worker, and web validation passes.
+- Branch/default-branch cleanup is explicitly documented.
+- The next real media/model milestone is ready.
+
+## Milestone 0E Status
+
+Status: complete.
+
+The repo now has one documented local setup path, one synthetic seed path, one backend API, one viewer path, one validation story, and exact branch/default-branch cleanup guidance.

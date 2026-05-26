@@ -10,6 +10,8 @@ media -> run -> persisted synthetic observations -> query -> visual replay
 
 This milestone is still foundation work. It does not integrate real ML.
 
+Status: complete after Milestone 0E.
+
 ## Scope
 
 Milestone 0 should prove that the project can:
@@ -49,6 +51,8 @@ Status: complete.
 ### 0E: QA / Integration / Docs Finalization
 
 Run integration checks across backend, worker, and viewer. Update docs and handoffs for the next milestone.
+
+Status: complete.
 
 ## Non-Goals
 
