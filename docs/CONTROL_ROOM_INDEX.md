@@ -40,6 +40,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 2E - Blueprint 2 Completion Review](milestones/milestone_2e_blueprint_2_completion_review.md)
 - [Milestone 3A - YOLO Runtime Environment / Runtime Probe Foundation](milestones/milestone_3a_yolo_runtime_environment_probe.md)
 - [Milestone 3B - YOLO Model Registry and Weights Validation](milestones/milestone_3b_yolo_model_registry_weights_validation.md)
+- [Milestone 3C - YOLO Detection Adapter Normalization](milestones/milestone_3c_yolo_detection_adapter_normalization.md)
 
 ## Handoffs
 
@@ -60,6 +61,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 2E Handoff](handoffs/milestone_2e_blueprint_2_completion_review_handoff.md)
 - [Milestone 3A Handoff](handoffs/milestone_3a_yolo_runtime_environment_probe_handoff.md)
 - [Milestone 3B Handoff](handoffs/milestone_3b_yolo_model_registry_weights_validation_handoff.md)
+- [Milestone 3C Handoff](handoffs/milestone_3c_yolo_detection_adapter_normalization_handoff.md)
 
 ## Agent Reports
 
@@ -80,6 +82,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 2E Agent Report](agent_reports/milestone_2e_blueprint_2_completion_review_report.md)
 - [Milestone 3A Agent Report](agent_reports/milestone_3a_yolo_runtime_environment_probe_report.md)
 - [Milestone 3B Agent Report](agent_reports/milestone_3b_yolo_model_registry_weights_validation_report.md)
+- [Milestone 3C Agent Report](agent_reports/milestone_3c_yolo_detection_adapter_normalization_report.md)
 
 ## Blueprints
 
@@ -105,6 +108,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [YOLO26 Detection Adapter Assessment](model_adapters/yolo26_detection_adapter_assessment.md)
 - [YOLO Runtime Environment v0](model_adapters/yolo_runtime_environment_v0.md)
 - [YOLO Model Registry and Weights v0](model_adapters/yolo_model_registry_weights_v0.md)
+- [YOLO Detection Normalization v0](model_adapters/yolo_detection_normalization_v0.md)
 
 ## Worker
 

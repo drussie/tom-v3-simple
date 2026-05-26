@@ -2,7 +2,7 @@
 
 ## Current Progress Gauge
 
-Current: ~35-40% through Blueprint 3
+Current: ~55-60% through Blueprint 3
 
 ## Current
 
@@ -81,6 +81,11 @@ Current: ~35-40% through Blueprint 3
 - Default ball/player YOLO class mapping exists and is validated.
 - YOLO model registry helper exists.
 - Worker `register-yolo-model` validates/registers weights without creating runs or observations.
+- YOLO-like frame result normalization exists.
+- Class mapping can normalize YOLO output to `ball_detection` and `player_detection`.
+- `xyxy` boxes convert to TOM v3 bbox/center payloads.
+- Unmapped classes and invalid boxes are counted without emitting observations.
+- YOLO adapter skeleton can normalize fake frame results without real inference.
 
 ## After Milestone 0A
 
@@ -398,3 +403,22 @@ Expected: ~35-40% through Blueprint 3
 Status: complete.
 
 The repo now has a YOLO weights validation and model registry foundation. Local weights can be validated, fingerprinted, mapped to TOM v3 ball/player observation targets, and registered in `model_registry` without creating processing runs or observations.
+
+## After Milestone 3C
+
+Expected: ~55-60% through Blueprint 3
+
+- YOLO-like result normalization exists.
+- Fake/serialized YOLO boxes can become TOM v3 detection payloads.
+- Class-name and class-id mapping is tested.
+- Bbox, center, confidence, class id, class name, and runtime metadata normalization is tested.
+- Unmapped classes and invalid inputs are accounted for without persistence.
+- YOLO adapter skeleton can prepare an adapter result from normalized output.
+- No real full-media YOLO inference is required yet.
+- No real YOLO detections are persisted yet.
+
+## Milestone 3C Status
+
+Status: complete.
+
+The repo now has YOLO detection normalization foundations. YOLO-like frame result dictionaries can be transformed into TOM v3-compatible detection payloads and adapter results, ready for future observation persistence once real frame inference is introduced.

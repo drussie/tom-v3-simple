@@ -631,3 +631,40 @@ Milestone 3B created:
 - Makefile helper for local model registration.
 - Docs for local weights placement, registry metadata, and the future runtime config preview.
 - Tests covering weights validation, class mapping, registry metadata, optional probe behavior, and CLI handler safety.
+
+## Milestone 3C - YOLO Detection Adapter Normalization Foundation
+
+Status: complete
+
+### Goal
+
+Normalize YOLO-like frame outputs into TOM v3-compatible detection payloads without running real inference or persisting real detections.
+
+### Non-goals
+
+- No full YOLO video inference.
+- No real detection persistence.
+- No tracklet generation from YOLO output.
+- No pose detection.
+- No court homography.
+- No bounce detection.
+- No hit detection.
+- No rally segmentation.
+- No point reconstruction.
+- No scoring.
+- No adjudication.
+
+### Notes
+
+Milestone 3C created:
+
+- YOLO normalization utility for serialized/fake frame result dictionaries.
+- Class mapping by normalized class name or source class id.
+- `xyxy` to bbox/center conversion.
+- Unmapped class accounting.
+- Invalid bbox and invalid confidence warnings.
+- Out-of-range confidence warnings.
+- Normalized detection payload dataclasses and summary result.
+- Adapter result conversion for existing detection persistence contracts.
+- YOLO adapter skeleton methods for normalization-only behavior.
+- Tests covering mapping, bbox conversion, invalid input, summary counts, metadata, and adapter skeleton compatibility.

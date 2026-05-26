@@ -56,13 +56,14 @@ Blueprint 2 is complete and Blueprint 3 has started. TOM v3 Simple can build, in
 - optional `requirements-yolo.txt` dependency path for a separate `tom_v3_yolo` environment
 - YOLO runtime probe and device resolver for Ultralytics, Torch, OpenCV, CUDA, and MPS diagnostics
 - YOLO weights validation and model registry registration without inference
+- YOLO-like output normalization into TOM v3-compatible detection payloads
 - model asset and weight ignore policy
 
 Portable TOM v1 detector assets/source and YOLO26 model weights are not present in this repo state. Real YOLO inference is not integrated yet. No sophisticated tracking, pose processing, court homography, or real bounce detection is implemented yet.
 
 Blueprint 2 did not add pose, homography, bounce detection, hit detection, rally/point reconstruction, scoring, identity proof, or adjudication.
 
-Recommended next milestone: Milestone 3C - YOLO Detection Adapter Normalization Foundation. Pose remains outside Blueprint 3 and is reserved for a later blueprint.
+Recommended next milestone: Milestone 3D - YOLO Frame Inference / Observation Persistence. Pose remains outside Blueprint 3 and is reserved for a later blueprint.
 
 ## Repo Structure
 
@@ -301,6 +302,24 @@ python -m apps.worker.cli register-yolo-model \
 
 The command fingerprints the file, validates the class mapping, creates or reuses a `model_registry` row, and does not create processing runs or observations.
 
+Normalize fake YOLO-like output without inference:
+
+```bash
+python - <<'PY'
+from tom_v3_model_adapters.yolo_normalization import normalize_yolo_frame_result
+
+result = normalize_yolo_frame_result({
+    "frame_number": 120,
+    "timestamp_ms": 4000,
+    "boxes": [
+        {"xyxy": [100, 200, 140, 240], "confidence": 0.91, "class_id": 32, "class_name": "sports ball"},
+        {"xyxy": [500, 150, 700, 900], "confidence": 0.87, "class_id": 0, "class_name": "person"},
+    ],
+})
+print(result.as_dict())
+PY
+```
+
 ## Validation
 
 Run the consolidated checks:
@@ -353,6 +372,7 @@ Useful runbooks:
 - [Detection Adapter v0](docs/model_adapters/detection_adapter_v0.md)
 - [YOLO Runtime Environment v0](docs/model_adapters/yolo_runtime_environment_v0.md)
 - [YOLO Model Registry and Weights v0](docs/model_adapters/yolo_model_registry_weights_v0.md)
+- [YOLO Detection Normalization v0](docs/model_adapters/yolo_detection_normalization_v0.md)
 - [Detection Overlay Viewer v0](docs/web/detection_overlay_viewer_v0.md)
 - [Frame Artifact Overlay v0](docs/web/frame_artifact_overlay_v0.md)
 - [Tracklet Foundation v0](docs/tracklets/tracklet_foundation_v0.md)

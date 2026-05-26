@@ -574,3 +574,54 @@ python -m apps.worker.cli register-yolo-model \
 ```
 
 Checksum mismatch produces a structured error and does not create a registry row.
+
+## 21. Normalize Fake YOLO Output
+
+Milestone 3C adds normalization for YOLO-like output dictionaries. This is a pure adapter-layer check; it does not load a model, run inference, create processing runs, or persist observations.
+
+Run a local normalization smoke:
+
+```bash
+python - <<'PY'
+from tom_v3_model_adapters.yolo_normalization import normalize_yolo_frame_result
+from tom_v3_model_adapters.yolo_weights import default_yolo_class_mapping
+
+result = normalize_yolo_frame_result(
+    {
+        "frame_number": 120,
+        "timestamp_ms": 4000,
+        "image_width": 1920,
+        "image_height": 1080,
+        "boxes": [
+            {
+                "xyxy": [100, 200, 140, 240],
+                "confidence": 0.91,
+                "class_id": 32,
+                "class_name": "sports ball",
+                "source_result_index": 0,
+            },
+            {
+                "xyxy": [500, 150, 700, 900],
+                "confidence": 0.87,
+                "class_id": 0,
+                "class_name": "person",
+                "source_result_index": 1,
+            },
+        ],
+    },
+    class_mapping=default_yolo_class_mapping(),
+)
+print(result.as_dict())
+PY
+```
+
+Expected behavior:
+
+- one `ball_detection` normalized payload
+- one `player_detection` normalized payload
+- bbox converted from `xyxy` to `x/y/width/height`
+- center calculated
+- `frame_time_owner = media_indexing`
+- `source_runtime = ultralytics_yolo`
+- no model inference
+- no observations persisted

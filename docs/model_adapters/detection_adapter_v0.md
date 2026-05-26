@@ -147,6 +147,29 @@ python -m apps.worker.cli register-yolo-model \
 
 The command creates or reuses a `model_registry` row with weights fingerprint and class map metadata. It does not create a `processing_run` or any detection observations.
 
+Milestone 3C supplies YOLO-like output normalization:
+
+```python
+from tom_v3_model_adapters.yolo_normalization import normalize_yolo_frame_result
+
+result = normalize_yolo_frame_result(
+    {
+        "frame_number": 120,
+        "timestamp_ms": 4000,
+        "boxes": [
+            {
+                "xyxy": [100, 200, 140, 240],
+                "confidence": 0.91,
+                "class_id": 32,
+                "class_name": "sports ball",
+            }
+        ],
+    }
+)
+```
+
+Normalization creates persistence-ready payloads only. It does not run a model or write observations.
+
 ## Persistence
 
 The worker service creates:

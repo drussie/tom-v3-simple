@@ -159,6 +159,49 @@ class YoloDetectionAdapter(BaseDetectionAdapter):
         self.image_size = image_size
         self.confidence_threshold = confidence_threshold
 
+    def normalize_frame_result(
+        self,
+        frame_result: dict[str, Any],
+        class_mapping: dict[str, Any] | None = None,
+        model_registry_id: str | None = None,
+        runtime_config_id: str | None = None,
+        inference_metadata: dict[str, Any] | None = None,
+    ):
+        from tom_v3_model_adapters.yolo_normalization import normalize_yolo_frame_result
+
+        return normalize_yolo_frame_result(
+            frame_result,
+            class_mapping=class_mapping,
+            model_registry_id=model_registry_id,
+            runtime_config_id=runtime_config_id,
+            inference_metadata=inference_metadata,
+        )
+
+    def normalize_results(
+        self,
+        frame_results: list[dict[str, Any]],
+        class_mapping: dict[str, Any] | None = None,
+        model_registry_id: str | None = None,
+        runtime_config_id: str | None = None,
+        inference_metadata: dict[str, Any] | None = None,
+    ):
+        from tom_v3_model_adapters.yolo_normalization import normalize_yolo_results
+
+        return normalize_yolo_results(
+            frame_results,
+            class_mapping=class_mapping,
+            model_registry_id=model_registry_id,
+            runtime_config_id=runtime_config_id,
+            inference_metadata=inference_metadata,
+        )
+
+    def build_adapter_result_from_normalized(self, normalization_result):
+        from tom_v3_model_adapters.yolo_normalization import (
+            build_detection_adapter_result_from_normalized,
+        )
+
+        return build_detection_adapter_result_from_normalized(normalization_result)
+
     def run(self, adapter_input: DetectionAdapterInput) -> DetectionAdapterResult:
         missing: list[str] = []
         if find_spec("ultralytics") is None:

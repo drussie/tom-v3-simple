@@ -4,8 +4,8 @@
 
 - Project name: TOM v3 Simple
 - Repo: drussie/tom-v3-simple
-- Current phase: Milestone 3B
-- Current goal: YOLO model registry and weights validation
+- Current phase: Milestone 3C
+- Current goal: YOLO detection adapter normalization foundation
 
 ## Mission
 
@@ -16,7 +16,7 @@ A lightweight tennis video observation platform that accepts model output as ope
 - Implementation status: persisted ball/player observations can be inspected visually and grouped into candidate tracklets
 - Model integration status: fixture gameplay and fixture detection adapters implemented for deterministic dev/test output
 - TOM v1 gameplay detector: known asset, portable source/assets not available in this repo/environment; integration stub documented
-- YOLO/YOLO26: optional runtime probe and model weights registration implemented; runtime/assets are not required in the base environment and real detection persistence is not integrated yet
+- YOLO/YOLO26: optional runtime probe, model weights registration, and YOLO-like output normalization implemented; runtime/assets are not required in the base environment and real detection persistence is not integrated yet
 - Database: initial SQLAlchemy models and Alembic migration implemented
 - API: FastAPI backend foundation implemented
 - Media indexing: implemented for local files via ffprobe, sha256 checksum, local storage copy/register mode, and frame/time summary
@@ -27,7 +27,7 @@ A lightweight tennis video observation platform that accepts model output as ope
 - Tracklet query/review: implemented with structured query filters, annotation summaries, and viewer review controls
 - Tracklet review dataset export: implemented with JSON export artifacts, evidence artifact metadata, optional query result memory, API endpoint, and worker CLI
 - Blueprint 2 status: complete; temporal evidence can be built, inspected, queried, reviewed, and exported as candidate evidence
-- Blueprint 3 status: in progress; optional YOLO runtime environment boundary, dependency probe, device resolver, weights validation, class mapping, and model registry helper are implemented
+- Blueprint 3 status: in progress; optional YOLO runtime environment boundary, dependency probe, device resolver, weights validation, class mapping, model registry helper, and YOLO output normalization are implemented
 - Observation writer: implemented with typed extension rows, lineage, artifacts, and idempotency
 - Worker synthetic seeder: implemented
 - Visual evidence viewer: implemented in `apps/web` with detection bbox overlay and frame artifact image support
@@ -143,10 +143,16 @@ Status: complete
 
 Milestone 3B adds YOLO model weights validation, safe local root checks, sha256 and file-size fingerprinting, default ball/player class mapping validation, optional model metadata probing, model registry registration/reuse, and worker `register-yolo-model`. It registers model asset metadata only; it does not run inference, create processing runs, or persist YOLO detections.
 
+## Milestone 3C Result
+
+Status: complete
+
+Milestone 3C adds YOLO-like output normalization. Serialized/fake frame results with `xyxy`, confidence, class id/name, and frame/time values can be normalized into TOM v3-compatible `ball_detection` and `player_detection` payloads. It includes class-map matching by name/id, bbox/center conversion, unmapped/invalid input accounting, and YOLO adapter skeleton normalization methods. It does not run real inference or persist YOLO detections.
+
 ## Naming Transition
 
 The implementation branch/file names may reference "1F" because the milestone was originally planned as a Blueprint 1 extension. After Blueprint 1 was declared complete, the same work was reclassified as Blueprint 2A because temporal grouping begins a new conceptual layer.
 
 ## Next Milestone
 
-Recommended next milestone: Milestone 3C - YOLO Detection Adapter Normalization Foundation.
+Recommended next milestone: Milestone 3D - YOLO Frame Inference / Observation Persistence.

@@ -162,6 +162,14 @@ Future real inference runtime config should include:
 }
 ```
 
+## Normalization Next Step
+
+Milestone 3C uses this class map to normalize YOLO-like frame results into TOM v3-compatible detection payloads. See:
+
+```text
+docs/model_adapters/yolo_detection_normalization_v0.md
+```
+
 ## Out of Scope
 
 - real YOLO inference

@@ -8,6 +8,8 @@ Milestone 3A establishes the optional YOLO runtime environment boundary.
 
 Milestone 3B establishes local weights validation and YOLO model registry metadata.
 
+Milestone 3C establishes YOLO-like output normalization.
+
 Real YOLO detection persistence is not implemented yet.
 
 ## Mission
@@ -65,6 +67,20 @@ Milestone 3B adds:
 
 3B registers model asset metadata only. It does not run inference and does not persist detections.
 
+## Milestone 3C Result
+
+Milestone 3C adds:
+
+- fake/serialized YOLO frame result normalization
+- class-map matching by source class name and id
+- bbox and center conversion from `xyxy`
+- confidence handling and warnings
+- unmapped class accounting
+- normalized TOM v3 detection payloads
+- adapter skeleton methods for normalization-only behavior
+
+3C prepares data for persistence compatibility only. It does not run full-media inference and does not create observations.
+
 ## What Blueprint 3 Will Not Prove
 
 Blueprint 3 does not prove that a detection is correct.
@@ -102,5 +118,5 @@ A rally or point exists.
 Recommended next milestone:
 
 ```text
-Milestone 3C - YOLO Detection Adapter Normalization Foundation
+Milestone 3D - YOLO Frame Inference / Observation Persistence
 ```
