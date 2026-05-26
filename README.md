@@ -55,13 +55,14 @@ Blueprint 2 is complete and Blueprint 3 has started. TOM v3 Simple can build, in
 - Blueprint 2 completion review and invariant audit
 - optional `requirements-yolo.txt` dependency path for a separate `tom_v3_yolo` environment
 - YOLO runtime probe and device resolver for Ultralytics, Torch, OpenCV, CUDA, and MPS diagnostics
+- YOLO weights validation and model registry registration without inference
 - model asset and weight ignore policy
 
 Portable TOM v1 detector assets/source and YOLO26 model weights are not present in this repo state. Real YOLO inference is not integrated yet. No sophisticated tracking, pose processing, court homography, or real bounce detection is implemented yet.
 
 Blueprint 2 did not add pose, homography, bounce detection, hit detection, rally/point reconstruction, scoring, identity proof, or adjudication.
 
-Recommended next milestone: Milestone 3B - YOLO Model Registry and Weights Validation. Pose remains outside Blueprint 3 and is reserved for a later blueprint.
+Recommended next milestone: Milestone 3C - YOLO Detection Adapter Normalization Foundation. Pose remains outside Blueprint 3 and is reserved for a later blueprint.
 
 ## Repo Structure
 
@@ -287,6 +288,19 @@ python -m apps.worker.cli yolo-runtime-probe
 
 Model weights are local assets, not source code. The repo ignores `model_assets/`, `weights/`, `*.pt`, `*.pth`, `*.onnx`, and `*.engine`.
 
+Validate and register local YOLO weights without running inference:
+
+```bash
+mkdir -p model_assets/yolo
+python -m apps.worker.cli register-yolo-model \
+  --weights-path model_assets/yolo/<model>.pt \
+  --model-name <model-name> \
+  --model-version v0 \
+  --device cpu
+```
+
+The command fingerprints the file, validates the class mapping, creates or reuses a `model_registry` row, and does not create processing runs or observations.
+
 ## Validation
 
 Run the consolidated checks:
@@ -321,6 +335,7 @@ make build-tracklets DETECTION_RUN_ID=<detection_run_id>
 make seed
 make smoke
 make yolo-runtime-probe
+make register-yolo-model WEIGHTS_PATH=model_assets/yolo/<model>.pt MODEL_NAME=<model-name>
 make all-checks
 ```
 
@@ -337,6 +352,7 @@ Useful runbooks:
 - [Gameplay Adapter v0](docs/model_adapters/gameplay_adapter_v0.md)
 - [Detection Adapter v0](docs/model_adapters/detection_adapter_v0.md)
 - [YOLO Runtime Environment v0](docs/model_adapters/yolo_runtime_environment_v0.md)
+- [YOLO Model Registry and Weights v0](docs/model_adapters/yolo_model_registry_weights_v0.md)
 - [Detection Overlay Viewer v0](docs/web/detection_overlay_viewer_v0.md)
 - [Frame Artifact Overlay v0](docs/web/frame_artifact_overlay_v0.md)
 - [Tracklet Foundation v0](docs/tracklets/tracklet_foundation_v0.md)

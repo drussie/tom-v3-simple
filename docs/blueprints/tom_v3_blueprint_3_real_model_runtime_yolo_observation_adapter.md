@@ -2,9 +2,13 @@
 
 ## Status
 
-Status: started
+Status: in progress
 
-Milestone 3A establishes the optional YOLO runtime environment boundary. Real YOLO detection persistence is not implemented yet.
+Milestone 3A establishes the optional YOLO runtime environment boundary.
+
+Milestone 3B establishes local weights validation and YOLO model registry metadata.
+
+Real YOLO detection persistence is not implemented yet.
 
 ## Mission
 
@@ -47,6 +51,20 @@ Milestone 3A adds:
 - model weight ignore policy
 - docs for `tom_v3_yolo`
 
+## Milestone 3B Result
+
+Milestone 3B adds:
+
+- safe local weights path validation
+- sha256 and file-size fingerprinting
+- required checksum validation
+- default ball/player class mapping
+- optional model metadata probing
+- `model_registry` registration/reuse for validated weights
+- worker `register-yolo-model`
+
+3B registers model asset metadata only. It does not run inference and does not persist detections.
+
 ## What Blueprint 3 Will Not Prove
 
 Blueprint 3 does not prove that a detection is correct.
@@ -84,5 +102,5 @@ A rally or point exists.
 Recommended next milestone:
 
 ```text
-Milestone 3B - YOLO Model Registry and Weights Validation
+Milestone 3C - YOLO Detection Adapter Normalization Foundation
 ```

@@ -33,6 +33,15 @@ from tom_v3_model_adapters.yolo_runtime import (
     resolve_yolo_device,
     try_import_yolo_runtime,
 )
+from tom_v3_model_adapters.yolo_weights import (
+    YoloClassMappingError,
+    YoloWeightsValidationError,
+    YoloWeightsValidationResult,
+    default_yolo_class_mapping,
+    probe_yolo_model_metadata,
+    validate_yolo_class_mapping,
+    validate_yolo_weights,
+)
 
 __all__ = [
     "BBox",
@@ -56,10 +65,17 @@ __all__ = [
     "YoloDetectionAdapterUnavailable",
     "YoloDeviceUnavailable",
     "YoloRuntimeUnavailable",
+    "YoloClassMappingError",
     "YoloWeightsUnavailable",
+    "YoloWeightsValidationError",
+    "YoloWeightsValidationResult",
+    "default_yolo_class_mapping",
     "get_detection_adapter",
     "get_gameplay_adapter",
     "probe_yolo_runtime",
+    "probe_yolo_model_metadata",
     "resolve_yolo_device",
     "try_import_yolo_runtime",
+    "validate_yolo_class_mapping",
+    "validate_yolo_weights",
 ]

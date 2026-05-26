@@ -15,10 +15,14 @@ TRACKLET_ID ?=
 QUERY_JSON ?=
 EXPORT_ROOT ?= .data/exports
 YOLO_DEVICE ?= auto
+WEIGHTS_PATH ?=
+MODEL_NAME ?=
+MODEL_VERSION ?= v0
+REQUIRED_SHA256 ?=
 
 export TOM_V3_DATABASE_URL
 
-.PHONY: install web-install test lint migrate api seed verify index-media run-gameplay index-and-run-gameplay run-detection index-and-run-detection extract-frame-artifacts build-tracklets export-tracklet-review-dataset yolo-runtime-probe web web-build web-lint smoke all-checks
+.PHONY: install web-install test lint migrate api seed verify index-media run-gameplay index-and-run-gameplay run-detection index-and-run-detection extract-frame-artifacts build-tracklets export-tracklet-review-dataset yolo-runtime-probe register-yolo-model web web-build web-lint smoke all-checks
 
 install:
 	$(PYTHON) -m pip install -e ".[dev]"
@@ -79,6 +83,10 @@ export-tracklet-review-dataset:
 
 yolo-runtime-probe:
 	$(PYTHON) -m apps.worker.cli yolo-runtime-probe --device "$(YOLO_DEVICE)"
+
+register-yolo-model:
+	@if [ -z "$(WEIGHTS_PATH)" ]; then echo "WEIGHTS_PATH is required: make register-yolo-model WEIGHTS_PATH=model_assets/yolo/model.pt"; exit 1; fi
+	$(PYTHON) -m apps.worker.cli register-yolo-model --weights-path "$(WEIGHTS_PATH)" --model-version "$(MODEL_VERSION)" $(if $(MODEL_NAME),--model-name "$(MODEL_NAME)",) $(if $(REQUIRED_SHA256),--required-sha256 "$(REQUIRED_SHA256)",)
 
 web:
 	cd $(WEB_DIR) && npm run dev

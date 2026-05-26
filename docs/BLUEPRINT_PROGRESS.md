@@ -2,7 +2,7 @@
 
 ## Current Progress Gauge
 
-Current: ~15-20% through Blueprint 3
+Current: ~35-40% through Blueprint 3
 
 ## Current
 
@@ -76,6 +76,11 @@ Current: ~15-20% through Blueprint 3
 - YOLO runtime probe and device resolver exist.
 - Worker `yolo-runtime-probe` reports optional dependency and device availability.
 - Model weights and runtime assets are ignored by git.
+- YOLO weights validation exists.
+- Local weights are fingerprinted with sha256 and file size.
+- Default ball/player YOLO class mapping exists and is validated.
+- YOLO model registry helper exists.
+- Worker `register-yolo-model` validates/registers weights without creating runs or observations.
 
 ## After Milestone 0A
 
@@ -373,3 +378,23 @@ Expected: ~15-20% through Blueprint 3
 Status: complete.
 
 The repo now has a clean optional YOLO runtime boundary with `requirements-yolo.txt`, import guards, runtime diagnostics, device resolution, worker probe command, weights ignore policy, tests, and docs. Blueprint 3 is prepared for model registry and weights validation without adding real inference, pose, homography, bounce, hit, rally, point, scoring, or adjudication.
+
+## After Milestone 3B
+
+Expected: ~35-40% through Blueprint 3
+
+- YOLO model registry contract exists.
+- YOLO weights can be validated from local filesystem paths.
+- Weights are fingerprinted with sha256 and file size.
+- Required checksum mismatches fail clearly.
+- Safe local root policy exists for `model_assets/yolo` and `weights/yolo`.
+- Default ball/player class mapping exists.
+- Optional model metadata probe can capture class names when runtime is available.
+- Model registry rows can be created or reused for validated weights.
+- No real YOLO detections are persisted yet.
+
+## Milestone 3B Status
+
+Status: complete.
+
+The repo now has a YOLO weights validation and model registry foundation. Local weights can be validated, fingerprinted, mapped to TOM v3 ball/player observation targets, and registered in `model_registry` without creating processing runs or observations.

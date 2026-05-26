@@ -110,6 +110,12 @@ weights/
 
 Future milestones should record weight path, checksum, runtime versions, class map, and adapter config before running real inference.
 
+Milestone 3B adds that first registration layer. See:
+
+```text
+docs/model_adapters/yolo_model_registry_weights_v0.md
+```
+
 ## Out of Scope
 
 Milestone 3A does not add:

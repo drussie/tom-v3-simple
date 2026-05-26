@@ -136,6 +136,17 @@ docs/model_adapters/yolo_runtime_environment_v0.md
 
 Real YOLO detection persistence remains out of scope until a future Blueprint 3 milestone supplies validated model weights and runtime configuration.
 
+Milestone 3B supplies the validated model weights and registry foundation, but still does not run inference:
+
+```bash
+python -m apps.worker.cli register-yolo-model \
+  --weights-path model_assets/yolo/<model>.pt \
+  --model-name <model-name> \
+  --model-version v0
+```
+
+The command creates or reuses a `model_registry` row with weights fingerprint and class map metadata. It does not create a `processing_run` or any detection observations.
+
 ## Persistence
 
 The worker service creates:

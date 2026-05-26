@@ -5,6 +5,10 @@ from collections.abc import Callable
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 from tom_v3_model_adapters.yolo_runtime import probe_yolo_runtime
+from tom_v3_model_adapters.yolo_weights import (
+    YoloClassMappingError,
+    YoloWeightsValidationError,
+)
 from tom_v3_observations.synthetic import BASELINE_SCENARIO_NAME, verify_synthetic_run
 from tom_v3_schema.exports import TrackletReviewDatasetExportRequest
 from tom_v3_schema.tracklets import TrackletQueryFilters
@@ -18,6 +22,7 @@ from apps.worker.services.frame_artifacts import extract_frame_artifacts_for_run
 from apps.worker.services.gameplay_adapter import run_gameplay_adapter
 from apps.worker.services.media_indexer import index_media
 from apps.worker.services.tracklet_builder import build_tracklets_from_detection_run
+from apps.worker.services.yolo_model_registry import register_yolo_model
 
 
 def main() -> None:
@@ -256,6 +261,27 @@ def main() -> None:
     )
     yolo_probe_parser.set_defaults(handler=_handle_yolo_runtime_probe, skip_create_db=True)
 
+    yolo_register_parser = subcommands.add_parser(
+        "register-yolo-model",
+        help="Validate local YOLO weights and register model metadata.",
+    )
+    yolo_register_parser.add_argument("--weights-path", required=True)
+    yolo_register_parser.add_argument("--model-name")
+    yolo_register_parser.add_argument("--model-version", default="v0")
+    yolo_register_parser.add_argument("--required-sha256")
+    yolo_register_parser.add_argument(
+        "--allowed-root",
+        action="append",
+        dest="allowed_roots",
+        help="Allowed local root for weights. May be supplied more than once.",
+    )
+    yolo_register_parser.add_argument("--class-map-json")
+    yolo_register_parser.add_argument("--probe-model", action="store_true")
+    yolo_register_parser.add_argument("--device", default="cpu")
+    yolo_register_parser.add_argument("--created-by", default="tom-v3-worker")
+    yolo_register_parser.add_argument("--skip-create-db", action="store_true")
+    yolo_register_parser.set_defaults(handler=_handle_register_yolo_model)
+
     args = parser.parse_args()
     with _session_factory(create_db=not args.skip_create_db)() as session:
         result = args.handler(session, args)
@@ -469,6 +495,45 @@ def _handle_yolo_runtime_probe(session: Session, args: argparse.Namespace) -> di
         requested_device=args.device,
         allow_mps=not args.no_mps,
     )
+
+
+def _handle_register_yolo_model(session: Session, args: argparse.Namespace) -> dict[str, object]:
+    try:
+        class_map = json.loads(args.class_map_json) if args.class_map_json else None
+        return register_yolo_model(
+            session=session,
+            weights_path=args.weights_path,
+            model_name=args.model_name,
+            model_version=args.model_version,
+            required_sha256=args.required_sha256,
+            allowed_roots=args.allowed_roots,
+            class_map=class_map,
+            probe_model=args.probe_model,
+            device=args.device,
+            created_by=args.created_by,
+        )
+    except YoloWeightsValidationError as exc:
+        return {
+            "ok": False,
+            "status": exc.result.status,
+            "error_type": exc.__class__.__name__,
+            "message": str(exc),
+            "weights_validation": exc.result.as_dict(),
+        }
+    except YoloClassMappingError as exc:
+        return {
+            "ok": False,
+            "status": "invalid_class_mapping",
+            "error_type": exc.__class__.__name__,
+            "message": str(exc),
+        }
+    except json.JSONDecodeError as exc:
+        return {
+            "ok": False,
+            "status": "invalid_class_mapping",
+            "error_type": exc.__class__.__name__,
+            "message": f"class-map-json is invalid JSON: {exc}",
+        }
 
 
 if __name__ == "__main__":

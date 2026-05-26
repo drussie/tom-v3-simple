@@ -595,3 +595,39 @@ Milestone 3A created:
 - Git ignore rules for model assets and weight formats.
 - Blueprint 3, runtime environment, milestone, handoff, and report docs.
 - Tests using mocked imports/devices so base `tom_v3` stays independent from Ultralytics, Torch, OpenCV, CUDA, and MPS.
+
+## Milestone 3B - YOLO Model Registry and Weights Validation
+
+Status: complete
+
+### Goal
+
+Validate local YOLO weights and register model metadata without running inference or persisting detections.
+
+### Non-goals
+
+- No full YOLO detection adapter.
+- No real detection persistence.
+- No pose detection.
+- No court homography.
+- No bounce detection.
+- No hit detection.
+- No rally segmentation.
+- No point reconstruction.
+- No scoring.
+- No adjudication.
+
+### Notes
+
+Milestone 3B created:
+
+- YOLO weights validation utility with safe local root checks.
+- sha256 and file-size fingerprinting for local weights.
+- Required checksum validation.
+- Default ball/player class mapping and validation.
+- Optional model metadata probe for class names when Ultralytics runtime is available.
+- Worker service for registering/reusing YOLO model registry rows.
+- Worker command `register-yolo-model`.
+- Makefile helper for local model registration.
+- Docs for local weights placement, registry metadata, and the future runtime config preview.
+- Tests covering weights validation, class mapping, registry metadata, optional probe behavior, and CLI handler safety.

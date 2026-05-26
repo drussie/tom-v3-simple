@@ -521,3 +521,56 @@ python -m apps.worker.cli yolo-runtime-probe --device auto --no-mps
 ```
 
 Milestone 3A does not persist real YOLO detections. It only validates runtime availability, device resolution, and optional dependency boundaries.
+
+## 20. Register Local YOLO Weights
+
+Milestone 3B adds local weights validation and model registry metadata. This still does not run inference or persist detections.
+
+Allowed local development roots:
+
+```text
+model_assets/yolo/
+weights/yolo/
+```
+
+Example local smoke file:
+
+```bash
+mkdir -p model_assets/yolo
+python - <<'PY'
+from pathlib import Path
+p = Path("model_assets/yolo/test_fake_model.pt")
+p.write_bytes(b"fake-yolo-weights-for-registry-smoke")
+print(p)
+PY
+```
+
+Register the weights metadata:
+
+```bash
+python -m apps.worker.cli register-yolo-model \
+  --weights-path model_assets/yolo/test_fake_model.pt \
+  --model-name fake-yolo-registry-smoke \
+  --model-version test-v0 \
+  --device cpu
+```
+
+Expected behavior:
+
+- command prints `model_registry_id`
+- output includes `weights_sha256` and `weights_size_bytes`
+- output includes the default ball/player `class_map`
+- no processing run is created
+- no observations are created
+
+Optional checksum enforcement:
+
+```bash
+python -m apps.worker.cli register-yolo-model \
+  --weights-path model_assets/yolo/test_fake_model.pt \
+  --model-name fake-yolo-registry-smoke \
+  --model-version test-v0 \
+  --required-sha256 <EXPECTED_SHA256>
+```
+
+Checksum mismatch produces a structured error and does not create a registry row.
