@@ -2,7 +2,7 @@
 
 ## Current Progress Gauge
 
-Current: ~55-60% through Blueprint 4
+Current: ~70-75% through Blueprint 4
 
 ## Current
 
@@ -118,7 +118,12 @@ Current: ~55-60% through Blueprint 4
 - Normalized pose payloads are persisted through `ObservationWriter`.
 - Source `player_detection` observations can link to pose observations through `pose_from_subject_detection_candidate` lineage.
 - Unassociated full-frame fixture poses persist with no lineage.
-- No real pose inference, pose overlay viewer, movement interpretation, homography, bounce, hit, rally, point, scoring, or adjudication has been added.
+- Viewer run payloads include typed pose detail.
+- Existing Evidence Viewer can render pose observations.
+- COCO17 skeleton edges and present keypoint markers render from persisted image-pixel coordinates.
+- Missing keypoints remain missing evidence and are not drawn as present markers.
+- Selected pose metadata, keypoint confidence rows, and source association candidate context are visible in the viewer.
+- No real pose inference, movement interpretation, homography, bounce, hit, rally, point, scoring, or adjudication has been added.
 
 ## After Milestone 0A
 
@@ -566,3 +571,23 @@ Expected: ~55-60% through Blueprint 4
 Status: complete.
 
 The repo now has a pose persistence and lineage foundation. Worker `run-pose-adapter` creates fixture pose runs, persists typed `pose_observation` rows through the central observation writer, preserves media-owned frame/time, and links source `player_detection` observations to pose observations with `pose_from_subject_detection_candidate` lineage when candidate subject context is supplied.
+
+## After Milestone 4D
+
+Expected: ~70-75% through Blueprint 4
+
+- Existing Evidence Viewer can render pose observations.
+- Viewer payloads include typed `pose_observation` detail.
+- COCO17 skeleton edges render from persisted keypoint evidence.
+- Present keypoints render as markers.
+- Missing keypoints remain missing evidence and are not drawn as present markers.
+- Pose bbox renders when available.
+- Selected pose metadata and keypoint confidence rows are visible.
+- Source association candidate context is visible when supplied.
+- No real pose runtime, movement interpretation, homography, bounce, hit, rally, point, scoring, or adjudication is added.
+
+## Milestone 4D Status
+
+Status: complete.
+
+The repo now has a pose overlay viewer foundation. The existing Evidence Viewer can inspect persisted `player_pose_observation` rows, draw COCO17 keypoint evidence and skeleton edges in image-pixel coordinates, show selected pose metadata, list all keypoint present/missing states, and display source association candidate context without interpreting movement.

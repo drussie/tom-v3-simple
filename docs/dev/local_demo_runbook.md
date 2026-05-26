@@ -827,7 +827,7 @@ It does not create pose processing runs, persist real model output, infer moveme
 
 ## 27. Validate Pose Persistence and Lineage
 
-Milestone 4C adds a fixture pose worker persistence path. It still does not run real pose inference or render pose overlays.
+Milestone 4C adds a fixture pose worker persistence path. It still does not run real pose inference.
 
 Run focused checks:
 
@@ -896,3 +896,24 @@ indexed media
 ```
 
 This does not create movement conclusions, source identity, homography, bounce/hit/rally/point/scoring evidence, or adjudication.
+
+## 28. Inspect Pose Overlay Evidence
+
+Milestone 4D adds pose overlay rendering to the existing Evidence Viewer.
+
+After running the fixture pose adapter, start the backend and web app, then open:
+
+```text
+http://127.0.0.1:3000/runs/<POSE_RUN_ID>
+```
+
+Expected behavior:
+
+- pose observations appear in the observation list and timeline
+- the Pose Overlay panel renders persisted COCO17 keypoint evidence
+- skeleton edges render only when both endpoint keypoints are present
+- missing keypoints stay visible in the keypoint table and are not drawn as present markers
+- selected pose details show skeleton format/version, confidence summaries, bbox, and frame time owner
+- source association candidate context appears when the pose was linked to source `player_detection` evidence
+
+The pose overlay uses persisted image-pixel coordinates. It does not recompute pose, infer missing keypoints, smooth movement, identify a player, classify a stroke, create homography, detect bounce/hit events, reconstruct rallies/points, score, or adjudicate outcomes.

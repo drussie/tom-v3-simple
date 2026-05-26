@@ -55,6 +55,58 @@ export interface DerivedDetail {
   derivation_payload_jsonb: JsonRecord;
 }
 
+export interface PoseKeypoint {
+  index: number;
+  name: string;
+  x: number | null;
+  y: number | null;
+  x_norm: number | null;
+  y_norm: number | null;
+  confidence: number | null;
+  present: boolean;
+  visibility: string | null;
+}
+
+export interface PoseDetail {
+  observation_id: string;
+  media_id: string;
+  run_id: string;
+  frame_number: number;
+  timestamp_ms: number;
+  skeleton_format: string;
+  skeleton_version: string;
+  keypoint_schema_jsonb: JsonRecord;
+  keypoints_jsonb: PoseKeypoint[];
+  keypoint_count: number;
+  keypoints_present_count: number;
+  keypoints_missing_count: number;
+  mean_keypoint_confidence: number | null;
+  min_keypoint_confidence: number | null;
+  max_keypoint_confidence: number | null;
+  pose_confidence: number | null;
+  bbox_x: number | null;
+  bbox_y: number | null;
+  bbox_w: number | null;
+  bbox_h: number | null;
+  bbox_confidence: number | null;
+  crop_x: number | null;
+  crop_y: number | null;
+  crop_w: number | null;
+  crop_h: number | null;
+  crop_source: string | null;
+  subject_ref_type: string;
+  subject_detection_observation_id: string | null;
+  subject_tracklet_id: string | null;
+  subject_track_point_id: string | null;
+  association_status: string;
+  association_method: string | null;
+  association_confidence: number | null;
+  frame_time_owner: string;
+  raw_model_payload_jsonb: JsonRecord;
+  metadata_jsonb: JsonRecord;
+  created_at: string | null;
+}
+
 export interface Observation {
   id: string;
   media_id: string;
@@ -77,6 +129,7 @@ export interface Observation {
   gameplay: GameplayDetail | null;
   atomic: AtomicDetail | null;
   derived: DerivedDetail | null;
+  pose: PoseDetail | null;
 }
 
 export interface TrackPoint {
@@ -244,6 +297,67 @@ export interface DetectionOverlayModel {
   selectedFrame: number | null;
   frameArtifact: FrameArtifactImage | null;
   missingBboxObservationIds: string[];
+  unavailableReason: string | null;
+  mediaWidth: number | null;
+  mediaHeight: number | null;
+}
+
+export interface PoseBBox {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  confidence: number | null;
+}
+
+export type PoseConfidenceBand = "unknown" | "low" | "normal";
+
+export interface PoseOverlayKeypoint extends PoseKeypoint {
+  confidenceBand: PoseConfidenceBand;
+}
+
+export interface PoseOverlayEdge {
+  id: string;
+  start: PoseOverlayKeypoint;
+  end: PoseOverlayKeypoint;
+}
+
+export interface PoseOverlayItem {
+  id: string;
+  observationId: string;
+  frameNumber: number;
+  timestampMs: number | null;
+  skeletonFormat: string;
+  skeletonVersion: string;
+  poseConfidence: number | null;
+  bbox: PoseBBox | null;
+  keypoints: PoseKeypoint[];
+  presentKeypoints: PoseOverlayKeypoint[];
+  missingKeypoints: PoseKeypoint[];
+  edges: PoseOverlayEdge[];
+  keypointCount: number;
+  keypointsPresentCount: number;
+  keypointsMissingCount: number;
+  meanKeypointConfidence: number | null;
+  minKeypointConfidence: number | null;
+  maxKeypointConfidence: number | null;
+  subjectRefType: string;
+  subjectDetectionObservationId: string | null;
+  subjectTrackletId: string | null;
+  subjectTrackPointId: string | null;
+  associationStatus: string;
+  associationMethod: string | null;
+  associationConfidence: number | null;
+  frameTimeOwner: string;
+  metadata: JsonRecord;
+  isSelected: boolean;
+}
+
+export interface PoseOverlayModel {
+  items: PoseOverlayItem[];
+  frameItems: PoseOverlayItem[];
+  selectedFrame: number | null;
+  selectedPoseItem: PoseOverlayItem | null;
   unavailableReason: string | null;
   mediaWidth: number | null;
   mediaHeight: number | null;

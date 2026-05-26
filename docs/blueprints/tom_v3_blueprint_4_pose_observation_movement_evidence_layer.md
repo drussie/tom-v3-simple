@@ -86,6 +86,22 @@ Milestone 4C adds:
 
 4C does not add real pose inference, pose overlay rendering, movement interpretation, or event candidates.
 
+## Milestone 4D Result
+
+Milestone 4D adds:
+
+- viewer payload serialization for typed pose details
+- frontend pose observation types
+- pose overlay extraction helpers
+- COCO17 skeleton edge rendering
+- present keypoint marker rendering from persisted image-pixel coordinates
+- missing keypoint table display without drawing missing markers
+- selected pose metadata and keypoint confidence detail
+- source association candidate context display
+- a pose observations timeline row
+
+4D does not add real pose inference, movement interpretation, pose review/export integration, or event candidates.
+
 ## Observation Boundary
 
 A pose observation means:
@@ -106,10 +122,9 @@ A biomechanical conclusion is valid.
 A rally or point exists.
 ```
 
-## Out of Scope For Blueprint 4A-4C
+## Out of Scope For Blueprint 4A-4D
 
 - real pose inference
-- pose overlay viewer
 - movement interpretation
 - serve mechanics conclusions
 - split-step conclusions
@@ -124,5 +139,5 @@ A rally or point exists.
 Recommended next milestone:
 
 ```text
-Milestone 4D - Pose Overlay Viewer
+Milestone 4E - Pose Query / Review / Export Integration
 ```

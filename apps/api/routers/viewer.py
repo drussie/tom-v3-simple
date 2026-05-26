@@ -177,6 +177,7 @@ def _observation_payload(observation: Observation) -> dict[str, Any]:
         "gameplay": _gameplay_payload(observation),
         "atomic": _atomic_payload(observation),
         "derived": _derived_payload(observation),
+        "pose": _pose_payload(observation),
     }
 
 
@@ -211,6 +212,51 @@ def _derived_payload(observation: Observation) -> dict[str, Any] | None:
         "observation_id": detail.observation_id,
         "derived_kind": detail.derived_kind,
         "derivation_payload_jsonb": detail.derivation_payload_jsonb,
+    }
+
+
+def _pose_payload(observation: Observation) -> dict[str, Any] | None:
+    detail = observation.pose_detail
+    if detail is None:
+        return None
+    return {
+        "observation_id": detail.observation_id,
+        "media_id": detail.media_id,
+        "run_id": detail.run_id,
+        "frame_number": detail.frame_number,
+        "timestamp_ms": detail.timestamp_ms,
+        "skeleton_format": detail.skeleton_format,
+        "skeleton_version": detail.skeleton_version,
+        "keypoint_schema_jsonb": detail.keypoint_schema_jsonb,
+        "keypoints_jsonb": detail.keypoints_jsonb,
+        "keypoint_count": detail.keypoint_count,
+        "keypoints_present_count": detail.keypoints_present_count,
+        "keypoints_missing_count": detail.keypoints_missing_count,
+        "mean_keypoint_confidence": detail.mean_keypoint_confidence,
+        "min_keypoint_confidence": detail.min_keypoint_confidence,
+        "max_keypoint_confidence": detail.max_keypoint_confidence,
+        "pose_confidence": detail.pose_confidence,
+        "bbox_x": detail.bbox_x,
+        "bbox_y": detail.bbox_y,
+        "bbox_w": detail.bbox_w,
+        "bbox_h": detail.bbox_h,
+        "bbox_confidence": detail.bbox_confidence,
+        "crop_x": detail.crop_x,
+        "crop_y": detail.crop_y,
+        "crop_w": detail.crop_w,
+        "crop_h": detail.crop_h,
+        "crop_source": detail.crop_source,
+        "subject_ref_type": detail.subject_ref_type,
+        "subject_detection_observation_id": detail.subject_detection_observation_id,
+        "subject_tracklet_id": detail.subject_tracklet_id,
+        "subject_track_point_id": detail.subject_track_point_id,
+        "association_status": detail.association_status,
+        "association_method": detail.association_method,
+        "association_confidence": detail.association_confidence,
+        "frame_time_owner": detail.frame_time_owner,
+        "raw_model_payload_jsonb": detail.raw_model_payload_jsonb,
+        "metadata_jsonb": detail.metadata_jsonb,
+        "created_at": _dt(detail.created_at),
     }
 
 

@@ -133,3 +133,5 @@ Refresh the viewer to see frame imagery behind bbox overlays.
 - Frame artifact serving is local-development only.
 
 Blueprint 3 completion confirms that YOLO-origin detections use this same overlay path; there is no separate YOLO viewer.
+
+Milestone 4D adds a separate pose overlay panel to the same Evidence Viewer. Detection overlays continue to render persisted bbox observations; pose overlays render persisted `player_pose_observation` keypoint evidence. Neither overlay interprets tennis events or adjudicates correctness.

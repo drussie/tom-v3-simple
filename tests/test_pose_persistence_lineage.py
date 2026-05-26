@@ -29,6 +29,7 @@ from tom_v3_storage.media_indexer import index_media_file
 from tom_v3_video.probe import VideoProbeResult
 from tom_v3_video.time_index import frame_to_timestamp_ms
 
+from apps.api.routers.viewer import build_viewer_run_payload
 from apps.worker.services.detection_adapter import run_detection_adapter
 from apps.worker.services.pose_adapter import PoseAdapterRunError, run_pose_adapter
 from apps.worker.services.tracklet_builder import build_tracklets_from_detection_run
@@ -328,6 +329,41 @@ def test_pose_processing_service_links_candidate_tracklet_and_track_point_contex
         "subject_context_candidate",
         "pose_from_track_point_candidate",
     }
+
+
+def test_viewer_payload_includes_pose_detail_for_overlay(
+    db_session: Session,
+    sample_video: str,
+    tmp_path: Path,
+) -> None:
+    media = indexed_media(db_session, sample_video, tmp_path)
+    result = run_pose_adapter(
+        session=db_session,
+        media_id=media.id,
+        adapter_name="fixture",
+        frame_sample_rate=30,
+        max_frames=1,
+    )
+
+    payload = build_viewer_run_payload(db_session, result["pose_run_id"])
+
+    assert payload is not None
+    pose_observations = [
+        observation
+        for observation in payload["observations"]
+        if observation["observation_type"] == "player_pose_observation"
+    ]
+    assert len(pose_observations) == 1
+    pose_observation = pose_observations[0]
+    assert pose_observation["observation_family"] == "pose"
+    assert pose_observation["pose"] is not None
+    assert pose_observation["pose"]["skeleton_format"] == "coco17"
+    assert pose_observation["pose"]["skeleton_version"] == "v1"
+    assert len(pose_observation["pose"]["keypoints_jsonb"]) == 17
+    assert pose_observation["pose"]["keypoints_present_count"] == 15
+    assert pose_observation["pose"]["keypoints_missing_count"] == 2
+    assert pose_observation["pose"]["frame_time_owner"] == "media_indexing"
+    assert pose_observation["pose"]["subject_ref_type"] == "none"
 
 
 def test_run_pose_adapter_cli_persists_fixture_pose(tmp_path: Path) -> None:

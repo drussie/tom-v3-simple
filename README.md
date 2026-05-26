@@ -14,7 +14,7 @@ The core invariant:
 
 ## Current Status
 
-Blueprints 1, 2, and 3 are complete. Blueprint 4 is in progress with pose evidence schema, normalization, persistence, and lineage foundations. TOM v3 Simple can build, inspect, query, review, and export candidate temporal evidence on top of persisted ball/player detections, has an optional YOLO / Ultralytics runtime path for ball/player observation adapters, and now has first-class pose observation persistence and normalization contracts:
+Blueprints 1, 2, and 3 are complete. Blueprint 4 is in progress with pose evidence schema, normalization, persistence, lineage, and overlay viewer foundations. TOM v3 Simple can build, inspect, query, review, and export candidate temporal evidence on top of persisted ball/player detections, has an optional YOLO / Ultralytics runtime path for ball/player observation adapters, and now has first-class pose observation persistence and visualization contracts:
 
 - repo memory and architecture contracts
 - FastAPI backend/API foundation
@@ -68,17 +68,19 @@ Blueprints 1, 2, and 3 are complete. Blueprint 4 is in progress with pose eviden
 - synthetic/fake pose observation insertion for schema and persistence validation
 - worker fixture pose persistence with processing run/step provenance
 - source `player_detection` candidate lineage to pose observations
+- pose overlay viewer for persisted COCO17 keypoint evidence
+- selected pose metadata, source association candidate context, and keypoint confidence table
 - model asset and weight ignore policy
 
-Portable TOM v1 detector assets/source and YOLO26 model weights are not present in this repo state. Real YOLO inference now has a guarded frame-level provider path and optional local smoke workflow, but local runtime validation still requires optional YOLO packages and explicitly registered local weights. Pose currently has schema/persistence and normalization foundations only; no real pose runtime, pose overlay viewer, movement interpretation, court homography, or real bounce detection is implemented yet.
+Portable TOM v1 detector assets/source and YOLO26 model weights are not present in this repo state. Real YOLO inference now has a guarded frame-level provider path and optional local smoke workflow, but local runtime validation still requires optional YOLO packages and explicitly registered local weights. Pose currently has schema, normalization, persistence, lineage, and overlay viewer foundations only; no real pose runtime, movement interpretation, court homography, or real bounce detection is implemented yet.
 
 Blueprint 2 did not add pose, homography, bounce detection, hit detection, rally/point reconstruction, scoring, identity proof, or adjudication.
 
 Blueprint 3 did not add pose, homography, bounce detection, hit detection, rally/point reconstruction, scoring, identity proof, YOLO tracking mode, or adjudication.
 
-Blueprint 4A/4B/4C did not add real pose inference, pose overlay rendering, movement interpretation, serve/hit/split-step/biomechanics conclusions, homography, rally/point reconstruction, scoring, or adjudication.
+Blueprint 4A/4B/4C/4D did not add real pose inference, movement interpretation, serve/hit/split-step/biomechanics conclusions, homography, rally/point reconstruction, scoring, or adjudication.
 
-Recommended next milestone: Milestone 4D - Pose Overlay Viewer.
+Recommended next milestone: Milestone 4E - Pose Query / Review / Export Integration.
 
 ## Repo Structure
 
@@ -376,11 +378,11 @@ Validate the pose schema foundation without real pose runtime:
 pytest tests/test_pose_schema.py tests/test_pose_observation_persistence.py tests/test_pose_normalization.py -q
 ```
 
-These focused tests create fixture pose model/runtime records, write a synthetic `player_pose_observation` spine row plus typed `pose_observation` row, normalize fake pose frame results into `PoseObservationCreate`-compatible payloads, and verify COCO17 keypoint summaries and media-owned frame/time. They do not run pose inference or render a pose overlay.
+These focused tests create fixture pose model/runtime records, write a synthetic `player_pose_observation` spine row plus typed `pose_observation` row, normalize fake pose frame results into `PoseObservationCreate`-compatible payloads, and verify COCO17 keypoint summaries and media-owned frame/time. They do not run pose inference.
 
 ## 27. Validate Pose Persistence and Lineage
 
-Milestone 4C adds worker pose persistence for normalized fixture output. It still does not run real pose inference or render pose overlays.
+Milestone 4C adds worker pose persistence for normalized fixture output. It still does not run real pose inference.
 
 Run focused persistence checks:
 
@@ -418,6 +420,27 @@ Expected behavior:
 - Source-detection-linked poses copy source detection frame/time values.
 
 This does not create movement conclusions, homography, bounce/hit/rally/point/scoring evidence, or adjudication.
+
+## 28. Inspect Pose Overlay Evidence
+
+Milestone 4D adds pose overlay rendering in the existing Evidence Viewer.
+
+Open a pose run:
+
+```text
+http://127.0.0.1:3000/runs/<POSE_RUN_ID>
+```
+
+Expected behavior:
+
+- pose observations appear in the observation list and timeline
+- the Pose Overlay panel renders present COCO17 keypoints
+- skeleton edges render only when both endpoint keypoints are present
+- missing keypoints stay visible as missing evidence in the keypoint table
+- selected pose metadata shows skeleton format, confidence summaries, bbox, and frame time owner
+- source association candidate context appears when a pose was linked to source player detection evidence
+
+The overlay visualizes persisted pose evidence. It does not infer subject identity, movement, serve mechanics, hit events, rally state, point state, scoring, or adjudicated outcomes.
 
 ## Validation
 
@@ -483,6 +506,7 @@ Useful runbooks:
 - [Pose Runtime Config v0](docs/pose/pose_runtime_config_v0.md)
 - [Pose Adapter Normalization v0](docs/pose/pose_adapter_normalization_v0.md)
 - [Pose Persistence and Lineage v0](docs/pose/pose_persistence_lineage_v0.md)
+- [Pose Overlay Viewer v0](docs/web/pose_overlay_viewer_v0.md)
 - [Detection Overlay Viewer v0](docs/web/detection_overlay_viewer_v0.md)
 - [Frame Artifact Overlay v0](docs/web/frame_artifact_overlay_v0.md)
 - [Tracklet Foundation v0](docs/tracklets/tracklet_foundation_v0.md)

@@ -884,3 +884,38 @@ Milestone 4C created:
 - `pose_from_subject_detection_candidate` lineage from source `player_detection` observations to pose observations.
 - Reserved relationship enum values for candidate tracklet and track point pose context.
 - Tests for unassociated fixture pose persistence, source detection lineage, invalid explicit source ids, and CLI smoke behavior.
+
+## Milestone 4D - Pose Overlay Viewer
+
+Status: complete
+
+### Goal
+
+Make persisted pose observations visually inspectable in the existing Evidence Viewer without adding real pose inference or movement interpretation.
+
+### Non-goals
+
+- No real pose runtime or adapter inference.
+- No pose review UI.
+- No pose export integration.
+- No movement interpretation.
+- No serve, split-step, or biomechanics conclusions.
+- No court homography.
+- No bounce detection.
+- No hit detection.
+- No rally segmentation.
+- No point reconstruction.
+- No scoring.
+- No adjudication.
+
+### Notes
+
+Milestone 4D created:
+
+- Viewer payload serialization for typed pose detail in `GET /viewer/runs/{run_id}`.
+- Frontend pose types and overlay extraction helpers.
+- COCO17 skeleton edge helpers for the web viewer.
+- Pose overlay panel and SVG canvas for persisted keypoint evidence.
+- Selected pose metadata, source association candidate context, and keypoint confidence table.
+- A pose observations timeline row.
+- Tests proving viewer payloads include pose detail for overlay rendering.

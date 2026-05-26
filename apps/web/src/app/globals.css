@@ -430,6 +430,196 @@ pre {
   color: var(--muted);
 }
 
+.pose-overlay-body,
+.pose-detail-stack {
+  display: grid;
+  gap: 12px;
+}
+
+.pose-toggle-grid {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.pose-toggle-grid label {
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--muted);
+  display: flex;
+  font-size: 12px;
+  font-weight: 700;
+  gap: 8px;
+  min-height: 34px;
+  padding: 0 10px;
+}
+
+.pose-toggle-grid input {
+  accent-color: var(--blue);
+}
+
+.pose-canvas {
+  background:
+    linear-gradient(90deg, rgba(72, 115, 87, 0.12) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(72, 115, 87, 0.12) 1px, transparent 1px),
+    #10191b;
+}
+
+.pose-svg-layer {
+  height: 100%;
+  inset: 0;
+  position: absolute;
+  width: 100%;
+  z-index: 3;
+}
+
+.pose-group {
+  cursor: pointer;
+  outline: none;
+}
+
+.pose-edge {
+  stroke: var(--mint);
+  stroke-linecap: round;
+  stroke-width: 3;
+}
+
+.pose-keypoint {
+  fill: #ffffff;
+  stroke: var(--mint);
+  stroke-width: 3;
+}
+
+.pose-keypoint.low {
+  fill: var(--amber-soft);
+  stroke: var(--amber);
+}
+
+.pose-keypoint.unknown {
+  fill: var(--surface-strong);
+  stroke: var(--muted);
+}
+
+.pose-bbox {
+  fill: transparent;
+  stroke: var(--violet);
+  stroke-dasharray: 8 6;
+  stroke-width: 3;
+}
+
+.pose-group.selected .pose-bbox {
+  stroke: var(--amber);
+}
+
+.pose-group.selected .pose-keypoint {
+  stroke: var(--amber);
+}
+
+.pose-keypoint-label {
+  fill: #ffffff;
+  font-size: 12px;
+  font-weight: 800;
+  paint-order: stroke;
+  pointer-events: none;
+  stroke: #10191b;
+  stroke-width: 3px;
+}
+
+.pose-frame-list {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.pose-frame-row {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--ink);
+  display: grid;
+  gap: 3px;
+  min-height: 64px;
+  padding: 8px 10px;
+  text-align: left;
+}
+
+.pose-frame-row.selected {
+  border-color: var(--amber);
+  box-shadow: inset 3px 0 0 var(--amber);
+}
+
+.pose-frame-row strong,
+.pose-frame-row span,
+.pose-detail-grid strong,
+.pose-detail-grid span,
+.source-context-card p,
+.source-context-card h3,
+.keypoint-table-wrap h3 {
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.pose-frame-row span,
+.pose-detail-grid span,
+.source-context-card p {
+  color: var(--muted);
+}
+
+.pose-detail-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+}
+
+.pose-detail-grid > div {
+  border-left: 3px solid var(--mint);
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  padding-left: 9px;
+}
+
+.source-context-card,
+.keypoint-table-wrap {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  display: grid;
+  gap: 8px;
+  overflow: hidden;
+  padding: 12px;
+}
+
+.source-context-card h3,
+.keypoint-table-wrap h3 {
+  margin: 0;
+}
+
+.keypoint-table {
+  border-collapse: collapse;
+  font-size: 12px;
+  min-width: 520px;
+  width: 100%;
+}
+
+.keypoint-table-wrap {
+  overflow-x: auto;
+}
+
+.keypoint-table th,
+.keypoint-table td {
+  border-bottom: 1px solid var(--line);
+  padding: 7px 8px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.keypoint-table th {
+  color: var(--muted);
+  font-weight: 800;
+}
+
 .tracklet-evidence-body {
   display: grid;
   gap: 12px;
@@ -745,6 +935,11 @@ pre {
 .timeline-segment.state-player_detection {
   background: var(--blue-soft);
   color: var(--blue);
+}
+
+.timeline-segment.state-pose_observation {
+  background: var(--mint);
+  color: #165038;
 }
 
 .timeline-segment.state-candidate {

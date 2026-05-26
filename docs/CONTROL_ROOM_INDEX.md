@@ -47,6 +47,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 4A - Pose Runtime / Schema Foundation](milestones/milestone_4a_pose_runtime_schema_foundation.md)
 - [Milestone 4B - Pose Adapter Normalization Foundation](milestones/milestone_4b_pose_adapter_normalization_foundation.md)
 - [Milestone 4C - Pose Observation Persistence and Lineage](milestones/milestone_4c_pose_observation_persistence_lineage.md)
+- [Milestone 4D - Pose Overlay Viewer](milestones/milestone_4d_pose_overlay_viewer.md)
 
 ## Handoffs
 
@@ -74,6 +75,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 4A Handoff](handoffs/milestone_4a_pose_runtime_schema_foundation_handoff.md)
 - [Milestone 4B Handoff](handoffs/milestone_4b_pose_adapter_normalization_foundation_handoff.md)
 - [Milestone 4C Handoff](handoffs/milestone_4c_pose_observation_persistence_lineage_handoff.md)
+- [Milestone 4D Handoff](handoffs/milestone_4d_pose_overlay_viewer_handoff.md)
 
 ## Agent Reports
 
@@ -101,6 +103,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 4A Agent Report](agent_reports/milestone_4a_pose_runtime_schema_foundation_report.md)
 - [Milestone 4B Agent Report](agent_reports/milestone_4b_pose_adapter_normalization_foundation_report.md)
 - [Milestone 4C Agent Report](agent_reports/milestone_4c_pose_observation_persistence_lineage_report.md)
+- [Milestone 4D Agent Report](agent_reports/milestone_4d_pose_overlay_viewer_report.md)
 
 ## Blueprints
 
@@ -144,6 +147,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Frame Artifact Overlay v0](web/frame_artifact_overlay_v0.md)
 - [Tracklet Evidence Viewer v0](web/tracklet_evidence_viewer_v0.md)
 - [Tracklet Review Viewer v0](web/tracklet_review_viewer_v0.md)
+- [Pose Overlay Viewer v0](web/pose_overlay_viewer_v0.md)
 
 ## Tracklets
 

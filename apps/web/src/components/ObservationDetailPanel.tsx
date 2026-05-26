@@ -19,7 +19,8 @@ export function ObservationDetailPanel({ observation }: ObservationDetailPanelPr
     );
   }
 
-  const typedDetail = observation.gameplay ?? observation.atomic ?? observation.derived;
+  const typedDetail =
+    observation.gameplay ?? observation.atomic ?? observation.derived ?? observation.pose;
 
   return (
     <section className="panel">

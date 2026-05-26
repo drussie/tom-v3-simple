@@ -11,6 +11,7 @@ import type {
   ViewerRun
 } from "./types";
 import { extractDetectionOverlayItems } from "./detections";
+import { extractPoseOverlayItems } from "./poses";
 
 export interface ViewerModel {
   range: TimelineRange;
@@ -31,6 +32,7 @@ export function buildViewerModel(viewerRun: ViewerRun): ViewerModel {
     buildGameplayRow(viewerRun.observations),
     ...buildTrackRows(viewerRun.tracklets),
     buildDetectionRow(viewerRun.observations),
+    buildPoseRow(viewerRun.observations),
     buildHomographyRow(viewerRun.observations)
   ].filter((row): row is TimelineRow => row !== null);
 
@@ -42,6 +44,7 @@ export function buildViewerModel(viewerRun: ViewerRun): ViewerModel {
     candidates.find((candidate) => candidate.type === "bounce_candidate")?.observationId ??
     candidates[0]?.observationId ??
     extractDetectionOverlayItems(viewerRun.observations).items[0]?.observationId ??
+    extractPoseOverlayItems(viewerRun.observations)[0]?.observationId ??
     viewerRun.observations[0]?.id ??
     null;
 
@@ -161,6 +164,23 @@ function buildDetectionRow(observations: Observation[]): TimelineRow | null {
   );
 
   return segments.length > 0 ? { id: "detections", label: "Detections", segments } : null;
+}
+
+function buildPoseRow(observations: Observation[]): TimelineRow | null {
+  const items = extractPoseOverlayItems(observations);
+  const segments = items.map(
+    (item): TimelineSegment => ({
+      id: item.id,
+      label: "pose observation",
+      state: "pose_observation",
+      frameStart: item.frameNumber,
+      frameEnd: item.frameNumber,
+      confidence: item.poseConfidence,
+      observationId: item.observationId
+    })
+  );
+
+  return segments.length > 0 ? { id: "poses", label: "Pose Observations", segments } : null;
 }
 
 function buildCandidates(observations: Observation[]): CandidateMarker[] {

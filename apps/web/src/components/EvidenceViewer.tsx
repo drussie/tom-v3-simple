@@ -8,10 +8,12 @@ import { LineagePanel } from "./LineagePanel";
 import { DetectionOverlayPanel } from "./DetectionOverlayPanel";
 import { ObservationDetailPanel } from "./ObservationDetailPanel";
 import { ObservationList } from "./ObservationList";
+import { PoseOverlayPanel } from "./PoseOverlayPanel";
 import { Timeline } from "./Timeline";
 import { TrackletEvidencePanel } from "./TrackletEvidencePanel";
 import { buildDetectionOverlayModel } from "../lib/detections";
 import { fetchTrackletEvidenceBundle } from "../lib/api";
+import { buildPoseOverlayModel } from "../lib/poses";
 import { resolveTrackletIdForObservation } from "../lib/trackletEvidence";
 import type { TrackletEvidenceBundle, ViewerRun } from "../lib/types";
 import { formatFrameRange } from "../lib/timeline";
@@ -94,8 +96,12 @@ export function EvidenceViewer({ viewerRun }: EvidenceViewerProps) {
         model.observations,
         viewerRun.artifacts,
         selectedObservationId
-      ),
+    ),
     [model.observations, selectedObservationId, viewerRun.artifacts, viewerRun.media]
+  );
+  const poseOverlay = useMemo(
+    () => buildPoseOverlayModel(viewerRun.media, model.observations, selectedObservationId),
+    [model.observations, selectedObservationId, viewerRun.media]
   );
 
   return (
@@ -124,6 +130,7 @@ export function EvidenceViewer({ viewerRun }: EvidenceViewerProps) {
             model={detectionOverlay}
             onSelectObservation={setSelectedObservationId}
           />
+          <PoseOverlayPanel model={poseOverlay} onSelectObservation={setSelectedObservationId} />
           <Timeline
             candidates={model.candidates}
             onSelectObservation={setSelectedObservationId}

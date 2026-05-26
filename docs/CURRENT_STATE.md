@@ -5,7 +5,7 @@
 - Project name: TOM v3 Simple
 - Repo: drussie/tom-v3-simple
 - Current phase: Blueprint 4 in progress
-- Current goal: Prepare the pose overlay viewer while preserving the TOM v3 observation-only runtime contract
+- Current goal: Prepare pose query, review, and export integration while preserving the TOM v3 observation-only runtime contract
 
 ## Mission
 
@@ -13,7 +13,7 @@ A lightweight tennis video observation platform that accepts model output as ope
 
 ## Implementation Status
 
-- Implementation status: persisted ball/player observations can be inspected visually, grouped into candidate tracklets, and complemented by first-class pose schema, normalization, persistence, and lineage foundations
+- Implementation status: persisted ball/player observations can be inspected visually, grouped into candidate tracklets, and complemented by first-class pose schema, normalization, persistence, lineage, and overlay viewer foundations
 - Model integration status: fixture gameplay and fixture detection adapters implemented for deterministic dev/test output
 - TOM v1 gameplay detector: known asset, portable source/assets not available in this repo/environment; integration stub documented
 - YOLO/YOLO26: optional runtime probe, model weights registration, YOLO-like output normalization, frame-level inference persistence bridge, and local real-YOLO smoke helper implemented; runtime/assets are not required in the base environment
@@ -28,11 +28,11 @@ A lightweight tennis video observation platform that accepts model output as ope
 - Tracklet review dataset export: implemented with JSON export artifacts, evidence artifact metadata, optional query result memory, API endpoint, and worker CLI
 - Blueprint 2 status: complete; temporal evidence can be built, inspected, queried, reviewed, and exported as candidate evidence
 - Blueprint 3 status: complete; optional YOLO runtime environment boundary, dependency probe, device resolver, weights validation, class mapping, model registry helper, YOLO output normalization, frame-level persistence bridge, local real-YOLO smoke workflow, completion review, and invariant audit are implemented
-- Blueprint 4 status: in progress; pose observation schema, COCO17 skeleton registry, keypoint validation, typed pose persistence, synthetic pose insertion, pose normalization, worker pose persistence, source detection lineage, and pose runtime/config metadata contracts are implemented
+- Blueprint 4 status: in progress; pose observation schema, COCO17 skeleton registry, keypoint validation, typed pose persistence, synthetic pose insertion, pose normalization, worker pose persistence, source detection lineage, pose overlay viewer, and pose runtime/config metadata contracts are implemented
 - Observation writer: implemented with typed extension rows, lineage, artifacts, and idempotency
 - Worker synthetic seeder: implemented
-- Visual evidence viewer: implemented in `apps/web` with detection bbox overlay and frame artifact image support
-- Pose observation foundation: implemented with a typed `pose_observation` table, COCO17 skeleton registry, keypoint summary statistics, fake/serialized pose output normalization, crop projection, worker fixture pose persistence, and source detection candidate lineage; no real pose inference or pose overlay viewer exists yet
+- Visual evidence viewer: implemented in `apps/web` with detection bbox overlay, pose keypoint/skeleton overlay, and frame artifact image support
+- Pose observation foundation: implemented with a typed `pose_observation` table, COCO17 skeleton registry, keypoint summary statistics, fake/serialized pose output normalization, crop projection, worker fixture pose persistence, source detection candidate lineage, and a pose overlay viewer; no real pose inference exists yet
 - Synthetic data: baseline scenario creates viewer-ready observations, tracklets, gaps, candidates, lineage, and artifacts
 - Local setup: documented with `.env.example`, Makefile, and dev runbooks
 - Branch/default branch: `main` is restored as the GitHub default branch
@@ -187,10 +187,16 @@ Status: complete
 
 Milestone 4C adds pose observation persistence and lineage. The worker `run-pose-adapter` command creates a pose processing run and step, normalizes fixture pose output, persists first-class `pose` observation spine rows plus typed `pose_observation` rows through `ObservationWriter`, and writes `pose_from_subject_detection_candidate` lineage when linked to source `player_detection` observations. It does not add real pose inference, a pose overlay viewer, movement interpretation, homography, bounce, hit, rally, point, scoring, or adjudication.
 
+## Milestone 4D Result
+
+Status: complete
+
+Milestone 4D adds pose overlay support to the existing Evidence Viewer. Viewer run payloads now include typed pose detail, the frontend renders persisted COCO17 keypoints and skeleton edges from image-pixel coordinates, missing keypoints remain visible as missing evidence in the keypoint table, selected pose metadata is inspectable, and source association candidate context is displayed when present. It does not add real pose inference, movement interpretation, homography, bounce, hit, rally, point, scoring, or adjudication.
+
 ## Naming Transition
 
 The implementation branch/file names may reference "1F" because the milestone was originally planned as a Blueprint 1 extension. After Blueprint 1 was declared complete, the same work was reclassified as Blueprint 2A because temporal grouping begins a new conceptual layer.
 
 ## Next Milestone
 
-Recommended next milestone: Milestone 4D - Pose Overlay Viewer.
+Recommended next milestone: Milestone 4E - Pose Query / Review / Export Integration.

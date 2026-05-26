@@ -129,6 +129,20 @@ python -m apps.worker.cli run-pose-adapter --media-id <media_id> --adapter fixtu
 
 Source-detection-linked fixture mode copies frame/time from source `player_detection` observations and records lineage without proving identity.
 
+## Viewer Compatibility
+
+Milestone 4D exposes typed pose detail through `GET /viewer/runs/{run_id}`.
+
+The Evidence Viewer uses:
+
+- `keypoints_jsonb` for COCO17 keypoint markers
+- `skeleton_format` / `skeleton_version` for skeleton display
+- bbox fields for optional pose bbox display
+- keypoint summary fields for selected pose detail
+- subject association candidate fields for source context display
+
+The viewer renders only present keypoints with numeric coordinates. Missing keypoints remain visible in the keypoint table and are not drawn as present markers.
+
 ## Non-Goals
 
 Pose observations do not infer movement, tennis actions, biomechanics, rally state, point state, or scoring.

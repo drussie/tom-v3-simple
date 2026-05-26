@@ -141,11 +141,22 @@ association_method = full_frame_pose
 
 These poses may have no lineage. That is expected for unassociated full-frame evidence.
 
+## Viewer Use
+
+Milestone 4D makes persisted pose rows visible in the existing Evidence Viewer:
+
+- pose rows appear in the observation list and timeline
+- COCO17 keypoints and skeleton edges render from persisted image-pixel coordinates
+- selected pose detail shows keypoint summary and bbox context
+- source association candidate fields are displayed when present
+- existing lineage panels still show persisted `observation_lineage` rows
+
+The viewer displays candidate source context. It does not identify a player or interpret movement.
+
 ## Non-Goals
 
 - No real pose inference.
 - No pose model loading.
-- No pose overlay viewer.
 - No movement interpretation.
 - No serve, hit, split-step, or biomechanics conclusions.
 - No homography.
