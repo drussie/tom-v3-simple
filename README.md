@@ -14,7 +14,7 @@ The core invariant:
 
 ## Current Status
 
-Milestone 2B adds multi-run tracklet evidence inspection on top of persisted ball/player detections:
+Milestone 2C adds tracklet query and review on top of persisted ball/player detections and candidate tracklets:
 
 - repo memory and architecture contracts
 - FastAPI backend/API foundation
@@ -48,6 +48,9 @@ Milestone 2B adds multi-run tracklet evidence inspection on top of persisted bal
 - lineage from source detections to track points and from track points to tracklets
 - dynamic tracklet evidence bundle API
 - viewer panel for tracklet candidate, track point candidate, source detection, frame artifact, and lineage inspection
+- structured tracklet query API
+- annotation summaries for tracklet evidence bundles
+- viewer review controls for annotating tracklet candidates, track point candidates, and source detections
 
 Portable TOM v1 detector assets/source and YOLO26 runtime/assets are not present in this repo state. No sophisticated tracking, pose processing, court homography, or real bounce detection is implemented yet.
 
@@ -227,6 +230,16 @@ GET /tracklets/<TRACKLET_ID>/evidence-bundle
 
 When a tracklet builder run is open in the viewer, selecting a tracklet loads that bundle and shows source detection evidence from the detection run.
 
+Tracklet candidates can be queried with structured filters:
+
+```bash
+curl -X POST http://127.0.0.1:8000/tracklets/query \
+  -H "Content-Type: application/json" \
+  -d '{"track_family":"ball","min_track_points":2,"has_gaps":true}'
+```
+
+The viewer Tracklet Evidence panel can add review annotations to the selected tracklet candidate, track point candidate, or source detection observation. These annotations are persisted as `human_annotation` rows and do not mutate the underlying evidence.
+
 ## Validation
 
 Run the consolidated checks:
@@ -280,4 +293,7 @@ Useful runbooks:
 - [Tracklet Foundation v0](docs/tracklets/tracklet_foundation_v0.md)
 - [Tracklet Evidence Bundle v0](docs/tracklets/tracklet_evidence_bundle_v0.md)
 - [Tracklet Evidence Viewer v0](docs/web/tracklet_evidence_viewer_v0.md)
+- [Tracklet Query v0](docs/tracklets/tracklet_query_v0.md)
+- [Tracklet Review Annotations v0](docs/tracklets/tracklet_review_annotations_v0.md)
+- [Tracklet Review Viewer v0](docs/web/tracklet_review_viewer_v0.md)
 - [Repo Branch Hygiene](docs/dev/repo_branch_hygiene.md)

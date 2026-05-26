@@ -455,3 +455,40 @@ Milestone 2B created:
 - Web Tracklet Evidence panel in the existing run viewer.
 - Viewer drilldown from tracklet candidate to track point candidate to source detection.
 - Tests covering bundle service, endpoint shape, lineage reconstruction, and artifact availability.
+
+## Milestone 2C - Tracklet Query and Review
+
+Status: complete
+
+### Goal
+
+Make candidate tracklets searchable and reviewable with human annotations while preserving observation immutability.
+
+### Non-goals
+
+- No new tracking algorithm.
+- No pose detection.
+- No court homography.
+- No bounce detection.
+- No hit detection.
+- No rally segmentation.
+- No point reconstruction.
+- No scoring.
+- No real YOLO runtime integration.
+- No production review queue or auth.
+- No adjudication.
+- No truth/fact/promotion/refusal concepts.
+
+### Notes
+
+Milestone 2C created:
+
+- Structured tracklet query service.
+- API endpoint `POST /tracklets/query`.
+- Query filters for media, tracklet run, source detection run, family, subject, frame/timestamp ranges, confidence, track point count, gap count, and annotation labels.
+- Tracklet query summaries by family, subject, annotation label, and gap state.
+- Annotation summary helpers for review labels.
+- Evidence bundle annotation summaries for tracklet candidates, track point candidates, and source detections.
+- Viewer review controls in the Tracklet Evidence panel.
+- Same-origin web proxy for creating annotations from the viewer.
+- Tests covering query filters, endpoint shape, annotations, and evidence bundle refresh behavior.

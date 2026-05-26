@@ -4,8 +4,8 @@
 
 - Project name: TOM v3 Simple
 - Repo: drussie/tom-v3-simple
-- Current phase: Milestone 2B
-- Current goal: tracklet viewer / multi-run evidence bundle
+- Current phase: Milestone 2C
+- Current goal: tracklet query and review
 
 ## Mission
 
@@ -24,6 +24,7 @@ A lightweight tennis video observation platform that accepts model output as ope
 - Detection adapter: implemented with `BaseDetectionAdapter`, fixture adapter, YOLO unavailable stub, worker service, and worker CLI
 - Tracklet builder: implemented with deterministic candidate grouping, first-class track observations, track point observations, and lineage from persisted detections
 - Tracklet evidence bundle: implemented as a dynamic API/viewer path for cross-run tracklet evidence inspection
+- Tracklet query/review: implemented with structured query filters, annotation summaries, and viewer review controls
 - Observation writer: implemented with typed extension rows, lineage, artifacts, and idempotency
 - Worker synthetic seeder: implemented
 - Visual evidence viewer: implemented in `apps/web` with detection bbox overlay and frame artifact image support
@@ -109,6 +110,12 @@ Status: complete
 
 Milestone 2B adds a dynamic `GET /tracklets/{tracklet_id}/evidence-bundle` endpoint and viewer panel that connect a tracklet candidate to track point candidates, source detection observations, matched frame artifacts, lineage rows, and run/config/model metadata across the tracklet builder and source detection runs.
 
+## Milestone 2C Result
+
+Status: complete
+
+Milestone 2C adds structured `POST /tracklets/query`, review annotation summaries in evidence bundles, and viewer controls for adding review annotations to tracklet candidate observations, track point candidate observations, and source detection observations without mutating the underlying evidence.
+
 ## Next Milestone
 
-Recommended next handoff: Milestone 2C - Tracklet Query and Review, unless YOLO26 runtime/assets become available and real detector integration is prioritized.
+Recommended next handoff: Milestone 2D - Tracklet Evidence Export / Review Dataset Foundation, unless YOLO26 runtime/assets become available and real detector integration is prioritized.

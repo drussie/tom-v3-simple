@@ -2,7 +2,7 @@
 
 ## Current Progress Gauge
 
-Current: ~55-60% through Blueprint 2
+Current: ~75% through Blueprint 2
 
 ## Current
 
@@ -59,6 +59,10 @@ Current: ~55-60% through Blueprint 2
 - Observation lineage links source detections to track points and track points to tracklets.
 - Tracklet evidence bundle service exists.
 - Viewer can inspect source detection evidence from a tracklet builder run.
+- Tracklet query service exists.
+- Candidate tracklets are searchable by run, source run, family, subject, frame range, confidence, gaps, point count, and review annotations.
+- Tracklet evidence bundles include annotation summaries.
+- Viewer review controls can add annotations to tracklet, track point, and source detection observations.
 
 ## After Milestone 0A
 
@@ -289,3 +293,19 @@ Expected: ~55-60% through Blueprint 2
 Status: complete.
 
 The repo now has a dynamic tracklet evidence bundle endpoint and a lightweight viewer panel for tracklet candidate, track point candidate, source detection, frame artifact, and lineage inspection across runs.
+
+## After Milestone 2C
+
+Expected: ~75% through Blueprint 2
+
+- Tracklet candidates can be queried with structured review filters.
+- Query responses include tracklet summaries, counts, annotation summaries, and evidence bundle URLs.
+- Evidence bundles include tracklet, track point, and source detection annotation summaries.
+- Viewer review controls can create annotations on selected candidate evidence.
+- Query/review remains descriptive and observation-only.
+
+## Milestone 2C Status
+
+Status: complete.
+
+The repo now has structured tracklet candidate query, evidence-bundle annotation summaries, and a viewer review flow that writes human annotations without mutating source observations, candidate track points, candidate tracklets, lineage, or artifacts.

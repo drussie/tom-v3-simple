@@ -202,6 +202,14 @@ GET /tracklets/{tracklet_id}/evidence-bundle
 
 The evidence bundle keeps the viewer opened on the tracklet builder run while showing source detection observations and frame artifacts from the source detection run in a focused panel.
 
+Milestone 2C adds structured query and review on top of these candidate rows:
+
+```text
+POST /tracklets/query
+```
+
+The query endpoint can filter by run, source run, family, subject, frame range, confidence, point count, gap count, and review labels. Review annotations target observation ids and do not change tracklet, track point, source detection, lineage, or artifact rows.
+
 ## Non-Goals
 
 - No sophisticated multi-object tracking.

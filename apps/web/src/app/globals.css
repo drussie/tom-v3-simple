@@ -584,6 +584,64 @@ pre {
   padding: 12px;
 }
 
+.review-history,
+.review-annotation-group,
+.tracklet-review-form {
+  display: grid;
+  gap: 8px;
+}
+
+.review-history h3,
+.tracklet-review-form h3 {
+  font-size: 13px;
+  margin: 0;
+}
+
+.review-annotation-group {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 9px 10px;
+}
+
+.review-annotation-group > strong {
+  font-size: 12px;
+}
+
+.review-annotation-group p {
+  color: var(--muted);
+  font-size: 12px;
+  margin: 4px 0 0;
+}
+
+.tracklet-review-form {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.tracklet-review-form label {
+  color: var(--muted);
+  display: grid;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.tracklet-review-form select,
+.tracklet-review-form textarea {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--ink);
+  min-width: 0;
+  padding: 9px 10px;
+}
+
+.tracklet-review-form textarea {
+  min-height: 76px;
+  resize: vertical;
+}
+
 .timeline-panel {
   overflow: hidden;
 }

@@ -10,7 +10,8 @@ Status: in progress.
 
 - Milestone 2A made tracklet candidates and track point candidates first-class observations.
 - Milestone 2A added lineage from source detections to track points and from track points to tracklets.
-- Milestone 2B adds a dynamic multi-run evidence bundle so the viewer can inspect tracklet evidence alongside source detection evidence.
+- Milestone 2B added a dynamic multi-run evidence bundle so the viewer can inspect tracklet evidence alongside source detection evidence.
+- Milestone 2C adds structured tracklet query and human review annotations.
 
 ## Core Flow
 
@@ -35,4 +36,5 @@ It does not prove object identity, object path, bounce, hit, rally, point state,
 
 - 2A: Tracklet candidate observation spine and lineage.
 - 2B: Tracklet viewer / multi-run evidence bundle.
-- 2C: Tracklet query and review, unless real YOLO runtime work is prioritized.
+- 2C: Tracklet query and review.
+- 2D: Tracklet evidence export / review dataset foundation, unless real YOLO runtime work is prioritized.

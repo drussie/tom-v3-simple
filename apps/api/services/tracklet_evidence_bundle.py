@@ -25,6 +25,7 @@ from apps.api.routers.viewer import (
     _observation_payload,
     _run_payload,
 )
+from apps.api.services.annotation_review import summarize_annotations
 
 FRAME_ARTIFACT_TYPES = {"frame_image", "detection_frame_image"}
 
@@ -71,6 +72,7 @@ def build_tracklet_evidence_bundle(
         source_detections=source_detections,
     )
     annotations = _annotations(session, observation_ids)
+    annotations_by_observation = _annotations_by_observation(annotations)
 
     source_detection_payloads = [
         {
@@ -79,11 +81,16 @@ def build_tracklet_evidence_bundle(
                 _artifact_payload(artifact)
                 for artifact in artifacts_by_source_detection.get(observation.id, [])
             ],
+            "annotations": [
+                _annotation_payload(annotation) for annotation in observation_annotations
+            ],
+            "annotation_summary": summarize_annotations(observation_annotations),
         }
         for observation in sorted(
             source_detections.values(),
             key=lambda row: (row.frame_start or 0, row.observation_type, row.id),
         )
+        for observation_annotations in [annotations_by_observation.get(observation.id, [])]
     ]
 
     return {
@@ -93,6 +100,13 @@ def build_tracklet_evidence_bundle(
                 _observation_payload(tracklet_observation)
                 if tracklet_observation is not None
                 else None
+            ),
+            "annotations": [
+                _annotation_payload(annotation)
+                for annotation in annotations_by_observation.get(tracklet.observation_id or "", [])
+            ],
+            "annotation_summary": summarize_annotations(
+                annotations_by_observation.get(tracklet.observation_id or "", [])
             ),
         },
         "media": _media_payload(media) if media is not None else None,
@@ -133,6 +147,7 @@ def build_tracklet_evidence_bundle(
                     str(point.payload_jsonb.get("source_detection_observation_id", "")),
                     [],
                 ),
+                annotations=annotations_by_observation.get(point.observation_id or "", []),
             )
             for point in track_points
         ],
@@ -144,6 +159,26 @@ def build_tracklet_evidence_bundle(
         ],
         "lineage": [_lineage_payload(row) for row in lineage],
         "annotations": [_annotation_payload(annotation) for annotation in annotations],
+        "annotation_summary": {
+            "tracklet": summarize_annotations(
+                annotations_by_observation.get(tracklet.observation_id or "", [])
+            ),
+            "track_points": summarize_annotations(
+                [
+                    annotation
+                    for point in track_points
+                    for annotation in annotations_by_observation.get(point.observation_id or "", [])
+                ]
+            ),
+            "source_detections": summarize_annotations(
+                [
+                    annotation
+                    for source_id in source_detections
+                    for annotation in annotations_by_observation.get(source_id, [])
+                ]
+            ),
+            "all": summarize_annotations(annotations),
+        },
         "summary": _summary_payload(
             tracklet=tracklet,
             tracklet_observation=tracklet_observation,
@@ -322,6 +357,16 @@ def _annotations(session: Session, observation_ids: list[str]) -> list[HumanAnno
     )
 
 
+def _annotations_by_observation(
+    annotations: list[HumanAnnotation],
+) -> dict[str, list[HumanAnnotation]]:
+    grouped: dict[str, list[HumanAnnotation]] = {}
+    for annotation in annotations:
+        if annotation.observation_id is not None:
+            grouped.setdefault(annotation.observation_id, []).append(annotation)
+    return grouped
+
+
 def _runtime_config(
     session: Session,
     run: ProcessingRun | None,
@@ -411,6 +456,7 @@ def _track_point_bundle_payload(
     tracked_from: ObservationLineage | None,
     grouped_from: ObservationLineage | None,
     frame_artifacts: list[EvidenceArtifact],
+    annotations: list[HumanAnnotation],
 ) -> dict[str, Any]:
     return {
         "typed": _track_point_payload(point),
@@ -443,6 +489,8 @@ def _track_point_bundle_payload(
             else None
         ),
         "frame_artifacts": [_artifact_payload(artifact) for artifact in frame_artifacts],
+        "annotations": [_annotation_payload(annotation) for annotation in annotations],
+        "annotation_summary": summarize_annotations(annotations),
     }
 
 

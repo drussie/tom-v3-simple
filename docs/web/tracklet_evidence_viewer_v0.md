@@ -30,6 +30,8 @@ The panel shows:
 - matched frame artifact image when available
 - bbox metadata when no frame artifact is available
 - lineage row ids for `tracked_from` and `grouped_from`
+- review annotation summaries
+- review controls for selected tracklet, track point, or source detection observations
 
 ## Multi-Run Scope
 
@@ -55,5 +57,5 @@ Avoid language that implies a confirmed trajectory, identity, event, rally, poin
 ## Known Limitations
 
 - The source detection overlay and tracklet coverage are not yet fused into one multi-run timeline.
-- Annotation display is read-only in this panel.
+- Review annotations use a local/dev reviewer value until auth exists.
 - Frame images appear only when frame artifacts have already been extracted.

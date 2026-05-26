@@ -33,6 +33,7 @@ export function EvidenceViewer({ viewerRun }: EvidenceViewerProps) {
   const [trackletBundle, setTrackletBundle] = useState<TrackletEvidenceBundle | null>(null);
   const [trackletBundleError, setTrackletBundleError] = useState<string | null>(null);
   const [isTrackletBundleLoading, setIsTrackletBundleLoading] = useState(false);
+  const [trackletBundleRefreshIndex, setTrackletBundleRefreshIndex] = useState(0);
 
   useEffect(() => {
     setSelectedObservationId(model.defaultObservationId);
@@ -69,7 +70,7 @@ export function EvidenceViewer({ viewerRun }: EvidenceViewerProps) {
     return () => {
       cancelled = true;
     };
-  }, [selectedTrackletId]);
+  }, [selectedTrackletId, trackletBundleRefreshIndex]);
 
   const selectedObservation =
     selectedObservationId !== null ? model.observationsById.get(selectedObservationId) ?? null : null;
@@ -134,6 +135,9 @@ export function EvidenceViewer({ viewerRun }: EvidenceViewerProps) {
             bundle={trackletBundle}
             error={trackletBundleError}
             isLoading={isTrackletBundleLoading}
+            onAnnotationCreated={() => {
+              setTrackletBundleRefreshIndex((value) => value + 1);
+            }}
             onSelectObservation={setSelectedObservationId}
             onSelectTracklet={(tracklet) => {
               setSelectedObservationId(tracklet.observation_id);

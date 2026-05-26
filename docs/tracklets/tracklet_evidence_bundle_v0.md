@@ -36,6 +36,7 @@ The response includes:
 - `tracked_from` lineage rows
 - `grouped_from` lineage rows
 - available annotations
+- annotation summaries for the tracklet, track points, source detections, and full bundle
 - candidate-only summary
 
 ## Lineage Path
@@ -61,6 +62,16 @@ For each source detection, the bundle looks for:
 3. no artifact, in which case bbox/coordinate metadata remains available
 
 Missing frame artifacts do not fail the bundle.
+
+## Review Annotations
+
+Milestone 2C adds annotation summaries to the bundle. Review annotations may target:
+
+- the tracklet candidate observation
+- track point candidate observations
+- source detection observations
+
+The bundle returns both the flat annotation list and per-target summaries so the viewer can show review state without mutating any evidence rows.
 
 ## Non-Goals
 

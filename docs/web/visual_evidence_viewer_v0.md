@@ -95,7 +95,11 @@ Selecting a segment, candidate marker, or observation row updates:
 - artifact metadata
 - annotation display
 
-Annotation creation is not wired in v0. The panel is present so the viewer layout reserves the workflow without mutating observations.
+The general side annotation panel remains simple. Milestone 2C wires review annotation creation in the Tracklet Evidence panel for selected tracklet candidate, track point candidate, and source detection observations.
+
+## Tracklet Review
+
+When a tracklet builder run is open, selecting a tracklet loads `GET /tracklets/{tracklet_id}/evidence-bundle`. The Tracklet Evidence panel can show annotation summaries and create review annotations through the existing `human_annotation` API. The viewer remains a single-run page while the focused panel displays source detection evidence from the source run.
 
 ## Local Development
 
@@ -137,8 +141,8 @@ http://127.0.0.1:3000/runs/<run_id>
 
 - No real video file is required or played.
 - Placeholder artifact URIs are displayed as metadata.
-- The annotation panel is read-only in v0.
+- The general annotation panel is read-only; tracklet review annotations are created in the focused Tracklet Evidence panel.
 - Detection overlays use a coordinate canvas when no frame image artifact is available.
 - Local artifact content serving is development-only.
-- The viewer is still a single-run view; it does not yet combine a detection run and tracklet-builder run into one evidence bundle.
+- The viewer is still a single-run view; cross-run evidence appears only in the focused Tracklet Evidence panel.
 - Production deployment, auth, and streaming are out of scope.

@@ -169,8 +169,26 @@ The endpoint is a read model over stored evidence. It does not create observatio
 
 ## Tracklet Evidence
 
+- `POST /tracklets/query`
 - `GET /tracklets/{tracklet_id}/evidence-bundle`
 
-This endpoint composes a dynamic multi-run evidence bundle for one tracklet candidate. It includes the tracklet candidate observation, track point candidate observations, source detection observations, frame artifacts when available, lineage rows, run/config/model summaries, and annotations.
+`POST /tracklets/query` returns structured candidate tracklet search results. Filters include media id, tracklet run id, source detection run id, track family, subject ref, frame/timestamp ranges, confidence, track point count, gap count, and review annotation labels.
+
+Example:
+
+```json
+{
+  "source_detection_run_id": "...",
+  "track_family": "ball",
+  "min_track_points": 2,
+  "has_gaps": true,
+  "confidence_gte": 0.5,
+  "limit": 50
+}
+```
+
+`GET /tracklets/{tracklet_id}/evidence-bundle` composes a dynamic multi-run evidence bundle for one tracklet candidate. It includes the tracklet candidate observation, track point candidate observations, source detection observations, frame artifacts when available, lineage rows, run/config/model summaries, and annotations.
 
 The endpoint is read-only and does not persist a saved bundle in v0.
+
+Tracklet review annotations use the existing `POST /annotations` endpoint. They target tracklet candidate, track point candidate, or source detection observation ids and are returned in evidence bundle annotation summaries.

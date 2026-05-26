@@ -157,6 +157,12 @@ export interface HumanAnnotation {
   created_at: string | null;
 }
 
+export interface AnnotationSummary {
+  count: number;
+  labels: Record<string, number>;
+  latest_created_at: string | null;
+}
+
 export interface ViewerRun {
   run: ProcessingRun;
   media: MediaAsset | null;
@@ -264,6 +270,8 @@ export interface ModelRegistrySummary {
 export interface TrackletEvidenceSourceDetection {
   observation: Observation;
   frame_artifacts: EvidenceArtifact[];
+  annotations: HumanAnnotation[];
+  annotation_summary: AnnotationSummary;
 }
 
 export interface TrackletEvidencePoint {
@@ -279,12 +287,16 @@ export interface TrackletEvidencePoint {
   lineage_to_source: LineageRow | null;
   lineage_to_tracklet: LineageRow | null;
   frame_artifacts: EvidenceArtifact[];
+  annotations: HumanAnnotation[];
+  annotation_summary: AnnotationSummary;
 }
 
 export interface TrackletEvidenceBundle {
   tracklet: {
     typed: Omit<Tracklet, "points">;
     observation: Observation | null;
+    annotations: HumanAnnotation[];
+    annotation_summary: AnnotationSummary;
   };
   media: MediaAsset | null;
   runs: {
@@ -304,6 +316,12 @@ export interface TrackletEvidenceBundle {
   frame_artifacts: EvidenceArtifact[];
   lineage: LineageRow[];
   annotations: HumanAnnotation[];
+  annotation_summary: {
+    tracklet: AnnotationSummary;
+    track_points: AnnotationSummary;
+    source_detections: AnnotationSummary;
+    all: AnnotationSummary;
+  };
   summary: {
     track_status: string | null;
     identity_status: string | null;

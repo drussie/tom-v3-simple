@@ -1,4 +1,4 @@
-import type { TrackletEvidenceBundle, ViewerRun } from "./types";
+import type { HumanAnnotation, JsonRecord, TrackletEvidenceBundle, ViewerRun } from "./types";
 
 const defaultApiBaseUrl = "http://127.0.0.1:8000";
 
@@ -30,4 +30,33 @@ export async function fetchTrackletEvidenceBundle(
   }
 
   return (await response.json()) as TrackletEvidenceBundle;
+}
+
+export interface CreateAnnotationInput {
+  media_id?: string | null;
+  observation_id?: string | null;
+  evidence_artifact_id?: string | null;
+  frame_start?: number | null;
+  frame_end?: number | null;
+  timestamp_start_ms?: number | null;
+  timestamp_end_ms?: number | null;
+  annotation_type: string;
+  payload_jsonb?: JsonRecord;
+  created_by?: string | null;
+}
+
+export async function createAnnotation(
+  input: CreateAnnotationInput
+): Promise<HumanAnnotation> {
+  const response = await fetch("/api/annotations", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input)
+  });
+
+  if (!response.ok) {
+    throw new Error(`Unable to create annotation: ${response.status}`);
+  }
+
+  return (await response.json()) as HumanAnnotation;
 }

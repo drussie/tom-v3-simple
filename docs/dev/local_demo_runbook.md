@@ -329,3 +329,54 @@ Expected behavior:
 - missing frame artifacts fall back to bbox/source metadata
 
 The evidence bundle is read-only and descriptive. It does not establish a confirmed track, identity, bounce, hit, rally, or point state.
+
+## 16. Query And Review Tracklet Candidates
+
+Milestone 2C adds structured tracklet candidate query:
+
+```bash
+curl -X POST http://127.0.0.1:8000/tracklets/query \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "source_detection_run_id": "<DETECTION_RUN_ID>",
+    "track_family": "ball",
+    "min_track_points": 2,
+    "has_gaps": true,
+    "limit": 50
+  }'
+```
+
+The response includes candidate summaries, annotation summaries, and evidence bundle URLs.
+
+To add a review annotation through the API:
+
+```bash
+curl -X POST http://127.0.0.1:8000/annotations \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "observation_id": "<TRACKLET_OR_POINT_OR_SOURCE_OBSERVATION_ID>",
+    "annotation_type": "bad_tracklet",
+    "payload_jsonb": {
+      "annotation_label": "bad_tracklet",
+      "notes": "Review note from local demo.",
+      "review_context": "tracklet_evidence_bundle",
+      "review_status": "reviewed"
+    },
+    "created_by": "local-reviewer"
+  }'
+```
+
+In the viewer, open the tracklet builder run:
+
+```text
+http://127.0.0.1:3000/runs/<TRACKLET_RUN_ID>
+```
+
+Expected behavior:
+
+- selecting a tracklet loads the Tracklet Evidence panel
+- annotation summaries are visible
+- the Tracklet Review form can target the selected tracklet candidate, track point candidate, or source detection
+- saving a review annotation refreshes the evidence bundle
+
+Review annotations are additional evidence. They do not mutate candidate observations or source detections.

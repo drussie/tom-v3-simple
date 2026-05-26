@@ -35,6 +35,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 1E - Detection Artifact / Frame Extraction Foundation](milestones/milestone_1e_detection_artifact_frame_extraction_foundation.md)
 - [Milestone 1F / 2A - Tracklet Foundation From Persisted Detections](milestones/milestone_1f_tracklet_foundation_from_persisted_detections.md)
 - [Milestone 2B - Tracklet Viewer / Multi-Run Evidence Bundle](milestones/milestone_2b_tracklet_viewer_multirun_evidence_bundle.md)
+- [Milestone 2C - Tracklet Query and Review](milestones/milestone_2c_tracklet_query_and_review.md)
 
 ## Handoffs
 
@@ -50,6 +51,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 1E Handoff](handoffs/milestone_1e_detection_artifact_frame_extraction_foundation_handoff.md)
 - [Milestone 1F Handoff](handoffs/milestone_1f_tracklet_foundation_from_persisted_detections_handoff.md)
 - [Milestone 2B Handoff](handoffs/milestone_2b_tracklet_viewer_multirun_evidence_bundle_handoff.md)
+- [Milestone 2C Handoff](handoffs/milestone_2c_tracklet_query_and_review_handoff.md)
 
 ## Agent Reports
 
@@ -65,6 +67,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 1E Agent Report](agent_reports/milestone_1e_detection_artifact_frame_extraction_foundation_report.md)
 - [Milestone 2A Tracklet Repair Agent Report](agent_reports/milestone_1f_tracklet_foundation_from_persisted_detections_report.md)
 - [Milestone 2B Agent Report](agent_reports/milestone_2b_tracklet_viewer_multirun_evidence_bundle_report.md)
+- [Milestone 2C Agent Report](agent_reports/milestone_2c_tracklet_query_and_review_report.md)
 
 ## Blueprints
 
@@ -98,11 +101,14 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Detection Overlay Viewer v0](web/detection_overlay_viewer_v0.md)
 - [Frame Artifact Overlay v0](web/frame_artifact_overlay_v0.md)
 - [Tracklet Evidence Viewer v0](web/tracklet_evidence_viewer_v0.md)
+- [Tracklet Review Viewer v0](web/tracklet_review_viewer_v0.md)
 
 ## Tracklets
 
 - [Tracklet Foundation v0](tracklets/tracklet_foundation_v0.md)
 - [Tracklet Evidence Bundle v0](tracklets/tracklet_evidence_bundle_v0.md)
+- [Tracklet Query v0](tracklets/tracklet_query_v0.md)
+- [Tracklet Review Annotations v0](tracklets/tracklet_review_annotations_v0.md)
 
 ## Development
 

@@ -1,10 +1,15 @@
+"use client";
+
+import { useMemo, useState } from "react";
+
 import { getApiBaseUrl } from "../lib/api";
+import { createAnnotation } from "../lib/api";
 import {
   buildTrackletEvidenceModel,
   jsonRecordValue,
   stringValue
 } from "../lib/trackletEvidence";
-import type { Tracklet, TrackletEvidenceBundle } from "../lib/types";
+import type { HumanAnnotation, Tracklet, TrackletEvidenceBundle } from "../lib/types";
 import type { TrackletEvidencePoint } from "../lib/types";
 import { formatConfidence, formatFrameRange } from "../lib/timeline";
 
@@ -12,6 +17,7 @@ interface TrackletEvidencePanelProps {
   bundle: TrackletEvidenceBundle | null;
   error: string | null;
   isLoading: boolean;
+  onAnnotationCreated: () => void;
   onSelectObservation: (observationId: string) => void;
   onSelectTracklet: (tracklet: Tracklet) => void;
   selectedObservationId: string | null;
@@ -23,6 +29,7 @@ export function TrackletEvidencePanel({
   bundle,
   error,
   isLoading,
+  onAnnotationCreated,
   onSelectObservation,
   onSelectTracklet,
   selectedObservationId,
@@ -34,6 +41,10 @@ export function TrackletEvidencePanel({
   }
 
   const model = buildTrackletEvidenceModel(bundle, selectedObservationId);
+  const reviewTargets = useMemo(
+    () => buildReviewTargets(bundle, model?.selectedPoint ?? null),
+    [bundle, model?.selectedPoint]
+  );
 
   return (
     <section className="panel tracklet-evidence-panel">
@@ -42,10 +53,11 @@ export function TrackletEvidencePanel({
         <span className="mini-pill">{tracklets.length} tracklet candidates</span>
       </div>
       <div className="panel-body tracklet-evidence-body">
-        <TrackletSelector
-          onSelectTracklet={onSelectTracklet}
-          selectedTrackletId={selectedTrackletId}
-          tracklets={tracklets}
+            <TrackletSelector
+              bundle={bundle}
+              onSelectTracklet={onSelectTracklet}
+              selectedTrackletId={selectedTrackletId}
+              tracklets={tracklets}
         />
 
         {isLoading ? <p className="empty-state">Loading evidence bundle...</p> : null}
@@ -77,6 +89,12 @@ export function TrackletEvidencePanel({
               point={model.selectedPoint}
               onSelectObservation={onSelectObservation}
             />
+            <ReviewAnnotationHistory bundle={bundle} point={model.selectedPoint} />
+            <TrackletReviewForm
+              mediaId={bundle.media?.id ?? bundle.tracklet.typed.media_id}
+              onAnnotationCreated={onAnnotationCreated}
+              targets={reviewTargets}
+            />
           </>
         ) : null}
       </div>
@@ -85,10 +103,12 @@ export function TrackletEvidencePanel({
 }
 
 function TrackletSelector({
+  bundle,
   onSelectTracklet,
   selectedTrackletId,
   tracklets
 }: {
+  bundle: TrackletEvidenceBundle | null;
   onSelectTracklet: (tracklet: Tracklet) => void;
   selectedTrackletId: string | null;
   tracklets: Tracklet[];
@@ -105,6 +125,9 @@ function TrackletSelector({
           <strong>{tracklet.subject_ref ?? tracklet.track_family} candidate</strong>
           <span>{formatFrameRange(tracklet.frame_start, tracklet.frame_end)}</span>
           <span>{formatConfidence(tracklet.confidence)}</span>
+          {tracklet.id === selectedTrackletId && bundle ? (
+            <span>{bundle.tracklet.annotation_summary.count} review annotations</span>
+          ) : null}
         </button>
       ))}
     </div>
@@ -230,5 +253,204 @@ function SelectedTrackPointEvidence({
         <pre>{JSON.stringify(bundle.lineage, null, 2)}</pre>
       </details>
     </div>
+  );
+}
+
+interface ReviewTarget {
+  kind: "tracklet_candidate" | "track_point_candidate" | "source_detection";
+  label: string;
+  observationId: string;
+}
+
+const REVIEW_LABELS = [
+  "likely_good_tracklet",
+  "bad_tracklet",
+  "identity_switch",
+  "wrong_grouping",
+  "fragmented_tracklet",
+  "merged_multiple_objects",
+  "uncertain",
+  "wrong_point_assignment",
+  "point_should_start_new_tracklet",
+  "point_should_belong_to_previous_tracklet",
+  "bad_source_detection",
+  "wrong_class_label",
+  "bad_bbox",
+  "duplicate_detection",
+  "missed_ball_nearby"
+];
+
+function buildReviewTargets(
+  bundle: TrackletEvidenceBundle | null,
+  point: TrackletEvidencePoint | null
+): ReviewTarget[] {
+  if (!bundle) {
+    return [];
+  }
+  const targets: ReviewTarget[] = [];
+  if (bundle.tracklet.observation) {
+    targets.push({
+      kind: "tracklet_candidate",
+      label: "selected tracklet candidate",
+      observationId: bundle.tracklet.observation.id
+    });
+  }
+  if (point?.observation) {
+    targets.push({
+      kind: "track_point_candidate",
+      label: `track point candidate frame ${point.frame_number}`,
+      observationId: point.observation.id
+    });
+  }
+  if (point?.source_detection) {
+    targets.push({
+      kind: "source_detection",
+      label: `source detection frame ${point.frame_number}`,
+      observationId: point.source_detection.id
+    });
+  }
+  return targets;
+}
+
+function ReviewAnnotationHistory({
+  bundle,
+  point
+}: {
+  bundle: TrackletEvidenceBundle;
+  point: TrackletEvidencePoint | null;
+}) {
+  const sourceAnnotations =
+    point?.source_detection !== null && point?.source_detection !== undefined
+      ? bundle.source_detections.find((row) => row.observation.id === point.source_detection?.id)
+          ?.annotations ?? []
+      : [];
+
+  return (
+    <div className="review-history">
+      <h3>Review Annotations</h3>
+      <AnnotationGroup
+        annotations={bundle.tracklet.annotations}
+        label="Tracklet candidate annotations"
+      />
+      <AnnotationGroup
+        annotations={point?.annotations ?? []}
+        label="Track point candidate annotations"
+      />
+      <AnnotationGroup
+        annotations={sourceAnnotations}
+        label="Source detection annotations"
+      />
+    </div>
+  );
+}
+
+function AnnotationGroup({
+  annotations,
+  label
+}: {
+  annotations: HumanAnnotation[];
+  label: string;
+}) {
+  return (
+    <div className="review-annotation-group">
+      <strong>{label}</strong>
+      {annotations.length === 0 ? <span className="empty-state">none</span> : null}
+      {annotations.map((annotation) => (
+        <div className="annotation-row" key={annotation.id}>
+          <strong>{annotation.annotation_type}</strong>
+          <span className="mono">{annotation.created_by ?? "local reviewer"}</span>
+          {typeof annotation.payload_jsonb.notes === "string" ? (
+            <p>{annotation.payload_jsonb.notes}</p>
+          ) : null}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function TrackletReviewForm({
+  mediaId,
+  onAnnotationCreated,
+  targets
+}: {
+  mediaId: string;
+  onAnnotationCreated: () => void;
+  targets: ReviewTarget[];
+}) {
+  const [targetId, setTargetId] = useState(targets[0]?.observationId ?? "");
+  const [label, setLabel] = useState(REVIEW_LABELS[0]);
+  const [notes, setNotes] = useState("");
+  const [status, setStatus] = useState<string | null>(null);
+  const selectedTarget = targets.find((target) => target.observationId === targetId) ?? targets[0];
+
+  if (targets.length === 0 || selectedTarget === undefined) {
+    return <p className="empty-state">No review target is available for this evidence bundle.</p>;
+  }
+
+  return (
+    <form
+      className="tracklet-review-form"
+      onSubmit={(event) => {
+        event.preventDefault();
+        setStatus("Saving review annotation...");
+        createAnnotation({
+          media_id: mediaId,
+          observation_id: selectedTarget.observationId,
+          annotation_type: label,
+          payload_jsonb: {
+            annotation_label: label,
+            notes,
+            review_context: "tracklet_evidence_bundle",
+            review_status: "reviewed",
+            target_kind: selectedTarget.kind,
+            created_from_view: "tracklet_evidence_panel"
+          },
+          created_by: "local-reviewer"
+        })
+          .then(() => {
+            setNotes("");
+            setStatus("Review annotation saved.");
+            onAnnotationCreated();
+          })
+          .catch((error: unknown) => {
+            setStatus(error instanceof Error ? error.message : "Unable to save annotation.");
+          });
+      }}
+    >
+      <h3>Tracklet Review</h3>
+      <label>
+        Target
+        <select value={selectedTarget.observationId} onChange={(event) => setTargetId(event.target.value)}>
+          {targets.map((target) => (
+            <option key={target.observationId} value={target.observationId}>
+              {target.label}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label>
+        Review label
+        <select value={label} onChange={(event) => setLabel(event.target.value)}>
+          {REVIEW_LABELS.map((reviewLabel) => (
+            <option key={reviewLabel} value={reviewLabel}>
+              {reviewLabel}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label>
+        Notes
+        <textarea
+          onChange={(event) => setNotes(event.target.value)}
+          placeholder="Optional review note"
+          rows={3}
+          value={notes}
+        />
+      </label>
+      <button className="quiet-button" type="submit">
+        Add review annotation
+      </button>
+      {status ? <p className="empty-state">{status}</p> : null}
+    </form>
   );
 }
