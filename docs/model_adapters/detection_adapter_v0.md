@@ -187,6 +187,14 @@ python -m apps.worker.cli run-detection-adapter \
 
 If runtime packages, device, or weights are unavailable, the YOLO path fails clearly and does not fall back to fixture detections. Tests use a fake provider to validate persistence without requiring real Ultralytics or weights.
 
+Milestone 3E adds a local smoke helper:
+
+```bash
+python -m apps.worker.cli smoke-real-yolo-local --plan-only
+```
+
+When optional runtime packages, local weights, and media are available, this helper runs the end-to-end YOLO detection smoke and can optionally build candidate tracklets after detection.
+
 ## Persistence
 
 The worker service creates:

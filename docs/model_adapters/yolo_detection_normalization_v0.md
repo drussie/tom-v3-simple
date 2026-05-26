@@ -114,6 +114,8 @@ Milestone 3C introduced normalization-only methods:
 
 Milestone 3D connects `run()` to frame-level YOLO inference behind guarded provider interfaces. Tests use a fake provider; real runtime use still requires optional Ultralytics/OpenCV dependencies and registered local weights.
 
+Milestone 3E adds a local smoke helper for validating that optional real runtime path when local weights and sample media are available.
+
 ## Persistence Compatibility
 
 Normalized payloads include the fields expected by existing detection persistence and viewer overlay contracts:

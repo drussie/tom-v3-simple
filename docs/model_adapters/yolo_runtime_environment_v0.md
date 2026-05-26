@@ -116,9 +116,15 @@ Milestone 3B adds that first registration layer. See:
 docs/model_adapters/yolo_model_registry_weights_v0.md
 ```
 
+Milestone 3E adds the optional local real-YOLO smoke workflow. See:
+
+```text
+docs/model_adapters/yolo_real_runtime_smoke_v0.md
+```
+
 ## Out of Scope
 
-Milestone 3A does not add:
+Milestone 3A did not add:
 
 - real YOLO inference
 - real detection persistence

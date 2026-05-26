@@ -12,7 +12,7 @@ Milestone 3C establishes YOLO-like output normalization.
 
 Milestone 3D establishes the guarded frame-level inference and observation persistence bridge.
 
-Real local runtime smoke remains optional and depends on local YOLO packages and registered weights.
+Milestone 3E establishes the optional local real-YOLO smoke and viewer validation workflow.
 
 ## Mission
 
@@ -99,6 +99,20 @@ Milestone 3D adds:
 
 3D proves the persistence bridge. It does not require real Ultralytics or real weights in CI.
 
+## Milestone 3E Result
+
+Milestone 3E adds:
+
+- local real-YOLO smoke runbook and helper
+- worker `smoke-real-yolo-local`
+- script wrapper `scripts/smoke_real_yolo_local.py`
+- plan-only smoke output
+- structured skip behavior for missing runtime, weights, or media
+- viewer validation instructions for YOLO-origin detection runs
+- optional tracklet builder compatibility path
+
+3E validates the developer workflow. It does not add new inference behavior.
+
 ## What Blueprint 3 Will Not Prove
 
 Blueprint 3 does not prove that a detection is correct.
@@ -136,5 +150,5 @@ A rally or point exists.
 Recommended next milestone:
 
 ```text
-Milestone 3E - Real YOLO Runtime Local Smoke / Viewer Validation
+Milestone 3F - Blueprint 3 Completion Review / Real Model Runtime Hardening
 ```

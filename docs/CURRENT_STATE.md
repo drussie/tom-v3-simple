@@ -4,8 +4,8 @@
 
 - Project name: TOM v3 Simple
 - Repo: drussie/tom-v3-simple
-- Current phase: Milestone 3D
-- Current goal: YOLO frame inference / observation persistence
+- Current phase: Milestone 3E
+- Current goal: Real YOLO runtime local smoke / viewer validation
 
 ## Mission
 
@@ -16,7 +16,7 @@ A lightweight tennis video observation platform that accepts model output as ope
 - Implementation status: persisted ball/player observations can be inspected visually and grouped into candidate tracklets
 - Model integration status: fixture gameplay and fixture detection adapters implemented for deterministic dev/test output
 - TOM v1 gameplay detector: known asset, portable source/assets not available in this repo/environment; integration stub documented
-- YOLO/YOLO26: optional runtime probe, model weights registration, YOLO-like output normalization, and frame-level inference persistence bridge implemented; runtime/assets are not required in the base environment and real runtime validation remains optional
+- YOLO/YOLO26: optional runtime probe, model weights registration, YOLO-like output normalization, frame-level inference persistence bridge, and local real-YOLO smoke helper implemented; runtime/assets are not required in the base environment
 - Database: initial SQLAlchemy models and Alembic migration implemented
 - API: FastAPI backend foundation implemented
 - Media indexing: implemented for local files via ffprobe, sha256 checksum, local storage copy/register mode, and frame/time summary
@@ -27,7 +27,7 @@ A lightweight tennis video observation platform that accepts model output as ope
 - Tracklet query/review: implemented with structured query filters, annotation summaries, and viewer review controls
 - Tracklet review dataset export: implemented with JSON export artifacts, evidence artifact metadata, optional query result memory, API endpoint, and worker CLI
 - Blueprint 2 status: complete; temporal evidence can be built, inspected, queried, reviewed, and exported as candidate evidence
-- Blueprint 3 status: in progress; optional YOLO runtime environment boundary, dependency probe, device resolver, weights validation, class mapping, model registry helper, YOLO output normalization, and frame-level persistence bridge are implemented
+- Blueprint 3 status: in progress; optional YOLO runtime environment boundary, dependency probe, device resolver, weights validation, class mapping, model registry helper, YOLO output normalization, frame-level persistence bridge, and local real-YOLO smoke workflow are implemented
 - Observation writer: implemented with typed extension rows, lineage, artifacts, and idempotency
 - Worker synthetic seeder: implemented
 - Visual evidence viewer: implemented in `apps/web` with detection bbox overlay and frame artifact image support
@@ -155,10 +155,16 @@ Status: complete
 
 Milestone 3D connects frame-level YOLO-style outputs to persisted TOM v3 observations. It adds a YOLO frame inference provider interface, fake provider for tests, guarded Ultralytics provider, media-owned frame sampling, registered model metadata/weights validation for YOLO runs, worker `run-detection-adapter --adapter yolo --model-registry-id ...`, and mocked YOLO persistence tests proving `ball_detection` / `player_detection` atomic observations remain viewer/query compatible. Real local runtime smoke remains optional and depends on local YOLO packages and weights.
 
+## Milestone 3E Result
+
+Status: complete
+
+Milestone 3E adds the local real-YOLO smoke and viewer validation foundation. It adds worker `smoke-real-yolo-local`, `scripts/smoke_real_yolo_local.py`, plan-only mode, structured skip behavior for missing runtime/weights/media, docs for runtime probe, weights registration, media indexing, YOLO detection runs, frame artifacts, viewer overlay inspection, and optional tracklet/evidence-bundle compatibility. The default suite still runs without real YOLO dependencies or weights.
+
 ## Naming Transition
 
 The implementation branch/file names may reference "1F" because the milestone was originally planned as a Blueprint 1 extension. After Blueprint 1 was declared complete, the same work was reclassified as Blueprint 2A because temporal grouping begins a new conceptual layer.
 
 ## Next Milestone
 
-Recommended next milestone: Milestone 3E - Real YOLO Runtime Local Smoke / Viewer Validation.
+Recommended next milestone: Milestone 3F - Blueprint 3 Completion Review / Real Model Runtime Hardening.

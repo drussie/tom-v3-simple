@@ -81,6 +81,10 @@ Milestone 2D review dataset exports package these dynamic bundles into local JSO
 
 Milestone 2E confirms that evidence bundles are the cross-run inspection layer for Blueprint 2. They explain candidate evidence; they do not confirm identity, trajectory, bounce, hit, rally, point, or score.
 
+## YOLO Source Detection Compatibility
+
+Milestone 3E validates that YOLO-origin detection runs use the same persisted `ball_detection` / `player_detection` observation contract as fixture runs. Tracklet evidence bundles can therefore expose YOLO-origin source detections through the same source detection, frame artifact, and lineage fields.
+
 ## Non-Goals
 
 - No new grouping algorithm.

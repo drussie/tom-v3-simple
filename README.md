@@ -58,13 +58,14 @@ Blueprint 2 is complete and Blueprint 3 has started. TOM v3 Simple can build, in
 - YOLO weights validation and model registry registration without inference
 - YOLO-like output normalization into TOM v3-compatible detection payloads
 - YOLO frame inference provider boundary and mocked YOLO detection persistence through the existing detection adapter path
+- optional real-YOLO local smoke helper and viewer validation workflow
 - model asset and weight ignore policy
 
-Portable TOM v1 detector assets/source and YOLO26 model weights are not present in this repo state. Real YOLO inference now has a guarded frame-level provider path, but local runtime validation still requires optional YOLO packages and explicitly registered local weights. No sophisticated tracking, pose processing, court homography, or real bounce detection is implemented yet.
+Portable TOM v1 detector assets/source and YOLO26 model weights are not present in this repo state. Real YOLO inference now has a guarded frame-level provider path and optional local smoke workflow, but local runtime validation still requires optional YOLO packages and explicitly registered local weights. No sophisticated tracking, pose processing, court homography, or real bounce detection is implemented yet.
 
 Blueprint 2 did not add pose, homography, bounce detection, hit detection, rally/point reconstruction, scoring, identity proof, or adjudication.
 
-Recommended next milestone: Milestone 3E - Real YOLO Runtime Local Smoke / Viewer Validation. Pose remains outside Blueprint 3 and is reserved for a later blueprint.
+Recommended next milestone: Milestone 3F - Blueprint 3 Completion Review / Real Model Runtime Hardening. Pose remains outside Blueprint 3 and is reserved for a later blueprint.
 
 ## Repo Structure
 
@@ -340,6 +341,22 @@ python -m apps.worker.cli run-detection-adapter \
 
 If runtime packages or weights are unavailable, the YOLO path fails clearly and does not fall back to fixture detections. Mocked provider tests cover persistence in the base environment without real Ultralytics or weights.
 
+Plan or run the optional real-YOLO local smoke:
+
+```bash
+python -m apps.worker.cli smoke-real-yolo-local --plan-only
+
+python -m apps.worker.cli smoke-real-yolo-local \
+  --source-path <sample_video_path> \
+  --weights-path model_assets/yolo/<model>.pt \
+  --model-name local-yolo-smoke \
+  --model-version local-v0 \
+  --device cpu \
+  --frame-sample-rate 30 \
+  --max-frames 3 \
+  --run-tracklets
+```
+
 ## Validation
 
 Run the consolidated checks:
@@ -375,6 +392,7 @@ make seed
 make smoke
 make yolo-runtime-probe
 make register-yolo-model WEIGHTS_PATH=model_assets/yolo/<model>.pt MODEL_NAME=<model-name>
+make smoke-real-yolo-local SOURCE_PATH=/path/to/video.mp4 WEIGHTS_PATH=model_assets/yolo/<model>.pt MODEL_NAME=local-yolo-smoke RUN_TRACKLETS=true
 make all-checks
 ```
 
@@ -393,6 +411,8 @@ Useful runbooks:
 - [YOLO Runtime Environment v0](docs/model_adapters/yolo_runtime_environment_v0.md)
 - [YOLO Model Registry and Weights v0](docs/model_adapters/yolo_model_registry_weights_v0.md)
 - [YOLO Detection Normalization v0](docs/model_adapters/yolo_detection_normalization_v0.md)
+- [YOLO Frame Inference Persistence v0](docs/model_adapters/yolo_frame_inference_persistence_v0.md)
+- [YOLO Real Runtime Smoke v0](docs/model_adapters/yolo_real_runtime_smoke_v0.md)
 - [Detection Overlay Viewer v0](docs/web/detection_overlay_viewer_v0.md)
 - [Frame Artifact Overlay v0](docs/web/frame_artifact_overlay_v0.md)
 - [Tracklet Foundation v0](docs/tracklets/tracklet_foundation_v0.md)

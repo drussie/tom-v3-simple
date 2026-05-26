@@ -19,10 +19,11 @@ WEIGHTS_PATH ?=
 MODEL_NAME ?=
 MODEL_VERSION ?= v0
 REQUIRED_SHA256 ?=
+RUN_TRACKLETS ?= false
 
 export TOM_V3_DATABASE_URL
 
-.PHONY: install web-install test lint migrate api seed verify index-media run-gameplay index-and-run-gameplay run-detection index-and-run-detection extract-frame-artifacts build-tracklets export-tracklet-review-dataset yolo-runtime-probe register-yolo-model web web-build web-lint smoke all-checks
+.PHONY: install web-install test lint migrate api seed verify index-media run-gameplay index-and-run-gameplay run-detection index-and-run-detection extract-frame-artifacts build-tracklets export-tracklet-review-dataset yolo-runtime-probe register-yolo-model smoke-real-yolo-local web web-build web-lint smoke all-checks
 
 install:
 	$(PYTHON) -m pip install -e ".[dev]"
@@ -87,6 +88,9 @@ yolo-runtime-probe:
 register-yolo-model:
 	@if [ -z "$(WEIGHTS_PATH)" ]; then echo "WEIGHTS_PATH is required: make register-yolo-model WEIGHTS_PATH=model_assets/yolo/model.pt"; exit 1; fi
 	$(PYTHON) -m apps.worker.cli register-yolo-model --weights-path "$(WEIGHTS_PATH)" --model-version "$(MODEL_VERSION)" $(if $(MODEL_NAME),--model-name "$(MODEL_NAME)",) $(if $(REQUIRED_SHA256),--required-sha256 "$(REQUIRED_SHA256)",)
+
+smoke-real-yolo-local:
+	$(PYTHON) -m apps.worker.cli smoke-real-yolo-local $(if $(SOURCE_PATH),--source-path "$(SOURCE_PATH)",) $(if $(WEIGHTS_PATH),--weights-path "$(WEIGHTS_PATH)",) $(if $(MODEL_NAME),--model-name "$(MODEL_NAME)",) --model-version "$(MODEL_VERSION)" --device "$(YOLO_DEVICE)" --frame-sample-rate "$(FRAME_SAMPLE_RATE)" --max-frames "$(MAX_FRAMES)" --output-root "$(ARTIFACT_ROOT)" $(if $(filter true,$(RUN_TRACKLETS)),--run-tracklets,--no-run-tracklets)
 
 web:
 	cd $(WEB_DIR) && npm run dev

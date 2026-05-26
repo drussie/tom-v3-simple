@@ -21,6 +21,7 @@ from apps.worker.services.detection_adapter import run_detection_adapter
 from apps.worker.services.frame_artifacts import extract_frame_artifacts_for_run
 from apps.worker.services.gameplay_adapter import run_gameplay_adapter
 from apps.worker.services.media_indexer import index_media
+from apps.worker.services.real_yolo_smoke import run_real_yolo_local_smoke
 from apps.worker.services.tracklet_builder import build_tracklets_from_detection_run
 from apps.worker.services.yolo_model_registry import register_yolo_model
 
@@ -288,6 +289,47 @@ def main() -> None:
     yolo_register_parser.add_argument("--skip-create-db", action="store_true")
     yolo_register_parser.set_defaults(handler=_handle_register_yolo_model)
 
+    yolo_smoke_parser = subcommands.add_parser(
+        "smoke-real-yolo-local",
+        help="Run or plan the optional local real-YOLO detection smoke path.",
+    )
+    yolo_smoke_parser.add_argument("--source-path")
+    yolo_smoke_parser.add_argument("--weights-path")
+    yolo_smoke_parser.add_argument("--model-name", default="local-yolo-smoke")
+    yolo_smoke_parser.add_argument("--model-version", default="local-v0")
+    yolo_smoke_parser.add_argument("--device", default="cpu")
+    yolo_smoke_parser.add_argument("--frame-sample-rate", type=int, default=30)
+    yolo_smoke_parser.add_argument("--max-frames", type=int, default=3)
+    yolo_smoke_parser.add_argument("--output-root", default=".data/artifacts")
+    yolo_smoke_parser.add_argument(
+        "--allowed-root",
+        action="append",
+        dest="allowed_roots",
+        help="Allowed local root for weights. May be supplied more than once.",
+    )
+    yolo_smoke_parser.add_argument(
+        "--copy-to-storage",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+    )
+    yolo_smoke_parser.add_argument(
+        "--run-tracklets",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+    )
+    yolo_smoke_parser.add_argument(
+        "--output-debug-artifact",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+    )
+    yolo_smoke_parser.add_argument(
+        "--plan-only",
+        action="store_true",
+        help="Print the smoke plan without probing runtime or touching local assets.",
+    )
+    yolo_smoke_parser.add_argument("--skip-create-db", action="store_true")
+    yolo_smoke_parser.set_defaults(handler=_handle_smoke_real_yolo_local)
+
     args = parser.parse_args()
     with _session_factory(create_db=not args.skip_create_db)() as session:
         result = args.handler(session, args)
@@ -546,6 +588,28 @@ def _handle_register_yolo_model(session: Session, args: argparse.Namespace) -> d
             "error_type": exc.__class__.__name__,
             "message": f"class-map-json is invalid JSON: {exc}",
         }
+
+
+def _handle_smoke_real_yolo_local(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    return run_real_yolo_local_smoke(
+        session=session,
+        source_path=args.source_path,
+        weights_path=args.weights_path,
+        model_name=args.model_name,
+        model_version=args.model_version,
+        device=args.device,
+        frame_sample_rate=args.frame_sample_rate,
+        max_frames=args.max_frames,
+        output_root=args.output_root,
+        allowed_roots=args.allowed_roots,
+        copy_to_storage=args.copy_to_storage,
+        run_tracklets=args.run_tracklets,
+        output_debug_artifact=args.output_debug_artifact,
+        plan_only=args.plan_only,
+    )
 
 
 if __name__ == "__main__":

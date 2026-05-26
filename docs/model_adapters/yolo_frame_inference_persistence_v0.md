@@ -83,6 +83,30 @@ python -m apps.worker.cli run-detection-adapter \
 
 If runtime packages or weights are unavailable, the command fails clearly and does not fall back to fixture detections.
 
+## Local Smoke Helper
+
+Milestone 3E adds:
+
+```bash
+python -m apps.worker.cli smoke-real-yolo-local --plan-only
+```
+
+When runtime, weights, and media are available:
+
+```bash
+python -m apps.worker.cli smoke-real-yolo-local \
+  --source-path <sample_video_path> \
+  --weights-path model_assets/yolo/<weights_file>.pt \
+  --model-name local-yolo-smoke \
+  --model-version local-v0 \
+  --device cpu \
+  --frame-sample-rate 30 \
+  --max-frames 3 \
+  --run-tracklets
+```
+
+The helper probes runtime, validates/registers weights, indexes media, runs YOLO detection, extracts frame artifacts when detections exist, and optionally builds tracklets. Missing runtime/assets produce structured skipped output.
+
 ## Persisted Payload
 
 Successful YOLO detections persist through the existing detection adapter service as atomic observations:

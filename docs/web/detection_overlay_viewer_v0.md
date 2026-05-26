@@ -127,7 +127,7 @@ Refresh the viewer to see frame imagery behind bbox overlays.
 ## Known Limitations
 
 - No video playback overlay is implemented.
-- No real YOLO26 inference is implemented in this repo state.
+- Real YOLO runtime validation is optional and local-only; fixture detection remains the default demo path.
 - Detection observations are not converted into tracks.
 - The overlay visualizes only frame-level bbox observations.
 - Frame artifact serving is local-development only.

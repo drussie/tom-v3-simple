@@ -705,3 +705,38 @@ Milestone 3D created:
 - Worker CLI options for `--model-registry-id`, `--iou-threshold`, and `--max-det`.
 - Tests proving mocked YOLO outputs persist as atomic `ball_detection` and `player_detection` observations through the existing worker service.
 - Failure tests proving unavailable YOLO runs do not persist fallback detections.
+
+## Milestone 3E - Real YOLO Runtime Local Smoke / Viewer Validation
+
+Status: complete
+
+### Goal
+
+Create an optional local real-YOLO smoke workflow and viewer validation path without making real YOLO dependencies required by the default test suite.
+
+### Non-goals
+
+- No new inference algorithms.
+- No YOLO tracking mode.
+- No tracklet generation inside YOLO.
+- No pose detection.
+- No court homography.
+- No bounce detection.
+- No hit detection.
+- No rally segmentation.
+- No point reconstruction.
+- No scoring.
+- No adjudication.
+
+### Notes
+
+Milestone 3E created:
+
+- Real YOLO smoke helper service.
+- Worker command `smoke-real-yolo-local`.
+- Script wrapper `scripts/smoke_real_yolo_local.py`.
+- Plan-only mode for local workflow inspection without runtime/assets.
+- Structured skip behavior for missing runtime, weights, or source media.
+- Optional tracklet-builder compatibility step after YOLO detection.
+- Docs for runtime probe, weights registration, media indexing, YOLO detection, frame artifacts, viewer overlay inspection, tracklet compatibility, and evidence bundle inspection.
+- Tests covering smoke plan and skip behavior without real YOLO packages or weights.

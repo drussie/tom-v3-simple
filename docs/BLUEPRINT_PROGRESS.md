@@ -2,7 +2,7 @@
 
 ## Current Progress Gauge
 
-Current: ~75-80% through Blueprint 3
+Current: ~90-95% through Blueprint 3
 
 ## Current
 
@@ -92,6 +92,10 @@ Current: ~75-80% through Blueprint 3
 - Worker detection adapter can persist mocked YOLO detections as atomic `ball_detection` and `player_detection` observations.
 - YOLO runs can use registered model metadata and weights checksum validation.
 - Failed YOLO runs do not persist fixture fallback detections.
+- Local real-YOLO smoke helper exists.
+- Smoke plan covers runtime probe, weights registration, media indexing, YOLO detection, frame artifacts, viewer inspection, and optional tracklet building.
+- Missing runtime, weights, or media produce structured skipped smoke output.
+- Blueprint 2 tracklet compatibility is documented for YOLO detection runs.
 
 ## After Milestone 0A
 
@@ -447,3 +451,22 @@ Expected: ~75-80% through Blueprint 3
 Status: complete.
 
 The repo now has a guarded YOLO frame inference and persistence bridge. Mocked provider tests prove YOLO-style frame outputs can be normalized and persisted as TOM v3 atomic detection observations through the existing worker path, while optional real Ultralytics runtime remains isolated behind import guards and registered local weights.
+
+## After Milestone 3E
+
+Expected: ~90-95% through Blueprint 3
+
+- Real local `tom_v3_yolo` setup path is documented.
+- Real YOLO runtime probe path is documented.
+- Local weights registration path is documented.
+- YOLO detection adapter run against indexed media is locally smoke-testable.
+- Frame artifact and viewer overlay validation path is documented.
+- Tracklet builder compatibility with YOLO detection runs is documented and smoke-testable.
+- Missing runtime/assets skip safely.
+- No real YOLO dependencies are required by default tests.
+
+## Milestone 3E Status
+
+Status: complete.
+
+The repo now has an optional local real-YOLO smoke workflow through worker `smoke-real-yolo-local` and `scripts/smoke_real_yolo_local.py`. The helper can plan the workflow without assets, skips cleanly when optional runtime or weights are missing, and documents how YOLO-origin detections flow into the existing viewer and Blueprint 2 candidate tracklet path.

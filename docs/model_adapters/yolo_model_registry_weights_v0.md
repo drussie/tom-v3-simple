@@ -176,6 +176,12 @@ Milestone 3D can use a registered `model_registry_id` to resolve weights path, w
 docs/model_adapters/yolo_frame_inference_persistence_v0.md
 ```
 
+Milestone 3E documents the local real-YOLO smoke flow that uses this registry row:
+
+```text
+docs/model_adapters/yolo_real_runtime_smoke_v0.md
+```
+
 ## Out of Scope
 
 - optimized full-video YOLO inference

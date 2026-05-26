@@ -668,3 +668,64 @@ Expected behavior when runtime or weights are unavailable:
 - no fixture detections are persisted as a fallback
 
 This path does not create tracklets. Build candidate tracklets explicitly with `build-tracklets` after reviewing a detection run.
+
+## 23. Plan Or Run Real YOLO Local Smoke
+
+Milestone 3E adds a smoke helper for the complete optional local workflow.
+
+Plan the flow without requiring runtime packages, weights, or sample media:
+
+```bash
+python -m apps.worker.cli smoke-real-yolo-local --plan-only
+```
+
+Run the flow when local prerequisites are available:
+
+```bash
+python -m apps.worker.cli smoke-real-yolo-local \
+  --source-path <sample_video_path> \
+  --weights-path model_assets/yolo/<weights_file>.pt \
+  --model-name local-yolo-smoke \
+  --model-version local-v0 \
+  --device cpu \
+  --frame-sample-rate 30 \
+  --max-frames 3 \
+  --output-root .data/artifacts \
+  --run-tracklets
+```
+
+Equivalent script:
+
+```bash
+python scripts/smoke_real_yolo_local.py --plan-only
+```
+
+The helper prints JSON with:
+
+- runtime probe result
+- weights validation result
+- model registry result
+- indexed media summary
+- detection run summary
+- frame artifact summary when detections exist
+- optional tracklet builder summary
+- viewer URL
+
+Expected skip behavior:
+
+- missing YOLO runtime returns `status = skipped` with `skip_reason = yolo_runtime_unavailable`
+- missing weights returns `status = skipped` with `skip_reason = missing_weights`
+- missing media returns `status = skipped` with `skip_reason = missing_source_media`
+- the helper never uses fixture detections as a fallback for a YOLO smoke
+
+Open the returned detection run:
+
+```text
+http://127.0.0.1:3000/runs/<detection_run_id>
+```
+
+If `--run-tracklets` created tracklets, inspect one with:
+
+```text
+GET /tracklets/<tracklet_id>/evidence-bundle
+```
