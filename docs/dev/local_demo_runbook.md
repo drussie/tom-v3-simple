@@ -758,3 +758,35 @@ python -m apps.worker.cli smoke-real-yolo-local --plan-only
 ```
 
 Blueprint 3 remains observation-only. YOLO-origin detections are persisted model outputs, not correctness claims. Tracklets are built only by the existing Blueprint 2 tracklet builder after detections are persisted.
+
+## 25. Validate Pose Schema Foundation
+
+Milestone 4A starts Blueprint 4 with pose observation schema and persistence contracts. It does not run real pose inference and does not render pose overlays.
+
+Run focused pose checks:
+
+```bash
+pytest tests/test_pose_schema.py tests/test_pose_observation_persistence.py -q
+```
+
+Expected behavior:
+
+- COCO17 skeleton metadata validates with 17 named keypoints.
+- Invalid keypoint names/counts fail validation.
+- A synthetic fixture pose observation can be inserted.
+- The observation spine row uses `observation_family = pose` and `observation_type = player_pose_observation`.
+- The typed `pose_observation` row stores named keypoints and keypoint summary statistics.
+- Pose frame/time values match media-owned frame/time.
+- Synthetic fixtures use `association_status = unassociated`.
+
+The helper path is for schema/persistence validation only:
+
+```text
+indexed media
+-> fixture pose model/runtime metadata
+-> synthetic keypoints
+-> observation spine row
+-> pose_observation typed row
+```
+
+It does not create movement conclusions, source-detection crop inference, homography, bounce/hit/rally/point/scoring evidence, or adjudication.

@@ -2,7 +2,7 @@
 
 ## Current Progress Gauge
 
-Current: Blueprint 3 complete
+Current: ~15-20% through Blueprint 4
 
 ## Current
 
@@ -99,6 +99,15 @@ Current: Blueprint 3 complete
 - Blueprint 3 completion review exists.
 - Real model runtime invariants are documented and mapped to test coverage.
 - Blueprint 3 is complete.
+- Blueprint 4 has started.
+- Pose observation schema foundation exists.
+- COCO17 skeleton registry exists.
+- Keypoint schema validation helpers exist.
+- `pose_observation` typed persistence exists.
+- Synthetic/fake pose observations can be inserted with first-class observation spine rows.
+- Pose observations use media-owned frame/time.
+- Pose runtime config and model registry metadata contracts are documented.
+- No real pose inference, pose overlay viewer, movement interpretation, homography, bounce, hit, rally, point, scoring, or adjudication has been added.
 
 ## After Milestone 0A
 
@@ -491,3 +500,21 @@ Expected: 100% through Blueprint 3
 Status: complete.
 
 Blueprint 3 is complete. TOM v3 can keep YOLO runtime optional, validate and register local weights, normalize YOLO-like model outputs, persist YOLO-origin atomic detection observations through the existing detection pipeline, inspect them through the existing viewer/frame artifact path, and feed Blueprint 2 candidate tracklet/review/export workflows without adding pose, homography, bounce, hit, rally, point, scoring, YOLO tracking mode, or adjudication.
+
+## After Milestone 4A
+
+Expected: ~15-20% through Blueprint 4
+
+- Pose has a first-class schema foundation.
+- `pose_observation` typed rows connect to the central observation spine.
+- COCO17 skeleton format and keypoint schema validation are centralized.
+- Synthetic/fake pose observations can be inserted for persistence validation.
+- Pose records are queryable through existing observation media/run/frame paths.
+- Pose model registry and runtime config metadata contracts are documented.
+- No real pose inference, pose overlay viewer, movement interpretation, homography, bounce, hit, rally, point, scoring, or adjudication is added.
+
+## Milestone 4A Status
+
+Status: complete.
+
+The repo now has a Blueprint 4 pose evidence foundation: COCO17 skeleton metadata, keypoint validation helpers, pose schema models, a `pose_observation` table, writer support for pose typed extensions, and synthetic pose insertion tests that preserve media-owned frame/time. Pose remains observation evidence only.

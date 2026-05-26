@@ -1,0 +1,95 @@
+# TOM v3 Blueprint 4 - Pose Observation / Movement Evidence Layer
+
+## Status
+
+Status: in progress
+
+Milestone 4A is complete. It establishes the pose runtime and schema foundation.
+
+## Mission
+
+Persist pose model output as replayable observation evidence, including keypoints, skeleton metadata, confidence, bbox context, model/runtime provenance, optional subject association, lineage, review annotations, and export compatibility, without interpreting tennis movement or events.
+
+Blueprint 4 is about pose evidence as model output.
+
+It is not about movement conclusions.
+
+## Starting Point
+
+Blueprint 1 proved the media, observation store, viewer, detection overlay, and frame artifact loop.
+
+Blueprint 2 proved candidate temporal evidence: persisted detections can become candidate tracklets with lineage, evidence bundles, query/review flows, and review dataset exports.
+
+Blueprint 3 proved optional real YOLO runtime: local weights can be validated and registered, YOLO-like output can be normalized, and YOLO-origin detections can persist through the existing detection pipeline.
+
+## Blueprint 4 Direction
+
+The intended path is:
+
+```text
+optional pose runtime
+-> validated pose model metadata
+-> pose adapter normalization
+-> persisted pose_observation rows
+-> pose viewer overlay
+-> pose review / export compatibility
+-> future movement evidence candidates
+```
+
+Pose observations must use media-owned frame/time. If a future pose observation is produced from a source detection crop or track point context, the pose frame/time still comes from the source TOM v3 observation.
+
+## Milestone 4A Result
+
+Milestone 4A adds:
+
+- `pose_observation` typed table
+- COCO17 skeleton registry
+- keypoint schema validation helpers
+- pose schema models
+- fixture/synthetic pose insertion helper
+- pose runtime config metadata contract
+- pose model registry metadata contract
+- tests for pose persistence, frame/time ownership, keypoint summaries, and queryability
+
+4A does not add real pose inference, pose overlay rendering, movement interpretation, or event candidates.
+
+## Observation Boundary
+
+A pose observation means:
+
+```text
+A pose adapter produced keypoint evidence for a person-like subject at a media-owned frame/time.
+```
+
+It does not mean:
+
+```text
+The subject identity is known.
+The player action is known.
+A serve occurred.
+A hit occurred.
+A split-step occurred.
+A biomechanical conclusion is valid.
+A rally or point exists.
+```
+
+## Out of Scope For Blueprint 4A
+
+- real pose inference
+- pose overlay viewer
+- movement interpretation
+- serve mechanics conclusions
+- split-step conclusions
+- biomechanics analysis
+- court homography
+- bounce or hit detection
+- rally/point/scoring
+- adjudication
+
+## Next Milestone
+
+Recommended next milestone:
+
+```text
+Milestone 4B - Pose Adapter Normalization Foundation
+```

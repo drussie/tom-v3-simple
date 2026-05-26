@@ -44,6 +44,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 3D - YOLO Frame Inference / Observation Persistence](milestones/milestone_3d_yolo_frame_inference_observation_persistence.md)
 - [Milestone 3E - Real YOLO Runtime Local Smoke / Viewer Validation](milestones/milestone_3e_real_yolo_runtime_local_smoke_viewer_validation.md)
 - [Milestone 3F - Blueprint 3 Completion Review](milestones/milestone_3f_blueprint_3_completion_review.md)
+- [Milestone 4A - Pose Runtime / Schema Foundation](milestones/milestone_4a_pose_runtime_schema_foundation.md)
 
 ## Handoffs
 
@@ -68,6 +69,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 3D Handoff](handoffs/milestone_3d_yolo_frame_inference_observation_persistence_handoff.md)
 - [Milestone 3E Handoff](handoffs/milestone_3e_real_yolo_runtime_local_smoke_viewer_validation_handoff.md)
 - [Milestone 3F Handoff](handoffs/milestone_3f_blueprint_3_completion_review_handoff.md)
+- [Milestone 4A Handoff](handoffs/milestone_4a_pose_runtime_schema_foundation_handoff.md)
 
 ## Agent Reports
 
@@ -92,6 +94,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 3D Agent Report](agent_reports/milestone_3d_yolo_frame_inference_observation_persistence_report.md)
 - [Milestone 3E Agent Report](agent_reports/milestone_3e_real_yolo_runtime_local_smoke_viewer_validation_report.md)
 - [Milestone 3F Agent Report](agent_reports/milestone_3f_blueprint_3_completion_review_report.md)
+- [Milestone 4A Agent Report](agent_reports/milestone_4a_pose_runtime_schema_foundation_report.md)
 
 ## Blueprints
 
@@ -99,6 +102,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Blueprint 2 Completion Review](blueprints/tom_v3_blueprint_2_completion_review.md)
 - [Blueprint 3 - Real Model Runtime / YOLO Observation Adapter](blueprints/tom_v3_blueprint_3_real_model_runtime_yolo_observation_adapter.md)
 - [Blueprint 3 Completion Review](blueprints/tom_v3_blueprint_3_completion_review.md)
+- [Blueprint 4 - Pose Observation / Movement Evidence Layer](blueprints/tom_v3_blueprint_4_pose_observation_movement_evidence_layer.md)
 
 ## API and Schema
 
@@ -142,6 +146,12 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Tracklet Query v0](tracklets/tracklet_query_v0.md)
 - [Tracklet Review Annotations v0](tracklets/tracklet_review_annotations_v0.md)
 - [Tracklet Review Dataset Export v0](tracklets/tracklet_review_dataset_export_v0.md)
+
+## Pose
+
+- [Skeleton Registry v0](pose/skeleton_registry_v0.md)
+- [Pose Observation Schema v0](pose/pose_observation_schema_v0.md)
+- [Pose Runtime Config v0](pose/pose_runtime_config_v0.md)
 
 ## Development
 

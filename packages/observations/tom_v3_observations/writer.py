@@ -10,6 +10,7 @@ from tom_v3_schema.observations import (
     GameplayObservationRead,
     ObservationCreate,
     ObservationDetailRead,
+    PoseObservationRead,
 )
 from tom_v3_storage.db_models import (
     AtomicObservation,
@@ -18,6 +19,7 @@ from tom_v3_storage.db_models import (
     GameplayObservation,
     Observation,
     ObservationLineage,
+    PoseObservation,
 )
 
 
@@ -46,6 +48,10 @@ def observation_detail_from_model(observation: Observation) -> ObservationDetail
     if observation.derived_detail is not None:
         derived = DerivedObservationRead.model_validate(observation.derived_detail)
 
+    pose = None
+    if observation.pose_detail is not None:
+        pose = PoseObservationRead.model_validate(observation.pose_detail)
+
     return ObservationDetailRead(
         id=observation.id,
         media_id=observation.media_id,
@@ -68,6 +74,7 @@ def observation_detail_from_model(observation: Observation) -> ObservationDetail
         gameplay=gameplay,
         atomic=atomic,
         derived=derived,
+        pose=pose,
         artifacts=[artifact_read_from_model(artifact) for artifact in observation.artifacts],
     )
 
@@ -139,7 +146,8 @@ class ObservationWriter:
 
     def _validate_typed_extension(self, request: ObservationCreate) -> None:
         typed_count = sum(
-            detail is not None for detail in (request.gameplay, request.atomic, request.derived)
+            detail is not None
+            for detail in (request.gameplay, request.atomic, request.derived, request.pose)
         )
         if typed_count > 1:
             raise ObservationWriterError(
@@ -153,6 +161,8 @@ class ObservationWriter:
             raise ObservationWriterError("atomic detail requires observation_family=atomic")
         if request.derived is not None and family != "derived":
             raise ObservationWriterError("derived detail requires observation_family=derived")
+        if request.pose is not None and family != "pose":
+            raise ObservationWriterError("pose detail requires observation_family=pose")
 
     def _insert_typed_extension(
         self, observation: Observation, request: ObservationCreate
@@ -184,6 +194,47 @@ class ObservationWriter:
                     observation_id=observation.id,
                     derived_kind=str(enum_value(request.derived.derived_kind)),
                     derivation_payload_jsonb=request.derived.derivation_payload_jsonb,
+                )
+            )
+        if request.pose is not None:
+            self.session.add(
+                PoseObservation(
+                    observation_id=observation.id,
+                    media_id=observation.media_id,
+                    run_id=observation.run_id,
+                    frame_number=request.pose.frame_number,
+                    timestamp_ms=request.pose.timestamp_ms,
+                    skeleton_format=request.pose.skeleton_format,
+                    skeleton_version=request.pose.skeleton_version,
+                    keypoint_schema_jsonb=request.pose.keypoint_schema_jsonb,
+                    keypoints_jsonb=request.pose.keypoints_jsonb,
+                    keypoint_count=request.pose.keypoint_count or 0,
+                    keypoints_present_count=request.pose.keypoints_present_count or 0,
+                    keypoints_missing_count=request.pose.keypoints_missing_count or 0,
+                    mean_keypoint_confidence=request.pose.mean_keypoint_confidence,
+                    min_keypoint_confidence=request.pose.min_keypoint_confidence,
+                    max_keypoint_confidence=request.pose.max_keypoint_confidence,
+                    pose_confidence=request.pose.pose_confidence,
+                    bbox_x=request.pose.bbox_x,
+                    bbox_y=request.pose.bbox_y,
+                    bbox_w=request.pose.bbox_w,
+                    bbox_h=request.pose.bbox_h,
+                    bbox_confidence=request.pose.bbox_confidence,
+                    crop_x=request.pose.crop_x,
+                    crop_y=request.pose.crop_y,
+                    crop_w=request.pose.crop_w,
+                    crop_h=request.pose.crop_h,
+                    crop_source=request.pose.crop_source,
+                    subject_ref_type=request.pose.subject_ref_type,
+                    subject_detection_observation_id=request.pose.subject_detection_observation_id,
+                    subject_tracklet_id=request.pose.subject_tracklet_id,
+                    subject_track_point_id=request.pose.subject_track_point_id,
+                    association_status=request.pose.association_status,
+                    association_method=request.pose.association_method,
+                    association_confidence=request.pose.association_confidence,
+                    frame_time_owner=request.pose.frame_time_owner,
+                    raw_model_payload_jsonb=request.pose.raw_model_payload_jsonb,
+                    metadata_jsonb=request.pose.metadata_jsonb,
                 )
             )
 

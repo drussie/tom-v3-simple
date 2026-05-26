@@ -14,7 +14,7 @@ The core invariant:
 
 ## Current Status
 
-Blueprints 1, 2, and 3 are complete. TOM v3 Simple can build, inspect, query, review, and export candidate temporal evidence on top of persisted ball/player detections, and now has an optional YOLO / Ultralytics runtime path for ball/player observation adapters:
+Blueprints 1, 2, and 3 are complete. Blueprint 4 has started with a pose evidence schema foundation. TOM v3 Simple can build, inspect, query, review, and export candidate temporal evidence on top of persisted ball/player detections, has an optional YOLO / Ultralytics runtime path for ball/player observation adapters, and now has first-class pose observation persistence contracts:
 
 - repo memory and architecture contracts
 - FastAPI backend/API foundation
@@ -60,15 +60,21 @@ Blueprints 1, 2, and 3 are complete. TOM v3 Simple can build, inspect, query, re
 - YOLO frame inference provider boundary and mocked YOLO detection persistence through the existing detection adapter path
 - optional real-YOLO local smoke helper and viewer validation workflow
 - Blueprint 3 completion review and runtime invariant audit
+- Blueprint 4 pose observation schema foundation
+- COCO17 skeleton registry and keypoint validation helpers
+- typed `pose_observation` persistence with keypoint summary statistics
+- synthetic/fake pose observation insertion for schema and persistence validation
 - model asset and weight ignore policy
 
-Portable TOM v1 detector assets/source and YOLO26 model weights are not present in this repo state. Real YOLO inference now has a guarded frame-level provider path and optional local smoke workflow, but local runtime validation still requires optional YOLO packages and explicitly registered local weights. No sophisticated tracking, pose processing, court homography, or real bounce detection is implemented yet.
+Portable TOM v1 detector assets/source and YOLO26 model weights are not present in this repo state. Real YOLO inference now has a guarded frame-level provider path and optional local smoke workflow, but local runtime validation still requires optional YOLO packages and explicitly registered local weights. Pose currently has schema/persistence foundations only; no real pose runtime, pose overlay viewer, movement interpretation, court homography, or real bounce detection is implemented yet.
 
 Blueprint 2 did not add pose, homography, bounce detection, hit detection, rally/point reconstruction, scoring, identity proof, or adjudication.
 
 Blueprint 3 did not add pose, homography, bounce detection, hit detection, rally/point reconstruction, scoring, identity proof, YOLO tracking mode, or adjudication.
 
-Recommended next blueprint: Blueprint 4 - Pose Observation / Movement Evidence Layer. Pose remains outside Blueprint 3.
+Blueprint 4A did not add real pose inference, pose overlay rendering, movement interpretation, serve/hit/split-step/biomechanics conclusions, homography, rally/point reconstruction, scoring, or adjudication.
+
+Recommended next milestone: Milestone 4B - Pose Adapter Normalization Foundation.
 
 ## Repo Structure
 
@@ -360,6 +366,14 @@ python -m apps.worker.cli smoke-real-yolo-local \
   --run-tracklets
 ```
 
+Validate the pose schema foundation without real pose runtime:
+
+```bash
+pytest tests/test_pose_schema.py tests/test_pose_observation_persistence.py -q
+```
+
+These focused tests create fixture pose model/runtime records, write a synthetic `player_pose_observation` spine row plus typed `pose_observation` row, and verify COCO17 keypoint summaries and media-owned frame/time. They do not run pose inference or render a pose overlay.
+
 ## Validation
 
 Run the consolidated checks:
@@ -417,6 +431,10 @@ Useful runbooks:
 - [YOLO Frame Inference Persistence v0](docs/model_adapters/yolo_frame_inference_persistence_v0.md)
 - [YOLO Real Runtime Smoke v0](docs/model_adapters/yolo_real_runtime_smoke_v0.md)
 - [Blueprint 3 Completion Review](docs/blueprints/tom_v3_blueprint_3_completion_review.md)
+- [Blueprint 4 - Pose Observation / Movement Evidence Layer](docs/blueprints/tom_v3_blueprint_4_pose_observation_movement_evidence_layer.md)
+- [Skeleton Registry v0](docs/pose/skeleton_registry_v0.md)
+- [Pose Observation Schema v0](docs/pose/pose_observation_schema_v0.md)
+- [Pose Runtime Config v0](docs/pose/pose_runtime_config_v0.md)
 - [Detection Overlay Viewer v0](docs/web/detection_overlay_viewer_v0.md)
 - [Frame Artifact Overlay v0](docs/web/frame_artifact_overlay_v0.md)
 - [Tracklet Foundation v0](docs/tracklets/tracklet_foundation_v0.md)

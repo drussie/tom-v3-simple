@@ -15,6 +15,7 @@ from tom_v3_schema.enums import (
     ViewState,
     ViewStateSubtype,
 )
+from tom_v3_schema.pose import PoseObservationCreate, PoseObservationRead
 
 
 class GameplayObservationCreate(TOMBaseModel):
@@ -78,6 +79,7 @@ class ObservationCreate(TOMBaseModel):
     gameplay: GameplayObservationCreate | None = None
     atomic: AtomicObservationCreate | None = None
     derived: DerivedObservationCreate | None = None
+    pose: PoseObservationCreate | None = None
     lineage: list[ObservationLineageCreate] = Field(default_factory=list)
     artifacts: list[EvidenceArtifactCreate] = Field(default_factory=list)
 
@@ -123,6 +125,7 @@ class ObservationDetailRead(ObservationCoreRead):
     gameplay: GameplayObservationRead | None = None
     atomic: AtomicObservationRead | None = None
     derived: DerivedObservationRead | None = None
+    pose: PoseObservationRead | None = None
     artifacts: list[EvidenceArtifactRead] = Field(default_factory=list)
 
 

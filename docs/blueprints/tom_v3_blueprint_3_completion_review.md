@@ -183,3 +183,7 @@ Blueprint 4 - Pose Observation / Movement Evidence Layer
 ```
 
 Pose should remain outside Blueprint 3. Blueprint 4 should preserve the same TOM v3 invariant: model outputs are observations, not adjudicated results.
+
+## Blueprint 4 Follow-Up
+
+Blueprint 4 has started with Milestone 4A - Pose Runtime / Schema Foundation. The first Blueprint 4 step adds typed pose observation schema, COCO17 skeleton metadata, keypoint validation, and synthetic pose persistence only. It does not add pose inference, pose overlays, movement interpretation, homography, bounce, hit, rally, point, scoring, or adjudication.

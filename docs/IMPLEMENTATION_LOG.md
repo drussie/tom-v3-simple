@@ -775,3 +775,37 @@ Milestone 3F created:
 - Control-room index, current-state, blueprint-progress, and model adapter docs updates.
 
 Blueprint 3 is complete. It closes with optional YOLO runtime support, local weights validation, model registry metadata, YOLO-like output normalization, frame-level provider persistence, local smoke/viewer validation, and Blueprint 2 compatibility while preserving the observation-only boundary.
+
+## Milestone 4A - Pose Runtime / Schema Foundation
+
+Status: complete
+
+### Goal
+
+Start Blueprint 4 by adding typed pose observation persistence, skeleton/keypoint schema contracts, and synthetic pose fixture insertion without adding real pose inference or movement interpretation.
+
+### Non-goals
+
+- No real pose runtime or adapter inference.
+- No pose overlay viewer.
+- No movement interpretation.
+- No serve, split-step, or biomechanics conclusions.
+- No court homography.
+- No bounce detection.
+- No hit detection.
+- No rally segmentation.
+- No point reconstruction.
+- No scoring.
+- No adjudication.
+
+### Notes
+
+Milestone 4A created:
+
+- Blueprint 4, pose schema, skeleton registry, runtime config, milestone, handoff, and report docs.
+- COCO17 skeleton registry with keypoint names, indices, edges, and validation helpers.
+- Pose schema helpers for named keypoints, summary statistics, typed pose creation, and runtime config payloads.
+- `pose_observation` typed table migration and SQLAlchemy model.
+- Observation writer support for a pose typed extension under `observation_family = pose`.
+- Synthetic pose insertion helper that creates fixture model/runtime/run/step records and writes first-class pose observation spine rows plus typed pose rows.
+- Tests covering skeleton validation, keypoint validation, pose persistence, media-owned frame/time, keypoint summary statistics, unassociated subject mode, model/runtime metadata, and existing observation query/detail compatibility.

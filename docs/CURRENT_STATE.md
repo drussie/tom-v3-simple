@@ -4,8 +4,8 @@
 
 - Project name: TOM v3 Simple
 - Repo: drussie/tom-v3-simple
-- Current phase: Blueprint 3 complete
-- Current goal: Prepare Blueprint 4 boundary while preserving the TOM v3 observation-only runtime contract
+- Current phase: Blueprint 4 in progress
+- Current goal: Build pose observation evidence foundations while preserving the TOM v3 observation-only runtime contract
 
 ## Mission
 
@@ -13,7 +13,7 @@ A lightweight tennis video observation platform that accepts model output as ope
 
 ## Implementation Status
 
-- Implementation status: persisted ball/player observations can be inspected visually and grouped into candidate tracklets
+- Implementation status: persisted ball/player observations can be inspected visually, grouped into candidate tracklets, and complemented by first-class pose evidence schema foundations
 - Model integration status: fixture gameplay and fixture detection adapters implemented for deterministic dev/test output
 - TOM v1 gameplay detector: known asset, portable source/assets not available in this repo/environment; integration stub documented
 - YOLO/YOLO26: optional runtime probe, model weights registration, YOLO-like output normalization, frame-level inference persistence bridge, and local real-YOLO smoke helper implemented; runtime/assets are not required in the base environment
@@ -28,9 +28,11 @@ A lightweight tennis video observation platform that accepts model output as ope
 - Tracklet review dataset export: implemented with JSON export artifacts, evidence artifact metadata, optional query result memory, API endpoint, and worker CLI
 - Blueprint 2 status: complete; temporal evidence can be built, inspected, queried, reviewed, and exported as candidate evidence
 - Blueprint 3 status: complete; optional YOLO runtime environment boundary, dependency probe, device resolver, weights validation, class mapping, model registry helper, YOLO output normalization, frame-level persistence bridge, local real-YOLO smoke workflow, completion review, and invariant audit are implemented
+- Blueprint 4 status: in progress; pose observation schema, COCO17 skeleton registry, keypoint validation, typed pose persistence, synthetic pose insertion, and pose runtime/config metadata contracts are implemented
 - Observation writer: implemented with typed extension rows, lineage, artifacts, and idempotency
 - Worker synthetic seeder: implemented
 - Visual evidence viewer: implemented in `apps/web` with detection bbox overlay and frame artifact image support
+- Pose observation foundation: implemented with a typed `pose_observation` table, COCO17 skeleton registry, keypoint summary statistics, and synthetic/fake pose observation insertion; no real pose inference or pose overlay viewer exists yet
 - Synthetic data: baseline scenario creates viewer-ready observations, tracklets, gaps, candidates, lineage, and artifacts
 - Local setup: documented with `.env.example`, Makefile, and dev runbooks
 - Branch/default branch: `main` is restored as the GitHub default branch
@@ -167,10 +169,16 @@ Status: complete
 
 Milestone 3F closes Blueprint 3 with a completion review, invariant audit, runbook cleanup, documentation/index updates, and validation pass. Blueprint 3 is now complete: TOM v3 can safely keep YOLO runtime optional, validate/register local model weights, normalize YOLO-like outputs, persist YOLO-origin atomic ball/player detections through the existing detection pipeline, inspect them through the existing viewer/frame artifact path, and feed the existing Blueprint 2 tracklet/review/export flow without adding tracking mode, pose, homography, bounce, hit, rally, point, scoring, or adjudication.
 
+## Milestone 4A Result
+
+Status: complete
+
+Milestone 4A starts Blueprint 4 with a pose runtime/schema foundation. TOM v3 now has a first-class `pose_observation` typed table, COCO17 skeleton registry, keypoint schema validation helpers, pose schema models, fixture pose model/runtime metadata, and a synthetic pose insertion helper that writes observation spine rows plus typed pose rows using media-owned frame/time. It does not add real pose inference, a pose overlay viewer, movement interpretation, homography, bounce, hit, rally, point, scoring, or adjudication.
+
 ## Naming Transition
 
 The implementation branch/file names may reference "1F" because the milestone was originally planned as a Blueprint 1 extension. After Blueprint 1 was declared complete, the same work was reclassified as Blueprint 2A because temporal grouping begins a new conceptual layer.
 
 ## Next Milestone
 
-Recommended next blueprint: Blueprint 4 - Pose Observation / Movement Evidence Layer.
+Recommended next milestone: Milestone 4B - Pose Adapter Normalization Foundation.

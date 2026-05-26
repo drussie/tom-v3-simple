@@ -151,6 +151,11 @@ class Observation(CreatedAtMixin, Base):
     derived_detail: Mapped["DerivedObservation | None"] = relationship(
         back_populates="observation", uselist=False
     )
+    pose_detail: Mapped["PoseObservation | None"] = relationship(
+        back_populates="observation",
+        uselist=False,
+        foreign_keys="PoseObservation.observation_id",
+    )
     artifacts: Mapped[list["EvidenceArtifact"]] = relationship(back_populates="target_observation")
     annotations: Mapped[list["HumanAnnotation"]] = relationship(back_populates="observation")
 
@@ -192,6 +197,82 @@ class DerivedObservation(Base):
     )
 
     observation: Mapped[Observation] = relationship(back_populates="derived_detail")
+
+
+class PoseObservation(CreatedAtMixin, Base):
+    __tablename__ = "pose_observation"
+    __table_args__ = (
+        Index("ix_pose_observation_media_run", "media_id", "run_id"),
+        Index("ix_pose_observation_media_frame", "media_id", "frame_number"),
+        Index("ix_pose_observation_run_confidence", "run_id", "pose_confidence"),
+        Index("ix_pose_observation_subject_detection", "subject_detection_observation_id"),
+        Index("ix_pose_observation_subject_tracklet", "subject_tracklet_id"),
+        Index("ix_pose_observation_subject_track_point", "subject_track_point_id"),
+        Index("ix_pose_observation_skeleton_format", "skeleton_format"),
+        Index("ix_pose_observation_missing_count", "keypoints_missing_count"),
+    )
+
+    observation_id: Mapped[str] = mapped_column(
+        ForeignKey("observation.id"), primary_key=True, nullable=False
+    )
+    media_id: Mapped[str] = mapped_column(ForeignKey("media_asset.id"), nullable=False)
+    run_id: Mapped[str] = mapped_column(ForeignKey("processing_run.id"), nullable=False)
+    frame_number: Mapped[int] = mapped_column(Integer, nullable=False)
+    timestamp_ms: Mapped[int] = mapped_column(Integer, nullable=False)
+    skeleton_format: Mapped[str] = mapped_column(String(100), nullable=False)
+    skeleton_version: Mapped[str] = mapped_column(String(100), nullable=False)
+    keypoint_schema_jsonb: Mapped[dict[str, Any]] = mapped_column(
+        JsonType, default=dict, nullable=False
+    )
+    keypoints_jsonb: Mapped[list[dict[str, Any]]] = mapped_column(
+        JsonType, default=list, nullable=False
+    )
+    keypoint_count: Mapped[int] = mapped_column(Integer, nullable=False)
+    keypoints_present_count: Mapped[int] = mapped_column(Integer, nullable=False)
+    keypoints_missing_count: Mapped[int] = mapped_column(Integer, nullable=False)
+    mean_keypoint_confidence: Mapped[float | None] = mapped_column(Float)
+    min_keypoint_confidence: Mapped[float | None] = mapped_column(Float)
+    max_keypoint_confidence: Mapped[float | None] = mapped_column(Float)
+    pose_confidence: Mapped[float | None] = mapped_column(Float)
+    bbox_x: Mapped[float | None] = mapped_column(Float)
+    bbox_y: Mapped[float | None] = mapped_column(Float)
+    bbox_w: Mapped[float | None] = mapped_column(Float)
+    bbox_h: Mapped[float | None] = mapped_column(Float)
+    bbox_confidence: Mapped[float | None] = mapped_column(Float)
+    crop_x: Mapped[float | None] = mapped_column(Float)
+    crop_y: Mapped[float | None] = mapped_column(Float)
+    crop_w: Mapped[float | None] = mapped_column(Float)
+    crop_h: Mapped[float | None] = mapped_column(Float)
+    crop_source: Mapped[str | None] = mapped_column(String(100))
+    subject_ref_type: Mapped[str] = mapped_column(String(100), nullable=False, default="none")
+    subject_detection_observation_id: Mapped[str | None] = mapped_column(
+        ForeignKey("observation.id")
+    )
+    subject_tracklet_id: Mapped[str | None] = mapped_column(ForeignKey("tracklet.id"))
+    subject_track_point_id: Mapped[str | None] = mapped_column(ForeignKey("track_point.id"))
+    association_status: Mapped[str] = mapped_column(
+        String(100), nullable=False, default="unassociated"
+    )
+    association_method: Mapped[str | None] = mapped_column(String(200))
+    association_confidence: Mapped[float | None] = mapped_column(Float)
+    frame_time_owner: Mapped[str] = mapped_column(
+        String(100), nullable=False, default="media_indexing"
+    )
+    raw_model_payload_jsonb: Mapped[dict[str, Any]] = mapped_column(
+        JsonType, default=dict, nullable=False
+    )
+    metadata_jsonb: Mapped[dict[str, Any]] = mapped_column(JsonType, default=dict, nullable=False)
+
+    observation: Mapped[Observation] = relationship(
+        back_populates="pose_detail", foreign_keys=[observation_id]
+    )
+    media: Mapped[MediaAsset] = relationship()
+    run: Mapped[ProcessingRun] = relationship()
+    subject_detection_observation: Mapped[Observation | None] = relationship(
+        foreign_keys=[subject_detection_observation_id]
+    )
+    subject_tracklet: Mapped["Tracklet | None"] = relationship()
+    subject_track_point: Mapped["TrackPoint | None"] = relationship()
 
 
 class Tracklet(Base):
