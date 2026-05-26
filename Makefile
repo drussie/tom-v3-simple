@@ -2,10 +2,12 @@ PYTHON ?= python
 WEB_DIR := apps/web
 TOM_V3_DATABASE_URL ?= sqlite+pysqlite:///./tmp_tom_v3.db
 RUN_ID ?=
+SOURCE_PATH ?=
+STORAGE_ROOT ?= .data/media
 
 export TOM_V3_DATABASE_URL
 
-.PHONY: install web-install test lint migrate api seed verify web web-build web-lint smoke all-checks
+.PHONY: install web-install test lint migrate api seed verify index-media web web-build web-lint smoke all-checks
 
 install:
 	$(PYTHON) -m pip install -e ".[dev]"
@@ -31,6 +33,10 @@ seed:
 verify:
 	@if [ -z "$(RUN_ID)" ]; then echo "RUN_ID is required: make verify RUN_ID=<run_id>"; exit 1; fi
 	$(PYTHON) -m apps.worker.cli verify-synthetic-run --run-id $(RUN_ID)
+
+index-media:
+	@if [ -z "$(SOURCE_PATH)" ]; then echo "SOURCE_PATH is required: make index-media SOURCE_PATH=/path/to/video.mp4"; exit 1; fi
+	$(PYTHON) -m apps.worker.cli index-media --source-path "$(SOURCE_PATH)" --storage-root "$(STORAGE_ROOT)"
 
 web:
 	cd $(WEB_DIR) && npm run dev

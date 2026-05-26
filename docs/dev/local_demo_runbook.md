@@ -99,3 +99,28 @@ The integration smoke script seeds a temporary run and validates the viewer read
 ```bash
 python scripts/smoke_synthetic_viewer_data.py
 ```
+
+## 10. Index a Real Local Video
+
+Milestone 1A adds real media registration:
+
+```bash
+python -m apps.worker.cli index-media \
+  --source-path /path/to/video.mp4 \
+  --copy-to-storage \
+  --storage-root .data/media
+```
+
+The command prints a `media_id`, stored URI, checksum, ffprobe metadata, and frame/time summary.
+
+The API equivalent is:
+
+```bash
+curl -X POST http://127.0.0.1:8000/media/register-file \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "source_path": "/path/to/video.mp4",
+    "copy_to_storage": true,
+    "storage_root": ".data/media"
+  }'
+```

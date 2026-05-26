@@ -164,3 +164,40 @@ Milestone 0E created:
 - Synthetic viewer smoke script.
 - Milestone 0 integration smoke test.
 - Updated README, docs index, current state, blueprint progress, implementation log, milestone docs, handoff, and report.
+
+## Milestone 1A - Real Media Indexing + Video Upload / Registration
+
+Status: complete
+
+### Goal
+
+Implement the first real media ingestion and indexing layer for TOM v3 Simple.
+
+### Non-goals
+
+- No YOLO integration.
+- No TOM v1 integration.
+- No gameplay classification.
+- No real tracking implementation.
+- No real homography calculation.
+- No pose processing.
+- No real bounce detection.
+- No streaming ingestion.
+- No production object storage.
+- No production auth.
+- No adjudication.
+- No truth/fact/promotion/refusal concepts.
+
+### Notes
+
+Milestone 1A created:
+
+- Local filesystem media storage adapter.
+- sha256 checksum calculation.
+- ffprobe metadata wrapper with clear missing-ffprobe errors.
+- Frame/time mapping utilities and persisted media frame/time summary.
+- Shared media indexing service.
+- `POST /media/register-file`.
+- Worker CLI command `index-media`.
+- Tests for checksum, storage copy/register modes, ffprobe parsing/errors, frame/time utilities, API registration, and worker media indexing service.
+- Media indexing docs, milestone doc, handoff, and report.

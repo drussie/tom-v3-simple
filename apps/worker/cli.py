@@ -9,6 +9,7 @@ from tom_v3_storage.db_models import Base
 
 from apps.worker.config import settings
 from apps.worker.pipelines.synthetic_seed import seed_synthetic_run
+from apps.worker.services.media_indexer import index_media
 
 
 def main() -> None:
@@ -45,6 +46,22 @@ def main() -> None:
     verify_parser.add_argument("--skip-create-db", action="store_true")
     verify_parser.set_defaults(handler=_handle_verify)
 
+    index_parser = subcommands.add_parser(
+        "index-media",
+        help="Index a real local media file and create a media asset.",
+    )
+    index_parser.add_argument("--source-path", required=True)
+    index_parser.add_argument(
+        "--copy-to-storage",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Copy the source file into local TOM v3 media storage.",
+    )
+    index_parser.add_argument("--media-name")
+    index_parser.add_argument("--storage-root", default=".data/media")
+    index_parser.add_argument("--skip-create-db", action="store_true")
+    index_parser.set_defaults(handler=_handle_index_media)
+
     args = parser.parse_args()
     with _session_factory(create_db=not args.skip_create_db)() as session:
         result = args.handler(session, args)
@@ -75,6 +92,31 @@ def _handle_seed(session: Session, args: argparse.Namespace) -> dict[str, object
 
 def _handle_verify(session: Session, args: argparse.Namespace) -> dict[str, object]:
     return verify_synthetic_run(session, args.run_id)
+
+
+def _handle_index_media(session: Session, args: argparse.Namespace) -> dict[str, object]:
+    media = index_media(
+        session=session,
+        source_path=args.source_path,
+        copy_to_storage=args.copy_to_storage,
+        media_name=args.media_name,
+        storage_root=args.storage_root,
+    )
+    return {
+        "media_id": media.id,
+        "source_uri": media.source_uri,
+        "stored_uri": media.metadata_jsonb.get("stored_uri"),
+        "stored_path": media.metadata_jsonb.get("stored_path"),
+        "storage_mode": media.metadata_jsonb.get("storage_mode"),
+        "checksum": media.checksum,
+        "checksum_algorithm": media.metadata_jsonb.get("checksum_algorithm"),
+        "fps": media.fps,
+        "frame_count": media.frame_count,
+        "duration_ms": media.duration_ms,
+        "width": media.width,
+        "height": media.height,
+        "frame_time_summary": media.metadata_jsonb.get("frame_time_index"),
+    }
 
 
 if __name__ == "__main__":

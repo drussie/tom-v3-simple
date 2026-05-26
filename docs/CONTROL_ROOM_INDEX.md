@@ -28,6 +28,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 0C - Worker + Synthetic Observation Seeder](milestones/milestone_0c_worker_synthetic_observation_seeder.md)
 - [Milestone 0D - Visual Evidence Viewer Foundation](milestones/milestone_0d_visual_evidence_viewer_foundation.md)
 - [Milestone 0E - Integration / QA / Repo Consolidation](milestones/milestone_0e_integration_qa_repo_consolidation.md)
+- [Milestone 1A - Real Media Indexing](milestones/milestone_1a_real_media_indexing.md)
 
 ## Handoffs
 
@@ -36,6 +37,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 0C Handoff](handoffs/milestone_0c_worker_synthetic_observation_seeder_handoff.md)
 - [Milestone 0D Handoff](handoffs/milestone_0d_visual_evidence_viewer_foundation_handoff.md)
 - [Milestone 0E Handoff](handoffs/milestone_0e_integration_qa_repo_consolidation_handoff.md)
+- [Milestone 1A Handoff](handoffs/milestone_1a_real_media_indexing_handoff.md)
 
 ## Agent Reports
 
@@ -44,11 +46,16 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 0C Agent Report](agent_reports/milestone_0c_worker_synthetic_observation_seeder_report.md)
 - [Milestone 0D Agent Report](agent_reports/milestone_0d_visual_evidence_viewer_foundation_report.md)
 - [Milestone 0E Agent Report](agent_reports/milestone_0e_integration_qa_repo_consolidation_report.md)
+- [Milestone 1A Agent Report](agent_reports/milestone_1a_real_media_indexing_report.md)
 
 ## API and Schema
 
 - [Backend API v0](api/backend_api_v0.md)
 - [Database Schema v0](schema/database_schema_v0.md)
+
+## Media
+
+- [Media Indexing v0](media/media_indexing_v0.md)
 
 ## Worker
 

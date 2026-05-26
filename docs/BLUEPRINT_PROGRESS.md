@@ -2,7 +2,7 @@
 
 ## Current Progress Gauge
 
-Current: ~75-80%
+Current: ~85%
 
 ## Current
 
@@ -29,6 +29,11 @@ Current: ~75-80%
 - Milestone 0 local setup and demo runbooks exist.
 - Makefile commands exist for common local workflows.
 - Integration smoke validation exists for synthetic viewer data.
+- Real local media file registration exists.
+- ffprobe-based metadata extraction exists.
+- Media checksum and local storage copy/register modes exist.
+- Central frame/time mapping utilities exist.
+- Worker `index-media` exists.
 
 ## After Milestone 0A
 
@@ -124,3 +129,20 @@ Expected: ~75-80%
 Status: complete.
 
 The repo now has one documented local setup path, one synthetic seed path, one backend API, one viewer path, one validation story, and exact branch/default-branch cleanup guidance.
+
+## After Milestone 1A
+
+Expected: ~85%
+
+- Real local media file registration exists.
+- ffprobe-based duration, FPS, frame count, dimensions, codec, and format extraction exists.
+- Media checksum and storage path are persisted.
+- Frame/time mapping ownership is centralized in media indexing utilities.
+- Viewer/API can load real media metadata before observations exist.
+- Future gameplay/model adapters have a stable media substrate.
+
+## Milestone 1A Status
+
+Status: complete.
+
+The repo now has real media indexing for local files, durable media registration, storage metadata, checksum persistence, frame/time summaries, API/worker entrypoints, tests, and docs.

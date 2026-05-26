@@ -14,7 +14,7 @@ The core invariant:
 
 ## Current Status
 
-Milestone 0E consolidates the Milestone 0 foundation:
+Milestone 1A adds the first real media substrate on top of the consolidated Milestone 0 foundation:
 
 - repo memory and architecture contracts
 - FastAPI backend/API foundation
@@ -24,8 +24,12 @@ Milestone 0E consolidates the Milestone 0 foundation:
 - viewer-ready synthetic baseline data
 - Next.js visual evidence viewer foundation
 - local setup, runbook, Makefile, and smoke validation
+- real local media registration with ffprobe metadata extraction
+- sha256 checksum persistence
+- local storage copy/register modes
+- centralized frame/time mapping utilities
 
-No real model pipeline, YOLO integration, TOM v1 integration, real video processing, real tracking, real homography calculation, or real bounce detection is implemented yet.
+No real model pipeline, YOLO integration, TOM v1 integration, gameplay classification, real tracking, real homography calculation, pose processing, or real bounce detection is implemented yet.
 
 ## Repo Structure
 
@@ -37,7 +41,7 @@ apps/
 packages/
   schema/          Shared schema contracts.
   storage/         Storage adapters and persistence helpers.
-  video/           Media indexing and video utilities placeholder.
+  video/           ffprobe metadata and frame/time mapping utilities.
   observations/    Observation writer, lineage, and synthetic helpers.
   visualization/   Viewer-oriented utilities placeholder.
 migrations/        Alembic database migrations.
@@ -77,6 +81,25 @@ Run migrations:
 
 ```bash
 alembic upgrade head
+```
+
+Index a real local video:
+
+```bash
+python -m apps.worker.cli index-media \
+  --source-path /path/to/video.mp4 \
+  --copy-to-storage
+```
+
+The media indexing path uses `ffprobe`, calculates a sha256 checksum, optionally copies the source into `.data/media/{media_id}/`, and persists a `media_asset` with duration, FPS, frame count, dimensions, checksum, storage metadata, and a frame/time summary.
+
+The same path is available through the API:
+
+```bash
+uvicorn apps.api.main:app --reload
+curl -X POST http://127.0.0.1:8000/media/register-file \
+  -H "Content-Type: application/json" \
+  -d '{"source_path":"/path/to/video.mp4","copy_to_storage":true}'
 ```
 
 Seed synthetic evidence:
@@ -137,6 +160,7 @@ make web-install
 make test
 make lint
 make migrate
+make index-media SOURCE_PATH=/path/to/video.mp4
 make seed
 make smoke
 make all-checks
@@ -150,4 +174,5 @@ Useful runbooks:
 
 - [Local Environment Setup](docs/dev/local_environment_setup.md)
 - [Local Demo Runbook](docs/dev/local_demo_runbook.md)
+- [Media Indexing v0](docs/media/media_indexing_v0.md)
 - [Repo Branch Hygiene](docs/dev/repo_branch_hygiene.md)

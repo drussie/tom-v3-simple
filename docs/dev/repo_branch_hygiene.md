@@ -1,16 +1,14 @@
 # Repo Branch Hygiene
 
-## Current Issue
+## Current Status
 
-As of Milestone 0E, GitHub reports the default branch as:
+As of Milestone 1A, GitHub reports the default branch as:
 
 ```text
-codex/m0a-repo-memory-architecture-schema
+main
 ```
 
-Remote `main` does not currently exist.
-
-This should be corrected after the Milestone 0E branch is accepted.
+The Milestone 0 branch/default branch issue is resolved.
 
 ## Recommended Final State
 
@@ -22,7 +20,7 @@ milestone codex branches = preserved or deleted by owner preference
 
 ## Exact Cleanup Steps
 
-After `codex/m0e-integration-qa-repo-consolidation` is accepted:
+If this issue reappears after future branch work:
 
 ```bash
 git fetch origin --prune

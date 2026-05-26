@@ -72,6 +72,7 @@ make test
 make lint
 make migrate
 make seed
+make index-media SOURCE_PATH=/path/to/video.mp4
 make smoke
 make all-checks
 ```

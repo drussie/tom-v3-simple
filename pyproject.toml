@@ -36,6 +36,7 @@ packages = [
   "tom_v3_schema",
   "tom_v3_storage",
   "tom_v3_observations",
+  "tom_v3_video",
 ]
 
 [tool.setuptools.package-dir]
@@ -43,6 +44,7 @@ apps = "apps"
 tom_v3_schema = "packages/schema/tom_v3_schema"
 tom_v3_storage = "packages/storage/tom_v3_storage"
 tom_v3_observations = "packages/observations/tom_v3_observations"
+tom_v3_video = "packages/video/tom_v3_video"
 
 [tool.pytest.ini_options]
 pythonpath = [
@@ -51,6 +53,7 @@ pythonpath = [
   "packages/schema",
   "packages/storage",
   "packages/observations",
+  "packages/video",
 ]
 testpaths = ["tests"]
 

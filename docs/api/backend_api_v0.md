@@ -34,9 +34,25 @@ Returns:
 ## Media
 
 - `POST /media`
+- `POST /media/register-file`
 - `GET /media/{media_id}`
 
-`POST /media` registers metadata only in v0. It does not upload files or run ffprobe.
+`POST /media` registers metadata manually.
+
+`POST /media/register-file` indexes a real local media file. It runs ffprobe, calculates sha256, optionally copies the file into local TOM v3 storage, persists a `media_asset`, and stores the frame/time summary in `metadata_jsonb`.
+
+Example:
+
+```json
+{
+  "source_path": "/path/to/video.mp4",
+  "copy_to_storage": true,
+  "media_name": "practice clip",
+  "storage_root": ".data/media"
+}
+```
+
+The response is a `media_asset` record with duration, frame count, FPS, dimensions, checksum, and media indexing metadata.
 
 ## Models and Runtime Configs
 

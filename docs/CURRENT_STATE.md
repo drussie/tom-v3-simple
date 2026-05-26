@@ -4,8 +4,8 @@
 
 - Project name: TOM v3 Simple
 - Repo: drussie/tom-v3-simple
-- Current phase: Milestone 0E
-- Current goal: integration, QA, local runbook, and repo consolidation
+- Current phase: Milestone 1A
+- Current goal: real media indexing + video registration foundation
 
 ## Mission
 
@@ -13,17 +13,19 @@ A lightweight tennis video observation platform that accepts model output as ope
 
 ## Implementation Status
 
-- Implementation status: Milestone 0 foundation consolidated; no real ML pipeline yet
+- Implementation status: real media indexing foundation exists; no real ML pipeline yet
 - Model integration status: none
 - TOM v1 gameplay detector: known asset, not integrated yet
 - YOLO/YOLO26: not integrated yet
 - Database: initial SQLAlchemy models and Alembic migration implemented
 - API: FastAPI backend foundation implemented
+- Media indexing: implemented for local files via ffprobe, sha256 checksum, local storage copy/register mode, and frame/time summary
 - Observation writer: implemented with typed extension rows, lineage, artifacts, and idempotency
 - Worker synthetic seeder: implemented
 - Visual evidence viewer: implemented in `apps/web`
 - Synthetic data: baseline scenario creates viewer-ready observations, tracklets, gaps, candidates, lineage, and artifacts
 - Local setup: documented with `.env.example`, Makefile, and dev runbooks
+- Branch/default branch: `main` is restored as the GitHub default branch
 
 ## Milestone 0A Result
 
@@ -55,6 +57,12 @@ Status: complete
 
 Milestone 0E consolidates Milestone 0 with local setup docs, a local demo runbook, `.env.example`, Makefile commands, a synthetic viewer smoke script, integration smoke test coverage, updated project memory, and branch/default-branch cleanup guidance.
 
+## Milestone 1A Result
+
+Status: complete
+
+Milestone 1A establishes real local media registration and indexing with ffprobe metadata extraction, sha256 checksums, local storage copy/register modes, frame/time mapping utilities, `POST /media/register-file`, worker `index-media`, tests, and media indexing docs.
+
 ## Next Milestone
 
-Recommended next handoff: Milestone 1A - Real Media Indexing + Video Upload/Registration.
+Recommended next handoff: Milestone 1B - TOM v1 Gameplay Detector Adapter.

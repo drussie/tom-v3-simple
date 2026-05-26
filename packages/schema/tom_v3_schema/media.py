@@ -22,3 +22,10 @@ class MediaAssetCreate(TOMBaseModel):
 class MediaAssetRead(MediaAssetCreate):
     id: str
     created_at: datetime
+
+
+class MediaRegisterFileRequest(TOMBaseModel):
+    source_path: str
+    copy_to_storage: bool = True
+    media_name: str | None = None
+    storage_root: str = ".data/media"
