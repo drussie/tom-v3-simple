@@ -2,7 +2,7 @@
 
 ## Current Progress Gauge
 
-Current: Blueprints 1, 2, 3, 4, 5, 6, and 7 complete; TOM v3 Simple is complete; Blueprint 7 is complete
+Current: Blueprints 1, 2, 3, 4, 5, 6, and 7 complete; TOM v3 Simple is complete; Blueprint 8 is in progress
 
 ## Current
 
@@ -190,11 +190,16 @@ Current: Blueprints 1, 2, 3, 4, 5, 6, and 7 complete; TOM v3 Simple is complete;
 - Replay pose overlays and pose timeline items include optional source/runtime/model/config metadata for real pose validation.
 - Replay selected pose detail displays source/runtime/model/config and subject association context when available.
 - Court/homography decision gate exists.
-- Court/camera/homography evidence is deferred to a Blueprint 8 candidate.
+- Court/camera/homography evidence has started as Blueprint 8 schema work.
 - No court/homography runtime, movement interpretation, bounce, hit, rally, point, scoring, or adjudication has been added.
 - Blueprint 7 completion review exists.
 - Blueprint 7 is marked complete in canonical docs.
 - Final real perception orchestration is documented for fixture-safe demo, optional real detection, optional real-detection-derived tracklets, and optional real pose replay.
+- Blueprint 8 has started.
+- Court keypoint, court line, camera/view, homography candidate, and projection diagnostic schema contracts exist.
+- Court evidence typed storage tables and migration exist.
+- Court template registry v0 exists.
+- Fake court evidence can be persisted through the observation writer with lineage.
 
 ## Blueprint 7 Status
 
@@ -265,7 +270,26 @@ fixture-safe baseline
 
 Blueprint 7 progress after 7F: complete.
 
-Remaining Blueprint 7 work: none. Future evaluation workflows, court/camera/homography evidence, movement/stroke evidence, bounce/hit candidates, real stream ingestion, and product deployment should start as separate blueprints.
+Remaining Blueprint 7 work: none. Future evaluation workflows, movement/stroke evidence, bounce/hit candidates, real stream ingestion, and product deployment should start as separate blueprints.
+
+## Blueprint 8 Status
+
+Status: in progress.
+
+Milestone 8A starts Blueprint 8 with court evidence schema and persistence:
+
+```text
+observation spine
+-> court keypoint observation
+-> court line observation
+-> camera/view observation
+-> homography candidate observation
+-> projection diagnostic observation
+```
+
+Blueprint 8 progress after 8A: about 10-15%.
+
+Remaining Blueprint 8 work should stay deliberate: court keypoint/line adapter, homography candidate builder, replay court overlays, projection diagnostics/review exports, and completion review. 8A does not add tennis-event interpretation.
 
 ## Blueprint 5 Status
 

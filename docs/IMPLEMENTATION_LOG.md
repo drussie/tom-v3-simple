@@ -1,5 +1,47 @@
 # TOM v3 Simple - Implementation Log
 
+## Milestone 8A - Court Evidence Schema / Contract
+
+Status: complete
+
+### Goal
+
+Start Blueprint 8 by implementing the schema and persistence foundation for court/camera/homography evidence.
+
+### Outcome
+
+Blueprint 8 is in progress.
+
+Milestone 8A created:
+
+- Court evidence schema contract docs.
+- Court template registry docs.
+- `tom_v3_schema.court` contracts.
+- Typed storage models for court keypoints, court lines, camera/view evidence, homography candidates, and projection diagnostics.
+- Alembic migration `0003_court_evidence_observations`.
+- Observation writer support for typed court evidence rows.
+- Lineage relationship constants for homography/projection provenance.
+- Schema and persistence tests for fake court evidence.
+
+8A final path:
+
+```text
+observation spine
+-> court typed detail row
+-> lineage when derived
+-> artifacts / annotations through existing evidence system
+```
+
+### Non-goals
+
+- No court runtime.
+- No homography computation.
+- No replay court overlay.
+- No ball/player court-space projection.
+- No bounce/hit/in-out/rally/point/scoring.
+- No stream ingestion.
+- No adjudication.
+
 ## Milestone 7F - Perception Run Orchestration and Completion Review
 
 Status: complete

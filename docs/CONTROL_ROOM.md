@@ -17,6 +17,7 @@ It is not TOM v2, and it does not decide official tennis meaning.
 - Blueprint 5: COMPLETE
 - Blueprint 6: COMPLETE
 - Blueprint 7: COMPLETE
+- Blueprint 8: IN PROGRESS
 - TOM v3 Simple: COMPLETE
 
 TOM v3 Simple is complete as a lightweight local observation/evidence platform. It can index local tennis video, run fixture gameplay/detection/pose paths, optionally run YOLO detection smoke when local runtime and weights exist, persist observations and typed evidence rows, build candidate tracklets, preserve lineage/provenance, render detection/tracklet/pose evidence in the viewer, seed and display review annotations, export TOM-native review datasets, and run a structural completion audit.
@@ -37,7 +38,13 @@ Blueprint 7 completes TOM v3's real perception runtime for the replay workstatio
 
 Blueprint 7 remains observation-only and non-adjudicative. It does not add court/homography implementation, bounce/hit/rally/point/scoring, movement/stroke interpretation, player identity conclusions, real stream ingestion, or TOM v2-style adjudication.
 
-Court/camera/homography evidence is deferred to Blueprint 8.
+Court/camera/homography evidence now proceeds in Blueprint 8.
+
+Blueprint 8 Status: IN PROGRESS
+
+Blueprint 8 starts the court/camera/homography evidence layer. Milestone 8A adds court keypoint, court line, camera/view, homography candidate, and projection diagnostic schema contracts, typed storage tables, writer persistence support, a normalized court template registry, lineage constants, tests, and docs.
+
+8A is schema/contract only. It does not add court runtime, homography computation, replay court overlays, ball/player court-space projection, stream ingestion, or tennis-event interpretation.
 
 ## Canonical Local Demo
 
@@ -93,13 +100,14 @@ An observation does not mean the output is correct, a tennis event happened, a s
 - Real pose crop mode can preserve lineage from source player detections to pose observations.
 - Court/camera/homography evidence decision gate with a Blueprint 8 candidate contract.
 - Blueprint 7 completion review and final perception orchestration runbook.
+- Court/camera/homography schema and typed persistence foundation for Blueprint 8.
 
 ## Explicitly Absent Capabilities
 
 - Movement interpretation or biomechanics conclusions.
 - Stroke classification.
 - Homography or court-space reasoning.
-- Court/camera/homography runtime.
+- Court/camera/homography runtime or replay court overlays.
 - Bounce detection.
 - Hit detection.
 - Rally segmentation.
@@ -132,7 +140,7 @@ Short version:
 - Fixture output is deterministic demo evidence.
 - Optional YOLO quality depends on local runtime, weights, model classes, and source media.
 - Optional real pose quality depends on local runtime, pose weights, source detections or frame sampling, and source media.
-- Court/camera/homography evidence is deferred to Blueprint 8.
+- Court/camera/homography evidence now proceeds in Blueprint 8.
 - Candidate tracklets can be wrong or incomplete.
 - Exports are TOM-native review datasets.
 - Storage lifecycle is local/demo-oriented.
@@ -289,6 +297,24 @@ fixture-safe demo
 
 Remaining Blueprint 7 milestones: none.
 
+## Blueprint 8 Status
+
+Status: IN PROGRESS
+
+Milestone 8A adds the court evidence schema contract:
+
+```text
+observation_family = court
+-> court keypoint observations
+-> court line observations
+-> camera/view observations
+-> homography candidates
+-> projection diagnostics
+-> normalized court template registry
+```
+
+8A adds database schema, typed Pydantic contracts, storage models, observation writer support, lineage relationship constants, schema/persistence tests, and docs. It does not add a court model adapter, homography computation, replay court overlay, ball/player court projection, event interpretation, stream ingestion, or adjudication.
+
 ## Future Blueprint Candidates
 
 Future work should be separate from TOM v3 Simple completion:
@@ -296,7 +322,6 @@ Future work should be separate from TOM v3 Simple completion:
 - Real live stream ingestion.
 - Tracklet quality/evaluation workflows.
 - Pose quality/evaluation workflows.
-- Blueprint 8 - Court / Camera / Homography Evidence Layer.
 - Event candidate layers for bounce/hit/rally/point work.
 - Product deployment, auth, storage lifecycle, and collaboration workflows.
 - Larger-scale evaluation and model-quality workflows.

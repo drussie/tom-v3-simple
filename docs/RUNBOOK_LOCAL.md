@@ -621,6 +621,35 @@ make web
 
 Default validation does not require local weights. If local YOLO or pose weights are absent, skip optional real smokes and use the fixture-safe baseline plus plan-only command checks.
 
+## 11C. Court Evidence Schema Contract
+
+Blueprint 8 has started. Milestone 8A is schema/contract only.
+
+Read:
+
+```text
+docs/court/court_evidence_schema_v0.md
+docs/court/court_template_registry_v0.md
+```
+
+8A adds typed storage for:
+
+```text
+court_keypoint_observation
+court_line_observation
+camera_view_observation
+homography_candidate_observation
+projection_diagnostic_observation
+```
+
+Run schema/persistence tests:
+
+```bash
+.venv/bin/python -m pytest tests/test_court_schema.py tests/test_court_observation_persistence.py -q
+```
+
+There is no court runtime command yet. There is no replay court overlay yet. There is no homography computation or ball/player court-space projection yet.
+
 ## 12. Optional Custom Media
 
 Use a local video:

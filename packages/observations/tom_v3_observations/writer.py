@@ -6,20 +6,30 @@ from sqlalchemy.orm import Session
 from tom_v3_schema.artifacts import EvidenceArtifactRead
 from tom_v3_schema.observations import (
     AtomicObservationRead,
+    CameraViewObservationRead,
+    CourtKeypointObservationRead,
+    CourtLineObservationRead,
     DerivedObservationRead,
     GameplayObservationRead,
+    HomographyCandidateObservationRead,
     ObservationCreate,
     ObservationDetailRead,
     PoseObservationRead,
+    ProjectionDiagnosticObservationRead,
 )
 from tom_v3_storage.db_models import (
     AtomicObservation,
+    CameraViewObservation,
+    CourtKeypointObservation,
+    CourtLineObservation,
     DerivedObservation,
     EvidenceArtifact,
     GameplayObservation,
+    HomographyCandidateObservation,
     Observation,
     ObservationLineage,
     PoseObservation,
+    ProjectionDiagnosticObservation,
 )
 
 
@@ -52,6 +62,32 @@ def observation_detail_from_model(observation: Observation) -> ObservationDetail
     if observation.pose_detail is not None:
         pose = PoseObservationRead.model_validate(observation.pose_detail)
 
+    court_keypoint = None
+    if observation.court_keypoint_detail is not None:
+        court_keypoint = CourtKeypointObservationRead.model_validate(
+            observation.court_keypoint_detail
+        )
+
+    court_line = None
+    if observation.court_line_detail is not None:
+        court_line = CourtLineObservationRead.model_validate(observation.court_line_detail)
+
+    camera_view = None
+    if observation.camera_view_detail is not None:
+        camera_view = CameraViewObservationRead.model_validate(observation.camera_view_detail)
+
+    homography_candidate = None
+    if observation.homography_candidate_detail is not None:
+        homography_candidate = HomographyCandidateObservationRead.model_validate(
+            observation.homography_candidate_detail
+        )
+
+    projection_diagnostic = None
+    if observation.projection_diagnostic_detail is not None:
+        projection_diagnostic = ProjectionDiagnosticObservationRead.model_validate(
+            observation.projection_diagnostic_detail
+        )
+
     return ObservationDetailRead(
         id=observation.id,
         media_id=observation.media_id,
@@ -75,6 +111,11 @@ def observation_detail_from_model(observation: Observation) -> ObservationDetail
         atomic=atomic,
         derived=derived,
         pose=pose,
+        court_keypoint=court_keypoint,
+        court_line=court_line,
+        camera_view=camera_view,
+        homography_candidate=homography_candidate,
+        projection_diagnostic=projection_diagnostic,
         artifacts=[artifact_read_from_model(artifact) for artifact in observation.artifacts],
     )
 
@@ -147,7 +188,17 @@ class ObservationWriter:
     def _validate_typed_extension(self, request: ObservationCreate) -> None:
         typed_count = sum(
             detail is not None
-            for detail in (request.gameplay, request.atomic, request.derived, request.pose)
+            for detail in (
+                request.gameplay,
+                request.atomic,
+                request.derived,
+                request.pose,
+                request.court_keypoint,
+                request.court_line,
+                request.camera_view,
+                request.homography_candidate,
+                request.projection_diagnostic,
+            )
         )
         if typed_count > 1:
             raise ObservationWriterError(
@@ -163,6 +214,15 @@ class ObservationWriter:
             raise ObservationWriterError("derived detail requires observation_family=derived")
         if request.pose is not None and family != "pose":
             raise ObservationWriterError("pose detail requires observation_family=pose")
+        court_details = (
+            request.court_keypoint,
+            request.court_line,
+            request.camera_view,
+            request.homography_candidate,
+            request.projection_diagnostic,
+        )
+        if any(detail is not None for detail in court_details) and family != "court":
+            raise ObservationWriterError("court details require observation_family=court")
 
     def _insert_typed_extension(
         self, observation: Observation, request: ObservationCreate
@@ -235,6 +295,148 @@ class ObservationWriter:
                     frame_time_owner=request.pose.frame_time_owner,
                     raw_model_payload_jsonb=request.pose.raw_model_payload_jsonb,
                     metadata_jsonb=request.pose.metadata_jsonb,
+                )
+            )
+        if request.court_keypoint is not None:
+            self.session.add(
+                CourtKeypointObservation(
+                    observation_id=observation.id,
+                    media_id=observation.media_id,
+                    run_id=observation.run_id,
+                    frame_number=request.court_keypoint.frame_number,
+                    timestamp_ms=request.court_keypoint.timestamp_ms,
+                    court_keypoint_schema=request.court_keypoint.court_keypoint_schema,
+                    schema_version=request.court_keypoint.schema_version,
+                    keypoints_jsonb=request.court_keypoint.keypoints_jsonb,
+                    keypoint_count=request.court_keypoint.keypoint_count or 0,
+                    keypoints_present_count=request.court_keypoint.keypoints_present_count or 0,
+                    keypoints_missing_count=request.court_keypoint.keypoints_missing_count or 0,
+                    mean_keypoint_confidence=request.court_keypoint.mean_keypoint_confidence,
+                    min_keypoint_confidence=request.court_keypoint.min_keypoint_confidence,
+                    max_keypoint_confidence=request.court_keypoint.max_keypoint_confidence,
+                    coordinate_space=request.court_keypoint.coordinate_space,
+                    model_id=observation.model_id,
+                    runtime_config_id=observation.runtime_config_id,
+                    frame_time_owner=request.court_keypoint.frame_time_owner,
+                    raw_model_payload_jsonb=request.court_keypoint.raw_model_payload_jsonb,
+                    metadata_jsonb=request.court_keypoint.metadata_jsonb,
+                )
+            )
+        if request.court_line is not None:
+            self.session.add(
+                CourtLineObservation(
+                    observation_id=observation.id,
+                    media_id=observation.media_id,
+                    run_id=observation.run_id,
+                    frame_number=request.court_line.frame_number,
+                    timestamp_ms=request.court_line.timestamp_ms,
+                    line_segments_jsonb=request.court_line.line_segments_jsonb,
+                    line_classes_jsonb=request.court_line.line_classes_jsonb,
+                    line_count=request.court_line.line_count or 0,
+                    mean_line_confidence=request.court_line.mean_line_confidence,
+                    coordinate_space=request.court_line.coordinate_space,
+                    model_id=observation.model_id,
+                    runtime_config_id=observation.runtime_config_id,
+                    frame_time_owner=request.court_line.frame_time_owner,
+                    raw_model_payload_jsonb=request.court_line.raw_model_payload_jsonb,
+                    metadata_jsonb=request.court_line.metadata_jsonb,
+                )
+            )
+        if request.camera_view is not None:
+            self.session.add(
+                CameraViewObservation(
+                    observation_id=observation.id,
+                    media_id=observation.media_id,
+                    run_id=observation.run_id,
+                    frame_number=request.camera_view.frame_number,
+                    timestamp_ms=request.camera_view.timestamp_ms,
+                    frame_start=request.camera_view.frame_start,
+                    frame_end=request.camera_view.frame_end,
+                    timestamp_start_ms=request.camera_view.timestamp_start_ms,
+                    timestamp_end_ms=request.camera_view.timestamp_end_ms,
+                    view_label=request.camera_view.view_label,
+                    view_confidence=request.camera_view.view_confidence,
+                    camera_motion_hint=request.camera_view.camera_motion_hint,
+                    stability_score=request.camera_view.stability_score,
+                    cut_likelihood=request.camera_view.cut_likelihood,
+                    model_id=observation.model_id,
+                    runtime_config_id=observation.runtime_config_id,
+                    frame_time_owner=request.camera_view.frame_time_owner,
+                    metadata_jsonb=request.camera_view.metadata_jsonb,
+                )
+            )
+        if request.homography_candidate is not None:
+            self.session.add(
+                HomographyCandidateObservation(
+                    observation_id=observation.id,
+                    media_id=observation.media_id,
+                    run_id=observation.run_id,
+                    frame_number=request.homography_candidate.frame_number,
+                    timestamp_ms=request.homography_candidate.timestamp_ms,
+                    source_court_keypoint_observation_id=(
+                        request.homography_candidate.source_court_keypoint_observation_id
+                    ),
+                    source_court_line_observation_id=(
+                        request.homography_candidate.source_court_line_observation_id
+                    ),
+                    source_camera_view_observation_id=(
+                        request.homography_candidate.source_camera_view_observation_id
+                    ),
+                    homography_matrix_jsonb=request.homography_candidate.homography_matrix_jsonb,
+                    inverse_homography_matrix_jsonb=(
+                        request.homography_candidate.inverse_homography_matrix_jsonb
+                    ),
+                    source_coordinate_space=request.homography_candidate.source_coordinate_space,
+                    target_coordinate_space=request.homography_candidate.target_coordinate_space,
+                    matrix_direction=request.homography_candidate.matrix_direction,
+                    template_name=request.homography_candidate.template_name,
+                    template_version=request.homography_candidate.template_version,
+                    reprojection_error_mean=(
+                        request.homography_candidate.reprojection_error_mean
+                    ),
+                    reprojection_error_median=(
+                        request.homography_candidate.reprojection_error_median
+                    ),
+                    reprojection_error_max=request.homography_candidate.reprojection_error_max,
+                    inlier_count=request.homography_candidate.inlier_count,
+                    outlier_count=request.homography_candidate.outlier_count,
+                    source_point_count=request.homography_candidate.source_point_count,
+                    source_line_count=request.homography_candidate.source_line_count,
+                    confidence=request.homography_candidate.confidence,
+                    status=request.homography_candidate.status,
+                    model_id=observation.model_id,
+                    runtime_config_id=observation.runtime_config_id,
+                    frame_time_owner=request.homography_candidate.frame_time_owner,
+                    metadata_jsonb=request.homography_candidate.metadata_jsonb,
+                )
+            )
+        if request.projection_diagnostic is not None:
+            self.session.add(
+                ProjectionDiagnosticObservation(
+                    observation_id=observation.id,
+                    media_id=observation.media_id,
+                    run_id=observation.run_id,
+                    frame_number=request.projection_diagnostic.frame_number,
+                    timestamp_ms=request.projection_diagnostic.timestamp_ms,
+                    source_homography_candidate_observation_id=(
+                        request.projection_diagnostic.source_homography_candidate_observation_id
+                    ),
+                    projected_template_keypoints_jsonb=(
+                        request.projection_diagnostic.projected_template_keypoints_jsonb
+                    ),
+                    projected_template_lines_jsonb=(
+                        request.projection_diagnostic.projected_template_lines_jsonb
+                    ),
+                    diagnostic_metrics_jsonb=(
+                        request.projection_diagnostic.diagnostic_metrics_jsonb
+                    ),
+                    overlay_artifact_id=request.projection_diagnostic.overlay_artifact_id,
+                    confidence=request.projection_diagnostic.confidence,
+                    status=request.projection_diagnostic.status,
+                    model_id=observation.model_id,
+                    runtime_config_id=observation.runtime_config_id,
+                    frame_time_owner=request.projection_diagnostic.frame_time_owner,
+                    metadata_jsonb=request.projection_diagnostic.metadata_jsonb,
                 )
             )
 

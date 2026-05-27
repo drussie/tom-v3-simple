@@ -349,4 +349,4 @@ Mitigation: replay layers should be toggleable and confidence-filtered.
 
 7E adds no runtime, database migration, API endpoint, detector, court overlay, homography computation, coordinate transform service, tennis-event interpretation, or stream ingestion.
 
-Milestone 7F preserves this boundary while marking Blueprint 7 complete. Court/camera/homography evidence remains a Blueprint 8 candidate, not a hidden extension of Blueprint 7.
+Milestone 7F preserves this boundary while marking Blueprint 7 complete. Milestone 8A starts Blueprint 8 by implementing the schema and typed persistence foundation for court/camera/homography evidence, without adding runtime inference, replay overlays, homography computation, ball/player projection, or tennis-event interpretation.

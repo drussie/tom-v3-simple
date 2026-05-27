@@ -1,8 +1,8 @@
 # TOM v3 Blueprint 8 Candidate - Court / Camera / Homography Evidence Layer
 
-Status: CANDIDATE
+Status: IN PROGRESS
 
-Blueprint 7 is complete. This document remains the future-work boundary for court/camera/homography evidence.
+Blueprint 7 is complete. Blueprint 8 has started with Milestone 8A schema/contract work.
 
 ## Mission
 
@@ -36,6 +36,10 @@ court/camera evidence
 ### 8A - Court Evidence Schema / Contract
 
 Define court observation family, typed rows, keypoint schemas, line classes, camera/view labels, lineage, audit expectations, and TOM-native export contracts.
+
+Status: COMPLETE.
+
+8A adds typed contracts, storage models, Alembic migration, observation writer support, lineage constants, a normalized court template registry, schema/persistence tests, and docs. It does not add court runtime, homography computation, replay court overlays, or ball/player court projections.
 
 ### 8B - Court Keypoint / Line Evidence Adapter
 
@@ -71,7 +75,7 @@ Potential observation types:
 - `homography_candidate_observation`
 - `projection_diagnostic_observation`
 
-Blueprint 8 should decide whether these become typed tables, free-text observation types with JSON contracts, or a hybrid.
+8A implements these as typed tables connected to the existing observation spine.
 
 ## Evidence Invariants
 

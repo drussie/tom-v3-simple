@@ -101,11 +101,18 @@ class RelationshipType(StrEnum):
     pose_from_subject_detection_candidate = "pose_from_subject_detection_candidate"
     subject_context_candidate = "subject_context_candidate"
     pose_from_track_point_candidate = "pose_from_track_point_candidate"
+    homography_from_court_keypoints_candidate = "homography_from_court_keypoints_candidate"
+    homography_from_court_lines_candidate = "homography_from_court_lines_candidate"
+    camera_context_for_homography_candidate = "camera_context_for_homography_candidate"
+    projection_diagnostic_for_homography_candidate = (
+        "projection_diagnostic_for_homography_candidate"
+    )
 
 
 class CoordinateSpace(StrEnum):
     image_pixels = "image_pixels"
     normalized_frame = "normalized_frame"
+    court_template_2d = "court_template_2d"
     court_plane = "court_plane"
     world_estimate = "world_estimate"
     none = "none"

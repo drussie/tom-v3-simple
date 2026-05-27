@@ -5,6 +5,18 @@ from pydantic import Field, model_validator
 
 from tom_v3_schema.artifacts import EvidenceArtifactCreate, EvidenceArtifactRead
 from tom_v3_schema.base import TOMBaseModel
+from tom_v3_schema.court import (
+    CameraViewObservationCreate,
+    CameraViewObservationRead,
+    CourtKeypointObservationCreate,
+    CourtKeypointObservationRead,
+    CourtLineObservationCreate,
+    CourtLineObservationRead,
+    HomographyCandidateObservationCreate,
+    HomographyCandidateObservationRead,
+    ProjectionDiagnosticObservationCreate,
+    ProjectionDiagnosticObservationRead,
+)
 from tom_v3_schema.enums import (
     AtomicKind,
     CoordinateSpace,
@@ -80,6 +92,11 @@ class ObservationCreate(TOMBaseModel):
     atomic: AtomicObservationCreate | None = None
     derived: DerivedObservationCreate | None = None
     pose: PoseObservationCreate | None = None
+    court_keypoint: CourtKeypointObservationCreate | None = None
+    court_line: CourtLineObservationCreate | None = None
+    camera_view: CameraViewObservationCreate | None = None
+    homography_candidate: HomographyCandidateObservationCreate | None = None
+    projection_diagnostic: ProjectionDiagnosticObservationCreate | None = None
     lineage: list[ObservationLineageCreate] = Field(default_factory=list)
     artifacts: list[EvidenceArtifactCreate] = Field(default_factory=list)
 
@@ -126,6 +143,11 @@ class ObservationDetailRead(ObservationCoreRead):
     atomic: AtomicObservationRead | None = None
     derived: DerivedObservationRead | None = None
     pose: PoseObservationRead | None = None
+    court_keypoint: CourtKeypointObservationRead | None = None
+    court_line: CourtLineObservationRead | None = None
+    camera_view: CameraViewObservationRead | None = None
+    homography_candidate: HomographyCandidateObservationRead | None = None
+    projection_diagnostic: ProjectionDiagnosticObservationRead | None = None
     artifacts: list[EvidenceArtifactRead] = Field(default_factory=list)
 
 

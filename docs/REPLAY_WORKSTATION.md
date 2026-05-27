@@ -54,7 +54,9 @@ indexed media
 -> replay URL with detectionRunId, trackletRunId, and poseRunId
 ```
 
-Blueprint 7 completes TOM v3's real perception runtime for the replay workstation. The workstation can render fixture evidence or optional real model-output evidence through the same detection, tracklet, pose, timeline, and selected-detail surfaces. Court/camera/homography evidence is deferred to Blueprint 8.
+Blueprint 7 completes TOM v3's real perception runtime for the replay workstation. The workstation can render fixture evidence or optional real model-output evidence through the same detection, tracklet, pose, timeline, and selected-detail surfaces. Court/camera/homography evidence now proceeds in Blueprint 8.
+
+Blueprint 8 has started with schema/contract work. Milestone 8A adds court keypoint, court line, camera/view, homography candidate, and projection diagnostic storage contracts, but it does not add replay court overlays yet.
 
 ## What 6A Added
 
@@ -222,6 +224,18 @@ run-real-pose
 ```
 
 The replay workstation remains evidence-only: detection observations, candidate tracklets, track point candidates, and pose keypoint evidence do not become tennis events, player identities, court positions, or scoring.
+
+## Blueprint 8A Court Schema Boundary
+
+8A adds backend schema and persistence foundations for future replay court layers:
+
+- court keypoint evidence
+- court line evidence
+- camera/view evidence
+- homography candidate
+- projection diagnostic
+
+The replay workstation does not yet fetch or render these court layers. Future Blueprint 8 milestones should add court overlays deliberately, with labels that keep geometry evidence separate from bounce, hit, in/out, rally, point, and scoring conclusions.
 
 ## Backend Replay Info
 

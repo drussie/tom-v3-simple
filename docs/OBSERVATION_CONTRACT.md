@@ -70,6 +70,22 @@ They use COCO17 keypoint names/indices in v0. Missing keypoints persist as missi
 
 Pose observations do not identify a player, classify movement, or describe tennis actions.
 
+## Court / Camera / Homography Evidence
+
+Blueprint 8 uses `observation_family = court` for geometry evidence.
+
+Current typed court observation types:
+
+- `court_keypoint_observation`
+- `court_line_observation`
+- `camera_view_observation`
+- `homography_candidate_observation`
+- `projection_diagnostic_observation`
+
+Court observations store geometry evidence at media-owned frame/time. Homography rows are candidates. Projection diagnostic rows diagnose court-template projection evidence only.
+
+Court evidence does not decide in/out, bounce locations, player court position, ball court position, rally state, point state, or score.
+
 ## Lineage
 
 Lineage records source relationships between observations.
@@ -81,6 +97,10 @@ Examples:
 - `pose_from_subject_detection_candidate`
 - `subject_context_candidate`
 - `pose_from_track_point_candidate`
+- `homography_from_court_keypoints_candidate`
+- `homography_from_court_lines_candidate`
+- `camera_context_for_homography_candidate`
+- `projection_diagnostic_for_homography_candidate`
 
 Lineage is source context. It does not certify correctness.
 
@@ -111,6 +131,8 @@ Current exports:
 
 - tracklet review dataset
 - pose review dataset
+
+Future court review exports should package court keypoints, court lines, camera/view evidence, homography candidates, projection diagnostics, lineage, artifacts, and annotations without producing tennis-event conclusions.
 
 Exports are portable evidence packages. They are not official tennis results.
 

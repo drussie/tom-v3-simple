@@ -156,6 +156,31 @@ class Observation(CreatedAtMixin, Base):
         uselist=False,
         foreign_keys="PoseObservation.observation_id",
     )
+    court_keypoint_detail: Mapped["CourtKeypointObservation | None"] = relationship(
+        back_populates="observation",
+        uselist=False,
+        foreign_keys="CourtKeypointObservation.observation_id",
+    )
+    court_line_detail: Mapped["CourtLineObservation | None"] = relationship(
+        back_populates="observation",
+        uselist=False,
+        foreign_keys="CourtLineObservation.observation_id",
+    )
+    camera_view_detail: Mapped["CameraViewObservation | None"] = relationship(
+        back_populates="observation",
+        uselist=False,
+        foreign_keys="CameraViewObservation.observation_id",
+    )
+    homography_candidate_detail: Mapped["HomographyCandidateObservation | None"] = relationship(
+        back_populates="observation",
+        uselist=False,
+        foreign_keys="HomographyCandidateObservation.observation_id",
+    )
+    projection_diagnostic_detail: Mapped["ProjectionDiagnosticObservation | None"] = relationship(
+        back_populates="observation",
+        uselist=False,
+        foreign_keys="ProjectionDiagnosticObservation.observation_id",
+    )
     artifacts: Mapped[list["EvidenceArtifact"]] = relationship(back_populates="target_observation")
     annotations: Mapped[list["HumanAnnotation"]] = relationship(back_populates="observation")
 
@@ -273,6 +298,270 @@ class PoseObservation(CreatedAtMixin, Base):
     )
     subject_tracklet: Mapped["Tracklet | None"] = relationship()
     subject_track_point: Mapped["TrackPoint | None"] = relationship()
+
+
+class CourtKeypointObservation(CreatedAtMixin, Base):
+    __tablename__ = "court_keypoint_observation"
+    __table_args__ = (
+        Index("ix_court_keypoint_media_run", "media_id", "run_id"),
+        Index("ix_court_keypoint_media_frame", "media_id", "frame_number"),
+        Index("ix_court_keypoint_run_frame", "run_id", "frame_number"),
+        Index("ix_court_keypoint_schema", "court_keypoint_schema", "schema_version"),
+    )
+
+    observation_id: Mapped[str] = mapped_column(
+        ForeignKey("observation.id"), primary_key=True, nullable=False
+    )
+    media_id: Mapped[str] = mapped_column(ForeignKey("media_asset.id"), nullable=False)
+    run_id: Mapped[str] = mapped_column(ForeignKey("processing_run.id"), nullable=False)
+    frame_number: Mapped[int] = mapped_column(Integer, nullable=False)
+    timestamp_ms: Mapped[int] = mapped_column(Integer, nullable=False)
+    court_keypoint_schema: Mapped[str] = mapped_column(String(120), nullable=False)
+    schema_version: Mapped[str] = mapped_column(String(100), nullable=False)
+    keypoints_jsonb: Mapped[list[dict[str, Any]]] = mapped_column(
+        JsonType, default=list, nullable=False
+    )
+    keypoint_count: Mapped[int] = mapped_column(Integer, nullable=False)
+    keypoints_present_count: Mapped[int] = mapped_column(Integer, nullable=False)
+    keypoints_missing_count: Mapped[int] = mapped_column(Integer, nullable=False)
+    mean_keypoint_confidence: Mapped[float | None] = mapped_column(Float)
+    min_keypoint_confidence: Mapped[float | None] = mapped_column(Float)
+    max_keypoint_confidence: Mapped[float | None] = mapped_column(Float)
+    coordinate_space: Mapped[str] = mapped_column(
+        String(100), nullable=False, default="image_pixels"
+    )
+    model_id: Mapped[str | None] = mapped_column(ForeignKey("model_registry.id"))
+    runtime_config_id: Mapped[str | None] = mapped_column(ForeignKey("runtime_config.id"))
+    frame_time_owner: Mapped[str] = mapped_column(
+        String(100), nullable=False, default="media_indexing"
+    )
+    raw_model_payload_jsonb: Mapped[dict[str, Any]] = mapped_column(
+        JsonType, default=dict, nullable=False
+    )
+    metadata_jsonb: Mapped[dict[str, Any]] = mapped_column(JsonType, default=dict, nullable=False)
+
+    observation: Mapped[Observation] = relationship(
+        back_populates="court_keypoint_detail", foreign_keys=[observation_id]
+    )
+    media: Mapped[MediaAsset] = relationship()
+    run: Mapped[ProcessingRun] = relationship()
+    model: Mapped[ModelRegistry | None] = relationship()
+    runtime_config: Mapped[RuntimeConfig | None] = relationship()
+
+
+class CourtLineObservation(CreatedAtMixin, Base):
+    __tablename__ = "court_line_observation"
+    __table_args__ = (
+        Index("ix_court_line_media_run", "media_id", "run_id"),
+        Index("ix_court_line_media_frame", "media_id", "frame_number"),
+        Index("ix_court_line_run_frame", "run_id", "frame_number"),
+    )
+
+    observation_id: Mapped[str] = mapped_column(
+        ForeignKey("observation.id"), primary_key=True, nullable=False
+    )
+    media_id: Mapped[str] = mapped_column(ForeignKey("media_asset.id"), nullable=False)
+    run_id: Mapped[str] = mapped_column(ForeignKey("processing_run.id"), nullable=False)
+    frame_number: Mapped[int] = mapped_column(Integer, nullable=False)
+    timestamp_ms: Mapped[int] = mapped_column(Integer, nullable=False)
+    line_segments_jsonb: Mapped[list[dict[str, Any]]] = mapped_column(
+        JsonType, default=list, nullable=False
+    )
+    line_classes_jsonb: Mapped[list[str]] = mapped_column(
+        JsonType, default=list, nullable=False
+    )
+    line_count: Mapped[int] = mapped_column(Integer, nullable=False)
+    mean_line_confidence: Mapped[float | None] = mapped_column(Float)
+    coordinate_space: Mapped[str] = mapped_column(
+        String(100), nullable=False, default="image_pixels"
+    )
+    model_id: Mapped[str | None] = mapped_column(ForeignKey("model_registry.id"))
+    runtime_config_id: Mapped[str | None] = mapped_column(ForeignKey("runtime_config.id"))
+    frame_time_owner: Mapped[str] = mapped_column(
+        String(100), nullable=False, default="media_indexing"
+    )
+    raw_model_payload_jsonb: Mapped[dict[str, Any]] = mapped_column(
+        JsonType, default=dict, nullable=False
+    )
+    metadata_jsonb: Mapped[dict[str, Any]] = mapped_column(JsonType, default=dict, nullable=False)
+
+    observation: Mapped[Observation] = relationship(
+        back_populates="court_line_detail", foreign_keys=[observation_id]
+    )
+    media: Mapped[MediaAsset] = relationship()
+    run: Mapped[ProcessingRun] = relationship()
+    model: Mapped[ModelRegistry | None] = relationship()
+    runtime_config: Mapped[RuntimeConfig | None] = relationship()
+
+
+class CameraViewObservation(CreatedAtMixin, Base):
+    __tablename__ = "camera_view_observation"
+    __table_args__ = (
+        Index("ix_camera_view_media_run", "media_id", "run_id"),
+        Index("ix_camera_view_media_frame", "media_id", "frame_number"),
+        Index("ix_camera_view_run_frame", "run_id", "frame_number"),
+        Index("ix_camera_view_label", "view_label"),
+    )
+
+    observation_id: Mapped[str] = mapped_column(
+        ForeignKey("observation.id"), primary_key=True, nullable=False
+    )
+    media_id: Mapped[str] = mapped_column(ForeignKey("media_asset.id"), nullable=False)
+    run_id: Mapped[str] = mapped_column(ForeignKey("processing_run.id"), nullable=False)
+    frame_number: Mapped[int] = mapped_column(Integer, nullable=False)
+    timestamp_ms: Mapped[int] = mapped_column(Integer, nullable=False)
+    frame_start: Mapped[int | None] = mapped_column(Integer)
+    frame_end: Mapped[int | None] = mapped_column(Integer)
+    timestamp_start_ms: Mapped[int | None] = mapped_column(Integer)
+    timestamp_end_ms: Mapped[int | None] = mapped_column(Integer)
+    view_label: Mapped[str] = mapped_column(String(100), nullable=False)
+    view_confidence: Mapped[float | None] = mapped_column(Float)
+    camera_motion_hint: Mapped[str | None] = mapped_column(String(100))
+    stability_score: Mapped[float | None] = mapped_column(Float)
+    cut_likelihood: Mapped[float | None] = mapped_column(Float)
+    model_id: Mapped[str | None] = mapped_column(ForeignKey("model_registry.id"))
+    runtime_config_id: Mapped[str | None] = mapped_column(ForeignKey("runtime_config.id"))
+    frame_time_owner: Mapped[str] = mapped_column(
+        String(100), nullable=False, default="media_indexing"
+    )
+    metadata_jsonb: Mapped[dict[str, Any]] = mapped_column(JsonType, default=dict, nullable=False)
+
+    observation: Mapped[Observation] = relationship(
+        back_populates="camera_view_detail", foreign_keys=[observation_id]
+    )
+    media: Mapped[MediaAsset] = relationship()
+    run: Mapped[ProcessingRun] = relationship()
+    model: Mapped[ModelRegistry | None] = relationship()
+    runtime_config: Mapped[RuntimeConfig | None] = relationship()
+
+
+class HomographyCandidateObservation(CreatedAtMixin, Base):
+    __tablename__ = "homography_candidate_observation"
+    __table_args__ = (
+        Index("ix_homography_candidate_media_run", "media_id", "run_id"),
+        Index("ix_homography_candidate_media_frame", "media_id", "frame_number"),
+        Index("ix_homography_candidate_run_frame", "run_id", "frame_number"),
+        Index(
+            "ix_homography_candidate_source_keypoint",
+            "source_court_keypoint_observation_id",
+        ),
+        Index("ix_homography_candidate_source_line", "source_court_line_observation_id"),
+        Index("ix_homography_candidate_source_camera", "source_camera_view_observation_id"),
+        Index("ix_homography_candidate_status", "status"),
+    )
+
+    observation_id: Mapped[str] = mapped_column(
+        ForeignKey("observation.id"), primary_key=True, nullable=False
+    )
+    media_id: Mapped[str] = mapped_column(ForeignKey("media_asset.id"), nullable=False)
+    run_id: Mapped[str] = mapped_column(ForeignKey("processing_run.id"), nullable=False)
+    frame_number: Mapped[int] = mapped_column(Integer, nullable=False)
+    timestamp_ms: Mapped[int] = mapped_column(Integer, nullable=False)
+    source_court_keypoint_observation_id: Mapped[str | None] = mapped_column(
+        ForeignKey("observation.id")
+    )
+    source_court_line_observation_id: Mapped[str | None] = mapped_column(
+        ForeignKey("observation.id")
+    )
+    source_camera_view_observation_id: Mapped[str | None] = mapped_column(
+        ForeignKey("observation.id")
+    )
+    homography_matrix_jsonb: Mapped[list[list[float]] | None] = mapped_column(JsonType)
+    inverse_homography_matrix_jsonb: Mapped[list[list[float]] | None] = mapped_column(JsonType)
+    source_coordinate_space: Mapped[str] = mapped_column(String(100), nullable=False)
+    target_coordinate_space: Mapped[str] = mapped_column(String(100), nullable=False)
+    matrix_direction: Mapped[str] = mapped_column(String(120), nullable=False)
+    template_name: Mapped[str] = mapped_column(String(200), nullable=False)
+    template_version: Mapped[str] = mapped_column(String(100), nullable=False)
+    reprojection_error_mean: Mapped[float | None] = mapped_column(Float)
+    reprojection_error_median: Mapped[float | None] = mapped_column(Float)
+    reprojection_error_max: Mapped[float | None] = mapped_column(Float)
+    inlier_count: Mapped[int | None] = mapped_column(Integer)
+    outlier_count: Mapped[int | None] = mapped_column(Integer)
+    source_point_count: Mapped[int | None] = mapped_column(Integer)
+    source_line_count: Mapped[int | None] = mapped_column(Integer)
+    confidence: Mapped[float | None] = mapped_column(Float)
+    status: Mapped[str] = mapped_column(String(100), nullable=False, default="candidate")
+    model_id: Mapped[str | None] = mapped_column(ForeignKey("model_registry.id"))
+    runtime_config_id: Mapped[str | None] = mapped_column(ForeignKey("runtime_config.id"))
+    frame_time_owner: Mapped[str] = mapped_column(
+        String(100), nullable=False, default="media_indexing"
+    )
+    metadata_jsonb: Mapped[dict[str, Any]] = mapped_column(JsonType, default=dict, nullable=False)
+
+    observation: Mapped[Observation] = relationship(
+        back_populates="homography_candidate_detail", foreign_keys=[observation_id]
+    )
+    media: Mapped[MediaAsset] = relationship()
+    run: Mapped[ProcessingRun] = relationship()
+    source_court_keypoint_observation: Mapped[Observation | None] = relationship(
+        foreign_keys=[source_court_keypoint_observation_id]
+    )
+    source_court_line_observation: Mapped[Observation | None] = relationship(
+        foreign_keys=[source_court_line_observation_id]
+    )
+    source_camera_view_observation: Mapped[Observation | None] = relationship(
+        foreign_keys=[source_camera_view_observation_id]
+    )
+    model: Mapped[ModelRegistry | None] = relationship()
+    runtime_config: Mapped[RuntimeConfig | None] = relationship()
+
+
+class ProjectionDiagnosticObservation(CreatedAtMixin, Base):
+    __tablename__ = "projection_diagnostic_observation"
+    __table_args__ = (
+        Index("ix_projection_diagnostic_media_run", "media_id", "run_id"),
+        Index("ix_projection_diagnostic_media_frame", "media_id", "frame_number"),
+        Index("ix_projection_diagnostic_run_frame", "run_id", "frame_number"),
+        Index(
+            "ix_projection_diagnostic_source_homography",
+            "source_homography_candidate_observation_id",
+        ),
+        Index("ix_projection_diagnostic_status", "status"),
+    )
+
+    observation_id: Mapped[str] = mapped_column(
+        ForeignKey("observation.id"), primary_key=True, nullable=False
+    )
+    media_id: Mapped[str] = mapped_column(ForeignKey("media_asset.id"), nullable=False)
+    run_id: Mapped[str] = mapped_column(ForeignKey("processing_run.id"), nullable=False)
+    frame_number: Mapped[int] = mapped_column(Integer, nullable=False)
+    timestamp_ms: Mapped[int] = mapped_column(Integer, nullable=False)
+    source_homography_candidate_observation_id: Mapped[str] = mapped_column(
+        ForeignKey("observation.id"), nullable=False
+    )
+    projected_template_keypoints_jsonb: Mapped[list[dict[str, Any]]] = mapped_column(
+        JsonType, default=list, nullable=False
+    )
+    projected_template_lines_jsonb: Mapped[list[dict[str, Any]]] = mapped_column(
+        JsonType, default=list, nullable=False
+    )
+    diagnostic_metrics_jsonb: Mapped[dict[str, Any]] = mapped_column(
+        JsonType, default=dict, nullable=False
+    )
+    overlay_artifact_id: Mapped[str | None] = mapped_column(ForeignKey("evidence_artifact.id"))
+    confidence: Mapped[float | None] = mapped_column(Float)
+    status: Mapped[str] = mapped_column(
+        String(100), nullable=False, default="diagnostic_candidate"
+    )
+    model_id: Mapped[str | None] = mapped_column(ForeignKey("model_registry.id"))
+    runtime_config_id: Mapped[str | None] = mapped_column(ForeignKey("runtime_config.id"))
+    frame_time_owner: Mapped[str] = mapped_column(
+        String(100), nullable=False, default="media_indexing"
+    )
+    metadata_jsonb: Mapped[dict[str, Any]] = mapped_column(JsonType, default=dict, nullable=False)
+
+    observation: Mapped[Observation] = relationship(
+        back_populates="projection_diagnostic_detail", foreign_keys=[observation_id]
+    )
+    media: Mapped[MediaAsset] = relationship()
+    run: Mapped[ProcessingRun] = relationship()
+    source_homography_candidate_observation: Mapped[Observation] = relationship(
+        foreign_keys=[source_homography_candidate_observation_id]
+    )
+    overlay_artifact: Mapped["EvidenceArtifact | None"] = relationship()
+    model: Mapped[ModelRegistry | None] = relationship()
+    runtime_config: Mapped[RuntimeConfig | None] = relationship()
 
 
 class Tracklet(Base):

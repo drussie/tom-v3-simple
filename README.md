@@ -28,7 +28,13 @@ Blueprint 7 completes TOM v3's real perception runtime for the replay workstatio
 
 Blueprint 7 remains observation-only and non-adjudicative. It does not add court/homography implementation, bounce/hit/rally/point/scoring, movement/stroke interpretation, player identity conclusions, real stream ingestion, or TOM v2-style adjudication.
 
-Court/camera/homography evidence is deferred to Blueprint 8.
+Court/camera/homography evidence now proceeds in Blueprint 8.
+
+Blueprint 8 Status: IN PROGRESS
+
+Blueprint 8 starts TOM v3's court/camera/homography evidence layer. Milestone 8A adds the schema and persistence contract for court keypoints, court lines, camera/view evidence, homography candidates, projection diagnostics, and a normalized court template registry.
+
+8A is schema/contract only. It does not add a court runtime, homography computation, replay court overlay, ball/player court-space projection, bounce/hit/in-out/rally/point/scoring, real stream ingestion, or adjudication.
 
 ## What It Does
 
@@ -52,7 +58,7 @@ Court/camera/homography evidence is deferred to Blueprint 8.
 - No scoring, point reconstruction, rally segmentation, hit detection, or bounce detection.
 - No stroke classification, movement interpretation, or biomechanics conclusions.
 - No homography or court-space reasoning.
-- No court/camera/homography runtime in Blueprint 7.
+- No court/camera/homography runtime or replay court overlay in Blueprint 8A.
 - No movement interpretation from pose keypoints.
 - No production deployment, auth, cloud workflow, real live stream ingestion, or multi-camera support.
 
@@ -196,17 +202,19 @@ Real pose output persists `player_pose_observation` keypoint evidence and can be
 - [Real Detection Replay](docs/perception/real_detection_replay_v0.md)
 - [Real Pose Replay](docs/perception/real_pose_replay_v0.md)
 - [Court / Homography Decision](docs/court/court_homography_evidence_decision_v0.md)
+- [Court Evidence Schema](docs/court/court_evidence_schema_v0.md)
+- [Court Template Registry](docs/court/court_template_registry_v0.md)
 - [Completion Checklist](docs/COMPLETION_CHECKLIST.md)
 - [Final Completion Review](docs/blueprints/tom_v3_simple_final_completion_review.md)
 - [Blueprint 6 Completion Review](docs/blueprints/tom_v3_blueprint_6_completion_review.md)
 - [Blueprint 7 - Real Perception Runtime](docs/blueprints/tom_v3_blueprint_7_real_perception_runtime_for_replay_workstation.md)
 - [Blueprint 7 Completion Review](docs/blueprints/tom_v3_blueprint_7_completion_review.md)
-- [Blueprint 8 Candidate - Court / Camera / Homography Evidence](docs/blueprints/tom_v3_blueprint_8_court_camera_homography_evidence_layer_candidate.md)
+- [Blueprint 8 - Court / Camera / Homography Evidence](docs/blueprints/tom_v3_blueprint_8_court_camera_homography_evidence_layer_candidate.md)
 - [Control Room Index](docs/CONTROL_ROOM_INDEX.md)
 
 ## Current State
 
-Blueprints 1, 2, 3, 4, 5, 6, and 7 are complete. TOM v3 Simple is complete as a lightweight local platform, Blueprint 6 is complete as the visual replay/operator workstation layer, and Blueprint 7 is complete as the real perception runtime layer for optional real detection, real-detection-derived candidate tracklets, and optional real pose replay.
+Blueprints 1, 2, 3, 4, 5, 6, and 7 are complete. TOM v3 Simple is complete as a lightweight local platform, Blueprint 6 is complete as the visual replay/operator workstation layer, Blueprint 7 is complete as the real perception runtime layer for optional real detection, real-detection-derived candidate tracklets, and optional real pose replay, and Blueprint 8 has started with court/camera/homography schema contracts.
 
 Current TOM v3 Simple path:
 
@@ -270,4 +278,4 @@ indexed media
 -> replay workstation evidence overlays
 ```
 
-Court/camera/homography evidence is deferred to Blueprint 8. Future real live ingestion, movement/stroke evidence, and new tennis-intelligence work should start as separate blueprints.
+Court/camera/homography evidence now has an 8A schema/persistence foundation, but runtime, homography computation, replay overlays, and ball/player court projections are future Blueprint 8 work. Future real live ingestion, movement/stroke evidence, and new tennis-intelligence work should start as separate blueprints.

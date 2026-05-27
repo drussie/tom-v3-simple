@@ -9,9 +9,10 @@
 - Blueprint 5: COMPLETE
 - Blueprint 6: COMPLETE
 - Blueprint 7: COMPLETE
+- Blueprint 8: IN PROGRESS
 - TOM v3 Simple: COMPLETE
 
-TOM v3 Simple is complete as a lightweight local observation/evidence platform. Blueprint 6 is complete as the visual replay/operator workstation layer. Blueprint 7 is complete as the real perception runtime layer for optional real detection, real-detection-derived candidate tracklets, and optional real pose keypoint evidence.
+TOM v3 Simple is complete as a lightweight local observation/evidence platform. Blueprint 6 is complete as the visual replay/operator workstation layer. Blueprint 7 is complete as the real perception runtime layer for optional real detection, real-detection-derived candidate tracklets, and optional real pose keypoint evidence. Blueprint 8 is in progress with court/camera/homography schema contracts.
 
 ## Blueprint 1 - Media, Observation Store, Viewer Foundation
 
@@ -397,6 +398,45 @@ Milestones 7A/7B/7C/7D/7E/7F do not add:
 - identity resolution or ball-path conclusions
 - adjudication
 
-Court/camera/homography evidence is future Blueprint 8 work.
+Court/camera/homography runtime work is future Blueprint 8 milestone work.
 
 Remaining Blueprint 7 milestones: none.
+
+## Blueprint 8 - Court / Camera / Homography Evidence Layer
+
+Status: IN PROGRESS
+
+Blueprint 8 mission:
+
+```text
+indexed video
+-> court / camera evidence
+-> homography candidates
+-> projection diagnostics
+-> replayable geometry evidence
+```
+
+Milestone 8A proves:
+
+```text
+observation spine
+-> court keypoint typed rows
+-> court line typed rows
+-> camera/view typed rows
+-> homography candidate typed rows
+-> projection diagnostic typed rows
+-> lineage-ready geometry evidence
+```
+
+8A adds schema contracts, typed storage tables, migration, a normalized court template registry, observation writer support, lineage relationship constants, and fake persistence tests.
+
+8A does not add:
+
+- real court keypoint detector
+- real court line detector
+- homography computation
+- replay court overlay
+- ball/player court-space projection
+- bounce/hit/in-out/rally/point/scoring
+- stream ingestion
+- adjudication
