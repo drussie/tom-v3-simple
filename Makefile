@@ -22,10 +22,14 @@ REQUIRED_SHA256 ?=
 RUN_TRACKLETS ?= false
 SOURCE_DETECTION_RUN_ID ?=
 LINK_SOURCE_DETECTIONS ?= false
+DEMO_MEDIA_PATH ?=
+VIEWER_BASE_URL ?= http://127.0.0.1:3000
+TRACKLET_RUN_ID ?=
+POSE_RUN_ID ?=
 
 export TOM_V3_DATABASE_URL
 
-.PHONY: install web-install test lint migrate api seed verify index-media run-gameplay index-and-run-gameplay run-detection index-and-run-detection extract-frame-artifacts build-tracklets run-pose export-tracklet-review-dataset yolo-runtime-probe register-yolo-model smoke-real-yolo-local web web-build web-lint smoke all-checks
+.PHONY: install web-install test lint migrate api seed verify index-media run-gameplay index-and-run-gameplay run-detection index-and-run-detection extract-frame-artifacts build-tracklets run-pose export-tracklet-review-dataset demo demo-fixture demo-plan demo-reset demo-export demo-open completion-check yolo-probe yolo-smoke yolo-runtime-probe register-yolo-model smoke-real-yolo-local web web-build web-lint smoke all-checks
 
 install:
 	$(PYTHON) -m pip install -e ".[dev]"
@@ -87,6 +91,45 @@ run-pose:
 export-tracklet-review-dataset:
 	@if [ -z "$(TRACKLET_ID)" ] && [ -z "$(QUERY_JSON)" ]; then echo "TRACKLET_ID or QUERY_JSON is required"; exit 1; fi
 	@if [ -n "$(TRACKLET_ID)" ]; then $(PYTHON) -m apps.worker.cli export-tracklet-review-dataset --tracklet-id "$(TRACKLET_ID)" --output-root "$(EXPORT_ROOT)"; else $(PYTHON) -m apps.worker.cli export-tracklet-review-dataset --query-json '$(QUERY_JSON)' --output-root "$(EXPORT_ROOT)"; fi
+
+demo:
+	$(PYTHON) -m apps.worker.cli run-demo $(if $(SOURCE_PATH),--source-path "$(SOURCE_PATH)",$(if $(DEMO_MEDIA_PATH),--source-path "$(DEMO_MEDIA_PATH)",)) --storage-root "$(STORAGE_ROOT)" --artifact-root "$(ARTIFACT_ROOT)" --export-root "$(EXPORT_ROOT)" --frame-sample-rate "$(FRAME_SAMPLE_RATE)" --max-frames "$(MAX_FRAMES)" --viewer-base-url "$(VIEWER_BASE_URL)"
+
+demo-fixture:
+	$(PYTHON) -m apps.worker.cli run-demo $(if $(SOURCE_PATH),--source-path "$(SOURCE_PATH)",$(if $(DEMO_MEDIA_PATH),--source-path "$(DEMO_MEDIA_PATH)",)) --storage-root "$(STORAGE_ROOT)" --artifact-root "$(ARTIFACT_ROOT)" --export-root "$(EXPORT_ROOT)" --frame-sample-rate "$(FRAME_SAMPLE_RATE)" --max-frames "$(MAX_FRAMES)" --viewer-base-url "$(VIEWER_BASE_URL)"
+
+demo-plan:
+	$(PYTHON) -m apps.worker.cli run-demo --plan-only $(if $(SOURCE_PATH),--source-path "$(SOURCE_PATH)",$(if $(DEMO_MEDIA_PATH),--source-path "$(DEMO_MEDIA_PATH)",)) --storage-root "$(STORAGE_ROOT)" --artifact-root "$(ARTIFACT_ROOT)" --export-root "$(EXPORT_ROOT)" --frame-sample-rate "$(FRAME_SAMPLE_RATE)" --max-frames "$(MAX_FRAMES)" --viewer-base-url "$(VIEWER_BASE_URL)"
+
+demo-reset:
+	@echo "demo-reset is intentionally non-destructive. TOM v3 demo runs are additive."; \
+	echo "To start fresh, set TOM_V3_DATABASE_URL to a new SQLite file, for example:"; \
+	echo "  TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_demo.db make demo"; \
+	echo "Local demo outputs live under .data/demo, $(ARTIFACT_ROOT), and $(EXPORT_ROOT). Remove only files you intentionally created."
+
+demo-export:
+	@if [ -z "$(RUN_ID)" ] && [ -z "$(TRACKLET_ID)" ] && [ -z "$(QUERY_JSON)" ]; then echo "RUN_ID for pose export or TRACKLET_ID/QUERY_JSON for tracklet export is required."; exit 1; fi
+	@if [ -n "$(RUN_ID)" ]; then $(PYTHON) -m apps.worker.cli export-pose-review-dataset --run-id "$(RUN_ID)" --output-root "$(EXPORT_ROOT)" --created-by tom-v3-demo; fi
+	@if [ -n "$(TRACKLET_ID)" ]; then $(PYTHON) -m apps.worker.cli export-tracklet-review-dataset --tracklet-id "$(TRACKLET_ID)" --output-root "$(EXPORT_ROOT)" --created-by tom-v3-demo; fi
+	@if [ -n "$(QUERY_JSON)" ]; then $(PYTHON) -m apps.worker.cli export-tracklet-review-dataset --query-json '$(QUERY_JSON)' --output-root "$(EXPORT_ROOT)" --created-by tom-v3-demo; fi
+
+demo-open:
+	@echo "Open viewer URLs manually:"; \
+	if [ -n "$(RUN_ID)" ]; then echo "$(VIEWER_BASE_URL)/runs/$(RUN_ID)"; fi; \
+	if [ -n "$(DETECTION_RUN_ID)" ]; then echo "$(VIEWER_BASE_URL)/runs/$(DETECTION_RUN_ID)"; fi; \
+	if [ -n "$(TRACKLET_RUN_ID)" ]; then echo "$(VIEWER_BASE_URL)/runs/$(TRACKLET_RUN_ID)"; fi; \
+	if [ -n "$(POSE_RUN_ID)" ]; then echo "$(VIEWER_BASE_URL)/runs/$(POSE_RUN_ID)"; fi; \
+	if [ -z "$(RUN_ID)" ] && [ -z "$(DETECTION_RUN_ID)" ] && [ -z "$(TRACKLET_RUN_ID)" ] && [ -z "$(POSE_RUN_ID)" ]; then echo "Pass RUN_ID=<run_id>, DETECTION_RUN_ID=<run_id>, TRACKLET_RUN_ID=<run_id>, or POSE_RUN_ID=<run_id>."; fi
+
+completion-check:
+	$(PYTHON) -m pytest -q
+	ruff check .
+	$(PYTHON) scripts/smoke_synthetic_viewer_data.py
+
+yolo-probe: yolo-runtime-probe
+
+yolo-smoke:
+	$(PYTHON) -m apps.worker.cli smoke-real-yolo-local --plan-only $(if $(SOURCE_PATH),--source-path "$(SOURCE_PATH)",) $(if $(WEIGHTS_PATH),--weights-path "$(WEIGHTS_PATH)",) $(if $(MODEL_NAME),--model-name "$(MODEL_NAME)",) --model-version "$(MODEL_VERSION)" --device "$(YOLO_DEVICE)" --frame-sample-rate "$(FRAME_SAMPLE_RATE)" --max-frames "$(MAX_FRAMES)" --output-root "$(ARTIFACT_ROOT)" $(if $(filter true,$(RUN_TRACKLETS)),--run-tracklets,--no-run-tracklets)
 
 yolo-runtime-probe:
 	$(PYTHON) -m apps.worker.cli yolo-runtime-probe --device "$(YOLO_DEVICE)"

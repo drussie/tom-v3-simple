@@ -25,6 +25,7 @@ from apps.worker.pipelines.synthetic_seed import seed_synthetic_run
 from apps.worker.services.detection_adapter import run_detection_adapter
 from apps.worker.services.frame_artifacts import extract_frame_artifacts_for_run
 from apps.worker.services.gameplay_adapter import run_gameplay_adapter
+from apps.worker.services.local_demo import run_local_fixture_demo
 from apps.worker.services.media_indexer import index_media
 from apps.worker.services.pose_adapter import run_pose_adapter
 from apps.worker.services.real_yolo_smoke import run_real_yolo_local_smoke
@@ -390,8 +391,33 @@ def main() -> None:
     yolo_smoke_parser.add_argument("--skip-create-db", action="store_true")
     yolo_smoke_parser.set_defaults(handler=_handle_smoke_real_yolo_local)
 
+    demo_parser = subcommands.add_parser(
+        "run-demo",
+        help="Run the canonical local fixture demo path without YOLO or pose weights.",
+    )
+    demo_parser.add_argument("--source-path")
+    demo_parser.add_argument("--storage-root", default=".data/media")
+    demo_parser.add_argument("--artifact-root", default=".data/artifacts")
+    demo_parser.add_argument("--export-root", default=".data/exports")
+    demo_parser.add_argument("--frame-sample-rate", type=int, default=30)
+    demo_parser.add_argument("--max-frames", type=int, default=3)
+    demo_parser.add_argument("--viewer-base-url", default="http://127.0.0.1:3000")
+    demo_parser.add_argument(
+        "--copy-to-storage",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+    )
+    demo_parser.add_argument(
+        "--plan-only",
+        action="store_true",
+        help="Print the fixture demo plan without touching local data.",
+    )
+    demo_parser.add_argument("--skip-create-db", action="store_true")
+    demo_parser.set_defaults(handler=_handle_run_demo)
+
     args = parser.parse_args()
-    with _session_factory(create_db=not args.skip_create_db)() as session:
+    create_db = not args.skip_create_db and not getattr(args, "plan_only", False)
+    with _session_factory(create_db=create_db)() as session:
         result = args.handler(session, args)
     print(json.dumps(result, indent=2, sort_keys=True))
     if result.get("ok") is False:
@@ -702,6 +728,21 @@ def _handle_smoke_real_yolo_local(
         copy_to_storage=args.copy_to_storage,
         run_tracklets=args.run_tracklets,
         output_debug_artifact=args.output_debug_artifact,
+        plan_only=args.plan_only,
+    )
+
+
+def _handle_run_demo(session: Session, args: argparse.Namespace) -> dict[str, object]:
+    return run_local_fixture_demo(
+        session=session,
+        source_path=args.source_path,
+        storage_root=args.storage_root,
+        artifact_root=args.artifact_root,
+        export_root=args.export_root,
+        frame_sample_rate=args.frame_sample_rate,
+        max_frames=args.max_frames,
+        viewer_base_url=args.viewer_base_url,
+        copy_to_storage=args.copy_to_storage,
         plan_only=args.plan_only,
     )
 

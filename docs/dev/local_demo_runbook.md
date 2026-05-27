@@ -1,5 +1,13 @@
 # Local Demo Runbook
 
+Canonical local runbook:
+
+```text
+docs/RUNBOOK_LOCAL.md
+```
+
+Use `docs/RUNBOOK_LOCAL.md` for the current Blueprint 5 fixture demo path. This historical runbook keeps milestone-specific command notes from earlier blueprints.
+
 This runbook exercises the Milestone 0 loop:
 
 ```text
@@ -1046,13 +1054,14 @@ Add a pose review annotation through the generic annotation path:
 curl -X POST http://127.0.0.1:8000/annotations \
   -H "Content-Type: application/json" \
   -d '{
-    "target_observation_id":"<pose_observation_id>",
-    "annotation_type":"review_label",
-    "label":"bad_keypoint",
-    "payload":{
+    "observation_id":"<pose_observation_id>",
+    "annotation_type":"bad_keypoint",
+    "payload_jsonb":{
+      "annotation_label":"bad_keypoint",
       "keypoint_name":"right_wrist",
       "keypoint_index":10
-    }
+    },
+    "created_by":"local-reviewer"
   }'
 ```
 

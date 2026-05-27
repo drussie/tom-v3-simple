@@ -50,6 +50,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 4D - Pose Overlay Viewer](milestones/milestone_4d_pose_overlay_viewer.md)
 - [Milestone 4E - Pose Query / Review / Export Integration](milestones/milestone_4e_pose_query_review_export_integration.md)
 - [Milestone 4F - Blueprint 4 Completion Review](milestones/milestone_4f_blueprint_4_completion_review.md)
+- [Milestone 5A - Local Demo / Runbook Completion Path](milestones/milestone_5a_local_demo_runbook_completion_path.md)
 
 ## Handoffs
 
@@ -80,6 +81,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 4D Handoff](handoffs/milestone_4d_pose_overlay_viewer_handoff.md)
 - [Milestone 4E Handoff](handoffs/milestone_4e_pose_query_review_export_integration_handoff.md)
 - [Milestone 4F Handoff](handoffs/milestone_4f_blueprint_4_completion_review_handoff.md)
+- [Milestone 5A Handoff](handoffs/milestone_5a_local_demo_runbook_completion_path_handoff.md)
 
 ## Agent Reports
 
@@ -110,6 +112,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 4D Agent Report](agent_reports/milestone_4d_pose_overlay_viewer_report.md)
 - [Milestone 4E Agent Report](agent_reports/milestone_4e_pose_query_review_export_integration_report.md)
 - [Milestone 4F Agent Report](agent_reports/milestone_4f_blueprint_4_completion_review_report.md)
+- [Milestone 5A Agent Report](agent_reports/milestone_5a_local_demo_runbook_completion_path_report.md)
 
 ## Blueprints
 
@@ -119,6 +122,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Blueprint 3 Completion Review](blueprints/tom_v3_blueprint_3_completion_review.md)
 - [Blueprint 4 - Pose Observation / Movement Evidence Layer](blueprints/tom_v3_blueprint_4_pose_observation_movement_evidence_layer.md)
 - [Blueprint 4 Completion Review](blueprints/tom_v3_blueprint_4_completion_review.md)
+- [Blueprint 5 - Simple Completion / Product Hardening](blueprints/tom_v3_blueprint_5_simple_completion_product_hardening.md)
 
 ## API and Schema
 
@@ -176,6 +180,7 @@ Use this index as the durable navigation point for project memory, architecture 
 ## Development
 
 - [Local Environment Setup](dev/local_environment_setup.md)
+- [Canonical Local Runbook](RUNBOOK_LOCAL.md)
 - [Local Demo Runbook](dev/local_demo_runbook.md)
 - [Repo Branch Hygiene](dev/repo_branch_hygiene.md)
 

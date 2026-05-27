@@ -4,8 +4,8 @@
 
 - Project name: TOM v3 Simple
 - Repo: drussie/tom-v3-simple
-- Current phase: Blueprint 4 complete
-- Current goal: Prepare Blueprint 5 product hardening while preserving the TOM v3 observation-only runtime contract
+- Current phase: Blueprint 5 in progress
+- Current goal: Harden TOM v3 Simple into a coherent local observation platform with a repeatable fixture demo, canonical runbook, and completion checklist while preserving the observation-only runtime contract
 
 ## Mission
 
@@ -13,7 +13,7 @@ A lightweight tennis video observation platform that accepts model output as ope
 
 ## Implementation Status
 
-- Implementation status: persisted ball/player observations can be inspected visually, grouped into candidate tracklets, and complemented by complete first-class pose schema, normalization, persistence, lineage, overlay viewer, query, review, and export foundations
+- Implementation status: persisted ball/player observations can be inspected visually, grouped into candidate tracklets, complemented by complete first-class pose schema/normalization/persistence/lineage/viewer/query/review/export foundations, and exercised through a canonical local fixture demo path
 - Model integration status: fixture gameplay and fixture detection adapters implemented for deterministic dev/test output
 - TOM v1 gameplay detector: known asset, portable source/assets not available in this repo/environment; integration stub documented
 - YOLO/YOLO26: optional runtime probe, model weights registration, YOLO-like output normalization, frame-level inference persistence bridge, and local real-YOLO smoke helper implemented; runtime/assets are not required in the base environment
@@ -33,6 +33,7 @@ A lightweight tennis video observation platform that accepts model output as ope
 - Worker synthetic seeder: implemented
 - Visual evidence viewer: implemented in `apps/web` with detection bbox overlay, pose keypoint/skeleton overlay, and frame artifact image support
 - Pose observation foundation: implemented with a typed `pose_observation` table, COCO17 skeleton registry, keypoint summary statistics, fake/serialized pose output normalization, crop projection, worker fixture pose persistence, source detection candidate lineage, pose overlay viewer, pose-specific query filters, review annotations, and TOM-native review dataset export; no real pose inference exists yet
+- Local fixture demo: implemented with worker `run-demo`, Makefile `demo` targets, deterministic media fallback, fixture gameplay/detection/tracklet/pose path, seeded review annotations, pose and tracklet review exports, summary IDs/counts/viewer URLs, and canonical `docs/RUNBOOK_LOCAL.md`
 - Synthetic data: baseline scenario creates viewer-ready observations, tracklets, gaps, candidates, lineage, and artifacts
 - Local setup: documented with `.env.example`, Makefile, and dev runbooks
 - Branch/default branch: `main` is restored as the GitHub default branch
@@ -205,10 +206,18 @@ Status: complete
 
 Milestone 4F closes Blueprint 4 with a completion review, invariant audit, runbook cleanup, documentation/index updates, and validation pass. Blueprint 4 is now complete: TOM v3 can persist pose model output as observation evidence using a first-class pose schema, COCO17 skeleton registry, keypoint validation, normalization, processing-run persistence, source-evidence lineage, viewer overlay, pose-specific query filters, review annotation support, evidence bundles, and TOM-native review dataset export. It does not add real pose inference, movement interpretation, stroke classification, serve/hit/split-step/biomechanics analysis, homography, bounce, hit, rally, point, scoring, or adjudication.
 
+## Milestone 5A Result
+
+Status: complete
+
+Milestone 5A starts Blueprint 5 with a canonical local fixture demo and runbook. TOM v3 Simple now has `make demo` and worker `run-demo` paths that index media, run fixture gameplay and detection adapters, extract frame artifacts, build candidate tracklets, run fixture pose observations, seed review annotations, export pose and tracklet review datasets, and print a summary with IDs, counts, export paths, warnings, and viewer URLs. The default path does not require YOLO weights, real pose weights, GPU runtime, or network access. Fixture output remains demo evidence only and does not add movement interpretation, tennis-event inference, homography, bounce/hit/rally/point/scoring, or adjudication.
+
 ## Naming Transition
 
 The implementation branch/file names may reference "1F" because the milestone was originally planned as a Blueprint 1 extension. After Blueprint 1 was declared complete, the same work was reclassified as Blueprint 2A because temporal grouping begins a new conceptual layer.
 
 ## Next Blueprint
 
-Recommended next blueprint: Blueprint 5 - TOM v3 Simple Completion / Product Hardening.
+Current blueprint: Blueprint 5 - TOM v3 Simple Completion / Product Hardening.
+
+Recommended next milestone: Milestone 5B - Viewer / Product Polish.

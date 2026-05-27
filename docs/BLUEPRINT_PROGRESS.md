@@ -2,7 +2,7 @@
 
 ## Current Progress Gauge
 
-Current: 100% through Blueprint 4
+Current: Blueprints 1, 2, 3, and 4 complete; Blueprint 5 is 20-25% complete
 
 ## Current
 
@@ -131,7 +131,33 @@ Current: 100% through Blueprint 4
 - Blueprint 4 completion review exists.
 - Pose evidence invariants are documented and mapped to focused tests and viewer contracts.
 - Blueprint 4 is complete.
+- Blueprint 5 has started.
+- Canonical local fixture demo path exists.
+- Worker `run-demo` can exercise media indexing, fixture gameplay, fixture detections, frame artifacts, candidate tracklets, fixture pose observations, review annotations, and review exports.
+- Makefile `demo`, `demo-plan`, `demo-reset`, `demo-export`, `demo-open`, `completion-check`, `yolo-probe`, and `yolo-smoke` targets exist.
+- `docs/RUNBOOK_LOCAL.md` is the canonical copy/pasteable local runbook.
+- Optional YOLO smoke remains separate from the fixture demo.
 - No real pose inference, movement interpretation, homography, bounce, hit, rally, point, scoring, or adjudication has been added.
+
+## Blueprint 5 Status
+
+Status: in progress.
+
+Milestone 5A is complete. TOM v3 Simple now has a repeatable local fixture demo that proves the completed evidence loop without optional YOLO weights or real pose weights:
+
+```text
+media
+-> fixture gameplay
+-> fixture detections
+-> frame artifacts
+-> candidate tracklets
+-> fixture pose observations
+-> review annotations
+-> TOM-native exports
+-> viewer URLs
+```
+
+Remaining Blueprint 5 work should focus on viewer/product polish, completion checklist hardening, documentation cleanup, and known limitations. It should not add new tennis interpretation capability.
 
 ## After Milestone 0A
 

@@ -986,3 +986,39 @@ Milestone 4F created:
 - Control-room index, current-state, blueprint-progress, and pose docs updates.
 
 Blueprint 4 is complete. It closes with pose schema, COCO17 skeleton registry, normalization, persistence, lineage, viewer overlay, pose query, review annotation support, and TOM-native export while preserving the observation-only boundary and keeping real pose inference and movement interpretation out of scope.
+
+## Milestone 5A - Local Demo / Runbook Completion Path
+
+Status: complete
+
+### Goal
+
+Start Blueprint 5 by adding a deterministic local fixture demo path and canonical runbook that proves the completed TOM v3 Simple evidence loop without optional YOLO weights or real pose weights.
+
+### Non-goals
+
+- No real pose runtime or adapter inference.
+- No movement interpretation.
+- No stroke classification.
+- No serve, hit, split-step, or biomechanics conclusions.
+- No court homography.
+- No bounce detection.
+- No rally segmentation.
+- No point reconstruction.
+- No scoring.
+- No adjudication.
+- No production streaming, auth, cloud deployment, or multi-camera reasoning.
+
+### Notes
+
+Milestone 5A created:
+
+- `apps/worker/services/local_demo.py` as a lightweight orchestration layer over existing worker/API services.
+- Worker command `run-demo`.
+- Makefile targets for `demo`, `demo-fixture`, `demo-plan`, `demo-reset`, `demo-export`, `demo-open`, `completion-check`, `yolo-probe`, and `yolo-smoke`.
+- Media fallback that prefers explicit media, then `demo_assets/tennis_fixture.mp4`, then generated synthetic placeholder media marked as synthetic demo media.
+- A fixture demo path covering media indexing, fixture gameplay, fixture detections, frame artifacts, candidate tracklets, fixture pose observations, seeded review annotations, pose review export, tracklet review export, and viewer URL summary.
+- Focused tests for media resolution, stage planning, temporary SQLite demo execution, seeded annotations, export artifacts, and summary contents.
+- Canonical `docs/RUNBOOK_LOCAL.md`, Blueprint 5 doc, 5A milestone, handoff, and agent report docs.
+
+The demo output is explicitly fixture/demo evidence only. It proves persistence, lineage, viewer, review, and export plumbing, not tennis understanding.

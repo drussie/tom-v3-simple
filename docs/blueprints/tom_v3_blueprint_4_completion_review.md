@@ -187,10 +187,12 @@ This path does not require real pose weights or Ultralytics pose runtime.
 
 ## Next Blueprint Recommendation
 
-Recommended next blueprint:
+Blueprint 5 has now started.
+
+Recommended next blueprint from 4F was:
 
 ```text
 Blueprint 5 - TOM v3 Simple Completion / Product Hardening
 ```
 
-Blueprint 5 should be a lightweight completion/product hardening pass unless the project explicitly chooses to add real pose inference next.
+Milestone 5A establishes the canonical local fixture demo and runbook path. Blueprint 5 should remain a lightweight completion/product hardening pass unless the project explicitly chooses to add real pose inference next.
