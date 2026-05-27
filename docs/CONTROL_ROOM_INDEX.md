@@ -60,6 +60,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 5B - Viewer / Product Polish](milestones/milestone_5b_viewer_product_polish.md)
 - [Milestone 5C - Final Evidence / Provenance Audit](milestones/milestone_5c_final_evidence_provenance_audit.md)
 - [Milestone 5D - Docs / Control-Room Consolidation](milestones/milestone_5d_docs_control_room_consolidation.md)
+- [Milestone 5E - Final Completion Review](milestones/milestone_5e_final_completion_review.md)
 
 ## Handoffs
 
@@ -94,6 +95,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 5B Handoff](handoffs/milestone_5b_viewer_product_polish_handoff.md)
 - [Milestone 5C Handoff](handoffs/milestone_5c_final_evidence_provenance_audit_handoff.md)
 - [Milestone 5D Handoff](handoffs/milestone_5d_docs_control_room_consolidation_handoff.md)
+- [Milestone 5E Handoff](handoffs/milestone_5e_final_completion_review_handoff.md)
 
 ## Agent Reports
 
@@ -128,6 +130,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 5B Agent Report](agent_reports/milestone_5b_viewer_product_polish_report.md)
 - [Milestone 5C Agent Report](agent_reports/milestone_5c_final_evidence_provenance_audit_report.md)
 - [Milestone 5D Agent Report](agent_reports/milestone_5d_docs_control_room_consolidation_report.md)
+- [Milestone 5E Agent Report](agent_reports/milestone_5e_final_completion_review_report.md)
 
 ## Blueprints
 
@@ -138,6 +141,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Blueprint 4 - Pose Observation / Movement Evidence Layer](blueprints/tom_v3_blueprint_4_pose_observation_movement_evidence_layer.md)
 - [Blueprint 4 Completion Review](blueprints/tom_v3_blueprint_4_completion_review.md)
 - [Blueprint 5 - Simple Completion / Product Hardening](blueprints/tom_v3_blueprint_5_simple_completion_product_hardening.md)
+- [TOM v3 Simple Final Completion Review](blueprints/tom_v3_simple_final_completion_review.md)
 
 ## API and Schema
 

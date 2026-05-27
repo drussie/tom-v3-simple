@@ -2,6 +2,12 @@
 
 Use this checklist for final local validation and completion review.
 
+## Final Status
+
+TOM v3 Simple Status: COMPLETE
+
+The final completion review passed. TOM v3 Simple is complete as a lightweight local observation/evidence platform. Future work should begin as a separate blueprint.
+
 ## Demo Checklist
 
 Run:
@@ -152,11 +158,11 @@ make yolo-smoke
 
 ## Final Completion Checklist
 
-- `make demo` passes.
-- `make completion-audit` passes.
-- Viewer shows detections, tracklets, pose evidence, lineage, artifacts, annotations, and exports.
-- Exports are created.
-- Known limitations are documented.
-- Optional YOLO is documented and separate from the default fixture demo.
-- Observation-only boundary is clear.
-- No out-of-scope capabilities were added.
+- [x] `make demo` passes.
+- [x] `make completion-audit` passes.
+- [x] Viewer shows detections, tracklets, pose evidence, lineage, artifacts, annotations, and exports.
+- [x] Exports are created.
+- [x] Known limitations are documented.
+- [x] Optional YOLO is documented and separate from the default fixture demo.
+- [x] Observation-only boundary is clear.
+- [x] No out-of-scope capabilities were added.

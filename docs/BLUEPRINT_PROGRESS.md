@@ -2,7 +2,7 @@
 
 ## Current Progress Gauge
 
-Current: Blueprints 1, 2, 3, and 4 complete; Blueprint 5 is 85-90% complete
+Current: Blueprints 1, 2, 3, 4, and 5 complete; TOM v3 Simple is complete
 
 ## Current
 
@@ -149,13 +149,15 @@ Current: Blueprints 1, 2, 3, and 4 complete; Blueprint 5 is 85-90% complete
 - Canonical docs now describe the final-ish TOM v3 Simple state without requiring milestone archaeology.
 - `docs/CONTROL_ROOM.md`, `docs/ARCHITECTURE.md`, `docs/OBSERVATION_CONTRACT.md`, `docs/BLUEPRINT_STATUS.md`, `docs/KNOWN_LIMITATIONS.md`, `docs/OPTIONAL_YOLO.md`, `docs/EXPORTS.md`, and `docs/COMPLETION_CHECKLIST.md` exist.
 - README, local runbook, current-state, progress, implementation log, and control-room index point to the consolidated docs.
+- Final completion review exists.
+- TOM v3 Simple is marked complete in canonical docs.
 - No real pose inference, movement interpretation, homography, bounce, hit, rally, point, scoring, or adjudication has been added.
 
 ## Blueprint 5 Status
 
-Status: in progress.
+Status: complete.
 
-Milestones 5A, 5B, 5C, and 5D are complete. TOM v3 Simple now has a repeatable local fixture demo that proves the completed evidence loop without optional YOLO weights or real pose weights:
+Milestones 5A, 5B, 5C, 5D, and 5E are complete. TOM v3 Simple has a repeatable local fixture demo that proves the completed evidence loop without optional YOLO weights or real pose weights:
 
 ```text
 media
@@ -172,7 +174,7 @@ media
 
 The viewer has also been polished with clearer empty states, run-level evidence summary, candidate/evidence wording, readable lineage descriptions, and review/export metadata display.
 
-The completion audit checks local demo evidence structure across media, runs, steps, observations, typed rows, lineage, artifacts, annotations, and exports. The docs/control-room consolidation makes the current state readable without milestone archaeology. Remaining Blueprint 5 work should focus on final completion review only, and should not add new tennis interpretation capability.
+The completion audit checks local demo evidence structure across media, runs, steps, observations, typed rows, lineage, artifacts, annotations, and exports. The docs/control-room consolidation makes the current state readable without milestone archaeology. The final completion review confirms that TOM v3 Simple is complete enough to stop building and start using/demoing.
 
 The docs/control-room consolidation now gives new developers a short canonical reading path:
 
@@ -190,13 +192,19 @@ README
 -> COMPLETION_CHECKLIST
 ```
 
-Remaining Blueprint 5 work should be the final completion review. It should confirm that the demo, viewer, audit, docs, and boundary checklist are coherent.
+Remaining Blueprint 5 work: none.
 
 ## Milestone 5D Status
 
 Status: complete.
 
 Milestone 5D consolidates TOM v3 Simple repo memory into a concise canonical documentation set. README is now practical and short, `docs/CONTROL_ROOM.md` is the current status document, and the new architecture, observation contract, blueprint status, known limitations, optional YOLO, exports, and completion checklist docs describe the current platform without adding new implementation behavior.
+
+## Milestone 5E Status
+
+Status: complete.
+
+Milestone 5E closes TOM v3 Simple with a final completion review, final agent report, final status updates, and final validation pass. The platform is complete as a lightweight local observation/evidence system. Future work should start as a separate blueprint.
 
 ## After Milestone 0A
 

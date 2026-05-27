@@ -6,6 +6,16 @@ It indexes media, persists model or fixture outputs as observations, preserves l
 
 It is not TOM v2, and it does not decide official tennis meaning.
 
+## Status
+
+TOM v3 Simple Status: COMPLETE
+
+TOM v3 Simple is complete as a lightweight local observation/evidence platform. It can index local tennis video, run fixture gameplay/detection/pose paths, optionally run YOLO detection smoke when local runtime and weights exist, persist observations and typed evidence rows, build candidate tracklets, preserve lineage/provenance, render detection/tracklet/pose evidence in the viewer, seed and display review annotations, export TOM-native review datasets, and run a structural completion audit.
+
+It remains intentionally non-decisive about tennis meaning. It does not include real pose inference, movement interpretation, stroke classification, homography, bounce/hit/rally/point/scoring, production deployment, auth, streaming, or TOM v2-style adjudication.
+
+Future work should start as a new blueprint.
+
 ## What It Does
 
 - Index local video media with frame/time metadata.
@@ -134,11 +144,12 @@ Real YOLO smoke requires a separate optional runtime environment, local weights 
 - [Exports](docs/EXPORTS.md)
 - [Provenance Audit](docs/PROVENANCE_AUDIT.md)
 - [Completion Checklist](docs/COMPLETION_CHECKLIST.md)
+- [Final Completion Review](docs/blueprints/tom_v3_simple_final_completion_review.md)
 - [Control Room Index](docs/CONTROL_ROOM_INDEX.md)
 
 ## Current State
 
-Blueprints 1, 2, 3, and 4 are complete. Blueprint 5 is in its final product-hardening phase.
+Blueprints 1, 2, 3, 4, and 5 are complete. TOM v3 Simple is complete as a lightweight local platform.
 
 Current TOM v3 Simple path:
 
@@ -155,4 +166,4 @@ media
 -> provenance audit
 ```
 
-Recommended next milestone: Milestone 5E - Final Completion Review.
+Recommended next step: stop building TOM v3 Simple and use/demo it. Future work should begin as a deliberately chosen new blueprint.

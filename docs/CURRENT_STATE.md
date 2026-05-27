@@ -4,8 +4,8 @@
 
 - Project name: TOM v3 Simple
 - Repo: drussie/tom-v3-simple
-- Current phase: Blueprint 5 in progress
-- Current goal: Harden TOM v3 Simple into a coherent local observation platform with a repeatable fixture demo, polished evidence viewer, canonical runbook, provenance audit, and completion checklist while preserving the observation-only runtime contract
+- Current phase: TOM v3 Simple complete
+- Current goal: Use/demo TOM v3 Simple as a coherent local observation platform; future expansion should begin as a separate blueprint
 
 ## Mission
 
@@ -13,7 +13,7 @@ A lightweight tennis video observation platform that accepts model output as ope
 
 ## Implementation Status
 
-- Implementation status: persisted ball/player observations can be inspected visually, grouped into candidate tracklets, complemented by complete first-class pose schema/normalization/persistence/lineage/viewer/query/review/export foundations, exercised through a canonical local fixture demo path, inspected through a coherent evidence/candidate viewer surface, and structurally audited for provenance integrity
+- Implementation status: complete lightweight local observation/evidence platform with persisted ball/player observations, candidate tracklets, pose schema/normalization/persistence/lineage/viewer/query/review/export foundations, canonical fixture demo, coherent evidence/candidate viewer, TOM-native exports, structural provenance audit, canonical docs, and final completion review
 - Model integration status: fixture gameplay and fixture detection adapters implemented for deterministic dev/test output
 - TOM v1 gameplay detector: known asset, portable source/assets not available in this repo/environment; integration stub documented
 - YOLO/YOLO26: optional runtime probe, model weights registration, YOLO-like output normalization, frame-level inference persistence bridge, and local real-YOLO smoke helper implemented; runtime/assets are not required in the base environment
@@ -29,6 +29,7 @@ A lightweight tennis video observation platform that accepts model output as ope
 - Blueprint 2 status: complete; temporal evidence can be built, inspected, queried, reviewed, and exported as candidate evidence
 - Blueprint 3 status: complete; optional YOLO runtime environment boundary, dependency probe, device resolver, weights validation, class mapping, model registry helper, YOLO output normalization, frame-level persistence bridge, local real-YOLO smoke workflow, completion review, and invariant audit are implemented
 - Blueprint 4 status: complete; pose observation schema, COCO17 skeleton registry, keypoint validation, typed pose persistence, synthetic pose insertion, pose normalization, worker pose persistence, source detection lineage, pose overlay viewer, pose query/review/export integration, completion review, and pose runtime/config metadata contracts are implemented
+- Blueprint 5 status: complete; local demo, viewer polish, provenance audit, docs/control-room consolidation, and final completion review are complete
 - Observation writer: implemented with typed extension rows, lineage, artifacts, and idempotency
 - Worker synthetic seeder: implemented
 - Visual evidence viewer: implemented in `apps/web` with detection bbox overlay, pose keypoint/skeleton overlay, frame artifact image support, run evidence summary, clearer empty states, candidate/evidence wording, readable lineage context, and review/export metadata display
@@ -233,12 +234,24 @@ Status: complete.
 
 Milestone 5D consolidates repo memory into a concise canonical documentation set. The README now points to `docs/RUNBOOK_LOCAL.md`, `docs/CONTROL_ROOM.md`, `docs/ARCHITECTURE.md`, `docs/OBSERVATION_CONTRACT.md`, `docs/BLUEPRINT_STATUS.md`, `docs/KNOWN_LIMITATIONS.md`, `docs/OPTIONAL_YOLO.md`, `docs/EXPORTS.md`, `docs/PROVENANCE_AUDIT.md`, and `docs/COMPLETION_CHECKLIST.md`. Older milestone docs remain accessible as history, while the canonical docs describe the current product state, local demo path, optional YOLO boundary, evidence/export contracts, limitations, and final completion checklist without adding new product capability.
 
+## Milestone 5E Result
+
+Status: complete.
+
+Milestone 5E closes TOM v3 Simple with a final completion review, final agent report, final status updates, and final validation pass. TOM v3 Simple is complete as a lightweight local observation/evidence platform that can index media, run fixture gameplay/detection/pose paths, optionally smoke-test YOLO detection when local runtime and weights exist, persist observations and typed evidence rows, build candidate tracklets, preserve lineage/provenance, render evidence in the viewer, seed and display review annotations, export TOM-native review datasets, and run a structural completion audit. It does not add real pose inference, movement interpretation, homography, bounce/hit/rally/point/scoring, production deployment, auth, streaming, or adjudication.
+
 ## Naming Transition
 
 The implementation branch/file names may reference "1F" because the milestone was originally planned as a Blueprint 1 extension. After Blueprint 1 was declared complete, the same work was reclassified as Blueprint 2A because temporal grouping begins a new conceptual layer.
 
-## Next Blueprint
+## Future Blueprints
 
-Current blueprint: Blueprint 5 - TOM v3 Simple Completion / Product Hardening.
+TOM v3 Simple is complete. Future work should begin as a separate blueprint only if deliberately chosen.
 
-Recommended next milestone: Milestone 5E - Final Completion Review.
+Possible future blueprint candidates:
+
+- Real Pose Runtime
+- Movement / Stroke Evidence Candidates
+- Homography / Court-Space Evidence
+- Bounce/Hit Candidate Evidence
+- Product Deployment

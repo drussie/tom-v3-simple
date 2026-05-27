@@ -6,7 +6,10 @@
 - Blueprint 2: COMPLETE
 - Blueprint 3: COMPLETE
 - Blueprint 4: COMPLETE
-- Blueprint 5: IN PROGRESS, through Milestone 5D
+- Blueprint 5: COMPLETE
+- TOM v3 Simple: COMPLETE
+
+TOM v3 Simple is complete as a lightweight local observation/evidence platform. Future work should start as a new blueprint.
 
 ## Blueprint 1 - Media, Observation Store, Viewer Foundation
 
@@ -118,16 +121,17 @@ Did not add:
 
 ## Blueprint 5 - Simple Completion / Product Hardening
 
-Status: IN PROGRESS
+Status: COMPLETE
 
-Completed so far:
+Completed:
 
 - 5A: canonical local fixture demo and runbook
 - 5B: viewer/product polish
 - 5C: final evidence/provenance audit
 - 5D: docs/control-room consolidation
+- 5E: final completion review
 
-Current proof path:
+Final proof path:
 
 ```text
 fixture demo
@@ -136,10 +140,9 @@ fixture demo
 -> exports
 -> provenance audit
 -> canonical docs
+-> final completion review
 ```
 
-Still expected:
+Blueprint 5 proved that TOM v3 Simple can be run, inspected, audited, explained, and demoed locally without adding tennis interpretation capability.
 
-- 5E final completion review
-
-Blueprint 5 is not a capability sprint. It should keep hardening the local platform without adding tennis interpretation.
+Blueprint 5 did not add real pose inference, movement interpretation, stroke classification, homography, bounce/hit/rally/point/scoring, production deployment, auth, streaming, or adjudication.

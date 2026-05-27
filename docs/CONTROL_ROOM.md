@@ -14,10 +14,14 @@ It is not TOM v2, and it does not decide official tennis meaning.
 - Blueprint 2: COMPLETE
 - Blueprint 3: COMPLETE
 - Blueprint 4: COMPLETE
-- Blueprint 5: IN PROGRESS, through Milestone 5D
-- Lightweight platform completion: about 96-97%
+- Blueprint 5: COMPLETE
+- TOM v3 Simple: COMPLETE
 
-Blueprint 5 is a completion/product-hardening pass. It should make the repo easy to run, inspect, audit, and explain without adding tennis interpretation capability.
+TOM v3 Simple is complete as a lightweight local observation/evidence platform. It can index local tennis video, run fixture gameplay/detection/pose paths, optionally run YOLO detection smoke when local runtime and weights exist, persist observations and typed evidence rows, build candidate tracklets, preserve lineage/provenance, render detection/tracklet/pose evidence in the viewer, seed and display review annotations, export TOM-native review datasets, and run a structural completion audit.
+
+It remains intentionally non-decisive about tennis meaning. It does not include real pose inference, movement interpretation, stroke classification, homography, bounce/hit/rally/point/scoring, production deployment, auth, streaming, or TOM v2-style adjudication.
+
+Future work should start as a new blueprint.
 
 ## Canonical Local Demo
 
@@ -115,10 +119,9 @@ Milestones complete:
 - 5B: Viewer / Product Polish
 - 5C: Final Evidence / Provenance Audit
 - 5D: Docs / Control-Room Consolidation
-
-Remaining:
-
 - 5E: Final Completion Review
+
+Remaining TOM v3 Simple milestones: none.
 
 ## Future Blueprint Candidates
 

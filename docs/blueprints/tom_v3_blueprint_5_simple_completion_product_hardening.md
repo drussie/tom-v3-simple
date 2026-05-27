@@ -2,9 +2,9 @@
 
 ## Status
 
-Status: IN PROGRESS
+Status: COMPLETE
 
-Blueprint 5 is the final lightweight completion and product-hardening pass for TOM v3 Simple.
+Blueprint 5 is complete. It was the final lightweight completion and product-hardening pass for TOM v3 Simple.
 
 ## Mission
 
@@ -113,6 +113,16 @@ Blueprint 5 does not add:
 
 Milestone 5E is expected to be a short completion review, not a new capability milestone.
 
+## Final Completion Statement
+
+TOM v3 Simple Status: COMPLETE
+
+TOM v3 Simple is complete as a lightweight local observation/evidence platform. It can index local tennis video, run fixture gameplay/detection/pose paths, optionally run YOLO detection smoke when local runtime and weights exist, persist observations and typed evidence rows, build candidate tracklets, preserve lineage/provenance, render detection/tracklet/pose evidence in the viewer, seed and display review annotations, export TOM-native review datasets, and run a structural completion audit.
+
+It remains intentionally non-decisive about tennis meaning. It does not include real pose inference, movement interpretation, stroke classification, homography, bounce/hit/rally/point/scoring, production deployment, auth, streaming, or TOM v2-style adjudication.
+
+Future work should start as a new blueprint.
+
 ## Completion Criteria
 
 Blueprint 5 is complete when a new developer can:
@@ -153,3 +163,11 @@ Status: complete.
 TOM v3 Simple now has a consolidated canonical documentation set. README is concise and practical, `docs/RUNBOOK_LOCAL.md` remains the copy/pasteable local demo path, `docs/CONTROL_ROOM.md` is the current repo-memory/status document, and the architecture, observation contract, blueprint status, known limitations, optional YOLO, exports, provenance audit, and completion checklist docs describe the current platform without requiring milestone archaeology.
 
 This is documentation consolidation only. It does not add new product behavior, model/runtime capability, real pose inference, movement interpretation, stroke classification, homography, bounce/hit/rally/point/scoring, or adjudication.
+
+## Milestone 5E Status
+
+Status: complete.
+
+Milestone 5E closes TOM v3 Simple with a final completion review, final agent report, final status updates, and final validation pass.
+
+This is closeout only. It does not add new product behavior, model/runtime capability, real pose inference, movement interpretation, stroke classification, homography, bounce/hit/rally/point/scoring, or adjudication.
