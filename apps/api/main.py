@@ -8,6 +8,7 @@ from apps.api.db import init_database
 from apps.api.routers import (
     annotations,
     artifacts,
+    court,
     dev,
     media,
     observations,
@@ -45,6 +46,7 @@ def create_app() -> FastAPI:
     app.include_router(artifacts.router)
     app.include_router(annotations.router)
     app.include_router(dev.router)
+    app.include_router(court.router)
     app.include_router(tracklets.router)
     app.include_router(pose.router)
     app.include_router(replay.router)

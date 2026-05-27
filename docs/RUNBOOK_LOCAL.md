@@ -693,6 +693,33 @@ camera_view_observation
 
 There is still no replay court overlay yet. There is no homography computation, projection diagnostic computation, real court model, or ball/player court-space projection yet.
 
+## 11E. Camera / View Evidence Queries
+
+Milestone 8C exposes fixture camera/view observations as read-only geometry context evidence.
+
+After running `run-fixture-court`, start the API against the same database:
+
+```bash
+TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_8b_court_fixture.db \
+.venv/bin/python -m uvicorn apps.api.main:app --reload
+```
+
+Then query:
+
+```text
+GET /court/camera-view?media_id=<media_id>&run_id=<court_run_id>
+GET /court/camera-view/summary?media_id=<media_id>&run_id=<court_run_id>
+GET /court/camera-view/<camera_view_observation_id>/bundle
+```
+
+Expected results:
+
+- camera/view rows return media-owned frame/time.
+- summary counts `broadcast_hardcam` and `stable` fixture evidence.
+- bundle includes observation spine, typed camera/view detail, run/model/runtime context, annotations, artifacts, and lineage arrays.
+
+This is not a confirmed camera state and does not compute homography.
+
 ## 12. Optional Custom Media
 
 Use a local video:

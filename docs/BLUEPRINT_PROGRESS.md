@@ -2,7 +2,7 @@
 
 ## Current Progress Gauge
 
-Current: Blueprints 1, 2, 3, 4, 5, 6, and 7 complete; TOM v3 Simple is complete; Blueprint 8 is in progress at Milestone 8B
+Current: Blueprints 1, 2, 3, 4, 5, 6, and 7 complete; TOM v3 Simple is complete; Blueprint 8 is in progress at Milestone 8C
 
 ## Current
 
@@ -190,7 +190,7 @@ Current: Blueprints 1, 2, 3, 4, 5, 6, and 7 complete; TOM v3 Simple is complete;
 - Replay pose overlays and pose timeline items include optional source/runtime/model/config metadata for real pose validation.
 - Replay selected pose detail displays source/runtime/model/config and subject association context when available.
 - Court/homography decision gate exists.
-- Court/camera/homography evidence has started as Blueprint 8 schema and fixture adapter work.
+- Court/camera/homography evidence has started as Blueprint 8 schema, fixture adapter, and camera/view read-model work.
 - No court/homography runtime, movement interpretation, bounce, hit, rally, point, scoring, or adjudication has been added.
 - Blueprint 7 completion review exists.
 - Blueprint 7 is marked complete in canonical docs.
@@ -203,6 +203,10 @@ Current: Blueprints 1, 2, 3, 4, 5, 6, and 7 complete; TOM v3 Simple is complete;
 - Worker `run-fixture-court` exists.
 - Makefile `court-fixture` exists.
 - Fixture court evidence can persist court keypoint, court line, and camera/view observations with model/runtime/run/step provenance.
+- Camera/view evidence query service exists.
+- Camera/view evidence summary read model exists.
+- Camera/view evidence bundle service exists.
+- API endpoints under `/court/camera-view` expose camera/view query, summary, and bundle payloads.
 
 ## Blueprint 7 Status
 
@@ -305,7 +309,19 @@ indexed media
 
 Blueprint 8 progress after 8B: about 25-30%.
 
-Remaining Blueprint 8 work should stay deliberate: camera/view context hardening, homography candidate builder, replay court overlays, projection diagnostics/review exports, and completion review. 8B does not add tennis-event interpretation.
+Milestone 8C hardens camera/view evidence as geometry context:
+
+```text
+camera_view_observation
+-> query filters
+-> summary metrics
+-> evidence bundle
+-> /court/camera-view API
+```
+
+Blueprint 8 progress after 8C: about 35-40%.
+
+Remaining Blueprint 8 work should stay deliberate: homography candidate persistence, replay court overlays, projection diagnostics/review exports, and completion review. 8C does not add homography computation, projection diagnostics, replay court overlays, real camera/court inference, ball/player court-space projection, or tennis-event interpretation.
 
 ## Blueprint 5 Status
 

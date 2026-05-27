@@ -442,6 +442,84 @@ class CameraViewObservationRead(CameraViewObservationCreate):
     created_at: datetime
 
 
+class CameraViewQueryFilters(TOMBaseModel):
+    media_id: str
+    run_id: str | None = None
+    start_ms: int | None = None
+    end_ms: int | None = None
+    frame_start: int | None = None
+    frame_end: int | None = None
+    view_label: str | None = None
+    camera_motion_hint: str | None = None
+    min_view_confidence: float | None = None
+    limit: int = Field(default=100, ge=1, le=500)
+    offset: int = Field(default=0, ge=0)
+
+    @model_validator(mode="after")
+    def validate_filters(self) -> CameraViewQueryFilters:
+        if self.view_label is not None and self.view_label not in CAMERA_VIEW_LABELS:
+            raise CourtSchemaError(f"invalid camera view label: {self.view_label}")
+        if (
+            self.camera_motion_hint is not None
+            and self.camera_motion_hint not in CAMERA_MOTION_HINTS
+        ):
+            raise CourtSchemaError(
+                f"invalid camera motion hint: {self.camera_motion_hint}"
+            )
+        return self
+
+
+class CameraViewQueryRow(TOMBaseModel):
+    observation_id: str
+    media_id: str
+    run_id: str
+    frame_number: int
+    timestamp_ms: int
+    frame_start: int | None = None
+    frame_end: int | None = None
+    timestamp_start_ms: int | None = None
+    timestamp_end_ms: int | None = None
+    view_label: str
+    view_confidence: float | None = None
+    camera_motion_hint: str | None = None
+    stability_score: float | None = None
+    cut_likelihood: float | None = None
+    model_id: str | None = None
+    runtime_config_id: str | None = None
+    frame_time_owner: str
+    metadata_jsonb: dict[str, Any] = Field(default_factory=dict)
+    created_at: datetime
+    fixture_camera_view_evidence: bool = False
+    observation_only: bool = True
+    no_adjudication: bool = True
+    geometry_evidence_only: bool = True
+
+
+class CameraViewQueryResponse(TOMBaseModel):
+    media_id: str
+    run_id: str | None = None
+    total: int
+    limit: int
+    offset: int
+    items: list[CameraViewQueryRow]
+    warnings: dict[str, Any] = Field(default_factory=dict)
+
+
+class CameraViewEvidenceSummary(TOMBaseModel):
+    media_id: str
+    run_id: str | None = None
+    camera_view_observation_count: int
+    labels: dict[str, int] = Field(default_factory=dict)
+    motion_hints: dict[str, int] = Field(default_factory=dict)
+    time_range: dict[str, int | None] = Field(default_factory=dict)
+    frame_range: dict[str, int | None] = Field(default_factory=dict)
+    mean_view_confidence: float | None = None
+    mean_stability_score: float | None = None
+    max_cut_likelihood: float | None = None
+    homography_context: dict[str, Any] = Field(default_factory=dict)
+    warnings: dict[str, Any] = Field(default_factory=dict)
+
+
 def validate_homography_matrix(matrix: list[list[float]] | None, *, required: bool) -> None:
     if matrix is None:
         if required:

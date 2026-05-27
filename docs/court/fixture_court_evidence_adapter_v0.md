@@ -70,6 +70,18 @@ Fixture margins are:
 
 Court lines connect the v0 template keypoints in image-pixel coordinates. Camera/view rows default to `broadcast_hardcam`, `stable`, and fixture confidence values.
 
+## Camera / View Read Layer
+
+Milestone 8C reads the `camera_view_observation` rows produced by this adapter through:
+
+```text
+GET /court/camera-view?media_id=<media_id>&run_id=<court_run_id>
+GET /court/camera-view/summary?media_id=<media_id>&run_id=<court_run_id>
+GET /court/camera-view/<camera_view_observation_id>/bundle
+```
+
+These APIs expose geometry context evidence only. They do not compute homography or confirm camera state.
+
 ## Provenance
 
 The adapter creates:
@@ -91,11 +103,12 @@ Every emitted observation has:
 
 ## Explicit Non-Goals
 
-8B does not create:
+8B and 8C do not create:
 
 - homography candidates
 - projection diagnostics
 - replay court overlays
 - real court model inference
+- real camera model inference
 - ball/player court-space projection
 - bounce, hit, in/out, rally, point, or scoring conclusions

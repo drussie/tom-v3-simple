@@ -53,6 +53,10 @@ Status: COMPLETE.
 
 Harden camera/view evidence as its own geometry context layer. 8B already writes fixture camera/view rows; 8C should query/expose/review camera/view evidence without duplicating the fixture camera row contract.
 
+Status: COMPLETE.
+
+8C adds camera/view query, summary, and evidence-bundle read models plus `/court/camera-view` API endpoints. It does not add a real camera model, homography computation, projection diagnostics, replay court overlays, or ball/player court projections.
+
 ### 8D - Homography Candidate Persistence
 
 Persist homography candidates from source court keypoint/line evidence with candidate status, confidence, reprojection diagnostics, and lineage.

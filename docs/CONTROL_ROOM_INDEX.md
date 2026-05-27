@@ -76,6 +76,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 7F - Perception Run Orchestration and Completion Review](milestones/milestone_7f_perception_run_orchestration_completion_review.md)
 - [Milestone 8A - Court Evidence Schema / Contract](milestones/milestone_8a_court_evidence_schema_contract.md)
 - [Milestone 8B - Court Keypoint / Line Evidence Adapter](milestones/milestone_8b_court_keypoint_line_evidence_adapter.md)
+- [Milestone 8C - Camera / View Evidence Layer](milestones/milestone_8c_camera_view_evidence_layer.md)
 
 ## Handoffs
 
@@ -125,6 +126,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 7F Handoff](handoffs/milestone_7f_perception_run_orchestration_completion_review_handoff.md)
 - [Milestone 8A Handoff](handoffs/milestone_8a_court_evidence_schema_contract_handoff.md)
 - [Milestone 8B Handoff](handoffs/milestone_8b_court_keypoint_line_evidence_adapter_handoff.md)
+- [Milestone 8C Handoff](handoffs/milestone_8c_camera_view_evidence_layer_handoff.md)
 
 ## Agent Reports
 
@@ -174,6 +176,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 7F Agent Report](agent_reports/milestone_7f_perception_run_orchestration_completion_review_report.md)
 - [Milestone 8A Agent Report](agent_reports/milestone_8a_court_evidence_schema_contract_report.md)
 - [Milestone 8B Agent Report](agent_reports/milestone_8b_court_keypoint_line_evidence_adapter_report.md)
+- [Milestone 8C Agent Report](agent_reports/milestone_8c_camera_view_evidence_layer_report.md)
 
 ## Blueprints
 
@@ -211,6 +214,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Court / Homography Evidence Decision v0](court/court_homography_evidence_decision_v0.md)
 - [Court Evidence Schema v0](court/court_evidence_schema_v0.md)
 - [Court Template Registry v0](court/court_template_registry_v0.md)
+- [Camera / View Evidence Layer v0](court/camera_view_evidence_layer_v0.md)
 
 ## Model Adapters
 

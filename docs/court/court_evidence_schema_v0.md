@@ -338,8 +338,14 @@ Future TOM-native court review exports should include:
 
 No export should promote court evidence into bounce, hit, in/out, rally, point, or scoring conclusions.
 
+## Camera / View Read Layer
+
+8C exposes `camera_view_observation` rows through read-only query, summary, and evidence-bundle services. The summary can count view labels and camera motion hints and report confidence/stability/cut metrics.
+
+Camera/view summaries are geometry context evidence. They do not confirm camera state or homography validity.
+
 ## Non-goals
 
-8B writes fixture `court_keypoint_observation`, `court_line_observation`, and `camera_view_observation` rows with `fixture_court_evidence = true` and `not_real_court_model = true`.
+8B writes fixture `court_keypoint_observation`, `court_line_observation`, and `camera_view_observation` rows with `fixture_court_evidence = true` and `not_real_court_model = true`. 8C exposes camera/view rows through read models.
 
-8B does not add a real court runtime, homography computation, projection diagnostics, replay court overlay, ball/player court projection, stream ingestion, or tennis-event interpretation.
+8C does not add a real court/runtime model, homography computation, projection diagnostics, replay court overlay, ball/player court projection, stream ingestion, or tennis-event interpretation.

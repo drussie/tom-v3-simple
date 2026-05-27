@@ -86,6 +86,8 @@ Court observations store geometry evidence at media-owned frame/time. Homography
 
 Milestone 8B adds fixture court evidence production for `court_keypoint_observation`, `court_line_observation`, and `camera_view_observation`. These rows carry `fixture_court_evidence = true`, `geometry_evidence_only = true`, `not_real_court_model = true`, model/runtime/run provenance, and media-owned frame/time.
 
+Milestone 8C adds read-only camera/view query, summary, and evidence-bundle access. A camera/view summary is geometry context evidence; it is not a confirmed camera state and does not decide homography validity.
+
 Court evidence does not decide in/out, bounce locations, player court position, ball court position, rally state, point state, or score.
 
 ## Lineage

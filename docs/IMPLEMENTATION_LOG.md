@@ -1,5 +1,45 @@
 # TOM v3 Simple - Implementation Log
 
+## Milestone 8C - Camera / View Evidence Layer
+
+Status: complete
+
+### Goal
+
+Make persisted `camera_view_observation` rows queryable and inspectable as geometry context evidence.
+
+### Outcome
+
+Milestone 8C created:
+
+- `apps.api.services.camera_view_evidence` query, summary, and bundle helpers.
+- `/court/camera-view` query endpoint.
+- `/court/camera-view/summary` summary endpoint.
+- `/court/camera-view/{observation_id}/bundle` evidence bundle endpoint.
+- Camera/view read-model schema contracts.
+- Service and API tests using 8B fixture camera/view rows.
+- Camera/view evidence docs, milestone doc, handoff, and agent report.
+
+8C final path:
+
+```text
+fixture court run
+-> camera_view_observation rows
+-> query / summary / bundle read models
+-> /court/camera-view API
+```
+
+### Non-goals
+
+- No homography computation.
+- No projection diagnostics.
+- No replay court overlay.
+- No real camera/court model.
+- No ball/player court-space projection.
+- No bounce/hit/in-out/rally/point/scoring.
+- No stream ingestion.
+- No adjudication.
+
 ## Milestone 8B - Court Keypoint / Line Evidence Adapter
 
 Status: complete

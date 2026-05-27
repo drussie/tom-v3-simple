@@ -12,7 +12,7 @@
 - Blueprint 8: IN PROGRESS
 - TOM v3 Simple: COMPLETE
 
-TOM v3 Simple is complete as a lightweight local observation/evidence platform. Blueprint 6 is complete as the visual replay/operator workstation layer. Blueprint 7 is complete as the real perception runtime layer for optional real detection, real-detection-derived candidate tracklets, and optional real pose keypoint evidence. Blueprint 8 is in progress with court/camera/homography schema contracts and fixture court evidence persistence.
+TOM v3 Simple is complete as a lightweight local observation/evidence platform. Blueprint 6 is complete as the visual replay/operator workstation layer. Blueprint 7 is complete as the real perception runtime layer for optional real detection, real-detection-derived candidate tracklets, and optional real pose keypoint evidence. Blueprint 8 is in progress with court/camera/homography schema contracts, fixture court evidence persistence, and camera/view evidence query/bundle read models.
 
 ## Blueprint 1 - Media, Observation Store, Viewer Foundation
 
@@ -443,6 +443,29 @@ indexed media
 ```
 
 8B adds worker `run-fixture-court`, Makefile `court-fixture`, deterministic fixture geometry, and adapter persistence tests.
+
+Milestone 8C proves:
+
+```text
+fixture camera/view observations
+-> camera/view query service
+-> camera/view summary read model
+-> camera/view evidence bundle
+-> /court/camera-view API
+```
+
+8C adds read-only query, summary, and bundle access for camera/view geometry context evidence. It does not create new camera/view rows beyond the 8B fixture adapter path.
+
+8C does not add:
+
+- real camera/view model
+- homography computation
+- projection diagnostics
+- replay court overlay
+- ball/player court-space projection
+- bounce/hit/in-out/rally/point/scoring
+- stream ingestion
+- adjudication
 
 8B does not add:
 

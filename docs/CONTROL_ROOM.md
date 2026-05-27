@@ -42,9 +42,9 @@ Court/camera/homography evidence now proceeds in Blueprint 8.
 
 Blueprint 8 Status: IN PROGRESS
 
-Blueprint 8 starts the court/camera/homography evidence layer. Milestone 8A adds court keypoint, court line, camera/view, homography candidate, and projection diagnostic schema contracts, typed storage tables, writer persistence support, a normalized court template registry, lineage constants, tests, and docs. Milestone 8B adds a deterministic fixture court evidence adapter that writes court keypoint, court line, and camera/view observations with model/runtime/run provenance.
+Blueprint 8 starts the court/camera/homography evidence layer. Milestone 8A adds court keypoint, court line, camera/view, homography candidate, and projection diagnostic schema contracts, typed storage tables, writer persistence support, a normalized court template registry, lineage constants, tests, and docs. Milestone 8B adds a deterministic fixture court evidence adapter that writes court keypoint, court line, and camera/view observations with model/runtime/run provenance. Milestone 8C makes camera/view observations queryable and inspectable as geometry context evidence with summary and evidence-bundle read models.
 
-8B is fixture/fake geometry evidence only. It does not add a real court model, homography computation, projection diagnostics, replay court overlays, ball/player court-space projection, stream ingestion, or tennis-event interpretation.
+8C is still geometry evidence only. It does not add a real camera/court model, homography computation, projection diagnostics, replay court overlays, ball/player court-space projection, stream ingestion, or tennis-event interpretation.
 
 ## Canonical Local Demo
 
@@ -100,7 +100,7 @@ An observation does not mean the output is correct, a tennis event happened, a s
 - Real pose crop mode can preserve lineage from source player detections to pose observations.
 - Court/camera/homography evidence decision gate with a Blueprint 8 candidate contract.
 - Blueprint 7 completion review and final perception orchestration runbook.
-- Court/camera/homography schema, typed persistence foundation, and fixture court evidence adapter for Blueprint 8.
+- Court/camera/homography schema, typed persistence foundation, fixture court evidence adapter, and camera/view evidence read layer for Blueprint 8.
 
 ## Explicitly Absent Capabilities
 
@@ -108,6 +108,7 @@ An observation does not mean the output is correct, a tennis event happened, a s
 - Stroke classification.
 - Homography or court-space reasoning.
 - Court/camera/homography runtime or replay court overlays.
+- Real camera/view model inference.
 - Bounce detection.
 - Hit detection.
 - Rally segmentation.
@@ -140,7 +141,7 @@ Short version:
 - Fixture output is deterministic demo evidence.
 - Optional YOLO quality depends on local runtime, weights, model classes, and source media.
 - Optional real pose quality depends on local runtime, pose weights, source detections or frame sampling, and source media.
-- Court/camera/homography evidence now proceeds in Blueprint 8 with schema persistence and fixture adapter foundations.
+- Court/camera/homography evidence now proceeds in Blueprint 8 with schema persistence, fixture adapter foundations, and camera/view query/bundle read models.
 - Candidate tracklets can be wrong or incomplete.
 - Exports are TOM-native review datasets.
 - Storage lifecycle is local/demo-oriented.
@@ -327,6 +328,19 @@ indexed media
 ```
 
 8B adds worker `run-fixture-court`, Makefile `court-fixture`, deterministic media-owned frame sampling, and tests for adapter persistence. It does not add homography computation, projection diagnostics, replay court overlays, real court inference, ball/player court-space projection, event interpretation, stream ingestion, or adjudication.
+
+Milestone 8C hardens camera/view evidence:
+
+```text
+fixture court run
+-> camera_view_observation rows
+-> camera/view query service
+-> summary read model
+-> evidence bundle
+-> /court/camera-view API
+```
+
+8C adds read-only query, summary, and bundle APIs for camera/view geometry context evidence. It does not add homography computation, projection diagnostics, replay court overlays, real camera/court inference, ball/player court-space projection, event interpretation, stream ingestion, or adjudication.
 
 ## Future Blueprint Candidates
 
