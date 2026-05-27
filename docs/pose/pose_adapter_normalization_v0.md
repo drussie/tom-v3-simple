@@ -146,3 +146,7 @@ The normalized output can be persisted by worker `run-pose-adapter`. Full-frame 
 - No homography.
 - No bounce/hit/rally/point/scoring.
 - No adjudication.
+
+## Blueprint 4 Completion
+
+Blueprint 4 closes with this normalizer as the bridge from fake/serialized pose model output into TOM v3 pose evidence. It prepares persistence-ready payloads, but it still does not load a pose model, smooth keypoints, repair missing keypoints, or interpret movement.

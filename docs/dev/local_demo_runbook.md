@@ -968,3 +968,111 @@ Expected behavior:
 - export creates `pose_review_dataset_export` artifact metadata with checksum
 
 Pose review/export packages evidence for inspection. It does not add real pose inference, movement interpretation, tennis-event inference, homography, bounce/hit/rally/point/scoring, or adjudication.
+
+## 30. Complete Blueprint 4 Fixture Pose Path
+
+Milestone 4F closes Blueprint 4. The complete local fixture pose path is:
+
+```text
+index media
+-> run fixture detection adapter
+-> run fixture pose adapter
+-> optionally link pose to source player detections
+-> open /runs/<pose_run_id>
+-> inspect pose overlay and keypoint table
+-> query pose observations
+-> add review annotation through the generic annotation API
+-> export TOM-native pose review dataset
+-> inspect JSON export and evidence artifact metadata
+```
+
+This path does not require real pose weights or Ultralytics pose runtime.
+
+Index media:
+
+```bash
+python -m apps.worker.cli index-media \
+  --source-path <sample_video_path>
+```
+
+Run fixture detections if you want source player detection context:
+
+```bash
+python -m apps.worker.cli run-detection-adapter \
+  --media-id <media_id> \
+  --adapter fixture \
+  --frame-sample-rate 30 \
+  --max-frames 3
+```
+
+Run unassociated fixture poses:
+
+```bash
+python -m apps.worker.cli run-pose-adapter \
+  --media-id <media_id> \
+  --adapter fixture \
+  --frame-sample-rate 30 \
+  --max-frames 3
+```
+
+Or run source-linked fixture poses:
+
+```bash
+python -m apps.worker.cli run-pose-adapter \
+  --media-id <media_id> \
+  --adapter fixture \
+  --source-detection-run-id <detection_run_id> \
+  --link-source-detections \
+  --max-frames 3
+```
+
+Open the viewer:
+
+```text
+http://127.0.0.1:3000/runs/<pose_run_id>
+```
+
+Query pose observations:
+
+```bash
+curl -X POST http://127.0.0.1:8000/pose/query \
+  -H "Content-Type: application/json" \
+  -d '{"run_id":"<pose_run_id>","skeleton_format":"coco17"}'
+```
+
+Add a pose review annotation through the generic annotation path:
+
+```bash
+curl -X POST http://127.0.0.1:8000/annotations \
+  -H "Content-Type: application/json" \
+  -d '{
+    "target_observation_id":"<pose_observation_id>",
+    "annotation_type":"review_label",
+    "label":"bad_keypoint",
+    "payload":{
+      "keypoint_name":"right_wrist",
+      "keypoint_index":10
+    }
+  }'
+```
+
+Export pose review evidence:
+
+```bash
+python -m apps.worker.cli export-pose-review-dataset \
+  --run-id <pose_run_id> \
+  --output-root .data/exports
+```
+
+Expected behavior:
+
+- pose observations persist with `observation_family = pose`
+- typed `pose_observation` rows store COCO17 keypoint evidence
+- source-linked poses record candidate source context and lineage
+- the viewer renders present keypoints and skeleton edges from persisted image-pixel coordinates
+- missing keypoints remain missing evidence in the table
+- query results and evidence bundles include pose detail and source context
+- export writes `.data/exports/pose/<export_id>/pose_review_dataset.json`
+- export creates `pose_review_dataset_export` evidence artifact metadata
+
+Blueprint 4 remains fixture/fake pose evidence only. It does not add real pose inference, movement interpretation, tennis-event inference, homography, bounce/hit/rally/point/scoring, or adjudication.

@@ -60,3 +60,7 @@ The skeleton registry describes the shape of model output evidence. It does not 
 ## Normalization Use
 
 Milestone 4B uses this registry to assign COCO17 names and indices to fake/serialized pose keypoints during normalization. The normalizer skips a pose when keypoint count does not match the registered skeleton instead of silently padding or truncating.
+
+## Blueprint 4 Completion
+
+Blueprint 4 closes with COCO17 as the first supported skeleton contract. The registry is reused by normalization, persistence tests, viewer overlay helpers, and pose export so keypoint names, indices, and edges stay consistent across the pose evidence path.

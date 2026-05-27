@@ -93,3 +93,7 @@ The 4B normalization adapter result includes:
 ## Non-Goals
 
 Milestones 4A, 4B, and 4C do not add real pose runtime, pose weights validation, overlay rendering, movement interpretation, or tennis-event candidates.
+
+## Blueprint 4 Completion
+
+Blueprint 4 closes with fixture pose runtime/config metadata only. The config contract records adapter identity, frame sampling, skeleton format, source candidate context, and `no_real_pose_inference` metadata for persisted fixture pose runs. Real pose runtime and weights validation remain future work.

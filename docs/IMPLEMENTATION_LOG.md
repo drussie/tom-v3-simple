@@ -952,3 +952,37 @@ Milestone 4E created:
 - TOM-native pose review dataset export service with local JSON output, checksum, `evidence_artifact` metadata, and query result memory.
 - Worker command `export-pose-review-dataset`.
 - Focused tests for pose query filters, bundle content, annotation immutability, and export artifacts.
+
+## Milestone 4F - Blueprint 4 Completion Review / Pose Evidence Hardening
+
+Status: complete
+
+### Goal
+
+Close Blueprint 4 with a completion review, invariant audit, documentation cleanup, validation pass, and next-blueprint recommendation.
+
+### Non-goals
+
+- No real pose runtime or adapter inference.
+- No movement interpretation.
+- No serve, hit, split-step, or biomechanics conclusions.
+- No court homography.
+- No bounce detection.
+- No hit detection.
+- No rally segmentation.
+- No point reconstruction.
+- No scoring.
+- No adjudication.
+
+### Notes
+
+Milestone 4F created:
+
+- Blueprint 4 completion review doc.
+- Milestone 4F milestone, handoff, and agent report docs.
+- Completion statement declaring Blueprint 4 complete.
+- Invariant audit mapping pose schema, normalization, persistence, lineage, viewer, query, review, and export coverage to existing tests and viewer contracts.
+- Runbook and README updates for the complete fixture pose evidence path.
+- Control-room index, current-state, blueprint-progress, and pose docs updates.
+
+Blueprint 4 is complete. It closes with pose schema, COCO17 skeleton registry, normalization, persistence, lineage, viewer overlay, pose query, review annotation support, and TOM-native export while preserving the observation-only boundary and keeping real pose inference and movement interpretation out of scope.

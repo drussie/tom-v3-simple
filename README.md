@@ -14,7 +14,7 @@ The core invariant:
 
 ## Current Status
 
-Blueprints 1, 2, and 3 are complete. Blueprint 4 is in progress with pose evidence schema, normalization, persistence, lineage, overlay viewer, query, review, and export foundations. TOM v3 Simple can build, inspect, query, review, and export candidate temporal evidence on top of persisted ball/player detections, has an optional YOLO / Ultralytics runtime path for ball/player observation adapters, and now has first-class pose observation review/export contracts:
+Blueprints 1, 2, 3, and 4 are complete. TOM v3 Simple can build, inspect, query, review, and export candidate temporal evidence on top of persisted ball/player detections, has an optional YOLO / Ultralytics runtime path for ball/player observation adapters, and now has a complete first-class pose evidence path covering schema, normalization, persistence, lineage, overlay viewer, query, review, and export:
 
 - repo memory and architecture contracts
 - FastAPI backend/API foundation
@@ -73,17 +73,18 @@ Blueprints 1, 2, and 3 are complete. Blueprint 4 is in progress with pose eviden
 - pose-specific query API and evidence bundle service
 - pose review labels with keypoint-level annotation metadata
 - worker/API pose review dataset export as local TOM-native JSON artifacts
+- Blueprint 4 completion review and pose invariant audit
 - model asset and weight ignore policy
 
-Portable TOM v1 detector assets/source and YOLO26 model weights are not present in this repo state. Real YOLO inference now has a guarded frame-level provider path and optional local smoke workflow, but local runtime validation still requires optional YOLO packages and explicitly registered local weights. Pose currently has schema, normalization, persistence, lineage, overlay viewer, query, review, and export foundations only; no real pose runtime, movement interpretation, court homography, or real bounce detection is implemented yet.
+Portable TOM v1 detector assets/source and YOLO26 model weights are not present in this repo state. Real YOLO inference now has a guarded frame-level provider path and optional local smoke workflow, but local runtime validation still requires optional YOLO packages and explicitly registered local weights. Pose currently has complete fixture/fake evidence foundations only; no real pose runtime, movement interpretation, court homography, or real bounce detection is implemented yet.
 
 Blueprint 2 did not add pose, homography, bounce detection, hit detection, rally/point reconstruction, scoring, identity proof, or adjudication.
 
 Blueprint 3 did not add pose, homography, bounce detection, hit detection, rally/point reconstruction, scoring, identity proof, YOLO tracking mode, or adjudication.
 
-Blueprint 4A/4B/4C/4D/4E did not add real pose inference, movement interpretation, serve/hit/split-step/biomechanics conclusions, homography, rally/point reconstruction, scoring, or adjudication.
+Blueprint 4 did not add real pose inference, movement interpretation, serve/hit/split-step/biomechanics conclusions, homography, rally/point reconstruction, scoring, or adjudication.
 
-Recommended next milestone: Milestone 4F - Blueprint 4 Completion Review / Pose Evidence Hardening.
+Recommended next blueprint: Blueprint 5 - TOM v3 Simple Completion / Product Hardening.
 
 ## Repo Structure
 
@@ -561,6 +562,7 @@ Useful runbooks:
 - [Pose Persistence and Lineage v0](docs/pose/pose_persistence_lineage_v0.md)
 - [Pose Overlay Viewer v0](docs/web/pose_overlay_viewer_v0.md)
 - [Pose Query / Review / Export v0](docs/pose/pose_query_review_export_v0.md)
+- [Blueprint 4 Completion Review](docs/blueprints/tom_v3_blueprint_4_completion_review.md)
 - [Detection Overlay Viewer v0](docs/web/detection_overlay_viewer_v0.md)
 - [Frame Artifact Overlay v0](docs/web/frame_artifact_overlay_v0.md)
 - [Tracklet Foundation v0](docs/tracklets/tracklet_foundation_v0.md)

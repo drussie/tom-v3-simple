@@ -2,9 +2,13 @@
 
 ## Status
 
-Status: in progress
+Status: COMPLETE
 
-Milestones 4A, 4B, 4C, 4D, and 4E are complete. They establish the pose runtime/schema foundation, pose adapter normalization foundation, pose observation persistence/lineage foundation, pose overlay viewer foundation, and pose query/review/export foundation.
+Milestones 4A, 4B, 4C, 4D, 4E, and 4F are complete. They establish the pose runtime/schema foundation, pose adapter normalization foundation, pose observation persistence/lineage foundation, pose overlay viewer foundation, pose query/review/export foundation, and Blueprint 4 completion review.
+
+Blueprint 4 proved that TOM v3 can persist pose model output as observation evidence using a first-class pose observation schema, COCO17 skeleton registry, keypoint validation, normalization, processing-run persistence, source-evidence lineage, viewer overlay, pose-specific query filters, review annotation support, evidence bundles, and TOM-native review dataset export.
+
+Blueprint 4 did not add real pose inference, movement interpretation, stroke classification, serve/hit/split-step/biomechanics analysis, homography, bounce detection, hit detection, rally/point/scoring, or adjudication.
 
 ## Mission
 
@@ -118,6 +122,19 @@ Milestone 4E adds:
 
 4E does not add real pose inference, movement interpretation, pose-derived event candidates, or third-party training format conversion.
 
+## Milestone 4F Result
+
+Milestone 4F adds:
+
+- Blueprint 4 completion review
+- pose evidence invariant audit
+- project memory and control-room index cleanup
+- runbook cleanup for the complete fixture pose path
+- completion statement declaring Blueprint 4 complete
+- next-blueprint recommendation
+
+4F does not add real pose inference, movement interpretation, pose-derived event candidates, homography, bounce/hit/rally/point/scoring, or adjudication.
+
 ## Observation Boundary
 
 A pose observation means:
@@ -138,7 +155,7 @@ A biomechanical conclusion is valid.
 A rally or point exists.
 ```
 
-## Out of Scope For Blueprint 4A-4E
+## Out of Scope For Blueprint 4
 
 - real pose inference
 - movement interpretation
@@ -150,10 +167,10 @@ A rally or point exists.
 - rally/point/scoring
 - adjudication
 
-## Next Milestone
+## Next Blueprint
 
-Recommended next milestone:
+Recommended next blueprint:
 
 ```text
-Milestone 4F - Blueprint 4 Completion Review / Pose Evidence Hardening
+Blueprint 5 - TOM v3 Simple Completion / Product Hardening
 ```

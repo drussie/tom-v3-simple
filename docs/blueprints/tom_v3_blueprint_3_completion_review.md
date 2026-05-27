@@ -186,4 +186,4 @@ Pose should remain outside Blueprint 3. Blueprint 4 should preserve the same TOM
 
 ## Blueprint 4 Follow-Up
 
-Blueprint 4 has started with Milestone 4A - Pose Runtime / Schema Foundation. The first Blueprint 4 step adds typed pose observation schema, COCO17 skeleton metadata, keypoint validation, and synthetic pose persistence only. It does not add pose inference, pose overlays, movement interpretation, homography, bounce, hit, rally, point, scoring, or adjudication.
+Blueprint 4 is complete. It adds typed pose observation schema, COCO17 skeleton metadata, keypoint validation, normalization, fixture pose persistence, lineage, viewer overlay, query/review/export integration, and completion review. It does not add real pose inference, movement interpretation, homography, bounce, hit, rally, point, scoring, or adjudication.

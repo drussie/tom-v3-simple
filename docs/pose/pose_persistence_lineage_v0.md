@@ -173,3 +173,7 @@ Lineage remains descriptive source context. It does not establish identity or mo
 - No homography.
 - No bounce/hit/rally/point/scoring.
 - No adjudication.
+
+## Blueprint 4 Completion
+
+Blueprint 4 closes with fixture pose persistence and lineage as the durable provenance path for pose evidence. Pose rows can be unassociated full-frame evidence or linked to source player detection / candidate tracklet / candidate track point context, and those links remain descriptive evidence lineage rather than identity or movement conclusions.

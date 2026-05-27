@@ -116,3 +116,7 @@ The viewer does not convert pose review labels into movement conclusions.
 - The pose review label form remains a future viewer enhancement; service/API support exists.
 - Deeper source observation lookup remains in existing lineage/detail panels.
 - No video playback pose overlay is implemented.
+
+## Blueprint 4 Completion
+
+Blueprint 4 closes with pose evidence visually inspectable in the existing Evidence Viewer. The overlay renders persisted keypoint evidence, skeleton edges, bbox context, keypoint confidence rows, and candidate source context. It does not infer movement, classify actions, or convert review labels into event conclusions.

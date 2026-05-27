@@ -192,3 +192,7 @@ Required warning fields:
 - No bounce/hit/rally/point/scoring.
 - No adjudication.
 - No conversion to a third-party pose training format in v0.
+
+## Blueprint 4 Completion
+
+Blueprint 4 closes with pose evidence searchable, reviewable, and exportable. Query, evidence bundle, annotation, and export flows preserve TOM-native keypoint evidence, source candidate context, lineage, artifacts, and annotations without mutating observations or creating movement/event conclusions.

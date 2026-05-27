@@ -163,3 +163,7 @@ Pose review dataset export writes TOM-native JSON under `.data/exports/pose/{exp
 ## Non-Goals
 
 Pose observations do not infer movement, tennis actions, biomechanics, rally state, point state, or scoring.
+
+## Blueprint 4 Completion
+
+Blueprint 4 closes with this schema as the typed storage contract for pose evidence. The schema supports normalization, fixture persistence, candidate source lineage, viewer overlay, pose query, review annotation, and TOM-native export without requiring real pose inference or movement interpretation.

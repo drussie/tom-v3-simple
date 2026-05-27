@@ -49,6 +49,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 4C - Pose Observation Persistence and Lineage](milestones/milestone_4c_pose_observation_persistence_lineage.md)
 - [Milestone 4D - Pose Overlay Viewer](milestones/milestone_4d_pose_overlay_viewer.md)
 - [Milestone 4E - Pose Query / Review / Export Integration](milestones/milestone_4e_pose_query_review_export_integration.md)
+- [Milestone 4F - Blueprint 4 Completion Review](milestones/milestone_4f_blueprint_4_completion_review.md)
 
 ## Handoffs
 
@@ -78,6 +79,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 4C Handoff](handoffs/milestone_4c_pose_observation_persistence_lineage_handoff.md)
 - [Milestone 4D Handoff](handoffs/milestone_4d_pose_overlay_viewer_handoff.md)
 - [Milestone 4E Handoff](handoffs/milestone_4e_pose_query_review_export_integration_handoff.md)
+- [Milestone 4F Handoff](handoffs/milestone_4f_blueprint_4_completion_review_handoff.md)
 
 ## Agent Reports
 
@@ -107,6 +109,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 4C Agent Report](agent_reports/milestone_4c_pose_observation_persistence_lineage_report.md)
 - [Milestone 4D Agent Report](agent_reports/milestone_4d_pose_overlay_viewer_report.md)
 - [Milestone 4E Agent Report](agent_reports/milestone_4e_pose_query_review_export_integration_report.md)
+- [Milestone 4F Agent Report](agent_reports/milestone_4f_blueprint_4_completion_review_report.md)
 
 ## Blueprints
 
@@ -115,6 +118,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Blueprint 3 - Real Model Runtime / YOLO Observation Adapter](blueprints/tom_v3_blueprint_3_real_model_runtime_yolo_observation_adapter.md)
 - [Blueprint 3 Completion Review](blueprints/tom_v3_blueprint_3_completion_review.md)
 - [Blueprint 4 - Pose Observation / Movement Evidence Layer](blueprints/tom_v3_blueprint_4_pose_observation_movement_evidence_layer.md)
+- [Blueprint 4 Completion Review](blueprints/tom_v3_blueprint_4_completion_review.md)
 
 ## API and Schema
 

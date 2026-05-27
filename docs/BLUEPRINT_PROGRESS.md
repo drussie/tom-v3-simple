@@ -2,7 +2,7 @@
 
 ## Current Progress Gauge
 
-Current: ~88-92% through Blueprint 4
+Current: 100% through Blueprint 4
 
 ## Current
 
@@ -99,7 +99,7 @@ Current: ~88-92% through Blueprint 4
 - Blueprint 3 completion review exists.
 - Real model runtime invariants are documented and mapped to test coverage.
 - Blueprint 3 is complete.
-- Blueprint 4 has started.
+- Blueprint 4 is complete.
 - Pose observation schema foundation exists.
 - COCO17 skeleton registry exists.
 - Keypoint schema validation helpers exist.
@@ -128,6 +128,9 @@ Current: ~88-92% through Blueprint 4
 - Pose evidence bundle service and API exist.
 - Pose annotations use the existing generic `human_annotation` path with pose labels and keypoint-level metadata.
 - Pose review dataset export exists as TOM-native JSON with `evidence_artifact` metadata, checksum, and query result memory.
+- Blueprint 4 completion review exists.
+- Pose evidence invariants are documented and mapped to focused tests and viewer contracts.
+- Blueprint 4 is complete.
 - No real pose inference, movement interpretation, homography, bounce, hit, rally, point, scoring, or adjudication has been added.
 
 ## After Milestone 0A
@@ -615,3 +618,21 @@ Expected: ~88-92% through Blueprint 4
 Status: complete.
 
 The repo now has pose query, review, and export integration. Persisted `player_pose_observation` rows can be filtered by typed pose fields, inspected through a pose evidence bundle, annotated with review labels and keypoint metadata, and exported as review dataset artifacts without changing the underlying pose evidence.
+
+## After Milestone 4F
+
+Expected: 100% through Blueprint 4
+
+- Blueprint 4 completion review exists.
+- Blueprint 4 status is complete.
+- Full pose evidence path is documented end to end.
+- Pose schema, skeleton registry, normalization, persistence, lineage, viewer, query, review, and export invariants are documented.
+- The local runbook describes the complete fixture pose validation path.
+- Next blueprint boundary is clear.
+- No real pose runtime, movement interpretation, homography, bounce, hit, rally, point, scoring, or adjudication is added.
+
+## Milestone 4F Status
+
+Status: complete.
+
+Blueprint 4 is complete. TOM v3 can persist pose model output as observation evidence with a first-class pose schema, COCO17 skeleton registry, keypoint validation, normalization, processing-run persistence, source candidate lineage, viewer overlay, pose-specific query filters, review annotation support, evidence bundles, and TOM-native review dataset export without adding real pose inference, movement interpretation, homography, bounce, hit, rally, point, scoring, or adjudication.
