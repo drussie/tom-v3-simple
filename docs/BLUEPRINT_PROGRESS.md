@@ -176,6 +176,9 @@ Current: Blueprints 1, 2, 3, 4, 5, and 6 complete; TOM v3 Simple is complete; Bl
 - Makefile `real-detection` exists.
 - Real YOLO detection replay runs reuse runtime probing, weights validation, model registry, class mapping, frame inference, and atomic observation persistence.
 - Real detection replay observations remain media-owned, observation-only model output.
+- Replay-info detection run metadata distinguishes real model-output runs from fixture demo runs.
+- Replay detection overlays and detection timeline items include optional source/runtime/model/config metadata for real detection validation.
+- Replay selected detection detail displays source/runtime/model/config/class context when available.
 - No real pose inference, movement interpretation, homography, bounce, hit, rally, point, scoring, or adjudication has been added.
 
 ## Blueprint 7 Status
@@ -193,9 +196,19 @@ indexed media
 -> replay workstation detection overlays
 ```
 
-Current Blueprint 7 progress after 7A: about 15-20%.
+Milestone 7B validates real detection overlay use in the replay workstation:
 
-Remaining Blueprint 7 work should stay separate and deliberate: real detection replay validation, possible real-detection tracklet candidates, real pose runtime, evaluation workflows, and future perception layers. No tennis-event interpretation is part of 7A.
+```text
+real detection run
+-> source-aware replay-info
+-> source-aware run selector labels
+-> overlay/timeline source metadata
+-> selected detection model/runtime/config detail
+```
+
+Current Blueprint 7 progress after 7B: about 25-30%.
+
+Remaining Blueprint 7 work should stay separate and deliberate: possible real-detection tracklet candidates, real pose runtime, evaluation workflows, and future perception layers. No tennis-event interpretation is part of 7A/7B.
 
 ## Blueprint 5 Status
 

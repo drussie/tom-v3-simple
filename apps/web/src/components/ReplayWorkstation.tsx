@@ -723,7 +723,7 @@ function RunSelect({
         <option value="">Select a run</option>
         {runs.map((run) => (
           <option key={run.run_id} value={run.run_id}>
-            {run.run_name} ({run.observation_count})
+            {formatReplayRunOptionLabel(run)}
           </option>
         ))}
       </select>
@@ -847,11 +847,24 @@ function SelectedEvidencePanel({
           value={`${detection.bbox.x}, ${detection.bbox.y}, ${detection.bbox.w}, ${detection.bbox.h}`}
         />
         <DetailRow label="source" value={detection.source_language} />
+        <DetailRow label="evidence source" value={sourceDisplayLabel(detection)} />
+        <DetailRow label="source runtime" value={detection.source_runtime ?? "n/a"} />
+        <DetailRow label="model registry id" value={detection.model_registry_id ?? "n/a"} />
+        <DetailRow
+          label="model"
+          value={formatModelNameVersion(detection.model_name, detection.model_version)}
+        />
+        <DetailRow label="runtime config id" value={detection.runtime_config_id ?? "n/a"} />
+        <DetailRow label="class id" value={detection.class_id?.toString() ?? "n/a"} />
+        <DetailRow label="class label" value={detection.class_label ?? "n/a"} />
+        <DetailRow label="frame/time owner" value={detection.frame_time_owner ?? "n/a"} />
         <a className="quiet-link" href={`/runs/${detection.run_id}`}>
           Open source evidence run
         </a>
         <p className="evidence-note">
-          Detection observation. Evidence only, not a confirmed object or tennis event.
+          {detection.real_model_output
+            ? "Real model output detection observation. Evidence only, not an object identity or tennis event conclusion."
+            : "Detection observation. Evidence only, not an object identity or tennis event conclusion."}
         </p>
       </EvidencePanel>
     );
@@ -867,12 +880,20 @@ function SelectedEvidencePanel({
         <DetailRow label="confidence" value={formatConfidence(item.confidence)} />
         <DetailRow label="frame" value={item.frame_number.toString()} />
         <DetailRow label="timestamp_ms" value={item.timestamp_ms.toString()} />
+        <DetailRow label="evidence source" value={sourceDisplayLabel(item)} />
+        <DetailRow label="model registry id" value={item.model_registry_id ?? "n/a"} />
+        <DetailRow
+          label="model"
+          value={formatModelNameVersion(item.model_name, item.model_version)}
+        />
+        <DetailRow label="runtime config id" value={item.runtime_config_id ?? "n/a"} />
         <a className="quiet-link" href={`/runs/${item.run_id}`}>
           Open source evidence run
         </a>
         <p className="evidence-note">
-          Detection observation selected from the evidence timeline. Evidence only, not a confirmed
-          object or tennis event.
+          {item.real_model_output
+            ? "Real model output detection observation selected from the evidence timeline. Evidence only, not an object identity or tennis event conclusion."
+            : "Detection observation selected from the evidence timeline. Evidence only, not an object identity or tennis event conclusion."}
         </p>
       </EvidencePanel>
     );
@@ -1067,8 +1088,15 @@ function RunGroup({ title, runs }: { title: string; runs: ReplayRunSummary[] }) 
               <strong>{run.run_name}</strong>
               <span className="mono">{run.run_id}</span>
               <span>
-                {run.run_status} · {run.observation_count} observations
+                {run.run_status} · {run.observation_count} observations ·{" "}
+                {formatReplayRunSourceLabel(run)}
               </span>
+              {run.model_registry_id !== null && run.model_registry_id !== undefined ? (
+                <span className="mono">
+                  {formatModelNameVersion(run.model_name, run.model_version)} ·{" "}
+                  {run.source_runtime ?? "unknown runtime"}
+                </span>
+              ) : null}
             </li>
           ))}
         </ul>
@@ -1096,7 +1124,8 @@ function SelectedRunRow({
         <span className="empty-state compact">Selected run is not available for this media.</span>
       ) : (
         <span>
-          {run.run_name} · {run.observation_count} observations
+          {run.run_name} · {run.observation_count} observations ·{" "}
+          {formatReplayRunSourceLabel(run)}
         </span>
       )}
     </div>
@@ -1120,6 +1149,50 @@ function selectedTimelineItemKey(selectedEvidence: SelectedReplayEvidence | null
     return `pose:${selectedEvidence.pose.observation_id}`;
   }
   return timelineItemKey(selectedEvidence.item);
+}
+
+function formatReplayRunOptionLabel(run: ReplayRunSummary): string {
+  return `${run.run_name} — ${formatReplayRunSourceLabel(run)} — ${run.observation_count} observations`;
+}
+
+function formatReplayRunSourceLabel(run: ReplayRunSummary): string {
+  if (run.is_real_model_output || run.evidence_source === "real_model_output") {
+    return "real model output";
+  }
+  if (run.is_fixture || run.evidence_source === "fixture_demo") {
+    return "fixture demo evidence";
+  }
+  return run.source_label ?? "persisted evidence";
+}
+
+function sourceDisplayLabel(
+  item:
+    | ReplayDetectionOverlay
+    | Extract<ReplayTimelineItem, { item_type: "detection" }>
+): string {
+  if (item.real_model_output || item.evidence_source === "real_model_output") {
+    return "Real model output";
+  }
+  if (item.is_fixture || item.evidence_source === "fixture_demo") {
+    return "Fixture/demo evidence";
+  }
+  return item.source_label ?? "Persisted evidence";
+}
+
+function formatModelNameVersion(
+  modelName: string | null | undefined,
+  modelVersion: string | null | undefined
+): string {
+  if (!modelName && !modelVersion) {
+    return "n/a";
+  }
+  if (!modelVersion) {
+    return modelName ?? "n/a";
+  }
+  if (!modelName) {
+    return modelVersion;
+  }
+  return `${modelName} / ${modelVersion}`;
 }
 
 function DetailRow({ label, value }: { label: string; value: string }) {

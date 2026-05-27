@@ -437,6 +437,15 @@ The command prints a replay URL:
 http://127.0.0.1:3000/replay/<media_id>?detectionRunId=<real_detection_run_id>
 ```
 
+Milestone 7B replay validation:
+
+- the detection run selector should label the run as real model output
+- fixture detection runs should remain labeled as fixture/demo evidence
+- clicking a real detection bbox should show source runtime, model registry id, runtime config id, class id/label, frame/time owner, and evidence-only copy when available
+- the detection timeline label should include the real model-output source label
+
+If local weights are not available, skip the real smoke and rely on the fake real-detection tests. The default fixture demo and CI path must not require YOLO weights.
+
 Real YOLO detections are model-output observations. They are not confirmed tennis state, and they do not create tracklets, pose, homography, events, scoring, or adjudication.
 
 ## 12. Optional Custom Media

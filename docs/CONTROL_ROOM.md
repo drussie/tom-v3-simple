@@ -33,7 +33,7 @@ Future real live ingestion and future tennis intelligence must begin as new blue
 
 Blueprint 7 Status: IN PROGRESS
 
-Blueprint 7 starts the real perception runtime for the replay workstation. Milestone 7A adds optional real YOLO detection replay: indexed media frames are sampled from media-owned timing, mapped real YOLO outputs are persisted as atomic `ball_detection` and `player_detection` observations, and the existing replay workstation displays them through `detectionRunId`.
+Blueprint 7 starts the real perception runtime for the replay workstation. Milestones 7A and 7B add optional real YOLO detection replay and validate it in the operator UI: indexed media frames are sampled from media-owned timing, mapped real YOLO outputs are persisted as atomic `ball_detection` and `player_detection` observations, and the existing replay workstation displays them through `detectionRunId` with source/runtime/model/config context.
 
 Blueprint 7 still records evidence only. Real model output is not confirmed tennis state.
 
@@ -85,6 +85,7 @@ An observation does not mean the output is correct, a tennis event happened, a s
 - Structural provenance audit for the demo path.
 - Replay/operator workstation with Replay Mode, Stream Proxy Mode, synchronized detection/tracklet/pose evidence overlays, evidence timeline lanes, click-to-seek, and click-to-select persisted evidence.
 - Optional real YOLO detection replay runs that persist real model-output detection observations for replay overlays.
+- Replay run selectors and selected detection detail can distinguish real model-output detection runs from fixture/demo detection runs.
 
 ## Explicitly Absent Capabilities
 
@@ -220,7 +221,17 @@ indexed media
 -> replay URL with detectionRunId
 ```
 
-7A does not add tracklet generation from real detections, real pose inference, homography, stream ingestion, tennis-event interpretation, or adjudication.
+Milestone 7B validates real detection overlays in replay:
+
+```text
+real detection run
+-> replay-info source metadata
+-> source-aware run selector label
+-> overlay/timeline source metadata
+-> selected detection source/runtime/model/config detail
+```
+
+7A/7B do not add tracklet generation from real detections, real pose inference, homography, stream ingestion, tennis-event interpretation, or adjudication.
 
 ## Future Blueprint Candidates
 

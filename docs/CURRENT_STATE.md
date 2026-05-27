@@ -31,11 +31,11 @@ A lightweight tennis video observation platform that accepts model output as ope
 - Blueprint 4 status: complete; pose observation schema, COCO17 skeleton registry, keypoint validation, typed pose persistence, synthetic pose insertion, pose normalization, worker pose persistence, source detection lineage, pose overlay viewer, pose query/review/export integration, completion review, and pose runtime/config metadata contracts are implemented
 - Blueprint 5 status: complete; local demo, viewer polish, provenance audit, docs/control-room consolidation, and final completion review are complete
 - Blueprint 6 status: complete; video replay timeline foundation, replay info, local video serving, frame/time mapping, frontend replay route, synchronized detection observation overlay playback, tracklet candidate overlay playback, pose keypoint overlay playback, evidence timeline lanes, Stream Proxy Mode, and completion review are complete
-- Blueprint 7 status: in progress; Milestone 7A adds optional real YOLO detection replay runs that persist real model-output `ball_detection` and `player_detection` observations for the existing replay workstation
+- Blueprint 7 status: in progress; Milestones 7A and 7B add optional real YOLO detection replay runs that persist real model-output `ball_detection` and `player_detection` observations, then label and inspect those real runs clearly in the existing replay workstation
 - Observation writer: implemented with typed extension rows, lineage, artifacts, and idempotency
 - Worker synthetic seeder: implemented
 - Visual evidence viewer: implemented in `apps/web` with detection bbox overlay, pose keypoint/skeleton overlay, frame artifact image support, run evidence summary, clearer empty states, candidate/evidence wording, readable lineage context, and review/export metadata display
-- Replay workstation: Milestones 6A/6B/6C/6D/6E/6F implemented `/replay/<media_id>` with indexed local video playback, current timestamp/frame display, selected run context, persisted detection overlay chunks, candidate tracklet overlays, pose keypoint/skeleton overlays, layer toggles, run selectors, evidence timeline lanes, click-to-seek/select evidence details, Stream Proxy Mode for video-as-live review, and Blueprint 6 closeout docs; Milestone 7A real detection runs are compatible through `detectionRunId`
+- Replay workstation: Milestones 6A/6B/6C/6D/6E/6F implemented `/replay/<media_id>` with indexed local video playback, current timestamp/frame display, selected run context, persisted detection overlay chunks, candidate tracklet overlays, pose keypoint/skeleton overlays, layer toggles, run selectors, evidence timeline lanes, click-to-seek/select evidence details, Stream Proxy Mode for video-as-live review, and Blueprint 6 closeout docs; Milestones 7A/7B make real detection runs compatible and source-labeled through `detectionRunId`
 - Pose observation foundation: implemented with a typed `pose_observation` table, COCO17 skeleton registry, keypoint summary statistics, fake/serialized pose output normalization, crop projection, worker fixture pose persistence, source detection candidate lineage, pose overlay viewer, pose-specific query filters, review annotations, and TOM-native review dataset export; no real pose inference exists yet
 - Local fixture demo: implemented with worker `run-demo`, Makefile `demo` targets, deterministic media fallback, fixture gameplay/detection/tracklet/pose path, seeded review annotations, pose and tracklet review exports, summary IDs/counts/viewer URLs, and canonical `docs/RUNBOOK_LOCAL.md`
 - Viewer product polish: implemented with shared frontend evidence copy helpers, run evidence summary, detection/tracklet/pose/detail panel wording cleanup, lineage relationship descriptions, artifact/export metadata display, annotation/keypoint metadata display, and viewer payload regression coverage
@@ -278,6 +278,18 @@ Milestone 6E adds Stream Proxy Mode to the replay workstation. `/replay/<media_i
 Status: complete.
 
 Milestone 6F closes Blueprint 6 with a completion review, final agent report, final status updates, and final validation pass. Blueprint 6 is complete: TOM v3 can open indexed video in Replay Mode or Stream Proxy Mode, synchronize persisted detection observations, candidate tracklets, and pose keypoint evidence over media-owned frame/time, render evidence timeline lanes, support click-to-seek/select persisted evidence, and hide future evidence in Stream Proxy Mode until the live-like proxy edge reaches it. It does not add real live ingestion, streaming protocols, websocket updates, model scheduling, tennis-event interpretation, homography, bounce/hit/rally/point/scoring, or adjudication.
+
+## Milestone 7A Result
+
+Status: complete.
+
+Milestone 7A starts Blueprint 7 with optional real YOLO detection replay. TOM can sample indexed media frames from media-owned timing, validate optional YOLO runtime and weights, register model metadata, apply explicit class mapping, persist mapped real model-output `ball_detection` and `player_detection` observations through the existing atomic detection contract, and print a replay URL with the real `detectionRunId`. It does not add tracklets from real detections, real pose inference, homography, stream ingestion, tennis-event interpretation, or adjudication.
+
+## Milestone 7B Result
+
+Status: complete.
+
+Milestone 7B validates real detection overlays in the replay workstation. Replay-info run summaries, detection overlay chunks, detection timeline items, and selected detection detail now expose optional source/runtime/model/config/class metadata so operators can distinguish real model-output evidence from fixture demo evidence. It does not add tracklets from real detections, real pose inference, court/homography evidence, model-quality claims, stream ingestion, tennis-event interpretation, or adjudication.
 
 ## Naming Transition
 

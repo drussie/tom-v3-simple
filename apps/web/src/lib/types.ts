@@ -234,6 +234,17 @@ export interface ReplayRunSummary {
   created_at: string | null;
   completed_at: string | null;
   observation_count: number;
+  evidence_source?: "real_model_output" | "fixture_demo" | "persisted_evidence" | string;
+  source_label?: string | null;
+  adapter_name?: string | null;
+  source_runtime?: string | null;
+  model_name?: string | null;
+  model_version?: string | null;
+  model_registry_id?: string | null;
+  runtime_config_id?: string | null;
+  is_fixture?: boolean;
+  is_real_model_output?: boolean;
+  model_output_not_truth?: boolean;
 }
 
 export interface ReplayAvailableRuns {
@@ -279,6 +290,19 @@ export interface ReplayDetectionOverlay {
   source_language: "detection observation";
   source_runtime: string | null;
   coordinate_space: "image_pixels";
+  class_id?: number | null;
+  class_label?: string | null;
+  frame_time_owner?: string | null;
+  evidence_source?: "real_model_output" | "fixture_demo" | "persisted_evidence" | string;
+  source_label?: string | null;
+  real_model_output?: boolean;
+  model_output_not_truth?: boolean;
+  model_registry_id?: string | null;
+  model_name?: string | null;
+  model_version?: string | null;
+  runtime_config_id?: string | null;
+  is_fixture?: boolean;
+  is_real_model_output?: boolean;
 }
 
 export interface ReplayTrackPointOverlay {
@@ -390,6 +414,16 @@ export interface ReplayDetectionTimelineItem {
   observation_type: "ball_detection" | "player_detection";
   confidence: number | null;
   display_label: string;
+  evidence_source?: "real_model_output" | "fixture_demo" | "persisted_evidence" | string;
+  source_label?: string | null;
+  real_model_output?: boolean;
+  model_output_not_truth?: boolean;
+  model_registry_id?: string | null;
+  model_name?: string | null;
+  model_version?: string | null;
+  runtime_config_id?: string | null;
+  is_fixture?: boolean;
+  is_real_model_output?: boolean;
 }
 
 export interface ReplayTrackletTimelineItem {

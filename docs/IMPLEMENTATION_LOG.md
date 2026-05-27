@@ -1429,3 +1429,49 @@ Milestone 6D created:
 - Milestone 6D docs, handoff, and agent report.
 
 Timeline lanes are evidence navigation only. They do not interpret tennis events or adjudicate model correctness.
+
+## Milestone 7A - Real YOLO Detection Replay Run
+
+Status: complete
+
+### Goal
+
+Run optional real YOLO detection over indexed media and persist mapped real model output as replay-compatible atomic detection observations.
+
+### Notes
+
+Milestone 7A created:
+
+- worker `run-real-detection`
+- Makefile `real-detection`
+- real detection replay service with plan-only mode
+- optional runtime and weights validation reuse
+- media-owned frame sampling for YOLO inference
+- explicit class mapping into `ball_detection` / `player_detection`
+- processing run/step summaries
+- replay URL output with real `detectionRunId`
+- fake-provider tests that do not require local YOLO weights
+
+7A does not add tracklets from real detections, real pose inference, homography, stream ingestion, tennis-event interpretation, or adjudication.
+
+## Milestone 7B - Real Detection Overlay Validation
+
+Status: complete
+
+### Goal
+
+Make real detection runs clear and inspectable in the replay workstation.
+
+### Notes
+
+Milestone 7B created:
+
+- replay-info source metadata for available runs
+- detection run selector labels that distinguish real model output from fixture demo evidence
+- optional source/runtime/model/config/class fields in detection overlay payloads
+- detection timeline labels with source metadata
+- selected detection detail fields for source runtime, model registry, runtime config, class id/label, and frame/time owner
+- `run-real-detection` stream-proxy replay URL and local command hints
+- tests for fixture and fake real detection source metadata
+
+7B does not add real-detection-derived tracklets, real pose inference, court/homography evidence, model-quality claims, stream ingestion, tennis-event interpretation, or adjudication.

@@ -291,6 +291,12 @@ def test_fake_real_detection_run_persists_atomic_observations_and_replay_payload
     assert result["replay_url"].endswith(
         f"/replay/{indexed_media.id}?detectionRunId={result['detection_run_id']}"
     )
+    assert result["stream_proxy_replay_url"].endswith(
+        f"/replay/{indexed_media.id}?mode=stream_proxy&detectionRunId={result['detection_run_id']}"
+    )
+    assert result["run_label"] == "real YOLO detection run"
+    assert "uvicorn apps.api.main:app" in result["api_command_hint"]
+    assert "npm run dev" in result["web_command_hint"]
 
     run = db_session.get(ProcessingRun, result["detection_run_id"])
     step = db_session.get(ProcessingStep, result["processing_step_id"])
@@ -350,7 +356,20 @@ def test_fake_real_detection_run_persists_atomic_observations_and_replay_payload
     replay_info = client.get(f"/media/{indexed_media.id}/replay-info")
     assert replay_info.status_code == 200
     detection_runs = replay_info.json()["available_runs"]["detection"]
-    assert any(run_item["run_id"] == result["detection_run_id"] for run_item in detection_runs)
+    real_detection_run = next(
+        run_item for run_item in detection_runs if run_item["run_id"] == result["detection_run_id"]
+    )
+    assert real_detection_run["run_name"] == "real-yolo-detection-replay"
+    assert real_detection_run["evidence_source"] == "real_model_output"
+    assert real_detection_run["source_label"] == "real model output"
+    assert real_detection_run["source_runtime"] == "ultralytics_yolo"
+    assert real_detection_run["model_name"] == "test-real-yolo"
+    assert real_detection_run["model_version"] == "7a-test"
+    assert real_detection_run["model_registry_id"] == result["model_registry_id"]
+    assert real_detection_run["runtime_config_id"] == result["runtime_config_id"]
+    assert real_detection_run["is_fixture"] is False
+    assert real_detection_run["is_real_model_output"] is True
+    assert real_detection_run["model_output_not_truth"] is True
 
     overlays = client.get(
         "/replay/overlays",
@@ -368,6 +387,18 @@ def test_fake_real_detection_run_persists_atomic_observations_and_replay_payload
     assert body["no_adjudication"] is True
     assert len(body["detections"]) == 4
     assert {item["source_runtime"] for item in body["detections"]} == {"ultralytics_yolo"}
+    first_detection = body["detections"][0]
+    assert first_detection["evidence_source"] == "real_model_output"
+    assert first_detection["source_label"] == "real model output"
+    assert first_detection["real_model_output"] is True
+    assert first_detection["model_output_not_truth"] is True
+    assert first_detection["model_registry_id"] == result["model_registry_id"]
+    assert first_detection["model_name"] == "test-real-yolo"
+    assert first_detection["model_version"] == "7a-test"
+    assert first_detection["runtime_config_id"] == result["runtime_config_id"]
+    assert first_detection["class_id"] in {0, 32}
+    assert first_detection["class_label"] in {"person", "sports ball"}
+    assert first_detection["frame_time_owner"] == "media_indexing"
 
     timeline = client.get(
         "/replay/timeline",
@@ -379,6 +410,13 @@ def test_fake_real_detection_run_persists_atomic_observations_and_replay_payload
     assert timeline.status_code == 200
     lanes = {lane["lane_type"]: lane for lane in timeline.json()["lanes"]}
     assert len(lanes["detections"]["items"]) == 4
+    timeline_detection = lanes["detections"]["items"][0]
+    assert timeline_detection["display_label"].endswith("· real model output")
+    assert timeline_detection["evidence_source"] == "real_model_output"
+    assert timeline_detection["real_model_output"] is True
+    assert timeline_detection["model_output_not_truth"] is True
+    assert timeline_detection["model_registry_id"] == result["model_registry_id"]
+    assert timeline_detection["runtime_config_id"] == result["runtime_config_id"]
 
 
 def test_failure_does_not_silently_create_fixture_observations(

@@ -11,6 +11,7 @@ from tom_v3_storage.db_models import (
     AtomicObservation,
     HumanAnnotation,
     MediaAsset,
+    ModelRegistry,
     Observation,
     PoseObservation,
     ProcessingRun,
@@ -259,6 +260,7 @@ def detection_timeline_item_from_observation(
 
     payload = _merged_detection_payload(observation)
     label = _detection_label(observation, payload)
+    source_metadata = _detection_source_metadata(observation, payload)
     return {
         "item_type": "detection",
         "observation_id": observation.id,
@@ -268,7 +270,8 @@ def detection_timeline_item_from_observation(
         "label": label,
         "observation_type": observation.observation_type,
         "confidence": observation.confidence,
-        "display_label": f"{label} detection observation",
+        "display_label": f"{label} detection observation · {source_metadata['source_label']}",
+        **source_metadata,
     }
 
 
@@ -481,6 +484,7 @@ def detection_overlay_item_from_observation(
     if bbox is None or frame_number is None or timestamp_ms is None:
         return None
 
+    source_metadata = _detection_source_metadata(observation, payload)
     return {
         "overlay_type": "detection_bbox",
         "observation_id": observation.id,
@@ -494,6 +498,10 @@ def detection_overlay_item_from_observation(
         "source_language": "detection observation",
         "source_runtime": _string_or_none(payload.get("source_runtime")),
         "coordinate_space": observation.coordinate_space or "image_pixels",
+        "class_id": _optional_int(payload.get("class_id")),
+        "class_label": _string_or_none(payload.get("class_label")),
+        "frame_time_owner": _string_or_none(payload.get("frame_time_owner")),
+        **source_metadata,
     }
 
 
@@ -732,17 +740,27 @@ def _run_summaries_for_observation_types(
         .where(ProcessingRun.id.in_(list(counts.keys())))
         .order_by(ProcessingRun.started_at, ProcessingRun.id)
     ).all()
-    return [
-        {
-            "run_id": run.id,
-            "run_name": run.run_name,
-            "run_status": run.run_status,
-            "created_at": run.started_at.isoformat() if run.started_at else None,
-            "completed_at": run.completed_at.isoformat() if run.completed_at else None,
-            "observation_count": int(counts.get(run.id, 0)),
-        }
-        for run in runs
-    ]
+    summaries: list[dict[str, Any]] = []
+    for run in runs:
+        source_metadata = _run_source_metadata(
+            session=session,
+            run=run,
+            media_id=media_id,
+            observation_types=observation_types,
+        )
+        summaries.append(
+            {
+                "run_id": run.id,
+                "run_name": run.run_name,
+                "run_status": run.run_status,
+                "created_at": run.started_at.isoformat() if run.started_at else None,
+                "completed_at": run.completed_at.isoformat() if run.completed_at else None,
+                "observation_count": int(counts.get(run.id, 0)),
+                "runtime_config_id": run.runtime_config_id,
+                **source_metadata,
+            }
+        )
+    return summaries
 
 
 def _merged_detection_payload(observation: Observation) -> dict[str, Any]:
@@ -751,6 +769,116 @@ def _merged_detection_payload(observation: Observation) -> dict[str, Any]:
         **(observation.payload_jsonb or {}),
         **(atomic.payload_jsonb if isinstance(atomic, AtomicObservation) else {}),
     }
+
+
+def _run_source_metadata(
+    session: Session,
+    run: ProcessingRun,
+    media_id: str,
+    observation_types: set[str],
+) -> dict[str, Any]:
+    observation = session.scalar(
+        select(Observation)
+        .where(
+            Observation.media_id == media_id,
+            Observation.run_id == run.id,
+            Observation.observation_type.in_(sorted(observation_types)),
+        )
+        .order_by(Observation.created_at, Observation.id)
+        .limit(1)
+    )
+    payload = _merged_detection_payload(observation) if observation is not None else {}
+    runtime_payload = run.runtime_config.payload_jsonb if run.runtime_config is not None else {}
+    diagnostics = (run.metadata_jsonb or {}).get("diagnostics")
+    if not isinstance(diagnostics, dict):
+        diagnostics = {}
+
+    model = (
+        session.get(ModelRegistry, observation.model_id)
+        if observation and observation.model_id
+        else None
+    )
+    source_runtime = (
+        _string_or_none(payload.get("source_runtime"))
+        or _string_or_none(diagnostics.get("source_runtime"))
+        or _string_or_none(runtime_payload.get("source_runtime"))
+    )
+    adapter_name = (
+        _string_or_none(runtime_payload.get("adapter"))
+        or _string_or_none((run.metadata_jsonb or {}).get("adapter_name"))
+    )
+    is_real_model_output = _truthy(payload.get("real_model_output")) or (
+        source_runtime == "ultralytics_yolo" and adapter_name in {"yolo", "ultralytics"}
+    )
+    is_fixture = (
+        _string_or_none(runtime_payload.get("adapter")) == "fixture"
+        or source_runtime == "fixture"
+        or "fixture" in run.run_name.lower()
+        or "fixture" in (adapter_name or "").lower()
+    )
+    evidence_source = (
+        "real_model_output"
+        if is_real_model_output
+        else "fixture_demo"
+        if is_fixture
+        else "persisted_evidence"
+    )
+    return {
+        "evidence_source": evidence_source,
+        "source_label": _source_label(evidence_source),
+        "adapter_name": adapter_name,
+        "source_runtime": source_runtime,
+        "model_name": model.name if model is not None else None,
+        "model_version": model.version if model is not None else None,
+        "model_registry_id": model.id if model is not None else None,
+        "is_fixture": is_fixture,
+        "is_real_model_output": is_real_model_output,
+        "model_output_not_truth": is_real_model_output,
+    }
+
+
+def _detection_source_metadata(
+    observation: Observation,
+    payload: dict[str, Any],
+) -> dict[str, Any]:
+    source_runtime = _string_or_none(payload.get("source_runtime"))
+    is_real_model_output = _truthy(payload.get("real_model_output")) or (
+        source_runtime == "ultralytics_yolo"
+    )
+    adapter_name = _string_or_none(payload.get("adapter_name")) or ""
+    is_fixture = (
+        source_runtime == "fixture"
+        or _string_or_none(payload.get("adapter_type")) == "fixture"
+        or "fixture" in adapter_name.lower()
+    )
+    evidence_source = (
+        "real_model_output"
+        if is_real_model_output
+        else "fixture_demo"
+        if is_fixture
+        else "persisted_evidence"
+    )
+    model = observation.model
+    return {
+        "evidence_source": evidence_source,
+        "source_label": _source_label(evidence_source),
+        "real_model_output": is_real_model_output,
+        "model_output_not_truth": is_real_model_output,
+        "model_registry_id": observation.model_id,
+        "model_name": model.name if model is not None else None,
+        "model_version": model.version if model is not None else None,
+        "runtime_config_id": observation.runtime_config_id,
+        "is_fixture": is_fixture,
+        "is_real_model_output": is_real_model_output,
+    }
+
+
+def _source_label(evidence_source: str) -> str:
+    if evidence_source == "real_model_output":
+        return "real model output"
+    if evidence_source == "fixture_demo":
+        return "fixture evidence"
+    return "persisted evidence"
 
 
 def _bbox_from_payload(payload: dict[str, Any]) -> dict[str, float] | None:
@@ -900,8 +1028,21 @@ def _numeric(value: Any) -> float | None:
     return None
 
 
+def _optional_int(value: Any) -> int | None:
+    if isinstance(value, bool) or value is None:
+        return None
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return None
+
+
 def _string_or_none(value: Any) -> str | None:
     return value if isinstance(value, str) and value else None
+
+
+def _truthy(value: Any) -> bool:
+    return value is True or value == "true" or value == 1
 
 
 def _positive_float(value: float | None) -> float | None:

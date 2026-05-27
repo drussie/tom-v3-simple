@@ -69,6 +69,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 6E - Stream Proxy Mode](milestones/milestone_6e_stream_proxy_mode.md)
 - [Milestone 6F - Blueprint 6 Completion Review](milestones/milestone_6f_blueprint_6_completion_review.md)
 - [Milestone 7A - Real YOLO Detection Replay Run](milestones/milestone_7a_real_yolo_detection_replay_run.md)
+- [Milestone 7B - Real Detection Overlay Validation](milestones/milestone_7b_real_detection_overlay_validation.md)
 
 ## Handoffs
 
@@ -111,6 +112,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 6E Handoff](handoffs/milestone_6e_stream_proxy_mode_handoff.md)
 - [Milestone 6F Handoff](handoffs/milestone_6f_blueprint_6_completion_review_handoff.md)
 - [Milestone 7A Handoff](handoffs/milestone_7a_real_yolo_detection_replay_run_handoff.md)
+- [Milestone 7B Handoff](handoffs/milestone_7b_real_detection_overlay_validation_handoff.md)
 
 ## Agent Reports
 
@@ -153,6 +155,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 6E Agent Report](agent_reports/milestone_6e_stream_proxy_mode_report.md)
 - [Milestone 6F Agent Report](agent_reports/milestone_6f_blueprint_6_completion_review_report.md)
 - [Milestone 7A Agent Report](agent_reports/milestone_7a_real_yolo_detection_replay_run_report.md)
+- [Milestone 7B Agent Report](agent_reports/milestone_7b_real_detection_overlay_validation_report.md)
 
 ## Blueprints
 

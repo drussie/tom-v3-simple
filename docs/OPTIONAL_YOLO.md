@@ -121,6 +121,8 @@ This command validates optional runtime and weights, registers model metadata, s
 
 It does not fall back to fixture detections.
 
+The replay workstation labels these runs as real model-output evidence when source metadata is available. Selected detection detail can show source runtime, model registry id, runtime config id, class id/label, and media-owned frame/time context. Fixture detection runs remain labeled as fixture/demo evidence.
+
 ## Common Failure Modes
 
 - Ultralytics missing.
@@ -146,3 +148,5 @@ It does not mean:
 - a tennis action happened
 - a rally or point exists
 - a score exists
+
+Real model output is useful replay evidence, but model quality depends on the local weights, class mapping, source media, device, and thresholds.

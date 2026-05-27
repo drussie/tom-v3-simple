@@ -1,6 +1,6 @@
 # TOM v3 Blueprint 7 - Real Perception Runtime For Replay Workstation
 
-Status: STARTING
+Status: IN PROGRESS
 
 ## Mission
 
@@ -31,6 +31,21 @@ indexed video
 
 7A does not build real tracklets from real detections, real pose inference, homography, stream ingestion, or tennis-event interpretation.
 
+## Milestone 7B
+
+Milestone 7B validates real detection overlay use in the replay workstation:
+
+```text
+real YOLO detection run
+-> replay-info source metadata
+-> run selector labels for real model output vs fixture evidence
+-> overlay payload source/runtime/model/config metadata
+-> selected detection detail source context
+-> timeline detection labels
+```
+
+7B does not create tracklets from real detections, add real pose inference, add court/homography evidence, improve model quality, ingest streams, or interpret tennis events.
+
 ## Boundaries
 
 Blueprint 7 does not add official tennis truth, TOM v2-style adjudication, accepted/rejected event lifecycles, bounce/hit detection, stroke classification, rally/point/scoring, confirmed player identity, confirmed ball paths, real pose inference, court-space reasoning, or live stream ingestion.
@@ -52,7 +67,6 @@ No YOLO weights, GPU, Torch, Ultralytics, OpenCV, or pose weights are required f
 
 Possible follow-on Blueprint 7 milestones:
 
-- 7B: Real Detection Overlay Validation in Replay Workstation
 - Real tracklet candidate generation from real detection observations
 - Real pose runtime integration
 - Real model-output quality/evaluation workflows

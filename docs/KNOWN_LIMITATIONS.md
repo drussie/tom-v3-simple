@@ -10,6 +10,7 @@ This registry makes TOM v3 Simple boundaries explicit.
 - Real YOLO detection quality depends on the chosen model, class mapping, source video, device, and confidence settings.
 - Real YOLO detection replay is optional and local-runtime dependent.
 - Real YOLO detections are model-output observations, not confirmed ball/player state.
+- Replay source labels distinguish real model output from fixture evidence, but they do not evaluate model correctness.
 - Real pose inference is not included.
 - Fixture pose output is demo evidence only.
 - Portable TOM v1 detector assets/source are not present in this repo state.

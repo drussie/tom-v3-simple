@@ -3,6 +3,7 @@
 ## Purpose
 
 Milestone 7A adds a real YOLO detection replay command for indexed media.
+Milestone 7B validates that the resulting real detection runs are clearly labeled and inspectable in the replay workstation.
 
 It runs optional Ultralytics YOLO detection over media-owned sampled frames, normalizes mapped model outputs into TOM atomic detection observations, persists them through the existing detection adapter path, and prints a replay workstation URL.
 
@@ -64,6 +65,8 @@ Successful output includes:
     "total": 0
   },
   "replay_url": "http://127.0.0.1:3000/replay/<media_id>?detectionRunId=<run_id>",
+  "stream_proxy_replay_url": "http://127.0.0.1:3000/replay/<media_id>?mode=stream_proxy&detectionRunId=<run_id>",
+  "run_label": "real YOLO detection run",
   "warnings": {
     "observation_only": true,
     "no_adjudication": true,
@@ -134,7 +137,7 @@ Default mapped classes:
 }
 ```
 
-Unmapped classes are skipped and counted in the summary. The command does not infer near/far player identity, confirmed identity, confirmed ball path, or tennis events.
+Unmapped classes are skipped and counted in the summary. The command does not infer near/far player role, player identity, ball path, or tennis events.
 
 ## Persistence
 
@@ -173,6 +176,39 @@ http://127.0.0.1:3000/replay/<media_id>?detectionRunId=<real_detection_run_id>
 
 The detection overlay endpoint and timeline lane read the persisted atomic detection observations. No new replay UI capability is required for 7A.
 
+Milestone 7B adds replay metadata that helps operators distinguish real model output from fixture demo evidence:
+
+- replay-info detection run summaries include `evidence_source`, `source_label`, `source_runtime`, model metadata, runtime config id, and boolean `is_fixture` / `is_real_model_output` flags when available
+- detection overlay payloads include optional source/runtime/model/config/class metadata
+- detection timeline labels include the source label
+- selected detection detail in the replay workstation shows model/runtime/config/class fields when present
+
+Example real detection run metadata:
+
+```json
+{
+  "run_name": "real-yolo-detection-replay",
+  "evidence_source": "real_model_output",
+  "source_label": "real model output",
+  "source_runtime": "ultralytics_yolo",
+  "is_fixture": false,
+  "is_real_model_output": true
+}
+```
+
+Example fixture detection run metadata:
+
+```json
+{
+  "evidence_source": "fixture_demo",
+  "source_label": "fixture evidence",
+  "is_fixture": true,
+  "is_real_model_output": false
+}
+```
+
+These fields are operational display metadata. They do not alter the persisted observation contract and do not make model output official tennis meaning.
+
 ## Non-goals
 
-7A does not add candidate tracklets from real detections, real pose inference, homography, court-space reasoning, stream ingestion, live model scheduling, bounce/hit/rally/point/scoring, or adjudication.
+7A/7B do not add candidate tracklets from real detections, real pose inference, homography, court-space reasoning, stream ingestion, live model scheduling, bounce/hit/rally/point/scoring, or adjudication.

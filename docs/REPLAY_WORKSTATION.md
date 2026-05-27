@@ -36,7 +36,7 @@ Blueprint 6 completes TOM v3's visual replay/operator workstation. TOM can now o
 
 Blueprint 6 remains observation-only and non-adjudicative. It does not add real live TV/HLS/RTSP/HDMI ingestion, stream backend infrastructure, real pose inference, movement interpretation, homography, bounce/hit/rally/point/scoring, or TOM v2-style adjudication.
 
-Blueprint 7 begins real perception runtime for this workstation. Milestone 7A adds optional real YOLO detection replay runs that persist model-output `ball_detection` and `player_detection` observations; the existing replay route displays them through `detectionRunId`.
+Blueprint 7 begins real perception runtime for this workstation. Milestones 7A and 7B add optional real YOLO detection replay runs that persist model-output `ball_detection` and `player_detection` observations, then label and inspect those real runs through `detectionRunId`.
 
 ## What 6A Added
 
@@ -203,7 +203,12 @@ Available runs are grouped from persisted observations:
 - pose: `player_pose_observation`
 - gameplay: `view_state`
 
-Real YOLO detection replay runs appear in the same detection run group because they persist the same atomic observation contract.
+Real YOLO detection replay runs appear in the same detection run group because they persist the same atomic observation contract. Run summaries can include optional source metadata so the UI can label:
+
+- real YOLO detection runs as real model-output evidence
+- fixture detection runs as fixture/demo evidence
+
+The optional fields include `evidence_source`, `source_label`, `source_runtime`, `model_name`, `model_version`, `model_registry_id`, `runtime_config_id`, `is_fixture`, and `is_real_model_output`.
 
 ## Replay Overlay Chunks
 
@@ -232,7 +237,11 @@ The response includes selected overlay families:
       "label": "ball",
       "confidence": 0.82,
       "bbox": { "x": 511, "y": 280, "w": 18, "h": 18 },
-      "source_language": "detection observation"
+      "source_language": "detection observation",
+      "evidence_source": "real_model_output",
+      "source_runtime": "ultralytics_yolo",
+      "real_model_output": true,
+      "model_output_not_truth": true
     }
   ],
   "tracklets": [
@@ -269,6 +278,8 @@ The boxes remain detection observations. They are not confirmed balls, confirmed
 The endpoint preserves media-owned frame/time and image-pixel coordinates.
 `min_confidence` affects only the returned display payload; it does not mutate
 observations.
+
+For 7B, selected detection detail shows source/runtime/model/config/class context when those fields exist. This is operator provenance, not a model-correctness claim.
 
 ## Replay Timeline
 

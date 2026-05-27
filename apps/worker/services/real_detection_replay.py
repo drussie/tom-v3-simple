@@ -268,7 +268,16 @@ def run_real_detection_replay(
         "weights_validation": weights_validation.as_dict(),
         "runtime_probe": runtime_probe,
         "class_map": normalized_class_map,
+        "run_label": "real YOLO detection run",
         "replay_url": f"{viewer_base_url}/replay/{media.id}?detectionRunId={run_id}",
+        "stream_proxy_replay_url": (
+            f"{viewer_base_url}/replay/{media.id}?mode=stream_proxy&detectionRunId={run_id}"
+        ),
+        "api_command_hint": (
+            "TOM_V3_DATABASE_URL=<db-url> .venv/bin/python -m uvicorn "
+            "apps.api.main:app --reload"
+        ),
+        "web_command_hint": "cd apps/web && npm run dev",
         "warnings": dict(REAL_DETECTION_WARNINGS),
     }
 

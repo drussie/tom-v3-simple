@@ -112,7 +112,13 @@ def test_replay_info_returns_media_metadata_and_available_runs(
     assert body["frame_time_index"]["owner"] == "media_indexing"
     assert body["observation_only"] is True
     assert body["no_adjudication"] is True
-    assert body["available_runs"]["detection"][0]["observation_count"] == 1
+    detection_run = body["available_runs"]["detection"][0]
+    assert detection_run["observation_count"] == 1
+    assert detection_run["evidence_source"] == "fixture_demo"
+    assert detection_run["source_label"] == "fixture evidence"
+    assert detection_run["is_fixture"] is True
+    assert detection_run["is_real_model_output"] is False
+    assert detection_run["model_output_not_truth"] is False
     assert body["available_runs"]["tracklet"][0]["run_name"] == "demo-candidate-tracklet-run"
     assert body["available_runs"]["pose"][0]["run_name"] == "demo-fixture-pose-run"
     assert body["available_runs"]["gameplay"][0]["run_name"] == "demo-fixture-gameplay-run"
@@ -191,22 +197,22 @@ def test_replay_overlay_endpoint_returns_detection_bbox_items(
     assert body["poses"] == []
     assert body["observation_only"] is True
     assert body["no_adjudication"] is True
-    assert body["detections"] == [
-        {
-            "overlay_type": "detection_bbox",
-            "observation_id": body["detections"][0]["observation_id"],
-            "run_id": run.id,
-            "frame_number": 30,
-            "timestamp_ms": 1000,
-            "observation_type": "ball_detection",
-            "label": "ball",
-            "confidence": 0.82,
-            "bbox": {"x": 511.0, "y": 280.0, "w": 18.0, "h": 18.0},
-            "source_language": "detection observation",
-            "source_runtime": "fixture",
-            "coordinate_space": "image_pixels",
-        }
-    ]
+    detection = body["detections"][0]
+    assert detection["overlay_type"] == "detection_bbox"
+    assert detection["run_id"] == run.id
+    assert detection["frame_number"] == 30
+    assert detection["timestamp_ms"] == 1000
+    assert detection["observation_type"] == "ball_detection"
+    assert detection["label"] == "ball"
+    assert detection["confidence"] == 0.82
+    assert detection["bbox"] == {"x": 511.0, "y": 280.0, "w": 18.0, "h": 18.0}
+    assert detection["source_language"] == "detection observation"
+    assert detection["source_runtime"] == "fixture"
+    assert detection["coordinate_space"] == "image_pixels"
+    assert detection["evidence_source"] == "fixture_demo"
+    assert detection["source_label"] == "fixture evidence"
+    assert detection["real_model_output"] is False
+    assert detection["model_output_not_truth"] is False
 
 
 def test_replay_overlay_endpoint_filters_by_detection_run_id(
@@ -567,7 +573,9 @@ def test_replay_timeline_endpoint_returns_evidence_lanes(
     assert detection_item["run_id"] == detection_run.id
     assert detection_item["timestamp_ms"] == 1000
     assert detection_item["frame_number"] == 30
-    assert detection_item["display_label"] == "ball detection observation"
+    assert detection_item["display_label"] == "ball detection observation · fixture evidence"
+    assert detection_item["evidence_source"] == "fixture_demo"
+    assert detection_item["source_label"] == "fixture evidence"
 
     tracklet_item = lanes["tracklets"]["items"][0]
     assert tracklet_item["item_type"] == "tracklet"

@@ -316,7 +316,7 @@ indexed video
 -> replay workstation overlays
 ```
 
-Milestone 7A proves:
+Milestone 7A proved:
 
 ```text
 indexed media
@@ -328,7 +328,18 @@ indexed media
 -> replay URL with real detectionRunId
 ```
 
-Milestone 7A does not add:
+Milestone 7B validates:
+
+```text
+real YOLO detection run
+-> replay-info available run source metadata
+-> real-vs-fixture run selector labels
+-> overlay payload source/runtime/model/config metadata
+-> selected detection detail source context
+-> timeline detection source labels
+```
+
+Milestones 7A/7B do not add:
 
 - tracklet generation from real detections
 - real pose inference
