@@ -1,4 +1,10 @@
 import type { Observation } from "../lib/types";
+import {
+  frameTimeOwner,
+  observationDisplayName,
+  observationEvidenceNote,
+  sourceRuntime
+} from "../lib/evidenceCopy";
 import { formatConfidence, formatFrameRange } from "../lib/timeline";
 
 interface ObservationDetailPanelProps {
@@ -13,7 +19,11 @@ export function ObservationDetailPanel({ observation }: ObservationDetailPanelPr
           <h2>Observation Detail</h2>
         </div>
         <div className="panel-body">
-          <p className="empty-state">No observation selected.</p>
+          <p className="empty-state">
+            No observation selected. Choose a detection observation, tracklet candidate, track point
+            candidate, or pose observation to inspect payload, provenance, artifacts, and review
+            context.
+          </p>
         </div>
       </section>
     );
@@ -26,9 +36,10 @@ export function ObservationDetailPanel({ observation }: ObservationDetailPanelPr
     <section className="panel">
       <div className="panel-header">
         <h2>Observation Detail</h2>
-        <span className="mini-pill">{observation.observation_family}</span>
+        <span className="mini-pill">{observationDisplayName(observation)}</span>
       </div>
       <div className="panel-body detail-stack">
+        <p className="evidence-note">{observationEvidenceNote(observation)}</p>
         <dl className="key-value">
           <dt>ID</dt>
           <dd className="mono">{observation.id}</dd>
@@ -44,8 +55,14 @@ export function ObservationDetailPanel({ observation }: ObservationDetailPanelPr
           <dd>{formatConfidence(observation.confidence)}</dd>
           <dt>Space</dt>
           <dd>{observation.coordinate_space ?? "n/a"}</dd>
+          <dt>Frame time owner</dt>
+          <dd>{frameTimeOwner(observation) ?? "n/a"}</dd>
+          <dt>Source runtime</dt>
+          <dd>{sourceRuntime(observation) ?? "n/a"}</dd>
           <dt>Model</dt>
           <dd className="mono">{observation.model_id ?? "n/a"}</dd>
+          <dt>Runtime config</dt>
+          <dd className="mono">{observation.runtime_config_id ?? "n/a"}</dd>
           <dt>Run</dt>
           <dd className="mono">{observation.run_id}</dd>
         </dl>

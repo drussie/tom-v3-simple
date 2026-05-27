@@ -35,6 +35,10 @@ export function PoseOverlayPanel({ model, onSelectObservation }: PoseOverlayPane
           <span>{model.frameItems.length} on selected frame</span>
           <span>COCO17 keypoint evidence</span>
         </div>
+        <p className="evidence-note">
+          Pose observations are keypoint evidence only. They do not classify strokes, movement, or
+          biomechanics.
+        </p>
 
         <div className="pose-toggle-grid" aria-label="Pose overlay controls">
           <label>
@@ -85,7 +89,8 @@ export function PoseOverlayPanel({ model, onSelectObservation }: PoseOverlayPane
         ) : (
           <p className="empty-state">
             {showPoseObservations
-              ? model.unavailableReason
+              ? model.unavailableReason ??
+                "No pose overlay available for this frame. Run run-pose-adapter or make demo to generate fixture pose evidence."
               : "Pose overlay hidden; persisted pose evidence remains listed below."}
           </p>
         )}
@@ -110,7 +115,12 @@ function PoseFrameList({
   onSelectObservation: (observationId: string) => void;
 }) {
   if (items.length === 0) {
-    return <p className="empty-state">No pose observations on this frame.</p>;
+    return (
+      <p className="empty-state">
+        No pose observations found for this frame. Run `run-pose-adapter` or `make demo` to generate
+        fixture pose evidence.
+      </p>
+    );
   }
 
   return (

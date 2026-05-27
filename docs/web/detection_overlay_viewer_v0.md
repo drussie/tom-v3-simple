@@ -89,6 +89,8 @@ It shows a safe unavailable state when:
 
 It also reports how many detection observations are missing bbox payloads.
 
+Milestone 5B adds clearer product copy around these states. If frame artifacts are missing, the viewer points to `extract-frame-artifacts`. If no detection observations exist, it points to `make demo` or `run-detection-adapter`.
+
 ## Local Flow
 
 Index a video:
@@ -135,3 +137,5 @@ Refresh the viewer to see frame imagery behind bbox overlays.
 Blueprint 3 completion confirms that YOLO-origin detections use this same overlay path; there is no separate YOLO viewer.
 
 Milestone 4D adds a separate pose overlay panel to the same Evidence Viewer. Detection overlays continue to render persisted bbox observations; pose overlays render persisted `player_pose_observation` keypoint evidence. Neither overlay interprets tennis events or adjudicates correctness.
+
+Milestone 5B adds run evidence summary and observation/evidence wording around this same detection overlay path. The rendering contract is unchanged.

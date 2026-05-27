@@ -1022,3 +1022,40 @@ Milestone 5A created:
 - Canonical `docs/RUNBOOK_LOCAL.md`, Blueprint 5 doc, 5A milestone, handoff, and agent report docs.
 
 The demo output is explicitly fixture/demo evidence only. It proves persistence, lineage, viewer, review, and export plumbing, not tennis understanding.
+
+## Milestone 5B - Viewer / Product Polish
+
+Status: complete
+
+### Goal
+
+Polish the existing Evidence Viewer and product surface so the local fixture demo is understandable to a new developer or reviewer.
+
+### Non-goals
+
+- No new model/runtime capability.
+- No real pose runtime or adapter inference.
+- No movement interpretation.
+- No stroke classification.
+- No serve, hit, split-step, or biomechanics conclusions.
+- No court homography.
+- No bounce detection.
+- No rally segmentation.
+- No point reconstruction.
+- No scoring.
+- No adjudication.
+
+### Notes
+
+Milestone 5B created:
+
+- Shared frontend evidence wording helpers in `apps/web/src/lib/evidenceCopy.ts`.
+- A run evidence summary panel with processing-run context, observation counts, lineage count, annotation count, runtime config, and review export artifact metadata when present.
+- Clearer empty states for missing observations, detection overlays, frame artifacts, tracklet bundles, pose observations, lineage, artifacts, annotations, and export summaries.
+- Detection, tracklet, pose, detail, lineage, artifact, and annotation panel copy updates using observation/evidence/candidate wording.
+- Human-readable lineage relationship descriptions while preserving raw relationship types.
+- Annotation panel support for keypoint metadata, review-only flags, demo-seeded flags, and notes.
+- Focused local demo viewer payload assertions for detection, tracklet, pose, lineage, artifacts, annotations, and exports.
+- Milestone 5B milestone, handoff, viewer product polish, and agent report docs.
+
+The viewer polish makes existing evidence easier to inspect. It does not create new tennis interpretation capability.

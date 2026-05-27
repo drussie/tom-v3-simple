@@ -108,6 +108,8 @@ Keypoint-level review metadata is stored in `payload_jsonb`:
 
 Annotations are separate evidence records. They do not mutate the pose observation, source detection, tracklet, or track point.
 
+Milestone 5B makes this visible in the viewer annotation panel. Keypoint-level metadata such as `keypoint_name` and `keypoint_index` is shown when present, along with notes, creator, frame range, demo-seeded metadata, and review-only metadata.
+
 ## Export
 
 API:
@@ -155,6 +157,8 @@ metadata_jsonb.export_version = pose_review_dataset_v0
 ```
 
 For run/media/query-based exports, a `query_result` row records the selection and export artifact id.
+
+Milestone 5B surfaces review dataset export artifacts in the run summary when those artifacts are present in the viewer payload. The export service and file format are unchanged.
 
 ## Export Record Shape
 

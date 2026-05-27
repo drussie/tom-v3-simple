@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import StaticPool
 from tom_v3_storage.db_models import Base, EvidenceArtifact, HumanAnnotation, Observation
 
+from apps.api.routers.viewer import build_viewer_run_payload
 from apps.worker.services.local_demo import (
     DEMO_CREATED_BY,
     build_local_demo_plan,
@@ -191,3 +192,37 @@ def test_fixture_demo_runs_without_yolo_or_pose_weights(
     assert pose_observation is not None
     assert pose_observation.payload_jsonb["source_runtime"] == "fixture_pose"
     assert "annotation_label" not in pose_observation.payload_jsonb
+
+    detection_payload = build_viewer_run_payload(db_session, summary["runs"]["detection_run_id"])
+    assert detection_payload is not None
+    assert {
+        row["observation_type"]
+        for row in detection_payload["observations"]
+        if row["observation_family"] == "atomic"
+    } == {"ball_detection", "player_detection"}
+    assert any(
+        artifact["artifact_type"] in {"frame_image", "detection_frame_image"}
+        for artifact in detection_payload["artifacts"]
+    )
+    assert detection_payload["annotations"]
+
+    tracklet_payload = build_viewer_run_payload(db_session, summary["runs"]["tracklet_run_id"])
+    assert tracklet_payload is not None
+    assert tracklet_payload["tracklets"]
+    assert tracklet_payload["lineage"]
+    assert any(
+        artifact["artifact_type"] == "tracklet_review_dataset_export"
+        for artifact in tracklet_payload["artifacts"]
+    )
+
+    pose_payload = build_viewer_run_payload(db_session, summary["runs"]["pose_run_id"])
+    assert pose_payload is not None
+    assert any(
+        row["pose"] is not None and row["observation_type"] == "player_pose_observation"
+        for row in pose_payload["observations"]
+    )
+    assert pose_payload["annotations"]
+    assert any(
+        artifact["artifact_type"] == "pose_review_dataset_export"
+        for artifact in pose_payload["artifacts"]
+    )

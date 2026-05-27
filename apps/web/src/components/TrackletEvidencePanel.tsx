@@ -37,7 +37,20 @@ export function TrackletEvidencePanel({
   tracklets
 }: TrackletEvidencePanelProps) {
   if (tracklets.length === 0) {
-    return null;
+    return (
+      <section className="panel tracklet-evidence-panel">
+        <div className="panel-header">
+          <h2>Tracklet Candidate Evidence</h2>
+          <span className="mini-pill">0 tracklet candidates</span>
+        </div>
+        <div className="panel-body tracklet-evidence-body">
+          <p className="empty-state">
+            No candidate tracklets found for this run. Run `build-tracklets` with a detection run id
+            or run `make demo` to create fixture tracklet evidence.
+          </p>
+        </div>
+      </section>
+    );
   }
 
   const model = buildTrackletEvidenceModel(bundle, selectedObservationId);
@@ -49,15 +62,15 @@ export function TrackletEvidencePanel({
   return (
     <section className="panel tracklet-evidence-panel">
       <div className="panel-header">
-        <h2>Tracklet Evidence</h2>
+        <h2>Tracklet Candidate Evidence</h2>
         <span className="mini-pill">{tracklets.length} tracklet candidates</span>
       </div>
       <div className="panel-body tracklet-evidence-body">
-            <TrackletSelector
-              bundle={bundle}
-              onSelectTracklet={onSelectTracklet}
-              selectedTrackletId={selectedTrackletId}
-              tracklets={tracklets}
+        <TrackletSelector
+          bundle={bundle}
+          onSelectTracklet={onSelectTracklet}
+          selectedTrackletId={selectedTrackletId}
+          tracklets={tracklets}
         />
 
         {isLoading ? <p className="empty-state">Loading evidence bundle...</p> : null}
@@ -65,6 +78,10 @@ export function TrackletEvidencePanel({
 
         {bundle && model ? (
           <>
+            <p className="evidence-note">
+              Candidate temporal grouping. This does not decide object identity or ball path
+              correctness.
+            </p>
             <div className="tracklet-summary-grid">
               <SummaryCell label="Status" value={model.status} />
               <SummaryCell label="Identity" value={model.identityStatus} />
@@ -96,6 +113,12 @@ export function TrackletEvidencePanel({
               targets={reviewTargets}
             />
           </>
+        ) : null}
+        {!isLoading && !error && (!bundle || !model) ? (
+          <p className="empty-state">
+            No tracklet evidence bundle loaded. Select a tracklet candidate to inspect source
+            detections, track point candidates, lineage, and review annotations.
+          </p>
         ) : null}
       </div>
     </section>
@@ -172,7 +195,11 @@ function TrackPointList({
           <span>#{point.sequence_index ?? "n/a"}</span>
           <strong>frame {point.frame_number}</strong>
           <span>{formatConfidence(point.typed.confidence)}</span>
-          <span>{point.source_detection?.observation_type ?? "source n/a"}</span>
+          <span>
+            {point.source_detection?.observation_type
+              ? "source detection observation"
+              : "source n/a"}
+          </span>
         </button>
       ))}
     </div>
@@ -209,7 +236,7 @@ function SelectedTrackPointEvidence({
     <div className="source-detection-card">
       <div className="source-detection-header">
         <div>
-          <h3>Selected Source Detection</h3>
+          <h3>Selected Source Detection Observation</h3>
           <p>
             {label} / {point.source_detection?.observation_type ?? "n/a"} / frame{" "}
             {point.frame_number}
@@ -237,10 +264,16 @@ function SelectedTrackPointEvidence({
       )}
 
       <div className="tracklet-summary-grid">
-        <SummaryCell label="Source obs" value={point.source_detection_observation_id ?? "n/a"} />
-        <SummaryCell label="Point obs" value={point.observation?.id ?? "n/a"} />
-        <SummaryCell label="tracked_from" value={point.lineage_to_source?.id ?? "missing"} />
-        <SummaryCell label="grouped_from" value={point.lineage_to_tracklet?.id ?? "missing"} />
+        <SummaryCell
+          label="Source detection observation"
+          value={point.source_detection_observation_id ?? "n/a"}
+        />
+        <SummaryCell label="Track point candidate obs" value={point.observation?.id ?? "n/a"} />
+        <SummaryCell label="tracked_from lineage" value={point.lineage_to_source?.id ?? "missing"} />
+        <SummaryCell
+          label="grouped_from lineage"
+          value={point.lineage_to_tracklet?.id ?? "missing"}
+        />
         <SummaryCell label="bbox x/y" value={`${bbox.x ?? "n/a"} / ${bbox.y ?? "n/a"}`} />
         <SummaryCell
           label="bbox w/h"

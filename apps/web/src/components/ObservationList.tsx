@@ -1,4 +1,5 @@
 import type { Observation } from "../lib/types";
+import { observationDisplayName } from "../lib/evidenceCopy";
 import { formatConfidence, formatFrameRange } from "../lib/timeline";
 
 interface ObservationListProps {
@@ -19,6 +20,12 @@ export function ObservationList({
         <span className="mini-pill">{observations.length}</span>
       </div>
       <div className="panel-body observation-list">
+        {observations.length === 0 ? (
+          <p className="empty-state">
+            No observations found for this run. Run `make demo` for the canonical fixture path, or
+            run a detection/pose adapter for this media asset.
+          </p>
+        ) : null}
         {observations.map((observation) => (
           <button
             className={`observation-row${observation.id === selectedObservationId ? " selected" : ""}`}
@@ -27,7 +34,7 @@ export function ObservationList({
             type="button"
           >
             <span className="row-title">
-              <strong>{observation.observation_type}</strong>
+              <strong>{observationDisplayName(observation)}</strong>
               <span className="mini-pill">{formatConfidence(observation.confidence)}</span>
             </span>
             <span className="row-meta">

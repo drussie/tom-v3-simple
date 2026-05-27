@@ -51,6 +51,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 4E - Pose Query / Review / Export Integration](milestones/milestone_4e_pose_query_review_export_integration.md)
 - [Milestone 4F - Blueprint 4 Completion Review](milestones/milestone_4f_blueprint_4_completion_review.md)
 - [Milestone 5A - Local Demo / Runbook Completion Path](milestones/milestone_5a_local_demo_runbook_completion_path.md)
+- [Milestone 5B - Viewer / Product Polish](milestones/milestone_5b_viewer_product_polish.md)
 
 ## Handoffs
 
@@ -82,6 +83,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 4E Handoff](handoffs/milestone_4e_pose_query_review_export_integration_handoff.md)
 - [Milestone 4F Handoff](handoffs/milestone_4f_blueprint_4_completion_review_handoff.md)
 - [Milestone 5A Handoff](handoffs/milestone_5a_local_demo_runbook_completion_path_handoff.md)
+- [Milestone 5B Handoff](handoffs/milestone_5b_viewer_product_polish_handoff.md)
 
 ## Agent Reports
 
@@ -113,6 +115,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 4E Agent Report](agent_reports/milestone_4e_pose_query_review_export_integration_report.md)
 - [Milestone 4F Agent Report](agent_reports/milestone_4f_blueprint_4_completion_review_report.md)
 - [Milestone 5A Agent Report](agent_reports/milestone_5a_local_demo_runbook_completion_path_report.md)
+- [Milestone 5B Agent Report](agent_reports/milestone_5b_viewer_product_polish_report.md)
 
 ## Blueprints
 
@@ -159,6 +162,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Tracklet Evidence Viewer v0](web/tracklet_evidence_viewer_v0.md)
 - [Tracklet Review Viewer v0](web/tracklet_review_viewer_v0.md)
 - [Pose Overlay Viewer v0](web/pose_overlay_viewer_v0.md)
+- [Viewer Product Polish v0](web/viewer_product_polish_v0.md)
 
 ## Tracklets
 

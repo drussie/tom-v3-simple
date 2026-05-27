@@ -29,17 +29,21 @@ export function DetectionOverlayPanel({
   return (
     <section className="panel detection-overlay-panel">
       <div className="panel-header">
-        <h2>Detection Overlay</h2>
+        <h2>Detection Observations</h2>
         <span className="mini-pill">frame {model.selectedFrame ?? "n/a"}</span>
       </div>
       <div className="panel-body detection-overlay-body">
         <div className="overlay-summary">
-          <span>{model.items.length} detections with bboxes</span>
+          <span>{model.items.length} detection observations with bboxes</span>
           <span>{model.frameItems.length} on selected frame</span>
           {model.missingBboxObservationIds.length > 0 ? (
             <span>{model.missingBboxObservationIds.length} missing bbox payload</span>
           ) : null}
         </div>
+        <p className="evidence-note">
+          Detection observations are model or fixture outputs. They are evidence, not final tennis
+          state.
+        </p>
 
         {canRender ? (
           <DetectionOverlayCanvas
@@ -57,7 +61,7 @@ export function DetectionOverlayPanel({
         {canRender ? (
           <p className="frame-artifact-state">
             {model.frameArtifact === null
-              ? "No frame image artifact is available for this frame; showing image_pixels coordinate canvas."
+              ? "No frame artifact found for this detection observation. Run extract-frame-artifacts for the detection run; showing image_pixels coordinate canvas for now."
               : `Showing ${model.frameArtifact.artifact.artifact_type} artifact for ${
                   model.frameArtifact.match === "selected_observation"
                     ? "selected observation"
@@ -81,7 +85,12 @@ function DetectionFrameList({
   onSelectObservation: (observationId: string) => void;
 }) {
   if (items.length === 0) {
-    return <p className="empty-state">No bbox observations on this frame.</p>;
+    return (
+      <p className="empty-state">
+        No detection observations with bboxes on this frame. Run `make demo` or
+        `run-detection-adapter` to create fixture detection evidence.
+      </p>
+    );
   }
 
   return (

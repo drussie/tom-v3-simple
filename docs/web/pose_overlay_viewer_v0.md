@@ -84,6 +84,8 @@ The selected pose panel shows:
 - frame time owner
 - association status and method
 
+Milestone 5B adds a short evidence note above these details: pose observations are keypoint evidence only and do not classify movement, actions, or biomechanics.
+
 The keypoint table includes all persisted COCO17 keypoints with name, x/y, confidence, and present/missing status.
 
 ## Source Context
@@ -120,3 +122,7 @@ The viewer does not convert pose review labels into movement conclusions.
 ## Blueprint 4 Completion
 
 Blueprint 4 closes with pose evidence visually inspectable in the existing Evidence Viewer. The overlay renders persisted keypoint evidence, skeleton edges, bbox context, keypoint confidence rows, and candidate source context. It does not infer movement, classify actions, or convert review labels into event conclusions.
+
+## Product Polish
+
+Milestone 5B keeps the same overlay but improves empty states and source context language. If no pose observations are available for a run, the viewer points to `run-pose-adapter` or `make demo`. Missing keypoints remain visible as missing evidence in the table and are not drawn as present markers.

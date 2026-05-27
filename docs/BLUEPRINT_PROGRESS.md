@@ -2,7 +2,7 @@
 
 ## Current Progress Gauge
 
-Current: Blueprints 1, 2, 3, and 4 complete; Blueprint 5 is 20-25% complete
+Current: Blueprints 1, 2, 3, and 4 complete; Blueprint 5 is 40-45% complete
 
 ## Current
 
@@ -137,13 +137,17 @@ Current: Blueprints 1, 2, 3, and 4 complete; Blueprint 5 is 20-25% complete
 - Makefile `demo`, `demo-plan`, `demo-reset`, `demo-export`, `demo-open`, `completion-check`, `yolo-probe`, and `yolo-smoke` targets exist.
 - `docs/RUNBOOK_LOCAL.md` is the canonical copy/pasteable local runbook.
 - Optional YOLO smoke remains separate from the fixture demo.
+- Viewer product polish exists.
+- Evidence Viewer includes a run evidence summary, clearer empty states, and consistent observation/evidence/candidate wording.
+- Detection, tracklet, pose, lineage, artifact, and annotation panels expose source context and review metadata more clearly.
+- Review export artifacts are summarized when present in the viewer payload.
 - No real pose inference, movement interpretation, homography, bounce, hit, rally, point, scoring, or adjudication has been added.
 
 ## Blueprint 5 Status
 
 Status: in progress.
 
-Milestone 5A is complete. TOM v3 Simple now has a repeatable local fixture demo that proves the completed evidence loop without optional YOLO weights or real pose weights:
+Milestones 5A and 5B are complete. TOM v3 Simple now has a repeatable local fixture demo that proves the completed evidence loop without optional YOLO weights or real pose weights:
 
 ```text
 media
@@ -157,7 +161,9 @@ media
 -> viewer URLs
 ```
 
-Remaining Blueprint 5 work should focus on viewer/product polish, completion checklist hardening, documentation cleanup, and known limitations. It should not add new tennis interpretation capability.
+The viewer has also been polished with clearer empty states, run-level evidence summary, candidate/evidence wording, readable lineage descriptions, and review/export metadata display.
+
+Remaining Blueprint 5 work should focus on final evidence/provenance audit, completion checklist hardening, documentation cleanup, and known limitations. It should not add new tennis interpretation capability.
 
 ## After Milestone 0A
 

@@ -46,6 +46,17 @@ index media
 -> completion checklist
 ```
 
+Milestone 5B adds product polish around that path:
+
+```text
+viewer run payload
+-> run evidence summary
+-> clearer empty states
+-> observation/evidence/candidate wording
+-> readable lineage/source context
+-> artifact, annotation, and review export clarity
+```
+
 ## Boundaries
 
 Blueprint 5 does not add:
@@ -89,3 +100,11 @@ Blueprint 5 is complete when a new developer can:
 - run the validation checklist
 
 The platform should remain honest: fixture/demo evidence proves plumbing, not tennis understanding.
+
+## Milestone 5B Status
+
+Status: complete.
+
+The Evidence Viewer now has clearer empty states, a run evidence summary, candidate/evidence wording, readable lineage descriptions, artifact/export metadata display, and annotation rows that expose review context and keypoint metadata when present.
+
+This is product polish only. It does not add real pose inference, movement interpretation, stroke classification, homography, bounce/hit/rally/point/scoring, or adjudication.

@@ -149,6 +149,10 @@ You can also print a URL helper:
 make demo-open RUN_ID=<run_id>
 ```
 
+The viewer includes a run evidence summary, observation counts, lineage and annotation counts, and review export artifact summaries when the selected run payload includes them.
+
+Viewer copy uses evidence and candidate wording. Fixture outputs are not presented as real tennis understanding.
+
 ## 6. Inspect Detections
 
 Open:
@@ -163,6 +167,7 @@ Expected:
 - bbox overlays use stored image-pixel coordinates
 - extracted frame artifacts appear behind bboxes when available
 - selected observations show payload, artifacts, lineage, and annotations
+- empty states explain how to create missing frame artifacts or detection evidence
 
 Fixture detections are demo evidence only. They are not real model findings.
 
@@ -180,6 +185,7 @@ Expected:
 - track point candidates reference source detections
 - lineage explains how persisted detections were grouped
 - review annotations are shown as review evidence
+- the tracklet panel uses candidate wording and describes source detection context
 
 Candidate tracklets are not accepted tennis events.
 
@@ -198,6 +204,7 @@ Expected:
 - missing keypoints remain missing evidence
 - source association fields use candidate language
 - keypoint confidence rows are inspectable
+- missing keypoints are listed as missing evidence and are not drawn as present markers
 
 Fixture pose output is not real pose inference and does not interpret movement.
 
@@ -216,6 +223,8 @@ created_by = tom-v3-demo
 ```
 
 Annotations are review evidence. They do not mutate observations, detections, tracklets, pose rows, or exports.
+
+The viewer annotation panel shows keypoint metadata, notes, demo-seeded metadata, and review-only metadata when present.
 
 Add a pose annotation through the generic annotation API:
 

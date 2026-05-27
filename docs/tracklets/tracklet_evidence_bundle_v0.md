@@ -53,6 +53,14 @@ source detection observation
 
 Sequence indexes are stored in lineage payload JSON because the lineage table does not currently have a dedicated `sequence_index` column.
 
+Milestone 5B adds human-readable relationship descriptions in the viewer while keeping raw relationship types visible:
+
+- `tracked_from`: source detection grouped into a track point candidate
+- `grouped_from`: track point candidate grouped into a tracklet candidate
+- `pose_from_subject_detection_candidate`: pose observation generated from source player detection candidate context
+- `subject_context_candidate`: pose observation has candidate subject context from a tracklet
+- `pose_from_track_point_candidate`: pose observation has candidate subject context from a track point
+
 ## Artifact Matching
 
 For each source detection, the bundle looks for:
@@ -86,6 +94,10 @@ Milestone 2E confirms that evidence bundles are the cross-run inspection layer f
 Milestone 3E validates that YOLO-origin detection runs use the same persisted `ball_detection` / `player_detection` observation contract as fixture runs. Tracklet evidence bundles can therefore expose YOLO-origin source detections through the same source detection, frame artifact, and lineage fields.
 
 Milestone 3F closes Blueprint 3 with this compatibility intact. Evidence bundles do not need YOLO-specific response fields.
+
+## Product Polish
+
+Milestone 5B updates the viewer panel to use tracklet candidate wording, describe candidate temporal grouping, show a helpful empty state when no bundle is loaded, and continue linking track points back to source detection observations.
 
 ## Non-Goals
 

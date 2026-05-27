@@ -1,4 +1,5 @@
 import type { LineageRow } from "../lib/types";
+import { relationshipDescription } from "../lib/evidenceCopy";
 
 interface LineagePanelProps {
   lineage: {
@@ -16,7 +17,10 @@ export function LineagePanel({ lineage }: LineagePanelProps) {
       </div>
       <div className="panel-body lineage-list">
         {lineage.parents.length === 0 && lineage.children.length === 0 ? (
-          <p className="empty-state">No lineage rows for this observation.</p>
+          <p className="empty-state">
+            No lineage rows for this observation. Some root observations, such as unassociated
+            full-frame pose observations or fixture source outputs, may have no parent lineage.
+          </p>
         ) : null}
         {lineage.parents.map((row) => (
           <LineageItem key={row.id} label="Parent" row={row} relatedId={row.parent_observation_id} />
@@ -43,6 +47,7 @@ function LineageItem({
       <strong>
         {label} / {row.relationship_type}
       </strong>
+      <span>{relationshipDescription(row.relationship_type)}</span>
       <span className="mono">{relatedId}</span>
     </div>
   );

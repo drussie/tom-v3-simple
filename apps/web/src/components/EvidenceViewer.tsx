@@ -9,6 +9,7 @@ import { DetectionOverlayPanel } from "./DetectionOverlayPanel";
 import { ObservationDetailPanel } from "./ObservationDetailPanel";
 import { ObservationList } from "./ObservationList";
 import { PoseOverlayPanel } from "./PoseOverlayPanel";
+import { RunEvidenceSummary } from "./RunEvidenceSummary";
 import { Timeline } from "./Timeline";
 import { TrackletEvidencePanel } from "./TrackletEvidencePanel";
 import { buildDetectionOverlayModel } from "../lib/detections";
@@ -118,7 +119,7 @@ export function EvidenceViewer({ viewerRun }: EvidenceViewerProps) {
         </div>
         <div className="meta-line">
           <span className="mini-pill">{model.observations.length} observations</span>
-          <span className="mini-pill">{viewerRun.tracklets.length} tracklets</span>
+          <span className="mini-pill">{viewerRun.tracklets.length} tracklet candidates</span>
           <span className="mini-pill">{viewerRun.artifacts.length} artifacts</span>
         </div>
       </header>
@@ -126,6 +127,7 @@ export function EvidenceViewer({ viewerRun }: EvidenceViewerProps) {
       <div className="viewer-grid">
         <div className="main-column">
           <MediaPanel viewerRun={viewerRun} selectedFrame={selectedFrame} />
+          <RunEvidenceSummary viewerRun={viewerRun} />
           <DetectionOverlayPanel
             model={detectionOverlay}
             onSelectObservation={setSelectedObservationId}
@@ -185,28 +187,37 @@ function MediaPanel({
         <span className="mini-pill">selected frame {selectedFrame ?? "n/a"}</span>
       </div>
       <div className="panel-body media-grid">
-        <div className="media-cell">
-          <strong>Source</strong>
-          <span>{media?.source_uri ?? "n/a"}</span>
-        </div>
-        <div className="media-cell">
-          <strong>Dimensions</strong>
-          <span>
-            {media?.width ?? "n/a"} x {media?.height ?? "n/a"}
-          </span>
-        </div>
-        <div className="media-cell">
-          <strong>FPS</strong>
-          <span>{media?.fps ?? "n/a"}</span>
-        </div>
-        <div className="media-cell">
-          <strong>Duration</strong>
-          <span>{media?.duration_ms ?? "n/a"} ms</span>
-        </div>
-        <div className="media-cell">
-          <strong>Frames</strong>
-          <span>{media?.frame_count ?? "n/a"}</span>
-        </div>
+        {media === null ? (
+          <p className="empty-state">
+            No media metadata is attached to this run. Index media with `index-media` or run
+            `make demo` to create a complete local fixture path.
+          </p>
+        ) : (
+          <>
+            <div className="media-cell">
+              <strong>Source</strong>
+              <span>{media.source_uri}</span>
+            </div>
+            <div className="media-cell">
+              <strong>Dimensions</strong>
+              <span>
+                {media.width ?? "n/a"} x {media.height ?? "n/a"}
+              </span>
+            </div>
+            <div className="media-cell">
+              <strong>FPS</strong>
+              <span>{media.fps ?? "n/a"}</span>
+            </div>
+            <div className="media-cell">
+              <strong>Duration</strong>
+              <span>{media.duration_ms ?? "n/a"} ms</span>
+            </div>
+            <div className="media-cell">
+              <strong>Frames</strong>
+              <span>{media.frame_count ?? "n/a"}</span>
+            </div>
+          </>
+        )}
       </div>
     </section>
   );
