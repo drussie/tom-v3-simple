@@ -10,13 +10,16 @@ indexed video
 -> TOM media-owned timestamp/frame display
 -> selected run context
 -> synchronized detection observation overlays
--> future tracklet/pose replay layers
+-> synchronized tracklet candidate overlays
+-> synchronized pose keypoint evidence overlays
 ```
 
 Milestone 6A proved video replay and frame/time synchronization.
 
 Milestone 6B adds detection overlay playback for persisted `ball_detection` and
 `player_detection` observations.
+
+Milestone 6C adds tracklet candidate and pose keypoint overlay playback.
 
 ## What 6A Added
 
@@ -49,11 +52,34 @@ identity or tennis meaning.
 
 ## What 6B Does Not Add
 
-- tracklet overlay playback
-- pose overlay playback
 - evidence lanes on the timeline
 - live stream ingestion
 - HLS/RTSP/HDMI capture
+- new model runtime behavior
+- tennis-event interpretation
+- scoring or official results
+
+## What 6C Adds
+
+- `GET /replay/overlays` support for `layers=tracklets,pose`
+- optional `tracklet_run_id` filtering
+- optional `pose_run_id` and display-only `min_pose_confidence` filtering
+- normalized tracklet candidate payloads with persisted track points
+- normalized pose observation payloads with persisted keypoints and COCO17 edges
+- replay layer toggles for detection observations, tracklet candidates, and pose observations
+- tracklet and pose run selection with query parameter support
+- candidate track point and selected candidate path rendering over replay video
+- pose bbox, keypoint, and skeleton rendering over replay video
+- click-to-select detection, tracklet, track point, and pose evidence details
+
+Tracklet overlays are candidate temporal groupings. Pose overlays are keypoint
+evidence. Neither layer confirms object identity, movement, or tennis events.
+
+## What 6C Does Not Add
+
+- full evidence timeline lanes
+- stream proxy mode
+- live stream ingestion
 - new model runtime behavior
 - tennis-event interpretation
 - scoring or official results
@@ -90,15 +116,15 @@ Available runs are grouped from persisted observations:
 - pose: `player_pose_observation`
 - gameplay: `view_state`
 
-## Detection Overlay Chunks
+## Replay Overlay Chunks
 
 `GET /replay/overlays` returns replay overlay data for a media/time window:
 
 ```text
-GET /replay/overlays?media_id=<media_id>&start_ms=0&end_ms=2000&layers=detections&detection_run_id=<run_id>
+GET /replay/overlays?media_id=<media_id>&start_ms=0&end_ms=2000&layers=detections,tracklets,pose&detection_run_id=<run_id>&tracklet_run_id=<run_id>&pose_run_id=<run_id>
 ```
 
-The 6B response includes detection bbox items only:
+The response includes selected overlay families:
 
 ```json
 {
@@ -120,8 +146,24 @@ The 6B response includes detection bbox items only:
       "source_language": "detection observation"
     }
   ],
-  "tracklets": [],
-  "poses": [],
+  "tracklets": [
+    {
+      "overlay_type": "tracklet_candidate",
+      "tracklet_id": "...",
+      "track_status": "candidate",
+      "identity_status": "unverified",
+      "points": []
+    }
+  ],
+  "poses": [
+    {
+      "overlay_type": "pose_skeleton",
+      "observation_id": "...",
+      "skeleton_format": "coco17",
+      "keypoints": [],
+      "edges": []
+    }
+  ],
   "observation_only": true,
   "no_adjudication": true
 }
@@ -179,8 +221,8 @@ Optional context query parameters:
 ?detectionRunId=<run_id>&trackletRunId=<run_id>&poseRunId=<run_id>
 ```
 
-In 6B, `detectionRunId` selects the detection observation run used for bbox
-overlay playback. Tracklet and pose query parameters still provide context only.
+`detectionRunId`, `trackletRunId`, and `poseRunId` select the persisted evidence
+runs used for replay overlay playback.
 
 ## Local Demo Flow
 
@@ -210,14 +252,14 @@ Open the replay URL from the demo summary or:
 make replay-open MEDIA_ID=<media_id>
 ```
 
-For detection overlay playback, open:
+For overlay playback, open:
 
 ```text
-http://127.0.0.1:3000/replay/<media_id>?detectionRunId=<detection_run_id>
+http://127.0.0.1:3000/replay/<media_id>?detectionRunId=<detection_run_id>&trackletRunId=<tracklet_run_id>&poseRunId=<pose_run_id>
 ```
 
 ## Boundary
 
 The replay workstation displays synchronized evidence context. It does not decide tennis meaning.
 
-Blueprint 6C can add tracklet and pose replay layers. Stream proxy mode remains future work.
+Blueprint 6D can add full evidence timeline lanes and richer scrubbing. Stream proxy mode remains future work.

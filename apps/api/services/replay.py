@@ -6,7 +6,16 @@ from typing import Any
 
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
-from tom_v3_storage.db_models import AtomicObservation, MediaAsset, Observation, ProcessingRun
+from tom_v3_schema.skeletons import get_skeleton_definition
+from tom_v3_storage.db_models import (
+    AtomicObservation,
+    MediaAsset,
+    Observation,
+    PoseObservation,
+    ProcessingRun,
+    Tracklet,
+    TrackPoint,
+)
 from tom_v3_video.paths import local_path_from_uri_or_path
 
 DETECTION_TYPES = {"ball_detection", "player_detection"}
@@ -81,7 +90,10 @@ def build_replay_overlay_chunk(
     end_ms: int,
     layers: set[str],
     detection_run_id: str | None = None,
+    tracklet_run_id: str | None = None,
+    pose_run_id: str | None = None,
     min_confidence: float | None = None,
+    min_pose_confidence: float | None = None,
 ) -> dict[str, Any] | None:
     media = session.get(MediaAsset, media_id)
     if media is None:
@@ -99,6 +111,29 @@ def build_replay_overlay_chunk(
         if "detections" in layers
         else []
     )
+    tracklets = (
+        build_tracklet_overlay_items(
+            session=session,
+            media=media,
+            start_ms=start_ms,
+            end_ms=end_ms,
+            tracklet_run_id=tracklet_run_id,
+        )
+        if "tracklets" in layers
+        else []
+    )
+    poses = (
+        build_pose_overlay_items(
+            session=session,
+            media=media,
+            start_ms=start_ms,
+            end_ms=end_ms,
+            pose_run_id=pose_run_id,
+            min_pose_confidence=min_pose_confidence,
+        )
+        if "pose" in layers
+        else []
+    )
     return {
         "media_id": media.id,
         "start_ms": start_ms,
@@ -107,8 +142,8 @@ def build_replay_overlay_chunk(
         "video_width": media.width,
         "video_height": media.height,
         "detections": detections,
-        "tracklets": [],
-        "poses": [],
+        "tracklets": tracklets,
+        "poses": poses,
         "observation_only": True,
         "no_adjudication": True,
     }
@@ -187,6 +222,168 @@ def detection_overlay_item_from_observation(
     }
 
 
+def build_tracklet_overlay_items(
+    session: Session,
+    *,
+    media: MediaAsset,
+    start_ms: int,
+    end_ms: int,
+    tracklet_run_id: str | None = None,
+) -> list[dict[str, Any]]:
+    query = (
+        select(Tracklet)
+        .where(Tracklet.media_id == media.id)
+        .order_by(Tracklet.frame_start, Tracklet.id)
+    )
+    if tracklet_run_id is not None:
+        query = query.where(Tracklet.run_id == tracklet_run_id)
+
+    items: list[dict[str, Any]] = []
+    for tracklet in session.scalars(query).all():
+        item = tracklet_overlay_item_from_row(media, tracklet)
+        if item is None:
+            continue
+        if _time_ranges_overlap(
+            item["timestamp_start_ms"],
+            item["timestamp_end_ms"],
+            start_ms,
+            end_ms,
+        ):
+            items.append(item)
+    return items
+
+
+def tracklet_overlay_item_from_row(
+    media: MediaAsset,
+    tracklet: Tracklet,
+) -> dict[str, Any] | None:
+    points = []
+    for point in tracklet.points:
+        item = point_overlay_item_from_row(media, point)
+        if item is not None:
+            points.append(item)
+    points.sort(
+        key=lambda item: (item["timestamp_ms"], item["frame_number"], item["track_point_id"])
+    )
+    if not points:
+        return None
+
+    timestamps = [point["timestamp_ms"] for point in points]
+    metadata = tracklet.metadata_jsonb or {}
+    observation_id = _string_or_none(tracklet.observation_id)
+    return {
+        "overlay_type": "tracklet_candidate",
+        "observation_id": observation_id,
+        "tracklet_id": tracklet.id,
+        "run_id": tracklet.run_id,
+        "track_type": tracklet.track_family,
+        "label_hint": _tracklet_label_hint(tracklet),
+        "track_status": _string_or_none(metadata.get("track_status")) or "candidate",
+        "identity_status": _string_or_none(metadata.get("identity_status")) or "unverified",
+        "frame_start": tracklet.frame_start,
+        "frame_end": tracklet.frame_end,
+        "timestamp_start_ms": min(timestamps),
+        "timestamp_end_ms": max(timestamps),
+        "points": points,
+        "source_language": "tracklet candidate",
+    }
+
+
+def point_overlay_item_from_row(
+    media: MediaAsset,
+    point: TrackPoint,
+) -> dict[str, Any] | None:
+    frame_number = point.frame_number
+    timestamp_ms = (
+        point.timestamp_ms
+        if point.timestamp_ms is not None
+        else frame_to_replay_timestamp_ms(media, frame_number)
+    )
+    x = _numeric(point.x)
+    y = _numeric(point.y)
+    if frame_number is None or timestamp_ms is None or x is None or y is None:
+        return None
+
+    payload = point.payload_jsonb or {}
+    bbox = _track_point_bbox(point, payload)
+    return {
+        "track_point_id": point.id,
+        "observation_id": point.observation_id,
+        "source_detection_observation_id": _string_or_none(
+            payload.get("source_detection_observation_id")
+        ),
+        "frame_number": frame_number,
+        "timestamp_ms": timestamp_ms,
+        "x": x,
+        "y": y,
+        "bbox": bbox,
+        "confidence": point.confidence,
+    }
+
+
+def build_pose_overlay_items(
+    session: Session,
+    *,
+    media: MediaAsset,
+    start_ms: int,
+    end_ms: int,
+    pose_run_id: str | None = None,
+    min_pose_confidence: float | None = None,
+) -> list[dict[str, Any]]:
+    query = (
+        select(PoseObservation)
+        .where(
+            PoseObservation.media_id == media.id,
+            PoseObservation.timestamp_ms.is_not(None),
+            PoseObservation.timestamp_ms >= start_ms,
+            PoseObservation.timestamp_ms <= end_ms,
+        )
+        .order_by(PoseObservation.timestamp_ms, PoseObservation.observation_id)
+    )
+    if pose_run_id is not None:
+        query = query.where(PoseObservation.run_id == pose_run_id)
+    if min_pose_confidence is not None:
+        query = query.where(
+            PoseObservation.pose_confidence.is_not(None),
+            PoseObservation.pose_confidence >= min_pose_confidence,
+        )
+
+    return [pose_overlay_item_from_row(pose) for pose in session.scalars(query).all()]
+
+
+def pose_overlay_item_from_row(pose: PoseObservation) -> dict[str, Any]:
+    keypoints = _pose_overlay_keypoints(pose.keypoints_jsonb or [])
+    return {
+        "overlay_type": "pose_skeleton",
+        "observation_id": pose.observation_id,
+        "run_id": pose.run_id,
+        "frame_number": pose.frame_number,
+        "timestamp_ms": pose.timestamp_ms,
+        "skeleton_format": pose.skeleton_format,
+        "skeleton_version": pose.skeleton_version,
+        "pose_confidence": pose.pose_confidence,
+        "bbox": _pose_bbox(pose),
+        "keypoint_count": pose.keypoint_count,
+        "keypoints_present_count": pose.keypoints_present_count,
+        "keypoints_missing_count": pose.keypoints_missing_count,
+        "mean_keypoint_confidence": pose.mean_keypoint_confidence,
+        "min_keypoint_confidence": pose.min_keypoint_confidence,
+        "max_keypoint_confidence": pose.max_keypoint_confidence,
+        "keypoints": keypoints,
+        "edges": [list(edge) for edge in _pose_edges(pose)],
+        "subject_context": {
+            "subject_ref_type": pose.subject_ref_type,
+            "subject_detection_observation_id": pose.subject_detection_observation_id,
+            "subject_tracklet_id": pose.subject_tracklet_id,
+            "subject_track_point_id": pose.subject_track_point_id,
+            "association_status": pose.association_status,
+            "association_method": pose.association_method,
+            "association_confidence": pose.association_confidence,
+        },
+        "source_language": "pose keypoint evidence",
+    }
+
+
 def available_runs_for_media(session: Session, media_id: str) -> dict[str, list[dict[str, Any]]]:
     return {
         "detection": _run_summaries_for_observation_types(session, media_id, DETECTION_TYPES),
@@ -203,7 +400,17 @@ def normalize_replay_layers(layers: str | list[str] | tuple[str, ...] | None) ->
         raw_layers = layers.split(",")
     else:
         raw_layers = [part for layer in layers for part in str(layer).split(",")]
-    return {layer.strip().lower() for layer in raw_layers if layer.strip()}
+    normalized: set[str] = set()
+    for raw_layer in raw_layers:
+        layer = raw_layer.strip().lower()
+        if not layer:
+            continue
+        if layer == "poses":
+            layer = "pose"
+        if layer == "tracklet":
+            layer = "tracklets"
+        normalized.add(layer)
+    return normalized
 
 
 def resolve_media_video_path(media: MediaAsset) -> Path | None:
@@ -291,6 +498,91 @@ def _bbox_from_payload(payload: dict[str, Any]) -> dict[str, float] | None:
     if width <= 0 or height <= 0:
         return None
     return {"x": x, "y": y, "w": width, "h": height}
+
+
+def _track_point_bbox(point: TrackPoint, payload: dict[str, Any]) -> dict[str, float] | None:
+    payload_bbox = _bbox_from_payload(payload)
+    if payload_bbox is not None:
+        return payload_bbox
+
+    width = _numeric(point.width)
+    height = _numeric(point.height)
+    x = _numeric(point.x)
+    y = _numeric(point.y)
+    if width is None or height is None or x is None or y is None:
+        return None
+    if width <= 0 or height <= 0:
+        return None
+    return {
+        "x": x - width / 2.0,
+        "y": y - height / 2.0,
+        "w": width,
+        "h": height,
+    }
+
+
+def _tracklet_label_hint(tracklet: Tracklet) -> str | None:
+    if tracklet.subject_ref:
+        return tracklet.subject_ref
+    if tracklet.track_family == "ball":
+        return "ball"
+    if tracklet.track_family == "player":
+        return "player_unknown"
+    return None
+
+
+def _pose_bbox(pose: PoseObservation) -> dict[str, float | None] | None:
+    x = _numeric(pose.bbox_x)
+    y = _numeric(pose.bbox_y)
+    width = _numeric(pose.bbox_w)
+    height = _numeric(pose.bbox_h)
+    if x is None or y is None or width is None or height is None:
+        return None
+    if width <= 0 or height <= 0:
+        return None
+    return {
+        "x": x,
+        "y": y,
+        "w": width,
+        "h": height,
+        "confidence": pose.bbox_confidence,
+    }
+
+
+def _pose_overlay_keypoints(keypoints: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    normalized: list[dict[str, Any]] = []
+    for keypoint in keypoints:
+        if not isinstance(keypoint, dict):
+            continue
+        normalized.append(
+            {
+                "index": keypoint.get("index"),
+                "name": keypoint.get("name"),
+                "x": keypoint.get("x"),
+                "y": keypoint.get("y"),
+                "confidence": keypoint.get("confidence"),
+                "present": bool(keypoint.get("present")),
+            }
+        )
+    return normalized
+
+
+def _pose_edges(pose: PoseObservation) -> list[tuple[str, str]]:
+    try:
+        return list(get_skeleton_definition(pose.skeleton_format, pose.skeleton_version).edges)
+    except ValueError:
+        return []
+
+
+def _time_ranges_overlap(
+    start_a: int | float | None,
+    end_a: int | float | None,
+    start_b: int,
+    end_b: int,
+) -> bool:
+    if start_a is None or end_a is None:
+        return False
+    return float(start_a) <= end_b and float(end_a) >= start_b
 
 
 def _detection_label(observation: Observation, payload: dict[str, Any]) -> str:

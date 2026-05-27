@@ -199,3 +199,26 @@ Milestone 6B did not add:
 - bounce or hit detection
 - rally/point/scoring
 - adjudication
+
+Milestone 6C proved:
+
+```text
+indexed video playback
+-> current TOM timestamp/frame
+-> detection overlay chunks
+-> tracklet candidate overlay chunks
+-> pose keypoint overlay chunks
+-> synchronized bbox / point / skeleton rendering
+-> click-to-select persisted evidence details
+```
+
+Milestone 6C did not add:
+
+- full evidence timeline lanes
+- stream proxy mode
+- live stream ingestion
+- model/runtime expansion
+- homography
+- bounce or hit detection
+- rally/point/scoring
+- adjudication

@@ -1,7 +1,10 @@
 import type {
   ReplayDetectionBBox,
   ReplayDetectionOverlay,
-  ReplayRunSummary
+  ReplayPoseOverlay,
+  ReplayRunSummary,
+  ReplayTrackletOverlay,
+  ReplayTrackPointOverlay
 } from "./types";
 
 export interface ContainedMediaRect {
@@ -18,6 +21,11 @@ export interface OverlayRect {
   y: number;
   width: number;
   height: number;
+}
+
+export interface OverlayPoint {
+  x: number;
+  y: number;
 }
 
 export function computeContainedMediaRect(
@@ -69,6 +77,24 @@ export function imagePixelRectToOverlayRect(
   };
 }
 
+export function imagePixelPointToOverlayPoint(
+  x: number,
+  y: number,
+  mediaWidth: number | null,
+  mediaHeight: number | null,
+  overlayWidth: number,
+  overlayHeight: number
+): OverlayPoint | null {
+  const contained = computeContainedMediaRect(overlayWidth, overlayHeight, mediaWidth, mediaHeight);
+  if (contained === null) {
+    return null;
+  }
+  return {
+    x: contained.x + x * contained.scaleX,
+    y: contained.y + y * contained.scaleY
+  };
+}
+
 export function activeReplayDetections(
   detections: ReplayDetectionOverlay[],
   currentTimestampMs: number,
@@ -84,7 +110,55 @@ export function activeReplayDetections(
   });
 }
 
+export function activeReplayTracklets(
+  tracklets: ReplayTrackletOverlay[],
+  currentTimestampMs: number,
+  currentFrame: number,
+  holdMs = 250
+): ReplayTrackletOverlay[] {
+  return tracklets.filter((tracklet) => {
+    if (
+      currentTimestampMs >= tracklet.timestamp_start_ms - holdMs &&
+      currentTimestampMs <= tracklet.timestamp_end_ms + holdMs
+    ) {
+      return true;
+    }
+    return tracklet.points.some((point) =>
+      isActiveReplayPoint(point.timestamp_ms, point.frame_number, currentTimestampMs, currentFrame, holdMs)
+    );
+  });
+}
+
+export function activeReplayTrackPoints(
+  points: ReplayTrackPointOverlay[],
+  currentTimestampMs: number,
+  currentFrame: number,
+  holdMs = 250
+): ReplayTrackPointOverlay[] {
+  return points.filter((point) =>
+    isActiveReplayPoint(point.timestamp_ms, point.frame_number, currentTimestampMs, currentFrame, holdMs)
+  );
+}
+
+export function activeReplayPoses(
+  poses: ReplayPoseOverlay[],
+  currentTimestampMs: number,
+  currentFrame: number,
+  holdMs = 250
+): ReplayPoseOverlay[] {
+  return poses.filter((pose) =>
+    isActiveReplayPoint(pose.timestamp_ms, pose.frame_number, currentTimestampMs, currentFrame, holdMs)
+  );
+}
+
 export function selectInitialDetectionRun(
+  runs: ReplayRunSummary[],
+  requestedRunId?: string
+): string | null {
+  return selectInitialReplayRun(runs, requestedRunId);
+}
+
+export function selectInitialReplayRun(
   runs: ReplayRunSummary[],
   requestedRunId?: string
 ): string | null {
@@ -92,4 +166,18 @@ export function selectInitialDetectionRun(
     return requestedRunId;
   }
   return runs.length === 1 ? runs[0].run_id : null;
+}
+
+function isActiveReplayPoint(
+  timestampMs: number,
+  frameNumber: number,
+  currentTimestampMs: number,
+  currentFrame: number,
+  holdMs: number
+): boolean {
+  const timestampDelta = Math.abs(timestampMs - currentTimestampMs);
+  if (timestampDelta <= holdMs) {
+    return true;
+  }
+  return frameNumber === currentFrame && timestampDelta <= Math.max(holdMs, 34);
 }

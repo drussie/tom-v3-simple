@@ -221,6 +221,15 @@ pre {
   z-index: 4;
 }
 
+.replay-vector-layer {
+  inset: 0;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  position: absolute;
+  width: 100%;
+}
+
 .replay-detection-box {
   background: rgba(255, 255, 255, 0.02);
   border: 2px solid var(--blue);
@@ -285,6 +294,105 @@ pre {
   max-width: min(520px, calc(100% - 28px));
   padding: 10px 12px;
   position: absolute;
+}
+
+.replay-overlay-status.tracklet {
+  bottom: 68px;
+}
+
+.replay-overlay-status.pose {
+  bottom: 122px;
+}
+
+.replay-tracklet-path,
+.replay-pose-edge {
+  fill: none;
+  pointer-events: auto;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.replay-tracklet-path {
+  stroke: var(--amber);
+  stroke-width: 3;
+}
+
+.replay-tracklet-point {
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.replay-tracklet-point circle {
+  fill: var(--amber);
+  stroke: #ffffff;
+  stroke-width: 2;
+}
+
+.replay-tracklet-group.ball .replay-tracklet-point circle {
+  fill: var(--rose);
+}
+
+.replay-tracklet-group.player .replay-tracklet-point circle {
+  fill: var(--blue);
+}
+
+.replay-tracklet-point.selected circle,
+.replay-tracklet-group.selected .replay-tracklet-point circle {
+  stroke: #ffffff;
+  stroke-width: 4;
+}
+
+.replay-tracklet-point text,
+.replay-pose-label {
+  fill: #ffffff;
+  font-size: 11px;
+  font-weight: 800;
+  paint-order: stroke;
+  pointer-events: none;
+  stroke: rgba(16, 23, 25, 0.92);
+  stroke-linejoin: round;
+  stroke-width: 4px;
+}
+
+.replay-pose-group {
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.replay-pose-bbox {
+  fill: rgba(37, 99, 235, 0.04);
+  pointer-events: auto;
+  stroke: var(--green);
+  stroke-dasharray: 5 4;
+  stroke-width: 2;
+}
+
+.replay-pose-group.selected .replay-pose-bbox {
+  stroke: var(--amber);
+  stroke-width: 3;
+}
+
+.replay-pose-edge {
+  stroke: rgba(52, 211, 153, 0.86);
+  stroke-width: 3;
+}
+
+.replay-pose-keypoint {
+  fill: var(--green);
+  stroke: #ffffff;
+  stroke-width: 1.5;
+}
+
+.replay-pose-keypoint.low {
+  fill: var(--amber);
+}
+
+.replay-pose-keypoint.unknown {
+  fill: var(--muted);
+}
+
+.replay-pose-group.selected .replay-pose-keypoint {
+  stroke-width: 3;
 }
 
 .replay-overlay-placeholder {

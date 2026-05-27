@@ -1258,3 +1258,43 @@ Milestone 6B created:
 - Milestone 6B docs, handoff, and agent report.
 
 Detection boxes remain persisted detection observations. They are not confirmed objects or tennis events.
+
+## Milestone 6C - Tracklet / Pose Overlay Playback
+
+Status: complete
+
+### Goal
+
+Add synchronized candidate tracklet and pose keypoint evidence overlays to the replay workstation.
+
+### Non-goals
+
+- No full evidence timeline lanes yet.
+- No stream proxy mode.
+- No live stream ingestion.
+- No new model/runtime capability.
+- No real pose runtime or adapter inference.
+- No movement interpretation.
+- No stroke classification.
+- No serve, hit, split-step, or biomechanics conclusions.
+- No court homography.
+- No bounce detection.
+- No rally segmentation.
+- No point reconstruction.
+- No scoring.
+- No adjudication.
+
+### Notes
+
+Milestone 6C created:
+
+- `GET /replay/overlays` support for tracklet candidate and pose keypoint overlay payloads.
+- `tracklet_run_id`, `pose_run_id`, and display-only `min_pose_confidence` replay overlay filters.
+- Backend replay helpers for persisted candidate tracklet points/paths and persisted pose observations.
+- Frontend replay tracklet and pose overlay layers that reuse contained-video coordinate scaling.
+- Layer toggles and run selectors for detection observations, tracklet candidates, and pose observations.
+- Click-to-select detail for detection observations, tracklet candidates, track point candidates, and pose observations.
+- Tests for backend tracklet/pose overlay payloads and filtering.
+- Milestone 6C docs, handoff, and agent report.
+
+Tracklet paths remain candidate temporal groupings. Pose skeletons remain keypoint evidence. They are not tennis-event interpretations.

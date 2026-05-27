@@ -18,7 +18,10 @@ def get_replay_overlays(
     end_ms: int = Query(..., ge=0),
     layers: str = "detections",
     detection_run_id: str | None = None,
+    tracklet_run_id: str | None = None,
+    pose_run_id: str | None = None,
     min_confidence: float | None = Query(default=None, ge=0.0, le=1.0),
+    min_pose_confidence: float | None = Query(default=None, ge=0.0, le=1.0),
 ) -> dict[str, object]:
     if start_ms > end_ms:
         raise HTTPException(
@@ -33,7 +36,10 @@ def get_replay_overlays(
         end_ms=end_ms,
         layers=normalize_replay_layers(layers),
         detection_run_id=detection_run_id,
+        tracklet_run_id=tracklet_run_id,
+        pose_run_id=pose_run_id,
         min_confidence=min_confidence,
+        min_pose_confidence=min_pose_confidence,
     )
     if chunk is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="media asset not found")

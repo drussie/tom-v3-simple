@@ -281,6 +281,76 @@ export interface ReplayDetectionOverlay {
   coordinate_space: "image_pixels";
 }
 
+export interface ReplayTrackPointOverlay {
+  track_point_id: string;
+  observation_id: string | null;
+  source_detection_observation_id: string | null;
+  frame_number: number;
+  timestamp_ms: number;
+  x: number;
+  y: number;
+  bbox: ReplayDetectionBBox | null;
+  confidence: number | null;
+}
+
+export interface ReplayTrackletOverlay {
+  overlay_type: "tracklet_candidate";
+  observation_id: string | null;
+  tracklet_id: string;
+  run_id: string;
+  track_type: "ball" | "player" | string;
+  label_hint: string | null;
+  track_status: "candidate" | string;
+  identity_status: "unverified" | string;
+  frame_start: number | null;
+  frame_end: number | null;
+  timestamp_start_ms: number;
+  timestamp_end_ms: number;
+  points: ReplayTrackPointOverlay[];
+  source_language: "tracklet candidate";
+}
+
+export interface ReplayPoseKeypoint {
+  index: number;
+  name: string;
+  x: number | null;
+  y: number | null;
+  confidence: number | null;
+  present: boolean;
+}
+
+export interface ReplayPoseSubjectContext {
+  subject_ref_type: string;
+  subject_detection_observation_id: string | null;
+  subject_tracklet_id: string | null;
+  subject_track_point_id: string | null;
+  association_status: string;
+  association_method: string | null;
+  association_confidence: number | null;
+}
+
+export interface ReplayPoseOverlay {
+  overlay_type: "pose_skeleton";
+  observation_id: string;
+  run_id: string;
+  frame_number: number;
+  timestamp_ms: number;
+  skeleton_format: string;
+  skeleton_version: string;
+  pose_confidence: number | null;
+  bbox: (ReplayDetectionBBox & { confidence: number | null }) | null;
+  keypoint_count: number;
+  keypoints_present_count: number;
+  keypoints_missing_count: number;
+  mean_keypoint_confidence: number | null;
+  min_keypoint_confidence: number | null;
+  max_keypoint_confidence: number | null;
+  keypoints: ReplayPoseKeypoint[];
+  edges: [string, string][];
+  subject_context: ReplayPoseSubjectContext;
+  source_language: "pose keypoint evidence";
+}
+
 export interface ReplayOverlayChunk {
   media_id: string;
   start_ms: number;
@@ -289,8 +359,8 @@ export interface ReplayOverlayChunk {
   video_width: number | null;
   video_height: number | null;
   detections: ReplayDetectionOverlay[];
-  tracklets: [];
-  poses: [];
+  tracklets: ReplayTrackletOverlay[];
+  poses: ReplayPoseOverlay[];
   observation_only: boolean;
   no_adjudication: boolean;
 }

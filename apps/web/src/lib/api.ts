@@ -43,7 +43,10 @@ export interface FetchReplayOverlayChunkInput {
   endMs: number;
   layers?: string;
   detectionRunId?: string | null;
+  trackletRunId?: string | null;
+  poseRunId?: string | null;
   minConfidence?: number | null;
+  minPoseConfidence?: number | null;
 }
 
 export async function fetchReplayOverlayChunk({
@@ -52,7 +55,10 @@ export async function fetchReplayOverlayChunk({
   endMs,
   layers = "detections",
   detectionRunId = null,
-  minConfidence = null
+  trackletRunId = null,
+  poseRunId = null,
+  minConfidence = null,
+  minPoseConfidence = null
 }: FetchReplayOverlayChunkInput): Promise<ReplayOverlayChunk> {
   const params = new URLSearchParams({
     media_id: mediaId,
@@ -63,8 +69,17 @@ export async function fetchReplayOverlayChunk({
   if (detectionRunId !== null) {
     params.set("detection_run_id", detectionRunId);
   }
+  if (trackletRunId !== null) {
+    params.set("tracklet_run_id", trackletRunId);
+  }
+  if (poseRunId !== null) {
+    params.set("pose_run_id", poseRunId);
+  }
   if (minConfidence !== null) {
     params.set("min_confidence", minConfidence.toString());
+  }
+  if (minPoseConfidence !== null) {
+    params.set("min_pose_confidence", minPoseConfidence.toString());
   }
 
   const response = await fetch(`/api/replay/overlays?${params.toString()}`, {

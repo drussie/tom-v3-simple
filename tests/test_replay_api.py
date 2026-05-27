@@ -8,7 +8,17 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import StaticPool
-from tom_v3_storage.db_models import AtomicObservation, Base, MediaAsset, Observation, ProcessingRun
+from tom_v3_schema.skeletons import COCO17_KEYPOINT_NAMES
+from tom_v3_storage.db_models import (
+    AtomicObservation,
+    Base,
+    MediaAsset,
+    Observation,
+    PoseObservation,
+    ProcessingRun,
+    Tracklet,
+    TrackPoint,
+)
 
 from apps.api.db import get_session
 from apps.api.main import create_app
@@ -312,6 +322,182 @@ def test_replay_overlay_endpoint_returns_empty_detections_for_empty_window(
     assert response.json()["detections"] == []
 
 
+def test_replay_overlay_endpoint_returns_tracklet_candidate_items(
+    client: TestClient,
+    db_session: Session,
+    tmp_path,
+) -> None:
+    media_path = tmp_path / "sample.mp4"
+    media_path.write_bytes(b"tom-v3-video")
+    media = _seed_media(db_session, media_path)
+    run = _seed_tracklet_run(db_session, media.id)
+
+    response = client.get(
+        "/replay/overlays",
+        params={
+            "media_id": media.id,
+            "start_ms": 0,
+            "end_ms": 2000,
+            "layers": "tracklets",
+            "tracklet_run_id": run.id,
+        },
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["detections"] == []
+    assert body["poses"] == []
+    assert len(body["tracklets"]) == 1
+    tracklet = body["tracklets"][0]
+    assert tracklet["overlay_type"] == "tracklet_candidate"
+    assert tracklet["run_id"] == run.id
+    assert tracklet["track_type"] == "ball"
+    assert tracklet["track_status"] == "candidate"
+    assert tracklet["identity_status"] == "unverified"
+    assert tracklet["source_language"] == "tracklet candidate"
+    assert [point["timestamp_ms"] for point in tracklet["points"]] == [0, 1000]
+    assert tracklet["points"][0]["bbox"] == {"x": 10.0, "y": 20.0, "w": 12.0, "h": 12.0}
+    assert body["observation_only"] is True
+    assert body["no_adjudication"] is True
+
+
+def test_replay_overlay_endpoint_filters_by_tracklet_run_id(
+    client: TestClient,
+    db_session: Session,
+    tmp_path,
+) -> None:
+    media_path = tmp_path / "sample.mp4"
+    media_path.write_bytes(b"tom-v3-video")
+    media = _seed_media(db_session, media_path)
+    included = _seed_tracklet_run(db_session, media.id, run_name="included-tracklet-run")
+    _seed_tracklet_run(db_session, media.id, run_name="excluded-tracklet-run", frame_offset=10)
+
+    response = client.get(
+        "/replay/overlays",
+        params={
+            "media_id": media.id,
+            "start_ms": 0,
+            "end_ms": 2000,
+            "layers": "tracklets",
+            "tracklet_run_id": included.id,
+        },
+    )
+
+    assert response.status_code == 200
+    tracklets = response.json()["tracklets"]
+    assert len(tracklets) == 1
+    assert tracklets[0]["run_id"] == included.id
+
+
+def test_replay_overlay_endpoint_returns_pose_keypoint_items(
+    client: TestClient,
+    db_session: Session,
+    tmp_path,
+) -> None:
+    media_path = tmp_path / "sample.mp4"
+    media_path.write_bytes(b"tom-v3-video")
+    media = _seed_media(db_session, media_path)
+    run = _seed_pose_run(db_session, media.id)
+
+    response = client.get(
+        "/replay/overlays",
+        params={
+            "media_id": media.id,
+            "start_ms": 0,
+            "end_ms": 2000,
+            "layers": "pose",
+            "pose_run_id": run.id,
+        },
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["detections"] == []
+    assert body["tracklets"] == []
+    assert len(body["poses"]) == 1
+    pose = body["poses"][0]
+    assert pose["overlay_type"] == "pose_skeleton"
+    assert pose["run_id"] == run.id
+    assert pose["skeleton_format"] == "coco17"
+    assert pose["skeleton_version"] == "v1"
+    assert pose["pose_confidence"] == 0.71
+    assert pose["bbox"] == {"x": 100.0, "y": 40.0, "w": 80.0, "h": 210.0, "confidence": 0.8}
+    assert len(pose["keypoints"]) == 17
+    assert pose["keypoints"][0]["name"] == "nose"
+    assert pose["keypoints"][0]["present"] is True
+    assert pose["keypoints"][3]["present"] is False
+    assert ["left_shoulder", "right_shoulder"] in pose["edges"]
+    assert pose["subject_context"]["association_status"] == "candidate"
+    assert pose["subject_context"]["association_method"] == "crop_from_player_detection"
+    assert pose["source_language"] == "pose keypoint evidence"
+
+
+def test_replay_overlay_endpoint_filters_by_pose_run_id_and_confidence(
+    client: TestClient,
+    db_session: Session,
+    tmp_path,
+) -> None:
+    media_path = tmp_path / "sample.mp4"
+    media_path.write_bytes(b"tom-v3-video")
+    media = _seed_media(db_session, media_path)
+    included = _seed_pose_run(
+        db_session,
+        media.id,
+        run_name="included-pose-run",
+        pose_confidence=0.9,
+    )
+    _seed_pose_run(
+        db_session,
+        media.id,
+        run_name="excluded-pose-run",
+        pose_confidence=0.4,
+    )
+
+    response = client.get(
+        "/replay/overlays",
+        params={
+            "media_id": media.id,
+            "start_ms": 0,
+            "end_ms": 2000,
+            "layers": "pose",
+            "pose_run_id": included.id,
+            "min_pose_confidence": 0.8,
+        },
+    )
+
+    assert response.status_code == 200
+    poses = response.json()["poses"]
+    assert len(poses) == 1
+    assert poses[0]["run_id"] == included.id
+    assert poses[0]["pose_confidence"] == 0.9
+
+
+def test_replay_overlay_endpoint_returns_empty_tracklets_and_poses_for_empty_window(
+    client: TestClient,
+    db_session: Session,
+    tmp_path,
+) -> None:
+    media_path = tmp_path / "sample.mp4"
+    media_path.write_bytes(b"tom-v3-video")
+    media = _seed_media(db_session, media_path)
+    _seed_tracklet_run(db_session, media.id)
+    _seed_pose_run(db_session, media.id)
+
+    response = client.get(
+        "/replay/overlays",
+        params={
+            "media_id": media.id,
+            "start_ms": 3000,
+            "end_ms": 4000,
+            "layers": "tracklets,pose",
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.json()["tracklets"] == []
+    assert response.json()["poses"] == []
+
+
 def test_replay_overlay_endpoint_returns_404_for_missing_media(client: TestClient) -> None:
     response = client.get(
         "/replay/overlays",
@@ -385,6 +571,208 @@ def _seed_run_with_observation(
     session.commit()
     session.refresh(run)
     return run
+
+
+def _seed_tracklet_run(
+    session: Session,
+    media_id: str,
+    run_name: str = "demo-candidate-tracklet-run",
+    frame_offset: int = 0,
+) -> ProcessingRun:
+    run = ProcessingRun(
+        media_id=media_id,
+        run_name=run_name,
+        run_status="completed",
+        started_at=datetime.now(UTC),
+        completed_at=datetime.now(UTC),
+        metadata_jsonb={"tom_v3_demo": True},
+    )
+    session.add(run)
+    session.flush()
+    tracklet_observation = Observation(
+        media_id=media_id,
+        run_id=run.id,
+        observation_family="tracklet",
+        observation_type="ball_tracklet_candidate",
+        granularity="tracklet",
+        frame_start=frame_offset,
+        frame_end=frame_offset + 30,
+        timestamp_start_ms=0,
+        timestamp_end_ms=1000,
+        confidence=0.82,
+        coordinate_space="image_pixels",
+        payload_jsonb={"track_status": "candidate", "identity_status": "unverified"},
+    )
+    session.add(tracklet_observation)
+    session.flush()
+    tracklet = Tracklet(
+        media_id=media_id,
+        run_id=run.id,
+        track_family="ball",
+        subject_ref="ball",
+        frame_start=frame_offset,
+        frame_end=frame_offset + 30,
+        confidence=0.82,
+        observation_id=tracklet_observation.id,
+        metadata_jsonb={"track_status": "candidate", "identity_status": "unverified"},
+    )
+    session.add(tracklet)
+    session.flush()
+    for index, (frame_number, timestamp_ms, x, y) in enumerate(
+        [
+            (frame_offset, 0, 16.0, 26.0),
+            (frame_offset + 30, 1000, 40.0, 52.0),
+        ]
+    ):
+        point_observation = Observation(
+            media_id=media_id,
+            run_id=run.id,
+            observation_family="tracklet",
+            observation_type="track_point_candidate",
+            granularity="frame",
+            frame_start=frame_number,
+            frame_end=frame_number,
+            timestamp_start_ms=timestamp_ms,
+            timestamp_end_ms=timestamp_ms,
+            confidence=0.82,
+            coordinate_space="image_pixels",
+            payload_jsonb={"track_status": "candidate", "identity_status": "unverified"},
+        )
+        session.add(point_observation)
+        session.flush()
+        session.add(
+            TrackPoint(
+                tracklet_id=tracklet.id,
+                observation_id=point_observation.id,
+                frame_number=frame_number,
+                timestamp_ms=timestamp_ms,
+                x=x,
+                y=y,
+                width=12.0,
+                height=12.0,
+                confidence=0.82,
+                payload_jsonb={
+                    "source_detection_observation_id": f"source-detection-{index}",
+                    "bbox": {"x": x - 6.0, "y": y - 6.0, "width": 12.0, "height": 12.0},
+                    "track_status": "candidate",
+                    "identity_status": "unverified",
+                },
+            )
+        )
+    session.commit()
+    session.refresh(run)
+    return run
+
+
+def _seed_pose_run(
+    session: Session,
+    media_id: str,
+    run_name: str = "demo-fixture-pose-run",
+    pose_confidence: float = 0.71,
+) -> ProcessingRun:
+    run = ProcessingRun(
+        media_id=media_id,
+        run_name=run_name,
+        run_status="completed",
+        started_at=datetime.now(UTC),
+        completed_at=datetime.now(UTC),
+        metadata_jsonb={"tom_v3_demo": True},
+    )
+    session.add(run)
+    session.flush()
+    observation = Observation(
+        media_id=media_id,
+        run_id=run.id,
+        observation_family="pose",
+        observation_type="player_pose_observation",
+        granularity="frame",
+        frame_start=30,
+        frame_end=30,
+        timestamp_start_ms=1000,
+        timestamp_end_ms=1000,
+        confidence=pose_confidence,
+        coordinate_space="image_pixels",
+        payload_jsonb={"source_runtime": "fixture_pose", "normalization_only": True},
+    )
+    session.add(observation)
+    session.flush()
+    keypoints = _pose_keypoints()
+    session.add(
+        PoseObservation(
+            observation_id=observation.id,
+            media_id=media_id,
+            run_id=run.id,
+            frame_number=30,
+            timestamp_ms=1000,
+            skeleton_format="coco17",
+            skeleton_version="v1",
+            keypoint_schema_jsonb={},
+            keypoints_jsonb=keypoints,
+            keypoint_count=17,
+            keypoints_present_count=3,
+            keypoints_missing_count=14,
+            mean_keypoint_confidence=0.8,
+            min_keypoint_confidence=0.7,
+            max_keypoint_confidence=0.9,
+            pose_confidence=pose_confidence,
+            bbox_x=100.0,
+            bbox_y=40.0,
+            bbox_w=80.0,
+            bbox_h=210.0,
+            bbox_confidence=0.8,
+            subject_ref_type="player_detection",
+            subject_detection_observation_id="source-player-detection-id",
+            association_status="candidate",
+            association_method="crop_from_player_detection",
+            association_confidence=0.8,
+            frame_time_owner="media_indexing",
+            raw_model_payload_jsonb={},
+            metadata_jsonb={"normalization_only": True},
+        )
+    )
+    session.commit()
+    session.refresh(run)
+    return run
+
+
+def _pose_keypoints() -> list[dict[str, object]]:
+    present = {
+        0: (120.0, 60.0, 0.9),
+        5: (110.0, 120.0, 0.8),
+        6: (155.0, 122.0, 0.7),
+    }
+    keypoints = []
+    for index, name in enumerate(COCO17_KEYPOINT_NAMES):
+        if index in present:
+            x, y, confidence = present[index]
+            keypoints.append(
+                {
+                    "index": index,
+                    "name": name,
+                    "x": x,
+                    "y": y,
+                    "x_norm": x / 640.0,
+                    "y_norm": y / 360.0,
+                    "confidence": confidence,
+                    "present": True,
+                    "visibility": None,
+                }
+            )
+        else:
+            keypoints.append(
+                {
+                    "index": index,
+                    "name": name,
+                    "x": None,
+                    "y": None,
+                    "x_norm": None,
+                    "y_norm": None,
+                    "confidence": None,
+                    "present": False,
+                    "visibility": None,
+                }
+            )
+    return keypoints
 
 
 def _seed_detection_observation(

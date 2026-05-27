@@ -214,6 +214,8 @@ The replay route loads the indexed local video through the API and shows:
 - basic timeline/progress shell
 - available detection, tracklet, pose, and gameplay run context
 - persisted detection observation overlays when a detection run is selected
+- persisted tracklet candidate overlays when a tracklet run is selected
+- persisted pose keypoint overlays when a pose run is selected
 
 Optional context query parameters:
 
@@ -221,17 +223,20 @@ Optional context query parameters:
 http://127.0.0.1:3000/replay/<media_id>?detectionRunId=<run_id>&trackletRunId=<run_id>&poseRunId=<run_id>
 ```
 
-In Milestone 6B, `detectionRunId` selects the persisted ball/player detection observations to draw over the replay video. Tracklet and pose parameters are context only until later Blueprint 6 milestones.
+`detectionRunId`, `trackletRunId`, and `poseRunId` select the persisted evidence runs to draw over the replay video.
 
-Expected 6B replay behavior:
+Expected 6C replay behavior:
 
 - video playback updates current TOM timestamp and nearest frame
 - detection boxes appear near persisted detection timestamps
+- tracklet candidate points and selected candidate paths appear near persisted track point timestamps
+- pose keypoints and skeleton edges appear near persisted pose timestamps
 - the detection layer can be hidden or shown
-- clicking a bbox selects the persisted detection observation
-- the selected detail panel shows observation id, run id, bbox, confidence, frame, and timestamp
+- the tracklet and pose layers can be hidden or shown
+- clicking an overlay selects persisted evidence detail
+- the selected detail panel shows observation id/run id, frame/time, confidence, and source context where available
 
-Detection boxes are observation evidence. They are not confirmed objects or tennis events.
+Replay overlays are observation evidence. They are not confirmed objects, player identity, movement analysis, or tennis events.
 
 ## 6. Inspect Detections
 
