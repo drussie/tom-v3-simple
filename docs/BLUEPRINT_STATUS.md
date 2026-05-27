@@ -176,3 +176,26 @@ Milestone 6A did not add:
 - bounce or hit detection
 - rally/point/scoring
 - adjudication
+
+Milestone 6B proved:
+
+```text
+indexed video playback
+-> current TOM timestamp/frame
+-> detection overlay chunk endpoint
+-> persisted ball/player bbox overlays
+-> detection layer toggle
+-> detection run selection
+-> click-to-select detection observation detail
+```
+
+Milestone 6B did not add:
+
+- tracklet overlay playback
+- pose overlay playback
+- live stream ingestion
+- model/runtime expansion
+- homography
+- bounce or hit detection
+- rally/point/scoring
+- adjudication

@@ -8,7 +8,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import StaticPool
-from tom_v3_storage.db_models import Base, MediaAsset, Observation, ProcessingRun
+from tom_v3_storage.db_models import AtomicObservation, Base, MediaAsset, Observation, ProcessingRun
 
 from apps.api.db import get_session
 from apps.api.main import create_app
@@ -141,6 +141,193 @@ def test_media_video_endpoint_returns_404_for_unavailable_local_file(
     assert response.json()["detail"] == "local media video file not found"
 
 
+def test_replay_overlay_endpoint_returns_detection_bbox_items(
+    client: TestClient,
+    db_session: Session,
+    tmp_path,
+) -> None:
+    media_path = tmp_path / "sample.mp4"
+    media_path.write_bytes(b"tom-v3-video")
+    media = _seed_media(db_session, media_path)
+    run = _seed_run_with_observation(
+        db_session,
+        media.id,
+        "demo-fixture-detection-run",
+        "ball_detection",
+        timestamp_ms=1000,
+        bbox={"x": 511.0, "y": 280.0, "width": 18.0, "height": 18.0},
+        confidence=0.82,
+    )
+
+    response = client.get(
+        "/replay/overlays",
+        params={
+            "media_id": media.id,
+            "start_ms": 0,
+            "end_ms": 2000,
+            "layers": "detections",
+            "detection_run_id": run.id,
+        },
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["media_id"] == media.id
+    assert body["coordinate_space"] == "image_pixels"
+    assert body["video_width"] == 640
+    assert body["video_height"] == 360
+    assert body["tracklets"] == []
+    assert body["poses"] == []
+    assert body["observation_only"] is True
+    assert body["no_adjudication"] is True
+    assert body["detections"] == [
+        {
+            "overlay_type": "detection_bbox",
+            "observation_id": body["detections"][0]["observation_id"],
+            "run_id": run.id,
+            "frame_number": 30,
+            "timestamp_ms": 1000,
+            "observation_type": "ball_detection",
+            "label": "ball",
+            "confidence": 0.82,
+            "bbox": {"x": 511.0, "y": 280.0, "w": 18.0, "h": 18.0},
+            "source_language": "detection observation",
+            "source_runtime": "fixture",
+            "coordinate_space": "image_pixels",
+        }
+    ]
+
+
+def test_replay_overlay_endpoint_filters_by_detection_run_id(
+    client: TestClient,
+    db_session: Session,
+    tmp_path,
+) -> None:
+    media_path = tmp_path / "sample.mp4"
+    media_path.write_bytes(b"tom-v3-video")
+    media = _seed_media(db_session, media_path)
+    included = _seed_run_with_observation(
+        db_session,
+        media.id,
+        "included-detection-run",
+        "ball_detection",
+        timestamp_ms=1000,
+    )
+    _seed_run_with_observation(
+        db_session,
+        media.id,
+        "excluded-detection-run",
+        "player_detection",
+        timestamp_ms=1000,
+    )
+
+    response = client.get(
+        "/replay/overlays",
+        params={
+            "media_id": media.id,
+            "start_ms": 0,
+            "end_ms": 2000,
+            "layers": "detections",
+            "detection_run_id": included.id,
+        },
+    )
+
+    assert response.status_code == 200
+    detections = response.json()["detections"]
+    assert len(detections) == 1
+    assert detections[0]["run_id"] == included.id
+    assert detections[0]["observation_type"] == "ball_detection"
+
+
+def test_replay_overlay_endpoint_filters_by_min_confidence(
+    client: TestClient,
+    db_session: Session,
+    tmp_path,
+) -> None:
+    media_path = tmp_path / "sample.mp4"
+    media_path.write_bytes(b"tom-v3-video")
+    media = _seed_media(db_session, media_path)
+    run = _seed_run_with_observation(
+        db_session,
+        media.id,
+        "demo-fixture-detection-run",
+        "ball_detection",
+        confidence=0.4,
+    )
+    _seed_detection_observation(
+        db_session,
+        media_id=media.id,
+        run_id=run.id,
+        observation_type="player_detection",
+        confidence=0.9,
+        timestamp_ms=1000,
+        bbox=[50.0, 60.0, 70.0, 80.0],
+    )
+
+    response = client.get(
+        "/replay/overlays",
+        params={
+            "media_id": media.id,
+            "start_ms": 0,
+            "end_ms": 2000,
+            "layers": "detections",
+            "min_confidence": 0.8,
+        },
+    )
+
+    assert response.status_code == 200
+    detections = response.json()["detections"]
+    assert len(detections) == 1
+    assert detections[0]["observation_type"] == "player_detection"
+    assert detections[0]["bbox"] == {"x": 50.0, "y": 60.0, "w": 70.0, "h": 80.0}
+
+
+def test_replay_overlay_endpoint_returns_empty_detections_for_empty_window(
+    client: TestClient,
+    db_session: Session,
+    tmp_path,
+) -> None:
+    media_path = tmp_path / "sample.mp4"
+    media_path.write_bytes(b"tom-v3-video")
+    media = _seed_media(db_session, media_path)
+    _seed_run_with_observation(
+        db_session,
+        media.id,
+        "demo-fixture-detection-run",
+        "ball_detection",
+        timestamp_ms=1000,
+    )
+
+    response = client.get(
+        "/replay/overlays",
+        params={
+            "media_id": media.id,
+            "start_ms": 3000,
+            "end_ms": 4000,
+            "layers": "detections",
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.json()["detections"] == []
+
+
+def test_replay_overlay_endpoint_returns_404_for_missing_media(client: TestClient) -> None:
+    response = client.get(
+        "/replay/overlays",
+        params={"media_id": "missing-media", "start_ms": 0, "end_ms": 2000},
+    )
+    assert response.status_code == 404
+
+
+def test_replay_overlay_endpoint_rejects_invalid_time_window(client: TestClient) -> None:
+    response = client.get(
+        "/replay/overlays",
+        params={"media_id": "media", "start_ms": 2000, "end_ms": 1000},
+    )
+    assert response.status_code == 400
+
+
 def _seed_media(session: Session, media_path) -> MediaAsset:
     media = MediaAsset(
         source_uri=media_path.as_uri(),
@@ -172,6 +359,9 @@ def _seed_run_with_observation(
     media_id: str,
     run_name: str,
     observation_type: str,
+    timestamp_ms: int = 0,
+    bbox: dict[str, float] | list[float] | None = None,
+    confidence: float = 0.8,
 ) -> ProcessingRun:
     run = ProcessingRun(
         media_id=media_id,
@@ -183,24 +373,64 @@ def _seed_run_with_observation(
     )
     session.add(run)
     session.flush()
-    observation = Observation(
+    _seed_detection_observation(
+        session,
         media_id=media_id,
         run_id=run.id,
-        observation_family=_family_for_type(observation_type),
         observation_type=observation_type,
-        granularity="frame",
-        frame_start=0,
-        frame_end=0,
-        timestamp_start_ms=0,
-        timestamp_end_ms=0,
-        confidence=0.8,
-        coordinate_space="image_pixels",
-        payload_jsonb={"source_runtime": "fixture"},
+        timestamp_ms=timestamp_ms,
+        bbox=bbox,
+        confidence=confidence,
     )
-    session.add(observation)
     session.commit()
     session.refresh(run)
     return run
+
+
+def _seed_detection_observation(
+    session: Session,
+    *,
+    media_id: str,
+    run_id: str,
+    observation_type: str,
+    timestamp_ms: int = 0,
+    bbox: dict[str, float] | list[float] | None = None,
+    confidence: float = 0.8,
+) -> Observation:
+    frame_number = round(timestamp_ms / 1000 * 30)
+    label = observation_type.replace("_detection", "")
+    bbox_payload = bbox or {"x": 10.0, "y": 20.0, "width": 30.0, "height": 40.0}
+    observation = Observation(
+        media_id=media_id,
+        run_id=run_id,
+        observation_family=_family_for_type(observation_type),
+        observation_type=observation_type,
+        granularity="frame",
+        frame_start=frame_number,
+        frame_end=frame_number,
+        timestamp_start_ms=timestamp_ms,
+        timestamp_end_ms=timestamp_ms,
+        confidence=confidence,
+        coordinate_space="image_pixels",
+        payload_jsonb={"source_runtime": "fixture", "label": label, "bbox": bbox_payload},
+    )
+    session.add(observation)
+    session.flush()
+    if observation_type in {"ball_detection", "player_detection"}:
+        session.add(
+            AtomicObservation(
+                observation_id=observation.id,
+                atomic_kind=observation_type,
+                payload_jsonb={
+                    "source_runtime": "fixture",
+                    "bbox": bbox_payload,
+                    "detector": {"label": label},
+                },
+            )
+        )
+    session.commit()
+    session.refresh(observation)
+    return observation
 
 
 def _family_for_type(observation_type: str) -> str:
@@ -208,6 +438,8 @@ def _family_for_type(observation_type: str) -> str:
         return "gameplay"
     if observation_type == "player_pose_observation":
         return "pose"
+    if observation_type in {"ball_detection", "player_detection"}:
+        return "atomic"
     if observation_type in {
         "track_point_candidate",
         "ball_tracklet_candidate",

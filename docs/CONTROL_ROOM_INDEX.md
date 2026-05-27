@@ -63,6 +63,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 5D - Docs / Control-Room Consolidation](milestones/milestone_5d_docs_control_room_consolidation.md)
 - [Milestone 5E - Final Completion Review](milestones/milestone_5e_final_completion_review.md)
 - [Milestone 6A - Video Replay Timeline Foundation](milestones/milestone_6a_video_replay_timeline_foundation.md)
+- [Milestone 6B - Detection Overlay Playback](milestones/milestone_6b_detection_overlay_playback.md)
 
 ## Handoffs
 
@@ -99,6 +100,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 5D Handoff](handoffs/milestone_5d_docs_control_room_consolidation_handoff.md)
 - [Milestone 5E Handoff](handoffs/milestone_5e_final_completion_review_handoff.md)
 - [Milestone 6A Handoff](handoffs/milestone_6a_video_replay_timeline_foundation_handoff.md)
+- [Milestone 6B Handoff](handoffs/milestone_6b_detection_overlay_playback_handoff.md)
 
 ## Agent Reports
 
@@ -135,6 +137,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 5D Agent Report](agent_reports/milestone_5d_docs_control_room_consolidation_report.md)
 - [Milestone 5E Agent Report](agent_reports/milestone_5e_final_completion_review_report.md)
 - [Milestone 6A Agent Report](agent_reports/milestone_6a_video_replay_timeline_foundation_report.md)
+- [Milestone 6B Agent Report](agent_reports/milestone_6b_detection_overlay_playback_report.md)
 
 ## Blueprints
 

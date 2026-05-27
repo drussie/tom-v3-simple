@@ -1218,3 +1218,43 @@ Milestone 6A created:
 - `docs/REPLAY_WORKSTATION.md`, Blueprint 6 docs, milestone docs, handoff, and agent report.
 
 Blueprint 6 is now in progress. TOM v3 Simple remains complete.
+
+## Milestone 6B - Detection Overlay Playback
+
+Status: complete
+
+### Goal
+
+Add synchronized detection observation overlays to the replay workstation.
+
+### Non-goals
+
+- No tracklet overlay playback yet.
+- No pose overlay playback yet.
+- No stream ingestion.
+- No new model/runtime capability.
+- No real pose runtime or adapter inference.
+- No movement interpretation.
+- No stroke classification.
+- No serve, hit, split-step, or biomechanics conclusions.
+- No court homography.
+- No bounce detection.
+- No rally segmentation.
+- No point reconstruction.
+- No scoring.
+- No adjudication.
+
+### Notes
+
+Milestone 6B created:
+
+- `GET /replay/overlays` for media/time-window detection overlay chunks.
+- Replay overlay service helpers that normalize persisted `ball_detection` and `player_detection` observations into image-pixel bbox payloads.
+- Detection run and display-only confidence filtering for overlay chunks.
+- Frontend replay overlay chunk fetching and caching.
+- `ReplayDetectionOverlay` with contained-video coordinate scaling, detection layer toggle, and click-to-select bbox behavior.
+- Replay workstation selected detection detail and loaded-chunk detection timeline ticks.
+- Tests for replay overlay API behavior.
+- Milestone 6B docs, handoff, and agent report.
+
+Detection boxes remain persisted detection observations. They are not confirmed objects or tennis events.

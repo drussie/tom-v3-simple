@@ -4,7 +4,7 @@
 
 Status: IN PROGRESS
 
-Milestone 6A starts Blueprint 6.
+Milestone 6A started Blueprint 6. Milestone 6B adds detection overlay playback.
 
 TOM v3 Simple is complete. Blueprint 6 is a new product layer that turns the local evidence platform into a replay/operator workstation.
 
@@ -19,10 +19,11 @@ indexed local video
 -> replay route
 -> synchronized frame/time display
 -> selected run context
--> future observation overlays
+-> persisted detection observation overlays
+-> future tracklet/pose replay layers
 ```
 
-Future modes may explore stream proxy workflows, but production live ingestion is not part of 6A.
+Future modes may explore stream proxy workflows, but production live ingestion is not part of 6A or 6B.
 
 ## Milestone Plan
 
@@ -58,6 +59,30 @@ Milestone 6A does not add:
 - pose overlay playback
 - live stream ingestion
 - HLS/RTSP/HDMI capture
+- model/runtime expansion
+- tennis-event interpretation
+- homography or court-space reasoning
+- bounce/hit/rally/point/scoring
+
+## 6B Proof
+
+Milestone 6B proves:
+
+```text
+indexed video playback
+-> current replay timestamp/frame
+-> detection overlay chunk lookup
+-> persisted ball/player bbox overlays
+-> click-to-select detection observation detail
+```
+
+## 6B Non-Goals
+
+Milestone 6B does not add:
+
+- tracklet overlay playback
+- pose overlay playback
+- live stream ingestion
 - model/runtime expansion
 - tennis-event interpretation
 - homography or court-space reasoning

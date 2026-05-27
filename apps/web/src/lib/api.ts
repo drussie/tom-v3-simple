@@ -2,6 +2,7 @@ import type {
   HumanAnnotation,
   JsonRecord,
   ReplayInfo,
+  ReplayOverlayChunk,
   TrackletEvidenceBundle,
   ViewerRun
 } from "./types";
@@ -34,6 +35,47 @@ export async function fetchReplayInfo(mediaId: string): Promise<ReplayInfo> {
   }
 
   return (await response.json()) as ReplayInfo;
+}
+
+export interface FetchReplayOverlayChunkInput {
+  mediaId: string;
+  startMs: number;
+  endMs: number;
+  layers?: string;
+  detectionRunId?: string | null;
+  minConfidence?: number | null;
+}
+
+export async function fetchReplayOverlayChunk({
+  mediaId,
+  startMs,
+  endMs,
+  layers = "detections",
+  detectionRunId = null,
+  minConfidence = null
+}: FetchReplayOverlayChunkInput): Promise<ReplayOverlayChunk> {
+  const params = new URLSearchParams({
+    media_id: mediaId,
+    start_ms: startMs.toString(),
+    end_ms: endMs.toString(),
+    layers
+  });
+  if (detectionRunId !== null) {
+    params.set("detection_run_id", detectionRunId);
+  }
+  if (minConfidence !== null) {
+    params.set("min_confidence", minConfidence.toString());
+  }
+
+  const response = await fetch(`/api/replay/overlays?${params.toString()}`, {
+    cache: "no-store"
+  });
+
+  if (!response.ok) {
+    throw new Error(`Unable to load replay overlay chunk: ${response.status}`);
+  }
+
+  return (await response.json()) as ReplayOverlayChunk;
 }
 
 export async function fetchTrackletEvidenceBundle(

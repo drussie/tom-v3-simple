@@ -155,7 +155,11 @@ Current: Blueprints 1, 2, 3, 4, and 5 complete; Blueprint 6 has started; TOM v3 
 - Replay info and local video serving endpoints exist.
 - Replay frame/time mapping helpers exist.
 - Frontend `/replay/<media_id>` route exists.
-- Replay page displays indexed video, current timestamp/frame, timeline shell, overlay placeholder, and available run context.
+- Replay page displays indexed video, current timestamp/frame, timeline shell, detection overlay playback, and available run context.
+- Replay detection overlay endpoint exists for persisted ball/player detection observations.
+- Replay page can fetch detection overlay chunks by media/time window and detection run.
+- Replay page renders persisted detection bboxes over video playback.
+- Detection overlay selection shows persisted detection observation details.
 - No real pose inference, movement interpretation, homography, bounce, hit, rally, point, scoring, or adjudication has been added.
 
 ## Blueprint 5 Status
@@ -218,7 +222,18 @@ indexed media
 
 Current Blueprint 6 progress: about 15-20%.
 
-6A is foundation only. Detection observation overlay playback, tracklet/pose replay layers, evidence lanes, stream proxy mode, and operator review hardening are future milestones.
+Milestone 6B is complete. It adds detection observation overlay playback only:
+
+```text
+current replay timestamp/frame
+-> overlay chunk fetch
+-> persisted ball/player detection boxes
+-> click-to-select evidence detail
+```
+
+Current Blueprint 6 progress after 6B: about 30-35%.
+
+Tracklet/pose replay layers, evidence lanes, stream proxy mode, and operator review hardening are future milestones.
 
 ## Milestone 5D Status
 

@@ -201,15 +201,90 @@ pre {
 .replay-video-frame {
   background: #101719;
   border-radius: 8px;
+  display: grid;
   min-height: 240px;
   overflow: hidden;
   position: relative;
 }
 
 .replay-video {
-  aspect-ratio: 16 / 9;
   display: block;
+  height: 100%;
+  object-fit: contain;
   width: 100%;
+}
+
+.replay-overlay-layer {
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: 4;
+}
+
+.replay-detection-box {
+  background: rgba(255, 255, 255, 0.02);
+  border: 2px solid var(--blue);
+  border-radius: 4px;
+  color: #ffffff;
+  min-height: 14px;
+  min-width: 14px;
+  padding: 0;
+  pointer-events: auto;
+  position: absolute;
+  text-align: left;
+}
+
+.replay-detection-box.ball {
+  border-color: var(--rose);
+}
+
+.replay-detection-box.player {
+  border-color: var(--blue);
+}
+
+.replay-detection-box.selected {
+  box-shadow:
+    0 0 0 2px #ffffff,
+    0 0 0 5px var(--amber);
+  z-index: 5;
+}
+
+.replay-detection-box span {
+  background: rgba(16, 23, 25, 0.86);
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  display: inline-grid;
+  font-size: 11px;
+  font-weight: 800;
+  gap: 2px;
+  left: -2px;
+  max-width: 170px;
+  min-width: 62px;
+  padding: 3px 5px;
+  position: absolute;
+  top: calc(100% + 4px);
+  white-space: nowrap;
+}
+
+.replay-detection-box em {
+  color: rgba(255, 255, 255, 0.76);
+  font-style: normal;
+  font-weight: 700;
+}
+
+.replay-overlay-status {
+  background: rgba(16, 23, 25, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 6px;
+  bottom: 14px;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  left: 14px;
+  line-height: 1.35;
+  max-width: min(520px, calc(100% - 28px));
+  padding: 10px 12px;
+  position: absolute;
 }
 
 .replay-overlay-placeholder {
@@ -258,6 +333,89 @@ pre {
 .run-group-list {
   display: grid;
   gap: 12px;
+}
+
+.replay-controls {
+  display: grid;
+  gap: 12px;
+}
+
+.toggle-row,
+.select-row {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.toggle-row {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.toggle-row input {
+  height: 18px;
+  width: 18px;
+}
+
+.select-row span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.select-row select {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--ink);
+  min-height: 36px;
+  min-width: min(100%, 360px);
+  padding: 0 10px;
+}
+
+.detection-tick-list {
+  display: grid;
+  gap: 8px;
+  max-height: 240px;
+  overflow: auto;
+}
+
+.detection-tick-row {
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--ink);
+  display: grid;
+  gap: 8px;
+  grid-template-columns: minmax(80px, 1fr) repeat(3, auto);
+  min-height: 42px;
+  padding: 8px 10px;
+  text-align: left;
+}
+
+.detection-tick-row.selected {
+  border-color: var(--amber);
+  box-shadow: inset 3px 0 0 var(--amber);
+}
+
+.detection-tick-row strong,
+.detection-tick-row span {
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.detection-tick-row span {
+  color: var(--muted);
+}
+
+.quiet-link {
+  color: var(--blue);
+  font-size: 12px;
+  font-weight: 800;
+  text-decoration: none;
 }
 
 .detail-row,

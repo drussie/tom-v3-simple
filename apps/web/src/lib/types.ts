@@ -259,6 +259,49 @@ export interface ReplayInfo {
   no_adjudication: boolean;
 }
 
+export interface ReplayDetectionBBox {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
+export interface ReplayDetectionOverlay {
+  overlay_type: "detection_bbox";
+  observation_id: string;
+  run_id: string;
+  frame_number: number;
+  timestamp_ms: number;
+  observation_type: "ball_detection" | "player_detection";
+  label: string;
+  confidence: number | null;
+  bbox: ReplayDetectionBBox;
+  source_language: "detection observation";
+  source_runtime: string | null;
+  coordinate_space: "image_pixels";
+}
+
+export interface ReplayOverlayChunk {
+  media_id: string;
+  start_ms: number;
+  end_ms: number;
+  coordinate_space: "image_pixels";
+  video_width: number | null;
+  video_height: number | null;
+  detections: ReplayDetectionOverlay[];
+  tracklets: [];
+  poses: [];
+  observation_only: boolean;
+  no_adjudication: boolean;
+}
+
+export interface ReplayPlaybackState {
+  currentTimeSeconds: number;
+  timestampMs: number;
+  frameNumber: number;
+  durationSeconds: number;
+}
+
 export interface TimelineRange {
   start: number;
   end: number;

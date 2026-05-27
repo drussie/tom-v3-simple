@@ -30,11 +30,11 @@ A lightweight tennis video observation platform that accepts model output as ope
 - Blueprint 3 status: complete; optional YOLO runtime environment boundary, dependency probe, device resolver, weights validation, class mapping, model registry helper, YOLO output normalization, frame-level persistence bridge, local real-YOLO smoke workflow, completion review, and invariant audit are implemented
 - Blueprint 4 status: complete; pose observation schema, COCO17 skeleton registry, keypoint validation, typed pose persistence, synthetic pose insertion, pose normalization, worker pose persistence, source detection lineage, pose overlay viewer, pose query/review/export integration, completion review, and pose runtime/config metadata contracts are implemented
 - Blueprint 5 status: complete; local demo, viewer polish, provenance audit, docs/control-room consolidation, and final completion review are complete
-- Blueprint 6 status: in progress; video replay timeline foundation exists with replay info, local video serving, frame/time mapping, and frontend replay route
+- Blueprint 6 status: in progress; video replay timeline foundation exists with replay info, local video serving, frame/time mapping, frontend replay route, and synchronized detection observation overlay playback
 - Observation writer: implemented with typed extension rows, lineage, artifacts, and idempotency
 - Worker synthetic seeder: implemented
 - Visual evidence viewer: implemented in `apps/web` with detection bbox overlay, pose keypoint/skeleton overlay, frame artifact image support, run evidence summary, clearer empty states, candidate/evidence wording, readable lineage context, and review/export metadata display
-- Replay workstation: Milestone 6A implemented `/replay/<media_id>` with indexed local video playback, current timestamp/frame display, timeline shell, overlay placeholder, and selected run context
+- Replay workstation: Milestones 6A/6B implemented `/replay/<media_id>` with indexed local video playback, current timestamp/frame display, timeline shell, selected run context, persisted detection overlay chunks, bbox overlays, detection layer toggles, and click-to-select detection observation details
 - Pose observation foundation: implemented with a typed `pose_observation` table, COCO17 skeleton registry, keypoint summary statistics, fake/serialized pose output normalization, crop projection, worker fixture pose persistence, source detection candidate lineage, pose overlay viewer, pose-specific query filters, review annotations, and TOM-native review dataset export; no real pose inference exists yet
 - Local fixture demo: implemented with worker `run-demo`, Makefile `demo` targets, deterministic media fallback, fixture gameplay/detection/tracklet/pose path, seeded review annotations, pose and tracklet review exports, summary IDs/counts/viewer URLs, and canonical `docs/RUNBOOK_LOCAL.md`
 - Viewer product polish: implemented with shared frontend evidence copy helpers, run evidence summary, detection/tracklet/pose/detail panel wording cleanup, lineage relationship descriptions, artifact/export metadata display, annotation/keypoint metadata display, and viewer payload regression coverage
@@ -248,6 +248,12 @@ Status: complete.
 
 Milestone 6A starts Blueprint 6 with a video replay timeline foundation. TOM now exposes replay info for indexed media, serves local indexed media files to the browser, maps playback time to TOM media-owned frame/time, and provides a `/replay/<media_id>` workstation route with an HTML video player, timestamp/frame telemetry, a timeline shell, selected run context, and an overlay placeholder for future evidence layers. It does not add detection/tracklet/pose overlay playback, live stream ingestion, homography, bounce/hit/rally/point/scoring, or adjudication.
 
+## Milestone 6B Result
+
+Status: complete.
+
+Milestone 6B adds detection overlay playback to the replay workstation. TOM now exposes `GET /replay/overlays` for media/time-window detection chunks, normalizes persisted `ball_detection` and `player_detection` observations into image-pixel bbox overlay payloads, and renders those boxes over `/replay/<media_id>` with detection layer controls, detection run selection, loaded-chunk timeline ticks, and click-to-select observation detail. It does not add tracklet/pose overlay playback, live stream ingestion, tennis-event interpretation, homography, bounce/hit/rally/point/scoring, or adjudication.
+
 ## Naming Transition
 
 The implementation branch/file names may reference "1F" because the milestone was originally planned as a Blueprint 1 extension. After Blueprint 1 was declared complete, the same work was reclassified as Blueprint 2A because temporal grouping begins a new conceptual layer.
@@ -258,7 +264,6 @@ TOM v3 Simple is complete. Blueprint 6 has started as the replay/operator layer.
 
 Possible future blueprint candidates:
 
-- Detection Overlay Playback
 - Tracklet / Pose Replay Layers
 - Real Pose Runtime
 - Movement / Stroke Evidence Candidates

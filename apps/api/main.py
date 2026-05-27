@@ -13,6 +13,7 @@ from apps.api.routers import (
     observations,
     pose,
     registry,
+    replay,
     runs,
     tracklets,
     viewer,
@@ -46,6 +47,7 @@ def create_app() -> FastAPI:
     app.include_router(dev.router)
     app.include_router(tracklets.router)
     app.include_router(pose.router)
+    app.include_router(replay.router)
     app.include_router(viewer.router)
     return app
 

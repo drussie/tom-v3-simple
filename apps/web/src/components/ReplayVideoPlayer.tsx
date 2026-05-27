@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { getApiBaseUrl } from "../lib/api";
@@ -8,13 +9,19 @@ import {
   currentTimeSecondsToTimestampMs,
   formatReplayTime
 } from "../lib/replayTime";
-import type { ReplayInfo } from "../lib/types";
+import type { ReplayInfo, ReplayPlaybackState } from "../lib/types";
 
 interface ReplayVideoPlayerProps {
   replayInfo: ReplayInfo;
+  children?: ReactNode;
+  onPlaybackStateChange?: (state: ReplayPlaybackState) => void;
 }
 
-export function ReplayVideoPlayer({ replayInfo }: ReplayVideoPlayerProps) {
+export function ReplayVideoPlayer({
+  replayInfo,
+  children,
+  onPlaybackStateChange
+}: ReplayVideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const animationFrameRef = useRef<number | null>(null);
   const [currentTimeSeconds, setCurrentTimeSeconds] = useState(0);
@@ -36,7 +43,21 @@ export function ReplayVideoPlayer({ replayInfo }: ReplayVideoPlayerProps) {
     }
 
     const update = () => {
-      setCurrentTimeSeconds(video.currentTime);
+      const nextCurrentTimeSeconds = video.currentTime;
+      const nextDurationSeconds = Number.isFinite(video.duration)
+        ? video.duration
+        : durationSeconds;
+      setCurrentTimeSeconds(nextCurrentTimeSeconds);
+      onPlaybackStateChange?.({
+        currentTimeSeconds: nextCurrentTimeSeconds,
+        timestampMs: currentTimeSecondsToTimestampMs(nextCurrentTimeSeconds),
+        frameNumber: currentTimeSecondsToFrame(
+          nextCurrentTimeSeconds,
+          replayInfo.fps,
+          replayInfo.frame_count
+        ),
+        durationSeconds: nextDurationSeconds
+      });
     };
     const updateDuration = () => {
       if (Number.isFinite(video.duration)) {
@@ -77,7 +98,7 @@ export function ReplayVideoPlayer({ replayInfo }: ReplayVideoPlayerProps) {
       video.removeEventListener("pause", stopTicking);
       video.removeEventListener("ended", stopTicking);
     };
-  }, []);
+  }, [durationSeconds, onPlaybackStateChange, replayInfo.fps, replayInfo.frame_count]);
 
   const timestampMs = currentTimeSecondsToTimestampMs(currentTimeSeconds);
   const frameNumber = currentTimeSecondsToFrame(
@@ -95,7 +116,15 @@ export function ReplayVideoPlayer({ replayInfo }: ReplayVideoPlayerProps) {
         <span className="mini-pill">nearest frame from media metadata</span>
       </div>
       <div className="panel-body replay-video-body">
-        <div className="replay-video-frame">
+        <div
+          className="replay-video-frame"
+          style={{
+            aspectRatio:
+              replayInfo.width !== null && replayInfo.height !== null
+                ? `${replayInfo.width} / ${replayInfo.height}`
+                : "16 / 9"
+          }}
+        >
           <video
             ref={videoRef}
             className="replay-video"
@@ -103,10 +132,7 @@ export function ReplayVideoPlayer({ replayInfo }: ReplayVideoPlayerProps) {
             preload="metadata"
             src={videoSource}
           />
-          <div className="replay-overlay-placeholder">
-            Overlay layers arrive in 6B/6C. This foundation proves replay frame/time
-            synchronization.
-          </div>
+          {children}
         </div>
 
         <div className="replay-telemetry-grid">

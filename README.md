@@ -14,7 +14,7 @@ TOM v3 Simple is complete as a lightweight local observation/evidence platform. 
 
 It remains intentionally non-decisive about tennis meaning. It does not include real pose inference, movement interpretation, stroke classification, homography, bounce/hit/rally/point/scoring, production deployment, auth, streaming, or TOM v2-style adjudication.
 
-Blueprint 6 has now started as a new visual replay/operator layer on top of the completed Simple platform. Milestone 6A adds replay video playback and media-owned frame/time synchronization only.
+Blueprint 6 has now started as a new visual replay/operator layer on top of the completed Simple platform. Milestone 6B adds detection observation overlays synchronized to replay video playback.
 
 ## What It Does
 
@@ -175,6 +175,7 @@ indexed media
 -> /media/<media_id>/video
 -> /replay/<media_id>
 -> current timestamp/frame display
+-> persisted detection observation overlays
 ```
 
 Open a replay URL after running the demo:
@@ -183,4 +184,10 @@ Open a replay URL after running the demo:
 make replay-open MEDIA_ID=<media_id>
 ```
 
-Milestone 6A does not add overlay playback or tennis-event interpretation. Detection overlays over video begin in a later Blueprint 6 milestone.
+Open detection overlay playback with:
+
+```text
+http://127.0.0.1:3000/replay/<media_id>?detectionRunId=<detection_run_id>
+```
+
+Milestone 6B only renders persisted ball/player detection observations. Tracklet playback, pose playback, live stream ingestion, and tennis-event interpretation remain future work.
