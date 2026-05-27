@@ -1059,3 +1059,40 @@ Milestone 5B created:
 - Milestone 5B milestone, handoff, viewer product polish, and agent report docs.
 
 The viewer polish makes existing evidence easier to inspect. It does not create new tennis interpretation capability.
+
+## Milestone 5C - Final Evidence / Provenance Audit
+
+Status: complete
+
+### Goal
+
+Add a final structural audit layer that checks whether local fixture demo evidence is internally coherent across media, runs, processing steps, observations, typed rows, lineage, artifacts, annotations, and review exports.
+
+### Non-goals
+
+- No new model/runtime capability.
+- No real pose runtime or adapter inference.
+- No movement interpretation.
+- No stroke classification.
+- No serve, hit, split-step, or biomechanics conclusions.
+- No court homography.
+- No bounce detection.
+- No rally segmentation.
+- No point reconstruction.
+- No scoring.
+- No adjudication.
+
+### Notes
+
+Milestone 5C created:
+
+- `apps/worker/services/completion_audit.py` with `run_completion_audit`.
+- Worker command `completion-audit`.
+- Makefile target `completion-audit`.
+- Optional `TOM_V3_AUDIT_REQUIRED=true make completion-check` integration.
+- PASS/WARN/FAIL-style JSON with summary counts, check diagnostics, warnings, failures, and observation-only flags.
+- Demo completeness checks for media, fixture runs, detections, candidate tracklets, track points, pose observations, artifacts, annotations, and pose/tracklet exports.
+- Focused tests for a passing fixture demo audit and several broken-reference cases.
+- Provenance audit docs and milestone/handoff/agent report entries.
+
+The audit checks structure and provenance only. It does not judge model output quality or tennis meaning.

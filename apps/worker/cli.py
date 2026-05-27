@@ -22,6 +22,7 @@ from apps.api.services.pose_review_export import export_pose_review_dataset
 from apps.api.services.tracklet_review_export import export_tracklet_review_dataset
 from apps.worker.config import settings
 from apps.worker.pipelines.synthetic_seed import seed_synthetic_run
+from apps.worker.services.completion_audit import run_completion_audit
 from apps.worker.services.detection_adapter import run_detection_adapter
 from apps.worker.services.frame_artifacts import extract_frame_artifacts_for_run
 from apps.worker.services.gameplay_adapter import run_gameplay_adapter
@@ -415,6 +416,31 @@ def main() -> None:
     demo_parser.add_argument("--skip-create-db", action="store_true")
     demo_parser.set_defaults(handler=_handle_run_demo)
 
+    audit_parser = subcommands.add_parser(
+        "completion-audit",
+        help="Audit local evidence/provenance structure without judging model correctness.",
+    )
+    audit_parser.add_argument("--media-id")
+    audit_parser.add_argument(
+        "--demo-only",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Scope audit to media marked as TOM v3 demo evidence.",
+    )
+    audit_parser.add_argument(
+        "--strict",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+        help="Treat warning-severity audit findings as command failures.",
+    )
+    audit_parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Reserved for compatibility. Worker output is JSON by default.",
+    )
+    audit_parser.add_argument("--skip-create-db", action="store_true")
+    audit_parser.set_defaults(handler=_handle_completion_audit)
+
     args = parser.parse_args()
     create_db = not args.skip_create_db and not getattr(args, "plan_only", False)
     with _session_factory(create_db=create_db)() as session:
@@ -744,6 +770,15 @@ def _handle_run_demo(session: Session, args: argparse.Namespace) -> dict[str, ob
         viewer_base_url=args.viewer_base_url,
         copy_to_storage=args.copy_to_storage,
         plan_only=args.plan_only,
+    )
+
+
+def _handle_completion_audit(session: Session, args: argparse.Namespace) -> dict[str, object]:
+    return run_completion_audit(
+        session=session,
+        media_id=args.media_id,
+        demo_only=args.demo_only,
+        strict=args.strict,
     )
 
 

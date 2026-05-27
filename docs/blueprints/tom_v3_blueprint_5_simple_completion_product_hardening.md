@@ -57,6 +57,17 @@ viewer run payload
 -> artifact, annotation, and review export clarity
 ```
 
+Milestone 5C adds provenance auditing around the completed demo state:
+
+```text
+fixture demo evidence
+-> completion audit
+-> media/run/step/observation integrity checks
+-> typed-row and lineage checks
+-> artifact, annotation, and export checks
+-> PASS/WARN/FAIL JSON
+```
+
 ## Boundaries
 
 Blueprint 5 does not add:
@@ -80,7 +91,8 @@ Blueprint 5 does not add:
 
 - Milestone 5A - Local Demo / Runbook Completion Path
 - Milestone 5B - Viewer / Product Polish
-- Milestone 5C - Completion Checklist / Release Hardening
+- Milestone 5C - Final Evidence / Provenance Audit
+- Milestone 5D - Docs / Control-Room Consolidation
 
 Milestone names after 5A may change as the product-hardening pass learns what needs the most attention.
 
@@ -108,3 +120,11 @@ Status: complete.
 The Evidence Viewer now has clearer empty states, a run evidence summary, candidate/evidence wording, readable lineage descriptions, artifact/export metadata display, and annotation rows that expose review context and keypoint metadata when present.
 
 This is product polish only. It does not add real pose inference, movement interpretation, stroke classification, homography, bounce/hit/rally/point/scoring, or adjudication.
+
+## Milestone 5C Status
+
+Status: complete.
+
+TOM v3 Simple now has a structural completion/provenance audit with worker `completion-audit`, Makefile `completion-audit`, demo-only/all-data scopes, strict mode, PASS/WARN/FAIL JSON, and tests proving the audit passes after the canonical fixture demo and catches broken references.
+
+The audit checks evidence structure and provenance integrity only. It does not add model/runtime capability, real pose inference, movement interpretation, stroke classification, homography, bounce/hit/rally/point/scoring, or adjudication.

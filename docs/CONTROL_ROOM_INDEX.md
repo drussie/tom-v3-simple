@@ -52,6 +52,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 4F - Blueprint 4 Completion Review](milestones/milestone_4f_blueprint_4_completion_review.md)
 - [Milestone 5A - Local Demo / Runbook Completion Path](milestones/milestone_5a_local_demo_runbook_completion_path.md)
 - [Milestone 5B - Viewer / Product Polish](milestones/milestone_5b_viewer_product_polish.md)
+- [Milestone 5C - Final Evidence / Provenance Audit](milestones/milestone_5c_final_evidence_provenance_audit.md)
 
 ## Handoffs
 
@@ -84,6 +85,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 4F Handoff](handoffs/milestone_4f_blueprint_4_completion_review_handoff.md)
 - [Milestone 5A Handoff](handoffs/milestone_5a_local_demo_runbook_completion_path_handoff.md)
 - [Milestone 5B Handoff](handoffs/milestone_5b_viewer_product_polish_handoff.md)
+- [Milestone 5C Handoff](handoffs/milestone_5c_final_evidence_provenance_audit_handoff.md)
 
 ## Agent Reports
 
@@ -116,6 +118,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 4F Agent Report](agent_reports/milestone_4f_blueprint_4_completion_review_report.md)
 - [Milestone 5A Agent Report](agent_reports/milestone_5a_local_demo_runbook_completion_path_report.md)
 - [Milestone 5B Agent Report](agent_reports/milestone_5b_viewer_product_polish_report.md)
+- [Milestone 5C Agent Report](agent_reports/milestone_5c_final_evidence_provenance_audit_report.md)
 
 ## Blueprints
 
@@ -185,6 +188,7 @@ Use this index as the durable navigation point for project memory, architecture 
 
 - [Local Environment Setup](dev/local_environment_setup.md)
 - [Canonical Local Runbook](RUNBOOK_LOCAL.md)
+- [Provenance Audit](PROVENANCE_AUDIT.md)
 - [Local Demo Runbook](dev/local_demo_runbook.md)
 - [Repo Branch Hygiene](dev/repo_branch_hygiene.md)
 

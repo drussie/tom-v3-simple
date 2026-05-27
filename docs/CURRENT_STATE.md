@@ -5,7 +5,7 @@
 - Project name: TOM v3 Simple
 - Repo: drussie/tom-v3-simple
 - Current phase: Blueprint 5 in progress
-- Current goal: Harden TOM v3 Simple into a coherent local observation platform with a repeatable fixture demo, polished evidence viewer, canonical runbook, and completion checklist while preserving the observation-only runtime contract
+- Current goal: Harden TOM v3 Simple into a coherent local observation platform with a repeatable fixture demo, polished evidence viewer, canonical runbook, provenance audit, and completion checklist while preserving the observation-only runtime contract
 
 ## Mission
 
@@ -13,7 +13,7 @@ A lightweight tennis video observation platform that accepts model output as ope
 
 ## Implementation Status
 
-- Implementation status: persisted ball/player observations can be inspected visually, grouped into candidate tracklets, complemented by complete first-class pose schema/normalization/persistence/lineage/viewer/query/review/export foundations, exercised through a canonical local fixture demo path, and inspected through a more coherent evidence/candidate viewer surface
+- Implementation status: persisted ball/player observations can be inspected visually, grouped into candidate tracklets, complemented by complete first-class pose schema/normalization/persistence/lineage/viewer/query/review/export foundations, exercised through a canonical local fixture demo path, inspected through a coherent evidence/candidate viewer surface, and structurally audited for provenance integrity
 - Model integration status: fixture gameplay and fixture detection adapters implemented for deterministic dev/test output
 - TOM v1 gameplay detector: known asset, portable source/assets not available in this repo/environment; integration stub documented
 - YOLO/YOLO26: optional runtime probe, model weights registration, YOLO-like output normalization, frame-level inference persistence bridge, and local real-YOLO smoke helper implemented; runtime/assets are not required in the base environment
@@ -35,6 +35,7 @@ A lightweight tennis video observation platform that accepts model output as ope
 - Pose observation foundation: implemented with a typed `pose_observation` table, COCO17 skeleton registry, keypoint summary statistics, fake/serialized pose output normalization, crop projection, worker fixture pose persistence, source detection candidate lineage, pose overlay viewer, pose-specific query filters, review annotations, and TOM-native review dataset export; no real pose inference exists yet
 - Local fixture demo: implemented with worker `run-demo`, Makefile `demo` targets, deterministic media fallback, fixture gameplay/detection/tracklet/pose path, seeded review annotations, pose and tracklet review exports, summary IDs/counts/viewer URLs, and canonical `docs/RUNBOOK_LOCAL.md`
 - Viewer product polish: implemented with shared frontend evidence copy helpers, run evidence summary, detection/tracklet/pose/detail panel wording cleanup, lineage relationship descriptions, artifact/export metadata display, annotation/keypoint metadata display, and viewer payload regression coverage
+- Completion/provenance audit: implemented with worker `completion-audit`, Makefile `completion-audit`, PASS/WARN/FAIL JSON, demo completeness checks, media/run/step/observation/typed-row/lineage/artifact/annotation/export integrity checks, and tests proving the audit passes after `make demo`
 - Synthetic data: baseline scenario creates viewer-ready observations, tracklets, gaps, candidates, lineage, and artifacts
 - Local setup: documented with `.env.example`, Makefile, and dev runbooks
 - Branch/default branch: `main` is restored as the GitHub default branch
@@ -218,6 +219,12 @@ Milestone 5A starts Blueprint 5 with a canonical local fixture demo and runbook.
 Status: complete
 
 Milestone 5B polishes the viewer and product surface for the local demo path. The Evidence Viewer now includes a run evidence summary, clearer empty states, consistent observation/evidence/candidate wording, readable lineage relationship descriptions, improved artifact and review export metadata display, and annotation rows that expose notes, review-only flags, demo-seeded flags, and keypoint-level metadata when present. It does not add new model/runtime capability, real pose inference, movement interpretation, homography, bounce/hit/rally/point/scoring, or adjudication.
+
+## Milestone 5C Result
+
+Status: complete
+
+Milestone 5C adds a final structural provenance audit for the local fixture demo path. TOM v3 Simple now has `run_completion_audit`, worker `completion-audit`, Makefile `completion-audit`, strict/non-strict modes, demo-only/all-data scopes, PASS/WARN/FAIL JSON, and focused tests covering successful demo audit plus broken media/run, typed-row, lineage, artifact, and annotation references. The audit checks evidence structure and provenance integrity only; it does not add model/runtime capability, real pose inference, movement interpretation, homography, bounce/hit/rally/point/scoring, or adjudication.
 
 ## Naming Transition
 

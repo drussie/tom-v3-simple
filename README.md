@@ -14,7 +14,7 @@ The core invariant:
 
 ## Current Status
 
-Blueprints 1, 2, 3, and 4 are complete. Blueprint 5 is in progress as a final completion/product-hardening pass. TOM v3 Simple can build, inspect, query, review, and export candidate temporal evidence on top of persisted ball/player detections, has an optional YOLO / Ultralytics runtime path for ball/player observation adapters, has a complete first-class pose evidence path covering schema, normalization, persistence, lineage, overlay viewer, query, review, and export, and now has a canonical local fixture demo path with a clearer evidence viewer surface:
+Blueprints 1, 2, 3, and 4 are complete. Blueprint 5 is in progress as a final completion/product-hardening pass. TOM v3 Simple can build, inspect, query, review, export, and structurally audit candidate temporal evidence on top of persisted ball/player detections, has an optional YOLO / Ultralytics runtime path for ball/player observation adapters, has a complete first-class pose evidence path covering schema, normalization, persistence, lineage, overlay viewer, query, review, and export, and now has a canonical local fixture demo path with a clearer evidence viewer surface:
 
 - repo memory and architecture contracts
 - FastAPI backend/API foundation
@@ -78,6 +78,7 @@ Blueprints 1, 2, 3, and 4 are complete. Blueprint 5 is in progress as a final co
 - canonical local runbook in `docs/RUNBOOK_LOCAL.md`
 - deterministic local demo summary with media/run ids, counts, exports, warnings, and viewer URLs
 - viewer run evidence summary, empty-state guidance, candidate/evidence wording, readable lineage descriptions, and annotation/export metadata display
+- completion/provenance audit service, CLI, and Makefile target for media/run/observation/typed-row/lineage/artifact/annotation/export integrity checks
 - model asset and weight ignore policy
 
 Portable TOM v1 detector assets/source and YOLO26 model weights are not present in this repo state. Real YOLO inference now has a guarded frame-level provider path and optional local smoke workflow, but local runtime validation still requires optional YOLO packages and explicitly registered local weights. Pose currently has complete fixture/fake evidence foundations only; no real pose runtime, movement interpretation, court homography, or real bounce detection is implemented yet.
@@ -90,7 +91,7 @@ Blueprint 4 did not add real pose inference, movement interpretation, serve/hit/
 
 Current blueprint: Blueprint 5 - TOM v3 Simple Completion / Product Hardening.
 
-Recommended next milestone: Milestone 5C - Final Evidence / Provenance Audit.
+Recommended next milestone: Milestone 5D - Docs / Control-Room Consolidation.
 
 ## Repo Structure
 
@@ -160,6 +161,14 @@ make demo PYTHON=.venv/bin/python
 The fixture demo does not require YOLO weights, real pose weights, GPU runtime, or network access. It indexes or generates demo media, runs fixture gameplay and detection adapters, extracts frame artifacts, builds candidate tracklets, runs fixture pose observations, seeds small review annotations, exports pose and tracklet review datasets, and prints viewer URLs.
 
 The viewer surfaces detection observations, tracklet candidates, pose keypoint evidence, lineage, artifacts, review annotations, and review export metadata with observation/evidence/candidate wording. Empty states point to the local command that creates the missing evidence where practical.
+
+Audit the demo evidence structure:
+
+```bash
+make completion-audit
+```
+
+The audit returns PASS/WARN/FAIL-style JSON for media, runs, steps, observations, typed rows, lineage, artifacts, annotations, and review exports. It checks structure and provenance only, not model correctness.
 
 Read the canonical local runbook:
 

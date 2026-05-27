@@ -26,10 +26,13 @@ DEMO_MEDIA_PATH ?=
 VIEWER_BASE_URL ?= http://127.0.0.1:3000
 TRACKLET_RUN_ID ?=
 POSE_RUN_ID ?=
+AUDIT_DEMO_ONLY ?= true
+AUDIT_STRICT ?= false
+TOM_V3_AUDIT_REQUIRED ?= false
 
 export TOM_V3_DATABASE_URL
 
-.PHONY: install web-install test lint migrate api seed verify index-media run-gameplay index-and-run-gameplay run-detection index-and-run-detection extract-frame-artifacts build-tracklets run-pose export-tracklet-review-dataset demo demo-fixture demo-plan demo-reset demo-export demo-open completion-check yolo-probe yolo-smoke yolo-runtime-probe register-yolo-model smoke-real-yolo-local web web-build web-lint smoke all-checks
+.PHONY: install web-install test lint migrate api seed verify index-media run-gameplay index-and-run-gameplay run-detection index-and-run-detection extract-frame-artifacts build-tracklets run-pose export-tracklet-review-dataset demo demo-fixture demo-plan demo-reset demo-export demo-open completion-audit completion-check yolo-probe yolo-smoke yolo-runtime-probe register-yolo-model smoke-real-yolo-local web web-build web-lint smoke all-checks
 
 install:
 	$(PYTHON) -m pip install -e ".[dev]"
@@ -121,10 +124,18 @@ demo-open:
 	if [ -n "$(POSE_RUN_ID)" ]; then echo "$(VIEWER_BASE_URL)/runs/$(POSE_RUN_ID)"; fi; \
 	if [ -z "$(RUN_ID)" ] && [ -z "$(DETECTION_RUN_ID)" ] && [ -z "$(TRACKLET_RUN_ID)" ] && [ -z "$(POSE_RUN_ID)" ]; then echo "Pass RUN_ID=<run_id>, DETECTION_RUN_ID=<run_id>, TRACKLET_RUN_ID=<run_id>, or POSE_RUN_ID=<run_id>."; fi
 
+completion-audit:
+	$(PYTHON) -m apps.worker.cli completion-audit $(if $(MEDIA_ID),--media-id "$(MEDIA_ID)",) $(if $(filter false,$(AUDIT_DEMO_ONLY)),--no-demo-only,--demo-only) $(if $(filter true,$(AUDIT_STRICT)),--strict,--no-strict)
+
 completion-check:
 	$(PYTHON) -m pytest -q
 	ruff check .
 	$(PYTHON) scripts/smoke_synthetic_viewer_data.py
+	@if [ "$(TOM_V3_AUDIT_REQUIRED)" = "true" ]; then \
+		$(PYTHON) -m apps.worker.cli completion-audit --demo-only; \
+	else \
+		echo "Run make demo then make completion-audit for the full provenance audit."; \
+	fi
 
 yolo-probe: yolo-runtime-probe
 

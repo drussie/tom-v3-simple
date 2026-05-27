@@ -120,6 +120,14 @@ resolve media
 
 The printed JSON summary includes media id, run ids, observation counts, artifact counts, annotation count, export artifact ids, export paths, viewer URLs, and warnings.
 
+Run the structural provenance audit after the demo:
+
+```bash
+make completion-audit
+```
+
+The audit checks media, processing runs/steps, observations, typed rows, lineage, artifacts, annotations, and review exports. It does not check model correctness or decide tennis meaning.
+
 ## 5. Open The Viewer
 
 Start the backend:
@@ -360,6 +368,19 @@ The `demo-reset` target is intentionally non-destructive:
 make demo-reset
 ```
 
+If the provenance audit reports no demo media:
+
+```bash
+make demo
+make completion-audit
+```
+
+To audit all local rows instead of only demo-marked media:
+
+```bash
+python -m apps.worker.cli completion-audit --no-demo-only
+```
+
 ## 14. Known Limitations
 
 - Fixture detection and pose output are deterministic demo evidence.
@@ -384,6 +405,12 @@ Run validation:
 pytest -q
 ruff check .
 python scripts/smoke_synthetic_viewer_data.py
+```
+
+Run the provenance audit after `make demo`:
+
+```bash
+make completion-audit
 ```
 
 Run web validation:
