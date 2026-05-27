@@ -2,7 +2,7 @@
 
 ## Current Progress Gauge
 
-Current: Blueprints 1, 2, 3, 4, 5, 6, and 7 complete; TOM v3 Simple is complete; Blueprint 8 is in progress
+Current: Blueprints 1, 2, 3, 4, 5, 6, and 7 complete; TOM v3 Simple is complete; Blueprint 8 is in progress at Milestone 8B
 
 ## Current
 
@@ -190,7 +190,7 @@ Current: Blueprints 1, 2, 3, 4, 5, 6, and 7 complete; TOM v3 Simple is complete;
 - Replay pose overlays and pose timeline items include optional source/runtime/model/config metadata for real pose validation.
 - Replay selected pose detail displays source/runtime/model/config and subject association context when available.
 - Court/homography decision gate exists.
-- Court/camera/homography evidence has started as Blueprint 8 schema work.
+- Court/camera/homography evidence has started as Blueprint 8 schema and fixture adapter work.
 - No court/homography runtime, movement interpretation, bounce, hit, rally, point, scoring, or adjudication has been added.
 - Blueprint 7 completion review exists.
 - Blueprint 7 is marked complete in canonical docs.
@@ -200,6 +200,9 @@ Current: Blueprints 1, 2, 3, 4, 5, 6, and 7 complete; TOM v3 Simple is complete;
 - Court evidence typed storage tables and migration exist.
 - Court template registry v0 exists.
 - Fake court evidence can be persisted through the observation writer with lineage.
+- Worker `run-fixture-court` exists.
+- Makefile `court-fixture` exists.
+- Fixture court evidence can persist court keypoint, court line, and camera/view observations with model/runtime/run/step provenance.
 
 ## Blueprint 7 Status
 
@@ -289,7 +292,20 @@ observation spine
 
 Blueprint 8 progress after 8A: about 10-15%.
 
-Remaining Blueprint 8 work should stay deliberate: court keypoint/line adapter, homography candidate builder, replay court overlays, projection diagnostics/review exports, and completion review. 8A does not add tennis-event interpretation.
+Milestone 8B adds fixture court keypoint, line, and camera/view evidence:
+
+```text
+indexed media
+-> fixture court evidence adapter
+-> court_keypoint_observation
+-> court_line_observation
+-> camera_view_observation
+-> processing provenance
+```
+
+Blueprint 8 progress after 8B: about 25-30%.
+
+Remaining Blueprint 8 work should stay deliberate: camera/view context hardening, homography candidate builder, replay court overlays, projection diagnostics/review exports, and completion review. 8B does not add tennis-event interpretation.
 
 ## Blueprint 5 Status
 

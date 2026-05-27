@@ -75,6 +75,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 7E - Court / Homography Evidence Decision Gate](milestones/milestone_7e_court_homography_evidence_decision_gate.md)
 - [Milestone 7F - Perception Run Orchestration and Completion Review](milestones/milestone_7f_perception_run_orchestration_completion_review.md)
 - [Milestone 8A - Court Evidence Schema / Contract](milestones/milestone_8a_court_evidence_schema_contract.md)
+- [Milestone 8B - Court Keypoint / Line Evidence Adapter](milestones/milestone_8b_court_keypoint_line_evidence_adapter.md)
 
 ## Handoffs
 
@@ -123,6 +124,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 7E Handoff](handoffs/milestone_7e_court_homography_evidence_decision_gate_handoff.md)
 - [Milestone 7F Handoff](handoffs/milestone_7f_perception_run_orchestration_completion_review_handoff.md)
 - [Milestone 8A Handoff](handoffs/milestone_8a_court_evidence_schema_contract_handoff.md)
+- [Milestone 8B Handoff](handoffs/milestone_8b_court_keypoint_line_evidence_adapter_handoff.md)
 
 ## Agent Reports
 
@@ -171,6 +173,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 7E Agent Report](agent_reports/milestone_7e_court_homography_evidence_decision_gate_report.md)
 - [Milestone 7F Agent Report](agent_reports/milestone_7f_perception_run_orchestration_completion_review_report.md)
 - [Milestone 8A Agent Report](agent_reports/milestone_8a_court_evidence_schema_contract_report.md)
+- [Milestone 8B Agent Report](agent_reports/milestone_8b_court_keypoint_line_evidence_adapter_report.md)
 
 ## Blueprints
 

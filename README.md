@@ -32,9 +32,9 @@ Court/camera/homography evidence now proceeds in Blueprint 8.
 
 Blueprint 8 Status: IN PROGRESS
 
-Blueprint 8 starts TOM v3's court/camera/homography evidence layer. Milestone 8A adds the schema and persistence contract for court keypoints, court lines, camera/view evidence, homography candidates, projection diagnostics, and a normalized court template registry.
+Blueprint 8 starts TOM v3's court/camera/homography evidence layer. Milestone 8A adds the schema and persistence contract for court keypoints, court lines, camera/view evidence, homography candidates, projection diagnostics, and a normalized court template registry. Milestone 8B adds a deterministic fixture court evidence adapter that writes court keypoint, court line, and camera/view observations with model/runtime/run provenance.
 
-8A is schema/contract only. It does not add a court runtime, homography computation, replay court overlay, ball/player court-space projection, bounce/hit/in-out/rally/point/scoring, real stream ingestion, or adjudication.
+8B is fixture/fake geometry evidence only. It does not add a real court model, homography computation, projection diagnostics, replay court overlay, ball/player court-space projection, bounce/hit/in-out/rally/point/scoring, real stream ingestion, or adjudication.
 
 ## What It Does
 
@@ -51,6 +51,7 @@ Blueprint 8 starts TOM v3's court/camera/homography evidence layer. Milestone 8A
 - Build candidate tracklets from real model-output detection runs while preserving source detection lineage.
 - Run an optional real pose replay pass on indexed media when local runtime and pose weights exist.
 - Persist real `player_pose_observation` rows with COCO17 keypoints and source player detection lineage when available.
+- Persist fixture court keypoint, court line, and camera/view observations for Blueprint 8 geometry evidence development.
 - Keep optional YOLO and pose runtimes separate from the default base environment.
 
 ## What It Does Not Do
@@ -58,7 +59,7 @@ Blueprint 8 starts TOM v3's court/camera/homography evidence layer. Milestone 8A
 - No scoring, point reconstruction, rally segmentation, hit detection, or bounce detection.
 - No stroke classification, movement interpretation, or biomechanics conclusions.
 - No homography or court-space reasoning.
-- No court/camera/homography runtime or replay court overlay in Blueprint 8A.
+- No real court model, homography computation, projection diagnostics, or replay court overlay in Blueprint 8B.
 - No movement interpretation from pose keypoints.
 - No production deployment, auth, cloud workflow, real live stream ingestion, or multi-camera support.
 
@@ -278,4 +279,4 @@ indexed media
 -> replay workstation evidence overlays
 ```
 
-Court/camera/homography evidence now has an 8A schema/persistence foundation, but runtime, homography computation, replay overlays, and ball/player court projections are future Blueprint 8 work. Future real live ingestion, movement/stroke evidence, and new tennis-intelligence work should start as separate blueprints.
+Court/camera/homography evidence now has an 8A schema/persistence foundation and an 8B fixture court evidence adapter, but real court inference, homography computation, projection diagnostics, replay overlays, and ball/player court projections are future Blueprint 8 work. Future real live ingestion, movement/stroke evidence, and new tennis-intelligence work should start as separate blueprints.

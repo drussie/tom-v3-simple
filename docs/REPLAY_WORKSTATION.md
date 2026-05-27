@@ -225,7 +225,7 @@ run-real-pose
 
 The replay workstation remains evidence-only: detection observations, candidate tracklets, track point candidates, and pose keypoint evidence do not become tennis events, player identities, court positions, or scoring.
 
-## Blueprint 8A Court Schema Boundary
+## Blueprint 8 Court Evidence Boundary
 
 8A adds backend schema and persistence foundations for future replay court layers:
 
@@ -234,6 +234,8 @@ The replay workstation remains evidence-only: detection observations, candidate 
 - camera/view evidence
 - homography candidate
 - projection diagnostic
+
+8B adds fixture production of court keypoint, court line, and camera/view evidence through `run-fixture-court`, but the replay workstation still does not fetch or render court layers.
 
 The replay workstation does not yet fetch or render these court layers. Future Blueprint 8 milestones should add court overlays deliberately, with labels that keep geometry evidence separate from bounce, hit, in/out, rally, point, and scoring conclusions.
 

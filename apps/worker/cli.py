@@ -23,6 +23,7 @@ from apps.api.services.tracklet_review_export import export_tracklet_review_data
 from apps.worker.config import settings
 from apps.worker.pipelines.synthetic_seed import seed_synthetic_run
 from apps.worker.services.completion_audit import run_completion_audit
+from apps.worker.services.court_adapter import run_fixture_court_adapter
 from apps.worker.services.detection_adapter import run_detection_adapter
 from apps.worker.services.frame_artifacts import extract_frame_artifacts_for_run
 from apps.worker.services.gameplay_adapter import run_gameplay_adapter
@@ -476,6 +477,23 @@ def main() -> None:
     real_pose_parser.add_argument("--skip-create-db", action="store_true")
     real_pose_parser.set_defaults(handler=_handle_run_real_pose)
 
+    fixture_court_parser = subcommands.add_parser(
+        "run-fixture-court",
+        help="Run deterministic fixture court keypoint/line/camera-view evidence.",
+    )
+    fixture_court_parser.add_argument("--media-id", required=True)
+    fixture_court_parser.add_argument("--frame-sample-rate", type=int, default=30)
+    fixture_court_parser.add_argument("--max-frames", type=int, default=30)
+    fixture_court_parser.add_argument("--run-name", default="fixture-court-evidence")
+    fixture_court_parser.add_argument("--viewer-base-url", default="http://127.0.0.1:3000")
+    fixture_court_parser.add_argument(
+        "--plan-only",
+        action="store_true",
+        help="Print the fixture court evidence plan without touching the database.",
+    )
+    fixture_court_parser.add_argument("--skip-create-db", action="store_true")
+    fixture_court_parser.set_defaults(handler=_handle_run_fixture_court)
+
     demo_parser = subcommands.add_parser(
         "run-demo",
         help="Run the canonical local fixture demo path without YOLO or pose weights.",
@@ -903,6 +921,21 @@ def _handle_run_real_pose(
         mode=args.mode,
         fallback_to_full_frame=args.fallback_to_full_frame,
         allowed_roots=args.allowed_roots,
+        viewer_base_url=args.viewer_base_url,
+        plan_only=args.plan_only,
+    )
+
+
+def _handle_run_fixture_court(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    return run_fixture_court_adapter(
+        session=session,
+        media_id=args.media_id,
+        frame_sample_rate=args.frame_sample_rate,
+        max_frames=args.max_frames,
+        run_name=args.run_name,
         viewer_base_url=args.viewer_base_url,
         plan_only=args.plan_only,
     )

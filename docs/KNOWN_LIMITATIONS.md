@@ -18,6 +18,8 @@ This registry makes TOM v3 Simple boundaries explicit.
 - Real pose observations are keypoint evidence; they do not establish movement, stroke, serve, split-step, biomechanics, or body-state conclusions.
 - Fixture pose output is demo evidence only.
 - Blueprint 8A adds court/camera/homography schema and typed persistence contracts.
+- Blueprint 8B adds deterministic fixture court keypoint, line, and camera/view evidence only.
+- Fixture court evidence is schema/provenance plumbing, not a real court model.
 - Court/camera/homography runtime is not implemented yet.
 - Homography computation is not implemented yet.
 - Projection diagnostics are schema-level only and do not project ball/player detections into court space.
@@ -51,7 +53,7 @@ This registry makes TOM v3 Simple boundaries explicit.
 - Stream Proxy Mode hides future evidence in the UI, but the underlying observations are already persisted.
 - There is no court evidence replay layer yet.
 - There is no homography candidate replay layer yet.
-- There is no court keypoint/line adapter yet.
+- The court keypoint/line adapter is fixture-only; no real court keypoint or line model is implemented yet.
 - There is no production deployment workflow.
 - There is no auth or user management.
 - There is no cloud storage lifecycle.

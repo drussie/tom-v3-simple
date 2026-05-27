@@ -84,6 +84,8 @@ Current typed court observation types:
 
 Court observations store geometry evidence at media-owned frame/time. Homography rows are candidates. Projection diagnostic rows diagnose court-template projection evidence only.
 
+Milestone 8B adds fixture court evidence production for `court_keypoint_observation`, `court_line_observation`, and `camera_view_observation`. These rows carry `fixture_court_evidence = true`, `geometry_evidence_only = true`, `not_real_court_model = true`, model/runtime/run provenance, and media-owned frame/time.
+
 Court evidence does not decide in/out, bounce locations, player court position, ball court position, rally state, point state, or score.
 
 ## Lineage

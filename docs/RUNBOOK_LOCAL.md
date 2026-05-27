@@ -648,7 +648,50 @@ Run schema/persistence tests:
 .venv/bin/python -m pytest tests/test_court_schema.py tests/test_court_observation_persistence.py -q
 ```
 
-There is no court runtime command yet. There is no replay court overlay yet. There is no homography computation or ball/player court-space projection yet.
+## 11D. Fixture Court Evidence Adapter
+
+Milestone 8B adds a deterministic fixture court evidence adapter. First index media through the fixture demo:
+
+```bash
+DEMO_MEDIA_PATH=demo_assets/sample_point.mp4 \
+TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_8b_court_fixture.db \
+make demo PYTHON=.venv/bin/python MAX_FRAMES=3
+```
+
+Then run fixture court evidence for the resulting `media_id`:
+
+```bash
+TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_8b_court_fixture.db \
+.venv/bin/python -m apps.worker.cli run-fixture-court \
+  --media-id <media_id> \
+  --frame-sample-rate 30 \
+  --max-frames 30
+```
+
+Or use:
+
+```bash
+TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_8b_court_fixture.db \
+make court-fixture MEDIA_ID=<media_id> PYTHON=.venv/bin/python MAX_FRAMES=30
+```
+
+Plan-only mode:
+
+```bash
+.venv/bin/python -m apps.worker.cli run-fixture-court \
+  --media-id media-plan \
+  --plan-only
+```
+
+Expected output includes `court_run_id`, sampled frames, and positive counts for:
+
+```text
+court_keypoint_observation
+court_line_observation
+camera_view_observation
+```
+
+There is still no replay court overlay yet. There is no homography computation, projection diagnostic computation, real court model, or ball/player court-space projection yet.
 
 ## 12. Optional Custom Media
 

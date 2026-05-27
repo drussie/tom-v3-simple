@@ -1,5 +1,48 @@
 # TOM v3 Simple - Implementation Log
 
+## Milestone 8B - Court Keypoint / Line Evidence Adapter
+
+Status: complete
+
+### Goal
+
+Make the 8A court evidence schema operational with deterministic fixture court evidence.
+
+### Outcome
+
+Milestone 8B created:
+
+- `apps.worker.services.court_adapter.run_fixture_court_adapter`.
+- Worker CLI `run-fixture-court`.
+- Makefile `court-fixture`.
+- Deterministic fixture court keypoint generation from the normalized template.
+- Fixture court line generation from template line definitions.
+- Fixture camera/view observation generation.
+- Model registry, runtime config, processing run, and processing step provenance.
+- Service and CLI tests.
+- Fixture court adapter docs and runbook updates.
+
+8B final path:
+
+```text
+indexed media
+-> fixture court evidence adapter
+-> court keypoint observations
+-> court line observations
+-> camera/view observations
+```
+
+### Non-goals
+
+- No real court model.
+- No homography computation.
+- No projection diagnostics.
+- No replay court overlay.
+- No ball/player court-space projection.
+- No bounce/hit/in-out/rally/point/scoring.
+- No stream ingestion.
+- No adjudication.
+
 ## Milestone 8A - Court Evidence Schema / Contract
 
 Status: complete

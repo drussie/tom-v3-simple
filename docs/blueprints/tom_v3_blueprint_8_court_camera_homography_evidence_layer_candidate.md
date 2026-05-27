@@ -2,7 +2,7 @@
 
 Status: IN PROGRESS
 
-Blueprint 7 is complete. Blueprint 8 has started with Milestone 8A schema/contract work.
+Blueprint 7 is complete. Blueprint 8 has started with Milestone 8A schema/contract work and Milestone 8B fixture court evidence persistence.
 
 ## Mission
 
@@ -45,19 +45,27 @@ Status: COMPLETE.
 
 Add an adapter boundary for court keypoint and court line model output. Preserve media-owned frame/time and image-pixel coordinates.
 
-### 8C - Homography Candidate Persistence
+Status: COMPLETE.
+
+8B adds a deterministic fixture court evidence adapter, worker `run-fixture-court`, Makefile `court-fixture`, model/runtime/run/step provenance, and persisted court keypoint, court line, and camera/view observations. It does not add a real court model, homography computation, projection diagnostics, replay court overlays, or ball/player court projections.
+
+### 8C - Camera / View Evidence Layer
+
+Harden camera/view evidence as its own geometry context layer. 8B already writes fixture camera/view rows; 8C should query/expose/review camera/view evidence without duplicating the fixture camera row contract.
+
+### 8D - Homography Candidate Persistence
 
 Persist homography candidates from source court keypoint/line evidence with candidate status, confidence, reprojection diagnostics, and lineage.
 
-### 8D - Court Overlay In Replay Workstation
+### 8E - Court Overlay In Replay Workstation
 
 Render court keypoint evidence, court line evidence, and homography candidate context as toggleable replay layers.
 
-### 8E - Projection Diagnostics / Review Export
+### 8F - Projection Diagnostics / Review Export
 
 Persist projection diagnostics and export TOM-native review datasets with lineage, artifacts, and annotations.
 
-### 8F - Completion Review
+### 8G - Completion Review
 
 Close Blueprint 8 with validation, limitations, final status updates, and future blueprint boundaries for bounce/hit/rally/point/scoring work.
 

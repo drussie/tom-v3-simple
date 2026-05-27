@@ -1,6 +1,6 @@
 # Court Evidence Schema v0
 
-Milestone 8A starts Blueprint 8 with schema and persistence contracts only.
+Milestone 8A starts Blueprint 8 with schema and persistence contracts. Milestone 8B uses this schema through a deterministic fixture court evidence adapter.
 
 Blueprint 8 court evidence uses the existing TOM observation spine:
 
@@ -340,4 +340,6 @@ No export should promote court evidence into bounce, hit, in/out, rally, point, 
 
 ## Non-goals
 
-8A does not add a court runtime, court adapter, homography computation, replay court overlay, ball/player court projection, stream ingestion, or tennis-event interpretation.
+8B writes fixture `court_keypoint_observation`, `court_line_observation`, and `camera_view_observation` rows with `fixture_court_evidence = true` and `not_real_court_model = true`.
+
+8B does not add a real court runtime, homography computation, projection diagnostics, replay court overlay, ball/player court projection, stream ingestion, or tennis-event interpretation.

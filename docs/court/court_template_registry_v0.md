@@ -2,6 +2,8 @@
 
 Milestone 8A introduces the first court template registry for Blueprint 8 geometry evidence.
 
+Milestone 8B uses this template registry to generate deterministic fixture court keypoint and line evidence in image-pixel coordinates.
+
 ## Template
 
 ```text
