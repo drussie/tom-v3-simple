@@ -6,6 +6,7 @@ import type {
   ReplayTimelineLane
 } from "../lib/types";
 import {
+  timelineLaneItemsAvailableAt,
   timelineItemKey,
   timelineItemTimestampMs,
   timelinePointPercent,
@@ -13,6 +14,7 @@ import {
 } from "../lib/replayTimeline";
 
 interface ReplayEvidenceTimelineProps {
+  availableUntilMs?: number | null;
   currentTimestampMs: number;
   durationMs: number | null;
   error: string | null;
@@ -29,6 +31,7 @@ interface ReplayEvidenceTimelineProps {
 }
 
 export function ReplayEvidenceTimeline({
+  availableUntilMs = null,
   currentTimestampMs,
   durationMs,
   error,
@@ -52,6 +55,12 @@ export function ReplayEvidenceTimeline({
           Timeline lanes are navigation aids over persisted evidence. They do not classify tennis
           actions or confirm object identity.
         </p>
+        {availableUntilMs !== null ? (
+          <p className="evidence-note">
+            Stream Proxy Mode hides future evidence until the live-like edge reaches it. Hidden
+            future items are still persisted records, not operator-available evidence yet.
+          </p>
+        ) : null}
         {error !== null ? <p className="empty-state">{error}</p> : null}
         {isLoading && timeline === null ? (
           <p className="empty-state">Loading timeline evidence lanes...</p>
@@ -74,6 +83,7 @@ export function ReplayEvidenceTimeline({
               {lanes.map((lane) => (
                 <TimelineLane
                   durationMs={durationMs}
+                  availableUntilMs={availableUntilMs}
                   isVisible={layerVisibility[lane.lane_type]}
                   key={lane.lane_type}
                   lane={lane}
@@ -96,29 +106,44 @@ export function ReplayEvidenceTimeline({
 }
 
 function TimelineLane({
+  availableUntilMs,
   durationMs,
   isVisible,
   lane,
   onSelectItem,
   selectedItemKey
 }: {
+  availableUntilMs: number | null;
   durationMs: number | null;
   isVisible: boolean;
   lane: ReplayTimelineLane;
   onSelectItem: (item: ReplayTimelineItem) => void;
   selectedItemKey: string | null;
 }) {
+  const availableItems = timelineLaneItemsAvailableAt(lane, availableUntilMs);
+  const hiddenFutureCount = lane.items.length - availableItems.length;
+
   return (
     <div className={`timeline-lane-row${isVisible ? "" : " muted"}`}>
       <div className="timeline-lane-label">
         <strong>{lane.label}</strong>
-        <span>{isVisible ? `${lane.items.length} items` : "layer hidden"}</span>
+        <span>
+          {isVisible
+            ? availableUntilMs === null
+              ? `${lane.items.length} items`
+              : `${availableItems.length} available · ${hiddenFutureCount} future hidden`
+            : "layer hidden"}
+        </span>
       </div>
       <div className="timeline-lane-track">
-        {lane.items.length === 0 ? (
-          <span className="timeline-lane-empty">{emptyLaneText(lane.lane_type)}</span>
+        {availableItems.length === 0 ? (
+          <span className="timeline-lane-empty">
+            {availableUntilMs === null
+              ? emptyLaneText(lane.lane_type)
+              : proxyEmptyLaneText(lane.lane_type)}
+          </span>
         ) : (
-          lane.items.map((item) => (
+          availableItems.map((item) => (
             <TimelineItemButton
               durationMs={durationMs}
               isSelected={timelineItemKey(item) === selectedItemKey}
@@ -184,4 +209,17 @@ function emptyLaneText(laneType: ReplayTimelineLane["lane_type"]): string {
     return "No pose observations in the selected run.";
   }
   return "No review annotations for this media/run context.";
+}
+
+function proxyEmptyLaneText(laneType: ReplayTimelineLane["lane_type"]): string {
+  if (laneType === "detections") {
+    return "No detection observations available at the current live-like edge.";
+  }
+  if (laneType === "tracklets") {
+    return "No tracklet candidates available at the current live-like edge.";
+  }
+  if (laneType === "pose") {
+    return "No pose observations available at the current live-like edge.";
+  }
+  return "No review annotations available at the current live-like edge.";
 }

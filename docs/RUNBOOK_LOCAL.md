@@ -240,6 +240,28 @@ Expected 6D replay behavior:
 
 Replay overlays are observation evidence. They are not confirmed objects, player identity, movement analysis, or tennis events.
 
+Open Stream Proxy Mode:
+
+```text
+http://127.0.0.1:3000/replay/<media_id>?mode=stream_proxy&detectionRunId=<run_id>&trackletRunId=<run_id>&poseRunId=<run_id>
+```
+
+Or print a helper URL:
+
+```bash
+make replay-open MEDIA_ID=<media_id> MODE=stream_proxy DETECTION_RUN_ID=<detection_run_id> TRACKLET_RUN_ID=<tracklet_run_id> POSE_RUN_ID=<pose_run_id>
+```
+
+Expected 6E Stream Proxy behavior:
+
+- playback starts from the beginning as a video-as-live proxy
+- future detection, tracklet, pose, and annotation evidence is hidden until playback reaches it
+- the page shows live edge, operator time, lag, and available evidence counts
+- pausing means the operator is reviewing paused proxy time
+- Return to live edge jumps back to the latest available proxy time
+
+Stream Proxy Mode still uses indexed local media and persisted observations. It is not real live stream ingestion.
+
 ## 6. Inspect Detections
 
 Open:

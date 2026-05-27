@@ -1,5 +1,36 @@
 # TOM v3 Simple - Implementation Log
 
+## Milestone 6E - Stream Proxy Mode
+
+Status: complete
+
+### Goal
+
+Add a live-like Stream Proxy Mode to the replay workstation using indexed local video and already-persisted TOM evidence.
+
+### Non-goals
+
+- No real live stream ingestion.
+- No HLS/RTSP/HDMI/camera capture.
+- No websocket live updates.
+- No model scheduling.
+- No real pose inference.
+- No tennis-event interpretation.
+- No homography, bounce, hit, rally, point, scoring, or adjudication.
+
+### Notes
+
+Milestone 6E created:
+
+- Replay / Stream Proxy mode toggle in `/replay/<media_id>`.
+- `mode=stream_proxy` query parameter support.
+- Stream Proxy live-like edge tracking.
+- Future overlay filtering for detection observations, tracklet candidates, and pose observations.
+- Future timeline filtering for detections, tracklets, poses, and review annotations.
+- Available evidence counts, live-edge lag, paused-review state, and return-to-live-edge control.
+- Makefile `replay-open` support for stream proxy URLs and selected run IDs.
+- Docs, milestone, handoff, and agent report updates.
+
 ## Milestone 0A - Repo Memory + Architecture / Schema Foundation
 
 Status: complete

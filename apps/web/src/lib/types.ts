@@ -365,11 +365,14 @@ export interface ReplayOverlayChunk {
   no_adjudication: boolean;
 }
 
+export type ReplayMode = "replay" | "stream_proxy";
+
 export interface ReplayPlaybackState {
   currentTimeSeconds: number;
   timestampMs: number;
   frameNumber: number;
   durationSeconds: number;
+  paused: boolean;
 }
 
 export interface ReplaySeekRequest {

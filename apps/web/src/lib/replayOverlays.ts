@@ -151,6 +151,49 @@ export function activeReplayPoses(
   );
 }
 
+export function filterDetectionsAvailableAt(
+  detections: ReplayDetectionOverlay[],
+  availableUntilMs: number | null
+): ReplayDetectionOverlay[] {
+  if (availableUntilMs === null) {
+    return detections;
+  }
+  return detections.filter((detection) => detection.timestamp_ms <= availableUntilMs);
+}
+
+export function filterTrackletsAvailableAt(
+  tracklets: ReplayTrackletOverlay[],
+  availableUntilMs: number | null
+): ReplayTrackletOverlay[] {
+  if (availableUntilMs === null) {
+    return tracklets;
+  }
+  return tracklets
+    .map((tracklet) => {
+      const points = tracklet.points.filter((point) => point.timestamp_ms <= availableUntilMs);
+      if (points.length === 0) {
+        return null;
+      }
+      const timestampEndMs = Math.min(tracklet.timestamp_end_ms, availableUntilMs);
+      return {
+        ...tracklet,
+        timestamp_end_ms: Math.max(tracklet.timestamp_start_ms, timestampEndMs),
+        points
+      };
+    })
+    .filter((tracklet): tracklet is ReplayTrackletOverlay => tracklet !== null);
+}
+
+export function filterPosesAvailableAt(
+  poses: ReplayPoseOverlay[],
+  availableUntilMs: number | null
+): ReplayPoseOverlay[] {
+  if (availableUntilMs === null) {
+    return poses;
+  }
+  return poses.filter((pose) => pose.timestamp_ms <= availableUntilMs);
+}
+
 export function selectInitialDetectionRun(
   runs: ReplayRunSummary[],
   requestedRunId?: string

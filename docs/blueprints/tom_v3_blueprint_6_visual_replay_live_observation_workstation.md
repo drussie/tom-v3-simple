@@ -7,6 +7,7 @@ Status: IN PROGRESS
 Milestone 6A started Blueprint 6. Milestone 6B added detection overlay playback.
 Milestone 6C adds tracklet candidate and pose keypoint overlay playback.
 Milestone 6D adds timeline lanes and evidence scrubbing.
+Milestone 6E adds Stream Proxy Mode over indexed local video.
 
 TOM v3 Simple is complete. Blueprint 6 is a new product layer that turns the local evidence platform into a replay/operator workstation.
 
@@ -26,9 +27,10 @@ indexed local video
 -> persisted pose keypoint overlays
 -> evidence timeline lanes
 -> click-to-seek persisted evidence
+-> Stream Proxy Mode for video-as-live review
 ```
 
-Future modes may explore stream proxy workflows, but production live ingestion is not part of 6A, 6B, 6C, or 6D.
+Stream Proxy Mode is now available as a UI/operator behavior. Production live ingestion is still out of scope.
 
 ## Milestone Plan
 
@@ -36,7 +38,8 @@ Future modes may explore stream proxy workflows, but production live ingestion i
 - 6B: Detection Overlay Playback
 - 6C: Tracklet / Pose Replay Layers
 - 6D: Evidence Timeline Lanes
-- 6E: Operator Review Workflow Hardening
+- 6E: Stream Proxy Mode
+- 6F: Operator Review Workflow Hardening
 
 The plan is intentionally incremental. Each milestone should preserve TOM's observation-only boundary.
 
@@ -139,6 +142,33 @@ Milestone 6D does not add:
 
 - stream proxy mode
 - live stream ingestion
+- model/runtime expansion
+- tennis-event interpretation
+- homography or court-space reasoning
+- bounce/hit/rally/point/scoring
+
+## 6E Proof
+
+Milestone 6E proves:
+
+```text
+indexed video playback
+-> Replay / Stream Proxy mode toggle
+-> video-as-live live edge
+-> hidden future overlays
+-> hidden future timeline evidence
+-> pause/review state
+-> return to live edge
+```
+
+## 6E Non-Goals
+
+Milestone 6E does not add:
+
+- real live stream ingestion
+- HLS/RTSP/HDMI/camera capture
+- websocket live updates
+- model scheduling
 - model/runtime expansion
 - tennis-event interpretation
 - homography or court-space reasoning

@@ -448,6 +448,44 @@ pre {
   gap: 12px;
 }
 
+.replay-mode-panel {
+  display: grid;
+  gap: 12px;
+}
+
+.replay-mode-switch {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  display: inline-grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  max-width: 420px;
+  overflow: hidden;
+}
+
+.replay-mode-switch button {
+  background: transparent;
+  border: 0;
+  color: var(--muted);
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  min-height: 38px;
+  padding: 0 12px;
+}
+
+.replay-mode-switch button.selected {
+  background: var(--ink);
+  color: #ffffff;
+}
+
+.stream-proxy-status-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+}
+
 .toggle-row,
 .select-row {
   align-items: center;

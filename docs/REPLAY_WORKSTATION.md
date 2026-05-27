@@ -13,6 +13,7 @@ indexed video
 -> synchronized tracklet candidate overlays
 -> synchronized pose keypoint evidence overlays
 -> evidence timeline lanes and click-to-seek scrubber
+-> Stream Proxy Mode for video-as-live operation
 ```
 
 Milestone 6A proved video replay and frame/time synchronization.
@@ -24,6 +25,8 @@ Milestone 6C adds tracklet candidate and pose keypoint overlay playback.
 
 Milestone 6D adds timeline lanes and evidence scrubbing across detection
 observations, tracklet candidates, pose observations, and review annotations.
+
+Milestone 6E adds Stream Proxy Mode over indexed local video.
 
 ## What 6A Added
 
@@ -108,6 +111,32 @@ official results.
 - stream proxy mode
 - live stream ingestion
 - HLS/RTSP/HDMI capture
+- new model runtime behavior
+- tennis-event interpretation
+- scoring or official results
+
+## What 6E Adds
+
+- Replay / Stream Proxy mode toggle
+- `mode=stream_proxy` query parameter support
+- video-as-live live edge that advances with playback
+- future detection/tracklet/pose overlays hidden until available
+- future timeline evidence hidden until available
+- tracklet spans clipped to the currently available live-like edge
+- available evidence counts
+- paused review / lag indicator
+- return-to-live-edge action
+- `make replay-open MODE=stream_proxy ...` helper URL support
+
+Stream Proxy Mode is a UI/operator mode over indexed local media. It does not
+create backend stream sessions or ingest real streams.
+
+## What 6E Does Not Add
+
+- live stream ingestion
+- HLS/RTSP/HDMI/camera capture
+- websocket live updates
+- model scheduling
 - new model runtime behavior
 - tennis-event interpretation
 - scoring or official results
@@ -285,6 +314,15 @@ Optional context query parameters:
 `detectionRunId`, `trackletRunId`, and `poseRunId` select the persisted evidence
 runs used for replay overlay playback.
 
+Open Stream Proxy Mode:
+
+```text
+?mode=stream_proxy&detectionRunId=<run_id>&trackletRunId=<run_id>&poseRunId=<run_id>
+```
+
+In Stream Proxy Mode, future evidence is not rendered in overlays or timeline
+lanes until playback reaches that media-owned time.
+
 ## Local Demo Flow
 
 Run a fixture demo:
@@ -319,8 +357,14 @@ For overlay playback, open:
 http://127.0.0.1:3000/replay/<media_id>?detectionRunId=<detection_run_id>&trackletRunId=<tracklet_run_id>&poseRunId=<pose_run_id>
 ```
 
+For Stream Proxy Mode, open:
+
+```text
+http://127.0.0.1:3000/replay/<media_id>?mode=stream_proxy&detectionRunId=<detection_run_id>&trackletRunId=<tracklet_run_id>&poseRunId=<pose_run_id>
+```
+
 ## Boundary
 
 The replay workstation displays synchronized evidence context. It does not decide tennis meaning.
 
-Stream proxy mode remains future work.
+Stream Proxy Mode is live-like local replay only. Real live ingestion remains future work.

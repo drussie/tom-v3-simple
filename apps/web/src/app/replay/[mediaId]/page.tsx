@@ -1,5 +1,6 @@
 import { ReplayWorkstation } from "../../../components/ReplayWorkstation";
 import { fetchReplayInfo } from "../../../lib/api";
+import type { ReplayMode } from "../../../lib/types";
 
 interface ReplayPageProps {
   params: Promise<{
@@ -7,6 +8,7 @@ interface ReplayPageProps {
   }>;
   searchParams: Promise<{
     detectionRunId?: string;
+    mode?: string;
     trackletRunId?: string;
     poseRunId?: string;
   }>;
@@ -15,9 +17,12 @@ interface ReplayPageProps {
 export default async function ReplayPage({ params, searchParams }: ReplayPageProps) {
   const { mediaId } = await params;
   const selectedRuns = await searchParams;
+  const initialMode: ReplayMode = selectedRuns.mode === "stream_proxy" ? "stream_proxy" : "replay";
   try {
     const replayInfo = await fetchReplayInfo(mediaId);
-    return <ReplayWorkstation replayInfo={replayInfo} selectedRuns={selectedRuns} />;
+    return (
+      <ReplayWorkstation initialMode={initialMode} replayInfo={replayInfo} selectedRuns={selectedRuns} />
+    );
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unable to load replay media";
     return (

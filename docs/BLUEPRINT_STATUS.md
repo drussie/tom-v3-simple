@@ -245,3 +245,27 @@ Milestone 6D did not add:
 - bounce or hit detection
 - rally/point/scoring
 - adjudication
+
+Milestone 6E proved:
+
+```text
+indexed video playback
+-> Replay / Stream Proxy mode toggle
+-> video-as-live live edge
+-> hidden future overlays
+-> hidden future timeline evidence
+-> operator pause/review state
+-> return-to-live-edge control
+```
+
+Milestone 6E did not add:
+
+- real live stream ingestion
+- HLS/RTSP/HDMI/camera capture
+- websocket live updates
+- model scheduling
+- model/runtime expansion
+- homography
+- bounce or hit detection
+- rally/point/scoring
+- adjudication

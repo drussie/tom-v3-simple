@@ -66,6 +66,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 6B - Detection Overlay Playback](milestones/milestone_6b_detection_overlay_playback.md)
 - [Milestone 6C - Tracklet / Pose Overlay Playback](milestones/milestone_6c_tracklet_pose_overlay_playback.md)
 - [Milestone 6D - Timeline Lanes / Evidence Scrubber](milestones/milestone_6d_timeline_lanes_evidence_scrubber.md)
+- [Milestone 6E - Stream Proxy Mode](milestones/milestone_6e_stream_proxy_mode.md)
 
 ## Handoffs
 
@@ -105,6 +106,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 6B Handoff](handoffs/milestone_6b_detection_overlay_playback_handoff.md)
 - [Milestone 6C Handoff](handoffs/milestone_6c_tracklet_pose_overlay_playback_handoff.md)
 - [Milestone 6D Handoff](handoffs/milestone_6d_timeline_lanes_evidence_scrubber_handoff.md)
+- [Milestone 6E Handoff](handoffs/milestone_6e_stream_proxy_mode_handoff.md)
 
 ## Agent Reports
 
@@ -144,6 +146,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 6B Agent Report](agent_reports/milestone_6b_detection_overlay_playback_report.md)
 - [Milestone 6C Agent Report](agent_reports/milestone_6c_tracklet_pose_overlay_playback_report.md)
 - [Milestone 6D Agent Report](agent_reports/milestone_6d_timeline_lanes_evidence_scrubber_report.md)
+- [Milestone 6E Agent Report](agent_reports/milestone_6e_stream_proxy_mode_report.md)
 
 ## Blueprints
 

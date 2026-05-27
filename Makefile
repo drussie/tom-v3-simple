@@ -128,8 +128,14 @@ replay-open:
 	@if [ -z "$(MEDIA_ID)" ]; then \
 		echo "Pass MEDIA_ID=<media_id>, then open:"; \
 		echo "  $(VIEWER_BASE_URL)/replay/<media_id>"; \
+		echo "Optional: MODE=stream_proxy DETECTION_RUN_ID=<run_id> TRACKLET_RUN_ID=<run_id> POSE_RUN_ID=<run_id>"; \
 	else \
-		echo "$(VIEWER_BASE_URL)/replay/$(MEDIA_ID)"; \
+		url="$(VIEWER_BASE_URL)/replay/$(MEDIA_ID)"; sep="?"; \
+		if [ -n "$(MODE)" ]; then url="$$url$${sep}mode=$(MODE)"; sep="&"; fi; \
+		if [ -n "$(DETECTION_RUN_ID)" ]; then url="$$url$${sep}detectionRunId=$(DETECTION_RUN_ID)"; sep="&"; fi; \
+		if [ -n "$(TRACKLET_RUN_ID)" ]; then url="$$url$${sep}trackletRunId=$(TRACKLET_RUN_ID)"; sep="&"; fi; \
+		if [ -n "$(POSE_RUN_ID)" ]; then url="$$url$${sep}poseRunId=$(POSE_RUN_ID)"; sep="&"; fi; \
+		echo "$$url"; \
 	fi
 
 completion-audit:

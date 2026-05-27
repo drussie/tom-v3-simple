@@ -4,11 +4,22 @@ import type { ReactNode } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { fetchReplayOverlayChunk, fetchReplayTimeline } from "../lib/api";
-import { selectInitialReplayRun } from "../lib/replayOverlays";
-import { timelineItemKey, timelineItemTimestampMs } from "../lib/replayTimeline";
+import {
+  filterDetectionsAvailableAt,
+  filterPosesAvailableAt,
+  filterTrackletsAvailableAt,
+  selectInitialReplayRun
+} from "../lib/replayOverlays";
+import { formatReplayTime } from "../lib/replayTime";
+import {
+  timelineAvailableItemCount,
+  timelineItemKey,
+  timelineItemTimestampMs
+} from "../lib/replayTimeline";
 import type {
   ReplayDetectionOverlay,
   ReplayInfo,
+  ReplayMode,
   ReplayOverlayChunk,
   ReplayPlaybackState,
   ReplayPoseOverlay,
@@ -29,6 +40,7 @@ import { ReplayVideoPlayer } from "./ReplayVideoPlayer";
 const overlayChunkMs = 2000;
 
 interface ReplayWorkstationProps {
+  initialMode?: ReplayMode;
   replayInfo: ReplayInfo;
   selectedRuns: {
     detectionRunId?: string;
@@ -59,7 +71,11 @@ type SelectedReplayEvidence =
   | { kind: "pose_timeline"; item: Extract<ReplayTimelineItem, { item_type: "pose" }> }
   | { kind: "annotation"; item: Extract<ReplayTimelineItem, { item_type: "annotation" }> };
 
-export function ReplayWorkstation({ replayInfo, selectedRuns }: ReplayWorkstationProps) {
+export function ReplayWorkstation({
+  initialMode = "replay",
+  replayInfo,
+  selectedRuns
+}: ReplayWorkstationProps) {
   const initialDetectionRunId = useMemo(
     () => selectInitialReplayRun(replayInfo.available_runs.detection, selectedRuns.detectionRunId),
     [replayInfo.available_runs.detection, selectedRuns.detectionRunId]
@@ -83,12 +99,16 @@ export function ReplayWorkstation({ replayInfo, selectedRuns }: ReplayWorkstatio
   const [showDetections, setShowDetections] = useState(true);
   const [showTracklets, setShowTracklets] = useState(true);
   const [showPoses, setShowPoses] = useState(true);
+  const [replayMode, setReplayMode] = useState<ReplayMode>(initialMode);
+  const [streamLiveEdgeMs, setStreamLiveEdgeMs] = useState(0);
+  const [streamProxyNotice, setStreamProxyNotice] = useState<string | null>(null);
   const [selectedEvidence, setSelectedEvidence] = useState<SelectedReplayEvidence | null>(null);
   const [playback, setPlayback] = useState<ReplayPlaybackState>({
     currentTimeSeconds: 0,
     timestampMs: 0,
     frameNumber: 0,
-    durationSeconds: replayInfo.duration_ms !== null ? replayInfo.duration_ms / 1000 : 0
+    durationSeconds: replayInfo.duration_ms !== null ? replayInfo.duration_ms / 1000 : 0,
+    paused: true
   });
   const [overlayState, setOverlayState] = useState<OverlayState>({
     chunk: null,
@@ -114,6 +134,22 @@ export function ReplayWorkstation({ replayInfo, selectedRuns }: ReplayWorkstatio
   useEffect(() => {
     setSelectedPoseRunId(initialPoseRunId);
   }, [initialPoseRunId]);
+
+  useEffect(() => {
+    setReplayMode(initialMode);
+  }, [initialMode]);
+
+  useEffect(() => {
+    if (replayMode === "stream_proxy") {
+      setStreamLiveEdgeMs(0);
+      setStreamProxyNotice(null);
+      setSelectedEvidence(null);
+      setSeekRequest({ timestampMs: 0, nonce: Date.now() });
+      chunkCache.current.clear();
+      return;
+    }
+    setStreamProxyNotice(null);
+  }, [replayMode]);
 
   const enabledLayers = useMemo(() => {
     const layers: string[] = [];
@@ -233,30 +269,76 @@ export function ReplayWorkstation({ replayInfo, selectedRuns }: ReplayWorkstatio
     };
   }, [replayInfo.media_id, selectedDetectionRunId, selectedPoseRunId, selectedTrackletRunId]);
 
-  const handlePlaybackStateChange = useCallback((state: ReplayPlaybackState) => {
-    setPlayback(state);
-  }, []);
+  const handlePlaybackStateChange = useCallback(
+    (state: ReplayPlaybackState) => {
+      setPlayback(state);
+      if (replayMode === "stream_proxy") {
+        const durationMs =
+          replayInfo.duration_ms ?? Math.max(0, Math.round(state.durationSeconds * 1000));
+        setStreamLiveEdgeMs((current) =>
+          Math.min(durationMs, Math.max(current, state.timestampMs))
+        );
+      }
+    },
+    [replayInfo.duration_ms, replayMode]
+  );
 
-  const handleTimelineItemSelect = useCallback((item: ReplayTimelineItem) => {
-    setSeekRequest({ timestampMs: timelineItemTimestampMs(item), nonce: Date.now() });
-    if (item.item_type === "detection") {
-      setSelectedEvidence({ kind: "detection_timeline", item });
-      return;
-    }
-    if (item.item_type === "tracklet") {
-      setSelectedEvidence({ kind: "tracklet_timeline", item });
-      return;
-    }
-    if (item.item_type === "pose") {
-      setSelectedEvidence({ kind: "pose_timeline", item });
-      return;
-    }
-    setSelectedEvidence({ kind: "annotation", item });
-  }, []);
+  const handleTimelineItemSelect = useCallback(
+    (item: ReplayTimelineItem) => {
+      const targetTimestampMs = timelineItemTimestampMs(item);
+      if (replayMode === "stream_proxy" && targetTimestampMs > streamLiveEdgeMs) {
+        setStreamProxyNotice(
+          "Future evidence is hidden until Stream Proxy Mode reaches that media time."
+        );
+        setSeekRequest({ timestampMs: streamLiveEdgeMs, nonce: Date.now() });
+        return;
+      }
+      setSeekRequest({ timestampMs: targetTimestampMs, nonce: Date.now() });
+      if (item.item_type === "detection") {
+        setSelectedEvidence({ kind: "detection_timeline", item });
+        return;
+      }
+      if (item.item_type === "tracklet") {
+        setSelectedEvidence({ kind: "tracklet_timeline", item });
+        return;
+      }
+      if (item.item_type === "pose") {
+        setSelectedEvidence({ kind: "pose_timeline", item });
+        return;
+      }
+      setSelectedEvidence({ kind: "annotation", item });
+    },
+    [replayMode, streamLiveEdgeMs]
+  );
 
-  const detections = overlayState.chunk?.detections ?? [];
-  const tracklets = overlayState.chunk?.tracklets ?? [];
-  const poses = overlayState.chunk?.poses ?? [];
+  const streamAvailableUntilMs = replayMode === "stream_proxy" ? streamLiveEdgeMs : null;
+  const detections = filterDetectionsAvailableAt(
+    overlayState.chunk?.detections ?? [],
+    streamAvailableUntilMs
+  );
+  const tracklets = filterTrackletsAvailableAt(
+    overlayState.chunk?.tracklets ?? [],
+    streamAvailableUntilMs
+  );
+  const poses = filterPosesAvailableAt(overlayState.chunk?.poses ?? [], streamAvailableUntilMs);
+  const totalTimelineItemCount = useMemo(
+    () =>
+      timelineState.timeline?.lanes.reduce((count, lane) => count + lane.items.length, 0) ?? 0,
+    [timelineState.timeline]
+  );
+  const availableTimelineItemCount = useMemo(
+    () =>
+      timelineState.timeline !== null
+        ? timelineAvailableItemCount(timelineState.timeline.lanes, streamAvailableUntilMs)
+        : 0,
+    [streamAvailableUntilMs, timelineState.timeline]
+  );
+  const handleReturnToLiveEdge = useCallback(() => {
+    setSeekRequest({ timestampMs: streamLiveEdgeMs, nonce: Date.now() });
+  }, [streamLiveEdgeMs]);
+  const handleSeekPastLiveEdge = useCallback(() => {
+    setStreamProxyNotice("Stream Proxy Mode cannot seek beyond the current live-like edge.");
+  }, []);
   const selectedDetectionId =
     selectedEvidence?.kind === "detection"
       ? selectedEvidence.detection.observation_id
@@ -286,10 +368,13 @@ export function ReplayWorkstation({ replayInfo, selectedRuns }: ReplayWorkstatio
       <header className="viewer-header">
         <div className="viewer-title">
           <p className="eyebrow">TOM v3 Replay Workstation</p>
-          <h1>Tracklet and pose overlay playback</h1>
+          <h1>Replay and Stream Proxy workstation</h1>
           <div className="meta-line">
             <span className="status-pill">observation-only</span>
             <span className="mini-pill">no adjudication</span>
+            <span className="mini-pill">
+              {replayMode === "stream_proxy" ? "Stream Proxy Mode" : "Replay Mode"}
+            </span>
             <span className="mono">{replayInfo.media_id}</span>
           </div>
         </div>
@@ -305,8 +390,11 @@ export function ReplayWorkstation({ replayInfo, selectedRuns }: ReplayWorkstatio
         <div className="main-column">
           <ReplayVideoPlayer
             onPlaybackStateChange={handlePlaybackStateChange}
+            onSeekPastLiveEdge={handleSeekPastLiveEdge}
             replayInfo={replayInfo}
             seekRequest={seekRequest}
+            streamLiveEdgeMs={streamAvailableUntilMs}
+            streamProxyMode={replayMode === "stream_proxy"}
           >
             <ReplayDetectionOverlayLayer
               currentFrame={playback.frameNumber}
@@ -352,6 +440,17 @@ export function ReplayWorkstation({ replayInfo, selectedRuns }: ReplayWorkstatio
               selectedObservationId={selectedPoseObservationId}
             />
           </ReplayVideoPlayer>
+          <ReplayModeControls
+            availableTimelineItemCount={availableTimelineItemCount}
+            durationMs={replayInfo.duration_ms ?? Math.round(playback.durationSeconds * 1000)}
+            onModeChange={setReplayMode}
+            onReturnToLiveEdge={handleReturnToLiveEdge}
+            playback={playback}
+            replayMode={replayMode}
+            streamLiveEdgeMs={streamLiveEdgeMs}
+            streamProxyNotice={streamProxyNotice}
+            totalTimelineItemCount={totalTimelineItemCount}
+          />
           <ReplayLayerControls
             detectionRuns={replayInfo.available_runs.detection}
             onSelectedDetectionRunChange={(runId) => {
@@ -379,6 +478,7 @@ export function ReplayWorkstation({ replayInfo, selectedRuns }: ReplayWorkstatio
             trackletRuns={replayInfo.available_runs.tracklet}
           />
           <ReplayEvidenceTimeline
+            availableUntilMs={streamAvailableUntilMs}
             currentTimestampMs={playback.timestampMs}
             durationMs={replayInfo.duration_ms}
             error={timelineState.error}
@@ -407,6 +507,102 @@ export function ReplayWorkstation({ replayInfo, selectedRuns }: ReplayWorkstatio
         </aside>
       </div>
     </main>
+  );
+}
+
+function ReplayModeControls({
+  availableTimelineItemCount,
+  durationMs,
+  onModeChange,
+  onReturnToLiveEdge,
+  playback,
+  replayMode,
+  streamLiveEdgeMs,
+  streamProxyNotice,
+  totalTimelineItemCount
+}: {
+  availableTimelineItemCount: number;
+  durationMs: number | null;
+  onModeChange: (mode: ReplayMode) => void;
+  onReturnToLiveEdge: () => void;
+  playback: ReplayPlaybackState;
+  replayMode: ReplayMode;
+  streamLiveEdgeMs: number;
+  streamProxyNotice: string | null;
+  totalTimelineItemCount: number;
+}) {
+  const isStreamProxy = replayMode === "stream_proxy";
+  const lagMs = Math.max(0, streamLiveEdgeMs - playback.timestampMs);
+  const atLiveEdge = !isStreamProxy || lagMs <= 250;
+  const durationLabel = durationMs !== null ? formatReplayTime(durationMs / 1000) : "n/a";
+
+  return (
+    <section className="panel">
+      <div className="panel-header">
+        <h2>Replay Mode</h2>
+        <span className="mini-pill">{isStreamProxy ? "video-as-live" : "free review"}</span>
+      </div>
+      <div className="panel-body replay-mode-panel">
+        <div className="replay-mode-switch" role="group" aria-label="Replay mode">
+          <button
+            aria-pressed={replayMode === "replay"}
+            className={replayMode === "replay" ? "selected" : ""}
+            onClick={() => onModeChange("replay")}
+            type="button"
+          >
+            Replay Mode
+          </button>
+          <button
+            aria-pressed={isStreamProxy}
+            className={isStreamProxy ? "selected" : ""}
+            onClick={() => onModeChange("stream_proxy")}
+            type="button"
+          >
+            Stream Proxy Mode
+          </button>
+        </div>
+        {isStreamProxy ? (
+          <>
+            <div className="stream-proxy-status-grid">
+              <TelemetryLikeCell label="live edge" value={formatReplayTime(streamLiveEdgeMs / 1000)} />
+              <TelemetryLikeCell label="operator time" value={formatReplayTime(playback.currentTimeSeconds)} />
+              <TelemetryLikeCell label="lag" value={formatReplayTime(lagMs / 1000)} />
+              <TelemetryLikeCell label="duration" value={durationLabel} />
+              <TelemetryLikeCell
+                label="available evidence"
+                value={`${availableTimelineItemCount} / ${totalTimelineItemCount}`}
+              />
+              <TelemetryLikeCell label="state" value={playback.paused ? "paused review" : "playing"} />
+            </div>
+            <div className="meta-line">
+              <span className={atLiveEdge ? "status-pill" : "mini-pill"}>
+                {atLiveEdge ? "at live edge" : "reviewing behind live edge"}
+              </span>
+              <button
+                className="quiet-button"
+                disabled={atLiveEdge}
+                onClick={onReturnToLiveEdge}
+                type="button"
+              >
+                Return to live edge
+              </button>
+            </div>
+            {streamProxyNotice !== null ? (
+              <p className="empty-state compact">{streamProxyNotice}</p>
+            ) : null}
+            <p className="evidence-note">
+              Stream Proxy Mode uses the indexed video as a live-like source. Future overlays and
+              timeline items stay hidden until playback reaches their media-owned time.
+            </p>
+          </>
+        ) : (
+          <p className="evidence-note">
+            Replay Mode is post-run review: the operator can scrub freely and inspect the full
+            persisted evidence timeline.
+          </p>
+        )}
+      </div>
+    </section>
   );
 }
 
@@ -931,6 +1127,15 @@ function DetailRow({ label, value }: { label: string; value: string }) {
     <div className="detail-row">
       <strong>{label}</strong>
       <span className="mono">{value}</span>
+    </div>
+  );
+}
+
+function TelemetryLikeCell({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="media-cell">
+      <strong>{label}</strong>
+      <span>{value}</span>
     </div>
   );
 }

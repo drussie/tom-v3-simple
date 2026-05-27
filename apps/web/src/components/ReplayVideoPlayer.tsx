@@ -16,16 +16,25 @@ interface ReplayVideoPlayerProps {
   children?: ReactNode;
   onPlaybackStateChange?: (state: ReplayPlaybackState) => void;
   seekRequest?: ReplaySeekRequest | null;
+  streamLiveEdgeMs?: number | null;
+  streamProxyMode?: boolean;
+  onSeekPastLiveEdge?: () => void;
 }
 
 export function ReplayVideoPlayer({
   replayInfo,
   children,
   onPlaybackStateChange,
-  seekRequest = null
+  seekRequest = null,
+  streamLiveEdgeMs = null,
+  streamProxyMode = false,
+  onSeekPastLiveEdge
 }: ReplayVideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const animationFrameRef = useRef<number | null>(null);
+  const streamLiveEdgeRef = useRef<number | null>(streamLiveEdgeMs);
+  const streamProxyModeRef = useRef(streamProxyMode);
+  const onSeekPastLiveEdgeRef = useRef(onSeekPastLiveEdge);
   const [currentTimeSeconds, setCurrentTimeSeconds] = useState(0);
   const [durationSeconds, setDurationSeconds] = useState(
     replayInfo.duration_ms !== null ? replayInfo.duration_ms / 1000 : 0
@@ -37,6 +46,12 @@ export function ReplayVideoPlayer({
     }
     return `${getApiBaseUrl()}${replayInfo.video_url}`;
   }, [replayInfo.video_url]);
+
+  useEffect(() => {
+    streamLiveEdgeRef.current = streamLiveEdgeMs;
+    streamProxyModeRef.current = streamProxyMode;
+    onSeekPastLiveEdgeRef.current = onSeekPastLiveEdge;
+  }, [onSeekPastLiveEdge, streamLiveEdgeMs, streamProxyMode]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -58,7 +73,8 @@ export function ReplayVideoPlayer({
           replayInfo.fps,
           replayInfo.frame_count
         ),
-        durationSeconds: nextDurationSeconds
+        durationSeconds: nextDurationSeconds,
+        paused: video.paused
       });
     };
     const updateDuration = () => {
@@ -82,12 +98,24 @@ export function ReplayVideoPlayer({
       }
       update();
     };
+    const clampSeekToLiveEdge = () => {
+      const liveEdgeMs = streamLiveEdgeRef.current;
+      if (!streamProxyModeRef.current || liveEdgeMs === null) {
+        return;
+      }
+      const liveEdgeSeconds = liveEdgeMs / 1000;
+      if (video.currentTime > liveEdgeSeconds + 0.05) {
+        video.currentTime = liveEdgeSeconds;
+        onSeekPastLiveEdgeRef.current?.();
+      }
+    };
 
     video.addEventListener("loadedmetadata", updateDuration);
     video.addEventListener("timeupdate", update);
     video.addEventListener("play", startTicking);
     video.addEventListener("pause", stopTicking);
     video.addEventListener("ended", stopTicking);
+    video.addEventListener("seeking", clampSeekToLiveEdge);
 
     update();
     updateDuration();
@@ -99,19 +127,29 @@ export function ReplayVideoPlayer({
       video.removeEventListener("play", startTicking);
       video.removeEventListener("pause", stopTicking);
       video.removeEventListener("ended", stopTicking);
+      video.removeEventListener("seeking", clampSeekToLiveEdge);
     };
-  }, [durationSeconds, onPlaybackStateChange, replayInfo.fps, replayInfo.frame_count]);
+  }, [
+    durationSeconds,
+    onPlaybackStateChange,
+    replayInfo.fps,
+    replayInfo.frame_count
+  ]);
 
   useEffect(() => {
     const video = videoRef.current;
     if (video === null || seekRequest === null) {
       return;
     }
-    const nextTimeSeconds = Math.max(0, seekRequest.timestampMs / 1000);
+    const requestedTimestampMs =
+      streamProxyMode && streamLiveEdgeMs !== null
+        ? Math.min(seekRequest.timestampMs, streamLiveEdgeMs)
+        : seekRequest.timestampMs;
+    const nextTimeSeconds = Math.max(0, requestedTimestampMs / 1000);
     if (Math.abs(video.currentTime - nextTimeSeconds) > 0.01) {
       video.currentTime = nextTimeSeconds;
     }
-  }, [seekRequest]);
+  }, [seekRequest, streamLiveEdgeMs, streamProxyMode]);
 
   const timestampMs = currentTimeSecondsToTimestampMs(currentTimeSeconds);
   const frameNumber = currentTimeSecondsToFrame(
@@ -154,6 +192,12 @@ export function ReplayVideoPlayer({
           <TelemetryCell label="frame" value={frameNumber.toString()} />
           <TelemetryCell label="fps" value={replayInfo.fps?.toString() ?? "n/a"} />
           <TelemetryCell label="frame_count" value={replayInfo.frame_count?.toString() ?? "n/a"} />
+          {streamProxyMode ? (
+            <TelemetryCell
+              label="live_edge_ms"
+              value={streamLiveEdgeMs !== null ? Math.round(streamLiveEdgeMs).toString() : "n/a"}
+            />
+          ) : null}
         </div>
 
         <div className="replay-timeline-shell" aria-label="Replay timeline shell">

@@ -20,9 +20,9 @@ It is not TOM v2, and it does not decide official tennis meaning.
 
 TOM v3 Simple is complete as a lightweight local observation/evidence platform. It can index local tennis video, run fixture gameplay/detection/pose paths, optionally run YOLO detection smoke when local runtime and weights exist, persist observations and typed evidence rows, build candidate tracklets, preserve lineage/provenance, render detection/tracklet/pose evidence in the viewer, seed and display review annotations, export TOM-native review datasets, and run a structural completion audit.
 
-It remains intentionally non-decisive about tennis meaning. It does not include real pose inference, movement interpretation, stroke classification, homography, bounce/hit/rally/point/scoring, production deployment, auth, streaming, or TOM v2-style adjudication.
+It remains intentionally non-decisive about tennis meaning. It does not include real pose inference, movement interpretation, stroke classification, homography, bounce/hit/rally/point/scoring, production deployment, auth, real stream ingestion, or TOM v2-style adjudication.
 
-Blueprint 6 is now that new blueprint. It starts with Replay Mode: indexed local video playback synchronized to TOM media-owned frame/time. Milestones 6B, 6C, and 6D add synchronized detection observation, tracklet candidate, pose keypoint evidence overlay playback, and evidence timeline navigation without adding live stream ingestion or tennis-event interpretation.
+Blueprint 6 is now that new blueprint. It starts with Replay Mode: indexed local video playback synchronized to TOM media-owned frame/time. Milestones 6B, 6C, 6D, and 6E add synchronized detection observation, tracklet candidate, pose keypoint evidence overlay playback, evidence timeline navigation, and Stream Proxy Mode without adding real live stream ingestion or tennis-event interpretation.
 
 ## Canonical Local Demo
 
@@ -82,7 +82,7 @@ An observation does not mean the output is correct, a tennis event happened, a s
 - Rally segmentation.
 - Point reconstruction.
 - Scoring.
-- Production deployment, auth, cloud workflow, streaming, or multi-camera reasoning.
+- Production deployment, auth, cloud workflow, real stream ingestion, or multi-camera reasoning.
 
 ## Optional YOLO Path
 
@@ -158,8 +158,6 @@ current replay timestamp/frame
 -> click-to-select evidence detail
 ```
 
-At 6C, full evidence lanes, live stream ingestion, stream proxy mode, and tennis-event interpretation remained deferred.
-
 Milestone 6D adds evidence timeline navigation:
 
 ```text
@@ -171,7 +169,21 @@ replay timeline endpoint
 -> click-to-seek/select persisted evidence
 ```
 
-6D still defers stream proxy mode, live stream ingestion, and tennis-event interpretation.
+6D deferred stream proxy mode, live stream ingestion, and tennis-event interpretation.
+
+Milestone 6E adds Stream Proxy Mode:
+
+```text
+indexed local video
+-> video-as-live operator mode
+-> live-like edge
+-> hidden future overlays
+-> hidden future timeline evidence
+-> pause/review state
+-> return to live edge
+```
+
+6E still defers real live stream ingestion, streaming protocols, model scheduling, and tennis-event interpretation.
 
 ## Future Blueprint Candidates
 
@@ -195,5 +207,5 @@ Do not add these to TOM v3 Simple without explicitly starting a new blueprint:
 - rally or point reconstruction
 - scoring
 - homography
-- production auth/cloud/streaming
+- production auth/cloud/real stream ingestion
 - adjudication

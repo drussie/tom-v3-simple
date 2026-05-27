@@ -1,5 +1,6 @@
 import type {
   ReplayTimelineItem,
+  ReplayTimelineLane,
   ReplayTrackletTimelineItem
 } from "./types";
 
@@ -48,6 +49,49 @@ export function timelineItemKey(item: ReplayTimelineItem): string {
     return `pose:${item.observation_id}`;
   }
   return `annotation:${item.annotation_id}`;
+}
+
+export function timelineItemAvailableAt(
+  item: ReplayTimelineItem,
+  availableUntilMs: number | null
+): boolean {
+  if (availableUntilMs === null) {
+    return true;
+  }
+  if (item.item_type === "tracklet") {
+    return item.timestamp_start_ms <= availableUntilMs;
+  }
+  return item.timestamp_ms <= availableUntilMs;
+}
+
+export function timelineLaneItemsAvailableAt(
+  lane: ReplayTimelineLane,
+  availableUntilMs: number | null
+): ReplayTimelineItem[] {
+  if (availableUntilMs === null) {
+    return lane.items;
+  }
+  return lane.items
+    .filter((item) => timelineItemAvailableAt(item, availableUntilMs))
+    .map((item) => {
+      if (item.item_type !== "tracklet") {
+        return item;
+      }
+      return {
+        ...item,
+        timestamp_end_ms: Math.min(item.timestamp_end_ms, Math.max(item.timestamp_start_ms, availableUntilMs))
+      };
+    });
+}
+
+export function timelineAvailableItemCount(
+  lanes: ReplayTimelineLane[],
+  availableUntilMs: number | null
+): number {
+  return lanes.reduce(
+    (count, lane) => count + timelineLaneItemsAvailableAt(lane, availableUntilMs).length,
+    0
+  );
 }
 
 function clampPercent(value: number): number {

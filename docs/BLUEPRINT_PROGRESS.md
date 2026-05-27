@@ -166,6 +166,9 @@ Current: Blueprints 1, 2, 3, 4, and 5 complete; Blueprint 6 has started; TOM v3 
 - Replay overlay selection shows persisted detection, tracklet candidate, track point candidate, and pose observation details.
 - Replay timeline endpoint and frontend evidence lanes exist for detection ticks, tracklet candidate spans, pose ticks, and review annotation markers.
 - Replay timeline items can seek playback and select persisted evidence detail.
+- Replay workstation Stream Proxy Mode exists for video-as-live review over indexed local media.
+- Stream Proxy Mode hides future overlays and future timeline evidence until the live-like edge reaches it.
+- Stream Proxy Mode displays available evidence counts, pause/review state, lag, and return-to-live-edge control.
 - No real pose inference, movement interpretation, homography, bounce, hit, rally, point, scoring, or adjudication has been added.
 
 ## Blueprint 5 Status
@@ -264,7 +267,21 @@ replay timeline endpoint
 
 Current Blueprint 6 progress after 6D: about 65-70%.
 
-Stream proxy mode and operator review hardening are future milestones.
+Milestone 6E is complete. It adds Stream Proxy Mode:
+
+```text
+indexed local video
+-> video-as-live mode
+-> live-like edge
+-> hidden future overlays
+-> hidden future timeline evidence
+-> pause/review state
+-> return to live edge
+```
+
+Current Blueprint 6 progress after 6E: about 80-85%.
+
+Operator review hardening remains a future milestone.
 
 ## Milestone 5D Status
 
