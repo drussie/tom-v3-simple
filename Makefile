@@ -32,7 +32,7 @@ TOM_V3_AUDIT_REQUIRED ?= false
 
 export TOM_V3_DATABASE_URL
 
-.PHONY: install web-install test lint migrate api seed verify index-media run-gameplay index-and-run-gameplay run-detection index-and-run-detection extract-frame-artifacts build-tracklets run-pose export-tracklet-review-dataset demo demo-fixture demo-plan demo-reset demo-export demo-open completion-audit completion-check yolo-probe yolo-smoke yolo-runtime-probe register-yolo-model smoke-real-yolo-local web web-build web-lint smoke all-checks
+.PHONY: install web-install test lint migrate api seed verify index-media run-gameplay index-and-run-gameplay run-detection index-and-run-detection extract-frame-artifacts build-tracklets run-pose export-tracklet-review-dataset demo demo-fixture demo-plan demo-reset demo-export demo-open replay-open completion-audit completion-check yolo-probe yolo-smoke yolo-runtime-probe register-yolo-model smoke-real-yolo-local web web-build web-lint smoke all-checks
 
 install:
 	$(PYTHON) -m pip install -e ".[dev]"
@@ -123,6 +123,14 @@ demo-open:
 	if [ -n "$(TRACKLET_RUN_ID)" ]; then echo "$(VIEWER_BASE_URL)/runs/$(TRACKLET_RUN_ID)"; fi; \
 	if [ -n "$(POSE_RUN_ID)" ]; then echo "$(VIEWER_BASE_URL)/runs/$(POSE_RUN_ID)"; fi; \
 	if [ -z "$(RUN_ID)" ] && [ -z "$(DETECTION_RUN_ID)" ] && [ -z "$(TRACKLET_RUN_ID)" ] && [ -z "$(POSE_RUN_ID)" ]; then echo "Pass RUN_ID=<run_id>, DETECTION_RUN_ID=<run_id>, TRACKLET_RUN_ID=<run_id>, or POSE_RUN_ID=<run_id>."; fi
+
+replay-open:
+	@if [ -z "$(MEDIA_ID)" ]; then \
+		echo "Pass MEDIA_ID=<media_id>, then open:"; \
+		echo "  $(VIEWER_BASE_URL)/replay/<media_id>"; \
+	else \
+		echo "$(VIEWER_BASE_URL)/replay/$(MEDIA_ID)"; \
+	fi
 
 completion-audit:
 	$(PYTHON) -m apps.worker.cli completion-audit $(if $(MEDIA_ID),--media-id "$(MEDIA_ID)",) $(if $(filter false,$(AUDIT_DEMO_ONLY)),--no-demo-only,--demo-only) $(if $(filter true,$(AUDIT_STRICT)),--strict,--no-strict)

@@ -97,3 +97,19 @@ Future work should begin only if deliberately chosen:
 - Product Deployment
 
 Do not pick one automatically as part of TOM v3 Simple.
+
+## Blueprint 6 Addendum
+
+Blueprint 6 has started after TOM v3 Simple completion.
+
+Milestone 6A adds a video replay timeline foundation:
+
+```text
+indexed media
+-> browser video endpoint
+-> replay info payload
+-> /replay/<media_id>
+-> current timestamp/frame display
+```
+
+This does not reopen TOM v3 Simple. It is a new product layer on top of the completed local evidence platform.

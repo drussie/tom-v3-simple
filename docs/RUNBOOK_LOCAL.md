@@ -191,6 +191,37 @@ The viewer includes a run evidence summary, observation counts, lineage and anno
 
 Viewer copy uses evidence and candidate wording. Fixture outputs are not presented as real tennis understanding.
 
+## 5A. Open The Replay Workstation
+
+Blueprint 6 adds a media-centric replay route:
+
+```text
+http://127.0.0.1:3000/replay/<media_id>
+```
+
+After `make demo`, use the `media_id` from the demo summary:
+
+```bash
+make replay-open MEDIA_ID=<media_id>
+```
+
+The replay route loads the indexed local video through the API and shows:
+
+- current video time
+- current timestamp in milliseconds
+- nearest TOM frame from indexed media metadata
+- fps and frame count
+- basic timeline/progress shell
+- available detection, tracklet, pose, and gameplay run context
+
+Optional context query parameters:
+
+```text
+http://127.0.0.1:3000/replay/<media_id>?detectionRunId=<run_id>&trackletRunId=<run_id>&poseRunId=<run_id>
+```
+
+Milestone 6A does not draw observation overlays yet. Detection overlay playback begins in a later Blueprint 6 milestone.
+
 ## 6. Inspect Detections
 
 Open:

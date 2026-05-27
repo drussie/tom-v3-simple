@@ -14,6 +14,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Blueprint Status](BLUEPRINT_STATUS.md)
 - [Implementation Log](IMPLEMENTATION_LOG.md)
 - [Known Limitations](KNOWN_LIMITATIONS.md)
+- [Replay Workstation](REPLAY_WORKSTATION.md)
 - [Completion Checklist](COMPLETION_CHECKLIST.md)
 
 ## Architecture
@@ -61,6 +62,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 5C - Final Evidence / Provenance Audit](milestones/milestone_5c_final_evidence_provenance_audit.md)
 - [Milestone 5D - Docs / Control-Room Consolidation](milestones/milestone_5d_docs_control_room_consolidation.md)
 - [Milestone 5E - Final Completion Review](milestones/milestone_5e_final_completion_review.md)
+- [Milestone 6A - Video Replay Timeline Foundation](milestones/milestone_6a_video_replay_timeline_foundation.md)
 
 ## Handoffs
 
@@ -96,6 +98,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 5C Handoff](handoffs/milestone_5c_final_evidence_provenance_audit_handoff.md)
 - [Milestone 5D Handoff](handoffs/milestone_5d_docs_control_room_consolidation_handoff.md)
 - [Milestone 5E Handoff](handoffs/milestone_5e_final_completion_review_handoff.md)
+- [Milestone 6A Handoff](handoffs/milestone_6a_video_replay_timeline_foundation_handoff.md)
 
 ## Agent Reports
 
@@ -131,6 +134,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 5C Agent Report](agent_reports/milestone_5c_final_evidence_provenance_audit_report.md)
 - [Milestone 5D Agent Report](agent_reports/milestone_5d_docs_control_room_consolidation_report.md)
 - [Milestone 5E Agent Report](agent_reports/milestone_5e_final_completion_review_report.md)
+- [Milestone 6A Agent Report](agent_reports/milestone_6a_video_replay_timeline_foundation_report.md)
 
 ## Blueprints
 
@@ -142,6 +146,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Blueprint 4 Completion Review](blueprints/tom_v3_blueprint_4_completion_review.md)
 - [Blueprint 5 - Simple Completion / Product Hardening](blueprints/tom_v3_blueprint_5_simple_completion_product_hardening.md)
 - [TOM v3 Simple Final Completion Review](blueprints/tom_v3_simple_final_completion_review.md)
+- [Blueprint 6 - Visual Replay / Live Observation Workstation](blueprints/tom_v3_blueprint_6_visual_replay_live_observation_workstation.md)
 
 ## API and Schema
 
@@ -179,6 +184,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Tracklet Review Viewer v0](web/tracklet_review_viewer_v0.md)
 - [Pose Overlay Viewer v0](web/pose_overlay_viewer_v0.md)
 - [Viewer Product Polish v0](web/viewer_product_polish_v0.md)
+- [Replay Workstation](REPLAY_WORKSTATION.md)
 
 ## Tracklets
 
@@ -202,6 +208,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Local Environment Setup](dev/local_environment_setup.md)
 - [Canonical Local Runbook](RUNBOOK_LOCAL.md)
 - [Provenance Audit](PROVENANCE_AUDIT.md)
+- [Replay Workstation](REPLAY_WORKSTATION.md)
 - [Optional YOLO](OPTIONAL_YOLO.md)
 - [Review Exports](EXPORTS.md)
 - [Local Demo Runbook](dev/local_demo_runbook.md)

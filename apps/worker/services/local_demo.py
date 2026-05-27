@@ -487,6 +487,12 @@ def demo_summary(
             "detection_run": _viewer_url(viewer_base_url, detection_run_id),
             "tracklet_run": _viewer_url(viewer_base_url, tracklet_run_id),
             "pose_run": _viewer_url(viewer_base_url, pose_run_id),
+            "replay": (
+                f"{viewer_base_url.rstrip('/')}/replay/{media.id}"
+                f"?detectionRunId={detection_run_id}"
+                f"&trackletRunId={tracklet_run_id}"
+                f"&poseRunId={pose_run_id}"
+            ),
         },
         "warnings": dict(DEMO_WARNINGS),
     }

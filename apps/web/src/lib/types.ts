@@ -227,6 +227,38 @@ export interface ViewerRun {
   annotations: HumanAnnotation[];
 }
 
+export interface ReplayRunSummary {
+  run_id: string;
+  run_name: string;
+  run_status: string;
+  created_at: string | null;
+  completed_at: string | null;
+  observation_count: number;
+}
+
+export interface ReplayAvailableRuns {
+  detection: ReplayRunSummary[];
+  tracklet: ReplayRunSummary[];
+  pose: ReplayRunSummary[];
+  gameplay: ReplayRunSummary[];
+}
+
+export interface ReplayInfo {
+  media_id: string;
+  video_url: string;
+  source_uri: string;
+  width: number | null;
+  height: number | null;
+  duration_ms: number | null;
+  fps: number | null;
+  frame_count: number | null;
+  frame_time_mode: string;
+  frame_time_index: JsonRecord | null;
+  available_runs: ReplayAvailableRuns;
+  observation_only: boolean;
+  no_adjudication: boolean;
+}
+
 export interface TimelineRange {
   start: number;
   end: number;

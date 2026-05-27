@@ -25,6 +25,8 @@ This registry makes TOM v3 Simple boundaries explicit.
 ## Product Limitations
 
 - TOM v3 Simple is local-first.
+- Replay Mode currently supports local indexed file playback only.
+- Replay Mode 6A displays frame/time synchronization and run context, not observation overlay playback.
 - There is no production deployment workflow.
 - There is no auth or user management.
 - There is no cloud storage lifecycle.

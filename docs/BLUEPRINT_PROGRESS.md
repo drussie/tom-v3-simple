@@ -2,7 +2,7 @@
 
 ## Current Progress Gauge
 
-Current: Blueprints 1, 2, 3, 4, and 5 complete; TOM v3 Simple is complete
+Current: Blueprints 1, 2, 3, 4, and 5 complete; Blueprint 6 has started; TOM v3 Simple is complete
 
 ## Current
 
@@ -151,6 +151,11 @@ Current: Blueprints 1, 2, 3, 4, and 5 complete; TOM v3 Simple is complete
 - README, local runbook, current-state, progress, implementation log, and control-room index point to the consolidated docs.
 - Final completion review exists.
 - TOM v3 Simple is marked complete in canonical docs.
+- Blueprint 6 has started as the visual replay/operator layer.
+- Replay info and local video serving endpoints exist.
+- Replay frame/time mapping helpers exist.
+- Frontend `/replay/<media_id>` route exists.
+- Replay page displays indexed video, current timestamp/frame, timeline shell, overlay placeholder, and available run context.
 - No real pose inference, movement interpretation, homography, bounce, hit, rally, point, scoring, or adjudication has been added.
 
 ## Blueprint 5 Status
@@ -193,6 +198,27 @@ README
 ```
 
 Remaining Blueprint 5 work: none.
+
+## Blueprint 6 Status
+
+Status: in progress.
+
+Milestone 6A is complete. Blueprint 6 starts with Replay Mode:
+
+```text
+indexed media
+-> replay info payload
+-> browser video endpoint
+-> /replay/<media_id>
+-> HTML video playback
+-> current timestamp/frame display
+-> timeline shell
+-> selected run context
+```
+
+Current Blueprint 6 progress: about 15-20%.
+
+6A is foundation only. Detection observation overlay playback, tracklet/pose replay layers, evidence lanes, stream proxy mode, and operator review hardening are future milestones.
 
 ## Milestone 5D Status
 

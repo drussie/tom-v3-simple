@@ -1177,3 +1177,44 @@ Milestone 5E created:
 - Final validation reporting.
 
 TOM v3 Simple is complete. The recommended next step is to stop building TOM v3 Simple and use/demo it. Future work should begin as a separate blueprint only if deliberately chosen.
+
+## Milestone 6A - Video Replay Timeline Foundation
+
+Status: complete
+
+### Goal
+
+Start Blueprint 6 with a replay workstation foundation that can load indexed local media into a browser video player and synchronize playback time to TOM media-owned frame/time.
+
+### Non-goals
+
+- No detection overlay playback yet.
+- No tracklet overlay playback yet.
+- No pose overlay playback yet.
+- No stream ingestion.
+- No new model/runtime capability.
+- No real pose runtime or adapter inference.
+- No movement interpretation.
+- No stroke classification.
+- No serve, hit, split-step, or biomechanics conclusions.
+- No court homography.
+- No bounce detection.
+- No rally segmentation.
+- No point reconstruction.
+- No scoring.
+- No adjudication.
+
+### Notes
+
+Milestone 6A created:
+
+- Replay backend service with frame/time mapping helpers and available run grouping.
+- `GET /media/{media_id}/replay-info`.
+- `GET /media/{media_id}/video` for local indexed media playback.
+- `/replay/[mediaId]` web route.
+- `ReplayVideoPlayer` with native video controls, current timestamp, nearest frame, and timeline shell.
+- Overlay placeholder text that keeps detection/tracklet/pose playback deferred to later milestones.
+- `make replay-open MEDIA_ID=<media_id>`.
+- `docs/REPLAY_WORKSTATION.md`, Blueprint 6 docs, milestone docs, handoff, and agent report.
+
+Blueprint 6 is now in progress. TOM v3 Simple remains complete.

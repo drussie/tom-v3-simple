@@ -14,7 +14,7 @@ TOM v3 Simple is complete as a lightweight local observation/evidence platform. 
 
 It remains intentionally non-decisive about tennis meaning. It does not include real pose inference, movement interpretation, stroke classification, homography, bounce/hit/rally/point/scoring, production deployment, auth, streaming, or TOM v2-style adjudication.
 
-Future work should start as a new blueprint.
+Blueprint 6 has now started as a new visual replay/operator layer on top of the completed Simple platform. Milestone 6A adds replay video playback and media-owned frame/time synchronization only.
 
 ## What It Does
 
@@ -143,13 +143,14 @@ Real YOLO smoke requires a separate optional runtime environment, local weights 
 - [Optional YOLO](docs/OPTIONAL_YOLO.md)
 - [Exports](docs/EXPORTS.md)
 - [Provenance Audit](docs/PROVENANCE_AUDIT.md)
+- [Replay Workstation](docs/REPLAY_WORKSTATION.md)
 - [Completion Checklist](docs/COMPLETION_CHECKLIST.md)
 - [Final Completion Review](docs/blueprints/tom_v3_simple_final_completion_review.md)
 - [Control Room Index](docs/CONTROL_ROOM_INDEX.md)
 
 ## Current State
 
-Blueprints 1, 2, 3, 4, and 5 are complete. TOM v3 Simple is complete as a lightweight local platform.
+Blueprints 1, 2, 3, 4, and 5 are complete. TOM v3 Simple is complete as a lightweight local platform. Blueprint 6 is in progress.
 
 Current TOM v3 Simple path:
 
@@ -166,4 +167,20 @@ media
 -> provenance audit
 ```
 
-Recommended next step: stop building TOM v3 Simple and use/demo it. Future work should begin as a deliberately chosen new blueprint.
+Replay workstation foundation:
+
+```text
+indexed media
+-> /media/<media_id>/replay-info
+-> /media/<media_id>/video
+-> /replay/<media_id>
+-> current timestamp/frame display
+```
+
+Open a replay URL after running the demo:
+
+```bash
+make replay-open MEDIA_ID=<media_id>
+```
+
+Milestone 6A does not add overlay playback or tennis-event interpretation. Detection overlays over video begin in a later Blueprint 6 milestone.

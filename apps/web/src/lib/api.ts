@@ -1,4 +1,10 @@
-import type { HumanAnnotation, JsonRecord, TrackletEvidenceBundle, ViewerRun } from "./types";
+import type {
+  HumanAnnotation,
+  JsonRecord,
+  ReplayInfo,
+  TrackletEvidenceBundle,
+  ViewerRun
+} from "./types";
 
 const defaultApiBaseUrl = "http://127.0.0.1:8000";
 
@@ -16,6 +22,18 @@ export async function fetchViewerRun(runId: string): Promise<ViewerRun> {
   }
 
   return (await response.json()) as ViewerRun;
+}
+
+export async function fetchReplayInfo(mediaId: string): Promise<ReplayInfo> {
+  const response = await fetch(`${getApiBaseUrl()}/media/${mediaId}/replay-info`, {
+    cache: "no-store"
+  });
+
+  if (!response.ok) {
+    throw new Error(`Unable to load replay info for media ${mediaId}: ${response.status}`);
+  }
+
+  return (await response.json()) as ReplayInfo;
 }
 
 export async function fetchTrackletEvidenceBundle(

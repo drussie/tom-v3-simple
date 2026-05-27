@@ -7,9 +7,10 @@
 - Blueprint 3: COMPLETE
 - Blueprint 4: COMPLETE
 - Blueprint 5: COMPLETE
+- Blueprint 6: IN PROGRESS
 - TOM v3 Simple: COMPLETE
 
-TOM v3 Simple is complete as a lightweight local observation/evidence platform. Future work should start as a new blueprint.
+TOM v3 Simple is complete as a lightweight local observation/evidence platform. Blueprint 6 has started as the visual replay/operator layer.
 
 ## Blueprint 1 - Media, Observation Store, Viewer Foundation
 
@@ -146,3 +147,32 @@ fixture demo
 Blueprint 5 proved that TOM v3 Simple can be run, inspected, audited, explained, and demoed locally without adding tennis interpretation capability.
 
 Blueprint 5 did not add real pose inference, movement interpretation, stroke classification, homography, bounce/hit/rally/point/scoring, production deployment, auth, streaming, or adjudication.
+
+## Blueprint 6 - Visual Replay / Live Observation Workstation
+
+Status: IN PROGRESS
+
+Milestone 6A proved:
+
+```text
+indexed media asset
+-> browser-usable local video URL
+-> replay info payload
+-> frontend replay route
+-> HTML video player
+-> current TOM timestamp/frame display
+-> timeline shell
+-> available run context
+```
+
+Milestone 6A did not add:
+
+- detection overlay playback
+- tracklet overlay playback
+- pose overlay playback
+- live stream ingestion
+- model/runtime expansion
+- homography
+- bounce or hit detection
+- rally/point/scoring
+- adjudication
