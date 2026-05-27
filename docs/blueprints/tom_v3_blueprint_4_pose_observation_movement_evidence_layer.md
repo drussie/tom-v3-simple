@@ -4,7 +4,7 @@
 
 Status: in progress
 
-Milestones 4A, 4B, and 4C are complete. They establish the pose runtime/schema foundation, pose adapter normalization foundation, and pose observation persistence/lineage foundation.
+Milestones 4A, 4B, 4C, 4D, and 4E are complete. They establish the pose runtime/schema foundation, pose adapter normalization foundation, pose observation persistence/lineage foundation, pose overlay viewer foundation, and pose query/review/export foundation.
 
 ## Mission
 
@@ -102,6 +102,22 @@ Milestone 4D adds:
 
 4D does not add real pose inference, movement interpretation, pose review/export integration, or event candidates.
 
+## Milestone 4E Result
+
+Milestone 4E adds:
+
+- pose-specific query filters and `POST /pose/query`
+- pose evidence bundle service and `GET /pose-observations/{pose_observation_id}/evidence-bundle`
+- pose review label vocabulary
+- keypoint-level annotation metadata support through `human_annotation.payload_jsonb`
+- TOM-native pose review dataset export
+- `pose_review_dataset_export` evidence artifacts with checksum metadata
+- query result memory for run/media/query-based exports
+- worker `export-pose-review-dataset`
+- tests for query filters, bundles, annotation immutability, and exports
+
+4E does not add real pose inference, movement interpretation, pose-derived event candidates, or third-party training format conversion.
+
 ## Observation Boundary
 
 A pose observation means:
@@ -122,7 +138,7 @@ A biomechanical conclusion is valid.
 A rally or point exists.
 ```
 
-## Out of Scope For Blueprint 4A-4D
+## Out of Scope For Blueprint 4A-4E
 
 - real pose inference
 - movement interpretation
@@ -139,5 +155,5 @@ A rally or point exists.
 Recommended next milestone:
 
 ```text
-Milestone 4E - Pose Query / Review / Export Integration
+Milestone 4F - Blueprint 4 Completion Review / Pose Evidence Hardening
 ```

@@ -11,6 +11,7 @@ from apps.api.routers import (
     dev,
     media,
     observations,
+    pose,
     registry,
     runs,
     tracklets,
@@ -44,6 +45,7 @@ def create_app() -> FastAPI:
     app.include_router(annotations.router)
     app.include_router(dev.router)
     app.include_router(tracklets.router)
+    app.include_router(pose.router)
     app.include_router(viewer.router)
     return app
 

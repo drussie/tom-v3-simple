@@ -10,10 +10,15 @@ from tom_v3_model_adapters.yolo_weights import (
     YoloWeightsValidationError,
 )
 from tom_v3_observations.synthetic import BASELINE_SCENARIO_NAME, verify_synthetic_run
-from tom_v3_schema.exports import TrackletReviewDatasetExportRequest
+from tom_v3_schema.exports import (
+    PoseReviewDatasetExportRequest,
+    TrackletReviewDatasetExportRequest,
+)
+from tom_v3_schema.pose import PoseQueryFilters
 from tom_v3_schema.tracklets import TrackletQueryFilters
 from tom_v3_storage.db_models import Base
 
+from apps.api.services.pose_review_export import export_pose_review_dataset
 from apps.api.services.tracklet_review_export import export_tracklet_review_dataset
 from apps.worker.config import settings
 from apps.worker.pipelines.synthetic_seed import seed_synthetic_run
@@ -267,6 +272,40 @@ def main() -> None:
     export_parser.add_argument("--created-by", default="tom-v3-worker")
     export_parser.add_argument("--skip-create-db", action="store_true")
     export_parser.set_defaults(handler=_handle_export_tracklet_review_dataset)
+
+    pose_export_parser = subcommands.add_parser(
+        "export-pose-review-dataset",
+        help="Export pose observations as a TOM-native review dataset artifact.",
+    )
+    pose_export_parser.add_argument(
+        "--pose-observation-id",
+        action="append",
+        dest="pose_observation_ids",
+        default=[],
+        help="Pose observation id to export. May be supplied more than once.",
+    )
+    pose_export_parser.add_argument("--run-id")
+    pose_export_parser.add_argument("--media-id")
+    pose_export_parser.add_argument(
+        "--query-json",
+        help="Structured pose query JSON. Reuses the pose query service.",
+    )
+    pose_export_parser.add_argument("--output-root", default=".data/exports")
+    pose_export_parser.add_argument("--format", default="json", choices=["json"])
+    pose_export_parser.add_argument(
+        "--include-annotations",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+    )
+    pose_export_parser.add_argument(
+        "--include-artifacts",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+    )
+    pose_export_parser.add_argument("--query-name")
+    pose_export_parser.add_argument("--created-by", default="tom-v3-worker")
+    pose_export_parser.add_argument("--skip-create-db", action="store_true")
+    pose_export_parser.set_defaults(handler=_handle_export_pose_review_dataset)
 
     yolo_probe_parser = subcommands.add_parser(
         "yolo-runtime-probe",
@@ -578,6 +617,25 @@ def _handle_export_tracklet_review_dataset(
         created_by=args.created_by,
     )
     return export_tracklet_review_dataset(session, request).model_dump()
+
+
+def _handle_export_pose_review_dataset(
+    session: Session, args: argparse.Namespace
+) -> dict[str, object]:
+    query = PoseQueryFilters(**json.loads(args.query_json)) if args.query_json else None
+    request = PoseReviewDatasetExportRequest(
+        pose_observation_ids=args.pose_observation_ids,
+        query=query,
+        run_id=args.run_id,
+        media_id=args.media_id,
+        include_annotations=args.include_annotations,
+        include_artifacts=args.include_artifacts,
+        format=args.format,
+        output_root=args.output_root,
+        query_name=args.query_name,
+        created_by=args.created_by,
+    )
+    return export_pose_review_dataset(session, request).model_dump()
 
 
 def _handle_yolo_runtime_probe(session: Session, args: argparse.Namespace) -> dict[str, object]:

@@ -153,6 +153,17 @@ Milestone 4D makes persisted pose rows visible in the existing Evidence Viewer:
 
 The viewer displays candidate source context. It does not identify a player or interpret movement.
 
+## Query, Review, and Export Use
+
+Milestone 4E adds query/review/export integration on top of the persisted pose and lineage records:
+
+- `POST /pose/query` filters pose rows by run/media/frame/time, pose confidence, missing keypoint count, skeleton format, and source association fields.
+- `GET /pose-observations/{pose_observation_id}/evidence-bundle` returns the pose detail, source candidate context, lineage rows, artifacts, annotations, model, and runtime config summaries.
+- `human_annotation` can target a pose observation and store keypoint-level review metadata in `payload_jsonb`.
+- `export-pose-review-dataset` packages pose observations, keypoints, source context, lineage, artifacts, and annotations into a TOM-native review dataset artifact.
+
+Lineage remains descriptive source context. It does not establish identity or movement meaning.
+
 ## Non-Goals
 
 - No real pose inference.

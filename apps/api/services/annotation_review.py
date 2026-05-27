@@ -33,8 +33,30 @@ SOURCE_DETECTION_REVIEW_LABELS = [
     "uncertain",
 ]
 
+POSE_REVIEW_LABELS = [
+    "likely_good_pose",
+    "bad_pose",
+    "wrong_subject",
+    "bad_skeleton",
+    "uncertain",
+    "missing_keypoint",
+    "bad_keypoint",
+    "low_confidence_but_visible",
+    "keypoint_on_wrong_body_part",
+    "keypoint_occluded",
+    "uncertain_keypoint",
+    "bad_source_detection",
+    "bad_tracklet_context",
+    "subject_association_uncertain",
+]
+
 REVIEW_LABELS = sorted(
-    set(TRACKLET_REVIEW_LABELS + TRACK_POINT_REVIEW_LABELS + SOURCE_DETECTION_REVIEW_LABELS)
+    set(
+        TRACKLET_REVIEW_LABELS
+        + TRACK_POINT_REVIEW_LABELS
+        + SOURCE_DETECTION_REVIEW_LABELS
+        + POSE_REVIEW_LABELS
+    )
 )
 
 

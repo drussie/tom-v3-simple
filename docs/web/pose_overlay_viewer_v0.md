@@ -100,10 +100,19 @@ When source association candidate fields exist, the panel displays:
 
 This is candidate context only. It does not establish player identity or movement meaning.
 
+## Review and Export Context
+
+Milestone 4E keeps pose review/export integration outside the overlay renderer:
+
+- pose annotations are created through the generic annotation API
+- selected pose annotations still appear in the existing annotation panel when present in the viewer payload
+- pose evidence bundles and review dataset exports are available through the backend/API and worker CLI
+
+The viewer does not convert pose review labels into movement conclusions.
+
 ## Known Limitations
 
 - No real pose inference is added by this milestone.
-- No pose review UI is added yet.
-- No pose export integration is added yet.
+- The pose review label form remains a future viewer enhancement; service/API support exists.
 - Deeper source observation lookup remains in existing lineage/detail panels.
 - No video playback pose overlay is implemented.

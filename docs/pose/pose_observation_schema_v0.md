@@ -103,7 +103,18 @@ relationship_type = pose_from_subject_detection_candidate
 
 Pose observations are queryable through the existing observation query path by media id, run id, frame range, confidence, family, and type.
 
-Future pose-specific filters may add keypoint missing count, skeleton format, and association status.
+Milestone 4E adds pose-specific filters through `POST /pose/query` for:
+
+- frame/time range
+- pose confidence range
+- missing keypoint count range
+- skeleton format
+- association status and method
+- subject reference type
+- source detection, tracklet, and track point candidate ids
+- review label
+
+Each query row includes the observation spine, typed pose detail, annotation summary, artifact summary, and evidence bundle URL.
 
 ## Normalization Compatibility
 
@@ -142,6 +153,12 @@ The Evidence Viewer uses:
 - subject association candidate fields for source context display
 
 The viewer renders only present keypoints with numeric coordinates. Missing keypoints remain visible in the keypoint table and are not drawn as present markers.
+
+## Review and Export
+
+Milestone 4E uses the existing `human_annotation` table for pose review annotations. Keypoint-level review metadata is stored in annotation payload JSON with fields such as `keypoint_name` and `keypoint_index`.
+
+Pose review dataset export writes TOM-native JSON under `.data/exports/pose/{export_id}/pose_review_dataset.json` and records an `evidence_artifact` row with checksum and export metadata.
 
 ## Non-Goals
 

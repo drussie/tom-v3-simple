@@ -919,3 +919,36 @@ Milestone 4D created:
 - Selected pose metadata, source association candidate context, and keypoint confidence table.
 - A pose observations timeline row.
 - Tests proving viewer payloads include pose detail for overlay rendering.
+
+## Milestone 4E - Pose Query / Review / Export Integration
+
+Status: complete
+
+### Goal
+
+Make persisted pose evidence searchable, reviewable, and exportable without adding pose inference or movement interpretation.
+
+### Non-goals
+
+- No real pose runtime or adapter inference.
+- No movement interpretation.
+- No serve, split-step, or biomechanics conclusions.
+- No court homography.
+- No bounce detection.
+- No hit detection.
+- No rally segmentation.
+- No point reconstruction.
+- No scoring.
+- No adjudication.
+
+### Notes
+
+Milestone 4E created:
+
+- Pose query schema and service for typed `pose_observation` filters.
+- API endpoints for pose query, pose evidence bundle, and pose review export.
+- Pose evidence bundle service with pose detail, source candidate context, lineage, artifacts, annotations, model, and runtime config summaries.
+- Pose review label vocabulary and keypoint-level annotation metadata support through the generic `human_annotation` table.
+- TOM-native pose review dataset export service with local JSON output, checksum, `evidence_artifact` metadata, and query result memory.
+- Worker command `export-pose-review-dataset`.
+- Focused tests for pose query filters, bundle content, annotation immutability, and export artifacts.

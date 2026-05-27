@@ -2,7 +2,7 @@
 
 ## Current Progress Gauge
 
-Current: ~70-75% through Blueprint 4
+Current: ~88-92% through Blueprint 4
 
 ## Current
 
@@ -123,6 +123,11 @@ Current: ~70-75% through Blueprint 4
 - COCO17 skeleton edges and present keypoint markers render from persisted image-pixel coordinates.
 - Missing keypoints remain missing evidence and are not drawn as present markers.
 - Selected pose metadata, keypoint confidence rows, and source association candidate context are visible in the viewer.
+- Pose query service and API exist.
+- Pose observations are searchable by run/media/frame/time, confidence, missing keypoint count, skeleton format, and source association fields.
+- Pose evidence bundle service and API exist.
+- Pose annotations use the existing generic `human_annotation` path with pose labels and keypoint-level metadata.
+- Pose review dataset export exists as TOM-native JSON with `evidence_artifact` metadata, checksum, and query result memory.
 - No real pose inference, movement interpretation, homography, bounce, hit, rally, point, scoring, or adjudication has been added.
 
 ## After Milestone 0A
@@ -591,3 +596,22 @@ Expected: ~70-75% through Blueprint 4
 Status: complete.
 
 The repo now has a pose overlay viewer foundation. The existing Evidence Viewer can inspect persisted `player_pose_observation` rows, draw COCO17 keypoint evidence and skeleton edges in image-pixel coordinates, show selected pose metadata, list all keypoint present/missing states, and display source association candidate context without interpreting movement.
+
+## After Milestone 4E
+
+Expected: ~88-92% through Blueprint 4
+
+- Pose observations can be queried with pose-specific filters.
+- Pose evidence bundles include pose detail, source context, lineage, artifacts, and annotations.
+- Pose observations can receive review annotations through the generic annotation API.
+- Keypoint-level annotation metadata is supported in annotation payload JSON.
+- Pose evidence can be exported as TOM-native review dataset JSON.
+- Export artifacts are persisted with checksum and evidence artifact metadata.
+- Run/media/query-based exports can persist query result memory.
+- No real pose runtime, movement interpretation, homography, bounce, hit, rally, point, scoring, or adjudication is added.
+
+## Milestone 4E Status
+
+Status: complete.
+
+The repo now has pose query, review, and export integration. Persisted `player_pose_observation` rows can be filtered by typed pose fields, inspected through a pose evidence bundle, annotated with review labels and keypoint metadata, and exported as review dataset artifacts without changing the underlying pose evidence.

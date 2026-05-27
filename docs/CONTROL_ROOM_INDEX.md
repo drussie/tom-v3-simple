@@ -48,6 +48,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 4B - Pose Adapter Normalization Foundation](milestones/milestone_4b_pose_adapter_normalization_foundation.md)
 - [Milestone 4C - Pose Observation Persistence and Lineage](milestones/milestone_4c_pose_observation_persistence_lineage.md)
 - [Milestone 4D - Pose Overlay Viewer](milestones/milestone_4d_pose_overlay_viewer.md)
+- [Milestone 4E - Pose Query / Review / Export Integration](milestones/milestone_4e_pose_query_review_export_integration.md)
 
 ## Handoffs
 
@@ -76,6 +77,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 4B Handoff](handoffs/milestone_4b_pose_adapter_normalization_foundation_handoff.md)
 - [Milestone 4C Handoff](handoffs/milestone_4c_pose_observation_persistence_lineage_handoff.md)
 - [Milestone 4D Handoff](handoffs/milestone_4d_pose_overlay_viewer_handoff.md)
+- [Milestone 4E Handoff](handoffs/milestone_4e_pose_query_review_export_integration_handoff.md)
 
 ## Agent Reports
 
@@ -104,6 +106,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 4B Agent Report](agent_reports/milestone_4b_pose_adapter_normalization_foundation_report.md)
 - [Milestone 4C Agent Report](agent_reports/milestone_4c_pose_observation_persistence_lineage_report.md)
 - [Milestone 4D Agent Report](agent_reports/milestone_4d_pose_overlay_viewer_report.md)
+- [Milestone 4E Agent Report](agent_reports/milestone_4e_pose_query_review_export_integration_report.md)
 
 ## Blueprints
 
@@ -164,6 +167,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Pose Runtime Config v0](pose/pose_runtime_config_v0.md)
 - [Pose Adapter Normalization v0](pose/pose_adapter_normalization_v0.md)
 - [Pose Persistence and Lineage v0](pose/pose_persistence_lineage_v0.md)
+- [Pose Query / Review / Export v0](pose/pose_query_review_export_v0.md)
 
 ## Development
 

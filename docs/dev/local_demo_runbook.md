@@ -917,3 +917,54 @@ Expected behavior:
 - source association candidate context appears when the pose was linked to source `player_detection` evidence
 
 The pose overlay uses persisted image-pixel coordinates. It does not recompute pose, infer missing keypoints, smooth movement, identify a player, classify a stroke, create homography, detect bounce/hit events, reconstruct rallies/points, score, or adjudicate outcomes.
+
+## 29. Query, Review, and Export Pose Evidence
+
+Milestone 4E makes pose evidence searchable, reviewable, and exportable.
+
+Run focused checks:
+
+```bash
+pytest tests/test_pose_query_review_export.py -q
+```
+
+Query a fixture pose run:
+
+```bash
+curl -X POST http://127.0.0.1:8000/pose/query \
+  -H "Content-Type: application/json" \
+  -d '{"run_id":"<pose_run_id>","skeleton_format":"coco17"}'
+```
+
+Inspect a pose evidence bundle:
+
+```text
+GET /pose-observations/<pose_observation_id>/evidence-bundle
+```
+
+Export pose review evidence:
+
+```bash
+python -m apps.worker.cli export-pose-review-dataset \
+  --run-id <pose_run_id> \
+  --output-root .data/exports
+```
+
+Query-based export:
+
+```bash
+python -m apps.worker.cli export-pose-review-dataset \
+  --query-json '{"association_status":"candidate","keypoints_missing_count_min":1}' \
+  --output-root .data/exports
+```
+
+Expected behavior:
+
+- query results include pose detail, annotation summary, artifact summary, and evidence bundle URL
+- evidence bundle includes pose detail, lineage, source candidate context, artifacts, and annotations
+- review annotations can target pose observations through the existing annotation API
+- keypoint-level metadata can be stored in annotation payload JSON
+- export writes `.data/exports/pose/<export_id>/pose_review_dataset.json`
+- export creates `pose_review_dataset_export` artifact metadata with checksum
+
+Pose review/export packages evidence for inspection. It does not add real pose inference, movement interpretation, tennis-event inference, homography, bounce/hit/rally/point/scoring, or adjudication.

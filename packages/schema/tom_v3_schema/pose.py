@@ -141,6 +141,59 @@ class PoseObservationRead(PoseObservationCreate):
     created_at: datetime
 
 
+class PoseQueryFilters(TOMBaseModel):
+    media_id: str | None = None
+    run_id: str | None = None
+    frame_start_gte: int | None = None
+    frame_end_lte: int | None = None
+    timestamp_start_gte: int | None = None
+    timestamp_end_lte: int | None = None
+    pose_confidence_min: float | None = None
+    pose_confidence_max: float | None = None
+    keypoints_missing_count_min: int | None = None
+    keypoints_missing_count_max: int | None = None
+    skeleton_format: str | None = None
+    association_status: str | None = None
+    association_method: str | None = None
+    subject_ref_type: str | None = None
+    subject_detection_observation_id: str | None = None
+    subject_tracklet_id: str | None = None
+    subject_track_point_id: str | None = None
+    review_label: str | None = None
+    limit: int = Field(default=50, ge=1, le=500)
+    offset: int = Field(default=0, ge=0)
+
+
+class PoseQueryRow(TOMBaseModel):
+    observation: dict[str, Any]
+    pose: dict[str, Any]
+    media_id: str
+    run_id: str
+    frame_number: int
+    timestamp_ms: int
+    skeleton_format: str
+    skeleton_version: str
+    pose_confidence: float | None
+    keypoints_present_count: int
+    keypoints_missing_count: int
+    subject_ref_type: str
+    association_status: str
+    association_method: str | None
+    subject_detection_observation_id: str | None = None
+    subject_tracklet_id: str | None = None
+    subject_track_point_id: str | None = None
+    annotation_summary: dict[str, Any] = Field(default_factory=dict)
+    artifact_summary: dict[str, Any] = Field(default_factory=dict)
+    evidence_bundle_url: str
+
+
+class PoseQueryResponse(TOMBaseModel):
+    count: int
+    poses: list[PoseQueryRow]
+    filters_applied: dict[str, Any]
+    summary: dict[str, Any] = Field(default_factory=dict)
+
+
 def default_pose_runtime_config_payload(
     *,
     model_registry_id: str | None = None,
