@@ -1,0 +1,58 @@
+import type {
+  ReplayTimelineItem,
+  ReplayTrackletTimelineItem
+} from "./types";
+
+export function timelinePointPercent(
+  timestampMs: number,
+  durationMs: number | null
+): number {
+  if (durationMs === null || durationMs <= 0) {
+    return 0;
+  }
+  return clampPercent((timestampMs / durationMs) * 100);
+}
+
+export function timelineSpanPosition(
+  item: ReplayTrackletTimelineItem,
+  durationMs: number | null
+): { left: number; width: number } {
+  if (durationMs === null || durationMs <= 0) {
+    return { left: 0, width: 0 };
+  }
+  const start = Math.min(item.timestamp_start_ms, item.timestamp_end_ms);
+  const end = Math.max(item.timestamp_start_ms, item.timestamp_end_ms);
+  const left = timelinePointPercent(start, durationMs);
+  const right = timelinePointPercent(end, durationMs);
+  return {
+    left,
+    width: Math.max(0.6, right - left)
+  };
+}
+
+export function timelineItemTimestampMs(item: ReplayTimelineItem): number {
+  if (item.item_type === "tracklet") {
+    return item.timestamp_start_ms;
+  }
+  return item.timestamp_ms;
+}
+
+export function timelineItemKey(item: ReplayTimelineItem): string {
+  if (item.item_type === "detection") {
+    return `detection:${item.observation_id}`;
+  }
+  if (item.item_type === "tracklet") {
+    return `tracklet:${item.tracklet_id}`;
+  }
+  if (item.item_type === "pose") {
+    return `pose:${item.observation_id}`;
+  }
+  return `annotation:${item.annotation_id}`;
+}
+
+function clampPercent(value: number): number {
+  if (!Number.isFinite(value)) {
+    return 0;
+  }
+  return Math.max(0, Math.min(value, 100));
+}

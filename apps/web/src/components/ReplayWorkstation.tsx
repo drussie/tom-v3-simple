@@ -3,8 +3,9 @@
 import type { ReactNode } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { fetchReplayOverlayChunk } from "../lib/api";
+import { fetchReplayOverlayChunk, fetchReplayTimeline } from "../lib/api";
 import { selectInitialReplayRun } from "../lib/replayOverlays";
+import { timelineItemKey, timelineItemTimestampMs } from "../lib/replayTimeline";
 import type {
   ReplayDetectionOverlay,
   ReplayInfo,
@@ -12,11 +13,15 @@ import type {
   ReplayPlaybackState,
   ReplayPoseOverlay,
   ReplayRunSummary,
+  ReplaySeekRequest,
+  ReplayTimeline,
+  ReplayTimelineItem,
   ReplayTrackletOverlay,
   ReplayTrackPointOverlay
 } from "../lib/types";
 import { formatConfidence } from "../lib/timeline";
 import { ReplayDetectionOverlay as ReplayDetectionOverlayLayer } from "./ReplayDetectionOverlay";
+import { ReplayEvidenceTimeline } from "./ReplayEvidenceTimeline";
 import { ReplayPoseOverlay as ReplayPoseOverlayLayer } from "./ReplayPoseOverlay";
 import { ReplayTrackletOverlay as ReplayTrackletOverlayLayer } from "./ReplayTrackletOverlay";
 import { ReplayVideoPlayer } from "./ReplayVideoPlayer";
@@ -38,11 +43,21 @@ interface OverlayState {
   error: string | null;
 }
 
+interface TimelineState {
+  timeline: ReplayTimeline | null;
+  loading: boolean;
+  error: string | null;
+}
+
 type SelectedReplayEvidence =
   | { kind: "detection"; detection: ReplayDetectionOverlay }
+  | { kind: "detection_timeline"; item: Extract<ReplayTimelineItem, { item_type: "detection" }> }
   | { kind: "tracklet"; tracklet: ReplayTrackletOverlay }
+  | { kind: "tracklet_timeline"; item: Extract<ReplayTimelineItem, { item_type: "tracklet" }> }
   | { kind: "track_point"; tracklet: ReplayTrackletOverlay; point: ReplayTrackPointOverlay }
-  | { kind: "pose"; pose: ReplayPoseOverlay };
+  | { kind: "pose"; pose: ReplayPoseOverlay }
+  | { kind: "pose_timeline"; item: Extract<ReplayTimelineItem, { item_type: "pose" }> }
+  | { kind: "annotation"; item: Extract<ReplayTimelineItem, { item_type: "annotation" }> };
 
 export function ReplayWorkstation({ replayInfo, selectedRuns }: ReplayWorkstationProps) {
   const initialDetectionRunId = useMemo(
@@ -80,6 +95,12 @@ export function ReplayWorkstation({ replayInfo, selectedRuns }: ReplayWorkstatio
     loading: false,
     error: null
   });
+  const [timelineState, setTimelineState] = useState<TimelineState>({
+    timeline: null,
+    loading: false,
+    error: null
+  });
+  const [seekRequest, setSeekRequest] = useState<ReplaySeekRequest | null>(null);
   const chunkCache = useRef<Map<string, ReplayOverlayChunk>>(new Map());
 
   useEffect(() => {
@@ -182,25 +203,83 @@ export function ReplayWorkstation({ replayInfo, selectedRuns }: ReplayWorkstatio
     selectedTrackletRunId
   ]);
 
+  useEffect(() => {
+    let cancelled = false;
+    setTimelineState((current) => ({ ...current, loading: true, error: null }));
+    fetchReplayTimeline({
+      mediaId: replayInfo.media_id,
+      detectionRunId: selectedDetectionRunId,
+      trackletRunId: selectedTrackletRunId,
+      poseRunId: selectedPoseRunId,
+      includeAnnotations: true
+    })
+      .then((timeline) => {
+        if (!cancelled) {
+          setTimelineState({ timeline, loading: false, error: null });
+        }
+      })
+      .catch((error: unknown) => {
+        if (!cancelled) {
+          setTimelineState({
+            timeline: null,
+            loading: false,
+            error: error instanceof Error ? error.message : "Unable to load replay timeline"
+          });
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [replayInfo.media_id, selectedDetectionRunId, selectedPoseRunId, selectedTrackletRunId]);
+
   const handlePlaybackStateChange = useCallback((state: ReplayPlaybackState) => {
     setPlayback(state);
+  }, []);
+
+  const handleTimelineItemSelect = useCallback((item: ReplayTimelineItem) => {
+    setSeekRequest({ timestampMs: timelineItemTimestampMs(item), nonce: Date.now() });
+    if (item.item_type === "detection") {
+      setSelectedEvidence({ kind: "detection_timeline", item });
+      return;
+    }
+    if (item.item_type === "tracklet") {
+      setSelectedEvidence({ kind: "tracklet_timeline", item });
+      return;
+    }
+    if (item.item_type === "pose") {
+      setSelectedEvidence({ kind: "pose_timeline", item });
+      return;
+    }
+    setSelectedEvidence({ kind: "annotation", item });
   }, []);
 
   const detections = overlayState.chunk?.detections ?? [];
   const tracklets = overlayState.chunk?.tracklets ?? [];
   const poses = overlayState.chunk?.poses ?? [];
   const selectedDetectionId =
-    selectedEvidence?.kind === "detection" ? selectedEvidence.detection.observation_id : null;
+    selectedEvidence?.kind === "detection"
+      ? selectedEvidence.detection.observation_id
+      : selectedEvidence?.kind === "detection_timeline"
+        ? selectedEvidence.item.observation_id
+        : null;
   const selectedTrackletId =
     selectedEvidence?.kind === "tracklet"
       ? selectedEvidence.tracklet.tracklet_id
+      : selectedEvidence?.kind === "tracklet_timeline"
+        ? selectedEvidence.item.tracklet_id
       : selectedEvidence?.kind === "track_point"
         ? selectedEvidence.tracklet.tracklet_id
         : null;
   const selectedTrackPointId =
     selectedEvidence?.kind === "track_point" ? selectedEvidence.point.track_point_id : null;
   const selectedPoseObservationId =
-    selectedEvidence?.kind === "pose" ? selectedEvidence.pose.observation_id : null;
+    selectedEvidence?.kind === "pose"
+      ? selectedEvidence.pose.observation_id
+      : selectedEvidence?.kind === "pose_timeline"
+        ? selectedEvidence.item.observation_id
+        : null;
+  const selectedTimelineKey = selectedTimelineItemKey(selectedEvidence);
 
   return (
     <main className="viewer-shell replay-shell">
@@ -227,6 +306,7 @@ export function ReplayWorkstation({ replayInfo, selectedRuns }: ReplayWorkstatio
           <ReplayVideoPlayer
             onPlaybackStateChange={handlePlaybackStateChange}
             replayInfo={replayInfo}
+            seekRequest={seekRequest}
           >
             <ReplayDetectionOverlayLayer
               currentFrame={playback.frameNumber}
@@ -298,14 +378,20 @@ export function ReplayWorkstation({ replayInfo, selectedRuns }: ReplayWorkstatio
             showTracklets={showTracklets}
             trackletRuns={replayInfo.available_runs.tracklet}
           />
-          <OverlayTimelineTicks
-            detections={detections}
-            onSelectDetection={(detection) => setSelectedEvidence({ kind: "detection", detection })}
-            onSelectPose={(pose) => setSelectedEvidence({ kind: "pose", pose })}
-            onSelectTracklet={(tracklet) => setSelectedEvidence({ kind: "tracklet", tracklet })}
-            poses={poses}
-            selectedEvidence={selectedEvidence}
-            tracklets={tracklets}
+          <ReplayEvidenceTimeline
+            currentTimestampMs={playback.timestampMs}
+            durationMs={replayInfo.duration_ms}
+            error={timelineState.error}
+            isLoading={timelineState.loading}
+            layerVisibility={{
+              detections: showDetections,
+              tracklets: showTracklets,
+              pose: showPoses,
+              annotations: true
+            }}
+            onSelectItem={handleTimelineItemSelect}
+            selectedItemKey={selectedTimelineKey}
+            timeline={timelineState.timeline}
           />
           <SelectedRunContext
             replayInfo={replayInfo}
@@ -318,18 +404,6 @@ export function ReplayWorkstation({ replayInfo, selectedRuns }: ReplayWorkstatio
           <ReplayMediaPanel replayInfo={replayInfo} />
           <SelectedEvidencePanel selectedEvidence={selectedEvidence} />
           <AvailableRunsPanel replayInfo={replayInfo} />
-          <section className="panel">
-            <div className="panel-header">
-              <h2>Future Timeline Lanes</h2>
-              <span className="mini-pill">6D</span>
-            </div>
-            <div className="panel-body">
-              <p className="empty-state">
-                Detection, tracklet candidate, and pose observation overlays now play over video.
-                Full evidence lanes and richer scrubbing arrive in the next replay milestone.
-              </p>
-            </div>
-          </section>
         </aside>
       </div>
     </main>
@@ -461,100 +535,6 @@ function RunSelect({
   );
 }
 
-function OverlayTimelineTicks({
-  detections,
-  tracklets,
-  poses,
-  selectedEvidence,
-  onSelectDetection,
-  onSelectTracklet,
-  onSelectPose
-}: {
-  detections: ReplayDetectionOverlay[];
-  tracklets: ReplayTrackletOverlay[];
-  poses: ReplayPoseOverlay[];
-  selectedEvidence: SelectedReplayEvidence | null;
-  onSelectDetection: (detection: ReplayDetectionOverlay) => void;
-  onSelectTracklet: (tracklet: ReplayTrackletOverlay) => void;
-  onSelectPose: (pose: ReplayPoseOverlay) => void;
-}) {
-  const itemCount = detections.length + tracklets.length + poses.length;
-  return (
-    <section className="panel">
-      <div className="panel-header">
-        <h2>Loaded Overlay Ticks</h2>
-        <span className="mini-pill">{itemCount} loaded items</span>
-      </div>
-      <div className="panel-body detection-tick-list">
-        {itemCount === 0 ? (
-          <p className="empty-state">
-            No replay overlays loaded for this window. Select runs and play or scrub the video.
-          </p>
-        ) : (
-          <>
-            {detections.map((detection) => (
-              <button
-                className={`detection-tick-row${
-                  selectedEvidence?.kind === "detection" &&
-                  selectedEvidence.detection.observation_id === detection.observation_id
-                    ? " selected"
-                    : ""
-                }`}
-                key={detection.observation_id}
-                onClick={() => onSelectDetection(detection)}
-                type="button"
-              >
-                <strong>{detection.label}</strong>
-                <span>frame {detection.frame_number}</span>
-                <span>{detection.timestamp_ms} ms</span>
-                <span>{formatConfidence(detection.confidence)}</span>
-              </button>
-            ))}
-            {tracklets.map((tracklet) => (
-              <button
-                className={`detection-tick-row${
-                  selectedEvidence?.kind === "tracklet" &&
-                  selectedEvidence.tracklet.tracklet_id === tracklet.tracklet_id
-                    ? " selected"
-                    : ""
-                }`}
-                key={tracklet.tracklet_id}
-                onClick={() => onSelectTracklet(tracklet)}
-                type="button"
-              >
-                <strong>{tracklet.label_hint ?? tracklet.track_type}</strong>
-                <span>candidate path</span>
-                <span>
-                  {tracklet.timestamp_start_ms}-{tracklet.timestamp_end_ms} ms
-                </span>
-                <span>{tracklet.points.length} points</span>
-              </button>
-            ))}
-            {poses.map((pose) => (
-              <button
-                className={`detection-tick-row${
-                  selectedEvidence?.kind === "pose" &&
-                  selectedEvidence.pose.observation_id === pose.observation_id
-                    ? " selected"
-                    : ""
-                }`}
-                key={pose.observation_id}
-                onClick={() => onSelectPose(pose)}
-                type="button"
-              >
-                <strong>pose evidence</strong>
-                <span>frame {pose.frame_number}</span>
-                <span>{pose.timestamp_ms} ms</span>
-                <span>{pose.keypoints_present_count} present</span>
-              </button>
-            ))}
-          </>
-        )}
-      </div>
-    </section>
-  );
-}
-
 function ReplayMediaPanel({ replayInfo }: { replayInfo: ReplayInfo }) {
   return (
     <section className="panel">
@@ -681,6 +661,27 @@ function SelectedEvidencePanel({
     );
   }
 
+  if (selectedEvidence.kind === "detection_timeline") {
+    const { item } = selectedEvidence;
+    return (
+      <EvidencePanel title="Selected Detection Observation" badge={item.observation_type}>
+        <DetailRow label="observation id" value={item.observation_id} />
+        <DetailRow label="run id" value={item.run_id} />
+        <DetailRow label="label" value={item.label} />
+        <DetailRow label="confidence" value={formatConfidence(item.confidence)} />
+        <DetailRow label="frame" value={item.frame_number.toString()} />
+        <DetailRow label="timestamp_ms" value={item.timestamp_ms.toString()} />
+        <a className="quiet-link" href={`/runs/${item.run_id}`}>
+          Open source evidence run
+        </a>
+        <p className="evidence-note">
+          Detection observation selected from the evidence timeline. Evidence only, not a confirmed
+          object or tennis event.
+        </p>
+      </EvidencePanel>
+    );
+  }
+
   if (selectedEvidence.kind === "tracklet") {
     const { tracklet } = selectedEvidence;
     return (
@@ -708,6 +709,33 @@ function SelectedEvidencePanel({
     );
   }
 
+  if (selectedEvidence.kind === "tracklet_timeline") {
+    const { item } = selectedEvidence;
+    return (
+      <EvidencePanel title="Selected Tracklet Candidate" badge={item.track_type}>
+        <DetailRow label="tracklet id" value={item.tracklet_id} />
+        <DetailRow label="observation id" value={item.observation_id ?? "n/a"} />
+        <DetailRow label="run id" value={item.run_id} />
+        <DetailRow label="label hint" value={item.label_hint ?? "n/a"} />
+        <DetailRow label="track_status" value={item.track_status} />
+        <DetailRow label="identity_status" value={item.identity_status} />
+        <DetailRow label="frame range" value={`${item.frame_start} - ${item.frame_end}`} />
+        <DetailRow
+          label="timestamp range"
+          value={`${item.timestamp_start_ms} - ${item.timestamp_end_ms} ms`}
+        />
+        <DetailRow label="track points" value={item.track_point_count.toString()} />
+        <a className="quiet-link" href={`/runs/${item.run_id}`}>
+          Open source evidence run
+        </a>
+        <p className="evidence-note">
+          Tracklet candidate selected from the evidence timeline. Candidate temporal grouping only;
+          it does not confirm identity or path correctness.
+        </p>
+      </EvidencePanel>
+    );
+  }
+
   if (selectedEvidence.kind === "track_point") {
     const { tracklet, point } = selectedEvidence;
     return (
@@ -726,6 +754,54 @@ function SelectedEvidencePanel({
         </a>
         <p className="evidence-note">
           Track point candidate. Source-linked evidence only, without interpolation or smoothing.
+        </p>
+      </EvidencePanel>
+    );
+  }
+
+  if (selectedEvidence.kind === "pose_timeline") {
+    const { item } = selectedEvidence;
+    return (
+      <EvidencePanel title="Selected Pose Observation" badge="pose">
+        <DetailRow label="observation id" value={item.observation_id} />
+        <DetailRow label="run id" value={item.run_id} />
+        <DetailRow label="frame" value={item.frame_number.toString()} />
+        <DetailRow label="timestamp_ms" value={item.timestamp_ms.toString()} />
+        <DetailRow label="pose confidence" value={formatConfidence(item.pose_confidence)} />
+        <DetailRow
+          label="keypoints"
+          value={`${item.keypoints_present_count} present / ${item.keypoints_missing_count} missing`}
+        />
+        <a className="quiet-link" href={`/runs/${item.run_id}`}>
+          Open source evidence run
+        </a>
+        <p className="evidence-note">
+          Pose observation selected from the evidence timeline. Keypoint evidence only; it does not
+          classify strokes, movement, or biomechanics.
+        </p>
+      </EvidencePanel>
+    );
+  }
+
+  if (selectedEvidence.kind === "annotation") {
+    const { item } = selectedEvidence;
+    return (
+      <EvidencePanel title="Selected Review Annotation" badge={item.annotation_label}>
+        <DetailRow label="annotation id" value={item.annotation_id} />
+        <DetailRow label="target observation id" value={item.target_observation_id ?? "n/a"} />
+        <DetailRow label="target observation type" value={item.target_observation_type ?? "n/a"} />
+        <DetailRow label="target run id" value={item.target_run_id ?? "n/a"} />
+        <DetailRow label="frame" value={item.frame_number.toString()} />
+        <DetailRow label="timestamp_ms" value={item.timestamp_ms.toString()} />
+        <DetailRow label="created_by" value={item.created_by ?? "n/a"} />
+        {item.target_run_id !== null ? (
+          <a className="quiet-link" href={`/runs/${item.target_run_id}`}>
+            Open target evidence run
+          </a>
+        ) : null}
+        <p className="evidence-note">
+          Review annotation. Annotations are non-mutating review evidence; they do not change model
+          output or adjudicate tennis meaning.
         </p>
       </EvidencePanel>
     );
@@ -829,6 +905,25 @@ function SelectedRunRow({
       )}
     </div>
   );
+}
+
+function selectedTimelineItemKey(selectedEvidence: SelectedReplayEvidence | null): string | null {
+  if (selectedEvidence === null) {
+    return null;
+  }
+  if (selectedEvidence.kind === "detection") {
+    return `detection:${selectedEvidence.detection.observation_id}`;
+  }
+  if (selectedEvidence.kind === "tracklet") {
+    return `tracklet:${selectedEvidence.tracklet.tracklet_id}`;
+  }
+  if (selectedEvidence.kind === "track_point") {
+    return `tracklet:${selectedEvidence.tracklet.tracklet_id}`;
+  }
+  if (selectedEvidence.kind === "pose") {
+    return `pose:${selectedEvidence.pose.observation_id}`;
+  }
+  return timelineItemKey(selectedEvidence.item);
 }
 
 function DetailRow({ label, value }: { label: string; value: string }) {

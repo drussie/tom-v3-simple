@@ -1,0 +1,187 @@
+"use client";
+
+import type {
+  ReplayTimeline,
+  ReplayTimelineItem,
+  ReplayTimelineLane
+} from "../lib/types";
+import {
+  timelineItemKey,
+  timelineItemTimestampMs,
+  timelinePointPercent,
+  timelineSpanPosition
+} from "../lib/replayTimeline";
+
+interface ReplayEvidenceTimelineProps {
+  currentTimestampMs: number;
+  durationMs: number | null;
+  error: string | null;
+  isLoading: boolean;
+  layerVisibility: {
+    detections: boolean;
+    tracklets: boolean;
+    pose: boolean;
+    annotations: boolean;
+  };
+  onSelectItem: (item: ReplayTimelineItem) => void;
+  selectedItemKey: string | null;
+  timeline: ReplayTimeline | null;
+}
+
+export function ReplayEvidenceTimeline({
+  currentTimestampMs,
+  durationMs,
+  error,
+  isLoading,
+  layerVisibility,
+  onSelectItem,
+  selectedItemKey,
+  timeline
+}: ReplayEvidenceTimelineProps) {
+  const playheadPercent = timelinePointPercent(currentTimestampMs, durationMs);
+  const lanes = timeline?.lanes ?? [];
+
+  return (
+    <section className="panel replay-evidence-timeline">
+      <div className="panel-header">
+        <h2>Evidence Timeline</h2>
+        <span className="mini-pill">click to seek</span>
+      </div>
+      <div className="panel-body">
+        <p className="evidence-note">
+          Timeline lanes are navigation aids over persisted evidence. They do not classify tennis
+          actions or confirm object identity.
+        </p>
+        {error !== null ? <p className="empty-state">{error}</p> : null}
+        {isLoading && timeline === null ? (
+          <p className="empty-state">Loading timeline evidence lanes...</p>
+        ) : null}
+        {timeline === null && !isLoading && error === null ? (
+          <p className="empty-state">No timeline payload loaded for this replay media.</p>
+        ) : null}
+        {timeline !== null ? (
+          <div className="timeline-lane-stack">
+            <div className="timeline-ruler" aria-hidden="true">
+              <span>0 ms</span>
+              <span>{durationMs ?? 0} ms</span>
+            </div>
+            <div className="timeline-lanes">
+              <div
+                className="timeline-playhead"
+                style={{ left: `${playheadPercent}%` }}
+                title={`${currentTimestampMs} ms`}
+              />
+              {lanes.map((lane) => (
+                <TimelineLane
+                  durationMs={durationMs}
+                  isVisible={layerVisibility[lane.lane_type]}
+                  key={lane.lane_type}
+                  lane={lane}
+                  onSelectItem={onSelectItem}
+                  selectedItemKey={selectedItemKey}
+                />
+              ))}
+            </div>
+            {timeline.annotations_without_time_count > 0 ? (
+              <p className="empty-state compact">
+                {timeline.annotations_without_time_count} review annotations have no media time and
+                are omitted from the lane.
+              </p>
+            ) : null}
+          </div>
+        ) : null}
+      </div>
+    </section>
+  );
+}
+
+function TimelineLane({
+  durationMs,
+  isVisible,
+  lane,
+  onSelectItem,
+  selectedItemKey
+}: {
+  durationMs: number | null;
+  isVisible: boolean;
+  lane: ReplayTimelineLane;
+  onSelectItem: (item: ReplayTimelineItem) => void;
+  selectedItemKey: string | null;
+}) {
+  return (
+    <div className={`timeline-lane-row${isVisible ? "" : " muted"}`}>
+      <div className="timeline-lane-label">
+        <strong>{lane.label}</strong>
+        <span>{isVisible ? `${lane.items.length} items` : "layer hidden"}</span>
+      </div>
+      <div className="timeline-lane-track">
+        {lane.items.length === 0 ? (
+          <span className="timeline-lane-empty">{emptyLaneText(lane.lane_type)}</span>
+        ) : (
+          lane.items.map((item) => (
+            <TimelineItemButton
+              durationMs={durationMs}
+              isSelected={timelineItemKey(item) === selectedItemKey}
+              item={item}
+              key={timelineItemKey(item)}
+              onSelectItem={onSelectItem}
+            />
+          ))
+        )}
+      </div>
+    </div>
+  );
+}
+
+function TimelineItemButton({
+  durationMs,
+  isSelected,
+  item,
+  onSelectItem
+}: {
+  durationMs: number | null;
+  isSelected: boolean;
+  item: ReplayTimelineItem;
+  onSelectItem: (item: ReplayTimelineItem) => void;
+}) {
+  if (item.item_type === "tracklet") {
+    const position = timelineSpanPosition(item, durationMs);
+    return (
+      <button
+        className={`timeline-lane-item span tracklet${isSelected ? " selected" : ""}`}
+        onClick={() => onSelectItem(item)}
+        style={{ left: `${position.left}%`, width: `${position.width}%` }}
+        title={`${item.display_label}: ${item.timestamp_start_ms}-${item.timestamp_end_ms} ms`}
+        type="button"
+      >
+        <span>{item.display_label}</span>
+      </button>
+    );
+  }
+
+  const left = timelinePointPercent(timelineItemTimestampMs(item), durationMs);
+  return (
+    <button
+      className={`timeline-lane-item tick ${item.item_type}${isSelected ? " selected" : ""}`}
+      onClick={() => onSelectItem(item)}
+      style={{ left: `${left}%` }}
+      title={`${item.display_label}: ${timelineItemTimestampMs(item)} ms`}
+      type="button"
+    >
+      <span>{item.display_label}</span>
+    </button>
+  );
+}
+
+function emptyLaneText(laneType: ReplayTimelineLane["lane_type"]): string {
+  if (laneType === "detections") {
+    return "No detection observations in the selected run.";
+  }
+  if (laneType === "tracklets") {
+    return "No tracklet candidates in the selected run.";
+  }
+  if (laneType === "pose") {
+    return "No pose observations in the selected run.";
+  }
+  return "No review annotations for this media/run context.";
+}

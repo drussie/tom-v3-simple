@@ -9,18 +9,20 @@ import {
   currentTimeSecondsToTimestampMs,
   formatReplayTime
 } from "../lib/replayTime";
-import type { ReplayInfo, ReplayPlaybackState } from "../lib/types";
+import type { ReplayInfo, ReplayPlaybackState, ReplaySeekRequest } from "../lib/types";
 
 interface ReplayVideoPlayerProps {
   replayInfo: ReplayInfo;
   children?: ReactNode;
   onPlaybackStateChange?: (state: ReplayPlaybackState) => void;
+  seekRequest?: ReplaySeekRequest | null;
 }
 
 export function ReplayVideoPlayer({
   replayInfo,
   children,
-  onPlaybackStateChange
+  onPlaybackStateChange,
+  seekRequest = null
 }: ReplayVideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const animationFrameRef = useRef<number | null>(null);
@@ -99,6 +101,17 @@ export function ReplayVideoPlayer({
       video.removeEventListener("ended", stopTicking);
     };
   }, [durationSeconds, onPlaybackStateChange, replayInfo.fps, replayInfo.frame_count]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (video === null || seekRequest === null) {
+      return;
+    }
+    const nextTimeSeconds = Math.max(0, seekRequest.timestampMs / 1000);
+    if (Math.abs(video.currentTime - nextTimeSeconds) > 0.01) {
+      video.currentTime = nextTimeSeconds;
+    }
+  }, [seekRequest]);
 
   const timestampMs = currentTimeSecondsToTimestampMs(currentTimeSeconds);
   const frameNumber = currentTimeSecondsToFrame(

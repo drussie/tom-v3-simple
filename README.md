@@ -14,7 +14,7 @@ TOM v3 Simple is complete as a lightweight local observation/evidence platform. 
 
 It remains intentionally non-decisive about tennis meaning. It does not include real pose inference, movement interpretation, stroke classification, homography, bounce/hit/rally/point/scoring, production deployment, auth, streaming, or TOM v2-style adjudication.
 
-Blueprint 6 has now started as a new visual replay/operator layer on top of the completed Simple platform. Milestones 6B and 6C add detection, tracklet candidate, and pose keypoint evidence overlays synchronized to replay video playback.
+Blueprint 6 has now started as a new visual replay/operator layer on top of the completed Simple platform. Milestones 6B, 6C, and 6D add detection, tracklet candidate, pose keypoint evidence overlays, and evidence timeline lanes synchronized to replay video playback.
 
 ## What It Does
 
@@ -178,6 +178,7 @@ indexed media
 -> persisted detection observation overlays
 -> persisted tracklet candidate overlays
 -> persisted pose keypoint evidence overlays
+-> evidence timeline lanes and click-to-seek scrubber
 ```
 
 Open a replay URL after running the demo:
@@ -192,4 +193,4 @@ Open overlay playback with:
 http://127.0.0.1:3000/replay/<media_id>?detectionRunId=<detection_run_id>&trackletRunId=<tracklet_run_id>&poseRunId=<pose_run_id>
 ```
 
-Replay overlays render persisted evidence only: detection observations, tracklet candidates, and pose keypoint evidence. Full evidence timeline lanes, live stream ingestion, and tennis-event interpretation remain future work.
+Replay overlays and timeline lanes render persisted evidence only: detection observations, tracklet candidates, pose keypoint evidence, and review annotation markers. Live stream ingestion and tennis-event interpretation remain future work.

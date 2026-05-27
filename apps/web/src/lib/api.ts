@@ -3,6 +3,7 @@ import type {
   JsonRecord,
   ReplayInfo,
   ReplayOverlayChunk,
+  ReplayTimeline,
   TrackletEvidenceBundle,
   ViewerRun
 } from "./types";
@@ -91,6 +92,46 @@ export async function fetchReplayOverlayChunk({
   }
 
   return (await response.json()) as ReplayOverlayChunk;
+}
+
+export interface FetchReplayTimelineInput {
+  mediaId: string;
+  detectionRunId?: string | null;
+  trackletRunId?: string | null;
+  poseRunId?: string | null;
+  includeAnnotations?: boolean;
+}
+
+export async function fetchReplayTimeline({
+  mediaId,
+  detectionRunId = null,
+  trackletRunId = null,
+  poseRunId = null,
+  includeAnnotations = true
+}: FetchReplayTimelineInput): Promise<ReplayTimeline> {
+  const params = new URLSearchParams({
+    media_id: mediaId,
+    include_annotations: includeAnnotations ? "true" : "false"
+  });
+  if (detectionRunId !== null) {
+    params.set("detection_run_id", detectionRunId);
+  }
+  if (trackletRunId !== null) {
+    params.set("tracklet_run_id", trackletRunId);
+  }
+  if (poseRunId !== null) {
+    params.set("pose_run_id", poseRunId);
+  }
+
+  const response = await fetch(`/api/replay/timeline?${params.toString()}`, {
+    cache: "no-store"
+  });
+
+  if (!response.ok) {
+    throw new Error(`Unable to load replay timeline: ${response.status}`);
+  }
+
+  return (await response.json()) as ReplayTimeline;
 }
 
 export async function fetchTrackletEvidenceBundle(

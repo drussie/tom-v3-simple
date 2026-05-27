@@ -27,7 +27,7 @@ This registry makes TOM v3 Simple boundaries explicit.
 - TOM v3 Simple is local-first.
 - Replay Mode currently supports local indexed file playback only.
 - Replay Mode displays persisted detection observation, tracklet candidate, and pose keypoint evidence overlays.
-- Replay Mode does not yet include full evidence timeline lanes, stream proxy mode, or live ingestion.
+- Replay Mode includes evidence timeline lanes for navigation, but not stream proxy mode or live ingestion.
 - There is no production deployment workflow.
 - There is no auth or user management.
 - There is no cloud storage lifecycle.

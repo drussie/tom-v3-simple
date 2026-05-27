@@ -483,6 +483,142 @@ pre {
   padding: 0 10px;
 }
 
+.replay-evidence-timeline .panel-body {
+  gap: 12px;
+}
+
+.timeline-lane-stack {
+  display: grid;
+  gap: 10px;
+}
+
+.timeline-ruler {
+  color: var(--muted);
+  display: flex;
+  font-size: 11px;
+  font-weight: 800;
+  justify-content: space-between;
+  text-transform: uppercase;
+}
+
+.timeline-lanes {
+  display: grid;
+  gap: 8px;
+  position: relative;
+}
+
+.timeline-playhead {
+  background: var(--ink);
+  bottom: 0;
+  opacity: 0.7;
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  width: 2px;
+  z-index: 4;
+}
+
+.timeline-lane-row {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 160px minmax(0, 1fr);
+  min-width: 0;
+}
+
+.timeline-lane-row.muted {
+  opacity: 0.56;
+}
+
+.timeline-lane-label {
+  border-left: 3px solid var(--line);
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+  padding-left: 10px;
+}
+
+.timeline-lane-label strong {
+  font-size: 12px;
+}
+
+.timeline-lane-label span,
+.timeline-lane-empty {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.timeline-lane-track {
+  background: color-mix(in srgb, var(--surface) 78%, white);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  min-height: 44px;
+  overflow: hidden;
+  position: relative;
+}
+
+.timeline-lane-empty {
+  left: 10px;
+  position: absolute;
+  top: 13px;
+}
+
+.timeline-lane-item {
+  align-items: center;
+  border: 0;
+  cursor: pointer;
+  display: flex;
+  font: inherit;
+  justify-content: center;
+  padding: 0;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+.timeline-lane-item.tick {
+  background: var(--blue);
+  border-radius: 999px;
+  height: 16px;
+  width: 16px;
+}
+
+.timeline-lane-item.tick.detection {
+  background: var(--green);
+}
+
+.timeline-lane-item.tick.pose {
+  background: var(--amber);
+}
+
+.timeline-lane-item.tick.annotation {
+  background: var(--blue);
+}
+
+.timeline-lane-item.span {
+  background: color-mix(in srgb, var(--violet) 72%, white);
+  border-radius: 999px;
+  height: 18px;
+  min-width: 16px;
+  transform: translateY(-50%);
+}
+
+.timeline-lane-item.selected {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+  z-index: 5;
+}
+
+.timeline-lane-item span {
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
 .detection-tick-list {
   display: grid;
   gap: 8px;

@@ -372,6 +372,88 @@ export interface ReplayPlaybackState {
   durationSeconds: number;
 }
 
+export interface ReplaySeekRequest {
+  timestampMs: number;
+  nonce: number;
+}
+
+export interface ReplayDetectionTimelineItem {
+  item_type: "detection";
+  observation_id: string;
+  run_id: string;
+  timestamp_ms: number;
+  frame_number: number;
+  label: string;
+  observation_type: "ball_detection" | "player_detection";
+  confidence: number | null;
+  display_label: string;
+}
+
+export interface ReplayTrackletTimelineItem {
+  item_type: "tracklet";
+  observation_id: string | null;
+  tracklet_id: string;
+  run_id: string;
+  timestamp_start_ms: number;
+  timestamp_end_ms: number;
+  frame_start: number | null;
+  frame_end: number | null;
+  label_hint: string | null;
+  track_type: "ball" | "player" | string;
+  track_status: "candidate" | string;
+  identity_status: "unverified" | string;
+  track_point_count: number;
+  display_label: string;
+}
+
+export interface ReplayPoseTimelineItem {
+  item_type: "pose";
+  observation_id: string;
+  run_id: string;
+  timestamp_ms: number;
+  frame_number: number;
+  pose_confidence: number | null;
+  keypoints_present_count: number;
+  keypoints_missing_count: number;
+  display_label: string;
+}
+
+export interface ReplayAnnotationTimelineItem {
+  item_type: "annotation";
+  annotation_id: string;
+  target_observation_id: string | null;
+  target_observation_type: string | null;
+  target_run_id: string | null;
+  timestamp_ms: number;
+  frame_number: number;
+  annotation_label: string;
+  created_by: string | null;
+  display_label: string;
+}
+
+export type ReplayTimelineItem =
+  | ReplayDetectionTimelineItem
+  | ReplayTrackletTimelineItem
+  | ReplayPoseTimelineItem
+  | ReplayAnnotationTimelineItem;
+
+export interface ReplayTimelineLane {
+  lane_type: "detections" | "tracklets" | "pose" | "annotations";
+  label: string;
+  items: ReplayTimelineItem[];
+}
+
+export interface ReplayTimeline {
+  media_id: string;
+  duration_ms: number | null;
+  frame_count: number | null;
+  fps: number | null;
+  observation_only: boolean;
+  no_adjudication: boolean;
+  annotations_without_time_count: number;
+  lanes: ReplayTimelineLane[];
+}
+
 export interface TimelineRange {
   start: number;
   end: number;

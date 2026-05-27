@@ -164,6 +164,8 @@ Current: Blueprints 1, 2, 3, 4, and 5 complete; Blueprint 6 has started; TOM v3 
 - Replay page can fetch detection, tracklet, and pose overlay chunks together.
 - Replay page renders candidate track points, selected candidate paths, pose bboxes, present keypoints, and COCO17 skeleton edges over video playback.
 - Replay overlay selection shows persisted detection, tracklet candidate, track point candidate, and pose observation details.
+- Replay timeline endpoint and frontend evidence lanes exist for detection ticks, tracklet candidate spans, pose ticks, and review annotation markers.
+- Replay timeline items can seek playback and select persisted evidence detail.
 - No real pose inference, movement interpretation, homography, bounce, hit, rally, point, scoring, or adjudication has been added.
 
 ## Blueprint 5 Status
@@ -249,7 +251,20 @@ current replay timestamp/frame
 
 Current Blueprint 6 progress after 6C: about 50-55%.
 
-Full evidence lanes, stream proxy mode, and operator review hardening are future milestones.
+Milestone 6D is complete. It adds timeline lanes and evidence scrubbing:
+
+```text
+replay timeline endpoint
+-> detection ticks
+-> tracklet candidate spans
+-> pose ticks
+-> review annotation markers
+-> click-to-seek/select evidence detail
+```
+
+Current Blueprint 6 progress after 6D: about 65-70%.
+
+Stream proxy mode and operator review hardening are future milestones.
 
 ## Milestone 5D Status
 

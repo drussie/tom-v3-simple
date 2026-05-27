@@ -5,13 +5,14 @@ from datetime import UTC, datetime
 
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import StaticPool
 from tom_v3_schema.skeletons import COCO17_KEYPOINT_NAMES
 from tom_v3_storage.db_models import (
     AtomicObservation,
     Base,
+    HumanAnnotation,
     MediaAsset,
     Observation,
     PoseObservation,
@@ -514,6 +515,177 @@ def test_replay_overlay_endpoint_rejects_invalid_time_window(client: TestClient)
     assert response.status_code == 400
 
 
+def test_replay_timeline_endpoint_returns_evidence_lanes(
+    client: TestClient,
+    db_session: Session,
+    tmp_path,
+) -> None:
+    media_path = tmp_path / "sample.mp4"
+    media_path.write_bytes(b"tom-v3-video")
+    media = _seed_media(db_session, media_path)
+    detection_run = _seed_run_with_observation(
+        db_session,
+        media.id,
+        "demo-fixture-detection-run",
+        "ball_detection",
+        timestamp_ms=1000,
+        confidence=0.82,
+    )
+    tracklet_run = _seed_tracklet_run(db_session, media.id)
+    pose_run = _seed_pose_run(db_session, media.id)
+    detection = db_session.scalars(
+        select(Observation).where(
+            Observation.run_id == detection_run.id,
+            Observation.observation_type == "ball_detection",
+        )
+    ).one()
+    _seed_annotation(db_session, media.id, detection)
+
+    response = client.get(
+        "/replay/timeline",
+        params={
+            "media_id": media.id,
+            "detection_run_id": detection_run.id,
+            "tracklet_run_id": tracklet_run.id,
+            "pose_run_id": pose_run.id,
+        },
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["media_id"] == media.id
+    assert body["duration_ms"] == 2000
+    assert body["frame_count"] == 60
+    assert body["fps"] == 30.0
+    assert body["observation_only"] is True
+    assert body["no_adjudication"] is True
+    lanes = {lane["lane_type"]: lane for lane in body["lanes"]}
+    assert set(lanes) == {"detections", "tracklets", "pose", "annotations"}
+
+    detection_item = lanes["detections"]["items"][0]
+    assert detection_item["item_type"] == "detection"
+    assert detection_item["run_id"] == detection_run.id
+    assert detection_item["timestamp_ms"] == 1000
+    assert detection_item["frame_number"] == 30
+    assert detection_item["display_label"] == "ball detection observation"
+
+    tracklet_item = lanes["tracklets"]["items"][0]
+    assert tracklet_item["item_type"] == "tracklet"
+    assert tracklet_item["run_id"] == tracklet_run.id
+    assert tracklet_item["track_status"] == "candidate"
+    assert tracklet_item["identity_status"] == "unverified"
+    assert tracklet_item["track_point_count"] == 2
+    assert tracklet_item["display_label"] == "ball tracklet candidate"
+
+    pose_item = lanes["pose"]["items"][0]
+    assert pose_item["item_type"] == "pose"
+    assert pose_item["run_id"] == pose_run.id
+    assert pose_item["keypoints_present_count"] == 3
+    assert pose_item["display_label"] == "pose observation"
+
+    annotation_item = lanes["annotations"]["items"][0]
+    assert annotation_item["item_type"] == "annotation"
+    assert annotation_item["target_observation_id"] == detection.id
+    assert annotation_item["target_observation_type"] == "ball_detection"
+    assert annotation_item["annotation_label"] == "uncertain"
+    assert annotation_item["display_label"] == "review annotation"
+
+
+def test_replay_timeline_endpoint_filters_selected_runs(
+    client: TestClient,
+    db_session: Session,
+    tmp_path,
+) -> None:
+    media_path = tmp_path / "sample.mp4"
+    media_path.write_bytes(b"tom-v3-video")
+    media = _seed_media(db_session, media_path)
+    included_detection = _seed_run_with_observation(
+        db_session,
+        media.id,
+        "included-detection-run",
+        "ball_detection",
+        timestamp_ms=1000,
+    )
+    _seed_run_with_observation(
+        db_session,
+        media.id,
+        "excluded-detection-run",
+        "player_detection",
+        timestamp_ms=1000,
+    )
+    included_tracklet = _seed_tracklet_run(db_session, media.id, run_name="included-tracklet-run")
+    _seed_tracklet_run(db_session, media.id, run_name="excluded-tracklet-run", frame_offset=10)
+    included_pose = _seed_pose_run(db_session, media.id, run_name="included-pose-run")
+    _seed_pose_run(db_session, media.id, run_name="excluded-pose-run")
+
+    response = client.get(
+        "/replay/timeline",
+        params={
+            "media_id": media.id,
+            "detection_run_id": included_detection.id,
+            "tracklet_run_id": included_tracklet.id,
+            "pose_run_id": included_pose.id,
+        },
+    )
+
+    assert response.status_code == 200
+    lanes = {lane["lane_type"]: lane for lane in response.json()["lanes"]}
+    assert [item["run_id"] for item in lanes["detections"]["items"]] == [included_detection.id]
+    assert [item["run_id"] for item in lanes["tracklets"]["items"]] == [included_tracklet.id]
+    assert [item["run_id"] for item in lanes["pose"]["items"]] == [included_pose.id]
+
+
+def test_replay_timeline_endpoint_can_omit_annotations(
+    client: TestClient,
+    db_session: Session,
+    tmp_path,
+) -> None:
+    media_path = tmp_path / "sample.mp4"
+    media_path.write_bytes(b"tom-v3-video")
+    media = _seed_media(db_session, media_path)
+    run = _seed_run_with_observation(
+        db_session,
+        media.id,
+        "demo-fixture-detection-run",
+        "ball_detection",
+        timestamp_ms=1000,
+    )
+    detection = db_session.scalars(select(Observation).where(Observation.run_id == run.id)).one()
+    _seed_annotation(db_session, media.id, detection)
+
+    response = client.get(
+        "/replay/timeline",
+        params={"media_id": media.id, "include_annotations": False},
+    )
+
+    assert response.status_code == 200
+    lanes = {lane["lane_type"]: lane for lane in response.json()["lanes"]}
+    assert lanes["annotations"]["items"] == []
+
+
+def test_replay_timeline_endpoint_returns_empty_lanes(
+    client: TestClient,
+    db_session: Session,
+    tmp_path,
+) -> None:
+    media_path = tmp_path / "sample.mp4"
+    media_path.write_bytes(b"tom-v3-video")
+    media = _seed_media(db_session, media_path)
+
+    response = client.get("/replay/timeline", params={"media_id": media.id})
+
+    assert response.status_code == 200
+    body = response.json()
+    assert all(lane["items"] == [] for lane in body["lanes"])
+    assert body["observation_only"] is True
+    assert body["no_adjudication"] is True
+
+
+def test_replay_timeline_endpoint_returns_404_for_missing_media(client: TestClient) -> None:
+    response = client.get("/replay/timeline", params={"media_id": "missing-media"})
+    assert response.status_code == 404
+
+
 def _seed_media(session: Session, media_path) -> MediaAsset:
     media = MediaAsset(
         source_uri=media_path.as_uri(),
@@ -819,6 +991,29 @@ def _seed_detection_observation(
     session.commit()
     session.refresh(observation)
     return observation
+
+
+def _seed_annotation(
+    session: Session,
+    media_id: str,
+    observation: Observation,
+    annotation_label: str = "uncertain",
+) -> HumanAnnotation:
+    annotation = HumanAnnotation(
+        media_id=media_id,
+        observation_id=observation.id,
+        frame_start=observation.frame_start,
+        frame_end=observation.frame_end,
+        timestamp_start_ms=observation.timestamp_start_ms,
+        timestamp_end_ms=observation.timestamp_end_ms,
+        annotation_type="review_annotation",
+        payload_jsonb={"annotation_label": annotation_label, "review_only": True},
+        created_by="tom-v3-demo",
+    )
+    session.add(annotation)
+    session.commit()
+    session.refresh(annotation)
+    return annotation
 
 
 def _family_for_type(observation_type: str) -> str:

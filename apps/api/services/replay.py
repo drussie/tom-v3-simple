@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 from tom_v3_schema.skeletons import get_skeleton_definition
 from tom_v3_storage.db_models import (
     AtomicObservation,
+    HumanAnnotation,
     MediaAsset,
     Observation,
     PoseObservation,
@@ -147,6 +148,280 @@ def build_replay_overlay_chunk(
         "observation_only": True,
         "no_adjudication": True,
     }
+
+
+def build_replay_timeline(
+    session: Session,
+    *,
+    media_id: str,
+    detection_run_id: str | None = None,
+    tracklet_run_id: str | None = None,
+    pose_run_id: str | None = None,
+    include_annotations: bool = True,
+) -> dict[str, Any] | None:
+    media = session.get(MediaAsset, media_id)
+    if media is None:
+        return None
+
+    annotation_items: list[dict[str, Any]] = []
+    annotations_without_time_count = 0
+    if include_annotations:
+        annotation_items, annotations_without_time_count = build_annotation_timeline_items(
+            session=session,
+            media=media,
+            selected_run_ids={
+                run_id
+                for run_id in (detection_run_id, tracklet_run_id, pose_run_id)
+                if run_id is not None
+            },
+        )
+
+    return {
+        "media_id": media.id,
+        "duration_ms": media.duration_ms,
+        "frame_count": media.frame_count,
+        "fps": media.fps,
+        "observation_only": True,
+        "no_adjudication": True,
+        "annotations_without_time_count": annotations_without_time_count,
+        "lanes": [
+            {
+                "lane_type": "detections",
+                "label": "Detection observations",
+                "items": build_detection_timeline_items(
+                    session=session,
+                    media=media,
+                    detection_run_id=detection_run_id,
+                ),
+            },
+            {
+                "lane_type": "tracklets",
+                "label": "Tracklet candidates",
+                "items": build_tracklet_timeline_items(
+                    session=session,
+                    media=media,
+                    tracklet_run_id=tracklet_run_id,
+                ),
+            },
+            {
+                "lane_type": "pose",
+                "label": "Pose observations",
+                "items": build_pose_timeline_items(
+                    session=session,
+                    media=media,
+                    pose_run_id=pose_run_id,
+                ),
+            },
+            {
+                "lane_type": "annotations",
+                "label": "Review annotations",
+                "items": annotation_items,
+            },
+        ],
+    }
+
+
+def build_detection_timeline_items(
+    session: Session,
+    *,
+    media: MediaAsset,
+    detection_run_id: str | None = None,
+) -> list[dict[str, Any]]:
+    query = (
+        select(Observation)
+        .where(
+            Observation.media_id == media.id,
+            Observation.observation_family == "atomic",
+            Observation.observation_type.in_(sorted(DETECTION_TYPES)),
+        )
+        .order_by(Observation.timestamp_start_ms, Observation.frame_start, Observation.id)
+    )
+    if detection_run_id is not None:
+        query = query.where(Observation.run_id == detection_run_id)
+
+    items: list[dict[str, Any]] = []
+    for observation in session.scalars(query).all():
+        item = detection_timeline_item_from_observation(observation)
+        if item is not None:
+            items.append(item)
+    return items
+
+
+def detection_timeline_item_from_observation(
+    observation: Observation,
+) -> dict[str, Any] | None:
+    if observation.observation_type not in DETECTION_TYPES:
+        return None
+
+    frame_number, timestamp_ms = _observation_frame_time(observation)
+    if frame_number is None or timestamp_ms is None:
+        return None
+
+    payload = _merged_detection_payload(observation)
+    label = _detection_label(observation, payload)
+    return {
+        "item_type": "detection",
+        "observation_id": observation.id,
+        "run_id": observation.run_id,
+        "timestamp_ms": timestamp_ms,
+        "frame_number": frame_number,
+        "label": label,
+        "observation_type": observation.observation_type,
+        "confidence": observation.confidence,
+        "display_label": f"{label} detection observation",
+    }
+
+
+def build_tracklet_timeline_items(
+    session: Session,
+    *,
+    media: MediaAsset,
+    tracklet_run_id: str | None = None,
+) -> list[dict[str, Any]]:
+    query = (
+        select(Tracklet)
+        .where(Tracklet.media_id == media.id)
+        .order_by(Tracklet.frame_start, Tracklet.id)
+    )
+    if tracklet_run_id is not None:
+        query = query.where(Tracklet.run_id == tracklet_run_id)
+
+    items: list[dict[str, Any]] = []
+    for tracklet in session.scalars(query).all():
+        item = tracklet_timeline_item_from_row(media, tracklet)
+        if item is not None:
+            items.append(item)
+    return items
+
+
+def tracklet_timeline_item_from_row(
+    media: MediaAsset,
+    tracklet: Tracklet,
+) -> dict[str, Any] | None:
+    overlay_item = tracklet_overlay_item_from_row(media, tracklet)
+    if overlay_item is None:
+        return None
+
+    label_hint = overlay_item["label_hint"] or overlay_item["track_type"]
+    return {
+        "item_type": "tracklet",
+        "observation_id": overlay_item["observation_id"],
+        "tracklet_id": overlay_item["tracklet_id"],
+        "run_id": overlay_item["run_id"],
+        "timestamp_start_ms": overlay_item["timestamp_start_ms"],
+        "timestamp_end_ms": overlay_item["timestamp_end_ms"],
+        "frame_start": overlay_item["frame_start"],
+        "frame_end": overlay_item["frame_end"],
+        "label_hint": overlay_item["label_hint"],
+        "track_type": overlay_item["track_type"],
+        "track_status": overlay_item["track_status"],
+        "identity_status": overlay_item["identity_status"],
+        "track_point_count": len(overlay_item["points"]),
+        "display_label": f"{label_hint} tracklet candidate",
+    }
+
+
+def build_pose_timeline_items(
+    session: Session,
+    *,
+    media: MediaAsset,
+    pose_run_id: str | None = None,
+) -> list[dict[str, Any]]:
+    query = (
+        select(PoseObservation)
+        .where(PoseObservation.media_id == media.id)
+        .order_by(PoseObservation.timestamp_ms, PoseObservation.observation_id)
+    )
+    if pose_run_id is not None:
+        query = query.where(PoseObservation.run_id == pose_run_id)
+
+    items: list[dict[str, Any]] = []
+    for pose in session.scalars(query).all():
+        item = pose_timeline_item_from_row(pose)
+        if item is not None:
+            items.append(item)
+    return items
+
+
+def pose_timeline_item_from_row(pose: PoseObservation) -> dict[str, Any] | None:
+    if pose.frame_number is None or pose.timestamp_ms is None:
+        return None
+
+    return {
+        "item_type": "pose",
+        "observation_id": pose.observation_id,
+        "run_id": pose.run_id,
+        "timestamp_ms": pose.timestamp_ms,
+        "frame_number": pose.frame_number,
+        "pose_confidence": pose.pose_confidence,
+        "keypoints_present_count": pose.keypoints_present_count,
+        "keypoints_missing_count": pose.keypoints_missing_count,
+        "display_label": "pose observation",
+    }
+
+
+def build_annotation_timeline_items(
+    session: Session,
+    *,
+    media: MediaAsset,
+    selected_run_ids: set[str],
+) -> tuple[list[dict[str, Any]], int]:
+    annotations = session.scalars(
+        select(HumanAnnotation)
+        .where(HumanAnnotation.media_id == media.id)
+        .order_by(
+            HumanAnnotation.timestamp_start_ms,
+            HumanAnnotation.frame_start,
+            HumanAnnotation.id,
+        )
+    ).all()
+
+    items: list[dict[str, Any]] = []
+    annotations_without_time_count = 0
+    for annotation in annotations:
+        target = (
+            session.get(Observation, annotation.observation_id)
+            if annotation.observation_id is not None
+            else None
+        )
+        if selected_run_ids and (target is None or target.run_id not in selected_run_ids):
+            continue
+
+        frame_number = (
+            annotation.frame_start
+            if annotation.frame_start is not None
+            else target.frame_start
+            if target is not None
+            else None
+        )
+        timestamp_ms = (
+            annotation.timestamp_start_ms
+            if annotation.timestamp_start_ms is not None
+            else target.timestamp_start_ms
+            if target is not None
+            else None
+        )
+        if frame_number is None or timestamp_ms is None:
+            annotations_without_time_count += 1
+            continue
+
+        items.append(
+            {
+                "item_type": "annotation",
+                "annotation_id": annotation.id,
+                "target_observation_id": annotation.observation_id,
+                "target_observation_type": target.observation_type if target is not None else None,
+                "target_run_id": target.run_id if target is not None else None,
+                "timestamp_ms": timestamp_ms,
+                "frame_number": frame_number,
+                "annotation_label": _annotation_label(annotation),
+                "created_by": annotation.created_by,
+                "display_label": "review annotation",
+            }
+        )
+
+    items.sort(key=lambda item: (item["timestamp_ms"], item["frame_number"], item["annotation_id"]))
+    return items, annotations_without_time_count
 
 
 def build_detection_overlay_items(
@@ -585,6 +860,18 @@ def _time_ranges_overlap(
     return float(start_a) <= end_b and float(end_a) >= start_b
 
 
+def _observation_frame_time(observation: Observation) -> tuple[int | None, int | None]:
+    frame_number = (
+        observation.frame_start if observation.frame_start is not None else observation.frame_end
+    )
+    timestamp_ms = (
+        observation.timestamp_start_ms
+        if observation.timestamp_start_ms is not None
+        else observation.timestamp_end_ms
+    )
+    return frame_number, timestamp_ms
+
+
 def _detection_label(observation: Observation, payload: dict[str, Any]) -> str:
     for key in ("label", "class_label"):
         value = _string_or_none(payload.get(key))
@@ -598,6 +885,12 @@ def _detection_label(observation: Observation, payload: dict[str, Any]) -> str:
             return detector_label
 
     return observation.observation_type.replace("_detection", "")
+
+
+def _annotation_label(annotation: HumanAnnotation) -> str:
+    payload = annotation.payload_jsonb or {}
+    label = _string_or_none(payload.get("annotation_label"))
+    return label if label is not None else annotation.annotation_type
 
 
 def _numeric(value: Any) -> float | None:

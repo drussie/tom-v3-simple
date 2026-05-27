@@ -214,7 +214,30 @@ indexed video playback
 
 Milestone 6C did not add:
 
-- full evidence timeline lanes
+- stream proxy mode
+- live stream ingestion
+- model/runtime expansion
+- homography
+- bounce or hit detection
+- rally/point/scoring
+- adjudication
+
+Milestone 6D proved:
+
+```text
+indexed video playback
+-> synchronized detection / tracklet / pose overlays
+-> replay timeline endpoint
+-> evidence lanes
+-> detection ticks
+-> tracklet candidate spans
+-> pose ticks
+-> review annotation markers
+-> click-to-seek/select persisted evidence
+```
+
+Milestone 6D did not add:
+
 - stream proxy mode
 - live stream ingestion
 - model/runtime expansion

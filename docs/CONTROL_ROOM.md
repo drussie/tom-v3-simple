@@ -22,7 +22,7 @@ TOM v3 Simple is complete as a lightweight local observation/evidence platform. 
 
 It remains intentionally non-decisive about tennis meaning. It does not include real pose inference, movement interpretation, stroke classification, homography, bounce/hit/rally/point/scoring, production deployment, auth, streaming, or TOM v2-style adjudication.
 
-Blueprint 6 is now that new blueprint. It starts with Replay Mode: indexed local video playback synchronized to TOM media-owned frame/time. Milestones 6B and 6C add synchronized detection observation, tracklet candidate, and pose keypoint evidence overlay playback without adding live stream ingestion or tennis-event interpretation.
+Blueprint 6 is now that new blueprint. It starts with Replay Mode: indexed local video playback synchronized to TOM media-owned frame/time. Milestones 6B, 6C, and 6D add synchronized detection observation, tracklet candidate, pose keypoint evidence overlay playback, and evidence timeline navigation without adding live stream ingestion or tennis-event interpretation.
 
 ## Canonical Local Demo
 
@@ -158,7 +158,20 @@ current replay timestamp/frame
 -> click-to-select evidence detail
 ```
 
-6C still defers full evidence lanes, live stream ingestion, stream proxy mode, and tennis-event interpretation.
+At 6C, full evidence lanes, live stream ingestion, stream proxy mode, and tennis-event interpretation remained deferred.
+
+Milestone 6D adds evidence timeline navigation:
+
+```text
+replay timeline endpoint
+-> detection observation ticks
+-> tracklet candidate spans
+-> pose observation ticks
+-> review annotation markers
+-> click-to-seek/select persisted evidence
+```
+
+6D still defers stream proxy mode, live stream ingestion, and tennis-event interpretation.
 
 ## Future Blueprint Candidates
 

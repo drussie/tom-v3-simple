@@ -225,12 +225,14 @@ http://127.0.0.1:3000/replay/<media_id>?detectionRunId=<run_id>&trackletRunId=<r
 
 `detectionRunId`, `trackletRunId`, and `poseRunId` select the persisted evidence runs to draw over the replay video.
 
-Expected 6C replay behavior:
+Expected 6D replay behavior:
 
 - video playback updates current TOM timestamp and nearest frame
 - detection boxes appear near persisted detection timestamps
 - tracklet candidate points and selected candidate paths appear near persisted track point timestamps
 - pose keypoints and skeleton edges appear near persisted pose timestamps
+- timeline lanes show detection observations, tracklet candidates, pose observations, and review annotations
+- clicking a timeline item seeks playback and selects persisted evidence detail
 - the detection layer can be hidden or shown
 - the tracklet and pose layers can be hidden or shown
 - clicking an overlay selects persisted evidence detail

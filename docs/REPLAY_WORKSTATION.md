@@ -12,6 +12,7 @@ indexed video
 -> synchronized detection observation overlays
 -> synchronized tracklet candidate overlays
 -> synchronized pose keypoint evidence overlays
+-> evidence timeline lanes and click-to-seek scrubber
 ```
 
 Milestone 6A proved video replay and frame/time synchronization.
@@ -20,6 +21,9 @@ Milestone 6B adds detection overlay playback for persisted `ball_detection` and
 `player_detection` observations.
 
 Milestone 6C adds tracklet candidate and pose keypoint overlay playback.
+
+Milestone 6D adds timeline lanes and evidence scrubbing across detection
+observations, tracklet candidates, pose observations, and review annotations.
 
 ## What 6A Added
 
@@ -77,9 +81,33 @@ evidence. Neither layer confirms object identity, movement, or tennis events.
 
 ## What 6C Does Not Add
 
-- full evidence timeline lanes
 - stream proxy mode
 - live stream ingestion
+- new model runtime behavior
+- tennis-event interpretation
+- scoring or official results
+
+## What 6D Adds
+
+- `GET /replay/timeline`
+- detection observation timeline ticks
+- tracklet candidate timeline spans
+- pose observation timeline ticks
+- review annotation timeline markers when target frame/time is available
+- frontend evidence timeline lanes
+- current playback playhead over the lane stack
+- click-to-seek for detection, tracklet, pose, and annotation timeline items
+- click-to-select persisted evidence detail from timeline items
+
+Timeline lanes are navigation aids over persisted evidence. They do not imply
+object correctness, movement interpretation, tennis-event interpretation, or
+official results.
+
+## What 6D Does Not Add
+
+- stream proxy mode
+- live stream ingestion
+- HLS/RTSP/HDMI capture
 - new model runtime behavior
 - tennis-event interpretation
 - scoring or official results
@@ -173,6 +201,39 @@ The endpoint preserves media-owned frame/time and image-pixel coordinates.
 `min_confidence` affects only the returned display payload; it does not mutate
 observations.
 
+## Replay Timeline
+
+`GET /replay/timeline` returns normalized evidence lanes for the selected media
+and optional run filters:
+
+```text
+GET /replay/timeline?media_id=<media_id>&detection_run_id=<run_id>&tracklet_run_id=<run_id>&pose_run_id=<run_id>
+```
+
+The response includes:
+
+```json
+{
+  "media_id": "...",
+  "duration_ms": 7133,
+  "frame_count": 214,
+  "fps": 30.0,
+  "observation_only": true,
+  "no_adjudication": true,
+  "lanes": [
+    { "lane_type": "detections", "label": "Detection observations", "items": [] },
+    { "lane_type": "tracklets", "label": "Tracklet candidates", "items": [] },
+    { "lane_type": "pose", "label": "Pose observations", "items": [] },
+    { "lane_type": "annotations", "label": "Review annotations", "items": [] }
+  ]
+}
+```
+
+Point-like items use `timestamp_ms`; tracklet candidate items use
+`timestamp_start_ms` and `timestamp_end_ms`. Clicking an item in the replay
+workstation seeks the video to the item time and selects the corresponding
+evidence detail.
+
 ## Video Serving
 
 `GET /media/{media_id}/video` serves the indexed local video file for browser playback.
@@ -262,4 +323,4 @@ http://127.0.0.1:3000/replay/<media_id>?detectionRunId=<detection_run_id>&trackl
 
 The replay workstation displays synchronized evidence context. It does not decide tennis meaning.
 
-Blueprint 6D can add full evidence timeline lanes and richer scrubbing. Stream proxy mode remains future work.
+Stream proxy mode remains future work.

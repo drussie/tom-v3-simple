@@ -4,7 +4,11 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from apps.api.db import get_session
-from apps.api.services.replay import build_replay_overlay_chunk, normalize_replay_layers
+from apps.api.services.replay import (
+    build_replay_overlay_chunk,
+    build_replay_timeline,
+    normalize_replay_layers,
+)
 
 router = APIRouter(tags=["replay"])
 SessionDep = Annotated[Session, Depends(get_session)]
@@ -44,3 +48,25 @@ def get_replay_overlays(
     if chunk is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="media asset not found")
     return chunk
+
+
+@router.get("/replay/timeline")
+def get_replay_timeline(
+    session: SessionDep,
+    media_id: str,
+    detection_run_id: str | None = None,
+    tracklet_run_id: str | None = None,
+    pose_run_id: str | None = None,
+    include_annotations: bool = True,
+) -> dict[str, object]:
+    timeline = build_replay_timeline(
+        session,
+        media_id=media_id,
+        detection_run_id=detection_run_id,
+        tracklet_run_id=tracklet_run_id,
+        pose_run_id=pose_run_id,
+        include_annotations=include_annotations,
+    )
+    if timeline is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="media asset not found")
+    return timeline

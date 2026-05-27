@@ -1298,3 +1298,41 @@ Milestone 6C created:
 - Milestone 6C docs, handoff, and agent report.
 
 Tracklet paths remain candidate temporal groupings. Pose skeletons remain keypoint evidence. They are not tennis-event interpretations.
+
+## Milestone 6D - Timeline Lanes / Evidence Scrubber
+
+Status: complete
+
+### Goal
+
+Add temporal navigation to the replay workstation so operators can see persisted evidence over time and click timeline items to seek/select evidence.
+
+### Non-goals
+
+- No stream proxy mode.
+- No live stream ingestion.
+- No new model/runtime capability.
+- No real pose runtime or adapter inference.
+- No movement interpretation.
+- No stroke classification.
+- No serve, hit, split-step, or biomechanics conclusions.
+- No court homography.
+- No bounce detection.
+- No rally segmentation.
+- No point reconstruction.
+- No scoring.
+- No adjudication.
+
+### Notes
+
+Milestone 6D created:
+
+- `GET /replay/timeline` for media/run-scoped evidence lanes.
+- Backend timeline helpers for detection observation ticks, tracklet candidate spans, pose observation ticks, and review annotation markers.
+- Frontend timeline payload fetching and proxy route.
+- `ReplayEvidenceTimeline` with current playhead, lane empty states, and click-to-seek/select behavior.
+- Timeline selection detail support for detection observations, tracklet candidates, pose observations, and review annotations.
+- Tests for backend timeline lanes, filters, empty lanes, and missing media handling.
+- Milestone 6D docs, handoff, and agent report.
+
+Timeline lanes are evidence navigation only. They do not interpret tennis events or adjudicate model correctness.
