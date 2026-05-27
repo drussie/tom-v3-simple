@@ -108,6 +108,13 @@ def test_fake_yolo_result_provider_produces_frame_result_dict() -> None:
 
 def test_sample_frame_numbers_match_fixture_policy() -> None:
     assert sample_frame_numbers(frame_count=90, frame_sample_rate=30, max_frames=2) == [0, 30]
+    assert sample_frame_numbers(
+        frame_count=90,
+        frame_sample_rate=15,
+        max_frames=3,
+        frame_start=30,
+        frame_end=80,
+    ) == [30, 45, 60]
 
 
 def test_yolo_adapter_uses_normalization_to_build_detection_result() -> None:

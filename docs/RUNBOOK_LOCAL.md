@@ -410,6 +410,35 @@ Real YOLO smoke requires:
 
 YOLO smoke remains separate from `make demo`. A YOLO smoke failure must not block the fixture demo.
 
+Run a real YOLO detection replay pass after a media asset exists:
+
+```bash
+make real-detection \
+  MEDIA_ID=<media_id> \
+  YOLO_WEIGHTS_PATH=./model_assets/yolo/<model>.pt \
+  PYTHON=.venv/bin/python \
+  MAX_FRAMES=120
+```
+
+Equivalent worker command:
+
+```bash
+.venv/bin/python -m apps.worker.cli run-real-detection \
+  --media-id <media_id> \
+  --weights ./model_assets/yolo/<model>.pt \
+  --every-n-frames 1 \
+  --max-frames 120 \
+  --device auto
+```
+
+The command prints a replay URL:
+
+```text
+http://127.0.0.1:3000/replay/<media_id>?detectionRunId=<real_detection_run_id>
+```
+
+Real YOLO detections are model-output observations. They are not confirmed tennis state, and they do not create tracklets, pose, homography, events, scoring, or adjudication.
+
 ## 12. Optional Custom Media
 
 Use a local video:

@@ -22,6 +22,12 @@ Blueprint 6 remains observation-only and non-adjudicative. It does not add real 
 
 Future real live ingestion and future tennis intelligence must begin as new blueprints.
 
+Blueprint 7 Status: IN PROGRESS
+
+Blueprint 7 starts TOM v3's real perception runtime for the replay workstation. Milestone 7A adds a real YOLO detection replay run that samples indexed media frames, persists mapped real model output as atomic `ball_detection` and `player_detection` observations, and opens those observations in the existing replay workstation with `detectionRunId`.
+
+Blueprint 7 remains observation-only. Real model output is evidence, not confirmed tennis state.
+
 ## What It Does
 
 - Index local video media with frame/time metadata.
@@ -32,6 +38,7 @@ Future real live ingestion and future tennis intelligence must begin as new blue
 - Export TOM-native pose and tracklet review datasets.
 - Run a structural provenance audit for the fixture demo.
 - Open indexed video in a replay/operator workstation with synchronized evidence overlays and timeline lanes.
+- Run an optional real YOLO detection replay pass on indexed media when local runtime and weights exist.
 - Keep optional YOLO runtime separate from the default base environment.
 
 ## What It Does Not Do
@@ -137,6 +144,12 @@ Preview the optional local YOLO smoke path:
 make yolo-smoke
 ```
 
+Run a real detection replay pass after indexing media:
+
+```bash
+make real-detection MEDIA_ID=<media_id> YOLO_WEIGHTS_PATH=./model_assets/yolo/<model>.pt PYTHON=.venv/bin/python
+```
+
 Real YOLO smoke requires a separate optional runtime environment, local weights outside git, and model registration. See [OPTIONAL_YOLO.md](docs/OPTIONAL_YOLO.md).
 
 ## Important Docs
@@ -151,14 +164,16 @@ Real YOLO smoke requires a separate optional runtime environment, local weights 
 - [Exports](docs/EXPORTS.md)
 - [Provenance Audit](docs/PROVENANCE_AUDIT.md)
 - [Replay Workstation](docs/REPLAY_WORKSTATION.md)
+- [Real Detection Replay](docs/perception/real_detection_replay_v0.md)
 - [Completion Checklist](docs/COMPLETION_CHECKLIST.md)
 - [Final Completion Review](docs/blueprints/tom_v3_simple_final_completion_review.md)
 - [Blueprint 6 Completion Review](docs/blueprints/tom_v3_blueprint_6_completion_review.md)
+- [Blueprint 7 - Real Perception Runtime](docs/blueprints/tom_v3_blueprint_7_real_perception_runtime_for_replay_workstation.md)
 - [Control Room Index](docs/CONTROL_ROOM_INDEX.md)
 
 ## Current State
 
-Blueprints 1, 2, 3, 4, 5, and 6 are complete. TOM v3 Simple is complete as a lightweight local platform, and Blueprint 6 is complete as the visual replay/operator workstation layer.
+Blueprints 1, 2, 3, 4, 5, and 6 are complete. TOM v3 Simple is complete as a lightweight local platform, Blueprint 6 is complete as the visual replay/operator workstation layer, and Blueprint 7 has started with real YOLO detection replay.
 
 Current TOM v3 Simple path:
 
@@ -210,4 +225,14 @@ http://127.0.0.1:3000/replay/<media_id>?mode=stream_proxy&detectionRunId=<detect
 
 Replay overlays and timeline lanes render persisted evidence only: detection observations, tracklet candidates, pose keypoint evidence, and review annotation markers. Stream Proxy Mode hides future evidence until playback reaches it. Real live stream ingestion and tennis-event interpretation remain future work.
 
-Future replay work, real live ingestion, and new tennis-intelligence work should start as separate blueprints.
+Real detection replay path:
+
+```text
+indexed media
+-> optional YOLO runtime and local weights
+-> run-real-detection
+-> real model-output ball/player detection observations
+-> replay workstation detection overlays
+```
+
+Future real tracklets, real pose, real live ingestion, and new tennis-intelligence work should start as separate blueprints.

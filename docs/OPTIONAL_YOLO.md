@@ -98,6 +98,29 @@ python -m apps.worker.cli smoke-real-yolo-local \
 
 YOLO smoke remains separate from `make demo`.
 
+## Real Detection Replay
+
+Milestone 7A adds a replay-oriented real detection command:
+
+```bash
+python -m apps.worker.cli run-real-detection \
+  --media-id <media_id> \
+  --weights model_assets/yolo/<model>.pt \
+  --every-n-frames 1 \
+  --max-frames 120 \
+  --device auto
+```
+
+Makefile helper:
+
+```bash
+make real-detection MEDIA_ID=<media_id> YOLO_WEIGHTS_PATH=model_assets/yolo/<model>.pt
+```
+
+This command validates optional runtime and weights, registers model metadata, samples indexed media frames, persists mapped `ball_detection` / `player_detection` observations, and prints a replay URL with `detectionRunId`.
+
+It does not fall back to fixture detections.
+
 ## Common Failure Modes
 
 - Ultralytics missing.

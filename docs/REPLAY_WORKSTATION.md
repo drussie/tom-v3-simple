@@ -36,6 +36,8 @@ Blueprint 6 completes TOM v3's visual replay/operator workstation. TOM can now o
 
 Blueprint 6 remains observation-only and non-adjudicative. It does not add real live TV/HLS/RTSP/HDMI ingestion, stream backend infrastructure, real pose inference, movement interpretation, homography, bounce/hit/rally/point/scoring, or TOM v2-style adjudication.
 
+Blueprint 7 begins real perception runtime for this workstation. Milestone 7A adds optional real YOLO detection replay runs that persist model-output `ball_detection` and `player_detection` observations; the existing replay route displays them through `detectionRunId`.
+
 ## What 6A Added
 
 - `GET /media/{media_id}/replay-info`
@@ -201,6 +203,8 @@ Available runs are grouped from persisted observations:
 - pose: `player_pose_observation`
 - gameplay: `view_state`
 
+Real YOLO detection replay runs appear in the same detection run group because they persist the same atomic observation contract.
+
 ## Replay Overlay Chunks
 
 `GET /replay/overlays` returns replay overlay data for a media/time window:
@@ -253,6 +257,14 @@ The response includes selected overlay families:
   "no_adjudication": true
 }
 ```
+
+For real YOLO detection replay, pass the printed `detectionRunId`:
+
+```text
+http://127.0.0.1:3000/replay/<media_id>?detectionRunId=<real_detection_run_id>
+```
+
+The boxes remain detection observations. They are not confirmed balls, confirmed players, or tennis-event conclusions.
 
 The endpoint preserves media-owned frame/time and image-pixel coordinates.
 `min_confidence` affects only the returned display payload; it does not mutate

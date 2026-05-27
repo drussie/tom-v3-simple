@@ -1,5 +1,35 @@
 # TOM v3 Simple - Implementation Log
 
+## Milestone 7A - Real YOLO Detection Replay Run
+
+Status: complete
+
+### Goal
+
+Start Blueprint 7 with an optional real YOLO detection replay command that persists mapped model-output detections as atomic observations for the existing replay workstation.
+
+### Non-goals
+
+- No tracklet generation from real detections.
+- No real pose inference.
+- No homography or court-space implementation.
+- No stream ingestion or live model scheduling.
+- No tennis-event interpretation.
+- No scoring or adjudication.
+
+### Notes
+
+Milestone 7A created:
+
+- `apps/worker/services/real_detection_replay.py`.
+- Worker CLI `run-real-detection`.
+- Makefile `real-detection`.
+- Real detection replay docs under `docs/perception/`.
+- Blueprint 7 status docs, milestone doc, handoff, and agent report.
+- Tests proving fake real-run YOLO output persists atomic observations without optional runtime or weights.
+
+The command reuses existing runtime probe, weights validation, model registry, YOLO normalization, frame inference, and detection persistence paths. Real model output remains observation evidence only.
+
 ## Milestone 6F - Blueprint 6 Completion Review
 
 Status: complete

@@ -68,6 +68,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 6D - Timeline Lanes / Evidence Scrubber](milestones/milestone_6d_timeline_lanes_evidence_scrubber.md)
 - [Milestone 6E - Stream Proxy Mode](milestones/milestone_6e_stream_proxy_mode.md)
 - [Milestone 6F - Blueprint 6 Completion Review](milestones/milestone_6f_blueprint_6_completion_review.md)
+- [Milestone 7A - Real YOLO Detection Replay Run](milestones/milestone_7a_real_yolo_detection_replay_run.md)
 
 ## Handoffs
 
@@ -109,6 +110,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 6D Handoff](handoffs/milestone_6d_timeline_lanes_evidence_scrubber_handoff.md)
 - [Milestone 6E Handoff](handoffs/milestone_6e_stream_proxy_mode_handoff.md)
 - [Milestone 6F Handoff](handoffs/milestone_6f_blueprint_6_completion_review_handoff.md)
+- [Milestone 7A Handoff](handoffs/milestone_7a_real_yolo_detection_replay_run_handoff.md)
 
 ## Agent Reports
 
@@ -150,6 +152,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 6D Agent Report](agent_reports/milestone_6d_timeline_lanes_evidence_scrubber_report.md)
 - [Milestone 6E Agent Report](agent_reports/milestone_6e_stream_proxy_mode_report.md)
 - [Milestone 6F Agent Report](agent_reports/milestone_6f_blueprint_6_completion_review_report.md)
+- [Milestone 7A Agent Report](agent_reports/milestone_7a_real_yolo_detection_replay_run_report.md)
 
 ## Blueprints
 
@@ -163,6 +166,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [TOM v3 Simple Final Completion Review](blueprints/tom_v3_simple_final_completion_review.md)
 - [Blueprint 6 - Visual Replay / Live Observation Workstation](blueprints/tom_v3_blueprint_6_visual_replay_live_observation_workstation.md)
 - [Blueprint 6 Completion Review](blueprints/tom_v3_blueprint_6_completion_review.md)
+- [Blueprint 7 - Real Perception Runtime For Replay Workstation](blueprints/tom_v3_blueprint_7_real_perception_runtime_for_replay_workstation.md)
 
 ## API and Schema
 
@@ -173,6 +177,10 @@ Use this index as the durable navigation point for project memory, architecture 
 
 - [Media Indexing v0](media/media_indexing_v0.md)
 - [Frame Artifacts v0](media/frame_artifacts_v0.md)
+
+## Perception
+
+- [Real Detection Replay v0](perception/real_detection_replay_v0.md)
 
 ## Model Adapters
 

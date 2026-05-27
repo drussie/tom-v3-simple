@@ -1,0 +1,60 @@
+# TOM v3 Blueprint 7 - Real Perception Runtime For Replay Workstation
+
+Status: STARTING
+
+## Mission
+
+Blueprint 7 runs real perception on indexed tennis video and persists model-output observations so the Blueprint 6 replay workstation displays real detection and future pose evidence over video playback.
+
+The architecture remains observation-only and non-adjudicative. Real model output is persisted as evidence, not as official tennis meaning.
+
+## Starting Point
+
+TOM v3 Simple is complete, and Blueprint 6 is complete. The replay workstation can already open indexed video, synchronize media-owned frame/time, render persisted detection, tracklet, and pose overlays, show evidence timeline lanes, and simulate video-as-live Stream Proxy Mode.
+
+Blueprint 7 begins from that replay surface and replaces fixture-only perception with optional real model-output runs.
+
+## Milestone 7A
+
+Milestone 7A adds a narrow real YOLO detection replay path:
+
+```text
+indexed video
+-> optional YOLO runtime and local weights
+-> media-owned frame sampling
+-> real YOLO frame inference
+-> explicit class mapping
+-> persisted atomic ball/player detection observations
+-> replay URL with detectionRunId
+-> real detection overlays in the replay workstation
+```
+
+7A does not build real tracklets from real detections, real pose inference, homography, stream ingestion, or tennis-event interpretation.
+
+## Boundaries
+
+Blueprint 7 does not add official tennis truth, TOM v2-style adjudication, accepted/rejected event lifecycles, bounce/hit detection, stroke classification, rally/point/scoring, confirmed player identity, confirmed ball paths, real pose inference, court-space reasoning, or live stream ingestion.
+
+Future real perception outputs remain observations and candidates until a separate blueprint deliberately defines a higher-level evidence layer.
+
+## Fixture Path
+
+The default fixture demo remains unchanged and CI-safe:
+
+```text
+make demo
+make completion-audit
+```
+
+No YOLO weights, GPU, Torch, Ultralytics, OpenCV, or pose weights are required for default validation.
+
+## Future Milestones
+
+Possible follow-on Blueprint 7 milestones:
+
+- 7B: Real Detection Overlay Validation in Replay Workstation
+- Real tracklet candidate generation from real detection observations
+- Real pose runtime integration
+- Real model-output quality/evaluation workflows
+
+Do not add tennis intelligence implicitly inside these runtime milestones.

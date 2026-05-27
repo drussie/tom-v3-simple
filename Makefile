@@ -16,6 +16,7 @@ QUERY_JSON ?=
 EXPORT_ROOT ?= .data/exports
 YOLO_DEVICE ?= auto
 WEIGHTS_PATH ?=
+YOLO_WEIGHTS_PATH ?= $(WEIGHTS_PATH)
 MODEL_NAME ?=
 MODEL_VERSION ?= v0
 REQUIRED_SHA256 ?=
@@ -29,10 +30,19 @@ POSE_RUN_ID ?=
 AUDIT_DEMO_ONLY ?= true
 AUDIT_STRICT ?= false
 TOM_V3_AUDIT_REQUIRED ?= false
+EVERY_N_FRAMES ?= 1
+IMG_SIZE ?=
+CONF ?= 0.25
+IOU ?= 0.7
+FRAME_START ?=
+FRAME_END ?=
+CLASS_MAP_JSON ?=
+PLAN_ONLY ?= false
+OUTPUT_DEBUG_ARTIFACT ?= false
 
 export TOM_V3_DATABASE_URL
 
-.PHONY: install web-install test lint migrate api seed verify index-media run-gameplay index-and-run-gameplay run-detection index-and-run-detection extract-frame-artifacts build-tracklets run-pose export-tracklet-review-dataset demo demo-fixture demo-plan demo-reset demo-export demo-open replay-open completion-audit completion-check yolo-probe yolo-smoke yolo-runtime-probe register-yolo-model smoke-real-yolo-local web web-build web-lint smoke all-checks
+.PHONY: install web-install test lint migrate api seed verify index-media run-gameplay index-and-run-gameplay run-detection index-and-run-detection extract-frame-artifacts build-tracklets run-pose export-tracklet-review-dataset demo demo-fixture demo-plan demo-reset demo-export demo-open replay-open completion-audit completion-check yolo-probe yolo-smoke yolo-runtime-probe register-yolo-model smoke-real-yolo-local real-detection web web-build web-lint smoke all-checks
 
 install:
 	$(PYTHON) -m pip install -e ".[dev]"
@@ -165,6 +175,11 @@ register-yolo-model:
 
 smoke-real-yolo-local:
 	$(PYTHON) -m apps.worker.cli smoke-real-yolo-local $(if $(SOURCE_PATH),--source-path "$(SOURCE_PATH)",) $(if $(WEIGHTS_PATH),--weights-path "$(WEIGHTS_PATH)",) $(if $(MODEL_NAME),--model-name "$(MODEL_NAME)",) --model-version "$(MODEL_VERSION)" --device "$(YOLO_DEVICE)" --frame-sample-rate "$(FRAME_SAMPLE_RATE)" --max-frames "$(MAX_FRAMES)" --output-root "$(ARTIFACT_ROOT)" $(if $(filter true,$(RUN_TRACKLETS)),--run-tracklets,--no-run-tracklets)
+
+real-detection:
+	@if [ -z "$(MEDIA_ID)" ]; then echo "MEDIA_ID is required: make real-detection MEDIA_ID=<media_id> YOLO_WEIGHTS_PATH=model_assets/yolo/model.pt"; exit 1; fi
+	@if [ -z "$(YOLO_WEIGHTS_PATH)" ]; then echo "YOLO_WEIGHTS_PATH is required: make real-detection MEDIA_ID=<media_id> YOLO_WEIGHTS_PATH=model_assets/yolo/model.pt"; exit 1; fi
+	$(PYTHON) -m apps.worker.cli run-real-detection --media-id "$(MEDIA_ID)" --weights "$(YOLO_WEIGHTS_PATH)" --device "$(YOLO_DEVICE)" --every-n-frames "$(EVERY_N_FRAMES)" --max-frames "$(MAX_FRAMES)" --conf "$(CONF)" --iou "$(IOU)" --viewer-base-url "$(VIEWER_BASE_URL)" $(if $(MODEL_NAME),--model-name "$(MODEL_NAME)",) --model-version "$(MODEL_VERSION)" $(if $(REQUIRED_SHA256),--required-sha256 "$(REQUIRED_SHA256)",) $(if $(IMG_SIZE),--imgsz "$(IMG_SIZE)",) $(if $(FRAME_START),--frame-start "$(FRAME_START)",) $(if $(FRAME_END),--frame-end "$(FRAME_END)",) $(if $(CLASS_MAP_JSON),--class-map-json '$(CLASS_MAP_JSON)',) $(if $(filter true,$(OUTPUT_DEBUG_ARTIFACT)),--output-debug-artifact,--no-output-debug-artifact) $(if $(filter true,$(PLAN_ONLY)),--plan-only,)
 
 web:
 	cd $(WEB_DIR) && npm run dev

@@ -2,7 +2,7 @@
 
 ## Current Progress Gauge
 
-Current: Blueprints 1, 2, 3, 4, 5, and 6 complete; TOM v3 Simple is complete
+Current: Blueprints 1, 2, 3, 4, 5, and 6 complete; TOM v3 Simple is complete; Blueprint 7 is in progress
 
 ## Current
 
@@ -171,7 +171,31 @@ Current: Blueprints 1, 2, 3, 4, 5, and 6 complete; TOM v3 Simple is complete
 - Stream Proxy Mode displays available evidence counts, pause/review state, lag, and return-to-live-edge control.
 - Blueprint 6 completion review exists.
 - Blueprint 6 is marked complete in canonical docs.
+- Blueprint 7 has started as the real perception runtime for the replay workstation.
+- Worker `run-real-detection` exists for optional real YOLO detection replay runs.
+- Makefile `real-detection` exists.
+- Real YOLO detection replay runs reuse runtime probing, weights validation, model registry, class mapping, frame inference, and atomic observation persistence.
+- Real detection replay observations remain media-owned, observation-only model output.
 - No real pose inference, movement interpretation, homography, bounce, hit, rally, point, scoring, or adjudication has been added.
+
+## Blueprint 7 Status
+
+Status: in progress.
+
+Milestone 7A starts Blueprint 7 with real YOLO detection replay:
+
+```text
+indexed media
+-> optional YOLO runtime and local weights
+-> media-owned frame sampling
+-> explicit class mapping
+-> real model-output atomic detection observations
+-> replay workstation detection overlays
+```
+
+Current Blueprint 7 progress after 7A: about 15-20%.
+
+Remaining Blueprint 7 work should stay separate and deliberate: real detection replay validation, possible real-detection tracklet candidates, real pose runtime, evaluation workflows, and future perception layers. No tennis-event interpretation is part of 7A.
 
 ## Blueprint 5 Status
 

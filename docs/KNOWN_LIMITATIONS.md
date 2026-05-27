@@ -8,6 +8,8 @@ This registry makes TOM v3 Simple boundaries explicit.
 - Fixture detection is deterministic demo output.
 - Optional YOLO requires a local optional runtime and local weights outside git.
 - Real YOLO detection quality depends on the chosen model, class mapping, source video, device, and confidence settings.
+- Real YOLO detection replay is optional and local-runtime dependent.
+- Real YOLO detections are model-output observations, not confirmed ball/player state.
 - Real pose inference is not included.
 - Fixture pose output is demo evidence only.
 - Portable TOM v1 detector assets/source are not present in this repo state.
@@ -28,6 +30,7 @@ This registry makes TOM v3 Simple boundaries explicit.
 - Replay Mode currently supports local indexed file playback only.
 - Replay Mode displays persisted detection observation, tracklet candidate, and pose keypoint evidence overlays.
 - Replay Mode includes evidence timeline lanes for navigation.
+- Replay Mode can display real YOLO detection replay runs through `detectionRunId` when local runtime/weights are available.
 - Blueprint 6 is complete for local replay/operator workstation behavior, not for production live ingestion.
 - Stream Proxy Mode is a live-like UI mode over indexed local media; it is not real live ingestion.
 - Stream Proxy Mode hides future evidence in the UI, but the underlying observations are already persisted.

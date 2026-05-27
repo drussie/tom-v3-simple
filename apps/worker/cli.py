@@ -29,6 +29,7 @@ from apps.worker.services.gameplay_adapter import run_gameplay_adapter
 from apps.worker.services.local_demo import run_local_fixture_demo
 from apps.worker.services.media_indexer import index_media
 from apps.worker.services.pose_adapter import run_pose_adapter
+from apps.worker.services.real_detection_replay import run_real_detection_replay
 from apps.worker.services.real_yolo_smoke import run_real_yolo_local_smoke
 from apps.worker.services.tracklet_builder import build_tracklets_from_detection_run
 from apps.worker.services.yolo_model_registry import register_yolo_model
@@ -392,6 +393,44 @@ def main() -> None:
     yolo_smoke_parser.add_argument("--skip-create-db", action="store_true")
     yolo_smoke_parser.set_defaults(handler=_handle_smoke_real_yolo_local)
 
+    real_detection_parser = subcommands.add_parser(
+        "run-real-detection",
+        help="Run real YOLO detection on indexed media for replay overlay evidence.",
+    )
+    real_detection_parser.add_argument("--media-id", required=True)
+    real_detection_parser.add_argument("--weights", required=True)
+    real_detection_parser.add_argument("--model-name")
+    real_detection_parser.add_argument("--model-version", default="v0")
+    real_detection_parser.add_argument("--required-sha256")
+    real_detection_parser.add_argument("--device", default="auto")
+    real_detection_parser.add_argument("--imgsz", type=int)
+    real_detection_parser.add_argument("--conf", type=float, default=0.25)
+    real_detection_parser.add_argument("--iou", type=float, default=0.7)
+    real_detection_parser.add_argument("--every-n-frames", type=int, default=1)
+    real_detection_parser.add_argument("--frame-start", type=int)
+    real_detection_parser.add_argument("--frame-end", type=int)
+    real_detection_parser.add_argument("--max-frames", type=int, default=120)
+    real_detection_parser.add_argument("--class-map-json")
+    real_detection_parser.add_argument("--viewer-base-url", default="http://127.0.0.1:3000")
+    real_detection_parser.add_argument(
+        "--allowed-root",
+        action="append",
+        dest="allowed_roots",
+        help="Allowed local root for weights. May be supplied more than once.",
+    )
+    real_detection_parser.add_argument(
+        "--output-debug-artifact",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+    )
+    real_detection_parser.add_argument(
+        "--plan-only",
+        action="store_true",
+        help="Print the real detection replay plan without probing runtime or touching assets.",
+    )
+    real_detection_parser.add_argument("--skip-create-db", action="store_true")
+    real_detection_parser.set_defaults(handler=_handle_run_real_detection)
+
     demo_parser = subcommands.add_parser(
         "run-demo",
         help="Run the canonical local fixture demo path without YOLO or pose weights.",
@@ -753,6 +792,43 @@ def _handle_smoke_real_yolo_local(
         allowed_roots=args.allowed_roots,
         copy_to_storage=args.copy_to_storage,
         run_tracklets=args.run_tracklets,
+        output_debug_artifact=args.output_debug_artifact,
+        plan_only=args.plan_only,
+    )
+
+
+def _handle_run_real_detection(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    try:
+        class_map = json.loads(args.class_map_json) if args.class_map_json else None
+    except json.JSONDecodeError as exc:
+        return {
+            "ok": False,
+            "status": "invalid_class_mapping",
+            "error_type": exc.__class__.__name__,
+            "message": f"class-map-json is invalid JSON: {exc}",
+        }
+
+    return run_real_detection_replay(
+        session=session,
+        media_id=args.media_id,
+        weights_path=args.weights,
+        model_name=args.model_name,
+        model_version=args.model_version,
+        required_sha256=args.required_sha256,
+        device=args.device,
+        imgsz=args.imgsz,
+        conf=args.conf,
+        iou=args.iou,
+        every_n_frames=args.every_n_frames,
+        frame_start=args.frame_start,
+        frame_end=args.frame_end,
+        max_frames=args.max_frames,
+        class_map=class_map,
+        allowed_roots=args.allowed_roots,
+        viewer_base_url=args.viewer_base_url,
         output_debug_artifact=args.output_debug_artifact,
         plan_only=args.plan_only,
     )

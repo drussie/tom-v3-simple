@@ -8,9 +8,10 @@
 - Blueprint 4: COMPLETE
 - Blueprint 5: COMPLETE
 - Blueprint 6: COMPLETE
+- Blueprint 7: IN PROGRESS
 - TOM v3 Simple: COMPLETE
 
-TOM v3 Simple is complete as a lightweight local observation/evidence platform. Blueprint 6 is complete as the visual replay/operator workstation layer.
+TOM v3 Simple is complete as a lightweight local observation/evidence platform. Blueprint 6 is complete as the visual replay/operator workstation layer. Blueprint 7 has started the real perception runtime layer for replay.
 
 ## Blueprint 1 - Media, Observation Store, Viewer Foundation
 
@@ -301,3 +302,39 @@ Milestone 6F did not add:
 - adjudication
 
 Future real live ingestion and future tennis intelligence must begin as new blueprints.
+
+## Blueprint 7 - Real Perception Runtime For Replay Workstation
+
+Status: IN PROGRESS
+
+Blueprint 7 mission:
+
+```text
+indexed video
+-> real perception runtime
+-> persisted model-output observations
+-> replay workstation overlays
+```
+
+Milestone 7A proves:
+
+```text
+indexed media
+-> optional YOLO runtime and local weights
+-> media-owned frame sampling
+-> explicit class mapping
+-> real YOLO frame inference
+-> persisted atomic ball/player detection observations
+-> replay URL with real detectionRunId
+```
+
+Milestone 7A does not add:
+
+- tracklet generation from real detections
+- real pose inference
+- homography or court-space reasoning
+- stream ingestion
+- bounce or hit detection
+- rally/point/scoring
+- confirmed identity or confirmed ball path
+- adjudication

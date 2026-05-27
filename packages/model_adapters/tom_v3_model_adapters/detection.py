@@ -262,6 +262,8 @@ class YoloDetectionAdapter(BaseDetectionAdapter):
                 height=adapter_input.height,
                 frame_sample_rate=int(runtime_config.get("frame_sample_rate") or 30),
                 max_frames=runtime_config.get("max_frames"),
+                frame_start=runtime_config.get("frame_start"),
+                frame_end=runtime_config.get("frame_end"),
                 class_mapping=runtime_config.get("class_map"),
                 model_registry_id=str(model_registry_id) if model_registry_id else None,
                 runtime_config_id=runtime_config.get("runtime_config_id"),

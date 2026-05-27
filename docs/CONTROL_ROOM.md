@@ -16,6 +16,7 @@ It is not TOM v2, and it does not decide official tennis meaning.
 - Blueprint 4: COMPLETE
 - Blueprint 5: COMPLETE
 - Blueprint 6: COMPLETE
+- Blueprint 7: IN PROGRESS
 - TOM v3 Simple: COMPLETE
 
 TOM v3 Simple is complete as a lightweight local observation/evidence platform. It can index local tennis video, run fixture gameplay/detection/pose paths, optionally run YOLO detection smoke when local runtime and weights exist, persist observations and typed evidence rows, build candidate tracklets, preserve lineage/provenance, render detection/tracklet/pose evidence in the viewer, seed and display review annotations, export TOM-native review datasets, and run a structural completion audit.
@@ -29,6 +30,12 @@ Blueprint 6 completes TOM v3's visual replay/operator workstation. TOM can now o
 Blueprint 6 remains observation-only and non-adjudicative. It does not add real live TV/HLS/RTSP/HDMI ingestion, stream backend infrastructure, real pose inference, movement interpretation, homography, bounce/hit/rally/point/scoring, or TOM v2-style adjudication.
 
 Future real live ingestion and future tennis intelligence must begin as new blueprints.
+
+Blueprint 7 Status: IN PROGRESS
+
+Blueprint 7 starts the real perception runtime for the replay workstation. Milestone 7A adds optional real YOLO detection replay: indexed media frames are sampled from media-owned timing, mapped real YOLO outputs are persisted as atomic `ball_detection` and `player_detection` observations, and the existing replay workstation displays them through `detectionRunId`.
+
+Blueprint 7 still records evidence only. Real model output is not confirmed tennis state.
 
 ## Canonical Local Demo
 
@@ -77,6 +84,7 @@ An observation does not mean the output is correct, a tennis event happened, a s
 - Canonical fixture demo path and local runbook.
 - Structural provenance audit for the demo path.
 - Replay/operator workstation with Replay Mode, Stream Proxy Mode, synchronized detection/tracklet/pose evidence overlays, evidence timeline lanes, click-to-seek, and click-to-select persisted evidence.
+- Optional real YOLO detection replay runs that persist real model-output detection observations for replay overlays.
 
 ## Explicitly Absent Capabilities
 
@@ -100,6 +108,7 @@ Use:
 ```bash
 make yolo-probe
 make yolo-smoke
+make real-detection MEDIA_ID=<media_id> YOLO_WEIGHTS_PATH=./model_assets/yolo/<model>.pt
 ```
 
 Real YOLO use requires optional dependencies and local weights. YOLO-origin detections are still observations, not final tennis meaning.
@@ -196,12 +205,30 @@ Milestone 6F closes Blueprint 6 with a completion review, final status updates, 
 
 Remaining Blueprint 6 milestones: none.
 
+## Blueprint 7 Status
+
+Status: IN PROGRESS
+
+Milestone 7A adds real YOLO detection replay:
+
+```text
+indexed media
+-> optional YOLO runtime / weights
+-> media-owned frame sampling
+-> explicit class mapping
+-> persisted atomic detection observations
+-> replay URL with detectionRunId
+```
+
+7A does not add tracklet generation from real detections, real pose inference, homography, stream ingestion, tennis-event interpretation, or adjudication.
+
 ## Future Blueprint Candidates
 
 Future work should be separate from TOM v3 Simple completion:
 
 - Real live stream ingestion.
 - Real pose runtime integration.
+- Real tracklet candidate generation from real detection runs.
 - Homography / court-space evidence.
 - Event candidate layers for bounce/hit/rally/point work.
 - Product deployment, auth, storage lifecycle, and collaboration workflows.

@@ -53,6 +53,8 @@ def run_detection_adapter(
     max_det: int | None = 50,
     frame_sample_rate: int = 30,
     max_frames: int | None = 5,
+    frame_start: int | None = None,
+    frame_end: int | None = None,
     gameplay_run_id: str | None = None,
     output_debug_artifact: bool = False,
     yolo_result_provider: Any | None = None,
@@ -111,6 +113,8 @@ def run_detection_adapter(
         max_det=max_det,
         frame_sample_rate=frame_sample_rate,
         max_frames=max_frames,
+        frame_start=frame_start,
+        frame_end=frame_end,
         gameplay_run_id=gameplay_run_id,
         class_map=class_map,
         weights_sha256=weights_sha256,
@@ -182,6 +186,8 @@ def _create_runtime_config(
     max_det: int | None,
     frame_sample_rate: int,
     max_frames: int | None,
+    frame_start: int | None,
+    frame_end: int | None,
     gameplay_run_id: str | None,
     class_map: dict[str, Any] | None,
     weights_sha256: str | None,
@@ -203,6 +209,15 @@ def _create_runtime_config(
             "max_det": max_det,
             "frame_sample_rate": frame_sample_rate,
             "max_frames": max_frames,
+            "frame_start": frame_start,
+            "frame_end": frame_end,
+            "frame_sampling": {
+                "mode": "every_n_frames",
+                "every_n_frames": frame_sample_rate,
+                "frame_start": frame_start,
+                "frame_end": frame_end,
+                "max_frames": max_frames,
+            },
             "gameplay_scope_run_id": gameplay_run_id,
             "class_map": class_map,
             "frame_time_owner": "media_indexing",
@@ -444,6 +459,8 @@ def _detection_payload(
         "class_id": detection.class_id,
         "class_label": detection.class_label,
         "source_runtime": detection.metadata.get("source_runtime"),
+        "real_model_output": bool(detection.metadata.get("real_model_output")),
+        "model_output_not_truth": bool(detection.metadata.get("real_model_output")),
         "source_result_index": detection.metadata.get("source_result_index"),
         "model_registry_id": detection.metadata.get("model_registry_id"),
         "runtime_config_id": detection.metadata.get("runtime_config_id"),
@@ -469,6 +486,8 @@ def _atomic_payload(
         "class_label": detection.class_label,
         "class_id": detection.class_id,
         "source_runtime": detection.metadata.get("source_runtime"),
+        "real_model_output": bool(detection.metadata.get("real_model_output")),
+        "model_output_not_truth": bool(detection.metadata.get("real_model_output")),
         "source_result_index": detection.metadata.get("source_result_index"),
         "model_registry_id": detection.metadata.get("model_registry_id"),
         "runtime_config_id": detection.metadata.get("runtime_config_id"),
@@ -572,19 +591,29 @@ def _mark_completed(
     result: DetectionAdapterResult,
 ) -> None:
     now = datetime.now(UTC)
+    counts_by_type = Counter(
+        _observation_type_for_label(detection.label) for detection in result.detections
+    )
+    diagnostics = {
+        **result.diagnostics,
+        "persisted_ball_detections": counts_by_type.get("ball_detection", 0),
+        "persisted_player_detections": counts_by_type.get("player_detection", 0),
+        "observation_only": True,
+        "no_adjudication": True,
+    }
     run.run_status = "completed"
     run.completed_at = now
     run.metadata_jsonb = {
         **run.metadata_jsonb,
         "detection_count": len(result.detections),
-        "diagnostics": result.diagnostics,
+        "diagnostics": diagnostics,
     }
     step.step_status = "completed"
     step.completed_at = now
     step.metadata_jsonb = {
         **step.metadata_jsonb,
         "detection_count": len(result.detections),
-        "diagnostics": result.diagnostics,
+        "diagnostics": diagnostics,
     }
     session.commit()
 

@@ -208,14 +208,27 @@ def sample_frame_numbers(
     frame_count: int,
     frame_sample_rate: int,
     max_frames: int | None,
+    frame_start: int | None = None,
+    frame_end: int | None = None,
 ) -> list[int]:
     if frame_count < 1:
         raise YoloFrameInferenceError("YOLO frame inference requires indexed frames")
     if frame_sample_rate <= 0:
         raise YoloFrameInferenceError("frame_sample_rate must be greater than 0")
-    sampled_frames = list(range(0, frame_count, frame_sample_rate))
+    start = 0 if frame_start is None else int(frame_start)
+    end = frame_count - 1 if frame_end is None else int(frame_end)
+    if start < 0:
+        raise YoloFrameInferenceError("frame_start must be greater than or equal to 0")
+    if end < 0:
+        raise YoloFrameInferenceError("frame_end must be greater than or equal to 0")
+    if start >= frame_count:
+        raise YoloFrameInferenceError("frame_start is outside indexed media frame range")
+    end = min(end, frame_count - 1)
+    if start > end:
+        raise YoloFrameInferenceError("frame_start must be less than or equal to frame_end")
+    sampled_frames = list(range(start, end + 1, frame_sample_rate))
     if not sampled_frames:
-        sampled_frames = [0]
+        sampled_frames = [start]
     if max_frames is not None:
         sampled_frames = sampled_frames[: max(1, int(max_frames))]
     return sampled_frames
@@ -229,11 +242,13 @@ def run_yolo_frame_inference(
     height: int | None,
     frame_sample_rate: int,
     max_frames: int | None,
-    class_mapping: Mapping[str, Any] | None,
-    model_registry_id: str | None,
-    runtime_config_id: str | None,
-    weights_sha256: str | None,
-    inference_metadata: Mapping[str, Any],
+    class_mapping: Mapping[str, Any] | None = None,
+    model_registry_id: str | None = None,
+    runtime_config_id: str | None = None,
+    weights_sha256: str | None = None,
+    inference_metadata: Mapping[str, Any] | None = None,
+    frame_start: int | None = None,
+    frame_end: int | None = None,
     result_provider: YoloResultProvider | None = None,
     frame_source: YoloFrameSource | None = None,
 ):
@@ -241,6 +256,7 @@ def run_yolo_frame_inference(
         raise YoloFrameInferenceError("YOLO frame inference requires positive media fps")
     if frame_count is None:
         raise YoloFrameInferenceError("YOLO frame inference requires indexed frame_count")
+    inference_metadata = inference_metadata or {}
     provider = result_provider or UltralyticsYoloResultProvider(
         weights_path=str(inference_metadata.get("weights_path") or ""),
         device=str(inference_metadata.get("device") or "cpu"),
@@ -254,7 +270,13 @@ def run_yolo_frame_inference(
         if isinstance(provider, FakeYoloResultProvider)
         else OpenCvYoloFrameSource()
     )
-    sampled_frames = sample_frame_numbers(frame_count, frame_sample_rate, max_frames)
+    sampled_frames = sample_frame_numbers(
+        frame_count,
+        frame_sample_rate,
+        max_frames,
+        frame_start=frame_start,
+        frame_end=frame_end,
+    )
     frame_inputs = source.iter_sampled_frames(
         media_path,
         fps,
@@ -275,18 +297,32 @@ def run_yolo_frame_inference(
             **dict(inference_metadata),
             "weights_sha256": weights_sha256,
             "sampled_frames": sampled_frames,
+            "frame_start": frame_start,
+            "frame_end": frame_end,
+            "frame_sample_rate": frame_sample_rate,
+            "max_frames": max_frames,
         },
     )
     adapter_result = build_detection_adapter_result_from_normalized(normalized)
     return adapter_result, {
+        "frames_considered": len(sampled_frames),
         "frames_processed": len(sampled_frames),
         "sampled_frames": sampled_frames,
+        "frame_start": frame_start,
+        "frame_end": frame_end,
+        "frame_sample_rate": frame_sample_rate,
+        "max_frames": max_frames,
+        "raw_detections": normalized.input_box_count,
+        "accepted_detections": normalized.mapped_detection_count,
         "input_box_count": normalized.input_box_count,
         "mapped_detection_count": normalized.mapped_detection_count,
         "unmapped_detection_count": normalized.unmapped_detection_count,
+        "skipped_unmapped_classes": normalized.unmapped_detection_count,
         "unmapped_classes": normalized.unmapped_classes,
         "warnings": normalized.warnings,
         "source_runtime": "ultralytics_yolo",
+        "weights_sha256": weights_sha256,
+        "device": inference_metadata.get("device"),
     }
 
 

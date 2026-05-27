@@ -176,6 +176,7 @@ def normalize_yolo_frame_result(
         metadata = {
             "adapter": "ultralytics_yolo_detection",
             "adapter_version": ADAPTER_VERSION,
+            "real_model_output": True,
             "raw_class_id": class_id,
             "raw_class_name": class_name,
             "target_label": target_label,
@@ -278,7 +279,7 @@ def build_detection_adapter_result_from_normalized(
             "unmapped_detection_count": result.unmapped_detection_count,
             "unmapped_classes": result.unmapped_classes,
             "warnings": result.warnings,
-            "note": "normalization-only adapter result; no real inference was run",
+            "note": "YOLO-like frame results normalized into TOM detection observations",
         },
     )
 
