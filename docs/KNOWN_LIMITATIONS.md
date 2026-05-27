@@ -18,7 +18,7 @@ This registry makes TOM v3 Simple boundaries explicit.
 - Real pose observations are keypoint evidence; they do not establish movement, stroke, serve, split-step, biomechanics, or body-state conclusions.
 - Fixture pose output is demo evidence only.
 - Court/camera/homography evidence is not implemented in Blueprint 7.
-- Court/homography is deferred to a future Blueprint 8 geometry evidence layer.
+- Court/homography is deferred to future Blueprint 8 geometry evidence work.
 - Portable TOM v1 detector assets/source are not present in this repo state.
 
 ## Evidence Limitations
@@ -41,8 +41,10 @@ This registry makes TOM v3 Simple boundaries explicit.
 - Replay Mode displays persisted detection observation, tracklet candidate, and pose keypoint evidence overlays.
 - Replay Mode includes evidence timeline lanes for navigation.
 - Replay Mode can display real YOLO detection replay runs through `detectionRunId` when local runtime/weights are available.
+- Replay Mode can display real-detection-derived candidate tracklets through `trackletRunId` when a tracklet run has been built from a real detection run.
 - Replay Mode can display real pose replay runs through `poseRunId` when local runtime/weights are available.
 - Blueprint 6 is complete for local replay/operator workstation behavior, not for production live ingestion.
+- Blueprint 7 is complete for optional real perception replay through detection observations, candidate tracklets, and pose keypoint evidence. It is not a court/homography, movement, stroke, event, stream, or deployment blueprint.
 - Stream Proxy Mode is a live-like UI mode over indexed local media; it is not real live ingestion.
 - Stream Proxy Mode hides future evidence in the UI, but the underlying observations are already persisted.
 - There is no court evidence replay layer yet.

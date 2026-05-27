@@ -1,6 +1,6 @@
 # TOM v3 Blueprint 7 - Real Perception Runtime For Replay Workstation
 
-Status: IN PROGRESS
+Status: COMPLETE
 
 ## Mission
 
@@ -91,6 +91,29 @@ Blueprint 7 real perception runtime
 
 7E decides that court/camera/homography evidence should be future Blueprint 8 work. It does not add database schema, court runtime, homography computation, replay court overlays, production coordinate transforms, stream ingestion, or tennis-event interpretation.
 
+## Milestone 7F
+
+Milestone 7F closes Blueprint 7 with perception run orchestration and completion review:
+
+```text
+fixture-safe demo
+-> optional real detection
+-> optional real-detection-derived candidate tracklets
+-> optional real pose
+-> replay workstation URLs
+-> Blueprint 8 court/homography boundary
+```
+
+7F adds final status updates, final runbook consolidation, completion review docs, and validation notes. It does not add new runtime behavior, API behavior, schema, frontend features, stream ingestion, court/homography implementation, or tennis-event interpretation.
+
+Blueprint 7 Status: COMPLETE
+
+Blueprint 7 completes TOM v3's real perception runtime for the replay workstation. TOM can now run optional real YOLO detection on indexed media, persist real ball/player detection observations, label and inspect real model-output detection evidence in replay, build candidate tracklets from real detection observations with lineage back to source detections, run optional real pose inference, persist COCO17 player pose observations, link pose evidence back to source player detections, and render detection, tracklet, and pose evidence in the replay workstation.
+
+Blueprint 7 remains observation-only and non-adjudicative. It does not add court/homography implementation, bounce/hit/rally/point/scoring, movement/stroke interpretation, player identity conclusions, real stream ingestion, or TOM v2-style adjudication.
+
+Court/camera/homography evidence is deferred to Blueprint 8.
+
 ## Boundaries
 
 Blueprint 7 does not add official tennis conclusions, TOM v2-style adjudication, accepted/rejected event lifecycles, bounce/hit detection, stroke classification, rally/point/scoring, player identity resolution, ball-path conclusions, movement interpretation from pose, court-space reasoning, court/homography runtime, or live stream ingestion.
@@ -108,14 +131,16 @@ make completion-audit
 
 No YOLO weights, GPU, Torch, Ultralytics, OpenCV, or pose weights are required for default validation.
 
-## Future Milestones
+## Future Work
 
-Possible follow-on Blueprint 7 milestones:
+Remaining Blueprint 7 milestones: none.
 
-- Perception run orchestration and completion review
-- Real model-output quality/evaluation workflows
-- Future perception layers that remain observation-only
+Future work should begin as a separate blueprint:
 
-Do not add tennis intelligence implicitly inside these runtime milestones.
+- Blueprint 8 - Court / Camera / Homography Evidence Layer.
+- Bounce / Hit Candidate Evidence.
+- Movement / Stroke Evidence Candidates.
+- Real Live Stream Ingestion.
+- Product Deployment Blueprint.
 
 Court/camera/homography evidence is now a Blueprint 8 candidate.

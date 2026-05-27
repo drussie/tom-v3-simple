@@ -4,8 +4,8 @@
 
 - Project name: TOM v3 Simple
 - Repo: drussie/tom-v3-simple
-- Current phase: Blueprint 7 in progress
-- Current goal: Activate optional real perception runtime for replay while preserving TOM v3's observation-only boundary
+- Current phase: Blueprint 7 complete
+- Current goal: Use/demo the real perception replay ladder when local optional weights are available; future work begins as a separate blueprint
 
 ## Mission
 
@@ -31,7 +31,7 @@ A lightweight tennis video observation platform that accepts model output as ope
 - Blueprint 4 status: complete; pose observation schema, COCO17 skeleton registry, keypoint validation, typed pose persistence, synthetic pose insertion, pose normalization, worker pose persistence, source detection lineage, pose overlay viewer, pose query/review/export integration, completion review, and pose runtime/config metadata contracts are implemented
 - Blueprint 5 status: complete; local demo, viewer polish, provenance audit, docs/control-room consolidation, and final completion review are complete
 - Blueprint 6 status: complete; video replay timeline foundation, replay info, local video serving, frame/time mapping, frontend replay route, synchronized detection observation overlay playback, tracklet candidate overlay playback, pose keypoint overlay playback, evidence timeline lanes, Stream Proxy Mode, and completion review are complete
-- Blueprint 7 status: in progress; Milestones 7A, 7B, 7C, and 7D add optional real YOLO detection replay runs, label and inspect those real runs clearly in the replay workstation, build candidate tracklets from real detection observations, and persist optional real pose keypoint observations; Milestone 7E defers court/camera/homography evidence to Blueprint 8
+- Blueprint 7 status: complete; optional real YOLO detection replay, real-vs-fixture labeling, candidate tracklets from real detection observations, optional real pose keypoint observations, court/camera/homography deferral, and final perception orchestration closeout are complete
 - Observation writer: implemented with typed extension rows, lineage, artifacts, and idempotency
 - Worker synthetic seeder: implemented
 - Visual evidence viewer: implemented in `apps/web` with detection bbox overlay, pose keypoint/skeleton overlay, frame artifact image support, run evidence summary, clearer empty states, candidate/evidence wording, readable lineage context, and review/export metadata display
@@ -310,19 +310,24 @@ Status: complete.
 
 Milestone 7E is a court/homography evidence decision gate. It decides that court/camera/homography evidence belongs in Blueprint 8, not hidden inside Blueprint 7. It documents the future court evidence family, court keypoint observation contract, court line observation contract, camera/view observation contract, homography candidate contract, lineage ideas, replay integration, review/export ideas, and risks. It does not add a database migration, court runtime, homography computation, replay court overlay, coordinate transform service, bounce/hit/rally/point/scoring, real stream ingestion, tennis-event interpretation, or adjudication.
 
+## Milestone 7F Result
+
+Status: complete.
+
+Milestone 7F closes Blueprint 7 with a completion review, final agent report, final status updates, and final local runbook orchestration. Blueprint 7 is complete: TOM v3 can run optional real YOLO detection on indexed media, persist real ball/player detection observations, label and inspect real model-output evidence in replay, build candidate tracklets from real detection observations with lineage back to source detections, run optional real pose inference, persist COCO17 player pose observations, link pose evidence back to source player detections, and render detection, tracklet, and pose evidence in the replay workstation. Court/camera/homography evidence remains deferred to Blueprint 8. 7F does not add new runtime behavior, schema changes, court/homography implementation, movement/stroke interpretation, bounce/hit/rally/point/scoring, real stream ingestion, or adjudication.
+
 ## Naming Transition
 
 The implementation branch/file names may reference "1F" because the milestone was originally planned as a Blueprint 1 extension. After Blueprint 1 was declared complete, the same work was reclassified as Blueprint 2A because temporal grouping begins a new conceptual layer.
 
 ## Future Blueprints
 
-TOM v3 Simple is complete. Blueprint 6 is complete as the replay/operator layer.
+TOM v3 Simple is complete. Blueprint 6 is complete as the replay/operator layer. Blueprint 7 is complete as the real perception replay runtime layer.
 
 Possible future blueprint candidates:
 
-- Real Live Stream Ingestion
-- Real Pose Runtime
+- Blueprint 8 - Court / Camera / Homography Evidence Layer
+- Bounce / Hit Candidate Evidence
 - Movement / Stroke Evidence Candidates
-- Homography / Court-Space Evidence
-- Bounce/Hit Candidate Evidence
-- Product Deployment
+- Real Live Stream Ingestion
+- Product Deployment Blueprint

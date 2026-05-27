@@ -2,6 +2,8 @@
 
 Status: CANDIDATE
 
+Blueprint 7 is complete. This document remains the future-work boundary for court/camera/homography evidence.
+
 ## Mission
 
 Persist court, camera, and homography model-output evidence as replayable observations, including court keypoints, court lines, camera/view state, homography candidates, projection diagnostics, and optional court-space coordinate transform candidates, without turning geometry evidence into tennis-event or court-position conclusions.
@@ -17,6 +19,8 @@ real detections
 -> real-detection-derived candidate tracklets
 -> real pose keypoint evidence
 ```
+
+Blueprint 7 closes before implementing court/camera/homography runtime, schema, API, or replay overlays. That boundary keeps Blueprint 8 focused on geometry evidence instead of folding court work into the real detection/pose runtime.
 
 Blueprint 8 should deliberately design:
 

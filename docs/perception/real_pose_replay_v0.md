@@ -8,6 +8,8 @@ It runs an Ultralytics pose model over media-owned frames or crops from persiste
 
 Pose output remains keypoint evidence. It is not movement, stroke, biomechanics, court, or tennis-event interpretation.
 
+Milestone 7F closes Blueprint 7 with real detection, real-detection-derived candidate tracklets, and optional real pose replay documented as the final perception ladder. Court/camera/homography evidence remains future Blueprint 8 work.
+
 ## Command
 
 Preferred crop-from-player-detection mode:
@@ -255,4 +257,4 @@ Selected pose detail can show source runtime, model registry id, runtime config 
 
 ## Non-goals
 
-7D does not add movement interpretation, stroke classification, serve detection, split-step analysis, biomechanics conclusions, court/homography evidence, bounce/hit/rally/point/scoring, real stream ingestion, or adjudication.
+7D and 7F do not add movement interpretation, stroke classification, serve detection, split-step analysis, biomechanics conclusions, court/homography evidence, bounce/hit/rally/point/scoring, real stream ingestion, or adjudication.

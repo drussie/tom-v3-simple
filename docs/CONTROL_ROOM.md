@@ -16,7 +16,7 @@ It is not TOM v2, and it does not decide official tennis meaning.
 - Blueprint 4: COMPLETE
 - Blueprint 5: COMPLETE
 - Blueprint 6: COMPLETE
-- Blueprint 7: IN PROGRESS
+- Blueprint 7: COMPLETE
 - TOM v3 Simple: COMPLETE
 
 TOM v3 Simple is complete as a lightweight local observation/evidence platform. It can index local tennis video, run fixture gameplay/detection/pose paths, optionally run YOLO detection smoke when local runtime and weights exist, persist observations and typed evidence rows, build candidate tracklets, preserve lineage/provenance, render detection/tracklet/pose evidence in the viewer, seed and display review annotations, export TOM-native review datasets, and run a structural completion audit.
@@ -31,11 +31,13 @@ Blueprint 6 remains observation-only and non-adjudicative. It does not add real 
 
 Future real live ingestion and future tennis intelligence must begin as new blueprints.
 
-Blueprint 7 Status: IN PROGRESS
+Blueprint 7 Status: COMPLETE
 
-Blueprint 7 starts the real perception runtime for the replay workstation. Milestones 7A, 7B, 7C, and 7D add optional real YOLO detection replay, validate it in the operator UI, build candidate tracklets from real detection observations through the existing tracklet builder, and persist optional real pose keypoint evidence when local pose runtime and weights exist. Milestone 7E decides that court/camera/homography evidence should be deferred to Blueprint 8.
+Blueprint 7 completes TOM v3's real perception runtime for the replay workstation. TOM can now run optional real YOLO detection on indexed media, persist real ball/player detection observations, label and inspect real model-output detection evidence in replay, build candidate tracklets from real detection observations with lineage back to source detections, run optional real pose inference, persist COCO17 player pose observations, link pose evidence back to source player detections, and render detection, tracklet, and pose evidence in the replay workstation.
 
-Blueprint 7 still records evidence only. Real model output is not tennis conclusions.
+Blueprint 7 remains observation-only and non-adjudicative. It does not add court/homography implementation, bounce/hit/rally/point/scoring, movement/stroke interpretation, player identity conclusions, real stream ingestion, or TOM v2-style adjudication.
+
+Court/camera/homography evidence is deferred to Blueprint 8.
 
 ## Canonical Local Demo
 
@@ -90,6 +92,7 @@ An observation does not mean the output is correct, a tennis event happened, a s
 - Optional real pose replay runs that persist real `player_pose_observation` rows with COCO17 keypoint evidence.
 - Real pose crop mode can preserve lineage from source player detections to pose observations.
 - Court/camera/homography evidence decision gate with a Blueprint 8 candidate contract.
+- Blueprint 7 completion review and final perception orchestration runbook.
 
 ## Explicitly Absent Capabilities
 
@@ -213,7 +216,7 @@ Remaining Blueprint 6 milestones: none.
 
 ## Blueprint 7 Status
 
-Status: IN PROGRESS
+Status: COMPLETE
 
 Milestone 7A adds real YOLO detection replay:
 
@@ -270,6 +273,21 @@ Blueprint 7 scope review
 ```
 
 7E decides that court/camera/homography belongs in Blueprint 8. It does not add schema migrations, runtime, replay court overlays, coordinate transforms, event interpretation, stream ingestion, or adjudication.
+
+Milestone 7F closes Blueprint 7:
+
+```text
+fixture-safe demo
+-> optional real detection
+-> optional real-detection-derived tracklets
+-> optional real pose
+-> replay workstation URLs
+-> Blueprint 8 boundary
+```
+
+7F adds completion review docs, consolidates the final local runbook, marks Blueprint 7 complete, and preserves the court/homography deferral. It adds no new runtime, schema, replay, stream, or tennis-event capability.
+
+Remaining Blueprint 7 milestones: none.
 
 ## Future Blueprint Candidates
 

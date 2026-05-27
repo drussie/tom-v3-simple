@@ -4,7 +4,7 @@
 
 Court / camera / homography evidence should be deferred to Blueprint 8.
 
-Blueprint 7 should close after real detection, real-detection-derived candidate tracklets, real pose keypoint evidence, and this decision gate.
+Blueprint 7 closes after real detection, real-detection-derived candidate tracklets, real pose keypoint evidence, this decision gate, and the 7F perception orchestration completion review.
 
 ## Rationale
 
@@ -348,3 +348,5 @@ Mitigation: replay layers should be toggleable and confidence-filtered.
 ## 7E Non-Implementation Statement
 
 7E adds no runtime, database migration, API endpoint, detector, court overlay, homography computation, coordinate transform service, tennis-event interpretation, or stream ingestion.
+
+Milestone 7F preserves this boundary while marking Blueprint 7 complete. Court/camera/homography evidence remains a Blueprint 8 candidate, not a hidden extension of Blueprint 7.

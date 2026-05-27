@@ -123,6 +123,22 @@ It does not fall back to fixture detections.
 
 The replay workstation labels these runs as real model-output evidence when source metadata is available. Selected detection detail can show source runtime, model registry id, runtime config id, class id/label, and media-owned frame/time context. Fixture detection runs remain labeled as fixture/demo evidence.
 
+## Blueprint 7 Completion Path
+
+Blueprint 7 is complete. Optional YOLO detection is the first step in the real perception replay ladder:
+
+```text
+run-real-detection
+-> real detection observations
+-> optional real-detection-derived candidate tracklets
+-> optional real pose keypoint evidence
+-> replay workstation overlays
+```
+
+`run-real-detection` requires local YOLO runtime and weights. `run-real-pose` requires local pose runtime and weights. The default fixture demo, default CI, and completion audit do not require either set of weights.
+
+Court/camera/homography evidence is not part of Blueprint 7 and is deferred to Blueprint 8.
+
 ## Common Failure Modes
 
 - Ultralytics missing.

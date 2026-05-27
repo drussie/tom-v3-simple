@@ -1,5 +1,46 @@
 # TOM v3 Simple - Implementation Log
 
+## Milestone 7F - Perception Run Orchestration and Completion Review
+
+Status: complete
+
+### Goal
+
+Close Blueprint 7 without adding new runtime capability.
+
+### Outcome
+
+Blueprint 7 is complete.
+
+Milestone 7F created:
+
+- Blueprint 7 completion review.
+- Milestone 7F closeout doc.
+- Milestone 7F handoff.
+- Milestone 7F agent report.
+- Final runbook orchestration for fixture baseline, optional real detection, optional real-detection-derived tracklets, and optional real pose replay.
+- Canonical status updates marking Blueprint 7 COMPLETE.
+
+Blueprint 7 final ladder:
+
+```text
+indexed media
+-> optional real YOLO detection observations
+-> optional candidate tracklets from real detections
+-> optional real pose keypoint observations
+-> replay workstation overlays and selected evidence details
+```
+
+### Non-goals
+
+- No new runtime behavior.
+- No court/homography implementation.
+- No database migration.
+- No movement/stroke interpretation.
+- No bounce/hit/rally/point/scoring.
+- No real stream ingestion.
+- No TOM v2-style adjudication.
+
 ## Milestone 7E - Court / Homography Evidence Decision Gate
 
 Status: complete

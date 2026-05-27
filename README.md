@@ -22,11 +22,13 @@ Blueprint 6 remains observation-only and non-adjudicative. It does not add real 
 
 Future real live ingestion and future tennis intelligence must begin as new blueprints.
 
-Blueprint 7 Status: IN PROGRESS
+Blueprint 7 Status: COMPLETE
 
-Blueprint 7 starts TOM v3's real perception runtime for the replay workstation. Milestones 7A, 7B, 7C, and 7D add a real YOLO detection replay run, label real-vs-fixture detection evidence clearly, build candidate tracklets from real detection observations through the existing tracklet builder, and persist real pose keypoint evidence when local pose runtime and weights exist. Milestone 7E decides that court/camera/homography evidence belongs in future Blueprint 8.
+Blueprint 7 completes TOM v3's real perception runtime for the replay workstation. TOM can now run optional real YOLO detection on indexed media, persist real ball/player detection observations, label and inspect real model-output detection evidence in replay, build candidate tracklets from real detection observations with lineage back to source detections, run optional real pose inference, persist COCO17 player pose observations, link pose evidence back to source player detections, and render detection, tracklet, and pose evidence in the replay workstation.
 
-Blueprint 7 remains observation-only. Real model output is evidence, not tennis conclusions.
+Blueprint 7 remains observation-only and non-adjudicative. It does not add court/homography implementation, bounce/hit/rally/point/scoring, movement/stroke interpretation, player identity conclusions, real stream ingestion, or TOM v2-style adjudication.
+
+Court/camera/homography evidence is deferred to Blueprint 8.
 
 ## What It Does
 
@@ -198,12 +200,13 @@ Real pose output persists `player_pose_observation` keypoint evidence and can be
 - [Final Completion Review](docs/blueprints/tom_v3_simple_final_completion_review.md)
 - [Blueprint 6 Completion Review](docs/blueprints/tom_v3_blueprint_6_completion_review.md)
 - [Blueprint 7 - Real Perception Runtime](docs/blueprints/tom_v3_blueprint_7_real_perception_runtime_for_replay_workstation.md)
+- [Blueprint 7 Completion Review](docs/blueprints/tom_v3_blueprint_7_completion_review.md)
 - [Blueprint 8 Candidate - Court / Camera / Homography Evidence](docs/blueprints/tom_v3_blueprint_8_court_camera_homography_evidence_layer_candidate.md)
 - [Control Room Index](docs/CONTROL_ROOM_INDEX.md)
 
 ## Current State
 
-Blueprints 1, 2, 3, 4, 5, and 6 are complete. TOM v3 Simple is complete as a lightweight local platform, Blueprint 6 is complete as the visual replay/operator workstation layer, and Blueprint 7 is in progress with real YOLO detection replay, replay-workstation source validation, candidate tracklets derived from real detections, optional real pose keypoint evidence, and a court/homography deferral decision.
+Blueprints 1, 2, 3, 4, 5, 6, and 7 are complete. TOM v3 Simple is complete as a lightweight local platform, Blueprint 6 is complete as the visual replay/operator workstation layer, and Blueprint 7 is complete as the real perception runtime layer for optional real detection, real-detection-derived candidate tracklets, and optional real pose replay.
 
 Current TOM v3 Simple path:
 

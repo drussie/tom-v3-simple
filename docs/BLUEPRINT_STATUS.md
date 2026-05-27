@@ -8,10 +8,10 @@
 - Blueprint 4: COMPLETE
 - Blueprint 5: COMPLETE
 - Blueprint 6: COMPLETE
-- Blueprint 7: IN PROGRESS
+- Blueprint 7: COMPLETE
 - TOM v3 Simple: COMPLETE
 
-TOM v3 Simple is complete as a lightweight local observation/evidence platform. Blueprint 6 is complete as the visual replay/operator workstation layer. Blueprint 7 is in progress through real detection, real-detection-derived candidate tracklets, and optional real pose keypoint evidence.
+TOM v3 Simple is complete as a lightweight local observation/evidence platform. Blueprint 6 is complete as the visual replay/operator workstation layer. Blueprint 7 is complete as the real perception runtime layer for optional real detection, real-detection-derived candidate tracklets, and optional real pose keypoint evidence.
 
 ## Blueprint 1 - Media, Observation Store, Viewer Foundation
 
@@ -305,7 +305,7 @@ Future real live ingestion and future tennis intelligence must begin as new blue
 
 ## Blueprint 7 - Real Perception Runtime For Replay Workstation
 
-Status: IN PROGRESS
+Status: COMPLETE
 
 Blueprint 7 mission:
 
@@ -371,7 +371,22 @@ court / camera / homography scope review
 -> implementation deferred
 ```
 
-Milestones 7A/7B/7C/7D/7E do not add:
+Milestone 7F closes Blueprint 7:
+
+```text
+real perception ladder
+-> final orchestration runbook
+-> completion review
+-> Blueprint 8 boundary preserved
+```
+
+Blueprint 7 Status: COMPLETE
+
+Blueprint 7 completes TOM v3's real perception runtime for the replay workstation. TOM can now run optional real YOLO detection on indexed media, persist real ball/player detection observations, label and inspect real model-output detection evidence in replay, build candidate tracklets from real detection observations with lineage back to source detections, run optional real pose inference, persist COCO17 player pose observations, link pose evidence back to source player detections, and render detection, tracklet, and pose evidence in the replay workstation.
+
+Blueprint 7 remains observation-only and non-adjudicative. It does not add court/homography implementation, bounce/hit/rally/point/scoring, movement/stroke interpretation, player identity conclusions, real stream ingestion, or TOM v2-style adjudication.
+
+Milestones 7A/7B/7C/7D/7E/7F do not add:
 
 - movement interpretation or biomechanics conclusions
 - homography or court-space reasoning
@@ -383,3 +398,5 @@ Milestones 7A/7B/7C/7D/7E do not add:
 - adjudication
 
 Court/camera/homography evidence is future Blueprint 8 work.
+
+Remaining Blueprint 7 milestones: none.

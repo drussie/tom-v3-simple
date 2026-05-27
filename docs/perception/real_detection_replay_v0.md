@@ -6,6 +6,7 @@ Milestone 7A adds a real YOLO detection replay command for indexed media.
 Milestone 7B validates that the resulting real detection runs are clearly labeled and inspectable in the replay workstation.
 Milestone 7C uses those persisted real detections as source observations for candidate tracklet generation.
 Milestone 7D can use source `player_detection` observations from the real detection run as crop subjects for real pose replay.
+Milestone 7F closes Blueprint 7 with the final perception orchestration path.
 
 It runs optional Ultralytics YOLO detection over media-owned sampled frames, normalizes mapped model outputs into TOM atomic detection observations, persists them through the existing detection adapter path, and prints a replay workstation URL.
 
@@ -272,4 +273,6 @@ These pose observations are keypoint evidence only. They do not interpret moveme
 
 ## Non-goals
 
-7A/7B/7C/7D do not add movement interpretation, stroke classification, homography, court-space reasoning, stream ingestion, live model scheduling, bounce/hit/rally/point/scoring, or adjudication.
+7A/7B/7C/7D/7F do not add movement interpretation, stroke classification, homography, court-space reasoning, stream ingestion, live model scheduling, bounce/hit/rally/point/scoring, or adjudication.
+
+Court/camera/homography evidence is deferred to Blueprint 8.

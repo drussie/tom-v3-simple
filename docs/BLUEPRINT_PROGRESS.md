@@ -2,7 +2,7 @@
 
 ## Current Progress Gauge
 
-Current: Blueprints 1, 2, 3, 4, 5, and 6 complete; TOM v3 Simple is complete; Blueprint 7 is in progress
+Current: Blueprints 1, 2, 3, 4, 5, 6, and 7 complete; TOM v3 Simple is complete; Blueprint 7 is complete
 
 ## Current
 
@@ -192,10 +192,13 @@ Current: Blueprints 1, 2, 3, 4, 5, and 6 complete; TOM v3 Simple is complete; Bl
 - Court/homography decision gate exists.
 - Court/camera/homography evidence is deferred to a Blueprint 8 candidate.
 - No court/homography runtime, movement interpretation, bounce, hit, rally, point, scoring, or adjudication has been added.
+- Blueprint 7 completion review exists.
+- Blueprint 7 is marked complete in canonical docs.
+- Final real perception orchestration is documented for fixture-safe demo, optional real detection, optional real-detection-derived tracklets, and optional real pose replay.
 
 ## Blueprint 7 Status
 
-Status: in progress.
+Status: complete.
 
 Milestone 7A starts Blueprint 7 with real YOLO detection replay:
 
@@ -249,9 +252,20 @@ Blueprint 7 real perception runtime
 -> no implementation
 ```
 
-Current Blueprint 7 progress after 7E: about 70-75%.
+Milestone 7F closes Blueprint 7:
 
-Remaining Blueprint 7 work should stay separate and deliberate: perception run orchestration, completion review, evaluation workflows, and future perception layers. No tennis-event interpretation is part of 7A/7B/7C/7D/7E.
+```text
+fixture-safe baseline
+-> optional real YOLO detection
+-> optional real-detection-derived tracklets
+-> optional real pose replay
+-> replay workstation URLs
+-> Blueprint 8 court/homography boundary
+```
+
+Blueprint 7 progress after 7F: complete.
+
+Remaining Blueprint 7 work: none. Future evaluation workflows, court/camera/homography evidence, movement/stroke evidence, bounce/hit candidates, real stream ingestion, and product deployment should start as separate blueprints.
 
 ## Blueprint 5 Status
 

@@ -540,6 +540,87 @@ court keypoint evidence
 
 Those records should not become bounce/hit/rally/point/scoring conclusions.
 
+## 11B. Blueprint 7 Final Perception Orchestration
+
+Blueprint 7 is complete. The final local path keeps the fixture-safe baseline separate from optional real runtime work.
+
+Fixture-safe baseline:
+
+```bash
+DEMO_MEDIA_PATH=demo_assets/sample_point.mp4 \
+TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_blueprint_7_demo.db \
+make demo PYTHON=.venv/bin/python MAX_FRAMES=3
+
+TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_blueprint_7_demo.db \
+make completion-audit PYTHON=.venv/bin/python
+```
+
+Optional real detection replay:
+
+```bash
+TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_blueprint_7_demo.db \
+.venv/bin/python -m apps.worker.cli run-real-detection \
+  --media-id <media_id> \
+  --weights ./model_assets/yolo/<detection_model>.pt \
+  --every-n-frames 1 \
+  --max-frames 120 \
+  --device auto
+```
+
+Replay:
+
+```text
+/replay/<media_id>?detectionRunId=<real_detection_run_id>
+```
+
+Optional real-detection-derived candidate tracklets:
+
+```bash
+TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_blueprint_7_demo.db \
+.venv/bin/python -m apps.worker.cli build-tracklets \
+  --detection-run-id <real_detection_run_id> \
+  --run-name real-detection-tracklet-candidates
+```
+
+Replay:
+
+```text
+/replay/<media_id>?detectionRunId=<real_detection_run_id>&trackletRunId=<real_tracklet_run_id>
+```
+
+Optional real pose replay:
+
+```bash
+TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_blueprint_7_demo.db \
+.venv/bin/python -m apps.worker.cli run-real-pose \
+  --media-id <media_id> \
+  --source-detection-run-id <real_detection_run_id> \
+  --weights ./model_assets/pose/<pose_model>.pt \
+  --mode crop_from_player_detection \
+  --every-n-frames 1 \
+  --max-frames 120 \
+  --device auto
+```
+
+Replay:
+
+```text
+/replay/<media_id>?detectionRunId=<real_detection_run_id>&trackletRunId=<real_tracklet_run_id>&poseRunId=<real_pose_run_id>
+```
+
+Start the API and web app against the same database before opening replay URLs:
+
+```bash
+TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_blueprint_7_demo.db \
+.venv/bin/python -m uvicorn apps.api.main:app --reload
+```
+
+```bash
+make web
+```
+
+Default validation does not require local weights. If local YOLO or pose weights are absent, skip optional real smokes and use the fixture-safe baseline plus plan-only command checks.
+
 ## 12. Optional Custom Media
 
 Use a local video:
