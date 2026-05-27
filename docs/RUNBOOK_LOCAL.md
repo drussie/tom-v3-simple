@@ -691,7 +691,7 @@ court_line_observation
 camera_view_observation
 ```
 
-There is still no replay court overlay yet. Fixture court evidence is the source input for later homography candidate persistence, but it is not a real court model.
+Fixture court evidence is the source input for homography candidate persistence and later replay overlays, but it is not a real court model.
 
 ## 11E. Camera / View Evidence Queries
 
@@ -755,6 +755,38 @@ Plan-only mode:
 Expected output includes `homography_run_id`, candidate counts, source counts, sampled frames, and a replay URL with `courtRunId` and `homographyRunId`.
 
 Homography candidates are candidate geometry evidence only. 8D does not add projection diagnostics, replay court overlays, real court model inference, ball/player court-space projection, bounce/hit/in-out/rally/point/scoring, or adjudication.
+
+## 11G. Court Overlay Replay Workstation
+
+Milestone 8E renders persisted court evidence in the replay workstation.
+
+After running `run-fixture-court` and `build-homography-candidates`, start the API and web app against the same database:
+
+```bash
+TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_8e_fixture_demo.db \
+.venv/bin/python -m uvicorn apps.api.main:app --reload
+```
+
+Second terminal:
+
+```bash
+make web
+```
+
+Open:
+
+```text
+http://127.0.0.1:3000/replay/<media_id>?courtRunId=<court_run_id>&homographyRunId=<homography_run_id>
+```
+
+Expected:
+
+- court keypoint evidence can be displayed
+- court line evidence can be displayed
+- camera/view evidence is visible as replay context
+- homography candidate geometry can be displayed from persisted candidate rows
+- selected court evidence remains geometry evidence only
+- no projection diagnostics, ball/player court-space projection, bounce, hit, in/out, rally, point, score, or adjudication is produced
 
 ## 12. Optional Custom Media
 

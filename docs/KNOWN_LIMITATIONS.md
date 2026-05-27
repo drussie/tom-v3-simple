@@ -21,9 +21,10 @@ This registry makes TOM v3 Simple boundaries explicit.
 - Blueprint 8B adds deterministic fixture court keypoint, line, and camera/view evidence only.
 - Blueprint 8C adds camera/view query, summary, and evidence-bundle read models only.
 - Blueprint 8D adds homography candidate persistence from fixture court evidence only.
+- Blueprint 8E adds replay overlays for persisted court keypoint, court line, camera/view, and homography candidate evidence only.
 - Fixture court evidence is schema/provenance plumbing, not a real court model.
 - Camera/view summaries are geometry context read models; they do not confirm camera state or homography validity.
-- Homography candidates are candidate geometry evidence; they do not confirm a court model or camera geometry.
+- Homography candidates and overlays are candidate geometry evidence; they do not confirm a court model or camera geometry.
 - Real court/camera/homography runtime is not implemented yet.
 - Projection diagnostics are schema-level only and do not project ball/player detections into court space.
 - Portable TOM v1 detector assets/source are not present in this repo state.
@@ -54,10 +55,9 @@ This registry makes TOM v3 Simple boundaries explicit.
 - Blueprint 7 is complete for optional real perception replay through detection observations, candidate tracklets, and pose keypoint evidence. It is not a court/homography, movement, stroke, event, stream, or deployment blueprint.
 - Stream Proxy Mode is a live-like UI mode over indexed local media; it is not real live ingestion.
 - Stream Proxy Mode hides future evidence in the UI, but the underlying observations are already persisted.
-- There is no court evidence replay layer yet.
-- There is no homography candidate replay layer yet.
-- Homography candidates can be persisted and queried at the storage/service level, but no frontend homography layer exists yet.
-- Camera/view evidence can be queried through API read models, but no frontend camera/court UI exists yet.
+- Replay Mode can display persisted fixture court keypoint, court line, camera/view, and homography candidate evidence through `courtRunId` and `homographyRunId`.
+- Homography candidate overlays are display-only candidate geometry; they are not projection diagnostics or court truth.
+- Camera/view evidence can be queried through API read models and viewed in the replay court evidence context.
 - The court keypoint/line adapter is fixture-only; no real court keypoint or line model is implemented yet.
 - There is no production deployment workflow.
 - There is no auth or user management.

@@ -1,6 +1,11 @@
 import type {
+  HomographyMatrix3x3,
+  ReplayCameraViewOverlay,
+  ReplayCourtKeypointOverlay,
+  ReplayCourtLineOverlay,
   ReplayDetectionBBox,
   ReplayDetectionOverlay,
+  ReplayHomographyCandidateOverlay,
   ReplayPoseOverlay,
   ReplayRunSummary,
   ReplayTrackletOverlay,
@@ -26,6 +31,10 @@ export interface OverlayRect {
 export interface OverlayPoint {
   x: number;
   y: number;
+}
+
+export interface TemplateProjectionPoint extends OverlayPoint {
+  valid: boolean;
 }
 
 export function computeContainedMediaRect(
@@ -151,6 +160,55 @@ export function activeReplayPoses(
   );
 }
 
+export function activeReplayCourtKeypoints(
+  keypoints: ReplayCourtKeypointOverlay[],
+  currentTimestampMs: number,
+  currentFrame: number,
+  holdMs = 250
+): ReplayCourtKeypointOverlay[] {
+  return keypoints.filter((item) =>
+    isActiveReplayPoint(item.timestamp_ms, item.frame_number, currentTimestampMs, currentFrame, holdMs)
+  );
+}
+
+export function activeReplayCourtLines(
+  lines: ReplayCourtLineOverlay[],
+  currentTimestampMs: number,
+  currentFrame: number,
+  holdMs = 250
+): ReplayCourtLineOverlay[] {
+  return lines.filter((item) =>
+    isActiveReplayPoint(item.timestamp_ms, item.frame_number, currentTimestampMs, currentFrame, holdMs)
+  );
+}
+
+export function activeReplayCameraViews(
+  cameraViews: ReplayCameraViewOverlay[],
+  currentTimestampMs: number,
+  currentFrame: number,
+  holdMs = 250
+): ReplayCameraViewOverlay[] {
+  return cameraViews.filter((item) => {
+    const startMs = item.timestamp_start_ms ?? item.timestamp_ms;
+    const endMs = item.timestamp_end_ms ?? item.timestamp_ms;
+    if (currentTimestampMs >= startMs - holdMs && currentTimestampMs <= endMs + holdMs) {
+      return true;
+    }
+    return isActiveReplayPoint(item.timestamp_ms, item.frame_number, currentTimestampMs, currentFrame, holdMs);
+  });
+}
+
+export function activeReplayHomographyCandidates(
+  homographies: ReplayHomographyCandidateOverlay[],
+  currentTimestampMs: number,
+  currentFrame: number,
+  holdMs = 250
+): ReplayHomographyCandidateOverlay[] {
+  return homographies.filter((item) =>
+    isActiveReplayPoint(item.timestamp_ms, item.frame_number, currentTimestampMs, currentFrame, holdMs)
+  );
+}
+
 export function filterDetectionsAvailableAt(
   detections: ReplayDetectionOverlay[],
   availableUntilMs: number | null
@@ -192,6 +250,66 @@ export function filterPosesAvailableAt(
     return poses;
   }
   return poses.filter((pose) => pose.timestamp_ms <= availableUntilMs);
+}
+
+export function filterCourtKeypointsAvailableAt(
+  keypoints: ReplayCourtKeypointOverlay[],
+  availableUntilMs: number | null
+): ReplayCourtKeypointOverlay[] {
+  if (availableUntilMs === null) {
+    return keypoints;
+  }
+  return keypoints.filter((item) => item.timestamp_ms <= availableUntilMs);
+}
+
+export function filterCourtLinesAvailableAt(
+  lines: ReplayCourtLineOverlay[],
+  availableUntilMs: number | null
+): ReplayCourtLineOverlay[] {
+  if (availableUntilMs === null) {
+    return lines;
+  }
+  return lines.filter((item) => item.timestamp_ms <= availableUntilMs);
+}
+
+export function filterCameraViewsAvailableAt(
+  cameraViews: ReplayCameraViewOverlay[],
+  availableUntilMs: number | null
+): ReplayCameraViewOverlay[] {
+  if (availableUntilMs === null) {
+    return cameraViews;
+  }
+  return cameraViews.filter((item) => (item.timestamp_start_ms ?? item.timestamp_ms) <= availableUntilMs);
+}
+
+export function filterHomographyCandidatesAvailableAt(
+  homographies: ReplayHomographyCandidateOverlay[],
+  availableUntilMs: number | null
+): ReplayHomographyCandidateOverlay[] {
+  if (availableUntilMs === null) {
+    return homographies;
+  }
+  return homographies.filter((item) => item.timestamp_ms <= availableUntilMs);
+}
+
+export function projectTemplatePointWithMatrix(
+  matrix: HomographyMatrix3x3 | null,
+  x: number,
+  y: number
+): TemplateProjectionPoint | null {
+  if (matrix === null) {
+    return null;
+  }
+  const w = matrix[2][0] * x + matrix[2][1] * y + matrix[2][2];
+  if (!Number.isFinite(w) || Math.abs(w) < 1e-9) {
+    return null;
+  }
+  const projectedX = (matrix[0][0] * x + matrix[0][1] * y + matrix[0][2]) / w;
+  const projectedY = (matrix[1][0] * x + matrix[1][1] * y + matrix[1][2]) / w;
+  if (!Number.isFinite(projectedX) || !Number.isFinite(projectedY)) {
+    return null;
+  }
+  return { x: projectedX, y: projectedY, valid: true };
 }
 
 export function selectInitialDetectionRun(

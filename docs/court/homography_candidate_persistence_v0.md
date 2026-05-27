@@ -137,7 +137,7 @@ The CLI returns JSON with:
 - replay URL with `courtRunId` and `homographyRunId`
 - warnings that the output is candidate geometry evidence only
 
-The replay URL is for future compatibility. 8D does not add replay court overlays.
+The replay URL is consumed by Milestone 8E court overlays. 8D itself does not add replay court overlays.
 
 ## Non-Goals
 

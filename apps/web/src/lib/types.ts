@@ -249,6 +249,13 @@ export interface ReplayRunSummary {
   source_detection_evidence_source?: string | null;
   source_detection_source_label?: string | null;
   source_detection_runtime?: string | null;
+  source_court_run_id?: string | null;
+  court_keypoint_count?: number;
+  court_line_count?: number;
+  camera_view_count?: number;
+  candidate_count?: number;
+  candidate_geometry?: boolean;
+  geometry_evidence_only?: boolean;
   model_output_not_truth?: boolean;
 }
 
@@ -257,6 +264,8 @@ export interface ReplayAvailableRuns {
   tracklet: ReplayRunSummary[];
   pose: ReplayRunSummary[];
   gameplay: ReplayRunSummary[];
+  court: ReplayRunSummary[];
+  homography: ReplayRunSummary[];
 }
 
 export interface ReplayInfo {
@@ -403,6 +412,146 @@ export interface ReplayPoseOverlay {
   is_real_model_output?: boolean;
 }
 
+export interface ReplayCourtEvidenceSource {
+  evidence_source?: string;
+  source_label?: string | null;
+  source_runtime?: string | null;
+  model_registry_id?: string | null;
+  model_name?: string | null;
+  model_version?: string | null;
+  runtime_config_id?: string | null;
+  fixture_court_evidence?: boolean;
+  fixture_camera_view_evidence?: boolean;
+  candidate_geometry?: boolean;
+  geometry_evidence_only?: boolean;
+  observation_only?: boolean;
+  no_adjudication?: boolean;
+  is_fixture?: boolean;
+  is_real_model_output?: boolean;
+  model_output_not_truth?: boolean;
+  frame_time_owner?: string | null;
+}
+
+export interface ReplayCourtKeypoint {
+  name: string;
+  x: number | null;
+  y: number | null;
+  confidence: number | null;
+  present: boolean;
+  visibility?: string | null;
+  source_index?: number | null;
+}
+
+export interface ReplayCourtKeypointOverlay extends ReplayCourtEvidenceSource {
+  overlay_type: "court_keypoint_evidence";
+  observation_id: string;
+  run_id: string;
+  frame_number: number;
+  timestamp_ms: number;
+  coordinate_space: "image_pixels";
+  court_keypoint_schema: string;
+  schema_version: string;
+  keypoints: ReplayCourtKeypoint[];
+  keypoint_count: number;
+  keypoints_present_count: number;
+  keypoints_missing_count: number;
+  mean_keypoint_confidence: number | null;
+  min_keypoint_confidence: number | null;
+  max_keypoint_confidence: number | null;
+}
+
+export interface ReplayCourtLineSegment {
+  line_class: string;
+  x1: number | null;
+  y1: number | null;
+  x2: number | null;
+  y2: number | null;
+  confidence: number | null;
+  visibility?: string | null;
+}
+
+export interface ReplayCourtLineOverlay extends ReplayCourtEvidenceSource {
+  overlay_type: "court_line_evidence";
+  observation_id: string;
+  run_id: string;
+  frame_number: number;
+  timestamp_ms: number;
+  coordinate_space: "image_pixels";
+  line_segments: ReplayCourtLineSegment[];
+  line_classes?: string[];
+  line_count: number;
+  mean_line_confidence: number | null;
+}
+
+export interface ReplayCameraViewOverlay extends ReplayCourtEvidenceSource {
+  overlay_type: "camera_view_evidence";
+  observation_id: string;
+  run_id: string;
+  frame_number: number;
+  timestamp_ms: number;
+  frame_start: number | null;
+  frame_end: number | null;
+  timestamp_start_ms: number | null;
+  timestamp_end_ms: number | null;
+  view_label: string;
+  view_confidence: number | null;
+  camera_motion_hint: string | null;
+  stability_score: number | null;
+  cut_likelihood: number | null;
+}
+
+export interface ReplayCourtTemplateKeypoint {
+  name: string;
+  x: number;
+  y: number;
+}
+
+export interface ReplayCourtTemplateLine {
+  line_class: string;
+  start_keypoint: string;
+  end_keypoint: string;
+}
+
+export interface ReplayCourtTemplate {
+  template_name: string;
+  template_version: string;
+  target_coordinate_space: string;
+  keypoints: ReplayCourtTemplateKeypoint[];
+  lines: ReplayCourtTemplateLine[];
+}
+
+export type HomographyMatrix3x3 = [
+  [number, number, number],
+  [number, number, number],
+  [number, number, number]
+];
+
+export interface ReplayHomographyCandidateOverlay extends ReplayCourtEvidenceSource {
+  overlay_type: "homography_candidate";
+  observation_id: string;
+  run_id: string;
+  frame_number: number;
+  timestamp_ms: number;
+  source_court_keypoint_observation_id: string | null;
+  source_court_line_observation_id: string | null;
+  source_camera_view_observation_id: string | null;
+  homography_matrix: HomographyMatrix3x3 | null;
+  inverse_homography_matrix: HomographyMatrix3x3 | null;
+  matrix_direction: string;
+  template_name: string;
+  template_version: string;
+  template: ReplayCourtTemplate | null;
+  reprojection_error_mean: number | null;
+  reprojection_error_median: number | null;
+  reprojection_error_max: number | null;
+  inlier_count: number | null;
+  outlier_count: number | null;
+  source_point_count: number | null;
+  source_line_count: number | null;
+  confidence: number | null;
+  status: string;
+}
+
 export interface ReplayOverlayChunk {
   media_id: string;
   start_ms: number;
@@ -413,6 +562,10 @@ export interface ReplayOverlayChunk {
   detections: ReplayDetectionOverlay[];
   tracklets: ReplayTrackletOverlay[];
   poses: ReplayPoseOverlay[];
+  court_keypoints: ReplayCourtKeypointOverlay[];
+  court_lines: ReplayCourtLineOverlay[];
+  camera_view: ReplayCameraViewOverlay[];
+  homography_candidates: ReplayHomographyCandidateOverlay[];
   observation_only: boolean;
   no_adjudication: boolean;
 }
@@ -514,14 +667,88 @@ export interface ReplayAnnotationTimelineItem {
   display_label: string;
 }
 
+export interface ReplayCourtKeypointTimelineItem extends ReplayCourtEvidenceSource {
+  item_type: "court_keypoint";
+  observation_id: string;
+  run_id: string;
+  timestamp_ms: number;
+  frame_number: number;
+  court_keypoint_schema: string;
+  schema_version: string;
+  keypoint_count: number;
+  keypoints_present_count: number;
+  keypoints_missing_count: number;
+  mean_keypoint_confidence: number | null;
+  display_label: string;
+}
+
+export interface ReplayCourtLineTimelineItem extends ReplayCourtEvidenceSource {
+  item_type: "court_line";
+  observation_id: string;
+  run_id: string;
+  timestamp_ms: number;
+  frame_number: number;
+  line_count: number;
+  line_classes?: string[];
+  mean_line_confidence: number | null;
+  display_label: string;
+}
+
+export interface ReplayCameraViewTimelineItem extends ReplayCourtEvidenceSource {
+  item_type: "camera_view";
+  observation_id: string;
+  run_id: string;
+  timestamp_ms: number;
+  frame_number: number;
+  frame_start: number | null;
+  frame_end: number | null;
+  timestamp_start_ms: number | null;
+  timestamp_end_ms: number | null;
+  view_label: string;
+  view_confidence: number | null;
+  camera_motion_hint: string | null;
+  stability_score: number | null;
+  cut_likelihood: number | null;
+  display_label: string;
+}
+
+export interface ReplayHomographyCandidateTimelineItem extends ReplayCourtEvidenceSource {
+  item_type: "homography_candidate";
+  observation_id: string;
+  run_id: string;
+  timestamp_ms: number;
+  frame_number: number;
+  status: string;
+  template_name: string;
+  template_version: string;
+  matrix_direction: string;
+  source_point_count: number | null;
+  source_line_count: number | null;
+  reprojection_error_mean: number | null;
+  confidence: number | null;
+  display_label: string;
+}
+
 export type ReplayTimelineItem =
   | ReplayDetectionTimelineItem
   | ReplayTrackletTimelineItem
   | ReplayPoseTimelineItem
+  | ReplayCourtKeypointTimelineItem
+  | ReplayCourtLineTimelineItem
+  | ReplayCameraViewTimelineItem
+  | ReplayHomographyCandidateTimelineItem
   | ReplayAnnotationTimelineItem;
 
 export interface ReplayTimelineLane {
-  lane_type: "detections" | "tracklets" | "pose" | "annotations";
+  lane_type:
+    | "detections"
+    | "tracklets"
+    | "pose"
+    | "court_keypoints"
+    | "court_lines"
+    | "camera_view"
+    | "homography_candidates"
+    | "annotations";
   label: string;
   items: ReplayTimelineItem[];
 }

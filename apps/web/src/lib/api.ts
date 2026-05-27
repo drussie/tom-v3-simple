@@ -46,6 +46,8 @@ export interface FetchReplayOverlayChunkInput {
   detectionRunId?: string | null;
   trackletRunId?: string | null;
   poseRunId?: string | null;
+  courtRunId?: string | null;
+  homographyRunId?: string | null;
   minConfidence?: number | null;
   minPoseConfidence?: number | null;
 }
@@ -58,6 +60,8 @@ export async function fetchReplayOverlayChunk({
   detectionRunId = null,
   trackletRunId = null,
   poseRunId = null,
+  courtRunId = null,
+  homographyRunId = null,
   minConfidence = null,
   minPoseConfidence = null
 }: FetchReplayOverlayChunkInput): Promise<ReplayOverlayChunk> {
@@ -75,6 +79,12 @@ export async function fetchReplayOverlayChunk({
   }
   if (poseRunId !== null) {
     params.set("pose_run_id", poseRunId);
+  }
+  if (courtRunId !== null) {
+    params.set("court_run_id", courtRunId);
+  }
+  if (homographyRunId !== null) {
+    params.set("homography_run_id", homographyRunId);
   }
   if (minConfidence !== null) {
     params.set("min_confidence", minConfidence.toString());
@@ -99,6 +109,8 @@ export interface FetchReplayTimelineInput {
   detectionRunId?: string | null;
   trackletRunId?: string | null;
   poseRunId?: string | null;
+  courtRunId?: string | null;
+  homographyRunId?: string | null;
   includeAnnotations?: boolean;
 }
 
@@ -107,6 +119,8 @@ export async function fetchReplayTimeline({
   detectionRunId = null,
   trackletRunId = null,
   poseRunId = null,
+  courtRunId = null,
+  homographyRunId = null,
   includeAnnotations = true
 }: FetchReplayTimelineInput): Promise<ReplayTimeline> {
   const params = new URLSearchParams({
@@ -121,6 +135,12 @@ export async function fetchReplayTimeline({
   }
   if (poseRunId !== null) {
     params.set("pose_run_id", poseRunId);
+  }
+  if (courtRunId !== null) {
+    params.set("court_run_id", courtRunId);
+  }
+  if (homographyRunId !== null) {
+    params.set("homography_run_id", homographyRunId);
   }
 
   const response = await fetch(`/api/replay/timeline?${params.toString()}`, {

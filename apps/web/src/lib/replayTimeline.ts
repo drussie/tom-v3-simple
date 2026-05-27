@@ -48,6 +48,18 @@ export function timelineItemKey(item: ReplayTimelineItem): string {
   if (item.item_type === "pose") {
     return `pose:${item.observation_id}`;
   }
+  if (item.item_type === "court_keypoint") {
+    return `court_keypoint:${item.observation_id}`;
+  }
+  if (item.item_type === "court_line") {
+    return `court_line:${item.observation_id}`;
+  }
+  if (item.item_type === "camera_view") {
+    return `camera_view:${item.observation_id}`;
+  }
+  if (item.item_type === "homography_candidate") {
+    return `homography_candidate:${item.observation_id}`;
+  }
   return `annotation:${item.annotation_id}`;
 }
 

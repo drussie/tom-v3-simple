@@ -23,6 +23,10 @@ interface ReplayEvidenceTimelineProps {
     detections: boolean;
     tracklets: boolean;
     pose: boolean;
+    court_keypoints: boolean;
+    court_lines: boolean;
+    camera_view: boolean;
+    homography_candidates: boolean;
     annotations: boolean;
   };
   onSelectItem: (item: ReplayTimelineItem) => void;
@@ -208,6 +212,18 @@ function emptyLaneText(laneType: ReplayTimelineLane["lane_type"]): string {
   if (laneType === "pose") {
     return "No pose observations in the selected run.";
   }
+  if (laneType === "court_keypoints") {
+    return "No court keypoint evidence in the selected run.";
+  }
+  if (laneType === "court_lines") {
+    return "No court line evidence in the selected run.";
+  }
+  if (laneType === "camera_view") {
+    return "No camera/view evidence in the selected run.";
+  }
+  if (laneType === "homography_candidates") {
+    return "No homography candidates in the selected run.";
+  }
   return "No review annotations for this media/run context.";
 }
 
@@ -220,6 +236,18 @@ function proxyEmptyLaneText(laneType: ReplayTimelineLane["lane_type"]): string {
   }
   if (laneType === "pose") {
     return "No pose observations available at the current live-like edge.";
+  }
+  if (laneType === "court_keypoints") {
+    return "No court keypoint evidence available at the current live-like edge.";
+  }
+  if (laneType === "court_lines") {
+    return "No court line evidence available at the current live-like edge.";
+  }
+  if (laneType === "camera_view") {
+    return "No camera/view evidence available at the current live-like edge.";
+  }
+  if (laneType === "homography_candidates") {
+    return "No homography candidates available at the current live-like edge.";
   }
   return "No review annotations available at the current live-like edge.";
 }

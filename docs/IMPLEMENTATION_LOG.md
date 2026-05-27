@@ -1761,3 +1761,26 @@ Milestone 8D created:
 - Milestone 8D docs, handoff, and agent report
 
 8D does not add projection diagnostics, replay court overlays, real court model inference, ball/player court-space projection, bounce/hit/in-out/rally/point/scoring, stream ingestion, tennis-event interpretation, or adjudication.
+
+## Milestone 8E - Court Overlay in Replay Workstation
+
+Status: complete
+
+### Goal
+
+Render persisted court keypoint, court line, camera/view, and homography candidate evidence in the replay workstation without creating new geometry observations or tennis conclusions.
+
+### Notes
+
+Milestone 8E created:
+
+- replay URL support for `courtRunId` and `homographyRunId`
+- replay overlay payloads for court keypoints, court lines, camera/view evidence, and homography candidates
+- replay-info summaries for court and homography runs
+- timeline lanes for court keypoint, court line, camera/view, and homography candidate evidence
+- frontend `ReplayCourtOverlay` rendering for image-pixel keypoints/lines and display-only homography candidate template projection
+- court layer toggles and selected court evidence detail in the replay workstation
+- tests for court replay payloads, run filtering, homography filtering, and timeline lanes
+- Milestone 8E docs, handoff, and agent report
+
+8E does not add projection diagnostics, real court model inference, ball/player court-space projection, bounce/hit/in-out/rally/point/scoring, stream ingestion, tennis-event interpretation, or adjudication.

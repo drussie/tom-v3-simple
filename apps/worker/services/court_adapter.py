@@ -36,7 +36,7 @@ FIXTURE_COURT_WARNINGS = {
     "geometry_evidence_only": True,
     "no_homography_computation": True,
     "no_projection_diagnostics": True,
-    "no_replay_court_overlay": True,
+    "replay_court_overlay_available_with_court_run_id": True,
     "no_ball_player_court_projection": True,
     "no_tennis_event_interpretation": True,
 }

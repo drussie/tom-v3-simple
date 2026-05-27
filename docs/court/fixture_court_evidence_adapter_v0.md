@@ -88,6 +88,8 @@ Milestone 8D consumes the fixture court keypoint, line, and camera/view observat
 
 The fixture adapter does not create homography candidates itself. It only provides deterministic source geometry rows with media-owned frame/time and provenance.
 
+Milestone 8E consumes those persisted fixture rows through replay overlay payloads. The fixture rows remain evidence plumbing and do not become a real court model.
+
 ## Provenance
 
 The adapter creates:

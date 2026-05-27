@@ -28,6 +28,8 @@ from apps.api.services.replay import (
     frame_to_replay_timestamp_ms,
     timestamp_ms_to_replay_frame,
 )
+from apps.worker.services.court_adapter import run_fixture_court_adapter
+from apps.worker.services.homography_candidate_builder import build_homography_candidates
 
 
 @pytest.fixture()
@@ -122,6 +124,36 @@ def test_replay_info_returns_media_metadata_and_available_runs(
     assert body["available_runs"]["tracklet"][0]["run_name"] == "demo-candidate-tracklet-run"
     assert body["available_runs"]["pose"][0]["run_name"] == "demo-fixture-pose-run"
     assert body["available_runs"]["gameplay"][0]["run_name"] == "demo-fixture-gameplay-run"
+
+
+def test_replay_info_returns_court_and_homography_run_metadata(
+    client: TestClient,
+    db_session: Session,
+    tmp_path,
+) -> None:
+    media_path = tmp_path / "sample.mp4"
+    media_path.write_bytes(b"tom-v3-video")
+    media = _seed_media(db_session, media_path)
+    court_result, homography_result = _seed_court_and_homography(db_session, media.id)
+
+    response = client.get(f"/media/{media.id}/replay-info")
+
+    assert response.status_code == 200
+    available_runs = response.json()["available_runs"]
+    court_run = available_runs["court"][0]
+    assert court_run["run_id"] == court_result["court_run_id"]
+    assert court_run["evidence_source"] == "fixture_court_evidence"
+    assert court_run["court_keypoint_count"] == 1
+    assert court_run["court_line_count"] == 1
+    assert court_run["camera_view_count"] == 1
+    assert court_run["geometry_evidence_only"] is True
+
+    homography_run = available_runs["homography"][0]
+    assert homography_run["run_id"] == homography_result["homography_run_id"]
+    assert homography_run["evidence_source"] == "homography_candidate"
+    assert homography_run["source_court_run_id"] == court_result["court_run_id"]
+    assert homography_run["candidate_count"] == 1
+    assert homography_run["candidate_geometry"] is True
 
 
 def test_replay_info_returns_404_for_missing_media(client: TestClient) -> None:
@@ -439,6 +471,108 @@ def test_replay_overlay_endpoint_returns_pose_keypoint_items(
     assert pose["source_language"] == "pose keypoint evidence"
 
 
+def test_replay_overlay_endpoint_returns_court_and_homography_items(
+    client: TestClient,
+    db_session: Session,
+    tmp_path,
+) -> None:
+    media_path = tmp_path / "sample.mp4"
+    media_path.write_bytes(b"tom-v3-video")
+    media = _seed_media(db_session, media_path)
+    court_result, homography_result = _seed_court_and_homography(db_session, media.id)
+
+    response = client.get(
+        "/replay/overlays",
+        params={
+            "media_id": media.id,
+            "start_ms": 0,
+            "end_ms": 2000,
+            "layers": "court_keypoints,court_lines,camera_view,homography_candidates",
+            "court_run_id": court_result["court_run_id"],
+            "homography_run_id": homography_result["homography_run_id"],
+        },
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["detections"] == []
+    assert body["tracklets"] == []
+    assert body["poses"] == []
+    assert len(body["court_keypoints"]) == 1
+    assert len(body["court_lines"]) == 1
+    assert len(body["camera_view"]) == 1
+    assert len(body["homography_candidates"]) == 1
+
+    keypoints = body["court_keypoints"][0]
+    assert keypoints["overlay_type"] == "court_keypoint_evidence"
+    assert keypoints["run_id"] == court_result["court_run_id"]
+    assert keypoints["court_keypoint_schema"] == "tennis_court_v0"
+    assert keypoints["keypoints_present_count"] == 12
+    assert keypoints["fixture_court_evidence"] is True
+    assert keypoints["geometry_evidence_only"] is True
+    assert keypoints["source_label"] == "court keypoint evidence"
+
+    lines = body["court_lines"][0]
+    assert lines["overlay_type"] == "court_line_evidence"
+    assert lines["line_count"] == 8
+    assert lines["fixture_court_evidence"] is True
+    assert lines["line_segments"][0]["line_class"] == "baseline_near"
+
+    camera = body["camera_view"][0]
+    assert camera["overlay_type"] == "camera_view_evidence"
+    assert camera["view_label"] == "broadcast_hardcam"
+    assert camera["camera_motion_hint"] == "stable"
+    assert camera["fixture_camera_view_evidence"] is True
+
+    homography = body["homography_candidates"][0]
+    assert homography["overlay_type"] == "homography_candidate"
+    assert homography["run_id"] == homography_result["homography_run_id"]
+    assert homography["matrix_direction"] == "image_pixels_to_court_template_2d"
+    assert homography["template"]["template_name"] == "tennis_court_template_normalized_v0"
+    assert homography["candidate_geometry"] is True
+    assert homography["geometry_evidence_only"] is True
+    assert homography["source_label"] == "homography candidate"
+
+
+def test_replay_overlay_endpoint_filters_court_and_homography_runs(
+    client: TestClient,
+    db_session: Session,
+    tmp_path,
+) -> None:
+    media_path = tmp_path / "sample.mp4"
+    media_path.write_bytes(b"tom-v3-video")
+    media = _seed_media(db_session, media_path)
+    included_court, included_homography = _seed_court_and_homography(db_session, media.id)
+    _seed_court_and_homography(db_session, media.id)
+
+    response = client.get(
+        "/replay/overlays",
+        params={
+            "media_id": media.id,
+            "start_ms": 0,
+            "end_ms": 2000,
+            "layers": "court",
+            "court_run_id": included_court["court_run_id"],
+            "homography_run_id": included_homography["homography_run_id"],
+        },
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert {item["run_id"] for item in body["court_keypoints"]} == {
+        included_court["court_run_id"]
+    }
+    assert {item["run_id"] for item in body["court_lines"]} == {
+        included_court["court_run_id"]
+    }
+    assert {item["run_id"] for item in body["camera_view"]} == {
+        included_court["court_run_id"]
+    }
+    assert {item["run_id"] for item in body["homography_candidates"]} == {
+        included_homography["homography_run_id"]
+    }
+
+
 def test_replay_overlay_endpoint_filters_by_pose_run_id_and_confidence(
     client: TestClient,
     db_session: Session,
@@ -566,7 +700,16 @@ def test_replay_timeline_endpoint_returns_evidence_lanes(
     assert body["observation_only"] is True
     assert body["no_adjudication"] is True
     lanes = {lane["lane_type"]: lane for lane in body["lanes"]}
-    assert set(lanes) == {"detections", "tracklets", "pose", "annotations"}
+    assert set(lanes) == {
+        "detections",
+        "tracklets",
+        "pose",
+        "court_keypoints",
+        "court_lines",
+        "camera_view",
+        "homography_candidates",
+        "annotations",
+    }
 
     detection_item = lanes["detections"]["items"][0]
     assert detection_item["item_type"] == "detection"
@@ -597,6 +740,48 @@ def test_replay_timeline_endpoint_returns_evidence_lanes(
     assert annotation_item["target_observation_type"] == "ball_detection"
     assert annotation_item["annotation_label"] == "uncertain"
     assert annotation_item["display_label"] == "review annotation"
+
+
+def test_replay_timeline_endpoint_returns_court_evidence_lanes(
+    client: TestClient,
+    db_session: Session,
+    tmp_path,
+) -> None:
+    media_path = tmp_path / "sample.mp4"
+    media_path.write_bytes(b"tom-v3-video")
+    media = _seed_media(db_session, media_path)
+    court_result, homography_result = _seed_court_and_homography(db_session, media.id)
+
+    response = client.get(
+        "/replay/timeline",
+        params={
+            "media_id": media.id,
+            "court_run_id": court_result["court_run_id"],
+            "homography_run_id": homography_result["homography_run_id"],
+        },
+    )
+
+    assert response.status_code == 200
+    lanes = {lane["lane_type"]: lane for lane in response.json()["lanes"]}
+    keypoint_item = lanes["court_keypoints"]["items"][0]
+    assert keypoint_item["item_type"] == "court_keypoint"
+    assert keypoint_item["run_id"] == court_result["court_run_id"]
+    assert keypoint_item["display_label"] == "court keypoint evidence"
+    assert keypoint_item["geometry_evidence_only"] is True
+
+    line_item = lanes["court_lines"]["items"][0]
+    assert line_item["item_type"] == "court_line"
+    assert line_item["line_count"] == 8
+
+    camera_item = lanes["camera_view"]["items"][0]
+    assert camera_item["item_type"] == "camera_view"
+    assert camera_item["view_label"] == "broadcast_hardcam"
+
+    homography_item = lanes["homography_candidates"]["items"][0]
+    assert homography_item["item_type"] == "homography_candidate"
+    assert homography_item["run_id"] == homography_result["homography_run_id"]
+    assert homography_item["status"] == "candidate"
+    assert homography_item["candidate_geometry"] is True
 
 
 def test_replay_timeline_endpoint_filters_selected_runs(
@@ -913,6 +1098,26 @@ def _seed_pose_run(
     session.commit()
     session.refresh(run)
     return run
+
+
+def _seed_court_and_homography(
+    session: Session,
+    media_id: str,
+) -> tuple[dict[str, object], dict[str, object]]:
+    court_result = run_fixture_court_adapter(
+        session=session,
+        media_id=media_id,
+        frame_sample_rate=30,
+        max_frames=1,
+    )
+    assert court_result["ok"] is True
+    homography_result = build_homography_candidates(
+        session=session,
+        media_id=media_id,
+        court_run_id=str(court_result["court_run_id"]),
+    )
+    assert homography_result["ok"] is True
+    return court_result, homography_result
 
 
 def _pose_keypoints() -> list[dict[str, object]]:

@@ -78,6 +78,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 8B - Court Keypoint / Line Evidence Adapter](milestones/milestone_8b_court_keypoint_line_evidence_adapter.md)
 - [Milestone 8C - Camera / View Evidence Layer](milestones/milestone_8c_camera_view_evidence_layer.md)
 - [Milestone 8D - Homography Candidate Persistence](milestones/milestone_8d_homography_candidate_persistence.md)
+- [Milestone 8E - Court Overlay in Replay Workstation](milestones/milestone_8e_court_overlay_replay_workstation.md)
 
 ## Handoffs
 
@@ -129,6 +130,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 8B Handoff](handoffs/milestone_8b_court_keypoint_line_evidence_adapter_handoff.md)
 - [Milestone 8C Handoff](handoffs/milestone_8c_camera_view_evidence_layer_handoff.md)
 - [Milestone 8D Handoff](handoffs/milestone_8d_homography_candidate_persistence_handoff.md)
+- [Milestone 8E Handoff](handoffs/milestone_8e_court_overlay_replay_workstation_handoff.md)
 
 ## Agent Reports
 
@@ -180,6 +182,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 8B Agent Report](agent_reports/milestone_8b_court_keypoint_line_evidence_adapter_report.md)
 - [Milestone 8C Agent Report](agent_reports/milestone_8c_camera_view_evidence_layer_report.md)
 - [Milestone 8D Agent Report](agent_reports/milestone_8d_homography_candidate_persistence_report.md)
+- [Milestone 8E Agent Report](agent_reports/milestone_8e_court_overlay_replay_workstation_report.md)
 
 ## Blueprints
 
@@ -218,6 +221,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Court Evidence Schema v0](court/court_evidence_schema_v0.md)
 - [Court Template Registry v0](court/court_template_registry_v0.md)
 - [Camera / View Evidence Layer v0](court/camera_view_evidence_layer_v0.md)
+- [Court Replay Overlay v0](court/court_replay_overlay_v0.md)
 
 ## Model Adapters
 

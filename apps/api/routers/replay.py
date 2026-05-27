@@ -24,6 +24,8 @@ def get_replay_overlays(
     detection_run_id: str | None = None,
     tracklet_run_id: str | None = None,
     pose_run_id: str | None = None,
+    court_run_id: str | None = None,
+    homography_run_id: str | None = None,
     min_confidence: float | None = Query(default=None, ge=0.0, le=1.0),
     min_pose_confidence: float | None = Query(default=None, ge=0.0, le=1.0),
 ) -> dict[str, object]:
@@ -42,6 +44,8 @@ def get_replay_overlays(
         detection_run_id=detection_run_id,
         tracklet_run_id=tracklet_run_id,
         pose_run_id=pose_run_id,
+        court_run_id=court_run_id,
+        homography_run_id=homography_run_id,
         min_confidence=min_confidence,
         min_pose_confidence=min_pose_confidence,
     )
@@ -57,6 +61,8 @@ def get_replay_timeline(
     detection_run_id: str | None = None,
     tracklet_run_id: str | None = None,
     pose_run_id: str | None = None,
+    court_run_id: str | None = None,
+    homography_run_id: str | None = None,
     include_annotations: bool = True,
 ) -> dict[str, object]:
     timeline = build_replay_timeline(
@@ -65,6 +71,8 @@ def get_replay_timeline(
         detection_run_id=detection_run_id,
         tracklet_run_id=tracklet_run_id,
         pose_run_id=pose_run_id,
+        court_run_id=court_run_id,
+        homography_run_id=homography_run_id,
         include_annotations=include_annotations,
     )
     if timeline is None:

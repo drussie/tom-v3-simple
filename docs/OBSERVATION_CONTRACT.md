@@ -90,6 +90,8 @@ Milestone 8C adds read-only camera/view query, summary, and evidence-bundle acce
 
 Milestone 8D adds `homography_candidate_observation` persistence from persisted court keypoint evidence, with optional court line and camera/view context. Homography candidates are candidate coordinate transforms; they are not confirmed court models or court-space conclusions.
 
+Milestone 8E renders persisted court keypoint, court line, camera/view, and homography candidate observations in the replay workstation. The replay overlays are display-only evidence surfaces; they do not create projection diagnostics, project ball/player observations into court space, or promote candidate geometry to truth.
+
 Court evidence does not decide in/out, bounce locations, player court position, ball court position, rally state, point state, or score.
 
 ## Lineage

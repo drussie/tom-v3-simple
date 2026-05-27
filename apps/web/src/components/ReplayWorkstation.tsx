@@ -5,7 +5,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { fetchReplayOverlayChunk, fetchReplayTimeline } from "../lib/api";
 import {
+  filterCameraViewsAvailableAt,
+  filterCourtKeypointsAvailableAt,
+  filterCourtLinesAvailableAt,
   filterDetectionsAvailableAt,
+  filterHomographyCandidatesAvailableAt,
   filterPosesAvailableAt,
   filterTrackletsAvailableAt,
   selectInitialReplayRun
@@ -18,6 +22,10 @@ import {
 } from "../lib/replayTimeline";
 import type {
   ReplayDetectionOverlay,
+  ReplayCameraViewOverlay,
+  ReplayCourtKeypointOverlay,
+  ReplayCourtLineOverlay,
+  ReplayHomographyCandidateOverlay,
   ReplayInfo,
   ReplayMode,
   ReplayOverlayChunk,
@@ -31,6 +39,7 @@ import type {
   ReplayTrackPointOverlay
 } from "../lib/types";
 import { formatConfidence } from "../lib/timeline";
+import { ReplayCourtOverlay as ReplayCourtOverlayLayer } from "./ReplayCourtOverlay";
 import { ReplayDetectionOverlay as ReplayDetectionOverlayLayer } from "./ReplayDetectionOverlay";
 import { ReplayEvidenceTimeline } from "./ReplayEvidenceTimeline";
 import { ReplayPoseOverlay as ReplayPoseOverlayLayer } from "./ReplayPoseOverlay";
@@ -46,6 +55,8 @@ interface ReplayWorkstationProps {
     detectionRunId?: string;
     trackletRunId?: string;
     poseRunId?: string;
+    courtRunId?: string;
+    homographyRunId?: string;
   };
 }
 
@@ -69,6 +80,14 @@ type SelectedReplayEvidence =
   | { kind: "track_point"; tracklet: ReplayTrackletOverlay; point: ReplayTrackPointOverlay }
   | { kind: "pose"; pose: ReplayPoseOverlay }
   | { kind: "pose_timeline"; item: Extract<ReplayTimelineItem, { item_type: "pose" }> }
+  | { kind: "court_keypoint"; item: ReplayCourtKeypointOverlay }
+  | { kind: "court_keypoint_timeline"; item: Extract<ReplayTimelineItem, { item_type: "court_keypoint" }> }
+  | { kind: "court_line"; item: ReplayCourtLineOverlay }
+  | { kind: "court_line_timeline"; item: Extract<ReplayTimelineItem, { item_type: "court_line" }> }
+  | { kind: "camera_view"; item: ReplayCameraViewOverlay }
+  | { kind: "camera_view_timeline"; item: Extract<ReplayTimelineItem, { item_type: "camera_view" }> }
+  | { kind: "homography_candidate"; item: ReplayHomographyCandidateOverlay }
+  | { kind: "homography_candidate_timeline"; item: Extract<ReplayTimelineItem, { item_type: "homography_candidate" }> }
   | { kind: "annotation"; item: Extract<ReplayTimelineItem, { item_type: "annotation" }> };
 
 export function ReplayWorkstation({
@@ -88,6 +107,18 @@ export function ReplayWorkstation({
     () => selectInitialReplayRun(replayInfo.available_runs.pose, selectedRuns.poseRunId),
     [replayInfo.available_runs.pose, selectedRuns.poseRunId]
   );
+  const initialCourtRunId = useMemo(
+    () => selectInitialReplayRun(replayInfo.available_runs.court, selectedRuns.courtRunId),
+    [replayInfo.available_runs.court, selectedRuns.courtRunId]
+  );
+  const initialHomographyRunId = useMemo(
+    () =>
+      selectInitialReplayRun(
+        replayInfo.available_runs.homography,
+        selectedRuns.homographyRunId
+      ),
+    [replayInfo.available_runs.homography, selectedRuns.homographyRunId]
+  );
 
   const [selectedDetectionRunId, setSelectedDetectionRunId] = useState<string | null>(
     initialDetectionRunId
@@ -96,9 +127,17 @@ export function ReplayWorkstation({
     initialTrackletRunId
   );
   const [selectedPoseRunId, setSelectedPoseRunId] = useState<string | null>(initialPoseRunId);
+  const [selectedCourtRunId, setSelectedCourtRunId] = useState<string | null>(initialCourtRunId);
+  const [selectedHomographyRunId, setSelectedHomographyRunId] = useState<string | null>(
+    initialHomographyRunId
+  );
   const [showDetections, setShowDetections] = useState(true);
   const [showTracklets, setShowTracklets] = useState(true);
   const [showPoses, setShowPoses] = useState(true);
+  const [showCourtKeypoints, setShowCourtKeypoints] = useState(initialCourtRunId !== null);
+  const [showCourtLines, setShowCourtLines] = useState(initialCourtRunId !== null);
+  const [showCameraView, setShowCameraView] = useState(initialCourtRunId !== null);
+  const [showHomography, setShowHomography] = useState(initialHomographyRunId !== null);
   const [replayMode, setReplayMode] = useState<ReplayMode>(initialMode);
   const [streamLiveEdgeMs, setStreamLiveEdgeMs] = useState(0);
   const [streamProxyNotice, setStreamProxyNotice] = useState<string | null>(null);
@@ -136,6 +175,18 @@ export function ReplayWorkstation({
   }, [initialPoseRunId]);
 
   useEffect(() => {
+    setSelectedCourtRunId(initialCourtRunId);
+    setShowCourtKeypoints(initialCourtRunId !== null);
+    setShowCourtLines(initialCourtRunId !== null);
+    setShowCameraView(initialCourtRunId !== null);
+  }, [initialCourtRunId]);
+
+  useEffect(() => {
+    setSelectedHomographyRunId(initialHomographyRunId);
+    setShowHomography(initialHomographyRunId !== null);
+  }, [initialHomographyRunId]);
+
+  useEffect(() => {
     setReplayMode(initialMode);
   }, [initialMode]);
 
@@ -162,12 +213,30 @@ export function ReplayWorkstation({
     if (showPoses && selectedPoseRunId !== null) {
       layers.push("pose");
     }
+    if (showCourtKeypoints && selectedCourtRunId !== null) {
+      layers.push("court_keypoints");
+    }
+    if (showCourtLines && selectedCourtRunId !== null) {
+      layers.push("court_lines");
+    }
+    if (showCameraView && selectedCourtRunId !== null) {
+      layers.push("camera_view");
+    }
+    if (showHomography && selectedHomographyRunId !== null) {
+      layers.push("homography_candidates");
+    }
     return layers;
   }, [
+    selectedCourtRunId,
     selectedDetectionRunId,
+    selectedHomographyRunId,
     selectedPoseRunId,
     selectedTrackletRunId,
+    showCameraView,
+    showCourtKeypoints,
+    showCourtLines,
     showDetections,
+    showHomography,
     showPoses,
     showTracklets
   ]);
@@ -180,6 +249,8 @@ export function ReplayWorkstation({
     selectedDetectionRunId ?? "none",
     selectedTrackletRunId ?? "none",
     selectedPoseRunId ?? "none",
+    selectedCourtRunId ?? "none",
+    selectedHomographyRunId ?? "none",
     layersParam || "none",
     currentChunkStart,
     currentChunkEnd
@@ -206,6 +277,8 @@ export function ReplayWorkstation({
       detectionRunId: selectedDetectionRunId,
       trackletRunId: selectedTrackletRunId,
       poseRunId: selectedPoseRunId,
+      courtRunId: selectedCourtRunId,
+      homographyRunId: selectedHomographyRunId,
       layers: layersParam
     })
       .then((chunk) => {
@@ -234,7 +307,9 @@ export function ReplayWorkstation({
     enabledLayers.length,
     layersParam,
     replayInfo.media_id,
+    selectedCourtRunId,
     selectedDetectionRunId,
+    selectedHomographyRunId,
     selectedPoseRunId,
     selectedTrackletRunId
   ]);
@@ -247,6 +322,8 @@ export function ReplayWorkstation({
       detectionRunId: selectedDetectionRunId,
       trackletRunId: selectedTrackletRunId,
       poseRunId: selectedPoseRunId,
+      courtRunId: selectedCourtRunId,
+      homographyRunId: selectedHomographyRunId,
       includeAnnotations: true
     })
       .then((timeline) => {
@@ -267,7 +344,14 @@ export function ReplayWorkstation({
     return () => {
       cancelled = true;
     };
-  }, [replayInfo.media_id, selectedDetectionRunId, selectedPoseRunId, selectedTrackletRunId]);
+  }, [
+    replayInfo.media_id,
+    selectedCourtRunId,
+    selectedDetectionRunId,
+    selectedHomographyRunId,
+    selectedPoseRunId,
+    selectedTrackletRunId
+  ]);
 
   const handlePlaybackStateChange = useCallback(
     (state: ReplayPlaybackState) => {
@@ -306,6 +390,22 @@ export function ReplayWorkstation({
         setSelectedEvidence({ kind: "pose_timeline", item });
         return;
       }
+      if (item.item_type === "court_keypoint") {
+        setSelectedEvidence({ kind: "court_keypoint_timeline", item });
+        return;
+      }
+      if (item.item_type === "court_line") {
+        setSelectedEvidence({ kind: "court_line_timeline", item });
+        return;
+      }
+      if (item.item_type === "camera_view") {
+        setSelectedEvidence({ kind: "camera_view_timeline", item });
+        return;
+      }
+      if (item.item_type === "homography_candidate") {
+        setSelectedEvidence({ kind: "homography_candidate_timeline", item });
+        return;
+      }
       setSelectedEvidence({ kind: "annotation", item });
     },
     [replayMode, streamLiveEdgeMs]
@@ -321,6 +421,22 @@ export function ReplayWorkstation({
     streamAvailableUntilMs
   );
   const poses = filterPosesAvailableAt(overlayState.chunk?.poses ?? [], streamAvailableUntilMs);
+  const courtKeypoints = filterCourtKeypointsAvailableAt(
+    overlayState.chunk?.court_keypoints ?? [],
+    streamAvailableUntilMs
+  );
+  const courtLines = filterCourtLinesAvailableAt(
+    overlayState.chunk?.court_lines ?? [],
+    streamAvailableUntilMs
+  );
+  const cameraViews = filterCameraViewsAvailableAt(
+    overlayState.chunk?.camera_view ?? [],
+    streamAvailableUntilMs
+  );
+  const homographyCandidates = filterHomographyCandidatesAvailableAt(
+    overlayState.chunk?.homography_candidates ?? [],
+    streamAvailableUntilMs
+  );
   const totalTimelineItemCount = useMemo(
     () =>
       timelineState.timeline?.lanes.reduce((count, lane) => count + lane.items.length, 0) ?? 0,
@@ -361,6 +477,7 @@ export function ReplayWorkstation({
       : selectedEvidence?.kind === "pose_timeline"
         ? selectedEvidence.item.observation_id
         : null;
+  const selectedCourtObservationId = courtSelectedObservationId(selectedEvidence);
   const selectedTimelineKey = selectedTimelineItemKey(selectedEvidence);
 
   return (
@@ -383,6 +500,9 @@ export function ReplayWorkstation({
           <span className="mini-pill">{detections.length} detection overlays</span>
           <span className="mini-pill">{tracklets.length} tracklet candidates</span>
           <span className="mini-pill">{poses.length} pose observations</span>
+          <span className="mini-pill">
+            {courtKeypoints.length + courtLines.length + homographyCandidates.length} court overlays
+          </span>
         </div>
       </header>
 
@@ -439,6 +559,34 @@ export function ReplayWorkstation({
               replayInfo={replayInfo}
               selectedObservationId={selectedPoseObservationId}
             />
+            <ReplayCourtOverlayLayer
+              cameraViews={cameraViews}
+              courtKeypoints={courtKeypoints}
+              courtLines={courtLines}
+              currentFrame={playback.frameNumber}
+              currentTimestampMs={playback.timestampMs}
+              error={overlayState.error}
+              homographyCandidates={homographyCandidates}
+              isLoading={overlayState.loading}
+              onSelectCameraView={(item) => {
+                setSelectedEvidence({ kind: "camera_view", item });
+              }}
+              onSelectCourtKeypoint={(item) => {
+                setSelectedEvidence({ kind: "court_keypoint", item });
+              }}
+              onSelectCourtLine={(item) => {
+                setSelectedEvidence({ kind: "court_line", item });
+              }}
+              onSelectHomography={(item) => {
+                setSelectedEvidence({ kind: "homography_candidate", item });
+              }}
+              replayInfo={replayInfo}
+              selectedObservationId={selectedCourtObservationId}
+              showCameraView={showCameraView && selectedCourtRunId !== null}
+              showCourtKeypoints={showCourtKeypoints && selectedCourtRunId !== null}
+              showCourtLines={showCourtLines && selectedCourtRunId !== null}
+              showHomography={showHomography && selectedHomographyRunId !== null}
+            />
           </ReplayVideoPlayer>
           <ReplayModeControls
             availableTimelineItemCount={availableTimelineItemCount}
@@ -452,9 +600,19 @@ export function ReplayWorkstation({
             totalTimelineItemCount={totalTimelineItemCount}
           />
           <ReplayLayerControls
+            courtRuns={replayInfo.available_runs.court}
             detectionRuns={replayInfo.available_runs.detection}
+            homographyRuns={replayInfo.available_runs.homography}
+            onSelectedCourtRunChange={(runId) => {
+              setSelectedCourtRunId(runId);
+              setSelectedEvidence(null);
+            }}
             onSelectedDetectionRunChange={(runId) => {
               setSelectedDetectionRunId(runId);
+              setSelectedEvidence(null);
+            }}
+            onSelectedHomographyRunChange={(runId) => {
+              setSelectedHomographyRunId(runId);
               setSelectedEvidence(null);
             }}
             onSelectedPoseRunChange={(runId) => {
@@ -466,13 +624,23 @@ export function ReplayWorkstation({
               setSelectedEvidence(null);
             }}
             onToggleDetections={setShowDetections}
+            onToggleCameraView={setShowCameraView}
+            onToggleCourtKeypoints={setShowCourtKeypoints}
+            onToggleCourtLines={setShowCourtLines}
+            onToggleHomography={setShowHomography}
             onTogglePoses={setShowPoses}
             onToggleTracklets={setShowTracklets}
             poseRuns={replayInfo.available_runs.pose}
+            selectedCourtRunId={selectedCourtRunId}
             selectedDetectionRunId={selectedDetectionRunId}
+            selectedHomographyRunId={selectedHomographyRunId}
             selectedPoseRunId={selectedPoseRunId}
             selectedTrackletRunId={selectedTrackletRunId}
+            showCameraView={showCameraView}
+            showCourtKeypoints={showCourtKeypoints}
+            showCourtLines={showCourtLines}
             showDetections={showDetections}
+            showHomography={showHomography}
             showPoses={showPoses}
             showTracklets={showTracklets}
             trackletRuns={replayInfo.available_runs.tracklet}
@@ -487,6 +655,10 @@ export function ReplayWorkstation({
               detections: showDetections,
               tracklets: showTracklets,
               pose: showPoses,
+              court_keypoints: showCourtKeypoints,
+              court_lines: showCourtLines,
+              camera_view: showCameraView,
+              homography_candidates: showHomography,
               annotations: true
             }}
             onSelectItem={handleTimelineItemSelect}
@@ -495,7 +667,9 @@ export function ReplayWorkstation({
           />
           <SelectedRunContext
             replayInfo={replayInfo}
+            selectedCourtRunId={selectedCourtRunId}
             selectedDetectionRunId={selectedDetectionRunId}
+            selectedHomographyRunId={selectedHomographyRunId}
             selectedPoseRunId={selectedPoseRunId}
             selectedTrackletRunId={selectedTrackletRunId}
           />
@@ -610,34 +784,62 @@ function ReplayLayerControls({
   detectionRuns,
   trackletRuns,
   poseRuns,
+  courtRuns,
+  homographyRuns,
   selectedDetectionRunId,
   selectedTrackletRunId,
   selectedPoseRunId,
+  selectedCourtRunId,
+  selectedHomographyRunId,
   showDetections,
   showTracklets,
   showPoses,
+  showCourtKeypoints,
+  showCourtLines,
+  showCameraView,
+  showHomography,
   onSelectedDetectionRunChange,
   onSelectedTrackletRunChange,
   onSelectedPoseRunChange,
+  onSelectedCourtRunChange,
+  onSelectedHomographyRunChange,
   onToggleDetections,
   onToggleTracklets,
-  onTogglePoses
+  onTogglePoses,
+  onToggleCourtKeypoints,
+  onToggleCourtLines,
+  onToggleCameraView,
+  onToggleHomography
 }: {
   detectionRuns: ReplayRunSummary[];
   trackletRuns: ReplayRunSummary[];
   poseRuns: ReplayRunSummary[];
+  courtRuns: ReplayRunSummary[];
+  homographyRuns: ReplayRunSummary[];
   selectedDetectionRunId: string | null;
   selectedTrackletRunId: string | null;
   selectedPoseRunId: string | null;
+  selectedCourtRunId: string | null;
+  selectedHomographyRunId: string | null;
   showDetections: boolean;
   showTracklets: boolean;
   showPoses: boolean;
+  showCourtKeypoints: boolean;
+  showCourtLines: boolean;
+  showCameraView: boolean;
+  showHomography: boolean;
   onSelectedDetectionRunChange: (runId: string | null) => void;
   onSelectedTrackletRunChange: (runId: string | null) => void;
   onSelectedPoseRunChange: (runId: string | null) => void;
+  onSelectedCourtRunChange: (runId: string | null) => void;
+  onSelectedHomographyRunChange: (runId: string | null) => void;
   onToggleDetections: (enabled: boolean) => void;
   onToggleTracklets: (enabled: boolean) => void;
   onTogglePoses: (enabled: boolean) => void;
+  onToggleCourtKeypoints: (enabled: boolean) => void;
+  onToggleCourtLines: (enabled: boolean) => void;
+  onToggleCameraView: (enabled: boolean) => void;
+  onToggleHomography: (enabled: boolean) => void;
 }) {
   return (
     <section className="panel">
@@ -679,9 +881,41 @@ function ReplayLayerControls({
           runs={poseRuns}
           selectedRunId={selectedPoseRunId}
         />
+        <LayerToggle
+          checked={showCourtKeypoints}
+          label="Show court keypoint evidence"
+          onChange={onToggleCourtKeypoints}
+        />
+        <LayerToggle
+          checked={showCourtLines}
+          label="Show court line evidence"
+          onChange={onToggleCourtLines}
+        />
+        <LayerToggle
+          checked={showCameraView}
+          label="Show camera/view evidence"
+          onChange={onToggleCameraView}
+        />
+        <RunSelect
+          label="Court evidence run"
+          onChange={onSelectedCourtRunChange}
+          runs={courtRuns}
+          selectedRunId={selectedCourtRunId}
+        />
+        <LayerToggle
+          checked={showHomography}
+          label="Show homography candidates"
+          onChange={onToggleHomography}
+        />
+        <RunSelect
+          label="Homography run"
+          onChange={onSelectedHomographyRunChange}
+          runs={homographyRuns}
+          selectedRunId={selectedHomographyRunId}
+        />
         <p className="evidence-note">
-          Overlays are synchronized persisted evidence. Display holds make sparse fixture output
-          inspectable but do not alter stored observations.
+          Overlays are synchronized persisted evidence. Court geometry layers are candidates for
+          review, not court truth or tennis-event conclusions.
         </p>
       </div>
     </section>
@@ -765,6 +999,8 @@ function AvailableRunsPanel({ replayInfo }: { replayInfo: ReplayInfo }) {
         <RunGroup title="Detection observations" runs={replayInfo.available_runs.detection} />
         <RunGroup title="Tracklet candidates" runs={replayInfo.available_runs.tracklet} />
         <RunGroup title="Pose observations" runs={replayInfo.available_runs.pose} />
+        <RunGroup title="Court evidence" runs={replayInfo.available_runs.court} />
+        <RunGroup title="Homography candidates" runs={replayInfo.available_runs.homography} />
         <RunGroup
           title="Gameplay/view-state observations"
           runs={replayInfo.available_runs.gameplay}
@@ -778,17 +1014,23 @@ function SelectedRunContext({
   replayInfo,
   selectedDetectionRunId,
   selectedTrackletRunId,
-  selectedPoseRunId
+  selectedPoseRunId,
+  selectedCourtRunId,
+  selectedHomographyRunId
 }: {
   replayInfo: ReplayInfo;
   selectedDetectionRunId: string | null;
   selectedTrackletRunId: string | null;
   selectedPoseRunId: string | null;
+  selectedCourtRunId: string | null;
+  selectedHomographyRunId: string | null;
 }) {
   const selected = [
     ["detection", selectedDetectionRunId, replayInfo.available_runs.detection],
     ["tracklet candidate", selectedTrackletRunId, replayInfo.available_runs.tracklet],
-    ["pose observation", selectedPoseRunId, replayInfo.available_runs.pose]
+    ["pose observation", selectedPoseRunId, replayInfo.available_runs.pose],
+    ["court evidence", selectedCourtRunId, replayInfo.available_runs.court],
+    ["homography candidate", selectedHomographyRunId, replayInfo.available_runs.homography]
   ] as const;
 
   return (
@@ -802,8 +1044,9 @@ function SelectedRunContext({
           <SelectedRunRow key={label} label={label} runId={runId ?? undefined} runs={runs} />
         ))}
         <p className="empty-state">
-          Selected runs provide synchronized detection observations, tracklet candidates, and pose
-          keypoint evidence. They do not confirm tennis events or object identity.
+          Selected runs provide synchronized detection observations, tracklet candidates, pose
+          keypoint evidence, and court geometry evidence. They do not confirm tennis events, court
+          truth, or object identity.
         </p>
       </div>
     </section>
@@ -824,8 +1067,8 @@ function SelectedEvidencePanel({
         </div>
         <div className="panel-body replay-media-detail">
           <p className="empty-state">
-            Click a replay bbox, track point, candidate path, or pose skeleton to inspect persisted
-            evidence.
+            Click a replay bbox, track point, candidate path, pose skeleton, or court evidence to
+            inspect persisted evidence.
           </p>
         </div>
       </section>
@@ -1026,6 +1269,144 @@ function SelectedEvidencePanel({
     );
   }
 
+  if (selectedEvidence.kind === "court_keypoint" || selectedEvidence.kind === "court_keypoint_timeline") {
+    const item = selectedEvidence.item;
+    return (
+      <EvidencePanel title="Selected Court Keypoint Evidence" badge="court keypoints">
+        <DetailRow label="observation id" value={item.observation_id} />
+        <DetailRow label="run id" value={item.run_id} />
+        <DetailRow label="schema" value={`${item.court_keypoint_schema} / ${item.schema_version}`} />
+        <DetailRow label="frame" value={item.frame_number.toString()} />
+        <DetailRow label="timestamp_ms" value={item.timestamp_ms.toString()} />
+        <DetailRow
+          label="keypoints"
+          value={`${item.keypoints_present_count} present / ${item.keypoints_missing_count} missing`}
+        />
+        <DetailRow label="mean confidence" value={formatConfidence(item.mean_keypoint_confidence)} />
+        <DetailRow label="source" value={courtSourceDisplayLabel(item)} />
+        <DetailRow label="model registry id" value={item.model_registry_id ?? "n/a"} />
+        <DetailRow
+          label="model"
+          value={formatModelNameVersion(item.model_name, item.model_version)}
+        />
+        <DetailRow label="runtime config id" value={item.runtime_config_id ?? "n/a"} />
+        <a className="quiet-link" href={`/runs/${item.run_id}`}>
+          Open source evidence run
+        </a>
+        <p className="evidence-note">
+          Court keypoint evidence only. It is not a confirmed court model and does not imply
+          bounce, in/out, point, or score.
+        </p>
+      </EvidencePanel>
+    );
+  }
+
+  if (selectedEvidence.kind === "court_line" || selectedEvidence.kind === "court_line_timeline") {
+    const item = selectedEvidence.item;
+    return (
+      <EvidencePanel title="Selected Court Line Evidence" badge="court lines">
+        <DetailRow label="observation id" value={item.observation_id} />
+        <DetailRow label="run id" value={item.run_id} />
+        <DetailRow label="frame" value={item.frame_number.toString()} />
+        <DetailRow label="timestamp_ms" value={item.timestamp_ms.toString()} />
+        <DetailRow label="line count" value={item.line_count.toString()} />
+        <DetailRow label="line classes" value={(item.line_classes ?? []).join(", ") || "n/a"} />
+        <DetailRow label="mean confidence" value={formatConfidence(item.mean_line_confidence)} />
+        <DetailRow label="source" value={courtSourceDisplayLabel(item)} />
+        <DetailRow label="model registry id" value={item.model_registry_id ?? "n/a"} />
+        <DetailRow
+          label="model"
+          value={formatModelNameVersion(item.model_name, item.model_version)}
+        />
+        <DetailRow label="runtime config id" value={item.runtime_config_id ?? "n/a"} />
+        <a className="quiet-link" href={`/runs/${item.run_id}`}>
+          Open source evidence run
+        </a>
+        <p className="evidence-note">
+          Court line evidence only. It is not a confirmed court model and does not imply bounce,
+          in/out, point, or score.
+        </p>
+      </EvidencePanel>
+    );
+  }
+
+  if (selectedEvidence.kind === "camera_view" || selectedEvidence.kind === "camera_view_timeline") {
+    const item = selectedEvidence.item;
+    return (
+      <EvidencePanel title="Selected Camera/View Evidence" badge={item.view_label}>
+        <DetailRow label="observation id" value={item.observation_id} />
+        <DetailRow label="run id" value={item.run_id} />
+        <DetailRow label="frame" value={item.frame_number.toString()} />
+        <DetailRow label="timestamp_ms" value={item.timestamp_ms.toString()} />
+        <DetailRow label="view label" value={item.view_label} />
+        <DetailRow label="confidence" value={formatConfidence(item.view_confidence)} />
+        <DetailRow label="motion hint" value={item.camera_motion_hint ?? "n/a"} />
+        <DetailRow label="stability" value={formatConfidence(item.stability_score)} />
+        <DetailRow label="cut likelihood" value={formatConfidence(item.cut_likelihood)} />
+        <DetailRow label="source" value={courtSourceDisplayLabel(item)} />
+        <DetailRow label="model registry id" value={item.model_registry_id ?? "n/a"} />
+        <DetailRow label="runtime config id" value={item.runtime_config_id ?? "n/a"} />
+        <a className="quiet-link" href={`/runs/${item.run_id}`}>
+          Open source evidence run
+        </a>
+        <p className="evidence-note">
+          Camera/view evidence only. It is geometry context and not a confirmed camera state or
+          homography decision.
+        </p>
+      </EvidencePanel>
+    );
+  }
+
+  if (
+    selectedEvidence.kind === "homography_candidate" ||
+    selectedEvidence.kind === "homography_candidate_timeline"
+  ) {
+    const item = selectedEvidence.item;
+    return (
+      <EvidencePanel title="Selected Homography Candidate" badge={item.status}>
+        <DetailRow label="observation id" value={item.observation_id} />
+        <DetailRow label="run id" value={item.run_id} />
+        <DetailRow label="frame" value={item.frame_number.toString()} />
+        <DetailRow label="timestamp_ms" value={item.timestamp_ms.toString()} />
+        <DetailRow label="template" value={`${item.template_name} / ${item.template_version}`} />
+        <DetailRow label="matrix direction" value={item.matrix_direction} />
+        <DetailRow label="source points" value={item.source_point_count?.toString() ?? "n/a"} />
+        <DetailRow label="source lines" value={item.source_line_count?.toString() ?? "n/a"} />
+        <DetailRow
+          label="mean reprojection error"
+          value={item.reprojection_error_mean?.toString() ?? "n/a"}
+        />
+        <DetailRow label="confidence" value={formatConfidence(item.confidence)} />
+        {"source_court_keypoint_observation_id" in item ? (
+          <>
+            <DetailRow
+              label="source keypoint id"
+              value={item.source_court_keypoint_observation_id ?? "n/a"}
+            />
+            <DetailRow
+              label="source line id"
+              value={item.source_court_line_observation_id ?? "n/a"}
+            />
+            <DetailRow
+              label="source camera/view id"
+              value={item.source_camera_view_observation_id ?? "n/a"}
+            />
+          </>
+        ) : null}
+        <DetailRow label="source" value={courtSourceDisplayLabel(item)} />
+        <DetailRow label="model registry id" value={item.model_registry_id ?? "n/a"} />
+        <DetailRow label="runtime config id" value={item.runtime_config_id ?? "n/a"} />
+        <a className="quiet-link" href={`/runs/${item.run_id}`}>
+          Open source evidence run
+        </a>
+        <p className="evidence-note">
+          Homography candidate evidence only. It is not a final court model and does not imply
+          bounce, in/out, player position, point, or score.
+        </p>
+      </EvidencePanel>
+    );
+  }
+
   if (selectedEvidence.kind === "annotation") {
     const { item } = selectedEvidence;
     return (
@@ -1182,7 +1563,38 @@ function selectedTimelineItemKey(selectedEvidence: SelectedReplayEvidence | null
   if (selectedEvidence.kind === "pose") {
     return `pose:${selectedEvidence.pose.observation_id}`;
   }
+  if (selectedEvidence.kind === "court_keypoint") {
+    return `court_keypoint:${selectedEvidence.item.observation_id}`;
+  }
+  if (selectedEvidence.kind === "court_line") {
+    return `court_line:${selectedEvidence.item.observation_id}`;
+  }
+  if (selectedEvidence.kind === "camera_view") {
+    return `camera_view:${selectedEvidence.item.observation_id}`;
+  }
+  if (selectedEvidence.kind === "homography_candidate") {
+    return `homography_candidate:${selectedEvidence.item.observation_id}`;
+  }
   return timelineItemKey(selectedEvidence.item);
+}
+
+function courtSelectedObservationId(selectedEvidence: SelectedReplayEvidence | null): string | null {
+  if (selectedEvidence === null) {
+    return null;
+  }
+  if (
+    selectedEvidence.kind === "court_keypoint" ||
+    selectedEvidence.kind === "court_line" ||
+    selectedEvidence.kind === "camera_view" ||
+    selectedEvidence.kind === "homography_candidate" ||
+    selectedEvidence.kind === "court_keypoint_timeline" ||
+    selectedEvidence.kind === "court_line_timeline" ||
+    selectedEvidence.kind === "camera_view_timeline" ||
+    selectedEvidence.kind === "homography_candidate_timeline"
+  ) {
+    return selectedEvidence.item.observation_id;
+  }
+  return null;
 }
 
 function formatReplayRunOptionLabel(run: ReplayRunSummary): string {
@@ -1204,6 +1616,15 @@ function formatReplayRunSourceLabel(run: ReplayRunSummary): string {
   }
   if (run.evidence_source === "fixture_derived_tracklet") {
     return "fixture-derived tracklet candidates";
+  }
+  if (run.evidence_source === "fixture_court_evidence") {
+    return "fixture court evidence";
+  }
+  if (run.evidence_source === "homography_candidate" || run.candidate_geometry) {
+    return "homography candidate";
+  }
+  if (run.geometry_evidence_only) {
+    return run.source_label ?? "court geometry evidence";
   }
   if (run.is_fixture || run.evidence_source === "fixture_demo") {
     return "fixture demo evidence";
@@ -1253,6 +1674,28 @@ function sourceDetectionDisplayLabel(
     return "Fixture/demo evidence";
   }
   return item.source_detection_source_label ?? "Persisted detection evidence";
+}
+
+function courtSourceDisplayLabel(item: {
+  evidence_source?: string;
+  source_label?: string | null;
+  fixture_court_evidence?: boolean;
+  fixture_camera_view_evidence?: boolean;
+  candidate_geometry?: boolean;
+}): string {
+  if (item.candidate_geometry || item.evidence_source === "homography_candidate") {
+    return "Homography candidate";
+  }
+  if (item.fixture_court_evidence || item.evidence_source === "fixture_court_evidence") {
+    return "Fixture court evidence";
+  }
+  if (
+    item.fixture_camera_view_evidence ||
+    item.evidence_source === "fixture_camera_view_evidence"
+  ) {
+    return "Fixture camera/view evidence";
+  }
+  return item.source_label ?? "Court geometry evidence";
 }
 
 function formatModelNameVersion(

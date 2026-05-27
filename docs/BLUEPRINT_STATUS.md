@@ -12,7 +12,7 @@
 - Blueprint 8: IN PROGRESS
 - TOM v3 Simple: COMPLETE
 
-TOM v3 Simple is complete as a lightweight local observation/evidence platform. Blueprint 6 is complete as the visual replay/operator workstation layer. Blueprint 7 is complete as the real perception runtime layer for optional real detection, real-detection-derived candidate tracklets, and optional real pose keypoint evidence. Blueprint 8 is in progress with court/camera/homography schema contracts, fixture court evidence persistence, camera/view evidence query/bundle read models, and homography candidate persistence.
+TOM v3 Simple is complete as a lightweight local observation/evidence platform. Blueprint 6 is complete as the visual replay/operator workstation layer. Blueprint 7 is complete as the real perception runtime layer for optional real detection, real-detection-derived candidate tracklets, and optional real pose keypoint evidence. Blueprint 8 is in progress with court/camera/homography schema contracts, fixture court evidence persistence, camera/view evidence query/bundle read models, homography candidate persistence, and replay court overlays.
 
 ## Blueprint 1 - Media, Observation Store, Viewer Foundation
 
@@ -480,13 +480,34 @@ fixture court evidence
 - stream ingestion
 - adjudication
 
+Milestone 8E proves:
+
+```text
+persisted court evidence
+-> replay overlay API
+-> court keypoint overlays
+-> court line overlays
+-> camera/view evidence lane or badge
+-> homography candidate display overlay
+```
+
+8E adds replay support for `courtRunId` and `homographyRunId`, court overlay payloads, frontend court layer toggles, selected court evidence details, and court timeline lanes.
+
+8E does not add:
+
+- projection diagnostics
+- real camera/view model
+- ball/player court-space projection
+- bounce/hit/in-out/rally/point/scoring
+- stream ingestion
+- adjudication
+
 8B does not add:
 
 - real court keypoint detector
 - real court line detector
 - homography computation
 - projection diagnostics
-- replay court overlay
 - ball/player court-space projection
 - bounce/hit/in-out/rally/point/scoring
 - stream ingestion
@@ -497,7 +518,6 @@ fixture court evidence
 - real court keypoint detector
 - real court line detector
 - homography computation
-- replay court overlay
 - ball/player court-space projection
 - bounce/hit/in-out/rally/point/scoring
 - stream ingestion

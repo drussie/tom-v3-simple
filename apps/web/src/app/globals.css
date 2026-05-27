@@ -304,8 +304,14 @@ pre {
   bottom: 122px;
 }
 
+.replay-overlay-status.court {
+  bottom: 176px;
+}
+
 .replay-tracklet-path,
-.replay-pose-edge {
+.replay-pose-edge,
+.replay-court-line,
+.replay-homography-line {
   fill: none;
   pointer-events: auto;
   stroke-linecap: round;
@@ -393,6 +399,101 @@ pre {
 
 .replay-pose-group.selected .replay-pose-keypoint {
   stroke-width: 3;
+}
+
+.replay-court-keypoint-group,
+.replay-court-line-group,
+.replay-homography-group {
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.replay-court-keypoint circle {
+  fill: var(--violet);
+  stroke: #ffffff;
+  stroke-width: 1.5;
+}
+
+.replay-court-keypoint text {
+  fill: #ffffff;
+  font-size: 10px;
+  font-weight: 800;
+  paint-order: stroke;
+  pointer-events: none;
+  stroke: rgba(16, 23, 25, 0.9);
+  stroke-linejoin: round;
+  stroke-width: 3px;
+  text-transform: capitalize;
+}
+
+.replay-court-keypoint-group.selected .replay-court-keypoint circle {
+  fill: var(--amber);
+  stroke-width: 3;
+}
+
+.replay-court-line {
+  stroke: rgba(124, 58, 237, 0.86);
+  stroke-width: 2.5;
+}
+
+.replay-court-line-group.selected .replay-court-line {
+  stroke: var(--amber);
+  stroke-width: 4;
+}
+
+.replay-homography-line {
+  stroke: rgba(255, 255, 255, 0.86);
+  stroke-dasharray: 7 5;
+  stroke-width: 2;
+}
+
+.replay-homography-keypoint {
+  fill: var(--amber);
+  stroke: rgba(16, 23, 25, 0.9);
+  stroke-width: 1.5;
+}
+
+.replay-homography-group.selected .replay-homography-line {
+  stroke: var(--green);
+  stroke-width: 3;
+}
+
+.replay-camera-view-stack {
+  display: grid;
+  gap: 6px;
+  left: 14px;
+  max-width: min(320px, calc(100% - 28px));
+  pointer-events: auto;
+  position: absolute;
+  top: 14px;
+}
+
+.replay-camera-view-badge {
+  background: rgba(16, 23, 25, 0.76);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 6px;
+  color: #ffffff;
+  cursor: pointer;
+  display: grid;
+  font: inherit;
+  gap: 2px;
+  padding: 8px 10px;
+  text-align: left;
+}
+
+.replay-camera-view-badge.selected {
+  border-color: var(--amber);
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.28);
+}
+
+.replay-camera-view-badge strong,
+.replay-camera-view-badge span {
+  font-size: 11px;
+}
+
+.replay-camera-view-badge span {
+  color: rgba(255, 255, 255, 0.76);
+  font-weight: 700;
 }
 
 .replay-overlay-placeholder {
@@ -627,6 +728,19 @@ pre {
 
 .timeline-lane-item.tick.pose {
   background: var(--amber);
+}
+
+.timeline-lane-item.tick.court_keypoint,
+.timeline-lane-item.tick.court_line {
+  background: var(--violet);
+}
+
+.timeline-lane-item.tick.camera_view {
+  background: var(--green);
+}
+
+.timeline-lane-item.tick.homography_candidate {
+  background: var(--rose);
 }
 
 .timeline-lane-item.tick.annotation {

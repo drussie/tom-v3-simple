@@ -6,9 +6,14 @@ from typing import Any
 
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
+from tom_v3_schema.court import get_court_template
 from tom_v3_schema.skeletons import get_skeleton_definition
 from tom_v3_storage.db_models import (
     AtomicObservation,
+    CameraViewObservation,
+    CourtKeypointObservation,
+    CourtLineObservation,
+    HomographyCandidateObservation,
     HumanAnnotation,
     MediaAsset,
     ModelRegistry,
@@ -28,6 +33,11 @@ TRACKLET_TYPES = {
 }
 POSE_TYPES = {"player_pose_observation"}
 GAMEPLAY_TYPES = {"view_state"}
+COURT_KEYPOINT_TYPES = {"court_keypoint_observation"}
+COURT_LINE_TYPES = {"court_line_observation"}
+CAMERA_VIEW_TYPES = {"camera_view_observation"}
+COURT_EVIDENCE_TYPES = COURT_KEYPOINT_TYPES | COURT_LINE_TYPES | CAMERA_VIEW_TYPES
+HOMOGRAPHY_TYPES = {"homography_candidate_observation"}
 
 
 def timestamp_ms_to_replay_frame(media: MediaAsset, timestamp_ms: int | float | None) -> int:
@@ -94,6 +104,8 @@ def build_replay_overlay_chunk(
     detection_run_id: str | None = None,
     tracklet_run_id: str | None = None,
     pose_run_id: str | None = None,
+    court_run_id: str | None = None,
+    homography_run_id: str | None = None,
     min_confidence: float | None = None,
     min_pose_confidence: float | None = None,
 ) -> dict[str, Any] | None:
@@ -136,6 +148,50 @@ def build_replay_overlay_chunk(
         if "pose" in layers
         else []
     )
+    court_keypoints = (
+        build_court_keypoint_overlay_items(
+            session=session,
+            media=media,
+            start_ms=start_ms,
+            end_ms=end_ms,
+            court_run_id=court_run_id,
+        )
+        if "court_keypoints" in layers
+        else []
+    )
+    court_lines = (
+        build_court_line_overlay_items(
+            session=session,
+            media=media,
+            start_ms=start_ms,
+            end_ms=end_ms,
+            court_run_id=court_run_id,
+        )
+        if "court_lines" in layers
+        else []
+    )
+    camera_view = (
+        build_camera_view_overlay_items(
+            session=session,
+            media=media,
+            start_ms=start_ms,
+            end_ms=end_ms,
+            court_run_id=court_run_id,
+        )
+        if "camera_view" in layers
+        else []
+    )
+    homography_candidates = (
+        build_homography_candidate_overlay_items(
+            session=session,
+            media=media,
+            start_ms=start_ms,
+            end_ms=end_ms,
+            homography_run_id=homography_run_id,
+        )
+        if "homography_candidates" in layers
+        else []
+    )
     return {
         "media_id": media.id,
         "start_ms": start_ms,
@@ -146,6 +202,10 @@ def build_replay_overlay_chunk(
         "detections": detections,
         "tracklets": tracklets,
         "poses": poses,
+        "court_keypoints": court_keypoints,
+        "court_lines": court_lines,
+        "camera_view": camera_view,
+        "homography_candidates": homography_candidates,
         "observation_only": True,
         "no_adjudication": True,
     }
@@ -158,6 +218,8 @@ def build_replay_timeline(
     detection_run_id: str | None = None,
     tracklet_run_id: str | None = None,
     pose_run_id: str | None = None,
+    court_run_id: str | None = None,
+    homography_run_id: str | None = None,
     include_annotations: bool = True,
 ) -> dict[str, Any] | None:
     media = session.get(MediaAsset, media_id)
@@ -172,7 +234,13 @@ def build_replay_timeline(
             media=media,
             selected_run_ids={
                 run_id
-                for run_id in (detection_run_id, tracklet_run_id, pose_run_id)
+                for run_id in (
+                    detection_run_id,
+                    tracklet_run_id,
+                    pose_run_id,
+                    court_run_id,
+                    homography_run_id,
+                )
                 if run_id is not None
             },
         )
@@ -211,6 +279,42 @@ def build_replay_timeline(
                     session=session,
                     media=media,
                     pose_run_id=pose_run_id,
+                ),
+            },
+            {
+                "lane_type": "court_keypoints",
+                "label": "Court keypoint evidence",
+                "items": build_court_keypoint_timeline_items(
+                    session=session,
+                    media=media,
+                    court_run_id=court_run_id,
+                ),
+            },
+            {
+                "lane_type": "court_lines",
+                "label": "Court line evidence",
+                "items": build_court_line_timeline_items(
+                    session=session,
+                    media=media,
+                    court_run_id=court_run_id,
+                ),
+            },
+            {
+                "lane_type": "camera_view",
+                "label": "Camera/view evidence",
+                "items": build_camera_view_timeline_items(
+                    session=session,
+                    media=media,
+                    court_run_id=court_run_id,
+                ),
+            },
+            {
+                "lane_type": "homography_candidates",
+                "label": "Homography candidates",
+                "items": build_homography_candidate_timeline_items(
+                    session=session,
+                    media=media,
+                    homography_run_id=homography_run_id,
                 ),
             },
             {
@@ -371,6 +475,157 @@ def pose_timeline_item_from_row(pose: PoseObservation) -> dict[str, Any] | None:
         "keypoints_missing_count": pose.keypoints_missing_count,
         "display_label": _pose_display_label(source_metadata),
         **source_metadata,
+    }
+
+
+def build_court_keypoint_timeline_items(
+    session: Session,
+    *,
+    media: MediaAsset,
+    court_run_id: str | None = None,
+) -> list[dict[str, Any]]:
+    query = (
+        select(CourtKeypointObservation)
+        .where(CourtKeypointObservation.media_id == media.id)
+        .order_by(CourtKeypointObservation.timestamp_ms, CourtKeypointObservation.observation_id)
+    )
+    if court_run_id is not None:
+        query = query.where(CourtKeypointObservation.run_id == court_run_id)
+    return [court_keypoint_timeline_item_from_row(row) for row in session.scalars(query).all()]
+
+
+def court_keypoint_timeline_item_from_row(
+    row: CourtKeypointObservation,
+) -> dict[str, Any]:
+    return {
+        "item_type": "court_keypoint",
+        "observation_id": row.observation_id,
+        "run_id": row.run_id,
+        "timestamp_ms": row.timestamp_ms,
+        "frame_number": row.frame_number,
+        "court_keypoint_schema": row.court_keypoint_schema,
+        "schema_version": row.schema_version,
+        "keypoint_count": row.keypoint_count,
+        "keypoints_present_count": row.keypoints_present_count,
+        "keypoints_missing_count": row.keypoints_missing_count,
+        "mean_keypoint_confidence": row.mean_keypoint_confidence,
+        "display_label": "court keypoint evidence",
+        **_court_source_metadata(row, "court keypoint evidence"),
+    }
+
+
+def build_court_line_timeline_items(
+    session: Session,
+    *,
+    media: MediaAsset,
+    court_run_id: str | None = None,
+) -> list[dict[str, Any]]:
+    query = (
+        select(CourtLineObservation)
+        .where(CourtLineObservation.media_id == media.id)
+        .order_by(CourtLineObservation.timestamp_ms, CourtLineObservation.observation_id)
+    )
+    if court_run_id is not None:
+        query = query.where(CourtLineObservation.run_id == court_run_id)
+    return [court_line_timeline_item_from_row(row) for row in session.scalars(query).all()]
+
+
+def court_line_timeline_item_from_row(row: CourtLineObservation) -> dict[str, Any]:
+    return {
+        "item_type": "court_line",
+        "observation_id": row.observation_id,
+        "run_id": row.run_id,
+        "timestamp_ms": row.timestamp_ms,
+        "frame_number": row.frame_number,
+        "line_count": row.line_count,
+        "line_classes": row.line_classes_jsonb,
+        "mean_line_confidence": row.mean_line_confidence,
+        "display_label": "court line evidence",
+        **_court_source_metadata(row, "court line evidence"),
+    }
+
+
+def build_camera_view_timeline_items(
+    session: Session,
+    *,
+    media: MediaAsset,
+    court_run_id: str | None = None,
+) -> list[dict[str, Any]]:
+    query = (
+        select(CameraViewObservation)
+        .where(CameraViewObservation.media_id == media.id)
+        .order_by(CameraViewObservation.timestamp_ms, CameraViewObservation.observation_id)
+    )
+    if court_run_id is not None:
+        query = query.where(CameraViewObservation.run_id == court_run_id)
+    return [camera_view_timeline_item_from_row(row) for row in session.scalars(query).all()]
+
+
+def camera_view_timeline_item_from_row(row: CameraViewObservation) -> dict[str, Any]:
+    return {
+        "item_type": "camera_view",
+        "observation_id": row.observation_id,
+        "run_id": row.run_id,
+        "timestamp_ms": row.timestamp_ms,
+        "frame_number": row.frame_number,
+        "frame_start": row.frame_start,
+        "frame_end": row.frame_end,
+        "timestamp_start_ms": row.timestamp_start_ms,
+        "timestamp_end_ms": row.timestamp_end_ms,
+        "view_label": row.view_label,
+        "view_confidence": row.view_confidence,
+        "camera_motion_hint": row.camera_motion_hint,
+        "stability_score": row.stability_score,
+        "cut_likelihood": row.cut_likelihood,
+        "display_label": "camera/view evidence",
+        **_court_source_metadata(row, "camera/view evidence"),
+    }
+
+
+def build_homography_candidate_timeline_items(
+    session: Session,
+    *,
+    media: MediaAsset,
+    homography_run_id: str | None = None,
+) -> list[dict[str, Any]]:
+    query = (
+        select(HomographyCandidateObservation)
+        .where(HomographyCandidateObservation.media_id == media.id)
+        .order_by(
+            HomographyCandidateObservation.timestamp_ms,
+            HomographyCandidateObservation.observation_id,
+        )
+    )
+    if homography_run_id is not None:
+        query = query.where(HomographyCandidateObservation.run_id == homography_run_id)
+    return [
+        homography_candidate_timeline_item_from_row(row) for row in session.scalars(query).all()
+    ]
+
+
+def homography_candidate_timeline_item_from_row(
+    row: HomographyCandidateObservation,
+) -> dict[str, Any]:
+    return {
+        "item_type": "homography_candidate",
+        "observation_id": row.observation_id,
+        "run_id": row.run_id,
+        "timestamp_ms": row.timestamp_ms,
+        "frame_number": row.frame_number,
+        "status": row.status,
+        "template_name": row.template_name,
+        "template_version": row.template_version,
+        "matrix_direction": row.matrix_direction,
+        "source_point_count": row.source_point_count,
+        "source_line_count": row.source_line_count,
+        "reprojection_error_mean": row.reprojection_error_mean,
+        "confidence": row.confidence,
+        "display_label": "homography candidate",
+        **_court_source_metadata(
+            row,
+            "homography candidate",
+            evidence_source="homography_candidate",
+        ),
     }
 
 
@@ -694,12 +949,211 @@ def pose_overlay_item_from_row(pose: PoseObservation) -> dict[str, Any]:
     }
 
 
+def build_court_keypoint_overlay_items(
+    session: Session,
+    *,
+    media: MediaAsset,
+    start_ms: int,
+    end_ms: int,
+    court_run_id: str | None = None,
+) -> list[dict[str, Any]]:
+    query = (
+        select(CourtKeypointObservation)
+        .where(
+            CourtKeypointObservation.media_id == media.id,
+            CourtKeypointObservation.timestamp_ms >= start_ms,
+            CourtKeypointObservation.timestamp_ms <= end_ms,
+        )
+        .order_by(CourtKeypointObservation.timestamp_ms, CourtKeypointObservation.observation_id)
+    )
+    if court_run_id is not None:
+        query = query.where(CourtKeypointObservation.run_id == court_run_id)
+    return [court_keypoint_overlay_item_from_row(row) for row in session.scalars(query).all()]
+
+
+def court_keypoint_overlay_item_from_row(row: CourtKeypointObservation) -> dict[str, Any]:
+    return {
+        "overlay_type": "court_keypoint_evidence",
+        "observation_id": row.observation_id,
+        "run_id": row.run_id,
+        "frame_number": row.frame_number,
+        "timestamp_ms": row.timestamp_ms,
+        "coordinate_space": row.coordinate_space,
+        "court_keypoint_schema": row.court_keypoint_schema,
+        "schema_version": row.schema_version,
+        "keypoints": _court_keypoints(row.keypoints_jsonb or []),
+        "keypoint_count": row.keypoint_count,
+        "keypoints_present_count": row.keypoints_present_count,
+        "keypoints_missing_count": row.keypoints_missing_count,
+        "mean_keypoint_confidence": row.mean_keypoint_confidence,
+        "min_keypoint_confidence": row.min_keypoint_confidence,
+        "max_keypoint_confidence": row.max_keypoint_confidence,
+        "frame_time_owner": row.frame_time_owner,
+        **_court_source_metadata(row, "court keypoint evidence"),
+    }
+
+
+def build_court_line_overlay_items(
+    session: Session,
+    *,
+    media: MediaAsset,
+    start_ms: int,
+    end_ms: int,
+    court_run_id: str | None = None,
+) -> list[dict[str, Any]]:
+    query = (
+        select(CourtLineObservation)
+        .where(
+            CourtLineObservation.media_id == media.id,
+            CourtLineObservation.timestamp_ms >= start_ms,
+            CourtLineObservation.timestamp_ms <= end_ms,
+        )
+        .order_by(CourtLineObservation.timestamp_ms, CourtLineObservation.observation_id)
+    )
+    if court_run_id is not None:
+        query = query.where(CourtLineObservation.run_id == court_run_id)
+    return [court_line_overlay_item_from_row(row) for row in session.scalars(query).all()]
+
+
+def court_line_overlay_item_from_row(row: CourtLineObservation) -> dict[str, Any]:
+    return {
+        "overlay_type": "court_line_evidence",
+        "observation_id": row.observation_id,
+        "run_id": row.run_id,
+        "frame_number": row.frame_number,
+        "timestamp_ms": row.timestamp_ms,
+        "coordinate_space": row.coordinate_space,
+        "line_segments": _court_line_segments(row.line_segments_jsonb or []),
+        "line_classes": row.line_classes_jsonb,
+        "line_count": row.line_count,
+        "mean_line_confidence": row.mean_line_confidence,
+        "frame_time_owner": row.frame_time_owner,
+        **_court_source_metadata(row, "court line evidence"),
+    }
+
+
+def build_camera_view_overlay_items(
+    session: Session,
+    *,
+    media: MediaAsset,
+    start_ms: int,
+    end_ms: int,
+    court_run_id: str | None = None,
+) -> list[dict[str, Any]]:
+    timestamp_start = func.coalesce(
+        CameraViewObservation.timestamp_start_ms,
+        CameraViewObservation.timestamp_ms,
+    )
+    timestamp_end = func.coalesce(
+        CameraViewObservation.timestamp_end_ms,
+        CameraViewObservation.timestamp_ms,
+    )
+    query = (
+        select(CameraViewObservation)
+        .where(
+            CameraViewObservation.media_id == media.id,
+            timestamp_start <= end_ms,
+            timestamp_end >= start_ms,
+        )
+        .order_by(CameraViewObservation.timestamp_ms, CameraViewObservation.observation_id)
+    )
+    if court_run_id is not None:
+        query = query.where(CameraViewObservation.run_id == court_run_id)
+    return [camera_view_overlay_item_from_row(row) for row in session.scalars(query).all()]
+
+
+def camera_view_overlay_item_from_row(row: CameraViewObservation) -> dict[str, Any]:
+    return {
+        "overlay_type": "camera_view_evidence",
+        "observation_id": row.observation_id,
+        "run_id": row.run_id,
+        "frame_number": row.frame_number,
+        "timestamp_ms": row.timestamp_ms,
+        "frame_start": row.frame_start,
+        "frame_end": row.frame_end,
+        "timestamp_start_ms": row.timestamp_start_ms,
+        "timestamp_end_ms": row.timestamp_end_ms,
+        "view_label": row.view_label,
+        "view_confidence": row.view_confidence,
+        "camera_motion_hint": row.camera_motion_hint,
+        "stability_score": row.stability_score,
+        "cut_likelihood": row.cut_likelihood,
+        "frame_time_owner": row.frame_time_owner,
+        **_court_source_metadata(row, "camera/view evidence"),
+    }
+
+
+def build_homography_candidate_overlay_items(
+    session: Session,
+    *,
+    media: MediaAsset,
+    start_ms: int,
+    end_ms: int,
+    homography_run_id: str | None = None,
+) -> list[dict[str, Any]]:
+    query = (
+        select(HomographyCandidateObservation)
+        .where(
+            HomographyCandidateObservation.media_id == media.id,
+            HomographyCandidateObservation.timestamp_ms >= start_ms,
+            HomographyCandidateObservation.timestamp_ms <= end_ms,
+        )
+        .order_by(
+            HomographyCandidateObservation.timestamp_ms,
+            HomographyCandidateObservation.observation_id,
+        )
+    )
+    if homography_run_id is not None:
+        query = query.where(HomographyCandidateObservation.run_id == homography_run_id)
+    return [
+        homography_candidate_overlay_item_from_row(row) for row in session.scalars(query).all()
+    ]
+
+
+def homography_candidate_overlay_item_from_row(
+    row: HomographyCandidateObservation,
+) -> dict[str, Any]:
+    return {
+        "overlay_type": "homography_candidate",
+        "observation_id": row.observation_id,
+        "run_id": row.run_id,
+        "frame_number": row.frame_number,
+        "timestamp_ms": row.timestamp_ms,
+        "source_court_keypoint_observation_id": row.source_court_keypoint_observation_id,
+        "source_court_line_observation_id": row.source_court_line_observation_id,
+        "source_camera_view_observation_id": row.source_camera_view_observation_id,
+        "homography_matrix": row.homography_matrix_jsonb,
+        "inverse_homography_matrix": row.inverse_homography_matrix_jsonb,
+        "matrix_direction": row.matrix_direction,
+        "template_name": row.template_name,
+        "template_version": row.template_version,
+        "template": _court_template_payload(row.template_name, row.template_version),
+        "reprojection_error_mean": row.reprojection_error_mean,
+        "reprojection_error_median": row.reprojection_error_median,
+        "reprojection_error_max": row.reprojection_error_max,
+        "inlier_count": row.inlier_count,
+        "outlier_count": row.outlier_count,
+        "source_point_count": row.source_point_count,
+        "source_line_count": row.source_line_count,
+        "confidence": row.confidence,
+        "status": row.status,
+        "frame_time_owner": row.frame_time_owner,
+        **_court_source_metadata(
+            row,
+            "homography candidate",
+            evidence_source="homography_candidate",
+        ),
+    }
+
+
 def available_runs_for_media(session: Session, media_id: str) -> dict[str, list[dict[str, Any]]]:
     return {
         "detection": _run_summaries_for_observation_types(session, media_id, DETECTION_TYPES),
         "tracklet": _run_summaries_for_observation_types(session, media_id, TRACKLET_TYPES),
         "pose": _run_summaries_for_observation_types(session, media_id, POSE_TYPES),
         "gameplay": _run_summaries_for_observation_types(session, media_id, GAMEPLAY_TYPES),
+        "court": _court_run_summaries(session, media_id),
+        "homography": _homography_run_summaries(session, media_id),
     }
 
 
@@ -719,6 +1173,24 @@ def normalize_replay_layers(layers: str | list[str] | tuple[str, ...] | None) ->
             layer = "pose"
         if layer == "tracklet":
             layer = "tracklets"
+        if layer in {"court", "court_evidence"}:
+            normalized.update(
+                {
+                    "court_keypoints",
+                    "court_lines",
+                    "camera_view",
+                    "homography_candidates",
+                }
+            )
+            continue
+        if layer in {"court_keypoint", "court-keypoints"}:
+            layer = "court_keypoints"
+        if layer in {"court_line", "court-lines"}:
+            layer = "court_lines"
+        if layer in {"camera", "camera-view", "camera_views"}:
+            layer = "camera_view"
+        if layer in {"homography", "homographies", "homography-candidates"}:
+            layer = "homography_candidates"
         normalized.add(layer)
     return normalized
 
@@ -742,6 +1214,89 @@ def resolve_media_video_path(media: MediaAsset) -> Path | None:
         if path.is_file():
             return path
     return None
+
+
+def _court_run_summaries(session: Session, media_id: str) -> list[dict[str, Any]]:
+    summaries = _run_summaries_for_observation_types(session, media_id, COURT_EVIDENCE_TYPES)
+    if not summaries:
+        return []
+
+    counts_by_run_type = _counts_by_run_and_type(session, media_id, COURT_EVIDENCE_TYPES)
+    for summary in summaries:
+        run_id = summary["run_id"]
+        summary.update(
+            {
+                "evidence_source": "fixture_court_evidence"
+                if summary.get("is_fixture")
+                else "court_evidence",
+                "source_label": "fixture court evidence"
+                if summary.get("is_fixture")
+                else "court evidence",
+                "court_keypoint_count": counts_by_run_type.get(
+                    (run_id, "court_keypoint_observation"), 0
+                ),
+                "court_line_count": counts_by_run_type.get(
+                    (run_id, "court_line_observation"), 0
+                ),
+                "camera_view_count": counts_by_run_type.get(
+                    (run_id, "camera_view_observation"), 0
+                ),
+                "geometry_evidence_only": True,
+                "is_real_model_output": False,
+                "model_output_not_truth": False,
+            }
+        )
+    return summaries
+
+
+def _homography_run_summaries(session: Session, media_id: str) -> list[dict[str, Any]]:
+    summaries = _run_summaries_for_observation_types(session, media_id, HOMOGRAPHY_TYPES)
+    if not summaries:
+        return []
+
+    candidate_counts = _counts_by_run_and_type(session, media_id, HOMOGRAPHY_TYPES)
+    for summary in summaries:
+        run = session.get(ProcessingRun, summary["run_id"])
+        runtime_payload = run.runtime_config.payload_jsonb if run and run.runtime_config else {}
+        run_metadata = run.metadata_jsonb if run is not None else {}
+        source_court_run_id = (
+            _string_or_none(run_metadata.get("source_court_run_id"))
+            or _string_or_none(runtime_payload.get("source_court_run_id"))
+        )
+        summary.update(
+            {
+                "evidence_source": "homography_candidate",
+                "source_label": "homography candidate",
+                "candidate_count": candidate_counts.get(
+                    (summary["run_id"], "homography_candidate_observation"), 0
+                ),
+                "source_court_run_id": source_court_run_id,
+                "candidate_geometry": True,
+                "geometry_evidence_only": True,
+                "is_fixture": False,
+                "is_real_model_output": False,
+                "model_output_not_truth": False,
+            }
+        )
+    return summaries
+
+
+def _counts_by_run_and_type(
+    session: Session,
+    media_id: str,
+    observation_types: set[str],
+) -> dict[tuple[str, str], int]:
+    return {
+        (run_id, observation_type): int(count)
+        for run_id, observation_type, count in session.execute(
+            select(Observation.run_id, Observation.observation_type, func.count())
+            .where(
+                Observation.media_id == media_id,
+                Observation.observation_type.in_(sorted(observation_types)),
+            )
+            .group_by(Observation.run_id, Observation.observation_type)
+        ).all()
+    }
 
 
 def _run_summaries_for_observation_types(
@@ -984,6 +1539,70 @@ def _pose_source_metadata(pose: PoseObservation) -> dict[str, Any]:
     }
 
 
+def _court_source_metadata(
+    row: (
+        CourtKeypointObservation
+        | CourtLineObservation
+        | CameraViewObservation
+        | HomographyCandidateObservation
+    ),
+    source_label: str,
+    *,
+    evidence_source: str | None = None,
+) -> dict[str, Any]:
+    observation = row.observation
+    payload = observation.payload_jsonb if observation is not None else {}
+    metadata = row.metadata_jsonb or {}
+    model = row.model if hasattr(row, "model") else None
+    if model is None and observation is not None:
+        model = observation.model
+
+    fixture_court_evidence = _truthy(metadata.get("fixture_court_evidence")) or _truthy(
+        payload.get("fixture_court_evidence")
+    )
+    fixture_camera_view_evidence = _truthy(
+        metadata.get("fixture_camera_view_evidence")
+    ) or _truthy(payload.get("fixture_camera_view_evidence"))
+    candidate_geometry = _truthy(metadata.get("candidate_geometry")) or _truthy(
+        payload.get("candidate_geometry")
+    )
+    geometry_evidence_only = (
+        _truthy(metadata.get("geometry_evidence_only"))
+        or _truthy(payload.get("geometry_evidence_only"))
+        or True
+    )
+    resolved_evidence_source = evidence_source
+    if resolved_evidence_source is None:
+        if candidate_geometry:
+            resolved_evidence_source = "homography_candidate"
+        elif fixture_court_evidence:
+            resolved_evidence_source = "fixture_court_evidence"
+        elif fixture_camera_view_evidence:
+            resolved_evidence_source = "fixture_camera_view_evidence"
+        else:
+            resolved_evidence_source = "court_evidence"
+
+    return {
+        "evidence_source": resolved_evidence_source,
+        "source_label": source_label,
+        "source_runtime": _string_or_none(payload.get("source_runtime"))
+        or _string_or_none(metadata.get("source_runtime")),
+        "model_registry_id": row.model_id,
+        "model_name": model.name if model is not None else None,
+        "model_version": model.version if model is not None else None,
+        "runtime_config_id": row.runtime_config_id,
+        "fixture_court_evidence": fixture_court_evidence,
+        "fixture_camera_view_evidence": fixture_camera_view_evidence,
+        "candidate_geometry": candidate_geometry,
+        "geometry_evidence_only": geometry_evidence_only,
+        "observation_only": True,
+        "no_adjudication": True,
+        "is_fixture": fixture_court_evidence or fixture_camera_view_evidence,
+        "is_real_model_output": False,
+        "model_output_not_truth": False,
+    }
+
+
 def _tracklet_run_source_metadata(
     *,
     run_metadata: dict[str, Any],
@@ -1074,6 +1693,14 @@ def _source_label(evidence_source: str) -> str:
         return "fixture-derived tracklet candidates"
     if evidence_source == "persisted_tracklet":
         return "persisted tracklet candidates"
+    if evidence_source == "fixture_court_evidence":
+        return "fixture court evidence"
+    if evidence_source == "fixture_camera_view_evidence":
+        return "fixture camera/view evidence"
+    if evidence_source == "court_evidence":
+        return "court evidence"
+    if evidence_source == "homography_candidate":
+        return "homography candidate"
     return "persisted evidence"
 
 
@@ -1175,6 +1802,58 @@ def _pose_overlay_keypoints(keypoints: list[dict[str, Any]]) -> list[dict[str, A
             }
         )
     return normalized
+
+
+def _court_keypoints(keypoints: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    normalized: list[dict[str, Any]] = []
+    for keypoint in keypoints:
+        if not isinstance(keypoint, dict):
+            continue
+        normalized.append(
+            {
+                "name": keypoint.get("name"),
+                "x": keypoint.get("x"),
+                "y": keypoint.get("y"),
+                "confidence": keypoint.get("confidence"),
+                "present": bool(keypoint.get("present")),
+                "visibility": keypoint.get("visibility"),
+                "source_index": keypoint.get("source_index"),
+            }
+        )
+    return normalized
+
+
+def _court_line_segments(line_segments: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    normalized: list[dict[str, Any]] = []
+    for segment in line_segments:
+        if not isinstance(segment, dict):
+            continue
+        normalized.append(
+            {
+                "line_class": segment.get("line_class"),
+                "x1": segment.get("x1"),
+                "y1": segment.get("y1"),
+                "x2": segment.get("x2"),
+                "y2": segment.get("y2"),
+                "confidence": segment.get("confidence"),
+                "visibility": segment.get("visibility"),
+            }
+        )
+    return normalized
+
+
+def _court_template_payload(template_name: str, template_version: str) -> dict[str, Any] | None:
+    try:
+        template = get_court_template(template_name, template_version)
+    except ValueError:
+        return None
+    return {
+        "template_name": template.template_name,
+        "template_version": template.template_version,
+        "target_coordinate_space": template.target_coordinate_space,
+        "keypoints": [keypoint.model_dump(mode="json") for keypoint in template.keypoints],
+        "lines": [line.model_dump(mode="json") for line in template.lines],
+    }
 
 
 def _pose_edges(pose: PoseObservation) -> list[tuple[str, str]]:
