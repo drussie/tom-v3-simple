@@ -339,9 +339,19 @@ real YOLO detection run
 -> timeline detection source labels
 ```
 
-Milestones 7A/7B do not add:
+Milestone 7C proves:
 
-- tracklet generation from real detections
+```text
+real model-output detection observations
+-> candidate tracklet builder
+-> real-detection-derived tracklet run
+-> track point candidates
+-> lineage to source detections
+-> replay URL with detectionRunId and trackletRunId
+```
+
+Milestones 7A/7B/7C do not add:
+
 - real pose inference
 - homography or court-space reasoning
 - stream ingestion

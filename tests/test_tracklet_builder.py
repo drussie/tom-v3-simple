@@ -21,6 +21,7 @@ from tom_v3_video.probe import VideoProbeResult
 
 from apps.api.routers.viewer import build_viewer_run_payload
 from apps.api.services.query_builder import query_observations
+from apps.api.services.replay import available_runs_for_media, build_replay_overlay_chunk
 from apps.worker.services.detection_adapter import run_detection_adapter
 from apps.worker.services.tracklet_builder import build_tracklets_from_detection_run
 
@@ -78,6 +79,37 @@ def seed_detection_run(db_session: Session, tmp_path, max_frames: int = 3) -> di
     )
 
 
+def _mark_detection_run_as_real_model_output(
+    db_session: Session,
+    observation_ids: list[str],
+) -> None:
+    for observation_id in observation_ids:
+        observation = db_session.get(Observation, observation_id)
+        assert observation is not None
+        payload = dict(observation.payload_jsonb or {})
+        payload.update(
+            {
+                "source_runtime": "ultralytics_yolo",
+                "real_model_output": True,
+                "model_output_not_truth": True,
+                "frame_time_owner": "media_indexing",
+            }
+        )
+        observation.payload_jsonb = payload
+        assert observation.atomic_detail is not None
+        atomic_payload = dict(observation.atomic_detail.payload_jsonb or {})
+        atomic_payload.update(
+            {
+                "source_runtime": "ultralytics_yolo",
+                "real_model_output": True,
+                "model_output_not_truth": True,
+                "frame_time_owner": "media_indexing",
+            }
+        )
+        observation.atomic_detail.payload_jsonb = atomic_payload
+    db_session.commit()
+
+
 def test_tracklet_builder_groups_fixture_detections_into_candidates(
     db_session: Session,
     tmp_path,
@@ -94,6 +126,9 @@ def test_tracklet_builder_groups_fixture_detections_into_candidates(
     assert result["tracklet_count"] == 3
     assert result["track_point_count"] == 9
     assert result["tracklets_by_family"] == {"ball": 1, "player": 2}
+    assert result["warnings"]["candidate_evidence_only"] is True
+    assert result["warnings"]["no_adjudication"] is True
+    assert result["source_detection_evidence"]["evidence_source"] == "fixture_demo"
 
     runtime_config = db_session.get(RuntimeConfig, result["runtime_config_id"])
     run = db_session.get(ProcessingRun, result["tracklet_run_id"])
@@ -101,6 +136,8 @@ def test_tracklet_builder_groups_fixture_detections_into_candidates(
     model = db_session.get(ModelRegistry, result["model_id"])
     assert runtime_config is not None
     assert runtime_config.payload_jsonb["source_detection_run_id"] == detection_result["run_id"]
+    assert runtime_config.payload_jsonb["source_detection_evidence_source"] == "fixture_demo"
+    assert runtime_config.payload_jsonb["source_detection_is_real_model_output"] is False
     assert runtime_config.payload_jsonb["track_status"] == "candidate"
     assert runtime_config.payload_jsonb["identity_status"] == "unverified"
     assert run is not None
@@ -108,6 +145,7 @@ def test_tracklet_builder_groups_fixture_detections_into_candidates(
     assert step is not None
     assert step.step_name == "tracklet_candidate_builder"
     assert step.step_status == "completed"
+    assert step.metadata_jsonb["source_detection_evidence_source"] == "fixture_demo"
     assert model is not None
     assert model.model_family == "tracker"
 
@@ -148,7 +186,105 @@ def test_tracklet_builder_groups_fixture_detections_into_candidates(
         assert observation.payload_jsonb["identity_status"] == "unverified"
         assert observation.payload_jsonb["frame_time_owner"] == "media_indexing"
         assert observation.payload_jsonb["source_detection_run_id"] == detection_result["run_id"]
+        assert observation.payload_jsonb["source_detection_evidence_source"] == "fixture_demo"
         assert observation.payload_jsonb["track_point_count"] == len(tracklet.points)
+
+
+def test_tracklet_builder_preserves_real_detection_source_metadata(
+    db_session: Session,
+    tmp_path,
+) -> None:
+    detection_result = seed_detection_run(db_session, tmp_path)
+    _mark_detection_run_as_real_model_output(db_session, detection_result["observation_ids"])
+
+    result = build_tracklets_from_detection_run(
+        session=db_session,
+        detection_run_id=str(detection_result["run_id"]),
+        run_name="real-detection-tracklet-candidates",
+        max_gap_frames=30,
+    )
+
+    assert result["ok"] is True
+    assert result["message"] == "candidate tracklets built from detection run"
+    assert result["source_detection_evidence"] == {
+        "is_real_model_output": True,
+        "evidence_source": "real_model_output",
+        "source_label": "real model output",
+        "source_runtime": "ultralytics_yolo",
+    }
+    assert result["replay_url"].endswith(
+        f"/replay/{result['media_id']}?detectionRunId={detection_result['run_id']}"
+        f"&trackletRunId={result['tracklet_run_id']}"
+    )
+
+    run = db_session.get(ProcessingRun, result["tracklet_run_id"])
+    runtime_config = db_session.get(RuntimeConfig, result["runtime_config_id"])
+    assert run is not None
+    assert run.metadata_jsonb["source_detection_run_id"] == detection_result["run_id"]
+    assert run.metadata_jsonb["source_detection_evidence_source"] == "real_model_output"
+    assert run.metadata_jsonb["source_detection_runtime"] == "ultralytics_yolo"
+    assert run.metadata_jsonb["source_detection_is_real_model_output"] is True
+    assert run.metadata_jsonb["is_real_detection_derived"] is True
+    assert runtime_config is not None
+    assert runtime_config.payload_jsonb["source_detection_evidence_source"] == (
+        "real_model_output"
+    )
+
+    tracklet = db_session.scalar(
+        select(Tracklet)
+        .where(Tracklet.run_id == result["tracklet_run_id"])
+        .order_by(Tracklet.track_family, Tracklet.subject_ref)
+    )
+    assert tracklet is not None
+    assert tracklet.metadata_jsonb["source_detection_evidence_source"] == "real_model_output"
+    assert tracklet.metadata_jsonb["source_detection_is_real_model_output"] is True
+
+    point = tracklet.points[0]
+    assert point.payload_jsonb["source_detection_evidence_source"] == "real_model_output"
+    assert point.payload_jsonb["source_detection_real_model_output"] is True
+    assert point.payload_jsonb["source_detection_runtime"] == "ultralytics_yolo"
+    assert point.payload_jsonb["source_detection_run_id"] == detection_result["run_id"]
+
+    tracked_from = db_session.scalar(
+        select(ObservationLineage).where(
+            ObservationLineage.parent_observation_id
+            == point.payload_jsonb["source_detection_observation_id"],
+            ObservationLineage.child_observation_id == point.observation_id,
+            ObservationLineage.relationship_type == "tracked_from",
+        )
+    )
+    assert tracked_from is not None
+    assert tracked_from.payload_jsonb["source_detection_evidence_source"] == "real_model_output"
+    assert tracked_from.payload_jsonb["source_detection_runtime"] == "ultralytics_yolo"
+
+    run_summaries = available_runs_for_media(db_session, str(result["media_id"]))
+    tracklet_summary = next(
+        run_item
+        for run_item in run_summaries["tracklet"]
+        if run_item["run_id"] == result["tracklet_run_id"]
+    )
+    assert tracklet_summary["evidence_source"] == "real_detection_derived_tracklet"
+    assert tracklet_summary["source_label"] == "real-detection-derived tracklet candidates"
+    assert tracklet_summary["source_detection_run_id"] == detection_result["run_id"]
+    assert tracklet_summary["source_detection_evidence_source"] == "real_model_output"
+    assert tracklet_summary["is_real_detection_derived"] is True
+
+    overlay = build_replay_overlay_chunk(
+        session=db_session,
+        media_id=str(result["media_id"]),
+        start_ms=0,
+        end_ms=3000,
+        layers={"tracklets"},
+        tracklet_run_id=str(result["tracklet_run_id"]),
+    )
+    assert overlay is not None
+    assert overlay["tracklets"]
+    overlay_tracklet = overlay["tracklets"][0]
+    assert overlay_tracklet["source_detection_evidence_source"] == "real_model_output"
+    assert overlay_tracklet["source_detection_real_model_output"] is True
+    assert overlay_tracklet["source_detection_runtime"] == "ultralytics_yolo"
+    assert overlay_tracklet["points"][0]["source_detection_real_model_output"] is True
+    assert overlay_tracklet["points"][0]["source_detection_runtime"] == "ultralytics_yolo"
 
 
 def test_track_points_have_candidate_observations_and_source_links(

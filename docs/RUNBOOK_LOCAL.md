@@ -238,7 +238,7 @@ Expected 6D replay behavior:
 - clicking an overlay selects persisted evidence detail
 - the selected detail panel shows observation id/run id, frame/time, confidence, and source context where available
 
-Replay overlays are observation evidence. They are not confirmed objects, player identity, movement analysis, or tennis events.
+Replay overlays are observation evidence. They do not establish object state, player identity, movement analysis, or tennis events.
 
 Open Stream Proxy Mode:
 
@@ -298,7 +298,7 @@ Expected:
 - review annotations are shown as review evidence
 - the tracklet panel uses candidate wording and describes source detection context
 
-Candidate tracklets are not accepted tennis events.
+Candidate tracklets are temporal grouping evidence, not tennis events.
 
 ## 8. Inspect Pose Observations
 
@@ -444,9 +444,30 @@ Milestone 7B replay validation:
 - clicking a real detection bbox should show source runtime, model registry id, runtime config id, class id/label, frame/time owner, and evidence-only copy when available
 - the detection timeline label should include the real model-output source label
 
+Build candidate tracklets from a real detection run:
+
+```bash
+.venv/bin/python -m apps.worker.cli build-tracklets \
+  --detection-run-id <real_detection_run_id> \
+  --run-name real-detection-tracklet-candidates
+```
+
+The command prints a replay URL with both run ids:
+
+```text
+http://127.0.0.1:3000/replay/<media_id>?detectionRunId=<real_detection_run_id>&trackletRunId=<tracklet_run_id>
+```
+
+Milestone 7C replay validation:
+
+- the tracklet run selector should label the run as real-detection-derived tracklet candidates
+- selected tracklet details should show source detection run, source evidence type, source runtime, candidate status, and unverified identity status when available
+- selected track point details should show the source detection observation id and source detection evidence metadata when available
+- tracklet points and paths remain candidate temporal groupings and do not establish object paths
+
 If local weights are not available, skip the real smoke and rely on the fake real-detection tests. The default fixture demo and CI path must not require YOLO weights.
 
-Real YOLO detections are model-output observations. They are not confirmed tennis state, and they do not create tracklets, pose, homography, events, scoring, or adjudication.
+Real YOLO detections are model-output observations. Real-detection-derived tracklets are candidate groupings from those observations. Neither layer creates pose, homography, events, scoring, or adjudication.
 
 ## 12. Optional Custom Media
 

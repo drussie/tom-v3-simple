@@ -208,6 +208,7 @@ def main() -> None:
     tracklet_parser.add_argument("--run-name", default="tracklet-builder-run")
     tracklet_parser.add_argument("--config-name", default="tracklet-builder-config")
     tracklet_parser.add_argument("--config-version", default="v0")
+    tracklet_parser.add_argument("--viewer-base-url", default="http://127.0.0.1:3000")
     tracklet_parser.add_argument("--max-gap-frames", type=int, default=30)
     tracklet_parser.add_argument("--max-center-distance-px", type=float, default=120.0)
     tracklet_parser.add_argument("--grouping-method", default="simple-frame-gap")
@@ -675,6 +676,7 @@ def _handle_build_tracklets(session: Session, args: argparse.Namespace) -> dict[
         grouping_method=args.grouping_method,
         include_ball=args.include_ball,
         include_players=args.include_players,
+        viewer_base_url=args.viewer_base_url,
     )
 
 

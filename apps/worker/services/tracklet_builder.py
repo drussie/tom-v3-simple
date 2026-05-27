@@ -21,6 +21,11 @@ from tom_v3_storage.db_models import (
 )
 
 DETECTION_OBSERVATION_TYPES = {"ball_detection", "player_detection"}
+TRACKLET_WARNINGS = {
+    "candidate_evidence_only": True,
+    "no_adjudication": True,
+    "tracklets_are_not_truth": True,
+}
 
 
 class TrackletBuilderError(ValueError):
@@ -33,6 +38,7 @@ class DetectionSource:
     label: str
     bbox: dict[str, float]
     center: dict[str, float]
+    source_metadata: dict[str, Any]
 
 
 def build_tracklets_from_detection_run(
@@ -46,6 +52,7 @@ def build_tracklets_from_detection_run(
     grouping_method: str = "simple-frame-gap",
     include_ball: bool = True,
     include_players: bool = True,
+    viewer_base_url: str = "http://127.0.0.1:3000",
 ) -> dict[str, Any]:
     if max_gap_frames < 0:
         raise TrackletBuilderError("max_gap_frames must be greater than or equal to 0")
@@ -56,12 +63,14 @@ def build_tracklets_from_detection_run(
     media = session.get(MediaAsset, detection_run.media_id)
     if media is None:
         raise TrackletBuilderError(f"media asset not found: {detection_run.media_id}")
+    source_metadata = _source_detection_run_metadata(session, detection_run, media.id)
 
     runtime_config = _create_runtime_config(
         session=session,
         config_name=config_name,
         config_version=config_version,
         detection_run_id=detection_run_id,
+        source_metadata=source_metadata,
         max_gap_frames=max_gap_frames,
         max_center_distance_px=max_center_distance_px,
         grouping_method=grouping_method,
@@ -76,6 +85,7 @@ def build_tracklets_from_detection_run(
         run_name=run_name,
         detection_run_id=detection_run_id,
         model=model,
+        source_metadata=source_metadata,
     )
     step = _create_step(
         session=session,
@@ -85,6 +95,7 @@ def build_tracklets_from_detection_run(
         grouping_method=grouping_method,
         max_gap_frames=max_gap_frames,
         max_center_distance_px=max_center_distance_px,
+        source_metadata=source_metadata,
     )
 
     try:
@@ -104,6 +115,7 @@ def build_tracklets_from_detection_run(
             step=step,
             detections_by_track=grouped,
             source_detection_run_id=detection_run_id,
+            source_metadata=source_metadata,
             grouping_method=grouping_method,
             max_gap_frames=max_gap_frames,
             max_center_distance_px=max_center_distance_px,
@@ -122,10 +134,32 @@ def build_tracklets_from_detection_run(
         "model_id": model.id,
         "runtime_config_id": runtime_config.id,
         "processing_step_id": step.id,
+        "ok": True,
+        "message": "candidate tracklets built from detection run",
         "tracklet_count": len(tracklets),
         "track_point_count": track_point_count,
         "tracklets_by_family": dict(Counter(tracklet.track_family for tracklet in tracklets)),
+        "tracklets": {
+            "ball_tracklet_candidate": len(
+                [tracklet for tracklet in tracklets if tracklet.track_family == "ball"]
+            ),
+            "player_tracklet_candidate": len(
+                [tracklet for tracklet in tracklets if tracklet.track_family == "player"]
+            ),
+            "track_points": track_point_count,
+        },
+        "source_detection_evidence": {
+            "is_real_model_output": source_metadata["source_detection_is_real_model_output"],
+            "evidence_source": source_metadata["source_detection_evidence_source"],
+            "source_label": source_metadata["source_detection_source_label"],
+            "source_runtime": source_metadata["source_detection_runtime"],
+        },
         "tracklet_ids": tracklet_ids,
+        "replay_url": (
+            f"{viewer_base_url}/replay/{media.id}"
+            f"?detectionRunId={detection_run_id}&trackletRunId={run.id}"
+        ),
+        "warnings": dict(TRACKLET_WARNINGS),
     }
 
 
@@ -134,6 +168,7 @@ def _create_runtime_config(
     config_name: str,
     config_version: str,
     detection_run_id: str,
+    source_metadata: dict[str, Any],
     max_gap_frames: int,
     max_center_distance_px: float | None,
     grouping_method: str,
@@ -145,6 +180,7 @@ def _create_runtime_config(
         config_version=config_version,
         payload_jsonb={
             "source_detection_run_id": detection_run_id,
+            **source_metadata,
             "max_gap_frames": max_gap_frames,
             "max_center_distance_px": max_center_distance_px,
             "grouping_method": grouping_method,
@@ -197,6 +233,7 @@ def _create_run(
     run_name: str,
     detection_run_id: str,
     model: ModelRegistry,
+    source_metadata: dict[str, Any],
 ) -> ProcessingRun:
     now = datetime.now(UTC)
     run = ProcessingRun(
@@ -207,6 +244,7 @@ def _create_run(
         runtime_config_id=runtime_config.id,
         metadata_jsonb={
             "source_detection_run_id": detection_run_id,
+            **source_metadata,
             "source": "worker tracklet builder",
             "model_id": model.id,
             "track_status": "candidate",
@@ -228,6 +266,7 @@ def _create_step(
     grouping_method: str,
     max_gap_frames: int,
     max_center_distance_px: float | None,
+    source_metadata: dict[str, Any],
 ) -> ProcessingStep:
     now = datetime.now(UTC)
     step = ProcessingStep(
@@ -238,6 +277,7 @@ def _create_step(
         runtime_config_id=runtime_config.id,
         metadata_jsonb={
             "source_detection_run_id": detection_run_id,
+            **source_metadata,
             "grouping_method": grouping_method,
             "max_gap_frames": max_gap_frames,
             "max_center_distance_px": max_center_distance_px,
@@ -265,6 +305,84 @@ def _load_detection_sources(session: Session, detection_run_id: str) -> list[Det
     return [source for row in rows if (source := _source_from_observation(row)) is not None]
 
 
+def _source_detection_run_metadata(
+    session: Session,
+    detection_run: ProcessingRun,
+    media_id: str,
+) -> dict[str, Any]:
+    observations = session.scalars(
+        select(Observation)
+        .where(
+            Observation.run_id == detection_run.id,
+            Observation.observation_type.in_(sorted(DETECTION_OBSERVATION_TYPES)),
+        )
+        .order_by(Observation.frame_start, Observation.id)
+    ).all()
+    if not observations:
+        raise TrackletBuilderError(
+            f"detection run has no ball/player detection observations: {detection_run.id}"
+        )
+
+    invalid: list[str] = []
+    for observation in observations:
+        if observation.media_id != media_id:
+            invalid.append(f"{observation.id}: media mismatch")
+        if observation.observation_family != "atomic":
+            invalid.append(f"{observation.id}: not atomic")
+        if observation.frame_start is None or observation.timestamp_start_ms is None:
+            invalid.append(f"{observation.id}: missing frame/time")
+        if observation.atomic_detail is None:
+            invalid.append(f"{observation.id}: missing atomic typed row")
+    if invalid:
+        raise TrackletBuilderError(
+            "source detection run is not valid for tracklet building: " + "; ".join(invalid)
+        )
+
+    runtime_payload = (
+        detection_run.runtime_config.payload_jsonb or {}
+        if detection_run.runtime_config is not None
+        else {}
+    )
+    payloads = [_merged_payload(observation) for observation in observations]
+    source_runtime = _first_string(
+        [payload.get("source_runtime") for payload in payloads]
+        + [runtime_payload.get("source_runtime")]
+    )
+    adapter_name = _string_or_none(runtime_payload.get("adapter")) or ""
+    is_real_model_output = any(
+        _truthy(payload.get("real_model_output"))
+        or _string_or_none(payload.get("source_runtime")) == "ultralytics_yolo"
+        for payload in payloads
+    )
+    is_fixture = (
+        not is_real_model_output
+        and (
+            source_runtime == "fixture"
+            or adapter_name == "fixture"
+            or "fixture" in detection_run.run_name.lower()
+        )
+    )
+    evidence_source = (
+        "real_model_output"
+        if is_real_model_output
+        else "fixture_demo"
+        if is_fixture
+        else "persisted_evidence"
+    )
+    return {
+        "source_detection_run_id": detection_run.id,
+        "source_detection_evidence_source": evidence_source,
+        "source_detection_source_label": _source_label(evidence_source),
+        "source_detection_runtime": source_runtime,
+        "source_detection_is_real_model_output": is_real_model_output,
+        "source_detection_real_model_output": is_real_model_output,
+        "source_detection_is_fixture": is_fixture,
+        "is_real_detection_derived": is_real_model_output,
+        "candidate_evidence_only": True,
+        "no_adjudication": True,
+    }
+
+
 def _source_from_observation(observation: Observation) -> DetectionSource | None:
     payload = _merged_payload(observation)
     bbox = _bbox(payload)
@@ -276,6 +394,7 @@ def _source_from_observation(observation: Observation) -> DetectionSource | None
         label=_label(observation, payload),
         bbox=bbox,
         center=center,
+        source_metadata=_source_detection_observation_metadata(observation, payload),
     )
 
 
@@ -304,6 +423,8 @@ def _group_detections(
             ),
         )
         grouped[subject] = _split_by_frame_gap(sorted_detections, max_gap_frames)
+    if not any(groups for groups in grouped.values()):
+        raise TrackletBuilderError("no valid detection observations found for tracklet building")
     return grouped
 
 
@@ -338,6 +459,7 @@ def _persist_tracklets(
     step: ProcessingStep,
     detections_by_track: dict[tuple[str, str], list[list[DetectionSource]]],
     source_detection_run_id: str,
+    source_metadata: dict[str, Any],
     grouping_method: str,
     max_gap_frames: int,
     max_center_distance_px: float | None,
@@ -356,6 +478,7 @@ def _persist_tracklets(
                 group=group,
                 group_index=group_index,
                 source_detection_run_id=source_detection_run_id,
+                source_metadata=source_metadata,
                 grouping_method=grouping_method,
                 max_gap_frames=max_gap_frames,
                 max_center_distance_px=max_center_distance_px,
@@ -388,6 +511,7 @@ def _create_tracklet(
     group: list[DetectionSource],
     group_index: int,
     source_detection_run_id: str,
+    source_metadata: dict[str, Any],
     grouping_method: str,
     max_gap_frames: int,
     max_center_distance_px: float | None,
@@ -402,6 +526,7 @@ def _create_tracklet(
         track_family=track_family,
         subject_ref=subject_ref,
         source_detection_run_id=source_detection_run_id,
+        source_metadata=source_metadata,
         grouping_method=grouping_method,
         max_gap_frames=max_gap_frames,
         max_center_distance_px=max_center_distance_px,
@@ -420,6 +545,7 @@ def _create_tracklet(
             "track_status": "candidate",
             "grouping_method": grouping_method,
             "source_detection_run_id": source_detection_run_id,
+            **source_metadata,
             "source_observation_count": len(group),
             "track_point_count": len(group),
             "gap_count": summary["gap_count"],
@@ -488,8 +614,10 @@ def _create_track_points(
                 confidence=observation.confidence,
                 payload_jsonb={
                     "source_detection_observation_id": observation.id,
+                    "source_detection_run_id": observation.run_id,
                     "source_observation_type": observation.observation_type,
                     "source_label": source.label,
+                    **source.source_metadata,
                     "bbox": source.bbox,
                     "center": source.center,
                     "source_confidence": observation.confidence,
@@ -511,6 +639,8 @@ def _create_track_points(
             payload={
                 "frame_number": frame,
                 "sequence_index": sequence_index,
+                "source_detection_run_id": observation.run_id,
+                **source.source_metadata,
                 "frame_time_owner": "media_indexing",
             },
         )
@@ -592,6 +722,7 @@ def _create_tracklet_observation(
     track_family: str,
     subject_ref: str,
     source_detection_run_id: str,
+    source_metadata: dict[str, Any],
     grouping_method: str,
     max_gap_frames: int,
     max_center_distance_px: float | None,
@@ -623,6 +754,7 @@ def _create_tracklet_observation(
             "subject_ref": subject_ref,
             "grouping_method": grouping_method,
             "source_detection_run_id": source_detection_run_id,
+            **source_metadata,
             "source_observation_count": summary.get("source_observation_count", 0),
             "track_point_count": summary.get("track_point_count", 0),
             "gap_count": summary["gap_count"],
@@ -667,8 +799,10 @@ def _create_track_point_observation(
         coordinate_space="image_pixels",
         payload_jsonb={
             "source_detection_observation_id": source_observation.id,
+            "source_detection_run_id": source_observation.run_id,
             "source_observation_type": source_observation.observation_type,
             "source_label": source.label,
+            **source.source_metadata,
             "bbox": source.bbox,
             "center": source.center,
             "source_confidence": source_observation.confidence,
@@ -745,7 +879,51 @@ def _merged_payload(observation: Observation) -> dict[str, Any]:
         if observation.atomic_detail is not None
         else {}
     )
-    return {**observation.payload_jsonb, **atomic_payload}
+    return {**(observation.payload_jsonb or {}), **(atomic_payload or {})}
+
+
+def _source_detection_observation_metadata(
+    observation: Observation,
+    payload: dict[str, Any],
+) -> dict[str, Any]:
+    source_runtime = _string_or_none(payload.get("source_runtime"))
+    is_real_model_output = _truthy(payload.get("real_model_output")) or (
+        source_runtime == "ultralytics_yolo"
+    )
+    adapter_name = _string_or_none(payload.get("adapter_name")) or ""
+    is_fixture = (
+        not is_real_model_output
+        and (
+            source_runtime == "fixture"
+            or _string_or_none(payload.get("adapter_type")) == "fixture"
+            or "fixture" in adapter_name.lower()
+        )
+    )
+    evidence_source = (
+        "real_model_output"
+        if is_real_model_output
+        else "fixture_demo"
+        if is_fixture
+        else "persisted_evidence"
+    )
+    return {
+        "source_detection_evidence_source": evidence_source,
+        "source_detection_source_label": _source_label(evidence_source),
+        "source_detection_runtime": source_runtime,
+        "source_detection_real_model_output": is_real_model_output,
+        "source_detection_is_real_model_output": is_real_model_output,
+        "source_detection_is_fixture": is_fixture,
+        "source_detection_model_registry_id": observation.model_id,
+        "source_detection_runtime_config_id": observation.runtime_config_id,
+    }
+
+
+def _source_label(evidence_source: str) -> str:
+    if evidence_source == "real_model_output":
+        return "real model output"
+    if evidence_source == "fixture_demo":
+        return "fixture evidence"
+    return "persisted evidence"
 
 
 def _bbox(payload: dict[str, Any]) -> dict[str, float] | None:
@@ -835,3 +1013,19 @@ def _number(value: Any) -> float | None:
     if isinstance(value, int | float):
         return float(value)
     return None
+
+
+def _first_string(values: list[Any]) -> str | None:
+    for value in values:
+        result = _string_or_none(value)
+        if result is not None:
+            return result
+    return None
+
+
+def _string_or_none(value: Any) -> str | None:
+    return value if isinstance(value, str) and value else None
+
+
+def _truthy(value: Any) -> bool:
+    return value is True or value == "true" or value == 1

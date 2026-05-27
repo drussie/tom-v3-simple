@@ -909,6 +909,18 @@ function SelectedEvidencePanel({
         <DetailRow label="label hint" value={tracklet.label_hint ?? "n/a"} />
         <DetailRow label="track_status" value={tracklet.track_status} />
         <DetailRow label="identity_status" value={tracklet.identity_status} />
+        <DetailRow
+          label="source detection run"
+          value={tracklet.source_detection_run_id ?? "n/a"}
+        />
+        <DetailRow
+          label="source evidence"
+          value={sourceDetectionDisplayLabel(tracklet)}
+        />
+        <DetailRow
+          label="source runtime"
+          value={tracklet.source_detection_runtime ?? "n/a"}
+        />
         <DetailRow label="frame range" value={`${tracklet.frame_start} - ${tracklet.frame_end}`} />
         <DetailRow
           label="timestamp range"
@@ -919,7 +931,7 @@ function SelectedEvidencePanel({
           Open source evidence run
         </a>
         <p className="evidence-note">
-          Tracklet candidate. Candidate temporal grouping only; it does not confirm identity or path
+          Tracklet candidate. Candidate temporal grouping only; it does not conclude identity or path
           correctness.
         </p>
       </EvidencePanel>
@@ -936,6 +948,9 @@ function SelectedEvidencePanel({
         <DetailRow label="label hint" value={item.label_hint ?? "n/a"} />
         <DetailRow label="track_status" value={item.track_status} />
         <DetailRow label="identity_status" value={item.identity_status} />
+        <DetailRow label="source detection run" value={item.source_detection_run_id ?? "n/a"} />
+        <DetailRow label="source evidence" value={sourceDetectionDisplayLabel(item)} />
+        <DetailRow label="source runtime" value={item.source_detection_runtime ?? "n/a"} />
         <DetailRow label="frame range" value={`${item.frame_start} - ${item.frame_end}`} />
         <DetailRow
           label="timestamp range"
@@ -947,7 +962,7 @@ function SelectedEvidencePanel({
         </a>
         <p className="evidence-note">
           Tracklet candidate selected from the evidence timeline. Candidate temporal grouping only;
-          it does not confirm identity or path correctness.
+          it does not conclude identity or path correctness.
         </p>
       </EvidencePanel>
     );
@@ -960,6 +975,9 @@ function SelectedEvidencePanel({
         <DetailRow label="track point id" value={point.track_point_id} />
         <DetailRow label="observation id" value={point.observation_id ?? "n/a"} />
         <DetailRow label="source detection" value={point.source_detection_observation_id ?? "n/a"} />
+        <DetailRow label="source detection run" value={point.source_detection_run_id ?? "n/a"} />
+        <DetailRow label="source evidence" value={sourceDetectionDisplayLabel(point)} />
+        <DetailRow label="source runtime" value={point.source_detection_runtime ?? "n/a"} />
         <DetailRow label="tracklet id" value={tracklet.tracklet_id} />
         <DetailRow label="run id" value={tracklet.run_id} />
         <DetailRow label="frame" value={point.frame_number.toString()} />
@@ -1159,6 +1177,15 @@ function formatReplayRunSourceLabel(run: ReplayRunSummary): string {
   if (run.is_real_model_output || run.evidence_source === "real_model_output") {
     return "real model output";
   }
+  if (
+    run.is_real_detection_derived ||
+    run.evidence_source === "real_detection_derived_tracklet"
+  ) {
+    return "real-detection-derived tracklet candidates";
+  }
+  if (run.evidence_source === "fixture_derived_tracklet") {
+    return "fixture-derived tracklet candidates";
+  }
   if (run.is_fixture || run.evidence_source === "fixture_demo") {
     return "fixture demo evidence";
   }
@@ -1177,6 +1204,24 @@ function sourceDisplayLabel(
     return "Fixture/demo evidence";
   }
   return item.source_label ?? "Persisted evidence";
+}
+
+function sourceDetectionDisplayLabel(
+  item:
+    | ReplayTrackletOverlay
+    | ReplayTrackPointOverlay
+    | Extract<ReplayTimelineItem, { item_type: "tracklet" }>
+): string {
+  if (
+    item.source_detection_real_model_output ||
+    item.source_detection_evidence_source === "real_model_output"
+  ) {
+    return "Real model output";
+  }
+  if (item.source_detection_evidence_source === "fixture_demo") {
+    return "Fixture/demo evidence";
+  }
+  return item.source_detection_source_label ?? "Persisted detection evidence";
 }
 
 function formatModelNameVersion(

@@ -244,6 +244,11 @@ export interface ReplayRunSummary {
   runtime_config_id?: string | null;
   is_fixture?: boolean;
   is_real_model_output?: boolean;
+  is_real_detection_derived?: boolean;
+  source_detection_run_id?: string | null;
+  source_detection_evidence_source?: string | null;
+  source_detection_source_label?: string | null;
+  source_detection_runtime?: string | null;
   model_output_not_truth?: boolean;
 }
 
@@ -309,6 +314,11 @@ export interface ReplayTrackPointOverlay {
   track_point_id: string;
   observation_id: string | null;
   source_detection_observation_id: string | null;
+  source_detection_run_id?: string | null;
+  source_detection_evidence_source?: string | null;
+  source_detection_source_label?: string | null;
+  source_detection_runtime?: string | null;
+  source_detection_real_model_output?: boolean;
   frame_number: number;
   timestamp_ms: number;
   x: number;
@@ -332,6 +342,13 @@ export interface ReplayTrackletOverlay {
   timestamp_end_ms: number;
   points: ReplayTrackPointOverlay[];
   source_language: "tracklet candidate";
+  source_detection_run_id?: string | null;
+  source_detection_evidence_source?: string | null;
+  source_detection_source_label?: string | null;
+  source_detection_runtime?: string | null;
+  source_detection_real_model_output?: boolean;
+  is_real_detection_derived?: boolean;
+  candidate_evidence_only?: boolean;
 }
 
 export interface ReplayPoseKeypoint {
@@ -441,6 +458,13 @@ export interface ReplayTrackletTimelineItem {
   identity_status: "unverified" | string;
   track_point_count: number;
   display_label: string;
+  source_detection_run_id?: string | null;
+  source_detection_evidence_source?: string | null;
+  source_detection_source_label?: string | null;
+  source_detection_runtime?: string | null;
+  source_detection_real_model_output?: boolean;
+  is_real_detection_derived?: boolean;
+  candidate_evidence_only?: boolean;
 }
 
 export interface ReplayPoseTimelineItem {

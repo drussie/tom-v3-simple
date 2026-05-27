@@ -10,6 +10,7 @@ FRAME_SAMPLE_RATE ?= 30
 MAX_FRAMES ?= 5
 ARTIFACT_ROOT ?= .data/artifacts
 DETECTION_RUN_ID ?=
+RUN_NAME ?= tracklet-builder-run
 MAX_GAP_FRAMES ?= 30
 TRACKLET_ID ?=
 QUERY_JSON ?=
@@ -95,7 +96,7 @@ extract-frame-artifacts:
 
 build-tracklets:
 	@if [ -z "$(DETECTION_RUN_ID)" ]; then echo "DETECTION_RUN_ID is required: make build-tracklets DETECTION_RUN_ID=<run_id>"; exit 1; fi
-	$(PYTHON) -m apps.worker.cli build-tracklets --detection-run-id "$(DETECTION_RUN_ID)" --max-gap-frames "$(MAX_GAP_FRAMES)"
+	$(PYTHON) -m apps.worker.cli build-tracklets --detection-run-id "$(DETECTION_RUN_ID)" --run-name "$(RUN_NAME)" --max-gap-frames "$(MAX_GAP_FRAMES)" --viewer-base-url "$(VIEWER_BASE_URL)"
 
 run-pose:
 	@if [ -z "$(MEDIA_ID)" ]; then echo "MEDIA_ID is required: make run-pose MEDIA_ID=<media_id>"; exit 1; fi

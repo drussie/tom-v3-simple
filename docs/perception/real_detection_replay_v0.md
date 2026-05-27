@@ -4,6 +4,7 @@
 
 Milestone 7A adds a real YOLO detection replay command for indexed media.
 Milestone 7B validates that the resulting real detection runs are clearly labeled and inspectable in the replay workstation.
+Milestone 7C uses those persisted real detections as source observations for candidate tracklet generation.
 
 It runs optional Ultralytics YOLO detection over media-owned sampled frames, normalizes mapped model outputs into TOM atomic detection observations, persists them through the existing detection adapter path, and prints a replay workstation URL.
 
@@ -209,6 +210,33 @@ Example fixture detection run metadata:
 
 These fields are operational display metadata. They do not alter the persisted observation contract and do not make model output official tennis meaning.
 
+## Real Detection-Derived Tracklets
+
+After a real detection run exists, build candidate tracklets from it with the existing tracklet builder:
+
+```bash
+.venv/bin/python -m apps.worker.cli build-tracklets \
+  --detection-run-id <real_detection_run_id> \
+  --run-name real-detection-tracklet-candidates
+```
+
+The command output includes a replay URL with both run ids:
+
+```text
+http://127.0.0.1:3000/replay/<media_id>?detectionRunId=<real_detection_run_id>&trackletRunId=<tracklet_run_id>
+```
+
+Tracklet runs derived from real model-output detections preserve:
+
+- source detection run id
+- source detection evidence source
+- source runtime
+- source detection observation ids on track points
+- `tracked_from` lineage from detection observations to track point candidates
+- `grouped_from` lineage from track point candidates to tracklet candidates
+
+These tracklets are candidate temporal groupings. They do not establish player identity, ball path correctness, tennis events, or scoring.
+
 ## Non-goals
 
-7A/7B do not add candidate tracklets from real detections, real pose inference, homography, court-space reasoning, stream ingestion, live model scheduling, bounce/hit/rally/point/scoring, or adjudication.
+7A/7B/7C do not add real pose inference, homography, court-space reasoning, stream ingestion, live model scheduling, bounce/hit/rally/point/scoring, or adjudication.

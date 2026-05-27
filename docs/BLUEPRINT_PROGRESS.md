@@ -179,6 +179,8 @@ Current: Blueprints 1, 2, 3, 4, 5, and 6 complete; TOM v3 Simple is complete; Bl
 - Replay-info detection run metadata distinguishes real model-output runs from fixture demo runs.
 - Replay detection overlays and detection timeline items include optional source/runtime/model/config metadata for real detection validation.
 - Replay selected detection detail displays source/runtime/model/config/class context when available.
+- Candidate tracklets can be built from real model-output detection observations using the existing tracklet builder.
+- Real-detection-derived tracklet runs preserve source detection run metadata and source detection observation lineage.
 - No real pose inference, movement interpretation, homography, bounce, hit, rally, point, scoring, or adjudication has been added.
 
 ## Blueprint 7 Status
@@ -206,9 +208,19 @@ real detection run
 -> selected detection model/runtime/config detail
 ```
 
-Current Blueprint 7 progress after 7B: about 25-30%.
+Milestone 7C builds candidate tracklets from real detection observations:
 
-Remaining Blueprint 7 work should stay separate and deliberate: possible real-detection tracklet candidates, real pose runtime, evaluation workflows, and future perception layers. No tennis-event interpretation is part of 7A/7B.
+```text
+real model-output detections
+-> candidate tracklet builder
+-> source-aware tracklet run metadata
+-> track point candidates with source detection ids
+-> replay tracklet overlays
+```
+
+Current Blueprint 7 progress after 7C: about 40-45%.
+
+Remaining Blueprint 7 work should stay separate and deliberate: real pose runtime, evaluation workflows, and future perception layers. No tennis-event interpretation is part of 7A/7B/7C.
 
 ## Blueprint 5 Status
 

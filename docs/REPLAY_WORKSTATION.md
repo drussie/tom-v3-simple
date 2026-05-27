@@ -38,6 +38,8 @@ Blueprint 6 remains observation-only and non-adjudicative. It does not add real 
 
 Blueprint 7 begins real perception runtime for this workstation. Milestones 7A and 7B add optional real YOLO detection replay runs that persist model-output `ball_detection` and `player_detection` observations, then label and inspect those real runs through `detectionRunId`.
 
+Milestone 7C builds candidate tracklets from real detection runs through the existing tracklet builder. These tracklets are real-detection-derived candidate evidence; they do not establish paths or identities.
+
 ## What 6A Added
 
 - `GET /media/{media_id}/replay-info`
@@ -210,6 +212,8 @@ Real YOLO detection replay runs appear in the same detection run group because t
 
 The optional fields include `evidence_source`, `source_label`, `source_runtime`, `model_name`, `model_version`, `model_registry_id`, `runtime_config_id`, `is_fixture`, and `is_real_model_output`.
 
+Real-detection-derived tracklet runs appear in the tracklet run group. Their optional metadata includes `evidence_source`, `source_label`, `source_detection_run_id`, `source_detection_evidence_source`, `source_detection_runtime`, and `is_real_detection_derived`.
+
 ## Replay Overlay Chunks
 
 `GET /replay/overlays` returns replay overlay data for a media/time window:
@@ -250,6 +254,9 @@ The response includes selected overlay families:
       "tracklet_id": "...",
       "track_status": "candidate",
       "identity_status": "unverified",
+      "source_detection_run_id": "...",
+      "source_detection_evidence_source": "real_model_output",
+      "source_detection_runtime": "ultralytics_yolo",
       "points": []
     }
   ],
@@ -273,13 +280,15 @@ For real YOLO detection replay, pass the printed `detectionRunId`:
 http://127.0.0.1:3000/replay/<media_id>?detectionRunId=<real_detection_run_id>
 ```
 
-The boxes remain detection observations. They are not confirmed balls, confirmed players, or tennis-event conclusions.
+The boxes remain detection observations. They do not establish ball/player state or tennis-event conclusions.
 
 The endpoint preserves media-owned frame/time and image-pixel coordinates.
 `min_confidence` affects only the returned display payload; it does not mutate
 observations.
 
 For 7B, selected detection detail shows source/runtime/model/config/class context when those fields exist. This is operator provenance, not a model-correctness claim.
+
+For 7C, selected tracklet and track point details show source detection run, source evidence type, and source runtime when those fields exist. This is source context for candidate temporal grouping; it does not claim path correctness.
 
 ## Replay Timeline
 
@@ -406,6 +415,27 @@ For overlay playback, open:
 
 ```text
 http://127.0.0.1:3000/replay/<media_id>?detectionRunId=<detection_run_id>&trackletRunId=<tracklet_run_id>&poseRunId=<pose_run_id>
+```
+
+For optional real YOLO detection plus real-detection-derived tracklet replay:
+
+```bash
+.venv/bin/python -m apps.worker.cli run-real-detection \
+  --media-id <media_id> \
+  --weights ./model_assets/yolo/<model>.pt \
+  --every-n-frames 1 \
+  --max-frames 120 \
+  --device auto
+
+.venv/bin/python -m apps.worker.cli build-tracklets \
+  --detection-run-id <real_detection_run_id> \
+  --run-name real-detection-tracklet-candidates
+```
+
+Open the replay URL from the `build-tracklets` output:
+
+```text
+http://127.0.0.1:3000/replay/<media_id>?detectionRunId=<real_detection_run_id>&trackletRunId=<real_tracklet_run_id>
 ```
 
 For Stream Proxy Mode, open:

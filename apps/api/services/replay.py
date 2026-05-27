@@ -321,6 +321,15 @@ def tracklet_timeline_item_from_row(
         "identity_status": overlay_item["identity_status"],
         "track_point_count": len(overlay_item["points"]),
         "display_label": f"{label_hint} tracklet candidate",
+        "source_detection_run_id": overlay_item["source_detection_run_id"],
+        "source_detection_evidence_source": overlay_item["source_detection_evidence_source"],
+        "source_detection_source_label": overlay_item["source_detection_source_label"],
+        "source_detection_runtime": overlay_item["source_detection_runtime"],
+        "source_detection_real_model_output": overlay_item[
+            "source_detection_real_model_output"
+        ],
+        "is_real_detection_derived": overlay_item["is_real_detection_derived"],
+        "candidate_evidence_only": overlay_item["candidate_evidence_only"],
     }
 
 
@@ -554,6 +563,7 @@ def tracklet_overlay_item_from_row(
     timestamps = [point["timestamp_ms"] for point in points]
     metadata = tracklet.metadata_jsonb or {}
     observation_id = _string_or_none(tracklet.observation_id)
+    source_metadata = _tracklet_source_metadata(metadata)
     return {
         "overlay_type": "tracklet_candidate",
         "observation_id": observation_id,
@@ -569,6 +579,7 @@ def tracklet_overlay_item_from_row(
         "timestamp_end_ms": max(timestamps),
         "points": points,
         "source_language": "tracklet candidate",
+        **source_metadata,
     }
 
 
@@ -595,6 +606,18 @@ def point_overlay_item_from_row(
         "source_detection_observation_id": _string_or_none(
             payload.get("source_detection_observation_id")
         ),
+        "source_detection_run_id": _string_or_none(payload.get("source_detection_run_id")),
+        "source_detection_evidence_source": _string_or_none(
+            payload.get("source_detection_evidence_source")
+        ),
+        "source_detection_source_label": _string_or_none(
+            payload.get("source_detection_source_label")
+        ),
+        "source_detection_runtime": _string_or_none(payload.get("source_detection_runtime")),
+        "source_detection_real_model_output": _truthy(
+            payload.get("source_detection_real_model_output")
+        )
+        or _truthy(payload.get("source_detection_is_real_model_output")),
         "frame_number": frame_number,
         "timestamp_ms": timestamp_ms,
         "x": x,
@@ -789,9 +812,32 @@ def _run_source_metadata(
     )
     payload = _merged_detection_payload(observation) if observation is not None else {}
     runtime_payload = run.runtime_config.payload_jsonb if run.runtime_config is not None else {}
+    run_metadata = run.metadata_jsonb or {}
     diagnostics = (run.metadata_jsonb or {}).get("diagnostics")
     if not isinstance(diagnostics, dict):
         diagnostics = {}
+
+    tracklet_source_metadata = _tracklet_run_source_metadata(
+        run_metadata=run_metadata,
+        runtime_payload=runtime_payload,
+        payload=payload,
+    )
+    if tracklet_source_metadata is not None:
+        model = (
+            session.get(ModelRegistry, observation.model_id)
+            if observation and observation.model_id
+            else None
+        )
+        return {
+            **tracklet_source_metadata,
+            "adapter_name": None,
+            "source_runtime": tracklet_source_metadata["source_detection_runtime"],
+            "model_name": model.name if model is not None else None,
+            "model_version": model.version if model is not None else None,
+            "model_registry_id": model.id if model is not None else None,
+            "is_real_model_output": False,
+            "model_output_not_truth": False,
+        }
 
     model = (
         session.get(ModelRegistry, observation.model_id)
@@ -873,11 +919,94 @@ def _detection_source_metadata(
     }
 
 
+def _tracklet_run_source_metadata(
+    *,
+    run_metadata: dict[str, Any],
+    runtime_payload: dict[str, Any],
+    payload: dict[str, Any],
+) -> dict[str, Any] | None:
+    source_detection_run_id = (
+        _string_or_none(payload.get("source_detection_run_id"))
+        or _string_or_none(run_metadata.get("source_detection_run_id"))
+        or _string_or_none(runtime_payload.get("source_detection_run_id"))
+    )
+    if source_detection_run_id is None:
+        return None
+
+    source_detection_evidence_source = (
+        _string_or_none(payload.get("source_detection_evidence_source"))
+        or _string_or_none(run_metadata.get("source_detection_evidence_source"))
+        or _string_or_none(runtime_payload.get("source_detection_evidence_source"))
+        or "persisted_evidence"
+    )
+    is_real_detection_derived = (
+        source_detection_evidence_source == "real_model_output"
+        or _truthy(payload.get("source_detection_real_model_output"))
+        or _truthy(run_metadata.get("source_detection_real_model_output"))
+        or _truthy(runtime_payload.get("source_detection_real_model_output"))
+        or _truthy(payload.get("source_detection_is_real_model_output"))
+        or _truthy(run_metadata.get("source_detection_is_real_model_output"))
+        or _truthy(runtime_payload.get("source_detection_is_real_model_output"))
+    )
+    is_fixture = source_detection_evidence_source == "fixture_demo" or _truthy(
+        payload.get("source_detection_is_fixture")
+    )
+    evidence_source = (
+        "real_detection_derived_tracklet"
+        if is_real_detection_derived
+        else "fixture_derived_tracklet"
+        if is_fixture
+        else "persisted_tracklet"
+    )
+    return {
+        "evidence_source": evidence_source,
+        "source_label": _source_label(evidence_source),
+        "source_detection_run_id": source_detection_run_id,
+        "source_detection_evidence_source": source_detection_evidence_source,
+        "source_detection_source_label": _source_label(source_detection_evidence_source),
+        "source_detection_runtime": (
+            _string_or_none(payload.get("source_detection_runtime"))
+            or _string_or_none(run_metadata.get("source_detection_runtime"))
+            or _string_or_none(runtime_payload.get("source_detection_runtime"))
+        ),
+        "is_fixture": is_fixture,
+        "is_real_detection_derived": is_real_detection_derived,
+    }
+
+
+def _tracklet_source_metadata(metadata: dict[str, Any]) -> dict[str, Any]:
+    source_detection_evidence_source = (
+        _string_or_none(metadata.get("source_detection_evidence_source"))
+        or "persisted_evidence"
+    )
+    is_real_detection_derived = (
+        source_detection_evidence_source == "real_model_output"
+        or _truthy(metadata.get("source_detection_real_model_output"))
+        or _truthy(metadata.get("source_detection_is_real_model_output"))
+        or _truthy(metadata.get("is_real_detection_derived"))
+    )
+    return {
+        "source_detection_run_id": _string_or_none(metadata.get("source_detection_run_id")),
+        "source_detection_evidence_source": source_detection_evidence_source,
+        "source_detection_source_label": _source_label(source_detection_evidence_source),
+        "source_detection_runtime": _string_or_none(metadata.get("source_detection_runtime")),
+        "source_detection_real_model_output": is_real_detection_derived,
+        "is_real_detection_derived": is_real_detection_derived,
+        "candidate_evidence_only": bool(metadata.get("candidate_evidence_only", True)),
+    }
+
+
 def _source_label(evidence_source: str) -> str:
     if evidence_source == "real_model_output":
         return "real model output"
     if evidence_source == "fixture_demo":
         return "fixture evidence"
+    if evidence_source == "real_detection_derived_tracklet":
+        return "real-detection-derived tracklet candidates"
+    if evidence_source == "fixture_derived_tracklet":
+        return "fixture-derived tracklet candidates"
+    if evidence_source == "persisted_tracklet":
+        return "persisted tracklet candidates"
     return "persisted evidence"
 
 

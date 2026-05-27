@@ -1475,3 +1475,28 @@ Milestone 7B created:
 - tests for fixture and fake real detection source metadata
 
 7B does not add real-detection-derived tracklets, real pose inference, court/homography evidence, model-quality claims, stream ingestion, tennis-event interpretation, or adjudication.
+
+## Milestone 7C - Real Detection Tracklet Generation
+
+Status: complete
+
+### Goal
+
+Build candidate tracklets from persisted real model-output detection observations while preserving source detection lineage and evidence-only language.
+
+### Notes
+
+Milestone 7C created:
+
+- source detection run validation for `build-tracklets`
+- tracklet builder source metadata for real model-output detection runs
+- processing run, processing step, runtime config, tracklet, track point, and lineage metadata describing the source detection evidence
+- replay-info labels for real-detection-derived tracklet runs
+- replay tracklet and track point overlay metadata for source detection run/runtime/evidence source
+- replay workstation selected tracklet and track point details showing source detection context
+- `build-tracklets` replay URL output with both `detectionRunId` and `trackletRunId`
+- Makefile support for passing tracklet run name and viewer base URL
+- tests covering fake real detection observations, tracklet metadata, lineage metadata, replay-info metadata, and overlay metadata
+- Milestone 7C docs, handoff, and agent report
+
+7C does not add a new tracking algorithm, smoothing, interpolation, real pose inference, court/homography evidence, stream ingestion, tennis-event interpretation, or adjudication. Tracklets remain candidate temporal groupings.

@@ -24,7 +24,7 @@ Future real live ingestion and future tennis intelligence must begin as new blue
 
 Blueprint 7 Status: IN PROGRESS
 
-Blueprint 7 starts TOM v3's real perception runtime for the replay workstation. Milestones 7A and 7B add a real YOLO detection replay run that samples indexed media frames, persists mapped real model output as atomic `ball_detection` and `player_detection` observations, and labels those real detection runs clearly in the replay workstation with source/runtime/model/config context.
+Blueprint 7 starts TOM v3's real perception runtime for the replay workstation. Milestones 7A, 7B, and 7C add a real YOLO detection replay run, label real-vs-fixture detection evidence clearly, and build candidate tracklets from real detection observations through the existing tracklet builder.
 
 Blueprint 7 remains observation-only. Real model output is evidence, not confirmed tennis state.
 
@@ -40,6 +40,7 @@ Blueprint 7 remains observation-only. Real model output is evidence, not confirm
 - Open indexed video in a replay/operator workstation with synchronized evidence overlays and timeline lanes.
 - Run an optional real YOLO detection replay pass on indexed media when local runtime and weights exist.
 - Distinguish fixture detection evidence from real model-output detection evidence in replay run selectors and selected detection detail.
+- Build candidate tracklets from real model-output detection runs while preserving source detection lineage.
 - Keep optional YOLO runtime separate from the default base environment.
 
 ## What It Does Not Do
@@ -155,6 +156,14 @@ Real YOLO smoke requires a separate optional runtime environment, local weights 
 
 When a real detection run is selected in the replay workstation, the UI labels it as real model-output evidence and shows available source runtime, model registry, runtime config, class, frame/time owner, and evidence-only metadata. Fixture runs remain labeled as fixture/demo evidence.
 
+Build candidate tracklets from a real detection run:
+
+```bash
+make build-tracklets DETECTION_RUN_ID=<real_detection_run_id> RUN_NAME=real-detection-tracklet-candidates PYTHON=.venv/bin/python
+```
+
+The output includes a replay URL with `detectionRunId` and `trackletRunId`. Tracklets remain candidate temporal groupings, not object identity or path conclusions.
+
 ## Important Docs
 
 - [Local Runbook](docs/RUNBOOK_LOCAL.md)
@@ -176,7 +185,7 @@ When a real detection run is selected in the replay workstation, the UI labels i
 
 ## Current State
 
-Blueprints 1, 2, 3, 4, 5, and 6 are complete. TOM v3 Simple is complete as a lightweight local platform, Blueprint 6 is complete as the visual replay/operator workstation layer, and Blueprint 7 is in progress with real YOLO detection replay and replay-workstation source validation.
+Blueprints 1, 2, 3, 4, 5, and 6 are complete. TOM v3 Simple is complete as a lightweight local platform, Blueprint 6 is complete as the visual replay/operator workstation layer, and Blueprint 7 is in progress with real YOLO detection replay, replay-workstation source validation, and candidate tracklets derived from real detections.
 
 Current TOM v3 Simple path:
 

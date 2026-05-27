@@ -46,6 +46,21 @@ real YOLO detection run
 
 7B does not create tracklets from real detections, add real pose inference, add court/homography evidence, improve model quality, ingest streams, or interpret tennis events.
 
+## Milestone 7C
+
+Milestone 7C builds candidate tracklets from real detection runs:
+
+```text
+real YOLO detection observations
+-> existing candidate tracklet builder
+-> real-detection-derived tracklet run metadata
+-> track point candidates with source detection ids
+-> lineage back to source real detections
+-> replay URL with detectionRunId and trackletRunId
+```
+
+7C keeps tracklets as candidate temporal groupings. It does not add a new tracking model, smoothing/interpolation as evidence, real pose inference, court/homography evidence, stream ingestion, or tennis-event interpretation.
+
 ## Boundaries
 
 Blueprint 7 does not add official tennis truth, TOM v2-style adjudication, accepted/rejected event lifecycles, bounce/hit detection, stroke classification, rally/point/scoring, confirmed player identity, confirmed ball paths, real pose inference, court-space reasoning, or live stream ingestion.

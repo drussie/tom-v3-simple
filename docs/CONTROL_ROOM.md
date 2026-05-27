@@ -33,7 +33,7 @@ Future real live ingestion and future tennis intelligence must begin as new blue
 
 Blueprint 7 Status: IN PROGRESS
 
-Blueprint 7 starts the real perception runtime for the replay workstation. Milestones 7A and 7B add optional real YOLO detection replay and validate it in the operator UI: indexed media frames are sampled from media-owned timing, mapped real YOLO outputs are persisted as atomic `ball_detection` and `player_detection` observations, and the existing replay workstation displays them through `detectionRunId` with source/runtime/model/config context.
+Blueprint 7 starts the real perception runtime for the replay workstation. Milestones 7A, 7B, and 7C add optional real YOLO detection replay, validate it in the operator UI, and build candidate tracklets from real detection observations through the existing tracklet builder.
 
 Blueprint 7 still records evidence only. Real model output is not confirmed tennis state.
 
@@ -86,6 +86,7 @@ An observation does not mean the output is correct, a tennis event happened, a s
 - Replay/operator workstation with Replay Mode, Stream Proxy Mode, synchronized detection/tracklet/pose evidence overlays, evidence timeline lanes, click-to-seek, and click-to-select persisted evidence.
 - Optional real YOLO detection replay runs that persist real model-output detection observations for replay overlays.
 - Replay run selectors and selected detection detail can distinguish real model-output detection runs from fixture/demo detection runs.
+- Real-detection-derived candidate tracklet runs that preserve source detection ids and lineage.
 
 ## Explicitly Absent Capabilities
 
@@ -231,7 +232,18 @@ real detection run
 -> selected detection source/runtime/model/config detail
 ```
 
-7A/7B do not add tracklet generation from real detections, real pose inference, homography, stream ingestion, tennis-event interpretation, or adjudication.
+Milestone 7C builds candidate tracklets from real detection observations:
+
+```text
+real model-output detections
+-> existing tracklet builder
+-> candidate tracklet observations
+-> track point candidates
+-> lineage to source real detections
+-> replay URL with detectionRunId and trackletRunId
+```
+
+7A/7B/7C do not add real pose inference, homography, stream ingestion, tennis-event interpretation, or adjudication.
 
 ## Future Blueprint Candidates
 

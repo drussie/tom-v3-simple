@@ -9,8 +9,10 @@ This registry makes TOM v3 Simple boundaries explicit.
 - Optional YOLO requires a local optional runtime and local weights outside git.
 - Real YOLO detection quality depends on the chosen model, class mapping, source video, device, and confidence settings.
 - Real YOLO detection replay is optional and local-runtime dependent.
-- Real YOLO detections are model-output observations, not confirmed ball/player state.
+- Real YOLO detections are model-output observations; they do not establish ball/player state.
 - Replay source labels distinguish real model output from fixture evidence, but they do not evaluate model correctness.
+- Candidate tracklets can be built from real YOLO detection runs, but they inherit the source model and class-mapping limitations.
+- Real-detection-derived tracklet labels describe provenance only; they do not evaluate track correctness or identity.
 - Real pose inference is not included.
 - Fixture pose output is demo evidence only.
 - Portable TOM v1 detector assets/source are not present in this repo state.
@@ -20,6 +22,7 @@ This registry makes TOM v3 Simple boundaries explicit.
 - Candidate tracklets are temporal groupings, not final object identity.
 - Tracklets may contain wrong grouping, gaps, or missed detections.
 - Track point candidates inherit limitations from source detection observations.
+- Tracklet lineage preserves source detection observations, including real model-output provenance when available, but lineage is not correctness proof.
 - Pose observations may be incomplete.
 - Pose observations may be associated with the wrong subject candidate.
 - Missing keypoints are recorded as missing evidence; they are not inferred.
