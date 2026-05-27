@@ -1003,6 +1003,14 @@ function SelectedEvidencePanel({
         <DetailRow label="frame" value={item.frame_number.toString()} />
         <DetailRow label="timestamp_ms" value={item.timestamp_ms.toString()} />
         <DetailRow label="pose confidence" value={formatConfidence(item.pose_confidence)} />
+        <DetailRow label="source" value={poseSourceDisplayLabel(item)} />
+        <DetailRow label="source runtime" value={item.source_runtime ?? "n/a"} />
+        <DetailRow
+          label="model"
+          value={formatModelNameVersion(item.model_name, item.model_version)}
+        />
+        <DetailRow label="model registry id" value={item.model_registry_id ?? "n/a"} />
+        <DetailRow label="runtime config id" value={item.runtime_config_id ?? "n/a"} />
         <DetailRow
           label="keypoints"
           value={`${item.keypoints_present_count} present / ${item.keypoints_missing_count} missing`}
@@ -1051,6 +1059,14 @@ function SelectedEvidencePanel({
       <DetailRow label="timestamp_ms" value={pose.timestamp_ms.toString()} />
       <DetailRow label="skeleton" value={`${pose.skeleton_format}/${pose.skeleton_version}`} />
       <DetailRow label="pose confidence" value={formatConfidence(pose.pose_confidence)} />
+      <DetailRow label="source" value={poseSourceDisplayLabel(pose)} />
+      <DetailRow label="source runtime" value={pose.source_runtime ?? "n/a"} />
+      <DetailRow
+        label="model"
+        value={formatModelNameVersion(pose.model_name, pose.model_version)}
+      />
+      <DetailRow label="model registry id" value={pose.model_registry_id ?? "n/a"} />
+      <DetailRow label="runtime config id" value={pose.runtime_config_id ?? "n/a"} />
       <DetailRow
         label="keypoints"
         value={`${pose.keypoints_present_count} present / ${pose.keypoints_missing_count} missing`}
@@ -1174,6 +1190,9 @@ function formatReplayRunOptionLabel(run: ReplayRunSummary): string {
 }
 
 function formatReplayRunSourceLabel(run: ReplayRunSummary): string {
+  if (run.evidence_source === "real_pose_model_output") {
+    return "real pose model output";
+  }
   if (run.is_real_model_output || run.evidence_source === "real_model_output") {
     return "real model output";
   }
@@ -1204,6 +1223,18 @@ function sourceDisplayLabel(
     return "Fixture/demo evidence";
   }
   return item.source_label ?? "Persisted evidence";
+}
+
+function poseSourceDisplayLabel(
+  item: ReplayPoseOverlay | Extract<ReplayTimelineItem, { item_type: "pose" }>
+): string {
+  if (item.evidence_source === "real_pose_model_output" || item.real_model_output) {
+    return "Real pose model output";
+  }
+  if (item.is_fixture || item.evidence_source === "fixture_demo") {
+    return "Fixture/demo evidence";
+  }
+  return item.source_label ?? "Persisted pose evidence";
 }
 
 function sourceDetectionDisplayLabel(

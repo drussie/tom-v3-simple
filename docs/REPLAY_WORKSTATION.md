@@ -40,6 +40,8 @@ Blueprint 7 begins real perception runtime for this workstation. Milestones 7A a
 
 Milestone 7C builds candidate tracklets from real detection runs through the existing tracklet builder. These tracklets are real-detection-derived candidate evidence; they do not establish paths or identities.
 
+Milestone 7D adds optional real pose replay runs that persist `player_pose_observation` keypoint evidence and render through `poseRunId`. Pose keypoints are evidence only and do not interpret movement, strokes, biomechanics, court position, or tennis events.
+
 ## What 6A Added
 
 - `GET /media/{media_id}/replay-info`
@@ -214,6 +216,8 @@ The optional fields include `evidence_source`, `source_label`, `source_runtime`,
 
 Real-detection-derived tracklet runs appear in the tracklet run group. Their optional metadata includes `evidence_source`, `source_label`, `source_detection_run_id`, `source_detection_evidence_source`, `source_detection_runtime`, and `is_real_detection_derived`.
 
+Real pose replay runs appear in the pose run group. Their optional metadata includes `evidence_source = real_pose_model_output`, `source_label`, `source_runtime = ultralytics_pose`, `model_name`, `model_version`, `model_registry_id`, `runtime_config_id`, `is_fixture`, and `is_real_model_output`.
+
 ## Replay Overlay Chunks
 
 `GET /replay/overlays` returns replay overlay data for a media/time window:
@@ -266,7 +270,11 @@ The response includes selected overlay families:
       "observation_id": "...",
       "skeleton_format": "coco17",
       "keypoints": [],
-      "edges": []
+      "edges": [],
+      "evidence_source": "real_pose_model_output",
+      "source_runtime": "ultralytics_pose",
+      "real_model_output": true,
+      "model_output_not_truth": true
     }
   ],
   "observation_only": true,
@@ -289,6 +297,8 @@ observations.
 For 7B, selected detection detail shows source/runtime/model/config/class context when those fields exist. This is operator provenance, not a model-correctness claim.
 
 For 7C, selected tracklet and track point details show source detection run, source evidence type, and source runtime when those fields exist. This is source context for candidate temporal grouping; it does not claim path correctness.
+
+For 7D, selected pose detail shows source runtime, model registry id, model name/version, runtime config id, skeleton format/version, keypoint counts, pose confidence, and subject association candidate context when those fields exist. This is keypoint evidence context, not movement interpretation.
 
 ## Replay Timeline
 
@@ -436,6 +446,31 @@ Open the replay URL from the `build-tracklets` output:
 
 ```text
 http://127.0.0.1:3000/replay/<media_id>?detectionRunId=<real_detection_run_id>&trackletRunId=<real_tracklet_run_id>
+```
+
+For optional real pose replay:
+
+```bash
+.venv/bin/python -m apps.worker.cli run-real-pose \
+  --media-id <media_id> \
+  --source-detection-run-id <real_detection_run_id> \
+  --weights ./model_assets/pose/<pose_model>.pt \
+  --mode crop_from_player_detection \
+  --every-n-frames 1 \
+  --max-frames 120 \
+  --device auto
+```
+
+Open the replay URL from the `run-real-pose` output:
+
+```text
+http://127.0.0.1:3000/replay/<media_id>?detectionRunId=<real_detection_run_id>&poseRunId=<real_pose_run_id>
+```
+
+If a tracklet run exists too:
+
+```text
+http://127.0.0.1:3000/replay/<media_id>?detectionRunId=<real_detection_run_id>&trackletRunId=<real_tracklet_run_id>&poseRunId=<real_pose_run_id>
 ```
 
 For Stream Proxy Mode, open:

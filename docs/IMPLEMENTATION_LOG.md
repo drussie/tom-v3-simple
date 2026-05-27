@@ -1,5 +1,38 @@
 # TOM v3 Simple - Implementation Log
 
+## Milestone 7D - Real Pose Runtime for Replay Workstation
+
+Status: complete
+
+### Goal
+
+Add optional real pose replay runtime so indexed media can produce persisted `player_pose_observation` keypoint evidence for the existing replay workstation.
+
+### Non-goals
+
+- No movement interpretation.
+- No stroke classification.
+- No serve, split-step, or biomechanics conclusions.
+- No court/homography implementation.
+- No bounce/hit/rally/point/scoring.
+- No real stream ingestion.
+- No tennis-event interpretation.
+- No adjudication.
+
+### Notes
+
+Milestone 7D created:
+
+- `apps/worker/services/real_pose_replay.py`.
+- `packages/model_adapters/tom_v3_model_adapters/pose_inference.py`.
+- Worker CLI `run-real-pose`.
+- Makefile `real-pose`.
+- Real pose replay docs under `docs/perception/`.
+- Milestone doc, handoff, and agent report.
+- Tests proving fake real-run pose output persists pose observations and source detection lineage without optional runtime or weights.
+
+The command reuses optional runtime probing, local weights validation, model registry metadata, COCO17 pose normalization, and existing pose observation persistence. Real pose model output remains keypoint evidence only.
+
 ## Milestone 7A - Real YOLO Detection Replay Run
 
 Status: complete

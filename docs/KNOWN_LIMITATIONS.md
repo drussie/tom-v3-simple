@@ -13,7 +13,9 @@ This registry makes TOM v3 Simple boundaries explicit.
 - Replay source labels distinguish real model output from fixture evidence, but they do not evaluate model correctness.
 - Candidate tracklets can be built from real YOLO detection runs, but they inherit the source model and class-mapping limitations.
 - Real-detection-derived tracklet labels describe provenance only; they do not evaluate track correctness or identity.
-- Real pose inference is not included.
+- Optional real pose replay requires local pose runtime and local pose weights outside git.
+- Real pose quality depends on the chosen pose model, source media, source player detections or frame sampling, device, and confidence settings.
+- Real pose observations are keypoint evidence; they do not establish movement, stroke, serve, split-step, biomechanics, or body-state conclusions.
 - Fixture pose output is demo evidence only.
 - Portable TOM v1 detector assets/source are not present in this repo state.
 
@@ -25,6 +27,8 @@ This registry makes TOM v3 Simple boundaries explicit.
 - Tracklet lineage preserves source detection observations, including real model-output provenance when available, but lineage is not correctness proof.
 - Pose observations may be incomplete.
 - Pose observations may be associated with the wrong subject candidate.
+- Real crop-mode pose observations inherit the source player detection limitations.
+- Full-frame real pose observations may be unassociated with a source player detection.
 - Missing keypoints are recorded as missing evidence; they are not inferred.
 - Review annotations do not mutate observations.
 
@@ -35,6 +39,7 @@ This registry makes TOM v3 Simple boundaries explicit.
 - Replay Mode displays persisted detection observation, tracklet candidate, and pose keypoint evidence overlays.
 - Replay Mode includes evidence timeline lanes for navigation.
 - Replay Mode can display real YOLO detection replay runs through `detectionRunId` when local runtime/weights are available.
+- Replay Mode can display real pose replay runs through `poseRunId` when local runtime/weights are available.
 - Blueprint 6 is complete for local replay/operator workstation behavior, not for production live ingestion.
 - Stream Proxy Mode is a live-like UI mode over indexed local media; it is not real live ingestion.
 - Stream Proxy Mode hides future evidence in the UI, but the underlying observations are already persisted.

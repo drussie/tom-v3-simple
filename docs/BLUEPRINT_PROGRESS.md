@@ -181,7 +181,15 @@ Current: Blueprints 1, 2, 3, 4, 5, and 6 complete; TOM v3 Simple is complete; Bl
 - Replay selected detection detail displays source/runtime/model/config/class context when available.
 - Candidate tracklets can be built from real model-output detection observations using the existing tracklet builder.
 - Real-detection-derived tracklet runs preserve source detection run metadata and source detection observation lineage.
-- No real pose inference, movement interpretation, homography, bounce, hit, rally, point, scoring, or adjudication has been added.
+- Worker `run-real-pose` exists for optional real pose replay runs.
+- Makefile `real-pose` exists.
+- Real pose replay runs reuse optional runtime probing, local weights validation, model registry metadata, COCO17 pose normalization, and typed pose observation persistence.
+- Real pose replay observations remain media-owned, observation-only model output.
+- Crop-from-player-detection mode preserves source player detection lineage through `pose_from_subject_detection_candidate`.
+- Replay-info pose run metadata distinguishes real pose model-output runs from fixture pose runs.
+- Replay pose overlays and pose timeline items include optional source/runtime/model/config metadata for real pose validation.
+- Replay selected pose detail displays source/runtime/model/config and subject association context when available.
+- No movement interpretation, homography, bounce, hit, rally, point, scoring, or adjudication has been added.
 
 ## Blueprint 7 Status
 
@@ -218,9 +226,20 @@ real model-output detections
 -> replay tracklet overlays
 ```
 
-Current Blueprint 7 progress after 7C: about 40-45%.
+Milestone 7D adds real pose replay runtime:
 
-Remaining Blueprint 7 work should stay separate and deliberate: real pose runtime, evaluation workflows, and future perception layers. No tennis-event interpretation is part of 7A/7B/7C.
+```text
+indexed media
+-> optional pose runtime and local weights
+-> source player detections or sampled frames
+-> COCO17 pose keypoint observations
+-> source detection lineage when available
+-> replay pose overlays
+```
+
+Current Blueprint 7 progress after 7D: about 60-65%.
+
+Remaining Blueprint 7 work should stay separate and deliberate: court/homography decision gates, evaluation workflows, and future perception layers. No tennis-event interpretation is part of 7A/7B/7C/7D.
 
 ## Blueprint 5 Status
 

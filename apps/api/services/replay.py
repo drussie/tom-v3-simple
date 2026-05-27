@@ -359,6 +359,7 @@ def pose_timeline_item_from_row(pose: PoseObservation) -> dict[str, Any] | None:
     if pose.frame_number is None or pose.timestamp_ms is None:
         return None
 
+    source_metadata = _pose_source_metadata(pose)
     return {
         "item_type": "pose",
         "observation_id": pose.observation_id,
@@ -368,7 +369,8 @@ def pose_timeline_item_from_row(pose: PoseObservation) -> dict[str, Any] | None:
         "pose_confidence": pose.pose_confidence,
         "keypoints_present_count": pose.keypoints_present_count,
         "keypoints_missing_count": pose.keypoints_missing_count,
-        "display_label": "pose observation",
+        "display_label": _pose_display_label(source_metadata),
+        **source_metadata,
     }
 
 
@@ -659,6 +661,7 @@ def build_pose_overlay_items(
 
 def pose_overlay_item_from_row(pose: PoseObservation) -> dict[str, Any]:
     keypoints = _pose_overlay_keypoints(pose.keypoints_jsonb or [])
+    source_metadata = _pose_source_metadata(pose)
     return {
         "overlay_type": "pose_skeleton",
         "observation_id": pose.observation_id,
@@ -687,6 +690,7 @@ def pose_overlay_item_from_row(pose: PoseObservation) -> dict[str, Any]:
             "association_confidence": pose.association_confidence,
         },
         "source_language": "pose keypoint evidence",
+        **source_metadata,
     }
 
 
@@ -817,10 +821,14 @@ def _run_source_metadata(
     if not isinstance(diagnostics, dict):
         diagnostics = {}
 
-    tracklet_source_metadata = _tracklet_run_source_metadata(
-        run_metadata=run_metadata,
-        runtime_payload=runtime_payload,
-        payload=payload,
+    tracklet_source_metadata = (
+        _tracklet_run_source_metadata(
+            run_metadata=run_metadata,
+            runtime_payload=runtime_payload,
+            payload=payload,
+        )
+        if observation_types == TRACKLET_TYPES
+        else None
     )
     if tracklet_source_metadata is not None:
         model = (
@@ -855,14 +863,24 @@ def _run_source_metadata(
     )
     is_real_model_output = _truthy(payload.get("real_model_output")) or (
         source_runtime == "ultralytics_yolo" and adapter_name in {"yolo", "ultralytics"}
+    ) or (
+        source_runtime == "ultralytics_pose"
     )
     is_fixture = (
         _string_or_none(runtime_payload.get("adapter")) == "fixture"
         or source_runtime == "fixture"
+        or source_runtime == "fixture_pose"
         or "fixture" in run.run_name.lower()
         or "fixture" in (adapter_name or "").lower()
     )
+    explicit_evidence_source = _string_or_none(payload.get("evidence_source"))
     evidence_source = (
+        "real_pose_model_output"
+        if explicit_evidence_source == "real_pose_model_output"
+        or source_runtime == "ultralytics_pose"
+        else explicit_evidence_source
+        if explicit_evidence_source
+        else
         "real_model_output"
         if is_real_model_output
         else "fixture_demo"
@@ -914,6 +932,53 @@ def _detection_source_metadata(
         "model_name": model.name if model is not None else None,
         "model_version": model.version if model is not None else None,
         "runtime_config_id": observation.runtime_config_id,
+        "is_fixture": is_fixture,
+        "is_real_model_output": is_real_model_output,
+    }
+
+
+def _pose_source_metadata(pose: PoseObservation) -> dict[str, Any]:
+    observation = pose.observation
+    payload = observation.payload_jsonb if observation is not None else {}
+    metadata = pose.metadata_jsonb or {}
+    source_runtime = (
+        _string_or_none(payload.get("source_runtime"))
+        or _string_or_none(metadata.get("source_runtime"))
+    )
+    evidence_source = (
+        _string_or_none(payload.get("evidence_source"))
+        or _string_or_none(metadata.get("evidence_source"))
+    )
+    is_real_model_output = (
+        evidence_source == "real_pose_model_output"
+        or source_runtime == "ultralytics_pose"
+        or _truthy(payload.get("real_model_output"))
+        or _truthy(metadata.get("real_model_output"))
+    )
+    is_fixture = (
+        source_runtime == "fixture_pose"
+        or _truthy(metadata.get("no_real_pose_inference"))
+        or evidence_source == "fixture_demo"
+    )
+    if evidence_source is None:
+        evidence_source = (
+            "real_pose_model_output"
+            if is_real_model_output
+            else "fixture_demo"
+            if is_fixture
+            else "persisted_evidence"
+        )
+    model = observation.model if observation is not None else None
+    return {
+        "evidence_source": evidence_source,
+        "source_label": _source_label(evidence_source),
+        "source_runtime": source_runtime,
+        "real_model_output": is_real_model_output,
+        "model_output_not_truth": is_real_model_output,
+        "model_registry_id": observation.model_id if observation is not None else None,
+        "model_name": model.name if model is not None else None,
+        "model_version": model.version if model is not None else None,
+        "runtime_config_id": observation.runtime_config_id if observation is not None else None,
         "is_fixture": is_fixture,
         "is_real_model_output": is_real_model_output,
     }
@@ -997,6 +1062,8 @@ def _tracklet_source_metadata(metadata: dict[str, Any]) -> dict[str, Any]:
 
 
 def _source_label(evidence_source: str) -> str:
+    if evidence_source == "real_pose_model_output":
+        return "real pose model output"
     if evidence_source == "real_model_output":
         return "real model output"
     if evidence_source == "fixture_demo":
@@ -1008,6 +1075,17 @@ def _source_label(evidence_source: str) -> str:
     if evidence_source == "persisted_tracklet":
         return "persisted tracklet candidates"
     return "persisted evidence"
+
+
+def _display_label(base_label: str, source_metadata: dict[str, Any]) -> str:
+    source_label = source_metadata.get("source_label")
+    return f"{base_label} · {source_label}" if source_label else base_label
+
+
+def _pose_display_label(source_metadata: dict[str, Any]) -> str:
+    if source_metadata.get("evidence_source") == "real_pose_model_output":
+        return _display_label("pose observation", source_metadata)
+    return "pose observation"
 
 
 def _bbox_from_payload(payload: dict[str, Any]) -> dict[str, float] | None:

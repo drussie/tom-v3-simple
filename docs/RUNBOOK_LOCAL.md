@@ -385,9 +385,9 @@ python -m apps.worker.cli export-tracklet-review-dataset \
 
 The exports are TOM-native JSON review datasets. They are not official labels or adjudicated results.
 
-## 11. Optional YOLO Runtime
+## 11. Optional YOLO / Pose Runtime
 
-The fixture demo does not require YOLO.
+The fixture demo does not require YOLO or pose weights.
 
 Probe the optional runtime:
 
@@ -465,9 +465,55 @@ Milestone 7C replay validation:
 - selected track point details should show the source detection observation id and source detection evidence metadata when available
 - tracklet points and paths remain candidate temporal groupings and do not establish object paths
 
+Run a real pose replay pass after a media asset exists. Crop-from-player-detection mode is preferred when a real detection run is available:
+
+```bash
+make real-pose \
+  MEDIA_ID=<media_id> \
+  SOURCE_DETECTION_RUN_ID=<real_detection_run_id> \
+  POSE_WEIGHTS_PATH=./model_assets/pose/<pose_model>.pt \
+  PYTHON=.venv/bin/python \
+  MAX_FRAMES=120
+```
+
+Equivalent worker command:
+
+```bash
+.venv/bin/python -m apps.worker.cli run-real-pose \
+  --media-id <media_id> \
+  --source-detection-run-id <real_detection_run_id> \
+  --weights ./model_assets/pose/<pose_model>.pt \
+  --mode crop_from_player_detection \
+  --every-n-frames 1 \
+  --max-frames 120 \
+  --device auto
+```
+
+The command prints a replay URL with `poseRunId`:
+
+```text
+http://127.0.0.1:3000/replay/<media_id>?detectionRunId=<real_detection_run_id>&poseRunId=<real_pose_run_id>
+```
+
+If a real-detection-derived tracklet run also exists, open:
+
+```text
+http://127.0.0.1:3000/replay/<media_id>?detectionRunId=<real_detection_run_id>&trackletRunId=<tracklet_run_id>&poseRunId=<real_pose_run_id>
+```
+
+Milestone 7D replay validation:
+
+- the pose run selector should label the run as real pose model output
+- pose keypoints and skeletons should render through `poseRunId`
+- selected pose details should show source runtime, model registry id, runtime config id, skeleton format, keypoint counts, and subject association candidate context when available
+- crop-mode pose lineage should point back to source `player_detection` observations
+- pose observations remain keypoint evidence and do not interpret movement, strokes, biomechanics, court position, or tennis events
+
 If local weights are not available, skip the real smoke and rely on the fake real-detection tests. The default fixture demo and CI path must not require YOLO weights.
 
-Real YOLO detections are model-output observations. Real-detection-derived tracklets are candidate groupings from those observations. Neither layer creates pose, homography, events, scoring, or adjudication.
+If local pose weights are not available, skip the real pose smoke and rely on the fake real-pose tests. The default fixture demo and CI path must not require pose weights.
+
+Real YOLO detections are model-output observations. Real-detection-derived tracklets are candidate groupings from those observations. Real pose observations are keypoint evidence. These layers do not create movement interpretation, homography, events, scoring, or adjudication.
 
 ## 12. Optional Custom Media
 
@@ -547,7 +593,7 @@ python -m apps.worker.cli completion-audit --no-demo-only
 
 - Fixture detection and pose output are deterministic demo evidence.
 - Real YOLO runtime is optional and locally gated.
-- Real pose inference is not implemented.
+- Real pose replay is optional and locally gated by pose runtime and weights.
 - Pose is keypoint evidence only, not movement interpretation.
 - Tracklets are candidates, not official rallies or points.
 - No homography, bounce, hit, rally, point, score, or adjudication is produced.

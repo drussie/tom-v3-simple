@@ -11,7 +11,7 @@
 - Blueprint 7: IN PROGRESS
 - TOM v3 Simple: COMPLETE
 
-TOM v3 Simple is complete as a lightweight local observation/evidence platform. Blueprint 6 is complete as the visual replay/operator workstation layer. Blueprint 7 has started the real perception runtime layer for replay.
+TOM v3 Simple is complete as a lightweight local observation/evidence platform. Blueprint 6 is complete as the visual replay/operator workstation layer. Blueprint 7 is in progress through real detection, real-detection-derived candidate tracklets, and optional real pose keypoint evidence.
 
 ## Blueprint 1 - Media, Observation Store, Viewer Foundation
 
@@ -350,9 +350,21 @@ real model-output detection observations
 -> replay URL with detectionRunId and trackletRunId
 ```
 
-Milestones 7A/7B/7C do not add:
+Milestone 7D proves:
 
-- real pose inference
+```text
+indexed media
+-> optional pose runtime and local weights
+-> crop-from-player-detection or full-frame pose inference
+-> normalized COCO17 keypoint evidence
+-> persisted player_pose_observation rows
+-> lineage to source player detections when available
+-> replay URL with poseRunId
+```
+
+Milestones 7A/7B/7C/7D do not add:
+
+- movement interpretation or biomechanics conclusions
 - homography or court-space reasoning
 - stream ingestion
 - bounce or hit detection

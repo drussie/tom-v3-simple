@@ -12,7 +12,7 @@ TOM v3 Simple Status: COMPLETE
 
 TOM v3 Simple is complete as a lightweight local observation/evidence platform. It can index local tennis video, run fixture gameplay/detection/pose paths, optionally run YOLO detection smoke when local runtime and weights exist, persist observations and typed evidence rows, build candidate tracklets, preserve lineage/provenance, render detection/tracklet/pose evidence in the viewer, seed and display review annotations, export TOM-native review datasets, and run a structural completion audit.
 
-It remains intentionally non-decisive about tennis meaning. It does not include real pose inference, movement interpretation, stroke classification, homography, bounce/hit/rally/point/scoring, production deployment, auth, real stream ingestion, or TOM v2-style adjudication.
+The completed TOM v3 Simple baseline remains intentionally non-decisive about tennis meaning. The fixture path does not require real pose inference, movement interpretation, stroke classification, homography, bounce/hit/rally/point/scoring, production deployment, auth, real stream ingestion, or TOM v2-style adjudication.
 
 Blueprint 6 Status: COMPLETE
 
@@ -24,9 +24,9 @@ Future real live ingestion and future tennis intelligence must begin as new blue
 
 Blueprint 7 Status: IN PROGRESS
 
-Blueprint 7 starts TOM v3's real perception runtime for the replay workstation. Milestones 7A, 7B, and 7C add a real YOLO detection replay run, label real-vs-fixture detection evidence clearly, and build candidate tracklets from real detection observations through the existing tracklet builder.
+Blueprint 7 starts TOM v3's real perception runtime for the replay workstation. Milestones 7A, 7B, 7C, and 7D add a real YOLO detection replay run, label real-vs-fixture detection evidence clearly, build candidate tracklets from real detection observations through the existing tracklet builder, and persist real pose keypoint evidence when local pose runtime and weights exist.
 
-Blueprint 7 remains observation-only. Real model output is evidence, not confirmed tennis state.
+Blueprint 7 remains observation-only. Real model output is evidence, not tennis conclusions.
 
 ## What It Does
 
@@ -41,14 +41,16 @@ Blueprint 7 remains observation-only. Real model output is evidence, not confirm
 - Run an optional real YOLO detection replay pass on indexed media when local runtime and weights exist.
 - Distinguish fixture detection evidence from real model-output detection evidence in replay run selectors and selected detection detail.
 - Build candidate tracklets from real model-output detection runs while preserving source detection lineage.
-- Keep optional YOLO runtime separate from the default base environment.
+- Run an optional real pose replay pass on indexed media when local runtime and pose weights exist.
+- Persist real `player_pose_observation` rows with COCO17 keypoints and source player detection lineage when available.
+- Keep optional YOLO and pose runtimes separate from the default base environment.
 
 ## What It Does Not Do
 
 - No scoring, point reconstruction, rally segmentation, hit detection, or bounce detection.
 - No stroke classification, movement interpretation, or biomechanics conclusions.
 - No homography or court-space reasoning.
-- No real pose inference in TOM v3 Simple.
+- No movement interpretation from pose keypoints.
 - No production deployment, auth, cloud workflow, real live stream ingestion, or multi-camera support.
 
 Fixture output proves persistence, lineage, viewer, review, export, and audit plumbing. It is demo evidence only.
@@ -164,6 +166,18 @@ make build-tracklets DETECTION_RUN_ID=<real_detection_run_id> RUN_NAME=real-dete
 
 The output includes a replay URL with `detectionRunId` and `trackletRunId`. Tracklets remain candidate temporal groupings, not object identity or path conclusions.
 
+Run a real pose replay pass after indexing media and, preferably, after a real detection run:
+
+```bash
+make real-pose \
+  MEDIA_ID=<media_id> \
+  SOURCE_DETECTION_RUN_ID=<real_detection_run_id> \
+  POSE_WEIGHTS_PATH=./model_assets/pose/<pose_model>.pt \
+  PYTHON=.venv/bin/python
+```
+
+Real pose output persists `player_pose_observation` keypoint evidence and can be opened with `poseRunId`. It does not interpret movement, strokes, biomechanics, court position, or tennis events.
+
 ## Important Docs
 
 - [Local Runbook](docs/RUNBOOK_LOCAL.md)
@@ -177,6 +191,7 @@ The output includes a replay URL with `detectionRunId` and `trackletRunId`. Trac
 - [Provenance Audit](docs/PROVENANCE_AUDIT.md)
 - [Replay Workstation](docs/REPLAY_WORKSTATION.md)
 - [Real Detection Replay](docs/perception/real_detection_replay_v0.md)
+- [Real Pose Replay](docs/perception/real_pose_replay_v0.md)
 - [Completion Checklist](docs/COMPLETION_CHECKLIST.md)
 - [Final Completion Review](docs/blueprints/tom_v3_simple_final_completion_review.md)
 - [Blueprint 6 Completion Review](docs/blueprints/tom_v3_blueprint_6_completion_review.md)
@@ -185,7 +200,7 @@ The output includes a replay URL with `detectionRunId` and `trackletRunId`. Trac
 
 ## Current State
 
-Blueprints 1, 2, 3, 4, 5, and 6 are complete. TOM v3 Simple is complete as a lightweight local platform, Blueprint 6 is complete as the visual replay/operator workstation layer, and Blueprint 7 is in progress with real YOLO detection replay, replay-workstation source validation, and candidate tracklets derived from real detections.
+Blueprints 1, 2, 3, 4, 5, and 6 are complete. TOM v3 Simple is complete as a lightweight local platform, Blueprint 6 is complete as the visual replay/operator workstation layer, and Blueprint 7 is in progress with real YOLO detection replay, replay-workstation source validation, candidate tracklets derived from real detections, and optional real pose keypoint evidence.
 
 Current TOM v3 Simple path:
 
@@ -244,7 +259,9 @@ indexed media
 -> optional YOLO runtime and local weights
 -> run-real-detection
 -> real model-output ball/player detection observations
--> replay workstation detection overlays
+-> optional candidate tracklets from real detections
+-> optional real pose keypoint observations
+-> replay workstation evidence overlays
 ```
 
-Future real tracklets, real pose, real live ingestion, and new tennis-intelligence work should start as separate blueprints.
+Future court/homography, real live ingestion, movement/stroke evidence, and new tennis-intelligence work should start as separate blueprints.

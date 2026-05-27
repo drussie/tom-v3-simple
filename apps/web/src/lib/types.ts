@@ -390,6 +390,17 @@ export interface ReplayPoseOverlay {
   edges: [string, string][];
   subject_context: ReplayPoseSubjectContext;
   source_language: "pose keypoint evidence";
+  evidence_source?: "real_pose_model_output" | "fixture_demo" | "persisted_evidence" | string;
+  source_label?: string | null;
+  source_runtime?: string | null;
+  real_model_output?: boolean;
+  model_output_not_truth?: boolean;
+  model_registry_id?: string | null;
+  model_name?: string | null;
+  model_version?: string | null;
+  runtime_config_id?: string | null;
+  is_fixture?: boolean;
+  is_real_model_output?: boolean;
 }
 
 export interface ReplayOverlayChunk {
@@ -477,6 +488,17 @@ export interface ReplayPoseTimelineItem {
   keypoints_present_count: number;
   keypoints_missing_count: number;
   display_label: string;
+  evidence_source?: "real_pose_model_output" | "fixture_demo" | "persisted_evidence" | string;
+  source_label?: string | null;
+  source_runtime?: string | null;
+  real_model_output?: boolean;
+  model_output_not_truth?: boolean;
+  model_registry_id?: string | null;
+  model_name?: string | null;
+  model_version?: string | null;
+  runtime_config_id?: string | null;
+  is_fixture?: boolean;
+  is_real_model_output?: boolean;
 }
 
 export interface ReplayAnnotationTimelineItem {

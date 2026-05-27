@@ -18,6 +18,7 @@ EXPORT_ROOT ?= .data/exports
 YOLO_DEVICE ?= auto
 WEIGHTS_PATH ?=
 YOLO_WEIGHTS_PATH ?= $(WEIGHTS_PATH)
+POSE_WEIGHTS_PATH ?= $(WEIGHTS_PATH)
 MODEL_NAME ?=
 MODEL_VERSION ?= v0
 REQUIRED_SHA256 ?=
@@ -40,10 +41,12 @@ FRAME_END ?=
 CLASS_MAP_JSON ?=
 PLAN_ONLY ?= false
 OUTPUT_DEBUG_ARTIFACT ?= false
+POSE_MODE ?= crop_from_player_detection
+FALLBACK_TO_FULL_FRAME ?= false
 
 export TOM_V3_DATABASE_URL
 
-.PHONY: install web-install test lint migrate api seed verify index-media run-gameplay index-and-run-gameplay run-detection index-and-run-detection extract-frame-artifacts build-tracklets run-pose export-tracklet-review-dataset demo demo-fixture demo-plan demo-reset demo-export demo-open replay-open completion-audit completion-check yolo-probe yolo-smoke yolo-runtime-probe register-yolo-model smoke-real-yolo-local real-detection web web-build web-lint smoke all-checks
+.PHONY: install web-install test lint migrate api seed verify index-media run-gameplay index-and-run-gameplay run-detection index-and-run-detection extract-frame-artifacts build-tracklets run-pose export-tracklet-review-dataset demo demo-fixture demo-plan demo-reset demo-export demo-open replay-open completion-audit completion-check yolo-probe yolo-smoke yolo-runtime-probe register-yolo-model smoke-real-yolo-local real-detection real-pose web web-build web-lint smoke all-checks
 
 install:
 	$(PYTHON) -m pip install -e ".[dev]"
@@ -181,6 +184,11 @@ real-detection:
 	@if [ -z "$(MEDIA_ID)" ]; then echo "MEDIA_ID is required: make real-detection MEDIA_ID=<media_id> YOLO_WEIGHTS_PATH=model_assets/yolo/model.pt"; exit 1; fi
 	@if [ -z "$(YOLO_WEIGHTS_PATH)" ]; then echo "YOLO_WEIGHTS_PATH is required: make real-detection MEDIA_ID=<media_id> YOLO_WEIGHTS_PATH=model_assets/yolo/model.pt"; exit 1; fi
 	$(PYTHON) -m apps.worker.cli run-real-detection --media-id "$(MEDIA_ID)" --weights "$(YOLO_WEIGHTS_PATH)" --device "$(YOLO_DEVICE)" --every-n-frames "$(EVERY_N_FRAMES)" --max-frames "$(MAX_FRAMES)" --conf "$(CONF)" --iou "$(IOU)" --viewer-base-url "$(VIEWER_BASE_URL)" $(if $(MODEL_NAME),--model-name "$(MODEL_NAME)",) --model-version "$(MODEL_VERSION)" $(if $(REQUIRED_SHA256),--required-sha256 "$(REQUIRED_SHA256)",) $(if $(IMG_SIZE),--imgsz "$(IMG_SIZE)",) $(if $(FRAME_START),--frame-start "$(FRAME_START)",) $(if $(FRAME_END),--frame-end "$(FRAME_END)",) $(if $(CLASS_MAP_JSON),--class-map-json '$(CLASS_MAP_JSON)',) $(if $(filter true,$(OUTPUT_DEBUG_ARTIFACT)),--output-debug-artifact,--no-output-debug-artifact) $(if $(filter true,$(PLAN_ONLY)),--plan-only,)
+
+real-pose:
+	@if [ -z "$(MEDIA_ID)" ]; then echo "MEDIA_ID is required: make real-pose MEDIA_ID=<media_id> SOURCE_DETECTION_RUN_ID=<run_id> POSE_WEIGHTS_PATH=model_assets/pose/model.pt"; exit 1; fi
+	@if [ -z "$(POSE_WEIGHTS_PATH)" ]; then echo "POSE_WEIGHTS_PATH is required: make real-pose MEDIA_ID=<media_id> SOURCE_DETECTION_RUN_ID=<run_id> POSE_WEIGHTS_PATH=model_assets/pose/model.pt"; exit 1; fi
+	$(PYTHON) -m apps.worker.cli run-real-pose --media-id "$(MEDIA_ID)" --weights "$(POSE_WEIGHTS_PATH)" $(if $(SOURCE_DETECTION_RUN_ID),--source-detection-run-id "$(SOURCE_DETECTION_RUN_ID)",) --mode "$(POSE_MODE)" --device "$(YOLO_DEVICE)" --every-n-frames "$(EVERY_N_FRAMES)" --max-frames "$(MAX_FRAMES)" --conf "$(CONF)" --iou "$(IOU)" --viewer-base-url "$(VIEWER_BASE_URL)" $(if $(MODEL_NAME),--model-name "$(MODEL_NAME)",) --model-version "$(MODEL_VERSION)" $(if $(REQUIRED_SHA256),--required-sha256 "$(REQUIRED_SHA256)",) $(if $(IMG_SIZE),--imgsz "$(IMG_SIZE)",) $(if $(FRAME_START),--frame-start "$(FRAME_START)",) $(if $(FRAME_END),--frame-end "$(FRAME_END)",) $(if $(filter true,$(FALLBACK_TO_FULL_FRAME)),--fallback-to-full-frame,--no-fallback-to-full-frame) $(if $(filter true,$(PLAN_ONLY)),--plan-only,)
 
 web:
 	cd $(WEB_DIR) && npm run dev

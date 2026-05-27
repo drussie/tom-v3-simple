@@ -4,7 +4,7 @@ Status: IN PROGRESS
 
 ## Mission
 
-Blueprint 7 runs real perception on indexed tennis video and persists model-output observations so the Blueprint 6 replay workstation displays real detection and future pose evidence over video playback.
+Blueprint 7 runs real perception on indexed tennis video and persists model-output observations so the Blueprint 6 replay workstation displays real detection, candidate tracklet, and pose keypoint evidence over video playback.
 
 The architecture remains observation-only and non-adjudicative. Real model output is persisted as evidence, not as official tennis meaning.
 
@@ -61,9 +61,25 @@ real YOLO detection observations
 
 7C keeps tracklets as candidate temporal groupings. It does not add a new tracking model, smoothing/interpolation as evidence, real pose inference, court/homography evidence, stream ingestion, or tennis-event interpretation.
 
+## Milestone 7D
+
+Milestone 7D adds optional real pose replay runtime:
+
+```text
+indexed media
+-> optional pose runtime and local weights
+-> crop-from-player-detection or full-frame pose inference
+-> normalized COCO17 keypoint evidence
+-> persisted player_pose_observation rows
+-> source player detection lineage when available
+-> replay URL with poseRunId
+```
+
+7D keeps pose as keypoint evidence. It does not add movement interpretation, stroke classification, serve detection, biomechanics conclusions, court/homography evidence, stream ingestion, or tennis-event interpretation.
+
 ## Boundaries
 
-Blueprint 7 does not add official tennis truth, TOM v2-style adjudication, accepted/rejected event lifecycles, bounce/hit detection, stroke classification, rally/point/scoring, confirmed player identity, confirmed ball paths, real pose inference, court-space reasoning, or live stream ingestion.
+Blueprint 7 does not add official tennis conclusions, TOM v2-style adjudication, accepted/rejected event lifecycles, bounce/hit detection, stroke classification, rally/point/scoring, player identity resolution, ball-path conclusions, movement interpretation from pose, court-space reasoning, or live stream ingestion.
 
 Future real perception outputs remain observations and candidates until a separate blueprint deliberately defines a higher-level evidence layer.
 
@@ -82,8 +98,8 @@ No YOLO weights, GPU, Torch, Ultralytics, OpenCV, or pose weights are required f
 
 Possible follow-on Blueprint 7 milestones:
 
-- Real tracklet candidate generation from real detection observations
-- Real pose runtime integration
+- Court / homography evidence decision gate
 - Real model-output quality/evaluation workflows
+- Future perception layers that remain observation-only
 
 Do not add tennis intelligence implicitly inside these runtime milestones.

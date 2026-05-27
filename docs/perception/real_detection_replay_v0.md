@@ -5,6 +5,7 @@
 Milestone 7A adds a real YOLO detection replay command for indexed media.
 Milestone 7B validates that the resulting real detection runs are clearly labeled and inspectable in the replay workstation.
 Milestone 7C uses those persisted real detections as source observations for candidate tracklet generation.
+Milestone 7D can use source `player_detection` observations from the real detection run as crop subjects for real pose replay.
 
 It runs optional Ultralytics YOLO detection over media-owned sampled frames, normalizes mapped model outputs into TOM atomic detection observations, persists them through the existing detection adapter path, and prints a replay workstation URL.
 
@@ -237,6 +238,38 @@ Tracklet runs derived from real model-output detections preserve:
 
 These tracklets are candidate temporal groupings. They do not establish player identity, ball path correctness, tennis events, or scoring.
 
+## Real Pose Replay From Source Player Detections
+
+After a real detection run exists, run real pose replay in crop mode:
+
+```bash
+.venv/bin/python -m apps.worker.cli run-real-pose \
+  --media-id <media_id> \
+  --source-detection-run-id <real_detection_run_id> \
+  --weights ./model_assets/pose/<pose_model>.pt \
+  --mode crop_from_player_detection \
+  --every-n-frames 1 \
+  --max-frames 120 \
+  --device auto
+```
+
+The command output includes a replay URL with `poseRunId`:
+
+```text
+http://127.0.0.1:3000/replay/<media_id>?detectionRunId=<real_detection_run_id>&poseRunId=<pose_run_id>
+```
+
+Crop-mode pose observations preserve:
+
+- source detection run id
+- source player detection observation id
+- source detection confidence as association context when available
+- `pose_from_subject_detection_candidate` lineage from the detection observation to the pose observation
+- full-frame image-pixel COCO17 keypoints
+- `source_runtime = ultralytics_pose`
+
+These pose observations are keypoint evidence only. They do not interpret movement, strokes, biomechanics, court position, tennis events, or scoring.
+
 ## Non-goals
 
-7A/7B/7C do not add real pose inference, homography, court-space reasoning, stream ingestion, live model scheduling, bounce/hit/rally/point/scoring, or adjudication.
+7A/7B/7C/7D do not add movement interpretation, stroke classification, homography, court-space reasoning, stream ingestion, live model scheduling, bounce/hit/rally/point/scoring, or adjudication.

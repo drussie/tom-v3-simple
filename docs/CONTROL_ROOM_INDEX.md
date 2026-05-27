@@ -71,6 +71,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 7A - Real YOLO Detection Replay Run](milestones/milestone_7a_real_yolo_detection_replay_run.md)
 - [Milestone 7B - Real Detection Overlay Validation](milestones/milestone_7b_real_detection_overlay_validation.md)
 - [Milestone 7C - Real Detection Tracklet Generation](milestones/milestone_7c_real_detection_tracklet_generation.md)
+- [Milestone 7D - Real Pose Runtime for Replay Workstation](milestones/milestone_7d_real_pose_runtime_replay_workstation.md)
 
 ## Handoffs
 
@@ -115,6 +116,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 7A Handoff](handoffs/milestone_7a_real_yolo_detection_replay_run_handoff.md)
 - [Milestone 7B Handoff](handoffs/milestone_7b_real_detection_overlay_validation_handoff.md)
 - [Milestone 7C Handoff](handoffs/milestone_7c_real_detection_tracklet_generation_handoff.md)
+- [Milestone 7D Handoff](handoffs/milestone_7d_real_pose_runtime_replay_workstation_handoff.md)
 
 ## Agent Reports
 
@@ -159,6 +161,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 7A Agent Report](agent_reports/milestone_7a_real_yolo_detection_replay_run_report.md)
 - [Milestone 7B Agent Report](agent_reports/milestone_7b_real_detection_overlay_validation_report.md)
 - [Milestone 7C Agent Report](agent_reports/milestone_7c_real_detection_tracklet_generation_report.md)
+- [Milestone 7D Agent Report](agent_reports/milestone_7d_real_pose_runtime_replay_workstation_report.md)
 
 ## Blueprints
 
@@ -187,6 +190,7 @@ Use this index as the durable navigation point for project memory, architecture 
 ## Perception
 
 - [Real Detection Replay v0](perception/real_detection_replay_v0.md)
+- [Real Pose Replay v0](perception/real_pose_replay_v0.md)
 
 ## Model Adapters
 
