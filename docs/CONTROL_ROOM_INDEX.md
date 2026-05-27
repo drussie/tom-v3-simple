@@ -77,6 +77,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 8A - Court Evidence Schema / Contract](milestones/milestone_8a_court_evidence_schema_contract.md)
 - [Milestone 8B - Court Keypoint / Line Evidence Adapter](milestones/milestone_8b_court_keypoint_line_evidence_adapter.md)
 - [Milestone 8C - Camera / View Evidence Layer](milestones/milestone_8c_camera_view_evidence_layer.md)
+- [Milestone 8D - Homography Candidate Persistence](milestones/milestone_8d_homography_candidate_persistence.md)
 
 ## Handoffs
 
@@ -127,6 +128,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 8A Handoff](handoffs/milestone_8a_court_evidence_schema_contract_handoff.md)
 - [Milestone 8B Handoff](handoffs/milestone_8b_court_keypoint_line_evidence_adapter_handoff.md)
 - [Milestone 8C Handoff](handoffs/milestone_8c_camera_view_evidence_layer_handoff.md)
+- [Milestone 8D Handoff](handoffs/milestone_8d_homography_candidate_persistence_handoff.md)
 
 ## Agent Reports
 
@@ -177,6 +179,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 8A Agent Report](agent_reports/milestone_8a_court_evidence_schema_contract_report.md)
 - [Milestone 8B Agent Report](agent_reports/milestone_8b_court_keypoint_line_evidence_adapter_report.md)
 - [Milestone 8C Agent Report](agent_reports/milestone_8c_camera_view_evidence_layer_report.md)
+- [Milestone 8D Agent Report](agent_reports/milestone_8d_homography_candidate_persistence_report.md)
 
 ## Blueprints
 
@@ -260,6 +263,15 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Pose Adapter Normalization v0](pose/pose_adapter_normalization_v0.md)
 - [Pose Persistence and Lineage v0](pose/pose_persistence_lineage_v0.md)
 - [Pose Query / Review / Export v0](pose/pose_query_review_export_v0.md)
+
+## Court / Camera / Homography
+
+- [Court / Homography Evidence Decision v0](court/court_homography_evidence_decision_v0.md)
+- [Court Evidence Schema v0](court/court_evidence_schema_v0.md)
+- [Court Template Registry v0](court/court_template_registry_v0.md)
+- [Fixture Court Evidence Adapter v0](court/fixture_court_evidence_adapter_v0.md)
+- [Camera / View Evidence Layer v0](court/camera_view_evidence_layer_v0.md)
+- [Homography Candidate Persistence v0](court/homography_candidate_persistence_v0.md)
 
 ## Development
 

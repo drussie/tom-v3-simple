@@ -79,7 +79,7 @@ The summary read model reports:
 - non-binding homography context hints
 - evidence-only warnings
 
-The homography context is a candidate context hint only. It does not compute or validate a homography.
+The homography context is a candidate context hint only. 8C does not compute or validate a homography. Milestone 8D may link camera/view observations as context for persisted homography candidates, but those candidates remain geometry evidence only.
 
 ## Evidence Bundle
 

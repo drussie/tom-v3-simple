@@ -42,9 +42,9 @@ Court/camera/homography evidence now proceeds in Blueprint 8.
 
 Blueprint 8 Status: IN PROGRESS
 
-Blueprint 8 starts the court/camera/homography evidence layer. Milestone 8A adds court keypoint, court line, camera/view, homography candidate, and projection diagnostic schema contracts, typed storage tables, writer persistence support, a normalized court template registry, lineage constants, tests, and docs. Milestone 8B adds a deterministic fixture court evidence adapter that writes court keypoint, court line, and camera/view observations with model/runtime/run provenance. Milestone 8C makes camera/view observations queryable and inspectable as geometry context evidence with summary and evidence-bundle read models.
+Blueprint 8 starts the court/camera/homography evidence layer. Milestone 8A adds court keypoint, court line, camera/view, homography candidate, and projection diagnostic schema contracts, typed storage tables, writer persistence support, a normalized court template registry, lineage constants, tests, and docs. Milestone 8B adds a deterministic fixture court evidence adapter that writes court keypoint, court line, and camera/view observations with model/runtime/run provenance. Milestone 8C makes camera/view observations queryable and inspectable as geometry context evidence with summary and evidence-bundle read models. Milestone 8D persists homography candidate observations from court keypoint, court line, and camera/view source evidence with lineage.
 
-8C is still geometry evidence only. It does not add a real camera/court model, homography computation, projection diagnostics, replay court overlays, ball/player court-space projection, stream ingestion, or tennis-event interpretation.
+8D is still geometry evidence only. Homography rows are candidates, not court truth. 8D does not add projection diagnostics, replay court overlays, real court model inference, ball/player court-space projection, stream ingestion, or tennis-event interpretation.
 
 ## Canonical Local Demo
 
@@ -100,14 +100,14 @@ An observation does not mean the output is correct, a tennis event happened, a s
 - Real pose crop mode can preserve lineage from source player detections to pose observations.
 - Court/camera/homography evidence decision gate with a Blueprint 8 candidate contract.
 - Blueprint 7 completion review and final perception orchestration runbook.
-- Court/camera/homography schema, typed persistence foundation, fixture court evidence adapter, and camera/view evidence read layer for Blueprint 8.
+- Court/camera/homography schema, typed persistence foundation, fixture court evidence adapter, camera/view evidence read layer, and homography candidate persistence for Blueprint 8.
 
 ## Explicitly Absent Capabilities
 
 - Movement interpretation or biomechanics conclusions.
 - Stroke classification.
-- Homography or court-space reasoning.
-- Court/camera/homography runtime or replay court overlays.
+- Confirmed homography, court truth, or court-space reasoning.
+- Court/camera/homography replay court overlays.
 - Real camera/view model inference.
 - Bounce detection.
 - Hit detection.
@@ -341,6 +341,20 @@ fixture court run
 ```
 
 8C adds read-only query, summary, and bundle APIs for camera/view geometry context evidence. It does not add homography computation, projection diagnostics, replay court overlays, real camera/court inference, ball/player court-space projection, event interpretation, stream ingestion, or adjudication.
+
+Milestone 8D adds homography candidate persistence:
+
+```text
+fixture court run
+-> court keypoint observations
+-> court line observations
+-> camera/view observations
+-> homography candidate builder
+-> homography_candidate_observation rows
+-> source evidence lineage
+```
+
+8D adds worker `build-homography-candidates`, Makefile `homography-candidates`, candidate matrix computation, model/runtime/run/step provenance, and lineage from source keypoints, lines, and camera/view context. It does not add projection diagnostics, replay court overlays, real court inference, ball/player court-space projection, event interpretation, stream ingestion, or adjudication.
 
 ## Future Blueprint Candidates
 

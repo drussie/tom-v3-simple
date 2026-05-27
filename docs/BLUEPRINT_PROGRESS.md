@@ -2,7 +2,7 @@
 
 ## Current Progress Gauge
 
-Current: Blueprints 1, 2, 3, 4, 5, 6, and 7 complete; TOM v3 Simple is complete; Blueprint 8 is in progress at Milestone 8C
+Current: Blueprints 1, 2, 3, 4, 5, 6, and 7 complete; TOM v3 Simple is complete; Blueprint 8 is in progress at Milestone 8D
 
 ## Current
 
@@ -190,8 +190,8 @@ Current: Blueprints 1, 2, 3, 4, 5, 6, and 7 complete; TOM v3 Simple is complete;
 - Replay pose overlays and pose timeline items include optional source/runtime/model/config metadata for real pose validation.
 - Replay selected pose detail displays source/runtime/model/config and subject association context when available.
 - Court/homography decision gate exists.
-- Court/camera/homography evidence has started as Blueprint 8 schema, fixture adapter, and camera/view read-model work.
-- No court/homography runtime, movement interpretation, bounce, hit, rally, point, scoring, or adjudication has been added.
+- Court/camera/homography evidence has started as Blueprint 8 schema, fixture adapter, camera/view read-model work, and homography candidate persistence.
+- No projection diagnostics, replay court overlays, court-space ball/player projection, movement interpretation, bounce, hit, rally, point, scoring, or adjudication has been added.
 - Blueprint 7 completion review exists.
 - Blueprint 7 is marked complete in canonical docs.
 - Final real perception orchestration is documented for fixture-safe demo, optional real detection, optional real-detection-derived tracklets, and optional real pose replay.
@@ -207,6 +207,10 @@ Current: Blueprints 1, 2, 3, 4, 5, 6, and 7 complete; TOM v3 Simple is complete;
 - Camera/view evidence summary read model exists.
 - Camera/view evidence bundle service exists.
 - API endpoints under `/court/camera-view` expose camera/view query, summary, and bundle payloads.
+- Worker `build-homography-candidates` exists.
+- Makefile `homography-candidates` exists.
+- Homography candidate observations can be persisted from court keypoint, court line, and camera/view source evidence.
+- Homography candidate lineage links source keypoints, lines, and camera/view context.
 
 ## Blueprint 7 Status
 
@@ -321,7 +325,19 @@ camera_view_observation
 
 Blueprint 8 progress after 8C: about 35-40%.
 
-Remaining Blueprint 8 work should stay deliberate: homography candidate persistence, replay court overlays, projection diagnostics/review exports, and completion review. 8C does not add homography computation, projection diagnostics, replay court overlays, real camera/court inference, ball/player court-space projection, or tennis-event interpretation.
+Milestone 8D adds homography candidate persistence:
+
+```text
+court_keypoint_observation
++ court_line_observation
++ camera_view_observation
+-> homography_candidate_observation
+-> source evidence lineage
+```
+
+Blueprint 8 progress after 8D: about 50-55%.
+
+Remaining Blueprint 8 work should stay deliberate: replay court overlays, projection diagnostics/review exports, and completion review. 8D does not add projection diagnostics, replay court overlays, real camera/court inference, ball/player court-space projection, bounce/hit/in-out/rally/point/scoring, or tennis-event interpretation.
 
 ## Blueprint 5 Status
 

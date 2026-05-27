@@ -12,7 +12,7 @@
 - Blueprint 8: IN PROGRESS
 - TOM v3 Simple: COMPLETE
 
-TOM v3 Simple is complete as a lightweight local observation/evidence platform. Blueprint 6 is complete as the visual replay/operator workstation layer. Blueprint 7 is complete as the real perception runtime layer for optional real detection, real-detection-derived candidate tracklets, and optional real pose keypoint evidence. Blueprint 8 is in progress with court/camera/homography schema contracts, fixture court evidence persistence, and camera/view evidence query/bundle read models.
+TOM v3 Simple is complete as a lightweight local observation/evidence platform. Blueprint 6 is complete as the visual replay/operator workstation layer. Blueprint 7 is complete as the real perception runtime layer for optional real detection, real-detection-derived candidate tracklets, and optional real pose keypoint evidence. Blueprint 8 is in progress with court/camera/homography schema contracts, fixture court evidence persistence, camera/view evidence query/bundle read models, and homography candidate persistence.
 
 ## Blueprint 1 - Media, Observation Store, Viewer Foundation
 
@@ -456,10 +456,23 @@ fixture camera/view observations
 
 8C adds read-only query, summary, and bundle access for camera/view geometry context evidence. It does not create new camera/view rows beyond the 8B fixture adapter path.
 
-8C does not add:
+Milestone 8D proves:
+
+```text
+fixture court evidence
+-> source court keypoint observations
+-> source court line observations
+-> source camera/view observations
+-> homography candidate builder
+-> homography_candidate_observation rows
+-> source evidence lineage
+```
+
+8D adds worker `build-homography-candidates`, Makefile `homography-candidates`, candidate matrix computation, reprojection metrics, model/runtime/run/step provenance, and lineage from source keypoints, lines, and camera/view context.
+
+8D does not add:
 
 - real camera/view model
-- homography computation
 - projection diagnostics
 - replay court overlay
 - ball/player court-space projection

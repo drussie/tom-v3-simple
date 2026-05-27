@@ -691,7 +691,7 @@ court_line_observation
 camera_view_observation
 ```
 
-There is still no replay court overlay yet. There is no homography computation, projection diagnostic computation, real court model, or ball/player court-space projection yet.
+There is still no replay court overlay yet. Fixture court evidence is the source input for later homography candidate persistence, but it is not a real court model.
 
 ## 11E. Camera / View Evidence Queries
 
@@ -719,6 +719,42 @@ Expected results:
 - bundle includes observation spine, typed camera/view detail, run/model/runtime context, annotations, artifacts, and lineage arrays.
 
 This is not a confirmed camera state and does not compute homography.
+
+## 11F. Homography Candidate Persistence
+
+Milestone 8D builds candidate homography observations from persisted court evidence.
+
+After running `run-fixture-court`, build homography candidates:
+
+```bash
+TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_8b_court_fixture.db \
+.venv/bin/python -m apps.worker.cli build-homography-candidates \
+  --media-id <media_id> \
+  --court-run-id <court_run_id>
+```
+
+Or use:
+
+```bash
+TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_8b_court_fixture.db \
+make homography-candidates \
+  MEDIA_ID=<media_id> \
+  COURT_RUN_ID=<court_run_id> \
+  PYTHON=.venv/bin/python
+```
+
+Plan-only mode:
+
+```bash
+.venv/bin/python -m apps.worker.cli build-homography-candidates \
+  --media-id media-plan \
+  --court-run-id court-run-plan \
+  --plan-only
+```
+
+Expected output includes `homography_run_id`, candidate counts, source counts, sampled frames, and a replay URL with `courtRunId` and `homographyRunId`.
+
+Homography candidates are candidate geometry evidence only. 8D does not add projection diagnostics, replay court overlays, real court model inference, ball/player court-space projection, bounce/hit/in-out/rally/point/scoring, or adjudication.
 
 ## 12. Optional Custom Media
 
@@ -801,7 +837,8 @@ python -m apps.worker.cli completion-audit --no-demo-only
 - Real pose replay is optional and locally gated by pose runtime and weights.
 - Pose is keypoint evidence only, not movement interpretation.
 - Tracklets are candidates, not official rallies or points.
-- No homography, bounce, hit, rally, point, score, or adjudication is produced.
+- Homography candidates are geometry evidence only, not court truth.
+- No projection diagnostics, bounce, hit, rally, point, score, or adjudication is produced.
 - Cloud deployment, auth, production streaming, and multi-camera reasoning are out of scope.
 
 ## 15. Completion Checklist

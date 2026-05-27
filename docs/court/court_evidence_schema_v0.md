@@ -1,6 +1,6 @@
 # Court Evidence Schema v0
 
-Milestone 8A starts Blueprint 8 with schema and persistence contracts. Milestone 8B uses this schema through a deterministic fixture court evidence adapter.
+Milestone 8A starts Blueprint 8 with schema and persistence contracts. Milestone 8B uses this schema through a deterministic fixture court evidence adapter. Milestone 8C exposes camera/view rows as read models. Milestone 8D persists homography candidate rows from source court evidence.
 
 Blueprint 8 court evidence uses the existing TOM observation spine:
 
@@ -348,4 +348,6 @@ Camera/view summaries are geometry context evidence. They do not confirm camera 
 
 8B writes fixture `court_keypoint_observation`, `court_line_observation`, and `camera_view_observation` rows with `fixture_court_evidence = true` and `not_real_court_model = true`. 8C exposes camera/view rows through read models.
 
-8C does not add a real court/runtime model, homography computation, projection diagnostics, replay court overlay, ball/player court projection, stream ingestion, or tennis-event interpretation.
+8D writes `homography_candidate_observation` rows from persisted court keypoint evidence and optional court line/camera-view context. These candidates preserve source lineage and remain candidate geometry evidence.
+
+8D does not add a real court/runtime model, projection diagnostics, replay court overlay, ball/player court projection, stream ingestion, or tennis-event interpretation.

@@ -56,7 +56,7 @@ indexed media
 
 Blueprint 7 completes TOM v3's real perception runtime for the replay workstation. The workstation can render fixture evidence or optional real model-output evidence through the same detection, tracklet, pose, timeline, and selected-detail surfaces. Court/camera/homography evidence now proceeds in Blueprint 8.
 
-Blueprint 8 has started with geometry evidence work. Milestone 8A adds court keypoint, court line, camera/view, homography candidate, and projection diagnostic storage contracts. Milestone 8B writes fixture court keypoint, line, and camera/view rows. Milestone 8C exposes camera/view rows through read-model APIs. Blueprint 8 does not add replay court overlays yet.
+Blueprint 8 has started with geometry evidence work. Milestone 8A adds court keypoint, court line, camera/view, homography candidate, and projection diagnostic storage contracts. Milestone 8B writes fixture court keypoint, line, and camera/view rows. Milestone 8C exposes camera/view rows through read-model APIs. Milestone 8D persists homography candidate rows with lineage from source court evidence. Blueprint 8 does not add replay court overlays yet.
 
 ## What 6A Added
 
@@ -235,7 +235,7 @@ The replay workstation remains evidence-only: detection observations, candidate 
 - homography candidate
 - projection diagnostic
 
-8B adds fixture production of court keypoint, court line, and camera/view evidence through `run-fixture-court`. 8C adds backend camera/view query, summary, and evidence-bundle APIs under `/court/camera-view` so future homography work can inspect view context.
+8B adds fixture production of court keypoint, court line, and camera/view evidence through `run-fixture-court`. 8C adds backend camera/view query, summary, and evidence-bundle APIs under `/court/camera-view` so future homography work can inspect view context. 8D adds `build-homography-candidates` to persist candidate transform evidence and source lineage.
 
 The replay workstation does not yet fetch or render these court layers. Future Blueprint 8 milestones should add court overlays deliberately, with labels that keep geometry evidence separate from bounce, hit, in/out, rally, point, and scoring conclusions.
 

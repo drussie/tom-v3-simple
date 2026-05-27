@@ -27,6 +27,7 @@ from apps.worker.services.court_adapter import run_fixture_court_adapter
 from apps.worker.services.detection_adapter import run_detection_adapter
 from apps.worker.services.frame_artifacts import extract_frame_artifacts_for_run
 from apps.worker.services.gameplay_adapter import run_gameplay_adapter
+from apps.worker.services.homography_candidate_builder import build_homography_candidates
 from apps.worker.services.local_demo import run_local_fixture_demo
 from apps.worker.services.media_indexer import index_media
 from apps.worker.services.pose_adapter import run_pose_adapter
@@ -494,6 +495,25 @@ def main() -> None:
     fixture_court_parser.add_argument("--skip-create-db", action="store_true")
     fixture_court_parser.set_defaults(handler=_handle_run_fixture_court)
 
+    homography_parser = subcommands.add_parser(
+        "build-homography-candidates",
+        help="Build candidate homography observations from persisted court evidence.",
+    )
+    homography_parser.add_argument("--media-id", required=True)
+    homography_parser.add_argument("--court-run-id", required=True)
+    homography_parser.add_argument("--run-name", default="homography-candidate-builder")
+    homography_parser.add_argument("--frame-start", type=int)
+    homography_parser.add_argument("--frame-end", type=int)
+    homography_parser.add_argument("--min-keypoint-confidence", type=float, default=0.0)
+    homography_parser.add_argument("--viewer-base-url", default="http://127.0.0.1:3000")
+    homography_parser.add_argument(
+        "--plan-only",
+        action="store_true",
+        help="Print the homography candidate plan without touching the database.",
+    )
+    homography_parser.add_argument("--skip-create-db", action="store_true")
+    homography_parser.set_defaults(handler=_handle_build_homography_candidates)
+
     demo_parser = subcommands.add_parser(
         "run-demo",
         help="Run the canonical local fixture demo path without YOLO or pose weights.",
@@ -936,6 +956,23 @@ def _handle_run_fixture_court(
         frame_sample_rate=args.frame_sample_rate,
         max_frames=args.max_frames,
         run_name=args.run_name,
+        viewer_base_url=args.viewer_base_url,
+        plan_only=args.plan_only,
+    )
+
+
+def _handle_build_homography_candidates(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    return build_homography_candidates(
+        session=session,
+        media_id=args.media_id,
+        court_run_id=args.court_run_id,
+        run_name=args.run_name,
+        frame_start=args.frame_start,
+        frame_end=args.frame_end,
+        min_keypoint_confidence=args.min_keypoint_confidence,
         viewer_base_url=args.viewer_base_url,
         plan_only=args.plan_only,
     )

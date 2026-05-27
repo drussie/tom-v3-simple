@@ -44,10 +44,13 @@ OUTPUT_DEBUG_ARTIFACT ?= false
 POSE_MODE ?= crop_from_player_detection
 FALLBACK_TO_FULL_FRAME ?= false
 COURT_RUN_NAME ?= fixture-court-evidence
+COURT_RUN_ID ?=
+HOMOGRAPHY_RUN_NAME ?= homography-candidate-builder
+MIN_KEYPOINT_CONFIDENCE ?= 0.0
 
 export TOM_V3_DATABASE_URL
 
-.PHONY: install web-install test lint migrate api seed verify index-media run-gameplay index-and-run-gameplay run-detection index-and-run-detection extract-frame-artifacts build-tracklets run-pose export-tracklet-review-dataset demo demo-fixture demo-plan demo-reset demo-export demo-open replay-open completion-audit completion-check yolo-probe yolo-smoke yolo-runtime-probe register-yolo-model smoke-real-yolo-local real-detection real-pose court-fixture web web-build web-lint smoke all-checks
+.PHONY: install web-install test lint migrate api seed verify index-media run-gameplay index-and-run-gameplay run-detection index-and-run-detection extract-frame-artifacts build-tracklets run-pose export-tracklet-review-dataset demo demo-fixture demo-plan demo-reset demo-export demo-open replay-open completion-audit completion-check yolo-probe yolo-smoke yolo-runtime-probe register-yolo-model smoke-real-yolo-local real-detection real-pose court-fixture homography-candidates web web-build web-lint smoke all-checks
 
 install:
 	$(PYTHON) -m pip install -e ".[dev]"
@@ -194,6 +197,11 @@ real-pose:
 court-fixture:
 	@if [ -z "$(MEDIA_ID)" ]; then echo "MEDIA_ID is required: make court-fixture MEDIA_ID=<media_id>"; exit 1; fi
 	$(PYTHON) -m apps.worker.cli run-fixture-court --media-id "$(MEDIA_ID)" --frame-sample-rate "$(FRAME_SAMPLE_RATE)" --max-frames "$(MAX_FRAMES)" --run-name "$(COURT_RUN_NAME)" --viewer-base-url "$(VIEWER_BASE_URL)" $(if $(filter true,$(PLAN_ONLY)),--plan-only,)
+
+homography-candidates:
+	@if [ -z "$(MEDIA_ID)" ]; then echo "MEDIA_ID is required: make homography-candidates MEDIA_ID=<media_id>"; exit 1; fi
+	@if [ -z "$(COURT_RUN_ID)" ]; then echo "COURT_RUN_ID is required: make homography-candidates COURT_RUN_ID=<court_run_id>"; exit 1; fi
+	$(PYTHON) -m apps.worker.cli build-homography-candidates --media-id "$(MEDIA_ID)" --court-run-id "$(COURT_RUN_ID)" --run-name "$(HOMOGRAPHY_RUN_NAME)" --min-keypoint-confidence "$(MIN_KEYPOINT_CONFIDENCE)" --viewer-base-url "$(VIEWER_BASE_URL)" $(if $(FRAME_START),--frame-start "$(FRAME_START)",) $(if $(FRAME_END),--frame-end "$(FRAME_END)",) $(if $(filter true,$(PLAN_ONLY)),--plan-only,)
 
 web:
 	cd $(WEB_DIR) && npm run dev

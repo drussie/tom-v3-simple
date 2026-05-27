@@ -82,6 +82,12 @@ GET /court/camera-view/<camera_view_observation_id>/bundle
 
 These APIs expose geometry context evidence only. They do not compute homography or confirm camera state.
 
+## Homography Candidate Input
+
+Milestone 8D consumes the fixture court keypoint, line, and camera/view observations as source evidence for `build-homography-candidates`.
+
+The fixture adapter does not create homography candidates itself. It only provides deterministic source geometry rows with media-owned frame/time and provenance.
+
 ## Provenance
 
 The adapter creates:
@@ -103,9 +109,10 @@ Every emitted observation has:
 
 ## Explicit Non-Goals
 
-8B and 8C do not create:
+8B and 8C do not create homography candidates. 8D can create homography candidates from this adapter's persisted source rows.
 
-- homography candidates
+The fixture adapter still does not create:
+
 - projection diagnostics
 - replay court overlays
 - real court model inference

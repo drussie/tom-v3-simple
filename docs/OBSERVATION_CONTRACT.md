@@ -88,6 +88,8 @@ Milestone 8B adds fixture court evidence production for `court_keypoint_observat
 
 Milestone 8C adds read-only camera/view query, summary, and evidence-bundle access. A camera/view summary is geometry context evidence; it is not a confirmed camera state and does not decide homography validity.
 
+Milestone 8D adds `homography_candidate_observation` persistence from persisted court keypoint evidence, with optional court line and camera/view context. Homography candidates are candidate coordinate transforms; they are not confirmed court models or court-space conclusions.
+
 Court evidence does not decide in/out, bounce locations, player court position, ball court position, rally state, point state, or score.
 
 ## Lineage

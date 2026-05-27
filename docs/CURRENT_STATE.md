@@ -5,7 +5,7 @@
 - Project name: TOM v3 Simple
 - Repo: drussie/tom-v3-simple
 - Current phase: Blueprint 8 in progress
-- Current goal: Build court/camera/homography evidence as observation-only geometry evidence, now with schema contracts, fixture court evidence persistence, and camera/view evidence read models
+- Current goal: Build court/camera/homography evidence as observation-only geometry evidence, now with schema contracts, fixture court evidence persistence, camera/view evidence read models, and homography candidate persistence
 
 ## Mission
 
@@ -37,7 +37,7 @@ A lightweight tennis video observation platform that accepts model output as ope
 - Visual evidence viewer: implemented in `apps/web` with detection bbox overlay, pose keypoint/skeleton overlay, frame artifact image support, run evidence summary, clearer empty states, candidate/evidence wording, readable lineage context, and review/export metadata display
 - Replay workstation: Milestones 6A/6B/6C/6D/6E/6F implemented `/replay/<media_id>` with indexed local video playback, current timestamp/frame display, selected run context, persisted detection overlay chunks, candidate tracklet overlays, pose keypoint/skeleton overlays, layer toggles, run selectors, evidence timeline lanes, click-to-seek/select evidence details, Stream Proxy Mode for video-as-live review, and Blueprint 6 closeout docs; Milestones 7A/7B/7C/7D make real detection runs, real-detection-derived tracklet runs, and real pose runs compatible and source-labeled through `detectionRunId`, `trackletRunId`, and `poseRunId`
 - Pose observation foundation: implemented with a typed `pose_observation` table, COCO17 skeleton registry, keypoint summary statistics, fake/serialized pose output normalization, crop projection, worker fixture pose persistence, optional real pose replay persistence, source detection candidate lineage, pose overlay viewer, pose-specific query filters, review annotations, and TOM-native review dataset export; pose observations remain keypoint evidence only
-- Court/homography evidence: Blueprint 8 has started; Milestone 8A adds typed schema contracts, storage models, migration, court template registry, writer persistence support, and fake persistence tests; Milestone 8B adds fixture court keypoint, court line, and camera/view evidence persistence; Milestone 8C adds camera/view query, summary, bundle, and `/court/camera-view` API read models, but no homography computation, projection diagnostics, real camera/court inference, or replay court overlay exists yet
+- Court/homography evidence: Blueprint 8 has started; Milestone 8A adds typed schema contracts, storage models, migration, court template registry, writer persistence support, and fake persistence tests; Milestone 8B adds fixture court keypoint, court line, and camera/view evidence persistence; Milestone 8C adds camera/view query, summary, bundle, and `/court/camera-view` API read models; Milestone 8D adds homography candidate persistence with source court evidence lineage, but no projection diagnostics, real camera/court inference, ball/player court-space projection, or replay court overlay exists yet
 - Local fixture demo: implemented with worker `run-demo`, Makefile `demo` targets, deterministic media fallback, fixture gameplay/detection/tracklet/pose path, seeded review annotations, pose and tracklet review exports, summary IDs/counts/viewer URLs, and canonical `docs/RUNBOOK_LOCAL.md`
 - Viewer product polish: implemented with shared frontend evidence copy helpers, run evidence summary, detection/tracklet/pose/detail panel wording cleanup, lineage relationship descriptions, artifact/export metadata display, annotation/keypoint metadata display, and viewer payload regression coverage
 - Completion/provenance audit: implemented with worker `completion-audit`, Makefile `completion-audit`, PASS/WARN/FAIL JSON, demo completeness checks, media/run/step/observation/typed-row/lineage/artifact/annotation/export integrity checks, and tests proving the audit passes after `make demo`
@@ -334,13 +334,19 @@ Status: complete
 
 Milestone 8C hardens `camera_view_observation` rows as queryable geometry context evidence. TOM now has a camera/view query service, summary read model, evidence bundle service, and `/court/camera-view` API endpoints for query, summary, and bundle inspection. 8C does not add homography computation, projection diagnostics, replay court overlays, real camera/court inference, ball/player court-space projection, bounce/hit/in-out/rally/point/scoring, stream ingestion, or adjudication.
 
+## Milestone 8D Result
+
+Status: complete
+
+Milestone 8D adds homography candidate persistence. TOM can now run `build-homography-candidates` or `make homography-candidates` for a source court run, compute candidate image-pixels-to-court-template transforms from persisted court keypoint observations, attach optional court line and camera/view context, persist `homography_candidate_observation` rows through `ObservationWriter`, and write lineage from source keypoints, lines, and camera/view evidence. 8D does not add projection diagnostics, replay court overlays, real court inference, ball/player court-space projection, bounce/hit/in-out/rally/point/scoring, stream ingestion, or adjudication.
+
 ## Naming Transition
 
 The implementation branch/file names may reference "1F" because the milestone was originally planned as a Blueprint 1 extension. After Blueprint 1 was declared complete, the same work was reclassified as Blueprint 2A because temporal grouping begins a new conceptual layer.
 
 ## Future Blueprints
 
-TOM v3 Simple is complete. Blueprint 6 is complete as the replay/operator layer. Blueprint 7 is complete as the real perception replay runtime layer. Blueprint 8 is in progress as the court/camera/homography evidence layer, with 8A schema contracts, 8B fixture court evidence persistence, and 8C camera/view evidence read models complete.
+TOM v3 Simple is complete. Blueprint 6 is complete as the replay/operator layer. Blueprint 7 is complete as the real perception replay runtime layer. Blueprint 8 is in progress as the court/camera/homography evidence layer, with 8A schema contracts, 8B fixture court evidence persistence, 8C camera/view evidence read models, and 8D homography candidate persistence complete.
 
 Possible future blueprint candidates:
 

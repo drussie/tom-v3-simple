@@ -2,7 +2,7 @@
 
 Status: IN PROGRESS
 
-Blueprint 7 is complete. Blueprint 8 has started with Milestone 8A schema/contract work and Milestone 8B fixture court evidence persistence.
+Blueprint 7 is complete. Blueprint 8 has started with Milestone 8A schema/contract work, Milestone 8B fixture court evidence persistence, Milestone 8C camera/view read models, and Milestone 8D homography candidate persistence.
 
 ## Mission
 
@@ -59,7 +59,9 @@ Status: COMPLETE.
 
 ### 8D - Homography Candidate Persistence
 
-Persist homography candidates from source court keypoint/line evidence with candidate status, confidence, reprojection diagnostics, and lineage.
+Persist homography candidates from source court keypoint/line/camera-view evidence with candidate status, confidence, reprojection metrics, template metadata, and lineage.
+
+8D adds `build-homography-candidates`, Makefile `homography-candidates`, candidate matrix computation, model/runtime/run/step provenance, and `homography_candidate_observation` typed rows. It does not add projection diagnostics, replay court overlays, real court model inference, or ball/player court-space projection.
 
 ### 8E - Court Overlay In Replay Workstation
 

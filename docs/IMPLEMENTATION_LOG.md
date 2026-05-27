@@ -1735,3 +1735,29 @@ Milestone 7C created:
 - Milestone 7C docs, handoff, and agent report
 
 7C does not add a new tracking algorithm, smoothing, interpolation, real pose inference, court/homography evidence, stream ingestion, tennis-event interpretation, or adjudication. Tracklets remain candidate temporal groupings.
+
+## Milestone 8D - Homography Candidate Persistence
+
+Status: complete
+
+### Goal
+
+Persist candidate homography observations from source court keypoint, court line, and camera/view evidence while preserving geometry-only language and lineage.
+
+### Notes
+
+Milestone 8D created:
+
+- `apps.worker.services.homography_candidate_builder`
+- worker `build-homography-candidates`
+- Makefile `homography-candidates`
+- plan-only homography candidate output
+- candidate matrix computation from persisted court keypoints
+- reprojection metrics, source counts, template metadata, and builder confidence
+- model registry, runtime config, processing run, and processing step provenance
+- `homography_candidate_observation` persistence through `ObservationWriter`
+- lineage from source court keypoints, court lines, and camera/view context
+- focused tests for candidate computation, persistence, insufficient source evidence, lineage, CLI plan mode, and no projection diagnostics
+- Milestone 8D docs, handoff, and agent report
+
+8D does not add projection diagnostics, replay court overlays, real court model inference, ball/player court-space projection, bounce/hit/in-out/rally/point/scoring, stream ingestion, tennis-event interpretation, or adjudication.
