@@ -6,7 +6,9 @@ Canonical local runbook:
 docs/RUNBOOK_LOCAL.md
 ```
 
-Use `docs/RUNBOOK_LOCAL.md` for the current Blueprint 5 fixture demo path. This historical runbook keeps milestone-specific command notes from earlier blueprints.
+Use `docs/RUNBOOK_LOCAL.md` for the current Blueprint 5 fixture demo path. For current repo status and final completion guidance, use `docs/CONTROL_ROOM.md` and `docs/COMPLETION_CHECKLIST.md`.
+
+This historical runbook keeps milestone-specific command notes from earlier blueprints.
 
 This runbook exercises the Milestone 0 loop:
 

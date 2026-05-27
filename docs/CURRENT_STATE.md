@@ -9,7 +9,7 @@
 
 ## Mission
 
-A lightweight tennis video observation platform that accepts model output as operational evidence, persists every atomic observation — including gameplay/non-gameplay state — and makes the evidence queryable and visually replayable without adjudicating truth.
+A lightweight tennis video observation platform that accepts model output as operational evidence, persists every atomic observation, including gameplay/non-gameplay state, and makes the evidence queryable and visually replayable without deciding official tennis meaning.
 
 ## Implementation Status
 
@@ -36,6 +36,7 @@ A lightweight tennis video observation platform that accepts model output as ope
 - Local fixture demo: implemented with worker `run-demo`, Makefile `demo` targets, deterministic media fallback, fixture gameplay/detection/tracklet/pose path, seeded review annotations, pose and tracklet review exports, summary IDs/counts/viewer URLs, and canonical `docs/RUNBOOK_LOCAL.md`
 - Viewer product polish: implemented with shared frontend evidence copy helpers, run evidence summary, detection/tracklet/pose/detail panel wording cleanup, lineage relationship descriptions, artifact/export metadata display, annotation/keypoint metadata display, and viewer payload regression coverage
 - Completion/provenance audit: implemented with worker `completion-audit`, Makefile `completion-audit`, PASS/WARN/FAIL JSON, demo completeness checks, media/run/step/observation/typed-row/lineage/artifact/annotation/export integrity checks, and tests proving the audit passes after `make demo`
+- Docs/control-room consolidation: implemented with concise canonical docs for repo memory, architecture, observation contracts, blueprint status, known limitations, optional YOLO, exports, and final completion checklists
 - Synthetic data: baseline scenario creates viewer-ready observations, tracklets, gaps, candidates, lineage, and artifacts
 - Local setup: documented with `.env.example`, Makefile, and dev runbooks
 - Branch/default branch: `main` is restored as the GitHub default branch
@@ -226,6 +227,12 @@ Status: complete
 
 Milestone 5C adds a final structural provenance audit for the local fixture demo path. TOM v3 Simple now has `run_completion_audit`, worker `completion-audit`, Makefile `completion-audit`, strict/non-strict modes, demo-only/all-data scopes, PASS/WARN/FAIL JSON, and focused tests covering successful demo audit plus broken media/run, typed-row, lineage, artifact, and annotation references. The audit checks evidence structure and provenance integrity only; it does not add model/runtime capability, real pose inference, movement interpretation, homography, bounce/hit/rally/point/scoring, or adjudication.
 
+## Milestone 5D Result
+
+Status: complete.
+
+Milestone 5D consolidates repo memory into a concise canonical documentation set. The README now points to `docs/RUNBOOK_LOCAL.md`, `docs/CONTROL_ROOM.md`, `docs/ARCHITECTURE.md`, `docs/OBSERVATION_CONTRACT.md`, `docs/BLUEPRINT_STATUS.md`, `docs/KNOWN_LIMITATIONS.md`, `docs/OPTIONAL_YOLO.md`, `docs/EXPORTS.md`, `docs/PROVENANCE_AUDIT.md`, and `docs/COMPLETION_CHECKLIST.md`. Older milestone docs remain accessible as history, while the canonical docs describe the current product state, local demo path, optional YOLO boundary, evidence/export contracts, limitations, and final completion checklist without adding new product capability.
+
 ## Naming Transition
 
 The implementation branch/file names may reference "1F" because the milestone was originally planned as a Blueprint 1 extension. After Blueprint 1 was declared complete, the same work was reclassified as Blueprint 2A because temporal grouping begins a new conceptual layer.
@@ -234,4 +241,4 @@ The implementation branch/file names may reference "1F" because the milestone wa
 
 Current blueprint: Blueprint 5 - TOM v3 Simple Completion / Product Hardening.
 
-Recommended next milestone: Milestone 5C - Final Evidence / Provenance Audit.
+Recommended next milestone: Milestone 5E - Final Completion Review.

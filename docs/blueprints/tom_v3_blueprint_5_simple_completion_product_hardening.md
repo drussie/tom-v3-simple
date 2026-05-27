@@ -68,6 +68,22 @@ fixture demo evidence
 -> PASS/WARN/FAIL JSON
 ```
 
+Milestone 5D consolidates docs and repo memory around the current product state:
+
+```text
+README
+-> RUNBOOK_LOCAL
+-> CONTROL_ROOM
+-> ARCHITECTURE
+-> OBSERVATION_CONTRACT
+-> BLUEPRINT_STATUS
+-> KNOWN_LIMITATIONS
+-> OPTIONAL_YOLO
+-> EXPORTS
+-> PROVENANCE_AUDIT
+-> COMPLETION_CHECKLIST
+```
+
 ## Boundaries
 
 Blueprint 5 does not add:
@@ -93,8 +109,9 @@ Blueprint 5 does not add:
 - Milestone 5B - Viewer / Product Polish
 - Milestone 5C - Final Evidence / Provenance Audit
 - Milestone 5D - Docs / Control-Room Consolidation
+- Milestone 5E - Final Completion Review
 
-Milestone names after 5A may change as the product-hardening pass learns what needs the most attention.
+Milestone 5E is expected to be a short completion review, not a new capability milestone.
 
 ## Completion Criteria
 
@@ -128,3 +145,11 @@ Status: complete.
 TOM v3 Simple now has a structural completion/provenance audit with worker `completion-audit`, Makefile `completion-audit`, demo-only/all-data scopes, strict mode, PASS/WARN/FAIL JSON, and tests proving the audit passes after the canonical fixture demo and catches broken references.
 
 The audit checks evidence structure and provenance integrity only. It does not add model/runtime capability, real pose inference, movement interpretation, stroke classification, homography, bounce/hit/rally/point/scoring, or adjudication.
+
+## Milestone 5D Status
+
+Status: complete.
+
+TOM v3 Simple now has a consolidated canonical documentation set. README is concise and practical, `docs/RUNBOOK_LOCAL.md` remains the copy/pasteable local demo path, `docs/CONTROL_ROOM.md` is the current repo-memory/status document, and the architecture, observation contract, blueprint status, known limitations, optional YOLO, exports, provenance audit, and completion checklist docs describe the current platform without requiring milestone archaeology.
+
+This is documentation consolidation only. It does not add new product behavior, model/runtime capability, real pose inference, movement interpretation, stroke classification, homography, bounce/hit/rally/point/scoring, or adjudication.

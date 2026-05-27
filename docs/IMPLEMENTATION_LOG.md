@@ -1096,3 +1096,46 @@ Milestone 5C created:
 - Provenance audit docs and milestone/handoff/agent report entries.
 
 The audit checks structure and provenance only. It does not judge model output quality or tennis meaning.
+
+## Milestone 5D - Docs / Control-Room Consolidation
+
+Status: complete
+
+### Goal
+
+Consolidate TOM v3 Simple repo memory into a clear canonical documentation set that explains the platform, local demo, evidence contract, optional YOLO path, exports, provenance audit, known limitations, and final completion checklist.
+
+### Non-goals
+
+- No new backend behavior.
+- No new frontend behavior.
+- No new database schema.
+- No new model/runtime capability.
+- No real pose runtime or adapter inference.
+- No movement interpretation.
+- No stroke classification.
+- No serve, hit, split-step, or biomechanics conclusions.
+- No court homography.
+- No bounce detection.
+- No rally segmentation.
+- No point reconstruction.
+- No scoring.
+- No adjudication.
+
+### Notes
+
+Milestone 5D created:
+
+- Concise README oriented around the local demo, audit, viewer, optional YOLO path, and canonical docs.
+- `docs/CONTROL_ROOM.md` as the canonical current repo-memory/status document.
+- `docs/ARCHITECTURE.md` as a high-level system overview.
+- `docs/OBSERVATION_CONTRACT.md` as the evidence contract for observations, candidates, lineage, artifacts, annotations, and exports.
+- `docs/BLUEPRINT_STATUS.md` as a compact blueprint completion summary.
+- `docs/KNOWN_LIMITATIONS.md` as an explicit limitation registry.
+- `docs/OPTIONAL_YOLO.md` as the optional real-runtime guide.
+- `docs/EXPORTS.md` as the TOM-native review export guide.
+- `docs/COMPLETION_CHECKLIST.md` as the final demo/viewer/audit/docs/boundary checklist.
+- Milestone 5D milestone, handoff, and agent report docs.
+- Cross-link cleanup in current-state, progress, implementation log, control-room index, runbook, historical dev runbook, and Blueprint 5 docs.
+
+The consolidation keeps milestone docs as history while making the current state easier to understand without adding product capability.

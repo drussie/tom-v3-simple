@@ -1,0 +1,125 @@
+# Optional YOLO Runtime
+
+YOLO is optional in TOM v3 Simple.
+
+The default fixture demo does not require Ultralytics, Torch, OpenCV, YOLO weights, GPU runtime, or network access.
+
+## Base Environment
+
+The base `tom_v3` environment remains lightweight. It can run:
+
+```bash
+make demo
+make completion-audit
+pytest -q
+```
+
+without YOLO packages.
+
+## Runtime Probe
+
+Probe optional dependencies:
+
+```bash
+make yolo-probe
+```
+
+Equivalent:
+
+```bash
+python -m apps.worker.cli yolo-runtime-probe --device auto
+python -m apps.worker.cli yolo-runtime-probe --device cpu
+```
+
+The probe reports package availability and resolved device information. Missing optional packages should produce clear diagnostics.
+
+## Optional Environment
+
+Recommended optional setup:
+
+```bash
+conda create -n tom_v3_yolo python=3.11 -y
+conda activate tom_v3_yolo
+python -m pip install --upgrade pip
+pip install -e ".[dev]"
+pip install -r requirements-yolo.txt
+```
+
+## Weights Policy
+
+Model weights are local assets, not source code.
+
+The repo ignores local weight/runtime paths such as:
+
+```text
+model_assets/
+weights/
+*.pt
+*.pth
+*.onnx
+*.engine
+```
+
+Do not commit YOLO weights unless the project explicitly changes that policy.
+
+## Register Weights
+
+```bash
+python -m apps.worker.cli register-yolo-model \
+  --weights-path model_assets/yolo/<model>.pt \
+  --model-name local-yolo-smoke \
+  --model-version local-v0 \
+  --device cpu
+```
+
+Registration validates the local path, records sha256/file size, validates class mapping, and creates or reuses a `model_registry` row. It does not create observations.
+
+## Smoke Path
+
+Preview the smoke path:
+
+```bash
+make yolo-smoke
+```
+
+Run it when runtime, weights, and media are present:
+
+```bash
+python -m apps.worker.cli smoke-real-yolo-local \
+  --source-path <sample_video_path> \
+  --weights-path model_assets/yolo/<model>.pt \
+  --model-name local-yolo-smoke \
+  --model-version local-v0 \
+  --device cpu \
+  --frame-sample-rate 30 \
+  --max-frames 3 \
+  --run-tracklets
+```
+
+YOLO smoke remains separate from `make demo`.
+
+## Common Failure Modes
+
+- Ultralytics missing.
+- Torch missing.
+- OpenCV missing.
+- Requested device unavailable.
+- Weights path missing or outside allowed roots.
+- Checksum mismatch.
+- Model load failure.
+- Prediction failure.
+- Media path missing.
+
+Failures should be clear and should not fall back to fixture detections.
+
+## What YOLO Detections Mean
+
+A YOLO-origin detection means the YOLO adapter produced a detection-like model output at a media-owned frame/time and TOM v3 persisted it through the existing detection observation contract.
+
+It does not mean:
+
+- the object is correct
+- identity is known
+- a tennis action happened
+- a rally or point exists
+- a score exists

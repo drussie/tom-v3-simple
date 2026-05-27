@@ -2,18 +2,24 @@
 
 TOM v3 is an observation-only platform.
 It records evidence.
-It does not adjudicate truth.
+It does not decide official tennis meaning.
 
 Use this index as the durable navigation point for project memory, architecture decisions, milestone state, handoffs, and agent reports.
 
 ## Current Project State
 
+- [Control Room](CONTROL_ROOM.md)
 - [Current State](CURRENT_STATE.md)
 - [Blueprint Progress](BLUEPRINT_PROGRESS.md)
+- [Blueprint Status](BLUEPRINT_STATUS.md)
 - [Implementation Log](IMPLEMENTATION_LOG.md)
+- [Known Limitations](KNOWN_LIMITATIONS.md)
+- [Completion Checklist](COMPLETION_CHECKLIST.md)
 
 ## Architecture
 
+- [Architecture Summary](ARCHITECTURE.md)
+- [Observation Contract](OBSERVATION_CONTRACT.md)
 - [TOM v3 Observation Platform Blueprint v0.1](architecture/tom_v3_observation_platform_blueprint_v0_1.md)
 - [Observation Store v0](architecture/observation_store_v0.md)
 - [Gameplay / View-State Layer v0](architecture/gameplay_view_state_layer_v0.md)
@@ -53,6 +59,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 5A - Local Demo / Runbook Completion Path](milestones/milestone_5a_local_demo_runbook_completion_path.md)
 - [Milestone 5B - Viewer / Product Polish](milestones/milestone_5b_viewer_product_polish.md)
 - [Milestone 5C - Final Evidence / Provenance Audit](milestones/milestone_5c_final_evidence_provenance_audit.md)
+- [Milestone 5D - Docs / Control-Room Consolidation](milestones/milestone_5d_docs_control_room_consolidation.md)
 
 ## Handoffs
 
@@ -86,6 +93,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 5A Handoff](handoffs/milestone_5a_local_demo_runbook_completion_path_handoff.md)
 - [Milestone 5B Handoff](handoffs/milestone_5b_viewer_product_polish_handoff.md)
 - [Milestone 5C Handoff](handoffs/milestone_5c_final_evidence_provenance_audit_handoff.md)
+- [Milestone 5D Handoff](handoffs/milestone_5d_docs_control_room_consolidation_handoff.md)
 
 ## Agent Reports
 
@@ -119,6 +127,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 5A Agent Report](agent_reports/milestone_5a_local_demo_runbook_completion_path_report.md)
 - [Milestone 5B Agent Report](agent_reports/milestone_5b_viewer_product_polish_report.md)
 - [Milestone 5C Agent Report](agent_reports/milestone_5c_final_evidence_provenance_audit_report.md)
+- [Milestone 5D Agent Report](agent_reports/milestone_5d_docs_control_room_consolidation_report.md)
 
 ## Blueprints
 
@@ -189,6 +198,8 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Local Environment Setup](dev/local_environment_setup.md)
 - [Canonical Local Runbook](RUNBOOK_LOCAL.md)
 - [Provenance Audit](PROVENANCE_AUDIT.md)
+- [Optional YOLO](OPTIONAL_YOLO.md)
+- [Review Exports](EXPORTS.md)
 - [Local Demo Runbook](dev/local_demo_runbook.md)
 - [Repo Branch Hygiene](dev/repo_branch_hygiene.md)
 
@@ -215,4 +226,4 @@ Preferred TOM v3 vocabulary:
 
 Core invariant:
 
-> TOM v3 records what was observed, not what was proven.
+> TOM v3 records evidence observations and candidate groupings. It does not decide official tennis meaning.

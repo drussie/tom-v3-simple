@@ -4,6 +4,17 @@ This is the canonical local runbook for TOM v3 Simple.
 
 It is written for a new developer who wants to prove the local observation loop without YOLO weights, real pose weights, GPU setup, or prior control-room context.
 
+For the short current-status map, start with:
+
+- [Control Room](CONTROL_ROOM.md)
+- [Architecture](ARCHITECTURE.md)
+- [Observation Contract](OBSERVATION_CONTRACT.md)
+- [Blueprint Status](BLUEPRINT_STATUS.md)
+- [Known Limitations](KNOWN_LIMITATIONS.md)
+- [Optional YOLO](OPTIONAL_YOLO.md)
+- [Exports](EXPORTS.md)
+- [Completion Checklist](COMPLETION_CHECKLIST.md)
+
 ## 1. What TOM v3 Simple Is
 
 TOM v3 Simple is a local observation platform for tennis video evidence.
@@ -102,6 +113,23 @@ Use custom media:
 DEMO_MEDIA_PATH=/path/to/video.mp4 make demo
 ```
 
+Use a sample asset and isolated demo database:
+
+```bash
+DEMO_MEDIA_PATH=demo_assets/sample_point.mp4 \
+TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_demo_sample_point.db \
+make demo PYTHON=.venv/bin/python MAX_FRAMES=3
+```
+
+Then audit the same database:
+
+```bash
+TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_demo_sample_point.db \
+make completion-audit PYTHON=.venv/bin/python
+```
+
+Local video files under `demo_assets/` should not be committed unless intentionally tracked.
+
 The demo runs this fixture-only path:
 
 ```text
@@ -127,6 +155,8 @@ make completion-audit
 ```
 
 The audit checks media, processing runs/steps, observations, typed rows, lineage, artifacts, annotations, and review exports. It does not check model correctness or decide tennis meaning.
+
+For the final checklist, see [Completion Checklist](COMPLETION_CHECKLIST.md).
 
 ## 5. Open The Viewer
 
