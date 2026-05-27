@@ -2,14 +2,19 @@
 
 ## Status
 
-Status: IN PROGRESS
+Status: COMPLETE
 
 Milestone 6A started Blueprint 6. Milestone 6B added detection overlay playback.
 Milestone 6C adds tracklet candidate and pose keypoint overlay playback.
 Milestone 6D adds timeline lanes and evidence scrubbing.
 Milestone 6E adds Stream Proxy Mode over indexed local video.
+Milestone 6F closes Blueprint 6 with a completion review.
 
 TOM v3 Simple is complete. Blueprint 6 is a new product layer that turns the local evidence platform into a replay/operator workstation.
+
+Blueprint 6 completes TOM v3's visual replay/operator workstation. TOM can now open an indexed video in Replay Mode or Stream Proxy Mode, play the video, synchronize persisted detection observations, candidate tracklets, and pose keypoint evidence over media-owned frame/time, render evidence timeline lanes, allow click-to-seek and click-to-select persisted observations, and hide future evidence in Stream Proxy Mode until the live-like proxy edge reaches it.
+
+Blueprint 6 remains observation-only and non-adjudicative. It does not add real live TV/HLS/RTSP/HDMI ingestion, stream backend infrastructure, real pose inference, movement interpretation, homography, bounce/hit/rally/point/scoring, or TOM v2-style adjudication.
 
 ## Mission
 
@@ -39,7 +44,7 @@ Stream Proxy Mode is now available as a UI/operator behavior. Production live in
 - 6C: Tracklet / Pose Replay Layers
 - 6D: Evidence Timeline Lanes
 - 6E: Stream Proxy Mode
-- 6F: Operator Review Workflow Hardening
+- 6F: Blueprint 6 Completion Review
 
 The plan is intentionally incremental. Each milestone should preserve TOM's observation-only boundary.
 
@@ -169,6 +174,35 @@ Milestone 6E does not add:
 - HLS/RTSP/HDMI/camera capture
 - websocket live updates
 - model scheduling
+- model/runtime expansion
+- tennis-event interpretation
+- homography or court-space reasoning
+- bounce/hit/rally/point/scoring
+
+## 6F Proof
+
+Milestone 6F proves:
+
+```text
+Replay Mode
+-> Stream Proxy Mode
+-> synchronized detection / tracklet / pose overlays
+-> evidence timeline lanes
+-> click-to-seek persisted evidence
+-> click-to-select persisted evidence
+-> hidden future evidence in Stream Proxy Mode
+-> Blueprint 6 complete
+```
+
+## 6F Non-Goals
+
+Milestone 6F does not add:
+
+- real live stream ingestion
+- HLS/RTSP/HDMI/camera capture
+- stream backend/session tables
+- websocket live updates
+- live model scheduling
 - model/runtime expansion
 - tennis-event interpretation
 - homography or court-space reasoning

@@ -7,10 +7,10 @@
 - Blueprint 3: COMPLETE
 - Blueprint 4: COMPLETE
 - Blueprint 5: COMPLETE
-- Blueprint 6: IN PROGRESS
+- Blueprint 6: COMPLETE
 - TOM v3 Simple: COMPLETE
 
-TOM v3 Simple is complete as a lightweight local observation/evidence platform. Blueprint 6 has started as the visual replay/operator layer.
+TOM v3 Simple is complete as a lightweight local observation/evidence platform. Blueprint 6 is complete as the visual replay/operator workstation layer.
 
 ## Blueprint 1 - Media, Observation Store, Viewer Foundation
 
@@ -150,7 +150,11 @@ Blueprint 5 did not add real pose inference, movement interpretation, stroke cla
 
 ## Blueprint 6 - Visual Replay / Live Observation Workstation
 
-Status: IN PROGRESS
+Status: COMPLETE
+
+Blueprint 6 completes TOM v3's visual replay/operator workstation. TOM can now open an indexed video in Replay Mode or Stream Proxy Mode, play the video, synchronize persisted detection observations, candidate tracklets, and pose keypoint evidence over media-owned frame/time, render evidence timeline lanes, allow click-to-seek and click-to-select persisted observations, and hide future evidence in Stream Proxy Mode until the live-like proxy edge reaches it.
+
+Blueprint 6 remains observation-only and non-adjudicative. It does not add real live TV/HLS/RTSP/HDMI ingestion, stream backend infrastructure, real pose inference, movement interpretation, homography, bounce/hit/rally/point/scoring, or TOM v2-style adjudication.
 
 Milestone 6A proved:
 
@@ -269,3 +273,31 @@ Milestone 6E did not add:
 - bounce or hit detection
 - rally/point/scoring
 - adjudication
+
+Milestone 6F proved:
+
+```text
+Replay Mode
+-> Stream Proxy Mode
+-> synchronized detection / tracklet / pose evidence overlays
+-> evidence timeline lanes
+-> click-to-seek/select persisted evidence
+-> hidden future evidence in Stream Proxy Mode
+-> Blueprint 6 completion review
+```
+
+Milestone 6F did not add:
+
+- real live stream ingestion
+- HLS/RTSP/HDMI/camera capture
+- stream backend/session tables
+- websocket live updates
+- live model scheduling
+- real pose inference
+- tennis-event interpretation
+- homography
+- bounce or hit detection
+- rally/point/scoring
+- adjudication
+
+Future real live ingestion and future tennis intelligence must begin as new blueprints.

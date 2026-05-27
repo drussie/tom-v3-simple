@@ -1,5 +1,37 @@
 # TOM v3 Simple - Implementation Log
 
+## Milestone 6F - Blueprint 6 Completion Review
+
+Status: complete
+
+### Goal
+
+Close Blueprint 6 with final status updates, completion review documentation, validation, and future blueprint boundaries.
+
+### Non-goals
+
+- No new frontend replay behavior.
+- No new backend replay behavior.
+- No real live stream ingestion.
+- No HLS/RTSP/HDMI/camera capture.
+- No stream backend/session tables.
+- No websocket live updates.
+- No model scheduling.
+- No real pose inference.
+- No tennis-event interpretation.
+- No homography, bounce, hit, rally, point, scoring, or adjudication.
+
+### Notes
+
+Milestone 6F created:
+
+- `docs/blueprints/tom_v3_blueprint_6_completion_review.md`.
+- `docs/milestones/milestone_6f_blueprint_6_completion_review.md`.
+- `docs/handoffs/milestone_6f_blueprint_6_completion_review_handoff.md`.
+- `docs/agent_reports/milestone_6f_blueprint_6_completion_review_report.md`.
+- Canonical docs updates marking Blueprint 6 COMPLETE.
+- Explicit future blueprint candidates for real live ingestion, real pose runtime, court-space evidence, event candidates, movement/stroke evidence, and deployment.
+
 ## Milestone 6E - Stream Proxy Mode
 
 Status: complete

@@ -6,7 +6,9 @@ Use this checklist for final local validation and completion review.
 
 TOM v3 Simple Status: COMPLETE
 
-The final completion review passed. TOM v3 Simple is complete as a lightweight local observation/evidence platform. Future work should begin as a separate blueprint.
+Blueprint 6 Status: COMPLETE
+
+The final TOM v3 Simple completion review passed. Blueprint 6 completion review passed. TOM v3 is complete as a lightweight local observation/evidence platform plus visual replay/operator workstation. Future work should begin as a separate blueprint.
 
 ## Demo Checklist
 
@@ -66,6 +68,33 @@ Confirm:
 - annotations are visible
 - review export artifacts appear when present in the run payload
 
+## Replay Workstation Checklist
+
+Open Replay Mode:
+
+```text
+http://127.0.0.1:3000/replay/<media_id>?detectionRunId=<detection_run_id>&trackletRunId=<tracklet_run_id>&poseRunId=<pose_run_id>
+```
+
+Open Stream Proxy Mode:
+
+```text
+http://127.0.0.1:3000/replay/<media_id>?mode=stream_proxy&detectionRunId=<detection_run_id>&trackletRunId=<tracklet_run_id>&poseRunId=<pose_run_id>
+```
+
+Confirm:
+
+- video loads
+- current timestamp/frame updates
+- detection observation overlays render
+- tracklet candidate overlays render
+- pose keypoint overlays render
+- evidence timeline lanes render
+- clicking timeline items seeks/selects persisted evidence
+- clicking overlays selects persisted evidence
+- Stream Proxy Mode hides future evidence until the live-like edge reaches it
+- no tennis-event interpretation is displayed
+
 ## Provenance Audit Checklist
 
 After `make demo`, run:
@@ -109,6 +138,8 @@ Confirm these files exist and are current:
 Confirm TOM v3 Simple still does not add:
 
 - real pose inference
+- real live stream ingestion
+- HLS/RTSP/HDMI/camera capture
 - movement interpretation
 - stroke classification
 - serve or hit conclusions
@@ -161,6 +192,8 @@ make yolo-smoke
 - [x] `make demo` passes.
 - [x] `make completion-audit` passes.
 - [x] Viewer shows detections, tracklets, pose evidence, lineage, artifacts, annotations, and exports.
+- [x] Replay workstation shows indexed video, detection overlays, tracklet candidate overlays, pose keypoint overlays, and evidence timeline lanes.
+- [x] Stream Proxy Mode hides future evidence until the live-like edge reaches it.
 - [x] Exports are created.
 - [x] Known limitations are documented.
 - [x] Optional YOLO is documented and separate from the default fixture demo.

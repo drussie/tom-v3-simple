@@ -193,7 +193,7 @@ Viewer copy uses evidence and candidate wording. Fixture outputs are not present
 
 ## 5A. Open The Replay Workstation
 
-Blueprint 6 adds a media-centric replay route:
+Blueprint 6 is complete and adds a media-centric replay/operator workstation route:
 
 ```text
 http://127.0.0.1:3000/replay/<media_id>
@@ -261,6 +261,8 @@ Expected 6E Stream Proxy behavior:
 - Return to live edge jumps back to the latest available proxy time
 
 Stream Proxy Mode still uses indexed local media and persisted observations. It is not real live stream ingestion.
+
+Blueprint 6 is complete at this boundary. Future real live ingestion, new replay capabilities, or tennis-intelligence layers should begin as separate blueprints.
 
 ## 6. Inspect Detections
 

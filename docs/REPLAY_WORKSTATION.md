@@ -1,6 +1,8 @@
 # TOM v3 Replay Workstation
 
-Blueprint 6 starts a new product layer on top of the completed TOM v3 Simple evidence platform.
+Blueprint 6 is complete.
+
+It adds a visual replay/operator workstation on top of the completed TOM v3 Simple evidence platform.
 
 Replay Mode is the first step:
 
@@ -27,6 +29,12 @@ Milestone 6D adds timeline lanes and evidence scrubbing across detection
 observations, tracklet candidates, pose observations, and review annotations.
 
 Milestone 6E adds Stream Proxy Mode over indexed local video.
+
+Milestone 6F closes Blueprint 6 with a completion review and final status updates.
+
+Blueprint 6 completes TOM v3's visual replay/operator workstation. TOM can now open an indexed video in Replay Mode or Stream Proxy Mode, play the video, synchronize persisted detection observations, candidate tracklets, and pose keypoint evidence over media-owned frame/time, render evidence timeline lanes, allow click-to-seek and click-to-select persisted observations, and hide future evidence in Stream Proxy Mode until the live-like proxy edge reaches it.
+
+Blueprint 6 remains observation-only and non-adjudicative. It does not add real live TV/HLS/RTSP/HDMI ingestion, stream backend infrastructure, real pose inference, movement interpretation, homography, bounce/hit/rally/point/scoring, or TOM v2-style adjudication.
 
 ## What 6A Added
 
@@ -135,6 +143,26 @@ create backend stream sessions or ingest real streams.
 
 - live stream ingestion
 - HLS/RTSP/HDMI/camera capture
+- websocket live updates
+- model scheduling
+- new model runtime behavior
+- tennis-event interpretation
+- scoring or official results
+
+## What 6F Adds
+
+- Blueprint 6 completion review
+- final status updates marking Blueprint 6 complete
+- final validation and smoke documentation
+- explicit future blueprint boundary
+
+6F is closeout only. It adds no new replay, stream, model, or tennis-intelligence capability.
+
+## What 6F Does Not Add
+
+- live stream ingestion
+- HLS/RTSP/HDMI/camera capture
+- stream backend/session tables
 - websocket live updates
 - model scheduling
 - new model runtime behavior
@@ -368,3 +396,5 @@ http://127.0.0.1:3000/replay/<media_id>?mode=stream_proxy&detectionRunId=<detect
 The replay workstation displays synchronized evidence context. It does not decide tennis meaning.
 
 Stream Proxy Mode is live-like local replay only. Real live ingestion remains future work.
+
+Future real live ingestion and future tennis intelligence must begin as new blueprints.

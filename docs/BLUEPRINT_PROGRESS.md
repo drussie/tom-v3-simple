@@ -2,7 +2,7 @@
 
 ## Current Progress Gauge
 
-Current: Blueprints 1, 2, 3, 4, and 5 complete; Blueprint 6 has started; TOM v3 Simple is complete
+Current: Blueprints 1, 2, 3, 4, 5, and 6 complete; TOM v3 Simple is complete
 
 ## Current
 
@@ -151,7 +151,7 @@ Current: Blueprints 1, 2, 3, 4, and 5 complete; Blueprint 6 has started; TOM v3 
 - README, local runbook, current-state, progress, implementation log, and control-room index point to the consolidated docs.
 - Final completion review exists.
 - TOM v3 Simple is marked complete in canonical docs.
-- Blueprint 6 has started as the visual replay/operator layer.
+- Blueprint 6 is complete as the visual replay/operator layer.
 - Replay info and local video serving endpoints exist.
 - Replay frame/time mapping helpers exist.
 - Frontend `/replay/<media_id>` route exists.
@@ -169,6 +169,8 @@ Current: Blueprints 1, 2, 3, 4, and 5 complete; Blueprint 6 has started; TOM v3 
 - Replay workstation Stream Proxy Mode exists for video-as-live review over indexed local media.
 - Stream Proxy Mode hides future overlays and future timeline evidence until the live-like edge reaches it.
 - Stream Proxy Mode displays available evidence counts, pause/review state, lag, and return-to-live-edge control.
+- Blueprint 6 completion review exists.
+- Blueprint 6 is marked complete in canonical docs.
 - No real pose inference, movement interpretation, homography, bounce, hit, rally, point, scoring, or adjudication has been added.
 
 ## Blueprint 5 Status
@@ -214,7 +216,7 @@ Remaining Blueprint 5 work: none.
 
 ## Blueprint 6 Status
 
-Status: in progress.
+Status: complete.
 
 Milestone 6A is complete. Blueprint 6 starts with Replay Mode:
 
@@ -281,7 +283,21 @@ indexed local video
 
 Current Blueprint 6 progress after 6E: about 80-85%.
 
-Operator review hardening remains a future milestone.
+Milestone 6F is complete. It closes Blueprint 6:
+
+```text
+Replay Mode
+-> Stream Proxy Mode
+-> synchronized detection / tracklet / pose evidence overlays
+-> evidence timeline lanes
+-> click-to-seek/select persisted evidence
+-> hidden future evidence in Stream Proxy Mode
+-> completion review
+```
+
+Current Blueprint 6 progress after 6F: 100%.
+
+Remaining Blueprint 6 work: none.
 
 ## Milestone 5D Status
 
