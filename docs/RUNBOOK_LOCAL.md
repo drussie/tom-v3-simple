@@ -515,6 +515,31 @@ If local pose weights are not available, skip the real pose smoke and rely on th
 
 Real YOLO detections are model-output observations. Real-detection-derived tracklets are candidate groupings from those observations. Real pose observations are keypoint evidence. These layers do not create movement interpretation, homography, events, scoring, or adjudication.
 
+## 11A. Court / Homography Decision Gate
+
+Milestone 7E is docs/status only. It decides that court/camera/homography evidence should be implemented as future Blueprint 8 work, not inside Blueprint 7.
+
+Read:
+
+```text
+docs/court/court_homography_evidence_decision_v0.md
+docs/blueprints/tom_v3_blueprint_8_court_camera_homography_evidence_layer_candidate.md
+```
+
+There is no `make court`, no homography runtime, no schema migration, no replay court overlay, and no production court-space transform in 7E.
+
+Future court evidence should remain observation-only:
+
+```text
+court keypoint evidence
+-> court line evidence
+-> camera/view evidence
+-> homography candidate
+-> projection diagnostic
+```
+
+Those records should not become bounce/hit/rally/point/scoring conclusions.
+
 ## 12. Optional Custom Media
 
 Use a local video:

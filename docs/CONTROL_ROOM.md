@@ -33,7 +33,7 @@ Future real live ingestion and future tennis intelligence must begin as new blue
 
 Blueprint 7 Status: IN PROGRESS
 
-Blueprint 7 starts the real perception runtime for the replay workstation. Milestones 7A, 7B, 7C, and 7D add optional real YOLO detection replay, validate it in the operator UI, build candidate tracklets from real detection observations through the existing tracklet builder, and persist optional real pose keypoint evidence when local pose runtime and weights exist.
+Blueprint 7 starts the real perception runtime for the replay workstation. Milestones 7A, 7B, 7C, and 7D add optional real YOLO detection replay, validate it in the operator UI, build candidate tracklets from real detection observations through the existing tracklet builder, and persist optional real pose keypoint evidence when local pose runtime and weights exist. Milestone 7E decides that court/camera/homography evidence should be deferred to Blueprint 8.
 
 Blueprint 7 still records evidence only. Real model output is not tennis conclusions.
 
@@ -89,12 +89,14 @@ An observation does not mean the output is correct, a tennis event happened, a s
 - Real-detection-derived candidate tracklet runs that preserve source detection ids and lineage.
 - Optional real pose replay runs that persist real `player_pose_observation` rows with COCO17 keypoint evidence.
 - Real pose crop mode can preserve lineage from source player detections to pose observations.
+- Court/camera/homography evidence decision gate with a Blueprint 8 candidate contract.
 
 ## Explicitly Absent Capabilities
 
 - Movement interpretation or biomechanics conclusions.
 - Stroke classification.
 - Homography or court-space reasoning.
+- Court/camera/homography runtime.
 - Bounce detection.
 - Hit detection.
 - Rally segmentation.
@@ -127,6 +129,7 @@ Short version:
 - Fixture output is deterministic demo evidence.
 - Optional YOLO quality depends on local runtime, weights, model classes, and source media.
 - Optional real pose quality depends on local runtime, pose weights, source detections or frame sampling, and source media.
+- Court/camera/homography evidence is deferred to Blueprint 8.
 - Candidate tracklets can be wrong or incomplete.
 - Exports are TOM-native review datasets.
 - Storage lifecycle is local/demo-oriented.
@@ -257,6 +260,17 @@ indexed media
 
 7A/7B/7C/7D do not add movement interpretation, stroke classification, biomechanics conclusions, homography, stream ingestion, tennis-event interpretation, or adjudication.
 
+Milestone 7E is a court/homography decision gate:
+
+```text
+Blueprint 7 scope review
+-> court/camera/homography evidence contract
+-> Blueprint 8 candidate
+-> no runtime implementation
+```
+
+7E decides that court/camera/homography belongs in Blueprint 8. It does not add schema migrations, runtime, replay court overlays, coordinate transforms, event interpretation, stream ingestion, or adjudication.
+
 ## Future Blueprint Candidates
 
 Future work should be separate from TOM v3 Simple completion:
@@ -264,7 +278,7 @@ Future work should be separate from TOM v3 Simple completion:
 - Real live stream ingestion.
 - Tracklet quality/evaluation workflows.
 - Pose quality/evaluation workflows.
-- Homography / court-space evidence.
+- Blueprint 8 - Court / Camera / Homography Evidence Layer.
 - Event candidate layers for bounce/hit/rally/point work.
 - Product deployment, auth, storage lifecycle, and collaboration workflows.
 - Larger-scale evaluation and model-quality workflows.

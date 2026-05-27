@@ -77,9 +77,23 @@ indexed media
 
 7D keeps pose as keypoint evidence. It does not add movement interpretation, stroke classification, serve detection, biomechanics conclusions, court/homography evidence, stream ingestion, or tennis-event interpretation.
 
+## Milestone 7E
+
+Milestone 7E is a court/homography evidence decision gate:
+
+```text
+Blueprint 7 real perception runtime
+-> court/camera/homography scope review
+-> geometry evidence contract proposal
+-> Blueprint 8 candidate
+-> no runtime implementation
+```
+
+7E decides that court/camera/homography evidence should be future Blueprint 8 work. It does not add database schema, court runtime, homography computation, replay court overlays, production coordinate transforms, stream ingestion, or tennis-event interpretation.
+
 ## Boundaries
 
-Blueprint 7 does not add official tennis conclusions, TOM v2-style adjudication, accepted/rejected event lifecycles, bounce/hit detection, stroke classification, rally/point/scoring, player identity resolution, ball-path conclusions, movement interpretation from pose, court-space reasoning, or live stream ingestion.
+Blueprint 7 does not add official tennis conclusions, TOM v2-style adjudication, accepted/rejected event lifecycles, bounce/hit detection, stroke classification, rally/point/scoring, player identity resolution, ball-path conclusions, movement interpretation from pose, court-space reasoning, court/homography runtime, or live stream ingestion.
 
 Future real perception outputs remain observations and candidates until a separate blueprint deliberately defines a higher-level evidence layer.
 
@@ -98,8 +112,10 @@ No YOLO weights, GPU, Torch, Ultralytics, OpenCV, or pose weights are required f
 
 Possible follow-on Blueprint 7 milestones:
 
-- Court / homography evidence decision gate
+- Perception run orchestration and completion review
 - Real model-output quality/evaluation workflows
 - Future perception layers that remain observation-only
 
 Do not add tennis intelligence implicitly inside these runtime milestones.
+
+Court/camera/homography evidence is now a Blueprint 8 candidate.

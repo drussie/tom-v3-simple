@@ -42,6 +42,8 @@ Milestone 7C builds candidate tracklets from real detection runs through the exi
 
 Milestone 7D adds optional real pose replay runs that persist `player_pose_observation` keypoint evidence and render through `poseRunId`. Pose keypoints are evidence only and do not interpret movement, strokes, biomechanics, court position, or tennis events.
 
+Milestone 7E decides that court/camera/homography evidence belongs in future Blueprint 8. The replay workstation does not yet implement court keypoint overlays, court line overlays, homography candidate overlays, projection diagnostics, or court-space coordinate transforms.
+
 ## What 6A Added
 
 - `GET /media/{media_id}/replay-info`
@@ -174,6 +176,21 @@ create backend stream sessions or ingest real streams.
 - new model runtime behavior
 - tennis-event interpretation
 - scoring or official results
+
+## Blueprint 7E Court / Homography Decision
+
+7E is a documentation and architecture decision gate. It adds no replay runtime behavior.
+
+Future Blueprint 8 replay layers may include:
+
+- court keypoint evidence
+- court line evidence
+- homography candidate
+- projection diagnostic
+
+Future selected detail should show source court evidence, model/runtime/config, matrix and diagnostics when applicable, lineage, annotations, and candidate-only wording.
+
+The replay workstation should avoid labels that imply final court geometry, in/out decisions, bounce locations, or official tennis results.
 
 ## Backend Replay Info
 

@@ -362,12 +362,24 @@ indexed media
 -> replay URL with poseRunId
 ```
 
-Milestones 7A/7B/7C/7D do not add:
+Milestone 7E decides:
+
+```text
+court / camera / homography scope review
+-> geometry evidence contract proposal
+-> Blueprint 8 candidate
+-> implementation deferred
+```
+
+Milestones 7A/7B/7C/7D/7E do not add:
 
 - movement interpretation or biomechanics conclusions
 - homography or court-space reasoning
+- court/camera/homography runtime
 - stream ingestion
 - bounce or hit detection
 - rally/point/scoring
-- confirmed identity or confirmed ball path
+- identity resolution or ball-path conclusions
 - adjudication
+
+Court/camera/homography evidence is future Blueprint 8 work.

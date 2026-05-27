@@ -1,5 +1,41 @@
 # TOM v3 Simple - Implementation Log
 
+## Milestone 7E - Court / Homography Evidence Decision Gate
+
+Status: complete
+
+### Goal
+
+Decide whether court/camera/homography evidence belongs inside Blueprint 7 or should become a separate blueprint.
+
+### Decision
+
+Court/camera/homography evidence should be deferred to Blueprint 8.
+
+### Non-goals
+
+- No court/homography database migration.
+- No court/homography runtime.
+- No court keypoint or line detector.
+- No homography computation service.
+- No replay court overlay implementation.
+- No production court-space coordinate transforms.
+- No bounce/hit/rally/point/scoring.
+- No real stream ingestion.
+- No tennis-event interpretation.
+- No adjudication.
+
+### Notes
+
+Milestone 7E created:
+
+- `docs/court/court_homography_evidence_decision_v0.md`.
+- `docs/blueprints/tom_v3_blueprint_8_court_camera_homography_evidence_layer_candidate.md`.
+- Milestone doc, handoff, and agent report.
+- Canonical status updates documenting the Blueprint 8 deferral.
+
+The decision note proposes future court keypoint, court line, camera/view, homography candidate, lineage, replay, review, and export contracts. No runtime or schema implementation was added.
+
 ## Milestone 7D - Real Pose Runtime for Replay Workstation
 
 Status: complete

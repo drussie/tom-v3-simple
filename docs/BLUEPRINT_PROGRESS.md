@@ -189,7 +189,9 @@ Current: Blueprints 1, 2, 3, 4, 5, and 6 complete; TOM v3 Simple is complete; Bl
 - Replay-info pose run metadata distinguishes real pose model-output runs from fixture pose runs.
 - Replay pose overlays and pose timeline items include optional source/runtime/model/config metadata for real pose validation.
 - Replay selected pose detail displays source/runtime/model/config and subject association context when available.
-- No movement interpretation, homography, bounce, hit, rally, point, scoring, or adjudication has been added.
+- Court/homography decision gate exists.
+- Court/camera/homography evidence is deferred to a Blueprint 8 candidate.
+- No court/homography runtime, movement interpretation, bounce, hit, rally, point, scoring, or adjudication has been added.
 
 ## Blueprint 7 Status
 
@@ -237,9 +239,19 @@ indexed media
 -> replay pose overlays
 ```
 
-Current Blueprint 7 progress after 7D: about 60-65%.
+Milestone 7E is a court/homography evidence decision gate:
 
-Remaining Blueprint 7 work should stay separate and deliberate: court/homography decision gates, evaluation workflows, and future perception layers. No tennis-event interpretation is part of 7A/7B/7C/7D.
+```text
+Blueprint 7 real perception runtime
+-> court/camera/homography scope review
+-> future evidence contract
+-> Blueprint 8 candidate
+-> no implementation
+```
+
+Current Blueprint 7 progress after 7E: about 70-75%.
+
+Remaining Blueprint 7 work should stay separate and deliberate: perception run orchestration, completion review, evaluation workflows, and future perception layers. No tennis-event interpretation is part of 7A/7B/7C/7D/7E.
 
 ## Blueprint 5 Status
 
