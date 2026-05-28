@@ -1036,11 +1036,17 @@ function RunSelect({
   selectedRunId: string | null;
   onChange: (runId: string | null) => void;
 }) {
+  const selectedRunHasSummary =
+    selectedRunId !== null && runs.some((run) => run.run_id === selectedRunId);
+
   return (
     <label className="select-row">
       <span>{label}</span>
       <select onChange={(event) => onChange(event.target.value || null)} value={selectedRunId ?? ""}>
         <option value="">Select a run</option>
+        {selectedRunId !== null && !selectedRunHasSummary ? (
+          <option value={selectedRunId}>URL-selected run {selectedRunId}</option>
+        ) : null}
         {runs.map((run) => (
           <option key={run.run_id} value={run.run_id}>
             {formatReplayRunOptionLabel(run)}

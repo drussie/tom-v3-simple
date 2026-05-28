@@ -345,7 +345,7 @@ export function selectInitialReplayRun(
   runs: ReplayRunSummary[],
   requestedRunId?: string
 ): string | null {
-  if (requestedRunId !== undefined && runs.some((run) => run.run_id === requestedRunId)) {
+  if (requestedRunId !== undefined && requestedRunId.trim() !== "") {
     return requestedRunId;
   }
   return runs.length === 1 ? runs[0].run_id : null;
