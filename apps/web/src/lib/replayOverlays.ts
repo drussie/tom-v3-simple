@@ -7,6 +7,7 @@ import type {
   ReplayDetectionOverlay,
   ReplayHomographyCandidateOverlay,
   ReplayPoseOverlay,
+  ReplayProjectionDiagnosticOverlay,
   ReplayRunSummary,
   ReplayTrackletOverlay,
   ReplayTrackPointOverlay
@@ -209,6 +210,17 @@ export function activeReplayHomographyCandidates(
   );
 }
 
+export function activeReplayProjectionDiagnostics(
+  diagnostics: ReplayProjectionDiagnosticOverlay[],
+  currentTimestampMs: number,
+  currentFrame: number,
+  holdMs = 250
+): ReplayProjectionDiagnosticOverlay[] {
+  return diagnostics.filter((item) =>
+    isActiveReplayPoint(item.timestamp_ms, item.frame_number, currentTimestampMs, currentFrame, holdMs)
+  );
+}
+
 export function filterDetectionsAvailableAt(
   detections: ReplayDetectionOverlay[],
   availableUntilMs: number | null
@@ -290,6 +302,16 @@ export function filterHomographyCandidatesAvailableAt(
     return homographies;
   }
   return homographies.filter((item) => item.timestamp_ms <= availableUntilMs);
+}
+
+export function filterProjectionDiagnosticsAvailableAt(
+  diagnostics: ReplayProjectionDiagnosticOverlay[],
+  availableUntilMs: number | null
+): ReplayProjectionDiagnosticOverlay[] {
+  if (availableUntilMs === null) {
+    return diagnostics;
+  }
+  return diagnostics.filter((item) => item.timestamp_ms <= availableUntilMs);
 }
 
 export function projectTemplatePointWithMatrix(

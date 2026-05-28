@@ -12,7 +12,7 @@
 - Blueprint 8: IN PROGRESS
 - TOM v3 Simple: COMPLETE
 
-TOM v3 Simple is complete as a lightweight local observation/evidence platform. Blueprint 6 is complete as the visual replay/operator workstation layer. Blueprint 7 is complete as the real perception runtime layer for optional real detection, real-detection-derived candidate tracklets, and optional real pose keypoint evidence. Blueprint 8 is in progress with court/camera/homography schema contracts, fixture court evidence persistence, camera/view evidence query/bundle read models, homography candidate persistence, and replay court overlays.
+TOM v3 Simple is complete as a lightweight local observation/evidence platform. Blueprint 6 is complete as the visual replay/operator workstation layer. Blueprint 7 is complete as the real perception runtime layer for optional real detection, real-detection-derived candidate tracklets, and optional real pose keypoint evidence. Blueprint 8 is in progress with court/camera/homography schema contracts, fixture court evidence persistence, camera/view evidence query/bundle read models, homography candidate persistence, replay court overlays, projection diagnostics, and court review export.
 
 ## Blueprint 1 - Media, Observation Store, Viewer Foundation
 
@@ -498,6 +498,30 @@ persisted court evidence
 - projection diagnostics
 - real camera/view model
 - ball/player court-space projection
+- bounce/hit/in-out/rally/point/scoring
+- stream ingestion
+- adjudication
+
+Milestone 8F proves:
+
+```text
+homography candidate rows
+-> projection diagnostic builder
+-> projection_diagnostic_observation rows
+-> projected court template keypoints/lines
+-> diagnostic metrics
+-> homography-to-diagnostic lineage
+-> replay payload/detail support
+-> court review dataset export
+```
+
+8F adds worker `build-projection-diagnostics`, Makefile `projection-diagnostics`, model/runtime/run/step provenance, `projection_diagnostic_observation` persistence, lineage from homography candidates, replay support for `projectionDiagnosticRunId`, worker `export-court-review-dataset`, Makefile `court-review-export`, TOM-native export artifacts, and tests for diagnostic and export boundaries.
+
+8F does not add:
+
+- ball/player court-space projection
+- real camera/view model
+- accepted/rejected court lifecycle
 - bounce/hit/in-out/rally/point/scoring
 - stream ingestion
 - adjudication

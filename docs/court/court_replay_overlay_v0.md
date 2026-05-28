@@ -14,7 +14,9 @@ indexed media
 -> court keypoint, court line, camera/view, and homography candidate evidence overlays
 ```
 
-Court overlays are display-only evidence. They do not create projection diagnostic observations, project ball/player observations into court space, infer bounce/hit/in-out, or confirm court truth.
+Court overlays are display-only evidence. 8E does not create projection diagnostic observations, project ball/player observations into court space, infer bounce/hit/in-out, or confirm a court model.
+
+Milestone 8F adds persisted projection diagnostic observations and replay payload support for `projectionDiagnosticRunId`. Projection diagnostic overlays draw projected court template keypoints and lines from persisted diagnostic rows; they remain review evidence and do not project ball/player observations into court space.
 
 ## Replay API
 
@@ -22,7 +24,8 @@ Court overlays are display-only evidence. They do not create projection diagnost
 
 - `court_run_id`
 - `homography_run_id`
-- `layers=court_keypoints,court_lines,camera_view,homography_candidates`
+- `projection_diagnostic_run_id`
+- `layers=court_keypoints,court_lines,camera_view,homography_candidates,projection_diagnostics`
 
 The payload adds:
 
@@ -30,6 +33,7 @@ The payload adds:
 - `court_lines`
 - `camera_view`
 - `homography_candidates`
+- `projection_diagnostics`
 
 Existing detection, tracklet, and pose payload fields are unchanged.
 
@@ -48,8 +52,9 @@ The replay workstation adds toggles and run selectors for court evidence and hom
 - persisted court line evidence in image-pixel coordinates
 - camera/view evidence as a current-frame badge and timeline lane
 - homography candidate template geometry by applying the stored inverse matrix to the normalized court template
+- projection diagnostic template geometry from persisted diagnostic rows
 
-The homography overlay is display-only. It does not write projection diagnostics or court-space ball/player projections.
+The homography overlay is display-only. Projection diagnostic overlays read persisted diagnostics written by the worker. Neither overlay writes court-space ball/player projections.
 
 ## Selected Detail
 
@@ -76,7 +81,7 @@ Avoid labels such as:
 
 8E does not add:
 
-- projection diagnostics
+- projection diagnostic creation in 8E
 - ball/player court-space projection
 - real court model inference
 - bounce/hit/in-out/rally/point/scoring

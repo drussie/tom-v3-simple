@@ -13,6 +13,7 @@ interface ReplayPageProps {
     poseRunId?: string;
     courtRunId?: string;
     homographyRunId?: string;
+    projectionDiagnosticRunId?: string;
   }>;
 }
 

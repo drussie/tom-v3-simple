@@ -1784,3 +1784,32 @@ Milestone 8E created:
 - Milestone 8E docs, handoff, and agent report
 
 8E does not add projection diagnostics, real court model inference, ball/player court-space projection, bounce/hit/in-out/rally/point/scoring, stream ingestion, tennis-event interpretation, or adjudication.
+
+## Milestone 8F - Projection Diagnostics / Review Export
+
+Status: complete
+
+### Goal
+
+Persist projection diagnostic observations from homography candidates and export court geometry review datasets while preserving the observation-only geometry boundary.
+
+### Notes
+
+Milestone 8F created:
+
+- `apps.worker.services.projection_diagnostic_builder`
+- worker `build-projection-diagnostics`
+- Makefile `projection-diagnostics`
+- projected court template keypoint and line payloads
+- diagnostic metrics for persisted homography candidates
+- `projection_diagnostic_observation` persistence through `ObservationWriter`
+- lineage from homography candidates to projection diagnostics
+- replay payload, timeline, and selected-detail support for `projectionDiagnosticRunId`
+- `apps.worker.services.court_review_export`
+- worker `export-court-review-dataset`
+- Makefile `court-review-export`
+- TOM-native `court_review_dataset_v0` JSON export artifacts
+- focused tests for diagnostics, lineage, replay payloads, export contents, and no ball/player source parents
+- Milestone 8F docs, handoff, and agent report
+
+8F does not add ball/player court-space projection, real court model inference, accepted/rejected court lifecycle, bounce/hit/in-out/rally/point/scoring, stream ingestion, tennis-event interpretation, or adjudication.

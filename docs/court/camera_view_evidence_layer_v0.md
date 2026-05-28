@@ -79,7 +79,7 @@ The summary read model reports:
 - non-binding homography context hints
 - evidence-only warnings
 
-The homography context is a candidate context hint only. 8C does not compute or validate a homography. Milestone 8D may link camera/view observations as context for persisted homography candidates, but those candidates remain geometry evidence only. Milestone 8E can display camera/view evidence as replay context, but it does not confirm camera state or compute projection diagnostics.
+The homography context is a candidate context hint only. 8C does not compute or validate a homography. Milestone 8D may link camera/view observations as context for persisted homography candidates, but those candidates remain geometry evidence only. Milestone 8E can display camera/view evidence as replay context. Milestone 8F projection diagnostics may package that context through homography lineage and review export, but camera/view evidence still does not confirm camera state or geometry correctness.
 
 ## Evidence Bundle
 

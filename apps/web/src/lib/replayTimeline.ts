@@ -60,6 +60,9 @@ export function timelineItemKey(item: ReplayTimelineItem): string {
   if (item.item_type === "homography_candidate") {
     return `homography_candidate:${item.observation_id}`;
   }
+  if (item.item_type === "projection_diagnostic") {
+    return `projection_diagnostic:${item.observation_id}`;
+  }
   return `annotation:${item.annotation_id}`;
 }
 

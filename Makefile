@@ -46,11 +46,14 @@ FALLBACK_TO_FULL_FRAME ?= false
 COURT_RUN_NAME ?= fixture-court-evidence
 COURT_RUN_ID ?=
 HOMOGRAPHY_RUN_NAME ?= homography-candidate-builder
+HOMOGRAPHY_RUN_ID ?=
+PROJECTION_DIAGNOSTIC_RUN_NAME ?= projection-diagnostic-builder
+PROJECTION_DIAGNOSTIC_RUN_ID ?=
 MIN_KEYPOINT_CONFIDENCE ?= 0.0
 
 export TOM_V3_DATABASE_URL
 
-.PHONY: install web-install test lint migrate api seed verify index-media run-gameplay index-and-run-gameplay run-detection index-and-run-detection extract-frame-artifacts build-tracklets run-pose export-tracklet-review-dataset demo demo-fixture demo-plan demo-reset demo-export demo-open replay-open completion-audit completion-check yolo-probe yolo-smoke yolo-runtime-probe register-yolo-model smoke-real-yolo-local real-detection real-pose court-fixture homography-candidates web web-build web-lint smoke all-checks
+.PHONY: install web-install test lint migrate api seed verify index-media run-gameplay index-and-run-gameplay run-detection index-and-run-detection extract-frame-artifacts build-tracklets run-pose export-tracklet-review-dataset court-review-export demo demo-fixture demo-plan demo-reset demo-export demo-open replay-open completion-audit completion-check yolo-probe yolo-smoke yolo-runtime-probe register-yolo-model smoke-real-yolo-local real-detection real-pose court-fixture homography-candidates projection-diagnostics web web-build web-lint smoke all-checks
 
 install:
 	$(PYTHON) -m pip install -e ".[dev]"
@@ -202,6 +205,15 @@ homography-candidates:
 	@if [ -z "$(MEDIA_ID)" ]; then echo "MEDIA_ID is required: make homography-candidates MEDIA_ID=<media_id>"; exit 1; fi
 	@if [ -z "$(COURT_RUN_ID)" ]; then echo "COURT_RUN_ID is required: make homography-candidates COURT_RUN_ID=<court_run_id>"; exit 1; fi
 	$(PYTHON) -m apps.worker.cli build-homography-candidates --media-id "$(MEDIA_ID)" --court-run-id "$(COURT_RUN_ID)" --run-name "$(HOMOGRAPHY_RUN_NAME)" --min-keypoint-confidence "$(MIN_KEYPOINT_CONFIDENCE)" --viewer-base-url "$(VIEWER_BASE_URL)" $(if $(FRAME_START),--frame-start "$(FRAME_START)",) $(if $(FRAME_END),--frame-end "$(FRAME_END)",) $(if $(filter true,$(PLAN_ONLY)),--plan-only,)
+
+projection-diagnostics:
+	@if [ -z "$(MEDIA_ID)" ]; then echo "MEDIA_ID is required: make projection-diagnostics MEDIA_ID=<media_id>"; exit 1; fi
+	@if [ -z "$(HOMOGRAPHY_RUN_ID)" ]; then echo "HOMOGRAPHY_RUN_ID is required: make projection-diagnostics HOMOGRAPHY_RUN_ID=<homography_run_id>"; exit 1; fi
+	$(PYTHON) -m apps.worker.cli build-projection-diagnostics --media-id "$(MEDIA_ID)" --homography-run-id "$(HOMOGRAPHY_RUN_ID)" --run-name "$(PROJECTION_DIAGNOSTIC_RUN_NAME)" --viewer-base-url "$(VIEWER_BASE_URL)" $(if $(FRAME_START),--frame-start "$(FRAME_START)",) $(if $(FRAME_END),--frame-end "$(FRAME_END)",) $(if $(filter true,$(PLAN_ONLY)),--plan-only,)
+
+court-review-export:
+	@if [ -z "$(MEDIA_ID)" ]; then echo "MEDIA_ID is required: make court-review-export MEDIA_ID=<media_id>"; exit 1; fi
+	$(PYTHON) -m apps.worker.cli export-court-review-dataset --media-id "$(MEDIA_ID)" $(if $(COURT_RUN_ID),--court-run-id "$(COURT_RUN_ID)",) $(if $(HOMOGRAPHY_RUN_ID),--homography-run-id "$(HOMOGRAPHY_RUN_ID)",) $(if $(PROJECTION_DIAGNOSTIC_RUN_ID),--projection-diagnostic-run-id "$(PROJECTION_DIAGNOSTIC_RUN_ID)",) --output-root "$(EXPORT_ROOT)"
 
 web:
 	cd $(WEB_DIR) && npm run dev

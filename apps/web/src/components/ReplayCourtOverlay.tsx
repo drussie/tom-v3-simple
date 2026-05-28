@@ -7,6 +7,7 @@ import {
   activeReplayCourtKeypoints,
   activeReplayCourtLines,
   activeReplayHomographyCandidates,
+  activeReplayProjectionDiagnostics,
   imagePixelPointToOverlayPoint,
   projectTemplatePointWithMatrix
 } from "../lib/replayOverlays";
@@ -18,7 +19,8 @@ import type {
   ReplayCourtLineOverlay,
   ReplayCourtTemplate,
   ReplayHomographyCandidateOverlay,
-  ReplayInfo
+  ReplayInfo,
+  ReplayProjectionDiagnosticOverlay
 } from "../lib/types";
 import { formatConfidence } from "../lib/timeline";
 
@@ -28,12 +30,14 @@ interface ReplayCourtOverlayProps {
   courtLines: ReplayCourtLineOverlay[];
   cameraViews: ReplayCameraViewOverlay[];
   homographyCandidates: ReplayHomographyCandidateOverlay[];
+  projectionDiagnostics: ReplayProjectionDiagnosticOverlay[];
   currentTimestampMs: number;
   currentFrame: number;
   showCourtKeypoints: boolean;
   showCourtLines: boolean;
   showCameraView: boolean;
   showHomography: boolean;
+  showProjectionDiagnostics: boolean;
   isLoading: boolean;
   error: string | null;
   selectedObservationId: string | null;
@@ -41,6 +45,7 @@ interface ReplayCourtOverlayProps {
   onSelectCourtLine: (item: ReplayCourtLineOverlay) => void;
   onSelectCameraView: (item: ReplayCameraViewOverlay) => void;
   onSelectHomography: (item: ReplayHomographyCandidateOverlay) => void;
+  onSelectProjectionDiagnostic: (item: ReplayProjectionDiagnosticOverlay) => void;
   holdMs?: number;
 }
 
@@ -117,12 +122,14 @@ export function ReplayCourtOverlay({
   courtLines,
   cameraViews,
   homographyCandidates,
+  projectionDiagnostics,
   currentTimestampMs,
   currentFrame,
   showCourtKeypoints,
   showCourtLines,
   showCameraView,
   showHomography,
+  showProjectionDiagnostics,
   isLoading,
   error,
   selectedObservationId,
@@ -130,6 +137,7 @@ export function ReplayCourtOverlay({
   onSelectCourtLine,
   onSelectCameraView,
   onSelectHomography,
+  onSelectProjectionDiagnostic,
   holdMs = 250
 }: ReplayCourtOverlayProps) {
   const overlayRef = useRef<HTMLDivElement | null>(null);
@@ -172,15 +180,34 @@ export function ReplayCourtOverlay({
       ),
     [currentFrame, currentTimestampMs, holdMs, homographyCandidates]
   );
+  const activeProjectionDiagnostics = useMemo(
+    () =>
+      activeReplayProjectionDiagnostics(
+        projectionDiagnostics,
+        currentTimestampMs,
+        currentFrame,
+        holdMs
+      ),
+    [currentFrame, currentTimestampMs, holdMs, projectionDiagnostics]
+  );
   const anyLayerEnabled =
-    showCourtKeypoints || showCourtLines || showCameraView || showHomography;
+    showCourtKeypoints ||
+    showCourtLines ||
+    showCameraView ||
+    showHomography ||
+    showProjectionDiagnostics;
   const totalCount =
-    courtKeypoints.length + courtLines.length + cameraViews.length + homographyCandidates.length;
+    courtKeypoints.length +
+    courtLines.length +
+    cameraViews.length +
+    homographyCandidates.length +
+    projectionDiagnostics.length;
   const activeCount =
     (showCourtKeypoints ? activeKeypoints.length : 0) +
     (showCourtLines ? activeLines.length : 0) +
     (showCameraView ? activeCameraViews.length : 0) +
-    (showHomography ? activeHomographies.length : 0);
+    (showHomography ? activeHomographies.length : 0) +
+    (showProjectionDiagnostics ? activeProjectionDiagnostics.length : 0);
   const status = overlayStatus({
     enabled: anyLayerEnabled,
     isLoading,
@@ -202,6 +229,18 @@ export function ReplayCourtOverlay({
                   overlaySize={overlaySize}
                   replayInfo={replayInfo}
                   selected={homography.observation_id === selectedObservationId}
+                />
+              ))
+            : null}
+          {showProjectionDiagnostics
+            ? activeProjectionDiagnostics.map((diagnostic) => (
+                <ProjectionDiagnosticGroup
+                  diagnostic={diagnostic}
+                  key={diagnostic.observation_id}
+                  onSelect={onSelectProjectionDiagnostic}
+                  overlaySize={overlaySize}
+                  replayInfo={replayInfo}
+                  selected={diagnostic.observation_id === selectedObservationId}
                 />
               ))
             : null}
@@ -451,6 +490,83 @@ function HomographyCandidateGroup({
           cx={point.x}
           cy={point.y}
           key={`${homography.observation_id}:${name}`}
+          r={selected ? 4 : 3}
+        />
+      ))}
+    </g>
+  );
+}
+
+function ProjectionDiagnosticGroup({
+  diagnostic,
+  replayInfo,
+  overlaySize,
+  selected,
+  onSelect
+}: {
+  diagnostic: ReplayProjectionDiagnosticOverlay;
+  replayInfo: ReplayInfo;
+  overlaySize: OverlaySize;
+  selected: boolean;
+  onSelect: (item: ReplayProjectionDiagnosticOverlay) => void;
+}) {
+  const points = diagnostic.projected_template_keypoints
+    .map((keypoint) => {
+      if (!keypoint.valid || typeof keypoint.image_x !== "number" || typeof keypoint.image_y !== "number") {
+        return null;
+      }
+      const scaled = imagePixelPointToOverlayPoint(
+        keypoint.image_x,
+        keypoint.image_y,
+        replayInfo.width,
+        replayInfo.height,
+        overlaySize.width,
+        overlaySize.height
+      );
+      return scaled === null ? null : [keypoint.name, scaled] as const;
+    })
+    .filter((entry): entry is readonly [string, { x: number; y: number }] => entry !== null);
+  const pointsByName = new Map(points);
+  return (
+    <g
+      aria-label={`projection diagnostic frame ${diagnostic.frame_number}`}
+      className={`replay-projection-diagnostic-group${selected ? " selected" : ""}`}
+      onClick={(event) => {
+        event.stopPropagation();
+        onSelect(diagnostic);
+      }}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          onSelect(diagnostic);
+        }
+      }}
+      role="button"
+      tabIndex={0}
+    >
+      {diagnostic.projected_template_lines.map((line) => {
+        const start = pointsByName.get(line.start_keypoint);
+        const end = pointsByName.get(line.end_keypoint);
+        if (start === undefined || end === undefined) {
+          return null;
+        }
+        return (
+          <line
+            className="replay-projection-diagnostic-line"
+            key={`${diagnostic.observation_id}:${line.line_class}`}
+            x1={start.x}
+            x2={end.x}
+            y1={start.y}
+            y2={end.y}
+          />
+        );
+      })}
+      {points.map(([name, point]) => (
+        <circle
+          className="replay-projection-diagnostic-keypoint"
+          cx={point.x}
+          cy={point.y}
+          key={`${diagnostic.observation_id}:${name}`}
           r={selected ? 4 : 3}
         />
       ))}

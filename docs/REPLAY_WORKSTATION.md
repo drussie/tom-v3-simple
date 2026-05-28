@@ -42,7 +42,7 @@ Milestone 7C builds candidate tracklets from real detection runs through the exi
 
 Milestone 7D adds optional real pose replay runs that persist `player_pose_observation` keypoint evidence and render through `poseRunId`. Pose keypoints are evidence only and do not interpret movement, strokes, biomechanics, court position, or tennis events.
 
-Milestone 7E decides that court/camera/homography evidence belongs in Blueprint 8. Blueprint 8E now adds replay overlays for persisted court keypoint evidence, court line evidence, camera/view evidence, and homography candidates. Projection diagnostics and court-space coordinate transforms remain future work.
+Milestone 7E decides that court/camera/homography evidence belongs in Blueprint 8. Blueprint 8E adds replay overlays for persisted court keypoint evidence, court line evidence, camera/view evidence, and homography candidates. Milestone 8F adds projection diagnostic replay payloads/details for persisted diagnostic observations. Ball/player court-space coordinate transforms remain future work.
 
 Milestone 7F closes Blueprint 7 with the final perception orchestration path:
 
@@ -56,7 +56,7 @@ indexed media
 
 Blueprint 7 completes TOM v3's real perception runtime for the replay workstation. The workstation can render fixture evidence or optional real model-output evidence through the same detection, tracklet, pose, timeline, and selected-detail surfaces. Court/camera/homography evidence now proceeds in Blueprint 8.
 
-Blueprint 8 has started with geometry evidence work. Milestone 8A adds court keypoint, court line, camera/view, homography candidate, and projection diagnostic storage contracts. Milestone 8B writes fixture court keypoint, line, and camera/view rows. Milestone 8C exposes camera/view rows through read-model APIs. Milestone 8D persists homography candidate rows with lineage from source court evidence. Milestone 8E renders those persisted court rows in the replay workstation through `courtRunId` and `homographyRunId`.
+Blueprint 8 has started with geometry evidence work. Milestone 8A adds court keypoint, court line, camera/view, homography candidate, and projection diagnostic storage contracts. Milestone 8B writes fixture court keypoint, line, and camera/view rows. Milestone 8C exposes camera/view rows through read-model APIs. Milestone 8D persists homography candidate rows with lineage from source court evidence. Milestone 8E renders those persisted court rows in the replay workstation through `courtRunId` and `homographyRunId`. Milestone 8F adds projection diagnostic rows and replay support through `projectionDiagnosticRunId`.
 
 ## What 6A Added
 
@@ -195,20 +195,17 @@ create backend stream sessions or ingest real streams.
 
 7E is a documentation and architecture decision gate. It adds no replay runtime behavior.
 
-Blueprint 8E replay layers now include:
+Blueprint 8 replay layers now include:
 
 - court keypoint evidence
 - court line evidence
 - camera/view evidence
 - homography candidate
-
-Future Blueprint 8 replay layers may include:
-
 - projection diagnostic
 
 Selected detail should show source court evidence, model/runtime/config, matrix fields when applicable, lineage-oriented identifiers, annotations where available, and candidate-only wording.
 
-The replay workstation should avoid labels that imply final court geometry, in/out decisions, bounce locations, or official tennis results.
+The replay workstation should avoid labels that imply final court geometry, line-call decisions, bounce locations, or official tennis results.
 
 ## Blueprint 7F Completion
 
@@ -239,9 +236,9 @@ The replay workstation remains evidence-only: detection observations, candidate 
 - homography candidate
 - projection diagnostic
 
-8B adds fixture production of court keypoint, court line, and camera/view evidence through `run-fixture-court`. 8C adds backend camera/view query, summary, and evidence-bundle APIs under `/court/camera-view` so future homography work can inspect view context. 8D adds `build-homography-candidates` to persist candidate transform evidence and source lineage. 8E adds replay overlay payloads, court layer toggles, selected evidence detail, and timeline lanes for persisted court evidence.
+8B adds fixture production of court keypoint, court line, and camera/view evidence through `run-fixture-court`. 8C adds backend camera/view query, summary, and evidence-bundle APIs under `/court/camera-view` so future homography work can inspect view context. 8D adds `build-homography-candidates` to persist candidate transform evidence and source lineage. 8E adds replay overlay payloads, court layer toggles, selected evidence detail, and timeline lanes for persisted court evidence. 8F adds `build-projection-diagnostics` and replay support for persisted projection diagnostic observations.
 
-The replay workstation fetches and renders court layers as geometry evidence only. Future Blueprint 8 milestones should add projection diagnostics deliberately, with labels that keep geometry evidence separate from bounce, hit, in/out, rally, point, and scoring conclusions.
+The replay workstation fetches and renders court layers as geometry evidence only. Projection diagnostics are review evidence for projected court template geometry; they remain separate from ball/player court projection, bounce, hit, line-call, rally, point, and scoring conclusions.
 
 ## Backend Replay Info
 
@@ -291,7 +288,7 @@ Real pose replay runs appear in the pose run group. Their optional metadata incl
 `GET /replay/overlays` returns replay overlay data for a media/time window:
 
 ```text
-GET /replay/overlays?media_id=<media_id>&start_ms=0&end_ms=2000&layers=detections,tracklets,pose&detection_run_id=<run_id>&tracklet_run_id=<run_id>&pose_run_id=<run_id>
+GET /replay/overlays?media_id=<media_id>&start_ms=0&end_ms=2000&layers=detections,tracklets,pose,court_keypoints,court_lines,camera_view,homography_candidates,projection_diagnostics&detection_run_id=<run_id>&tracklet_run_id=<run_id>&pose_run_id=<run_id>&court_run_id=<run_id>&homography_run_id=<run_id>&projection_diagnostic_run_id=<run_id>
 ```
 
 The response includes selected overlay families:
@@ -345,6 +342,22 @@ The response includes selected overlay families:
       "model_output_not_truth": true
     }
   ],
+  "projection_diagnostics": [
+    {
+      "overlay_type": "projection_diagnostic",
+      "observation_id": "...",
+      "run_id": "...",
+      "frame_number": 30,
+      "timestamp_ms": 1000,
+      "source_homography_candidate_observation_id": "...",
+      "projected_template_keypoints": [],
+      "projected_template_lines": [],
+      "diagnostic_metrics": {},
+      "status": "diagnostic_candidate",
+      "geometry_evidence_only": true,
+      "not_ball_player_projection": true
+    }
+  ],
   "observation_only": true,
   "no_adjudication": true
 }
@@ -374,7 +387,7 @@ For 7D, selected pose detail shows source runtime, model registry id, model name
 and optional run filters:
 
 ```text
-GET /replay/timeline?media_id=<media_id>&detection_run_id=<run_id>&tracklet_run_id=<run_id>&pose_run_id=<run_id>
+GET /replay/timeline?media_id=<media_id>&detection_run_id=<run_id>&tracklet_run_id=<run_id>&pose_run_id=<run_id>&court_run_id=<run_id>&homography_run_id=<run_id>&projection_diagnostic_run_id=<run_id>
 ```
 
 The response includes:
@@ -391,6 +404,7 @@ The response includes:
     { "lane_type": "detections", "label": "Detection observations", "items": [] },
     { "lane_type": "tracklets", "label": "Tracklet candidates", "items": [] },
     { "lane_type": "pose", "label": "Pose observations", "items": [] },
+    { "lane_type": "projection_diagnostics", "label": "Projection diagnostics", "items": [] },
     { "lane_type": "annotations", "label": "Review annotations", "items": [] }
   ]
 }
@@ -446,16 +460,15 @@ http://127.0.0.1:3000/replay/<media_id>
 Optional context query parameters:
 
 ```text
-?detectionRunId=<run_id>&trackletRunId=<run_id>&poseRunId=<run_id>
+?detectionRunId=<run_id>&trackletRunId=<run_id>&poseRunId=<run_id>&courtRunId=<run_id>&homographyRunId=<run_id>&projectionDiagnosticRunId=<run_id>
 ```
 
-`detectionRunId`, `trackletRunId`, and `poseRunId` select the persisted evidence
-runs used for replay overlay playback.
+`detectionRunId`, `trackletRunId`, `poseRunId`, `courtRunId`, `homographyRunId`, and `projectionDiagnosticRunId` select the persisted evidence runs used for replay overlay playback.
 
 Open Stream Proxy Mode:
 
 ```text
-?mode=stream_proxy&detectionRunId=<run_id>&trackletRunId=<run_id>&poseRunId=<run_id>
+?mode=stream_proxy&detectionRunId=<run_id>&trackletRunId=<run_id>&poseRunId=<run_id>&courtRunId=<run_id>&homographyRunId=<run_id>&projectionDiagnosticRunId=<run_id>
 ```
 
 In Stream Proxy Mode, future evidence is not rendered in overlays or timeline
@@ -540,6 +553,31 @@ If a tracklet run exists too:
 ```text
 http://127.0.0.1:3000/replay/<media_id>?detectionRunId=<real_detection_run_id>&trackletRunId=<real_tracklet_run_id>&poseRunId=<real_pose_run_id>
 ```
+
+For court geometry evidence replay:
+
+```bash
+.venv/bin/python -m apps.worker.cli run-fixture-court \
+  --media-id <media_id> \
+  --frame-sample-rate 30 \
+  --max-frames 30
+
+.venv/bin/python -m apps.worker.cli build-homography-candidates \
+  --media-id <media_id> \
+  --court-run-id <court_run_id>
+
+.venv/bin/python -m apps.worker.cli build-projection-diagnostics \
+  --media-id <media_id> \
+  --homography-run-id <homography_run_id>
+```
+
+Open:
+
+```text
+http://127.0.0.1:3000/replay/<media_id>?courtRunId=<court_run_id>&homographyRunId=<homography_run_id>&projectionDiagnosticRunId=<projection_diagnostic_run_id>
+```
+
+Projection diagnostics display projected court template evidence only. They do not project ball/player observations into court space.
 
 For Stream Proxy Mode, open:
 

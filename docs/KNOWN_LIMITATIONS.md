@@ -22,11 +22,12 @@ This registry makes TOM v3 Simple boundaries explicit.
 - Blueprint 8C adds camera/view query, summary, and evidence-bundle read models only.
 - Blueprint 8D adds homography candidate persistence from fixture court evidence only.
 - Blueprint 8E adds replay overlays for persisted court keypoint, court line, camera/view, and homography candidate evidence only.
+- Blueprint 8F adds projection diagnostic observations and court review export only.
 - Fixture court evidence is schema/provenance plumbing, not a real court model.
 - Camera/view summaries are geometry context read models; they do not confirm camera state or homography validity.
 - Homography candidates and overlays are candidate geometry evidence; they do not confirm a court model or camera geometry.
 - Real court/camera/homography runtime is not implemented yet.
-- Projection diagnostics are schema-level only and do not project ball/player detections into court space.
+- Projection diagnostics project court template geometry for review only; they do not project ball/player detections into court space.
 - Portable TOM v1 detector assets/source are not present in this repo state.
 
 ## Evidence Limitations
@@ -56,7 +57,8 @@ This registry makes TOM v3 Simple boundaries explicit.
 - Stream Proxy Mode is a live-like UI mode over indexed local media; it is not real live ingestion.
 - Stream Proxy Mode hides future evidence in the UI, but the underlying observations are already persisted.
 - Replay Mode can display persisted fixture court keypoint, court line, camera/view, and homography candidate evidence through `courtRunId` and `homographyRunId`.
-- Homography candidate overlays are display-only candidate geometry; they are not projection diagnostics or court truth.
+- Replay Mode can display projection diagnostic evidence through `projectionDiagnosticRunId`.
+- Homography candidate overlays and projection diagnostic overlays are display-only candidate geometry; they are not final court models.
 - Camera/view evidence can be queried through API read models and viewed in the replay court evidence context.
 - The court keypoint/line adapter is fixture-only; no real court keypoint or line model is implemented yet.
 - There is no production deployment workflow.
@@ -71,9 +73,9 @@ This registry makes TOM v3 Simple boundaries explicit.
 TOM v3 Simple does not include:
 
 - confirmed homography
-- court truth
+- confirmed court model
 - court-space reasoning
-- in/out conclusions
+- line-call conclusions
 - court-space projection of detections
 - bounce detection
 - hit detection

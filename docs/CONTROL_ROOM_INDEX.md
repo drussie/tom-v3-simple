@@ -79,6 +79,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 8C - Camera / View Evidence Layer](milestones/milestone_8c_camera_view_evidence_layer.md)
 - [Milestone 8D - Homography Candidate Persistence](milestones/milestone_8d_homography_candidate_persistence.md)
 - [Milestone 8E - Court Overlay in Replay Workstation](milestones/milestone_8e_court_overlay_replay_workstation.md)
+- [Milestone 8F - Projection Diagnostics / Review Export](milestones/milestone_8f_projection_diagnostics_review_export.md)
 
 ## Handoffs
 
@@ -131,6 +132,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 8C Handoff](handoffs/milestone_8c_camera_view_evidence_layer_handoff.md)
 - [Milestone 8D Handoff](handoffs/milestone_8d_homography_candidate_persistence_handoff.md)
 - [Milestone 8E Handoff](handoffs/milestone_8e_court_overlay_replay_workstation_handoff.md)
+- [Milestone 8F Handoff](handoffs/milestone_8f_projection_diagnostics_review_export_handoff.md)
 
 ## Agent Reports
 
@@ -183,6 +185,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 8C Agent Report](agent_reports/milestone_8c_camera_view_evidence_layer_report.md)
 - [Milestone 8D Agent Report](agent_reports/milestone_8d_homography_candidate_persistence_report.md)
 - [Milestone 8E Agent Report](agent_reports/milestone_8e_court_overlay_replay_workstation_report.md)
+- [Milestone 8F Agent Report](agent_reports/milestone_8f_projection_diagnostics_review_export_report.md)
 
 ## Blueprints
 

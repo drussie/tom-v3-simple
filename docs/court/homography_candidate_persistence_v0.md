@@ -56,7 +56,7 @@ The v0 builder consumes persisted `court_keypoint_observation` rows from a sourc
 - uses a bounded builder confidence score
 - links optional source `court_line_observation` and `camera_view_observation` rows from the same frame when present
 
-The v0 matrix method is a lightweight axis-aligned affine fit suitable for deterministic fixture evidence. It is intentionally labeled as candidate geometry, not court truth.
+The v0 matrix method is a lightweight axis-aligned affine fit suitable for deterministic fixture evidence. It is intentionally labeled as candidate geometry, not a confirmed court model.
 
 ## Persisted Observation
 
@@ -138,6 +138,8 @@ The CLI returns JSON with:
 - warnings that the output is candidate geometry evidence only
 
 The replay URL is consumed by Milestone 8E court overlays. 8D itself does not add replay court overlays.
+
+Milestone 8F consumes persisted homography candidate rows as source evidence for projection diagnostics. A homography candidate remains a candidate coordinate transform even when a diagnostic row or review export references it. 8F does not change homography candidate semantics and does not use the candidate to create ball/player court-space projections.
 
 ## Non-Goals
 

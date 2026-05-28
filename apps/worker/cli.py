@@ -11,6 +11,7 @@ from tom_v3_model_adapters.yolo_weights import (
 )
 from tom_v3_observations.synthetic import BASELINE_SCENARIO_NAME, verify_synthetic_run
 from tom_v3_schema.exports import (
+    CourtReviewDatasetExportRequest,
     PoseReviewDatasetExportRequest,
     TrackletReviewDatasetExportRequest,
 )
@@ -24,6 +25,7 @@ from apps.worker.config import settings
 from apps.worker.pipelines.synthetic_seed import seed_synthetic_run
 from apps.worker.services.completion_audit import run_completion_audit
 from apps.worker.services.court_adapter import run_fixture_court_adapter
+from apps.worker.services.court_review_export import export_court_review_dataset
 from apps.worker.services.detection_adapter import run_detection_adapter
 from apps.worker.services.frame_artifacts import extract_frame_artifacts_for_run
 from apps.worker.services.gameplay_adapter import run_gameplay_adapter
@@ -31,6 +33,7 @@ from apps.worker.services.homography_candidate_builder import build_homography_c
 from apps.worker.services.local_demo import run_local_fixture_demo
 from apps.worker.services.media_indexer import index_media
 from apps.worker.services.pose_adapter import run_pose_adapter
+from apps.worker.services.projection_diagnostic_builder import build_projection_diagnostics
 from apps.worker.services.real_detection_replay import run_real_detection_replay
 from apps.worker.services.real_pose_replay import run_real_pose_replay
 from apps.worker.services.real_yolo_smoke import run_real_yolo_local_smoke
@@ -314,6 +317,31 @@ def main() -> None:
     pose_export_parser.add_argument("--skip-create-db", action="store_true")
     pose_export_parser.set_defaults(handler=_handle_export_pose_review_dataset)
 
+    court_export_parser = subcommands.add_parser(
+        "export-court-review-dataset",
+        help="Export court/homography/projection diagnostic evidence for review.",
+    )
+    court_export_parser.add_argument("--media-id", required=True)
+    court_export_parser.add_argument("--court-run-id")
+    court_export_parser.add_argument("--homography-run-id")
+    court_export_parser.add_argument("--projection-diagnostic-run-id")
+    court_export_parser.add_argument("--output-root", default=".data/exports")
+    court_export_parser.add_argument("--format", default="json", choices=["json"])
+    court_export_parser.add_argument(
+        "--include-annotations",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+    )
+    court_export_parser.add_argument(
+        "--include-artifacts",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+    )
+    court_export_parser.add_argument("--query-name")
+    court_export_parser.add_argument("--created-by", default="tom-v3-worker")
+    court_export_parser.add_argument("--skip-create-db", action="store_true")
+    court_export_parser.set_defaults(handler=_handle_export_court_review_dataset)
+
     yolo_probe_parser = subcommands.add_parser(
         "yolo-runtime-probe",
         help="Inspect optional YOLO runtime dependencies and device resolution.",
@@ -513,6 +541,24 @@ def main() -> None:
     )
     homography_parser.add_argument("--skip-create-db", action="store_true")
     homography_parser.set_defaults(handler=_handle_build_homography_candidates)
+
+    projection_parser = subcommands.add_parser(
+        "build-projection-diagnostics",
+        help="Build projection diagnostic observations from homography candidates.",
+    )
+    projection_parser.add_argument("--media-id", required=True)
+    projection_parser.add_argument("--homography-run-id", required=True)
+    projection_parser.add_argument("--run-name", default="projection-diagnostic-builder")
+    projection_parser.add_argument("--frame-start", type=int)
+    projection_parser.add_argument("--frame-end", type=int)
+    projection_parser.add_argument("--viewer-base-url", default="http://127.0.0.1:3000")
+    projection_parser.add_argument(
+        "--plan-only",
+        action="store_true",
+        help="Print the projection diagnostic plan without touching the database.",
+    )
+    projection_parser.add_argument("--skip-create-db", action="store_true")
+    projection_parser.set_defaults(handler=_handle_build_projection_diagnostics)
 
     demo_parser = subcommands.add_parser(
         "run-demo",
@@ -813,6 +859,24 @@ def _handle_export_pose_review_dataset(
     return export_pose_review_dataset(session, request).model_dump()
 
 
+def _handle_export_court_review_dataset(
+    session: Session, args: argparse.Namespace
+) -> dict[str, object]:
+    request = CourtReviewDatasetExportRequest(
+        media_id=args.media_id,
+        court_run_id=args.court_run_id,
+        homography_run_id=args.homography_run_id,
+        projection_diagnostic_run_id=args.projection_diagnostic_run_id,
+        include_annotations=args.include_annotations,
+        include_artifacts=args.include_artifacts,
+        format=args.format,
+        output_root=args.output_root,
+        query_name=args.query_name,
+        created_by=args.created_by,
+    )
+    return export_court_review_dataset(session, request).model_dump()
+
+
 def _handle_yolo_runtime_probe(session: Session, args: argparse.Namespace) -> dict[str, object]:
     return probe_yolo_runtime(
         requested_device=args.device,
@@ -973,6 +1037,22 @@ def _handle_build_homography_candidates(
         frame_start=args.frame_start,
         frame_end=args.frame_end,
         min_keypoint_confidence=args.min_keypoint_confidence,
+        viewer_base_url=args.viewer_base_url,
+        plan_only=args.plan_only,
+    )
+
+
+def _handle_build_projection_diagnostics(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    return build_projection_diagnostics(
+        session=session,
+        media_id=args.media_id,
+        homography_run_id=args.homography_run_id,
+        run_name=args.run_name,
+        frame_start=args.frame_start,
+        frame_end=args.frame_end,
         viewer_base_url=args.viewer_base_url,
         plan_only=args.plan_only,
     )

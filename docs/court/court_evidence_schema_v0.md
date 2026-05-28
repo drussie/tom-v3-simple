@@ -1,6 +1,6 @@
 # Court Evidence Schema v0
 
-Milestone 8A starts Blueprint 8 with schema and persistence contracts. Milestone 8B uses this schema through a deterministic fixture court evidence adapter. Milestone 8C exposes camera/view rows as read models. Milestone 8D persists homography candidate rows from source court evidence. Milestone 8E renders persisted court evidence in replay.
+Milestone 8A starts Blueprint 8 with schema and persistence contracts. Milestone 8B uses this schema through a deterministic fixture court evidence adapter. Milestone 8C exposes camera/view rows as read models. Milestone 8D persists homography candidate rows from source court evidence. Milestone 8E renders persisted court evidence in replay. Milestone 8F persists projection diagnostic rows and exports court review datasets.
 
 Blueprint 8 court evidence uses the existing TOM observation spine:
 
@@ -353,3 +353,11 @@ Camera/view summaries are geometry context evidence. They do not confirm camera 
 8D does not add a real court/runtime model, projection diagnostics, replay court overlay, ball/player court projection, stream ingestion, or tennis-event interpretation.
 
 8E reads persisted court keypoint, court line, camera/view, and homography candidate rows into replay overlay payloads. It does not create new court observations, projection diagnostics, ball/player court projections, or tennis-event conclusions.
+
+## Milestone 8F Projection Diagnostics And Export
+
+8F writes `projection_diagnostic_observation` rows from persisted homography candidates. Diagnostic rows store projected court template keypoints and lines in image-pixel space, diagnostic metrics, source homography candidate IDs, model/runtime/run provenance, media-owned frame/time, and geometry-evidence-only metadata.
+
+Projection diagnostics are review evidence only. They do not use ball/player observations as source parents, do not create object court-space projections, and do not add bounce/hit/in-out/rally/point/scoring.
+
+8F also exports TOM-native `court_review_dataset_v0` JSON packages containing selected court keypoint, court line, camera/view, homography candidate, projection diagnostic, lineage, artifact, and annotation evidence.

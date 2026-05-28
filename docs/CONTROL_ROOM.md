@@ -42,9 +42,9 @@ Court/camera/homography evidence now proceeds in Blueprint 8.
 
 Blueprint 8 Status: IN PROGRESS
 
-Blueprint 8 starts the court/camera/homography evidence layer. Milestone 8A adds court keypoint, court line, camera/view, homography candidate, and projection diagnostic schema contracts, typed storage tables, writer persistence support, a normalized court template registry, lineage constants, tests, and docs. Milestone 8B adds a deterministic fixture court evidence adapter that writes court keypoint, court line, and camera/view observations with model/runtime/run provenance. Milestone 8C makes camera/view observations queryable and inspectable as geometry context evidence with summary and evidence-bundle read models. Milestone 8D persists homography candidate observations from court keypoint, court line, and camera/view source evidence with lineage. Milestone 8E renders persisted court keypoints, court lines, camera/view evidence, and homography candidates in the replay workstation.
+Blueprint 8 starts the court/camera/homography evidence layer. Milestone 8A adds court keypoint, court line, camera/view, homography candidate, and projection diagnostic schema contracts, typed storage tables, writer persistence support, a normalized court template registry, lineage constants, tests, and docs. Milestone 8B adds a deterministic fixture court evidence adapter that writes court keypoint, court line, and camera/view observations with model/runtime/run provenance. Milestone 8C makes camera/view observations queryable and inspectable as geometry context evidence with summary and evidence-bundle read models. Milestone 8D persists homography candidate observations from court keypoint, court line, and camera/view source evidence with lineage. Milestone 8E renders persisted court keypoints, court lines, camera/view evidence, and homography candidates in the replay workstation. Milestone 8F persists projection diagnostic observations and exports TOM-native court review datasets.
 
-8E is still geometry evidence only. Homography overlays are display-only candidate layers, not court truth. 8E does not add projection diagnostics, real court model inference, ball/player court-space projection, stream ingestion, or tennis-event interpretation.
+8F is still geometry review evidence only. Projection diagnostics are reviewable projected template evidence, not final court models. 8F does not add ball/player court-space projection, stream ingestion, accepted/rejected court lifecycle, or tennis-event interpretation.
 
 ## Canonical Local Demo
 
@@ -100,14 +100,14 @@ An observation does not mean the output is correct, a tennis event happened, a s
 - Real pose crop mode can preserve lineage from source player detections to pose observations.
 - Court/camera/homography evidence decision gate with a Blueprint 8 candidate contract.
 - Blueprint 7 completion review and final perception orchestration runbook.
-- Court/camera/homography schema, typed persistence foundation, fixture court evidence adapter, camera/view evidence read layer, homography candidate persistence, and replay court overlays for Blueprint 8.
+- Court/camera/homography schema, typed persistence foundation, fixture court evidence adapter, camera/view evidence read layer, homography candidate persistence, replay court overlays, projection diagnostics, and court review export for Blueprint 8.
 
 ## Explicitly Absent Capabilities
 
 - Movement interpretation or biomechanics conclusions.
 - Stroke classification.
-- Confirmed homography, court truth, or court-space reasoning.
-- Projection diagnostics and ball/player court-space projection.
+- Confirmed homography, confirmed court model, or court-space reasoning.
+- Ball/player court-space projection.
 - Real camera/view model inference.
 - Bounce detection.
 - Hit detection.
@@ -141,7 +141,7 @@ Short version:
 - Fixture output is deterministic demo evidence.
 - Optional YOLO quality depends on local runtime, weights, model classes, and source media.
 - Optional real pose quality depends on local runtime, pose weights, source detections or frame sampling, and source media.
-- Court/camera/homography evidence now proceeds in Blueprint 8 with schema persistence, fixture adapter foundations, camera/view query/bundle read models, homography candidate persistence, and replay court overlays.
+- Court/camera/homography evidence now proceeds in Blueprint 8 with schema persistence, fixture adapter foundations, camera/view query/bundle read models, homography candidate persistence, replay court overlays, projection diagnostics, and court review export.
 - Candidate tracklets can be wrong or incomplete.
 - Exports are TOM-native review datasets.
 - Storage lifecycle is local/demo-oriented.
@@ -368,6 +368,19 @@ courtRunId + homographyRunId
 ```
 
 8E adds replay URL support for `courtRunId` and `homographyRunId`, overlay payloads for court keypoints, court lines, camera/view evidence, and homography candidates, frontend court layer toggles, selected evidence detail, and timeline lanes. It does not add projection diagnostics, real court inference, ball/player court-space projection, event interpretation, stream ingestion, or adjudication.
+
+Milestone 8F adds projection diagnostics and review export:
+
+```text
+homographyRunId
+-> projection diagnostic builder
+-> projection_diagnostic_observation rows
+-> homography-to-diagnostic lineage
+-> projectionDiagnosticRunId replay payloads
+-> court review dataset export
+```
+
+8F adds worker `build-projection-diagnostics`, Makefile `projection-diagnostics`, projected template keypoint/line payloads, diagnostic metrics, replay payload/detail support, worker `export-court-review-dataset`, Makefile `court-review-export`, TOM-native export artifacts, and tests for diagnostics, lineage, replay payloads, and export boundaries. It does not add ball/player court-space projection, bounce/hit/in-out/rally/point/scoring, accepted/rejected court lifecycle, stream ingestion, tennis-event interpretation, or adjudication.
 
 ## Future Blueprint Candidates
 

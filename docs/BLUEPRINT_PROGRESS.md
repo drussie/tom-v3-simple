@@ -2,7 +2,7 @@
 
 ## Current Progress Gauge
 
-Current: Blueprints 1, 2, 3, 4, 5, 6, and 7 complete; TOM v3 Simple is complete; Blueprint 8 is in progress at Milestone 8E
+Current: Blueprints 1, 2, 3, 4, 5, 6, and 7 complete; TOM v3 Simple is complete; Blueprint 8 is in progress at Milestone 8F
 
 ## Current
 
@@ -190,8 +190,8 @@ Current: Blueprints 1, 2, 3, 4, 5, 6, and 7 complete; TOM v3 Simple is complete;
 - Replay pose overlays and pose timeline items include optional source/runtime/model/config metadata for real pose validation.
 - Replay selected pose detail displays source/runtime/model/config and subject association context when available.
 - Court/homography decision gate exists.
-- Court/camera/homography evidence has started as Blueprint 8 schema, fixture adapter, camera/view read-model work, homography candidate persistence, and replay court overlays.
-- No projection diagnostics, court-space ball/player projection, movement interpretation, bounce, hit, rally, point, scoring, or adjudication has been added.
+- Court/camera/homography evidence has started as Blueprint 8 schema, fixture adapter, camera/view read-model work, homography candidate persistence, replay court overlays, projection diagnostics, and court review export.
+- No court-space ball/player projection, movement interpretation, bounce, hit, rally, point, scoring, or adjudication has been added.
 - Blueprint 7 completion review exists.
 - Blueprint 7 is marked complete in canonical docs.
 - Final real perception orchestration is documented for fixture-safe demo, optional real detection, optional real-detection-derived tracklets, and optional real pose replay.
@@ -350,7 +350,19 @@ courtRunId + homographyRunId
 
 Blueprint 8 progress after 8E: about 65-70%.
 
-Remaining Blueprint 8 work should stay deliberate: projection diagnostics/review exports and completion review. 8E does not add projection diagnostics, real camera/court inference, ball/player court-space projection, bounce/hit/in-out/rally/point/scoring, or tennis-event interpretation.
+Milestone 8F adds projection diagnostics and review export:
+
+```text
+homography_candidate_observation
+-> projection_diagnostic_observation
+-> projected template geometry
+-> diagnostic metrics
+-> court review dataset export
+```
+
+Blueprint 8 progress after 8F: about 80-85%.
+
+Remaining Blueprint 8 work should stay deliberate: completion review and future boundary setting. 8F does not add real camera/court inference, ball/player court-space projection, bounce/hit/in-out/rally/point/scoring, accepted/rejected court lifecycle, or tennis-event interpretation.
 
 ## Blueprint 5 Status
 

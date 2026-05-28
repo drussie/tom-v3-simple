@@ -30,6 +30,7 @@ from apps.api.services.replay import (
 )
 from apps.worker.services.court_adapter import run_fixture_court_adapter
 from apps.worker.services.homography_candidate_builder import build_homography_candidates
+from apps.worker.services.projection_diagnostic_builder import build_projection_diagnostics
 
 
 @pytest.fixture()
@@ -154,6 +155,21 @@ def test_replay_info_returns_court_and_homography_run_metadata(
     assert homography_run["source_court_run_id"] == court_result["court_run_id"]
     assert homography_run["candidate_count"] == 1
     assert homography_run["candidate_geometry"] is True
+
+    projection_result = build_projection_diagnostics(
+        session=db_session,
+        media_id=media.id,
+        homography_run_id=str(homography_result["homography_run_id"]),
+    )
+    projection_response = client.get(f"/media/{media.id}/replay-info")
+    assert projection_response.status_code == 200
+    projection_run = projection_response.json()["available_runs"]["projection_diagnostic"][0]
+    assert projection_run["run_id"] == projection_result["projection_diagnostic_run_id"]
+    assert projection_run["evidence_source"] == "projection_diagnostic"
+    assert projection_run["source_homography_run_id"] == homography_result["homography_run_id"]
+    assert projection_run["projection_diagnostic_count"] == 1
+    assert projection_run["diagnostic_geometry"] is True
+    assert projection_run["not_ball_player_projection"] is True
 
 
 def test_replay_info_returns_404_for_missing_media(client: TestClient) -> None:
@@ -534,6 +550,50 @@ def test_replay_overlay_endpoint_returns_court_and_homography_items(
     assert homography["source_label"] == "homography candidate"
 
 
+def test_replay_overlay_endpoint_returns_projection_diagnostic_items(
+    client: TestClient,
+    db_session: Session,
+    tmp_path,
+) -> None:
+    media_path = tmp_path / "sample.mp4"
+    media_path.write_bytes(b"tom-v3-video")
+    media = _seed_media(db_session, media_path)
+    _, homography_result = _seed_court_and_homography(db_session, media.id)
+    projection_result = build_projection_diagnostics(
+        session=db_session,
+        media_id=media.id,
+        homography_run_id=str(homography_result["homography_run_id"]),
+    )
+    assert projection_result["ok"] is True
+
+    response = client.get(
+        "/replay/overlays",
+        params={
+            "media_id": media.id,
+            "start_ms": 0,
+            "end_ms": 2000,
+            "layers": "projection_diagnostics",
+            "projection_diagnostic_run_id": projection_result[
+                "projection_diagnostic_run_id"
+            ],
+        },
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert len(body["projection_diagnostics"]) == 1
+    diagnostic = body["projection_diagnostics"][0]
+    assert diagnostic["overlay_type"] == "projection_diagnostic"
+    assert diagnostic["run_id"] == projection_result["projection_diagnostic_run_id"]
+    assert diagnostic["status"] == "diagnostic_candidate"
+    assert len(diagnostic["projected_template_keypoints"]) == 12
+    assert len(diagnostic["projected_template_lines"]) == 8
+    assert diagnostic["diagnostic_metrics"]["not_ball_player_projection"] is True
+    assert diagnostic["geometry_evidence_only"] is True
+    assert diagnostic["not_ball_player_projection"] is True
+    assert diagnostic["source_label"] == "projection diagnostic"
+
+
 def test_replay_overlay_endpoint_filters_court_and_homography_runs(
     client: TestClient,
     db_session: Session,
@@ -708,6 +768,7 @@ def test_replay_timeline_endpoint_returns_evidence_lanes(
         "court_lines",
         "camera_view",
         "homography_candidates",
+        "projection_diagnostics",
         "annotations",
     }
 
@@ -782,6 +843,30 @@ def test_replay_timeline_endpoint_returns_court_evidence_lanes(
     assert homography_item["run_id"] == homography_result["homography_run_id"]
     assert homography_item["status"] == "candidate"
     assert homography_item["candidate_geometry"] is True
+
+    projection_result = build_projection_diagnostics(
+        session=db_session,
+        media_id=media.id,
+        homography_run_id=str(homography_result["homography_run_id"]),
+    )
+    projection_response = client.get(
+        "/replay/timeline",
+        params={
+            "media_id": media.id,
+            "court_run_id": court_result["court_run_id"],
+            "homography_run_id": homography_result["homography_run_id"],
+            "projection_diagnostic_run_id": projection_result[
+                "projection_diagnostic_run_id"
+            ],
+        },
+    )
+    assert projection_response.status_code == 200
+    projection_lanes = {lane["lane_type"]: lane for lane in projection_response.json()["lanes"]}
+    projection_item = projection_lanes["projection_diagnostics"]["items"][0]
+    assert projection_item["item_type"] == "projection_diagnostic"
+    assert projection_item["run_id"] == projection_result["projection_diagnostic_run_id"]
+    assert projection_item["status"] == "diagnostic_candidate"
+    assert projection_item["not_ball_player_projection"] is True
 
 
 def test_replay_timeline_endpoint_filters_selected_runs(

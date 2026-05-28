@@ -20,6 +20,7 @@ from tom_v3_storage.db_models import (
     Observation,
     PoseObservation,
     ProcessingRun,
+    ProjectionDiagnosticObservation,
     Tracklet,
     TrackPoint,
 )
@@ -38,6 +39,7 @@ COURT_LINE_TYPES = {"court_line_observation"}
 CAMERA_VIEW_TYPES = {"camera_view_observation"}
 COURT_EVIDENCE_TYPES = COURT_KEYPOINT_TYPES | COURT_LINE_TYPES | CAMERA_VIEW_TYPES
 HOMOGRAPHY_TYPES = {"homography_candidate_observation"}
+PROJECTION_DIAGNOSTIC_TYPES = {"projection_diagnostic_observation"}
 
 
 def timestamp_ms_to_replay_frame(media: MediaAsset, timestamp_ms: int | float | None) -> int:
@@ -106,6 +108,7 @@ def build_replay_overlay_chunk(
     pose_run_id: str | None = None,
     court_run_id: str | None = None,
     homography_run_id: str | None = None,
+    projection_diagnostic_run_id: str | None = None,
     min_confidence: float | None = None,
     min_pose_confidence: float | None = None,
 ) -> dict[str, Any] | None:
@@ -192,6 +195,17 @@ def build_replay_overlay_chunk(
         if "homography_candidates" in layers
         else []
     )
+    projection_diagnostics = (
+        build_projection_diagnostic_overlay_items(
+            session=session,
+            media=media,
+            start_ms=start_ms,
+            end_ms=end_ms,
+            projection_diagnostic_run_id=projection_diagnostic_run_id,
+        )
+        if "projection_diagnostics" in layers
+        else []
+    )
     return {
         "media_id": media.id,
         "start_ms": start_ms,
@@ -206,6 +220,7 @@ def build_replay_overlay_chunk(
         "court_lines": court_lines,
         "camera_view": camera_view,
         "homography_candidates": homography_candidates,
+        "projection_diagnostics": projection_diagnostics,
         "observation_only": True,
         "no_adjudication": True,
     }
@@ -220,6 +235,7 @@ def build_replay_timeline(
     pose_run_id: str | None = None,
     court_run_id: str | None = None,
     homography_run_id: str | None = None,
+    projection_diagnostic_run_id: str | None = None,
     include_annotations: bool = True,
 ) -> dict[str, Any] | None:
     media = session.get(MediaAsset, media_id)
@@ -240,6 +256,7 @@ def build_replay_timeline(
                     pose_run_id,
                     court_run_id,
                     homography_run_id,
+                    projection_diagnostic_run_id,
                 )
                 if run_id is not None
             },
@@ -315,6 +332,15 @@ def build_replay_timeline(
                     session=session,
                     media=media,
                     homography_run_id=homography_run_id,
+                ),
+            },
+            {
+                "lane_type": "projection_diagnostics",
+                "label": "Projection diagnostics",
+                "items": build_projection_diagnostic_timeline_items(
+                    session=session,
+                    media=media,
+                    projection_diagnostic_run_id=projection_diagnostic_run_id,
                 ),
             },
             {
@@ -625,6 +651,54 @@ def homography_candidate_timeline_item_from_row(
             row,
             "homography candidate",
             evidence_source="homography_candidate",
+        ),
+    }
+
+
+def build_projection_diagnostic_timeline_items(
+    session: Session,
+    *,
+    media: MediaAsset,
+    projection_diagnostic_run_id: str | None = None,
+) -> list[dict[str, Any]]:
+    query = (
+        select(ProjectionDiagnosticObservation)
+        .where(ProjectionDiagnosticObservation.media_id == media.id)
+        .order_by(
+            ProjectionDiagnosticObservation.timestamp_ms,
+            ProjectionDiagnosticObservation.observation_id,
+        )
+    )
+    if projection_diagnostic_run_id is not None:
+        query = query.where(ProjectionDiagnosticObservation.run_id == projection_diagnostic_run_id)
+    return [
+        projection_diagnostic_timeline_item_from_row(row)
+        for row in session.scalars(query).all()
+    ]
+
+
+def projection_diagnostic_timeline_item_from_row(
+    row: ProjectionDiagnosticObservation,
+) -> dict[str, Any]:
+    metrics = row.diagnostic_metrics_jsonb or {}
+    return {
+        "item_type": "projection_diagnostic",
+        "observation_id": row.observation_id,
+        "run_id": row.run_id,
+        "timestamp_ms": row.timestamp_ms,
+        "frame_number": row.frame_number,
+        "source_homography_candidate_observation_id": (
+            row.source_homography_candidate_observation_id
+        ),
+        "projected_keypoint_count": metrics.get("projected_keypoint_count"),
+        "projected_line_count": metrics.get("projected_line_count"),
+        "status": row.status,
+        "confidence": row.confidence,
+        "display_label": "projection diagnostic",
+        **_court_source_metadata(
+            row,
+            "projection diagnostic",
+            evidence_source="projection_diagnostic",
         ),
     }
 
@@ -1146,6 +1220,61 @@ def homography_candidate_overlay_item_from_row(
     }
 
 
+def build_projection_diagnostic_overlay_items(
+    session: Session,
+    *,
+    media: MediaAsset,
+    start_ms: int,
+    end_ms: int,
+    projection_diagnostic_run_id: str | None = None,
+) -> list[dict[str, Any]]:
+    query = (
+        select(ProjectionDiagnosticObservation)
+        .where(
+            ProjectionDiagnosticObservation.media_id == media.id,
+            ProjectionDiagnosticObservation.timestamp_ms >= start_ms,
+            ProjectionDiagnosticObservation.timestamp_ms <= end_ms,
+        )
+        .order_by(
+            ProjectionDiagnosticObservation.timestamp_ms,
+            ProjectionDiagnosticObservation.observation_id,
+        )
+    )
+    if projection_diagnostic_run_id is not None:
+        query = query.where(ProjectionDiagnosticObservation.run_id == projection_diagnostic_run_id)
+    return [
+        projection_diagnostic_overlay_item_from_row(row)
+        for row in session.scalars(query).all()
+    ]
+
+
+def projection_diagnostic_overlay_item_from_row(
+    row: ProjectionDiagnosticObservation,
+) -> dict[str, Any]:
+    return {
+        "overlay_type": "projection_diagnostic",
+        "observation_id": row.observation_id,
+        "run_id": row.run_id,
+        "frame_number": row.frame_number,
+        "timestamp_ms": row.timestamp_ms,
+        "source_homography_candidate_observation_id": (
+            row.source_homography_candidate_observation_id
+        ),
+        "projected_template_keypoints": row.projected_template_keypoints_jsonb or [],
+        "projected_template_lines": row.projected_template_lines_jsonb or [],
+        "diagnostic_metrics": row.diagnostic_metrics_jsonb or {},
+        "status": row.status,
+        "confidence": row.confidence,
+        "frame_time_owner": row.frame_time_owner,
+        "not_ball_player_projection": True,
+        **_court_source_metadata(
+            row,
+            "projection diagnostic",
+            evidence_source="projection_diagnostic",
+        ),
+    }
+
+
 def available_runs_for_media(session: Session, media_id: str) -> dict[str, list[dict[str, Any]]]:
     return {
         "detection": _run_summaries_for_observation_types(session, media_id, DETECTION_TYPES),
@@ -1154,6 +1283,7 @@ def available_runs_for_media(session: Session, media_id: str) -> dict[str, list[
         "gameplay": _run_summaries_for_observation_types(session, media_id, GAMEPLAY_TYPES),
         "court": _court_run_summaries(session, media_id),
         "homography": _homography_run_summaries(session, media_id),
+        "projection_diagnostic": _projection_diagnostic_run_summaries(session, media_id),
     }
 
 
@@ -1180,6 +1310,7 @@ def normalize_replay_layers(layers: str | list[str] | tuple[str, ...] | None) ->
                     "court_lines",
                     "camera_view",
                     "homography_candidates",
+                    "projection_diagnostics",
                 }
             )
             continue
@@ -1191,6 +1322,8 @@ def normalize_replay_layers(layers: str | list[str] | tuple[str, ...] | None) ->
             layer = "camera_view"
         if layer in {"homography", "homographies", "homography-candidates"}:
             layer = "homography_candidates"
+        if layer in {"projection", "projection-diagnostics", "projection_diagnostic"}:
+            layer = "projection_diagnostics"
         normalized.add(layer)
     return normalized
 
@@ -1273,6 +1406,46 @@ def _homography_run_summaries(session: Session, media_id: str) -> list[dict[str,
                 "source_court_run_id": source_court_run_id,
                 "candidate_geometry": True,
                 "geometry_evidence_only": True,
+                "is_fixture": False,
+                "is_real_model_output": False,
+                "model_output_not_truth": False,
+            }
+        )
+    return summaries
+
+
+def _projection_diagnostic_run_summaries(
+    session: Session,
+    media_id: str,
+) -> list[dict[str, Any]]:
+    summaries = _run_summaries_for_observation_types(
+        session,
+        media_id,
+        PROJECTION_DIAGNOSTIC_TYPES,
+    )
+    if not summaries:
+        return []
+
+    diagnostic_counts = _counts_by_run_and_type(session, media_id, PROJECTION_DIAGNOSTIC_TYPES)
+    for summary in summaries:
+        run = session.get(ProcessingRun, summary["run_id"])
+        runtime_payload = run.runtime_config.payload_jsonb if run and run.runtime_config else {}
+        run_metadata = run.metadata_jsonb if run is not None else {}
+        source_homography_run_id = (
+            _string_or_none(run_metadata.get("source_homography_run_id"))
+            or _string_or_none(runtime_payload.get("source_homography_run_id"))
+        )
+        summary.update(
+            {
+                "evidence_source": "projection_diagnostic",
+                "source_label": "projection diagnostic",
+                "projection_diagnostic_count": diagnostic_counts.get(
+                    (summary["run_id"], "projection_diagnostic_observation"), 0
+                ),
+                "source_homography_run_id": source_homography_run_id,
+                "diagnostic_geometry": True,
+                "geometry_evidence_only": True,
+                "not_ball_player_projection": True,
                 "is_fixture": False,
                 "is_real_model_output": False,
                 "model_output_not_truth": False,
@@ -1545,6 +1718,7 @@ def _court_source_metadata(
         | CourtLineObservation
         | CameraViewObservation
         | HomographyCandidateObservation
+        | ProjectionDiagnosticObservation
     ),
     source_label: str,
     *,
@@ -1566,6 +1740,9 @@ def _court_source_metadata(
     candidate_geometry = _truthy(metadata.get("candidate_geometry")) or _truthy(
         payload.get("candidate_geometry")
     )
+    diagnostic_geometry = _truthy(metadata.get("diagnostic_geometry")) or _truthy(
+        payload.get("diagnostic_geometry")
+    )
     geometry_evidence_only = (
         _truthy(metadata.get("geometry_evidence_only"))
         or _truthy(payload.get("geometry_evidence_only"))
@@ -1573,7 +1750,9 @@ def _court_source_metadata(
     )
     resolved_evidence_source = evidence_source
     if resolved_evidence_source is None:
-        if candidate_geometry:
+        if diagnostic_geometry:
+            resolved_evidence_source = "projection_diagnostic"
+        elif candidate_geometry:
             resolved_evidence_source = "homography_candidate"
         elif fixture_court_evidence:
             resolved_evidence_source = "fixture_court_evidence"
@@ -1594,7 +1773,10 @@ def _court_source_metadata(
         "fixture_court_evidence": fixture_court_evidence,
         "fixture_camera_view_evidence": fixture_camera_view_evidence,
         "candidate_geometry": candidate_geometry,
+        "diagnostic_geometry": diagnostic_geometry,
         "geometry_evidence_only": geometry_evidence_only,
+        "not_ball_player_projection": _truthy(metadata.get("not_ball_player_projection"))
+        or _truthy(payload.get("not_ball_player_projection")),
         "observation_only": True,
         "no_adjudication": True,
         "is_fixture": fixture_court_evidence or fixture_camera_view_evidence,

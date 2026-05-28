@@ -311,7 +311,8 @@ pre {
 .replay-tracklet-path,
 .replay-pose-edge,
 .replay-court-line,
-.replay-homography-line {
+.replay-homography-line,
+.replay-projection-diagnostic-line {
   fill: none;
   pointer-events: auto;
   stroke-linecap: round;
@@ -403,7 +404,8 @@ pre {
 
 .replay-court-keypoint-group,
 .replay-court-line-group,
-.replay-homography-group {
+.replay-homography-group,
+.replay-projection-diagnostic-group {
   cursor: pointer;
   pointer-events: auto;
 }
@@ -455,6 +457,23 @@ pre {
 
 .replay-homography-group.selected .replay-homography-line {
   stroke: var(--green);
+  stroke-width: 3;
+}
+
+.replay-projection-diagnostic-line {
+  stroke: rgba(52, 211, 153, 0.88);
+  stroke-dasharray: 2 6;
+  stroke-width: 2.25;
+}
+
+.replay-projection-diagnostic-keypoint {
+  fill: var(--green);
+  stroke: rgba(16, 23, 25, 0.9);
+  stroke-width: 1.5;
+}
+
+.replay-projection-diagnostic-group.selected .replay-projection-diagnostic-line {
+  stroke: var(--amber);
   stroke-width: 3;
 }
 
@@ -741,6 +760,10 @@ pre {
 
 .timeline-lane-item.tick.homography_candidate {
   background: var(--rose);
+}
+
+.timeline-lane-item.tick.projection_diagnostic {
+  background: var(--green);
 }
 
 .timeline-lane-item.tick.annotation {

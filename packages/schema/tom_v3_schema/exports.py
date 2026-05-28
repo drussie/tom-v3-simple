@@ -67,3 +67,51 @@ class PoseReviewDatasetExportResponse(TOMBaseModel):
     query_result_id: str | None = None
     warnings: dict[str, bool]
     metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class CourtReviewDatasetExportRequest(TOMBaseModel):
+    media_id: str
+    court_run_id: str | None = None
+    homography_run_id: str | None = None
+    projection_diagnostic_run_id: str | None = None
+    include_annotations: bool = True
+    include_artifacts: bool = True
+    format: Literal["json"] = "json"
+    output_root: str = ".data/exports"
+    query_name: str | None = None
+    created_by: str | None = "tom-v3-worker"
+
+    @model_validator(mode="after")
+    def validate_selection(self) -> "CourtReviewDatasetExportRequest":
+        if not any(
+            (
+                self.court_run_id,
+                self.homography_run_id,
+                self.projection_diagnostic_run_id,
+            )
+        ):
+            raise ValueError(
+                "court_run_id, homography_run_id, or projection_diagnostic_run_id is required"
+            )
+        return self
+
+
+class CourtReviewDatasetExportResponse(TOMBaseModel):
+    export_id: str
+    artifact_id: str
+    uri: str
+    path: str
+    checksum: str
+    media_id: str
+    court_run_id: str | None = None
+    homography_run_id: str | None = None
+    projection_diagnostic_run_id: str | None = None
+    court_keypoint_count: int
+    court_line_count: int
+    camera_view_count: int
+    homography_candidate_count: int
+    projection_diagnostic_count: int
+    observation_ids: list[str]
+    query_result_id: str | None = None
+    warnings: dict[str, bool]
+    metadata: dict[str, Any] = Field(default_factory=dict)

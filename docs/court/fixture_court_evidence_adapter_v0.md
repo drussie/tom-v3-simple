@@ -90,6 +90,8 @@ The fixture adapter does not create homography candidates itself. It only provid
 
 Milestone 8E consumes those persisted fixture rows through replay overlay payloads. The fixture rows remain evidence plumbing and do not become a real court model.
 
+Milestone 8F can use downstream homography candidates built from fixture rows to create projection diagnostic observations and court review exports. The fixture adapter itself still does not create homography candidates, projection diagnostics, or court-space ball/player projections.
+
 ## Provenance
 
 The adapter creates:
@@ -115,7 +117,7 @@ Every emitted observation has:
 
 The fixture adapter still does not create:
 
-- projection diagnostics
+- projection diagnostics directly
 - replay court overlays
 - real court model inference
 - real camera model inference

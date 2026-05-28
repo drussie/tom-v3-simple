@@ -786,7 +786,72 @@ Expected:
 - camera/view evidence is visible as replay context
 - homography candidate geometry can be displayed from persisted candidate rows
 - selected court evidence remains geometry evidence only
-- no projection diagnostics, ball/player court-space projection, bounce, hit, in/out, rally, point, score, or adjudication is produced
+- no projection diagnostics, ball/player court-space projection, bounce, hit, line-call, rally, point, score, or adjudication is produced
+
+## 11H. Projection Diagnostics / Court Review Export
+
+Milestone 8F persists projection diagnostic observations from homography candidates and exports TOM-native court review datasets.
+
+After running `run-fixture-court` and `build-homography-candidates`, build projection diagnostics:
+
+```bash
+TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_8f_projection_diag.db \
+.venv/bin/python -m apps.worker.cli build-projection-diagnostics \
+  --media-id <media_id> \
+  --homography-run-id <homography_run_id>
+```
+
+Or use:
+
+```bash
+TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_8f_projection_diag.db \
+make projection-diagnostics \
+  MEDIA_ID=<media_id> \
+  HOMOGRAPHY_RUN_ID=<homography_run_id> \
+  PYTHON=.venv/bin/python
+```
+
+Plan-only mode:
+
+```bash
+.venv/bin/python -m apps.worker.cli build-projection-diagnostics \
+  --media-id media-plan \
+  --homography-run-id homography-run-plan \
+  --plan-only
+```
+
+Expected output includes `projection_diagnostic_run_id`, diagnostic counts, source counts, sampled frames, and a replay URL with `projectionDiagnosticRunId`.
+
+Export a court review dataset:
+
+```bash
+TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_8f_projection_diag.db \
+.venv/bin/python -m apps.worker.cli export-court-review-dataset \
+  --media-id <media_id> \
+  --court-run-id <court_run_id> \
+  --homography-run-id <homography_run_id> \
+  --projection-diagnostic-run-id <projection_diagnostic_run_id>
+```
+
+Or use:
+
+```bash
+TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_8f_projection_diag.db \
+make court-review-export \
+  MEDIA_ID=<media_id> \
+  COURT_RUN_ID=<court_run_id> \
+  HOMOGRAPHY_RUN_ID=<homography_run_id> \
+  PROJECTION_DIAGNOSTIC_RUN_ID=<projection_diagnostic_run_id> \
+  PYTHON=.venv/bin/python
+```
+
+Open replay with diagnostics:
+
+```text
+http://127.0.0.1:3000/replay/<media_id>?courtRunId=<court_run_id>&homographyRunId=<homography_run_id>&projectionDiagnosticRunId=<projection_diagnostic_run_id>
+```
+
+Projection diagnostics are review evidence for projected court template geometry. They do not project ball/player observations into court space and do not produce bounce, hit, line-call, rally, point, score, or adjudication.
 
 ## 12. Optional Custom Media
 
@@ -869,8 +934,8 @@ python -m apps.worker.cli completion-audit --no-demo-only
 - Real pose replay is optional and locally gated by pose runtime and weights.
 - Pose is keypoint evidence only, not movement interpretation.
 - Tracklets are candidates, not official rallies or points.
-- Homography candidates are geometry evidence only, not court truth.
-- No projection diagnostics, bounce, hit, rally, point, score, or adjudication is produced.
+- Homography candidates and projection diagnostics are geometry evidence only, not final court models.
+- No ball/player court-space projection, bounce, hit, rally, point, score, or adjudication is produced.
 - Cloud deployment, auth, production streaming, and multi-camera reasoning are out of scope.
 
 ## 15. Completion Checklist

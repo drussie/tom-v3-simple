@@ -27,6 +27,7 @@ interface ReplayEvidenceTimelineProps {
     court_lines: boolean;
     camera_view: boolean;
     homography_candidates: boolean;
+    projection_diagnostics: boolean;
     annotations: boolean;
   };
   onSelectItem: (item: ReplayTimelineItem) => void;
@@ -224,6 +225,9 @@ function emptyLaneText(laneType: ReplayTimelineLane["lane_type"]): string {
   if (laneType === "homography_candidates") {
     return "No homography candidates in the selected run.";
   }
+  if (laneType === "projection_diagnostics") {
+    return "No projection diagnostics in the selected run.";
+  }
   return "No review annotations for this media/run context.";
 }
 
@@ -248,6 +252,9 @@ function proxyEmptyLaneText(laneType: ReplayTimelineLane["lane_type"]): string {
   }
   if (laneType === "homography_candidates") {
     return "No homography candidates available at the current live-like edge.";
+  }
+  if (laneType === "projection_diagnostics") {
+    return "No projection diagnostics available at the current live-like edge.";
   }
   return "No review annotations available at the current live-like edge.";
 }

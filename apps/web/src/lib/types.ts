@@ -250,12 +250,16 @@ export interface ReplayRunSummary {
   source_detection_source_label?: string | null;
   source_detection_runtime?: string | null;
   source_court_run_id?: string | null;
+  source_homography_run_id?: string | null;
   court_keypoint_count?: number;
   court_line_count?: number;
   camera_view_count?: number;
   candidate_count?: number;
+  projection_diagnostic_count?: number;
   candidate_geometry?: boolean;
+  diagnostic_geometry?: boolean;
   geometry_evidence_only?: boolean;
+  not_ball_player_projection?: boolean;
   model_output_not_truth?: boolean;
 }
 
@@ -266,6 +270,7 @@ export interface ReplayAvailableRuns {
   gameplay: ReplayRunSummary[];
   court: ReplayRunSummary[];
   homography: ReplayRunSummary[];
+  projection_diagnostic: ReplayRunSummary[];
 }
 
 export interface ReplayInfo {
@@ -424,6 +429,8 @@ export interface ReplayCourtEvidenceSource {
   fixture_camera_view_evidence?: boolean;
   candidate_geometry?: boolean;
   geometry_evidence_only?: boolean;
+  diagnostic_geometry?: boolean;
+  not_ball_player_projection?: boolean;
   observation_only?: boolean;
   no_adjudication?: boolean;
   is_fixture?: boolean;
@@ -552,6 +559,40 @@ export interface ReplayHomographyCandidateOverlay extends ReplayCourtEvidenceSou
   status: string;
 }
 
+export interface ReplayProjectedTemplateKeypoint {
+  name: string;
+  template_x: number;
+  template_y: number;
+  image_x: number | null;
+  image_y: number | null;
+  valid: boolean;
+}
+
+export interface ReplayProjectedTemplateLine {
+  line_class: string;
+  start_keypoint: string;
+  end_keypoint: string;
+  x1: number | null;
+  y1: number | null;
+  x2: number | null;
+  y2: number | null;
+  valid: boolean;
+}
+
+export interface ReplayProjectionDiagnosticOverlay extends ReplayCourtEvidenceSource {
+  overlay_type: "projection_diagnostic";
+  observation_id: string;
+  run_id: string;
+  frame_number: number;
+  timestamp_ms: number;
+  source_homography_candidate_observation_id: string;
+  projected_template_keypoints: ReplayProjectedTemplateKeypoint[];
+  projected_template_lines: ReplayProjectedTemplateLine[];
+  diagnostic_metrics: JsonRecord;
+  status: string;
+  confidence: number | null;
+}
+
 export interface ReplayOverlayChunk {
   media_id: string;
   start_ms: number;
@@ -566,6 +607,7 @@ export interface ReplayOverlayChunk {
   court_lines: ReplayCourtLineOverlay[];
   camera_view: ReplayCameraViewOverlay[];
   homography_candidates: ReplayHomographyCandidateOverlay[];
+  projection_diagnostics: ReplayProjectionDiagnosticOverlay[];
   observation_only: boolean;
   no_adjudication: boolean;
 }
@@ -729,6 +771,20 @@ export interface ReplayHomographyCandidateTimelineItem extends ReplayCourtEviden
   display_label: string;
 }
 
+export interface ReplayProjectionDiagnosticTimelineItem extends ReplayCourtEvidenceSource {
+  item_type: "projection_diagnostic";
+  observation_id: string;
+  run_id: string;
+  timestamp_ms: number;
+  frame_number: number;
+  source_homography_candidate_observation_id: string;
+  projected_keypoint_count: number | null;
+  projected_line_count: number | null;
+  status: string;
+  confidence: number | null;
+  display_label: string;
+}
+
 export type ReplayTimelineItem =
   | ReplayDetectionTimelineItem
   | ReplayTrackletTimelineItem
@@ -737,6 +793,7 @@ export type ReplayTimelineItem =
   | ReplayCourtLineTimelineItem
   | ReplayCameraViewTimelineItem
   | ReplayHomographyCandidateTimelineItem
+  | ReplayProjectionDiagnosticTimelineItem
   | ReplayAnnotationTimelineItem;
 
 export interface ReplayTimelineLane {
@@ -748,6 +805,7 @@ export interface ReplayTimelineLane {
     | "court_lines"
     | "camera_view"
     | "homography_candidates"
+    | "projection_diagnostics"
     | "annotations";
   label: string;
   items: ReplayTimelineItem[];

@@ -2,7 +2,7 @@
 
 Status: IN PROGRESS
 
-Blueprint 7 is complete. Blueprint 8 has started with Milestone 8A schema/contract work, Milestone 8B fixture court evidence persistence, Milestone 8C camera/view read models, Milestone 8D homography candidate persistence, and Milestone 8E court replay overlays.
+Blueprint 7 is complete. Blueprint 8 has started with Milestone 8A schema/contract work, Milestone 8B fixture court evidence persistence, Milestone 8C camera/view read models, Milestone 8D homography candidate persistence, Milestone 8E court replay overlays, and Milestone 8F projection diagnostics/review export.
 
 ## Mission
 
@@ -76,6 +76,10 @@ Status: COMPLETE.
 ### 8F - Projection Diagnostics / Review Export
 
 Persist projection diagnostics and export TOM-native review datasets with lineage, artifacts, and annotations.
+
+Status: COMPLETE.
+
+8F adds `build-projection-diagnostics`, Makefile `projection-diagnostics`, projected court template keypoint/line payloads, diagnostic metrics, `projection_diagnostic_observation` persistence, homography-to-diagnostic lineage, replay support for `projectionDiagnosticRunId`, `export-court-review-dataset`, Makefile `court-review-export`, and TOM-native `court_review_dataset_v0` export artifacts. It does not add ball/player court-space projection, accepted/rejected court lifecycle, bounce/hit/in-out/rally/point/scoring, or adjudication.
 
 ### 8G - Completion Review
 

@@ -48,6 +48,7 @@ export interface FetchReplayOverlayChunkInput {
   poseRunId?: string | null;
   courtRunId?: string | null;
   homographyRunId?: string | null;
+  projectionDiagnosticRunId?: string | null;
   minConfidence?: number | null;
   minPoseConfidence?: number | null;
 }
@@ -62,6 +63,7 @@ export async function fetchReplayOverlayChunk({
   poseRunId = null,
   courtRunId = null,
   homographyRunId = null,
+  projectionDiagnosticRunId = null,
   minConfidence = null,
   minPoseConfidence = null
 }: FetchReplayOverlayChunkInput): Promise<ReplayOverlayChunk> {
@@ -85,6 +87,9 @@ export async function fetchReplayOverlayChunk({
   }
   if (homographyRunId !== null) {
     params.set("homography_run_id", homographyRunId);
+  }
+  if (projectionDiagnosticRunId !== null) {
+    params.set("projection_diagnostic_run_id", projectionDiagnosticRunId);
   }
   if (minConfidence !== null) {
     params.set("min_confidence", minConfidence.toString());
@@ -111,6 +116,7 @@ export interface FetchReplayTimelineInput {
   poseRunId?: string | null;
   courtRunId?: string | null;
   homographyRunId?: string | null;
+  projectionDiagnosticRunId?: string | null;
   includeAnnotations?: boolean;
 }
 
@@ -121,6 +127,7 @@ export async function fetchReplayTimeline({
   poseRunId = null,
   courtRunId = null,
   homographyRunId = null,
+  projectionDiagnosticRunId = null,
   includeAnnotations = true
 }: FetchReplayTimelineInput): Promise<ReplayTimeline> {
   const params = new URLSearchParams({
@@ -141,6 +148,9 @@ export async function fetchReplayTimeline({
   }
   if (homographyRunId !== null) {
     params.set("homography_run_id", homographyRunId);
+  }
+  if (projectionDiagnosticRunId !== null) {
+    params.set("projection_diagnostic_run_id", projectionDiagnosticRunId);
   }
 
   const response = await fetch(`/api/replay/timeline?${params.toString()}`, {
