@@ -175,6 +175,8 @@ make tom-v1-main-player-tracks \
 
 This helper groups frame-local subject candidates into `near_player_track_candidate` and `far_player_track_candidate` visual track candidates, with per-frame `main_player_track_assignment_candidate` evidence. These are still not identity truth.
 
+The current assignment method is `main_player_track_assignment_v01`. It uses simple persistent-lock checks, rejects large jumps or edge/wall candidates, and may leave assignment gaps rather than passing an implausible subject to pose.
+
 Pose from selected main subject candidates:
 
 ```bash
@@ -201,6 +203,14 @@ make tom-v1-pose-main-tracks \
 ```
 
 Track-filtered pose mode preserves track assignment metadata on pose observations, including `track_candidate_id`, `track_role_candidate`, and `track_assignment_observation_id`. It remains candidate visual subject evidence only.
+
+Replay can show these track assignments with:
+
+```text
+/replay/<media_id>?detectionRunId=<player_detection_run_id>&trackletRunId=<player_tracklet_run_id>&subjectRunId=<main_subject_run_id>&mainPlayerTrackRunId=<main_player_track_run_id>&poseRunId=<track_filtered_pose_run_id>
+```
+
+The visible `NEAR TRACK` and `FAR TRACK` labels are candidate visual track labels. They are not player names, identity truth, or accepted tracks.
 
 ## Runtime / Replay Repair Notes
 

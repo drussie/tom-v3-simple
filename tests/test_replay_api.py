@@ -487,6 +487,44 @@ def test_replay_overlay_endpoint_returns_pose_keypoint_items(
     assert pose["source_language"] == "pose keypoint evidence"
 
 
+def test_replay_overlay_endpoint_returns_main_player_track_assignment_items(
+    client: TestClient,
+    db_session: Session,
+    tmp_path,
+) -> None:
+    media_path = tmp_path / "sample.mp4"
+    media_path.write_bytes(b"tom-v3-video")
+    media = _seed_media(db_session, media_path)
+    run = _seed_main_player_track_run(db_session, media.id)
+
+    response = client.get(
+        "/replay/overlays",
+        params={
+            "media_id": media.id,
+            "start_ms": 0,
+            "end_ms": 2000,
+            "layers": "main_player_tracks",
+            "main_player_track_run_id": run.id,
+        },
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert len(body["main_player_tracks"]) == 1
+    track = body["main_player_tracks"][0]
+    assert track["overlay_type"] == "main_player_track_assignment"
+    assert track["run_id"] == run.id
+    assert track["bbox"] == {"x": 100.0, "y": 120.0, "w": 80.0, "h": 180.0}
+    assert track["track_candidate_id"] == "near_player_track_candidate_001"
+    assert track["track_role_candidate"] == "near_player_track_candidate"
+    assert track["label"] == "NEAR TRACK"
+    assert track["assignment_score"] == 0.86
+    assert track["candidate_track_only"] is True
+    assert track["not_identity_truth"] is True
+    assert track["observation_only"] is True
+    assert track["no_adjudication"] is True
+
+
 def test_replay_overlay_endpoint_returns_court_and_homography_items(
     client: TestClient,
     db_session: Session,
@@ -764,6 +802,7 @@ def test_replay_timeline_endpoint_returns_evidence_lanes(
         "detections",
         "tracklets",
         "pose",
+        "main_player_tracks",
         "court_keypoints",
         "court_lines",
         "camera_view",
@@ -794,6 +833,8 @@ def test_replay_timeline_endpoint_returns_evidence_lanes(
     assert pose_item["run_id"] == pose_run.id
     assert pose_item["keypoints_present_count"] == 3
     assert pose_item["display_label"] == "pose observation"
+
+    assert lanes["main_player_tracks"]["items"] == []
 
     annotation_item = lanes["annotations"]["items"][0]
     assert annotation_item["item_type"] == "annotation"
@@ -867,6 +908,36 @@ def test_replay_timeline_endpoint_returns_court_evidence_lanes(
     assert projection_item["run_id"] == projection_result["projection_diagnostic_run_id"]
     assert projection_item["status"] == "diagnostic_candidate"
     assert projection_item["not_ball_player_projection"] is True
+
+
+def test_replay_timeline_endpoint_returns_main_player_track_lane(
+    client: TestClient,
+    db_session: Session,
+    tmp_path,
+) -> None:
+    media_path = tmp_path / "sample.mp4"
+    media_path.write_bytes(b"tom-v3-video")
+    media = _seed_media(db_session, media_path)
+    run = _seed_main_player_track_run(db_session, media.id)
+
+    response = client.get(
+        "/replay/timeline",
+        params={
+            "media_id": media.id,
+            "main_player_track_run_id": run.id,
+        },
+    )
+
+    assert response.status_code == 200
+    lanes = {lane["lane_type"]: lane for lane in response.json()["lanes"]}
+    item = lanes["main_player_tracks"]["items"][0]
+    assert item["item_type"] == "main_player_track_assignment"
+    assert item["run_id"] == run.id
+    assert item["track_candidate_id"] == "near_player_track_candidate_001"
+    assert item["track_role_candidate"] == "near_player_track_candidate"
+    assert item["assignment_score"] == 0.86
+    assert item["candidate_track_only"] is True
+    assert item["not_identity_truth"] is True
 
 
 def test_replay_timeline_endpoint_filters_selected_runs(
@@ -1178,6 +1249,85 @@ def _seed_pose_run(
             frame_time_owner="media_indexing",
             raw_model_payload_jsonb={},
             metadata_jsonb={"normalization_only": True},
+        )
+    )
+    session.commit()
+    session.refresh(run)
+    return run
+
+
+def _seed_main_player_track_run(
+    session: Session,
+    media_id: str,
+    run_name: str = "main-player-track-assignment-v01",
+) -> ProcessingRun:
+    run = ProcessingRun(
+        media_id=media_id,
+        run_name=run_name,
+        run_status="completed",
+        started_at=datetime.now(UTC),
+        completed_at=datetime.now(UTC),
+        metadata_jsonb={
+            "evidence_source": "main_player_track_assignment",
+            "source_label": "main player visual track candidates",
+            "candidate_track_only": True,
+            "not_identity_truth": True,
+        },
+    )
+    session.add(run)
+    session.flush()
+    track = Observation(
+        media_id=media_id,
+        run_id=run.id,
+        observation_family="tracking",
+        observation_type="main_player_track_candidate",
+        granularity="frame_range",
+        frame_start=30,
+        frame_end=30,
+        timestamp_start_ms=1000,
+        timestamp_end_ms=1000,
+        confidence=0.86,
+        coordinate_space="image_pixels",
+        payload_jsonb={
+            "track_candidate_id": "near_player_track_candidate_001",
+            "track_role_candidate": "near_player_track_candidate",
+            "candidate_track_only": True,
+            "not_identity_truth": True,
+            "observation_only": True,
+            "no_adjudication": True,
+        },
+    )
+    session.add(track)
+    session.flush()
+    session.add(
+        Observation(
+            media_id=media_id,
+            run_id=run.id,
+            observation_family="tracking",
+            observation_type="main_player_track_assignment_candidate",
+            granularity="frame",
+            frame_start=30,
+            frame_end=30,
+            timestamp_start_ms=1000,
+            timestamp_end_ms=1000,
+            confidence=0.86,
+            coordinate_space="image_pixels",
+            payload_jsonb={
+                "track_candidate_id": "near_player_track_candidate_001",
+                "track_role_candidate": "near_player_track_candidate",
+                "source_track_candidate_observation_id": track.id,
+                "source_subject_candidate_observation_id": "source-subject-candidate",
+                "source_detection_observation_id": "source-player-detection",
+                "assignment_method": "nearest_temporal_continuity_v0",
+                "assignment_score": 0.86,
+                "track_lock_state": "locked_forward",
+                "bbox": {"x": 100.0, "y": 120.0, "width": 80.0, "height": 180.0},
+                "candidate_track_only": True,
+                "candidate_subject_only": True,
+                "not_identity_truth": True,
+                "observation_only": True,
+                "no_adjudication": True,
+            },
         )
     )
     session.commit()

@@ -57,6 +57,7 @@ REAL_POSE_WARNINGS = {
 }
 MAIN_PLAYER_TRACK_OBSERVATION_TYPE = "main_player_track_candidate"
 MAIN_PLAYER_TRACK_ASSIGNMENT_OBSERVATION_TYPE = "main_player_track_assignment_candidate"
+MAIN_PLAYER_TRACK_ASSIGNMENT_METHOD = "main_player_track_assignment_v01"
 
 
 class RealPoseReplayError(ValueError):
@@ -715,7 +716,7 @@ def _create_runtime_config(
                 "main_tennis_subject_filter_v0" if source_subject_run_id else None
             ),
             "source_track_assignment": (
-                "main_player_track_assignment_v0" if source_track_run_id else None
+                MAIN_PLAYER_TRACK_ASSIGNMENT_METHOD if source_track_run_id else None
             ),
             "fallback_to_full_frame": fallback_to_full_frame,
             "real_model_output": True,
@@ -765,7 +766,7 @@ def _create_run(
                 "main_tennis_subject_filter_v0" if source_subject_run_id else None
             ),
             "source_track_assignment": (
-                "main_player_track_assignment_v0" if source_track_run_id else None
+                MAIN_PLAYER_TRACK_ASSIGNMENT_METHOD if source_track_run_id else None
             ),
             "mode": mode,
             "evidence_source": "real_pose_model_output",
@@ -925,7 +926,7 @@ def _crop_frame_results(
             "main_tennis_subject_filter_v0" if source_subject_run_id else None
         ),
         "source_track_assignment": (
-            "main_player_track_assignment_v0" if source_track_run_id else None
+            MAIN_PLAYER_TRACK_ASSIGNMENT_METHOD if source_track_run_id else None
         ),
     }
 
@@ -1326,7 +1327,9 @@ def _frame_result_with_source_context(
         track_candidate.payload_jsonb if track_candidate is not None else {}
     )
     if track_assignment is not None:
-        association_method = "main_player_track_assignment_v0_crop_from_player_track_candidate"
+        association_method = (
+            f"{MAIN_PLAYER_TRACK_ASSIGNMENT_METHOD}_crop_from_player_track_candidate"
+        )
     elif subject_candidate is not None:
         association_method = "main_tennis_subject_filter_v0_crop_from_player_detection"
     else:

@@ -591,6 +591,14 @@ For TOM v1 main player track-filtered pose replay, assign visual track candidate
 
 Then run pose with `--source-track-run-id <main_player_track_run_id>` in addition to the detection and subject run ids. Replay pose details show the candidate visual track context when present. This does not confirm player names, identity, side, server/receiver role, or tennis events.
 
+Open track-filtered replay with the track run selected:
+
+```text
+http://127.0.0.1:3000/replay/<media_id>?detectionRunId=<player_detection_run_id>&trackletRunId=<player_tracklet_run_id>&subjectRunId=<main_subject_run_id>&mainPlayerTrackRunId=<main_player_track_run_id>&poseRunId=<track_filtered_pose_run_id>
+```
+
+When `mainPlayerTrackRunId` is present, the workstation can draw selectable `NEAR TRACK` and `FAR TRACK` candidate labels from `main_player_track_assignment_candidate` rows. Selecting a label shows track candidate id, role candidate, assignment score, source subject candidate id, source detection id, and evidence-only warnings. These labels are candidate visual track labels, not player names or identity truth.
+
 For court geometry evidence replay:
 
 ```bash

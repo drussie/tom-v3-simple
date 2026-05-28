@@ -249,8 +249,11 @@ export interface ReplayRunSummary {
   source_detection_evidence_source?: string | null;
   source_detection_source_label?: string | null;
   source_detection_runtime?: string | null;
+  source_subject_run_id?: string | null;
   source_court_run_id?: string | null;
   source_homography_run_id?: string | null;
+  track_candidate_count?: number;
+  track_assignment_count?: number;
   court_keypoint_count?: number;
   court_line_count?: number;
   camera_view_count?: number;
@@ -260,6 +263,9 @@ export interface ReplayRunSummary {
   diagnostic_geometry?: boolean;
   geometry_evidence_only?: boolean;
   not_ball_player_projection?: boolean;
+  candidate_track_only?: boolean;
+  candidate_subject_only?: boolean;
+  not_identity_truth?: boolean;
   model_output_not_truth?: boolean;
 }
 
@@ -442,6 +448,38 @@ export interface ReplayPoseOverlay {
   runtime_config_id?: string | null;
   is_fixture?: boolean;
   is_real_model_output?: boolean;
+}
+
+export interface ReplayMainPlayerTrackOverlay {
+  overlay_type: "main_player_track_assignment";
+  observation_id: string;
+  run_id: string;
+  frame_number: number;
+  timestamp_ms: number;
+  bbox: ReplayDetectionBBox;
+  track_candidate_id: string | null;
+  track_role_candidate: string | null;
+  label: string;
+  assignment_score: number | null;
+  assignment_method: string | null;
+  track_lock_state?: string | null;
+  source_track_candidate_observation_id?: string | null;
+  source_subject_candidate_observation_id: string | null;
+  source_detection_observation_id: string | null;
+  candidate_track_only: boolean;
+  candidate_subject_only?: boolean;
+  not_identity_truth: boolean;
+  observation_only: boolean;
+  no_adjudication: boolean;
+  source_language: "main player track assignment candidate";
+  coordinate_space: "image_pixels";
+  evidence_source?: string;
+  source_label?: string | null;
+  model_registry_id?: string | null;
+  model_name?: string | null;
+  model_version?: string | null;
+  runtime_config_id?: string | null;
+  model_output_not_truth?: boolean;
 }
 
 export interface ReplayCourtEvidenceSource {
@@ -630,6 +668,7 @@ export interface ReplayOverlayChunk {
   detections: ReplayDetectionOverlay[];
   tracklets: ReplayTrackletOverlay[];
   poses: ReplayPoseOverlay[];
+  main_player_tracks: ReplayMainPlayerTrackOverlay[];
   court_keypoints: ReplayCourtKeypointOverlay[];
   court_lines: ReplayCourtLineOverlay[];
   camera_view: ReplayCameraViewOverlay[];
@@ -745,6 +784,25 @@ export interface ReplayPoseTimelineItem {
   not_identity_truth?: boolean;
 }
 
+export interface ReplayMainPlayerTrackTimelineItem {
+  item_type: "main_player_track_assignment";
+  observation_id: string;
+  run_id: string;
+  timestamp_ms: number;
+  frame_number: number;
+  track_candidate_id: string | null;
+  track_role_candidate: string | null;
+  assignment_score: number | null;
+  assignment_method: string | null;
+  source_subject_candidate_observation_id: string | null;
+  source_detection_observation_id: string | null;
+  candidate_track_only: boolean;
+  not_identity_truth: boolean;
+  observation_only: boolean;
+  no_adjudication: boolean;
+  display_label: string;
+}
+
 export interface ReplayAnnotationTimelineItem {
   item_type: "annotation";
   annotation_id: string;
@@ -838,6 +896,7 @@ export type ReplayTimelineItem =
   | ReplayDetectionTimelineItem
   | ReplayTrackletTimelineItem
   | ReplayPoseTimelineItem
+  | ReplayMainPlayerTrackTimelineItem
   | ReplayCourtKeypointTimelineItem
   | ReplayCourtLineTimelineItem
   | ReplayCameraViewTimelineItem
@@ -850,6 +909,7 @@ export interface ReplayTimelineLane {
     | "detections"
     | "tracklets"
     | "pose"
+    | "main_player_tracks"
     | "court_keypoints"
     | "court_lines"
     | "camera_view"

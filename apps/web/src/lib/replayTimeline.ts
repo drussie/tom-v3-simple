@@ -48,6 +48,9 @@ export function timelineItemKey(item: ReplayTimelineItem): string {
   if (item.item_type === "pose") {
     return `pose:${item.observation_id}`;
   }
+  if (item.item_type === "main_player_track_assignment") {
+    return `main_player_track_assignment:${item.observation_id}`;
+  }
   if (item.item_type === "court_keypoint") {
     return `court_keypoint:${item.observation_id}`;
   }

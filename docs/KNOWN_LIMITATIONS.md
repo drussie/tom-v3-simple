@@ -21,7 +21,7 @@ This registry makes TOM v3 Simple boundaries explicit.
 - Real pose quality depends on the chosen pose model, source media, source player detections or frame sampling, device, and confidence settings.
 - Real pose observations are keypoint evidence; they do not establish movement, stroke, serve, split-step, biomechanics, or body-state conclusions.
 - Main tennis-player subject filtering selects `near_player_candidate` and `far_player_candidate` pose source candidates only; it does not confirm player identity or delete raw detections.
-- Main player track assignment groups those frame-local candidates into `near_player_track_candidate` and `far_player_track_candidate` visual track candidates only; it does not confirm identity, player names, server/receiver role, side changes, or track truth.
+- Main player track assignment v0.1 groups those frame-local candidates into `near_player_track_candidate` and `far_player_track_candidate` visual track candidates, applies simple continuity and edge/wall jump rejection, and may leave gaps. It does not confirm identity, player names, server/receiver role, side changes, or track truth.
 - Fixture pose output is demo evidence only.
 - Blueprint 8A adds court/camera/homography schema and typed persistence contracts.
 - Blueprint 8B adds deterministic fixture court keypoint, line, and camera/view evidence only.
@@ -47,7 +47,7 @@ This registry makes TOM v3 Simple boundaries explicit.
 - Pose observations may be associated with the wrong subject candidate.
 - Real crop-mode pose observations inherit the source player detection limitations.
 - Filtered crop-mode pose observations also inherit the main subject filter heuristic limitations.
-- Track-filtered crop-mode pose observations also inherit main player track assignment limitations, including possible gaps or wrong temporary visual assignments.
+- Track-filtered crop-mode pose observations also inherit main player track assignment limitations, including possible gaps, missed accepted assignments, or wrong temporary visual assignments when the heuristic is fooled.
 - Full-frame real pose observations may be unassociated with a source player detection.
 - Missing keypoints are recorded as missing evidence; they are not inferred.
 - Review annotations do not mutate observations.
@@ -67,6 +67,7 @@ This registry makes TOM v3 Simple boundaries explicit.
 - Stream Proxy Mode hides future evidence in the UI, but the underlying observations are already persisted.
 - Replay Mode can display persisted fixture court keypoint, court line, camera/view, and homography candidate evidence through `courtRunId` and `homographyRunId`.
 - Replay Mode can display projection diagnostic evidence through `projectionDiagnosticRunId`.
+- Replay Mode can display selectable `NEAR TRACK` / `FAR TRACK` main player track candidate labels through `mainPlayerTrackRunId`; these labels are visual track candidate labels, not identities.
 - Homography candidate overlays and projection diagnostic overlays are display-only candidate geometry; they are not final court models.
 - Camera/view evidence can be queried through API read models and viewed in the replay court evidence context.
 - The court keypoint/line adapter is fixture-only; no real court keypoint or line model is implemented yet.

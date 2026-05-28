@@ -36,3 +36,5 @@ def test_replay_display_policy_helpers_define_expected_modes() -> None:
     assert 'displayMode === "short_trail"' in source or '"short_trail"' in source
     assert 'displayMode === "full_trail"' in source
     assert "isActiveReplayPointForDisplay" in source
+    assert "activeReplayMainPlayerTracks" in source
+    assert "filterMainPlayerTracksAvailableAt" in source

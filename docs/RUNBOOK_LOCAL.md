@@ -642,14 +642,14 @@ TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_tom_v1_bridge.db \
   --media-id <media_id> \
   --source-detection-run-id <player_real_detection_run_id> \
   --source-subject-run-id <main_subject_run_id> \
-  --run-name main-player-track-assignment-v0 \
+  --run-name main-player-track-assignment-v01 \
   --frame-start 0 \
   --frame-end 214 \
   --max-frames 214 \
   --every-n-frames 1
 ```
 
-This persists `main_player_track_candidate` rows for `near_player_track_candidate` and `far_player_track_candidate`, plus per-frame `main_player_track_assignment_candidate` rows. These are visual subject track candidates only. They do not confirm player identity, names, server/receiver role, side changes, or tennis truth.
+This persists `main_player_track_candidate` rows for `near_player_track_candidate` and `far_player_track_candidate`, plus per-frame `main_player_track_assignment_candidate` rows. v0.1 locks each candidate visual track from plausible seeds, rejects large jumps or edge/wall candidates, and allows gaps instead of forcing a bad assignment. These are visual subject track candidates only. They do not confirm player identity, names, server/receiver role, side changes, or tennis truth.
 
 TOM v1 pose from selected main subject candidates:
 
@@ -713,6 +713,14 @@ Class mapping warning:
 The TOM v1 ball model may emit `class 0 = ball`. If real detection returns zero useful detections, lower the confidence threshold, inspect debug payloads/artifacts if available, check class names emitted by Ultralytics, and add an explicit class map only when the model output proves the mapping. Do not relabel unknown classes without evidence.
 
 TOM v1-origin detections and poses are still model-output observations. They do not confirm ball path, player identity, court position, bounce/hit/in-out/rally/point/scoring, or official tennis truth.
+
+Main player track replay:
+
+```text
+/replay/<media_id>?detectionRunId=<player_detection_run_id>&trackletRunId=<player_tracklet_run_id>&subjectRunId=<main_subject_run_id>&mainPlayerTrackRunId=<main_player_track_run_id>&poseRunId=<track_filtered_pose_run_id>
+```
+
+When `mainPlayerTrackRunId` is present, replay can show selectable `NEAR TRACK` and `FAR TRACK` candidate labels over accepted track assignments. The labels expose track candidate evidence; they are not player identities.
 
 Replay display policy:
 

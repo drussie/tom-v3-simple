@@ -541,7 +541,7 @@ def main() -> None:
     main_track_parser.add_argument("--media-id", required=True)
     main_track_parser.add_argument("--source-detection-run-id", required=True)
     main_track_parser.add_argument("--source-subject-run-id", required=True)
-    main_track_parser.add_argument("--run-name", default="main-player-track-assignment-v0")
+    main_track_parser.add_argument("--run-name", default="main-player-track-assignment-v01")
     main_track_parser.add_argument("--every-n-frames", type=int, default=1)
     main_track_parser.add_argument("--frame-start", type=int)
     main_track_parser.add_argument("--frame-end", type=int)

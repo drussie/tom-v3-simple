@@ -24,7 +24,7 @@ from apps.worker.services.main_subject_filter import MAIN_SUBJECT_OBSERVATION_TY
 
 MAIN_PLAYER_TRACK_OBSERVATION_TYPE = "main_player_track_candidate"
 MAIN_PLAYER_TRACK_ASSIGNMENT_OBSERVATION_TYPE = "main_player_track_assignment_candidate"
-MAIN_PLAYER_TRACK_ASSIGNMENT_METHOD = "main_player_track_assignment_v0"
+MAIN_PLAYER_TRACK_ASSIGNMENT_METHOD = "main_player_track_assignment_v01"
 MAIN_PLAYER_TRACK_ASSIGNMENT_WARNINGS = {
     "candidate_track_only": True,
     "candidate_subject_only": True,
@@ -47,14 +47,30 @@ class MainPlayerTrackAssignmentError(ValueError):
 @dataclass(frozen=True)
 class MainPlayerTrackAssignmentConfig:
     min_assignment_score: float = 0.25
+    min_seed_score: float = 0.35
     max_center_jump_norm: float = 0.35
     max_area_ratio_change: float = 3.0
+    edge_wall_x_min: float = 0.12
+    edge_wall_x_max: float = 0.88
+    far_wall_x_min: float = 0.75
+    far_wall_y_max: float = 0.45
+    edge_wall_penalty: float = 0.35
+    strong_continuity_score: float = 0.82
+    max_gap_frames: int = 30
 
-    def as_dict(self) -> dict[str, float]:
+    def as_dict(self) -> dict[str, float | int]:
         return {
             "min_assignment_score": self.min_assignment_score,
+            "min_seed_score": self.min_seed_score,
             "max_center_jump_norm": self.max_center_jump_norm,
             "max_area_ratio_change": self.max_area_ratio_change,
+            "edge_wall_x_min": self.edge_wall_x_min,
+            "edge_wall_x_max": self.edge_wall_x_max,
+            "far_wall_x_min": self.far_wall_x_min,
+            "far_wall_y_max": self.far_wall_y_max,
+            "edge_wall_penalty": self.edge_wall_penalty,
+            "strong_continuity_score": self.strong_continuity_score,
+            "max_gap_frames": self.max_gap_frames,
         }
 
 
@@ -77,6 +93,8 @@ class TrackAssignmentCandidate:
     continuity_score: float
     center_distance_norm: float | None
     area_change_ratio: float | None
+    edge_wall_penalty: float
+    track_lock_state: str
 
 
 def build_main_player_track_assignment_plan(
@@ -84,7 +102,7 @@ def build_main_player_track_assignment_plan(
     media_id: str = "<media_id>",
     source_detection_run_id: str = "<source_detection_run_id>",
     source_subject_run_id: str = "<source_subject_run_id>",
-    run_name: str = "main-player-track-assignment-v0",
+    run_name: str = "main-player-track-assignment-v01",
     every_n_frames: int = 1,
     frame_start: int | None = None,
     frame_end: int | None = None,
@@ -148,7 +166,7 @@ def assign_main_player_tracks(
     media_id: str,
     source_detection_run_id: str,
     source_subject_run_id: str,
-    run_name: str = "main-player-track-assignment-v0",
+    run_name: str = "main-player-track-assignment-v01",
     every_n_frames: int = 1,
     frame_start: int | None = None,
     frame_end: int | None = None,
@@ -341,7 +359,7 @@ def _register_model(session: Session) -> ModelRegistry:
         select(ModelRegistry)
         .where(
             ModelRegistry.name == "main-player-track-assignment",
-            ModelRegistry.version == "v0",
+            ModelRegistry.version == "v0.1",
             ModelRegistry.model_family == "tracking",
             ModelRegistry.source == "apps.worker.services.main_player_track_assignment",
         )
@@ -351,7 +369,7 @@ def _register_model(session: Session) -> ModelRegistry:
         return existing
     model = ModelRegistry(
         name="main-player-track-assignment",
-        version="v0",
+        version="v0.1",
         model_family="tracking",
         source="apps.worker.services.main_player_track_assignment",
         metadata_jsonb={
@@ -383,7 +401,7 @@ def _create_runtime_config(
 ) -> RuntimeConfig:
     runtime_config = RuntimeConfig(
         config_name="main-player-track-assignment-config",
-        config_version="v0",
+        config_version="v0.1",
         payload_jsonb={
             "selection_method": MAIN_PLAYER_TRACK_ASSIGNMENT_METHOD,
             "source_detection_run_id": source_detection_run_id,
@@ -444,7 +462,7 @@ def _create_step(
     now = datetime.now(UTC)
     step = ProcessingStep(
         run_id=run.id,
-        step_name="main_player_track_assignment_v0",
+        step_name="main_player_track_assignment_v01",
         step_status="running",
         started_at=now,
         runtime_config_id=runtime_config.id,
@@ -572,48 +590,176 @@ def _assign_tracks_by_role(
                 subject.observation.id,
             ),
         )
-        previous: SubjectCandidateInput | None = None
-        role_assignments: list[TrackAssignmentCandidate] = []
-        for subject in ordered:
-            continuity_score = 1.0
-            center_distance = None
-            area_change = None
-            if previous is not None:
-                center_distance = _normalized_center_distance(
-                    previous.bbox,
-                    subject.bbox,
-                    width=float(media.width or 1),
-                    height=float(media.height or 1),
-                )
-                continuity_score = max(
-                    0.0,
-                    1.0 - (center_distance / max(0.001, config.max_center_jump_norm)),
-                )
-                area_change = _area_change_ratio(previous.bbox, subject.bbox)
-                if area_change > config.max_area_ratio_change:
-                    continuity_score *= 0.5
-            assignment_score = _bounded(
-                0.60 * subject.selection_score
-                + 0.30 * continuity_score
-                + 0.10 * _area_score(subject.bbox, media)
-            )
-            if assignment_score >= config.min_assignment_score:
-                role_assignments.append(
-                    TrackAssignmentCandidate(
-                        subject=subject,
-                        track_candidate_id=track_candidate_id,
-                        assignment_score=assignment_score,
-                        continuity_score=_bounded(continuity_score),
-                        center_distance_norm=(
-                            None if center_distance is None else round(center_distance, 6)
-                        ),
-                        area_change_ratio=None if area_change is None else round(area_change, 6),
-                    )
-                )
-                previous = subject
+        role_assignments = _locked_assignments_for_role(
+            media=media,
+            ordered=ordered,
+            track_role=track_role,
+            track_candidate_id=track_candidate_id,
+            config=config,
+        )
         if role_assignments:
             assignments[track_role] = role_assignments
     return assignments
+
+
+def _locked_assignments_for_role(
+    *,
+    media: MediaAsset,
+    ordered: list[SubjectCandidateInput],
+    track_role: str,
+    track_candidate_id: str,
+    config: MainPlayerTrackAssignmentConfig,
+) -> list[TrackAssignmentCandidate]:
+    if not ordered:
+        return []
+
+    seed_index = _track_seed_index(
+        media=media,
+        ordered=ordered,
+        track_role=track_role,
+        config=config,
+    )
+    if seed_index is None:
+        return []
+
+    seed_assignment = _candidate_assignment(
+        media=media,
+        subject=ordered[seed_index],
+        previous=None,
+        track_role=track_role,
+        track_candidate_id=track_candidate_id,
+        config=config,
+        track_lock_state="seed",
+    )
+    if seed_assignment is None:
+        return []
+
+    assignments_by_observation_id = {seed_assignment.subject.observation.id: seed_assignment}
+
+    previous = seed_assignment.subject
+    for subject in ordered[seed_index + 1 :]:
+        candidate = _candidate_assignment(
+            media=media,
+            subject=subject,
+            previous=previous,
+            track_role=track_role,
+            track_candidate_id=track_candidate_id,
+            config=config,
+            track_lock_state="locked_forward",
+        )
+        if candidate is None:
+            continue
+        assignments_by_observation_id[subject.observation.id] = candidate
+        previous = subject
+
+    previous = seed_assignment.subject
+    for subject in reversed(ordered[:seed_index]):
+        candidate = _candidate_assignment(
+            media=media,
+            subject=subject,
+            previous=previous,
+            track_role=track_role,
+            track_candidate_id=track_candidate_id,
+            config=config,
+            track_lock_state="locked_backward",
+        )
+        if candidate is None:
+            continue
+        assignments_by_observation_id[subject.observation.id] = candidate
+        previous = subject
+
+    return sorted(
+        assignments_by_observation_id.values(),
+        key=lambda assignment: (
+            assignment.subject.observation.frame_start or 0,
+            assignment.subject.observation.id,
+        ),
+    )
+
+
+def _track_seed_index(
+    *,
+    media: MediaAsset,
+    ordered: list[SubjectCandidateInput],
+    track_role: str,
+    config: MainPlayerTrackAssignmentConfig,
+) -> int | None:
+    scored: list[tuple[float, int]] = []
+    for index, subject in enumerate(ordered):
+        edge_penalty = _edge_wall_penalty(subject.bbox, media, track_role, config)
+        if edge_penalty >= config.edge_wall_penalty:
+            continue
+        seed_score = _seed_score(subject, media, track_role, config)
+        if seed_score >= config.min_seed_score:
+            scored.append((seed_score, index))
+    if not scored:
+        return None
+    return max(scored, key=lambda item: (item[0], -item[1]))[1]
+
+
+def _candidate_assignment(
+    *,
+    media: MediaAsset,
+    subject: SubjectCandidateInput,
+    previous: SubjectCandidateInput | None,
+    track_role: str,
+    track_candidate_id: str,
+    config: MainPlayerTrackAssignmentConfig,
+    track_lock_state: str,
+) -> TrackAssignmentCandidate | None:
+    center_distance = None
+    area_change = None
+    continuity_score = 1.0
+    if previous is not None:
+        center_distance = _normalized_center_distance(
+            previous.bbox,
+            subject.bbox,
+            width=float(media.width or 1),
+            height=float(media.height or 1),
+        )
+        if center_distance > config.max_center_jump_norm:
+            return None
+        continuity_score = max(
+            0.0,
+            1.0 - (center_distance / max(0.001, config.max_center_jump_norm)),
+        )
+        area_change = _area_change_ratio(previous.bbox, subject.bbox)
+        if area_change > config.max_area_ratio_change:
+            return None
+        frame_gap = abs(
+            int(subject.observation.frame_start or 0)
+            - int(previous.observation.frame_start or 0)
+        )
+        if frame_gap > config.max_gap_frames:
+            continuity_score *= 0.7
+
+    edge_penalty = _edge_wall_penalty(subject.bbox, media, track_role, config)
+    if previous is None and edge_penalty >= config.edge_wall_penalty:
+        return None
+    if edge_penalty > 0 and continuity_score < config.strong_continuity_score:
+        return None
+
+    assignment_score = _bounded(
+        0.50 * subject.selection_score
+        + 0.30 * continuity_score
+        + 0.15 * _area_score(subject.bbox, media)
+        + 0.05 * _region_score(subject.bbox, media, track_role)
+        - edge_penalty
+    )
+    minimum_score = config.min_seed_score if previous is None else config.min_assignment_score
+    if assignment_score < minimum_score:
+        return None
+
+    return TrackAssignmentCandidate(
+        subject=subject,
+        track_candidate_id=track_candidate_id,
+        assignment_score=assignment_score,
+        continuity_score=_bounded(continuity_score),
+        center_distance_norm=None if center_distance is None else round(center_distance, 6),
+        area_change_ratio=None if area_change is None else round(area_change, 6),
+        edge_wall_penalty=round(edge_penalty, 6),
+        track_lock_state=track_lock_state,
+    )
 
 
 def _persist_track_candidates(
@@ -720,10 +866,13 @@ def _persist_track_assignments(
                     "continuity_score": assignment.continuity_score,
                     "center_distance_norm": assignment.center_distance_norm,
                     "area_change_ratio": assignment.area_change_ratio,
+                    "edge_wall_penalty": assignment.edge_wall_penalty,
+                    "track_lock_state": assignment.track_lock_state,
                     "bbox_center_x": _bbox_center(subject.bbox)[0],
                     "bbox_center_y": _bbox_center(subject.bbox)[1],
                     "bbox_area": subject.bbox["width"] * subject.bbox["height"],
                 },
+                "track_lock_state": assignment.track_lock_state,
                 "bbox": subject.bbox,
                 **MAIN_PLAYER_TRACK_ASSIGNMENT_WARNINGS,
             }
@@ -919,6 +1068,73 @@ def _area_change_ratio(previous: dict[str, float], current: dict[str, float]) ->
 def _area_score(bbox: dict[str, float], media: MediaAsset) -> float:
     image_area = max(1.0, float(media.width or 1) * float(media.height or 1))
     return min(1.0, (bbox["width"] * bbox["height"]) / image_area / 0.06)
+
+
+def _seed_score(
+    subject: SubjectCandidateInput,
+    media: MediaAsset,
+    track_role: str,
+    config: MainPlayerTrackAssignmentConfig,
+) -> float:
+    return _bounded(
+        0.65 * subject.selection_score
+        + 0.20 * _area_score(subject.bbox, media)
+        + 0.15 * _region_score(subject.bbox, media, track_role)
+        - _edge_wall_penalty(subject.bbox, media, track_role, config)
+    )
+
+
+def _region_score(
+    bbox: dict[str, float],
+    media: MediaAsset,
+    track_role: str,
+) -> float:
+    cx, cy = _normalized_bbox_center(bbox, media)
+    central_score = max(0.0, 1.0 - abs(cx - 0.5) / 0.5)
+    if track_role == "near_player_track_candidate":
+        y_score = max(0.0, min(1.0, (cy - 0.35) / 0.35))
+    else:
+        y_score = max(0.0, 1.0 - abs(cy - 0.35) / 0.35)
+    return _bounded(0.55 * central_score + 0.45 * y_score)
+
+
+def _edge_wall_penalty(
+    bbox: dict[str, float],
+    media: MediaAsset,
+    track_role: str,
+    config: MainPlayerTrackAssignmentConfig,
+) -> float:
+    cx, cy = _normalized_bbox_center(bbox, media)
+    edge_penalty = 0.0
+    if cx < config.edge_wall_x_min:
+        edge_penalty = max(
+            edge_penalty,
+            config.edge_wall_penalty
+            * ((config.edge_wall_x_min - cx) / max(0.001, config.edge_wall_x_min)),
+        )
+    if cx > config.edge_wall_x_max:
+        edge_penalty = max(
+            edge_penalty,
+            config.edge_wall_penalty
+            * ((cx - config.edge_wall_x_max) / max(0.001, 1.0 - config.edge_wall_x_max)),
+        )
+    if (
+        track_role == "far_player_track_candidate"
+        and cx > config.far_wall_x_min
+        and cy < config.far_wall_y_max
+    ):
+        edge_penalty = max(edge_penalty, config.edge_wall_penalty)
+    return _bounded(edge_penalty)
+
+
+def _normalized_bbox_center(
+    bbox: dict[str, float],
+    media: MediaAsset,
+) -> tuple[float, float]:
+    center_x, center_y = _bbox_center(bbox)
+    width = max(1.0, float(media.width or 1))
+    height = max(1.0, float(media.height or 1))
+    return center_x / width, center_y / height
 
 
 def _bounded(value: float) -> float:

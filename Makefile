@@ -227,7 +227,7 @@ tom-v1-main-player-tracks:
 	@if [ -z "$(MEDIA_ID)" ]; then echo "MEDIA_ID is required: make tom-v1-main-player-tracks MEDIA_ID=<media_id> DETECTION_RUN_ID=<player_detection_run_id> SOURCE_SUBJECT_RUN_ID=<main_subject_run_id>"; exit 1; fi
 	@if [ -z "$(DETECTION_RUN_ID)" ]; then echo "DETECTION_RUN_ID is required: make tom-v1-main-player-tracks DETECTION_RUN_ID=<player_detection_run_id>"; exit 1; fi
 	@if [ -z "$(SOURCE_SUBJECT_RUN_ID)" ]; then echo "SOURCE_SUBJECT_RUN_ID is required: make tom-v1-main-player-tracks SOURCE_SUBJECT_RUN_ID=<main_subject_run_id>"; exit 1; fi
-	$(PYTHON) -m apps.worker.cli assign-main-player-tracks --media-id "$(MEDIA_ID)" --source-detection-run-id "$(DETECTION_RUN_ID)" --source-subject-run-id "$(SOURCE_SUBJECT_RUN_ID)" --run-name main-player-track-assignment-v0 --every-n-frames "$(EVERY_N_FRAMES)" --max-frames "$(MAX_FRAMES)" --viewer-base-url "$(VIEWER_BASE_URL)" $(if $(FRAME_START),--frame-start "$(FRAME_START)",) $(if $(FRAME_END),--frame-end "$(FRAME_END)",) $(if $(filter true,$(PLAN_ONLY)),--plan-only,)
+	$(PYTHON) -m apps.worker.cli assign-main-player-tracks --media-id "$(MEDIA_ID)" --source-detection-run-id "$(DETECTION_RUN_ID)" --source-subject-run-id "$(SOURCE_SUBJECT_RUN_ID)" --run-name main-player-track-assignment-v01 --every-n-frames "$(EVERY_N_FRAMES)" --max-frames "$(MAX_FRAMES)" --viewer-base-url "$(VIEWER_BASE_URL)" $(if $(FRAME_START),--frame-start "$(FRAME_START)",) $(if $(FRAME_END),--frame-end "$(FRAME_END)",) $(if $(filter true,$(PLAN_ONLY)),--plan-only,)
 
 tom-v1-pose:
 	@if [ -z "$(MEDIA_ID)" ]; then echo "MEDIA_ID is required: make tom-v1-pose MEDIA_ID=<media_id> SOURCE_DETECTION_RUN_ID=<player_detection_run_id>"; exit 1; fi

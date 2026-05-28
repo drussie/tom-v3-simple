@@ -6,6 +6,7 @@ import type {
   ReplayDetectionBBox,
   ReplayDetectionOverlay,
   ReplayHomographyCandidateOverlay,
+  ReplayMainPlayerTrackOverlay,
   ReplayPoseOverlay,
   ReplayProjectionDiagnosticOverlay,
   ReplayOverlayDisplayMode,
@@ -193,6 +194,17 @@ export function activeReplayPoses(
   );
 }
 
+export function activeReplayMainPlayerTracks(
+  tracks: ReplayMainPlayerTrackOverlay[],
+  currentTimestampMs: number,
+  currentFrame: number,
+  holdMs = 250
+): ReplayMainPlayerTrackOverlay[] {
+  return tracks.filter((track) =>
+    isActiveReplayPoint(track.timestamp_ms, track.frame_number, currentTimestampMs, currentFrame, holdMs)
+  );
+}
+
 export function activeReplayCourtKeypoints(
   keypoints: ReplayCourtKeypointOverlay[],
   currentTimestampMs: number,
@@ -311,6 +323,16 @@ export function filterPosesAvailableAt(
     return poses;
   }
   return poses.filter((pose) => pose.timestamp_ms <= availableUntilMs);
+}
+
+export function filterMainPlayerTracksAvailableAt(
+  tracks: ReplayMainPlayerTrackOverlay[],
+  availableUntilMs: number | null
+): ReplayMainPlayerTrackOverlay[] {
+  if (availableUntilMs === null) {
+    return tracks;
+  }
+  return tracks.filter((track) => track.timestamp_ms <= availableUntilMs);
 }
 
 export function filterCourtKeypointsAvailableAt(

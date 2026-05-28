@@ -10,6 +10,7 @@ import {
   filterCourtLinesAvailableAt,
   filterDetectionsAvailableAt,
   filterHomographyCandidatesAvailableAt,
+  filterMainPlayerTracksAvailableAt,
   filterPosesAvailableAt,
   filterProjectionDiagnosticsAvailableAt,
   filterTrackletsAvailableAt,
@@ -28,6 +29,7 @@ import type {
   ReplayCourtLineOverlay,
   ReplayHomographyCandidateOverlay,
   ReplayInfo,
+  ReplayMainPlayerTrackOverlay,
   ReplayMode,
   ReplayOverlayDisplayMode,
   ReplayOverlayChunk,
@@ -45,6 +47,7 @@ import { formatConfidence } from "../lib/timeline";
 import { ReplayCourtOverlay as ReplayCourtOverlayLayer } from "./ReplayCourtOverlay";
 import { ReplayDetectionOverlay as ReplayDetectionOverlayLayer } from "./ReplayDetectionOverlay";
 import { ReplayEvidenceTimeline } from "./ReplayEvidenceTimeline";
+import { ReplayMainPlayerTrackOverlay as ReplayMainPlayerTrackOverlayLayer } from "./ReplayMainPlayerTrackOverlay";
 import { ReplayPoseOverlay as ReplayPoseOverlayLayer } from "./ReplayPoseOverlay";
 import { ReplayTrackletOverlay as ReplayTrackletOverlayLayer } from "./ReplayTrackletOverlay";
 import { ReplayVideoPlayer } from "./ReplayVideoPlayer";
@@ -58,6 +61,7 @@ interface ReplayWorkstationProps {
     detectionRunId?: string;
     trackletRunId?: string;
     poseRunId?: string;
+    mainPlayerTrackRunId?: string;
     courtRunId?: string;
     homographyRunId?: string;
     projectionDiagnosticRunId?: string;
@@ -84,6 +88,8 @@ type SelectedReplayEvidence =
   | { kind: "track_point"; tracklet: ReplayTrackletOverlay; point: ReplayTrackPointOverlay }
   | { kind: "pose"; pose: ReplayPoseOverlay }
   | { kind: "pose_timeline"; item: Extract<ReplayTimelineItem, { item_type: "pose" }> }
+  | { kind: "main_player_track"; item: ReplayMainPlayerTrackOverlay }
+  | { kind: "main_player_track_timeline"; item: Extract<ReplayTimelineItem, { item_type: "main_player_track_assignment" }> }
   | { kind: "court_keypoint"; item: ReplayCourtKeypointOverlay }
   | { kind: "court_keypoint_timeline"; item: Extract<ReplayTimelineItem, { item_type: "court_keypoint" }> }
   | { kind: "court_line"; item: ReplayCourtLineOverlay }
@@ -112,6 +118,14 @@ export function ReplayWorkstation({
   const initialPoseRunId = useMemo(
     () => selectInitialReplayRun(replayInfo.available_runs.pose, selectedRuns.poseRunId),
     [replayInfo.available_runs.pose, selectedRuns.poseRunId]
+  );
+  const initialMainPlayerTrackRunId = useMemo(
+    () =>
+      selectInitialReplayRun(
+        replayInfo.available_runs.main_player_track,
+        selectedRuns.mainPlayerTrackRunId
+      ),
+    [replayInfo.available_runs.main_player_track, selectedRuns.mainPlayerTrackRunId]
   );
   const initialCourtRunId = useMemo(
     () => selectInitialReplayRun(replayInfo.available_runs.court, selectedRuns.courtRunId),
@@ -144,6 +158,9 @@ export function ReplayWorkstation({
     initialTrackletRunId
   );
   const [selectedPoseRunId, setSelectedPoseRunId] = useState<string | null>(initialPoseRunId);
+  const [selectedMainPlayerTrackRunId, setSelectedMainPlayerTrackRunId] = useState<string | null>(
+    initialMainPlayerTrackRunId
+  );
   const [selectedCourtRunId, setSelectedCourtRunId] = useState<string | null>(initialCourtRunId);
   const [selectedHomographyRunId, setSelectedHomographyRunId] = useState<string | null>(
     initialHomographyRunId
@@ -154,6 +171,9 @@ export function ReplayWorkstation({
   const [showDetections, setShowDetections] = useState(true);
   const [showTracklets, setShowTracklets] = useState(true);
   const [showPoses, setShowPoses] = useState(true);
+  const [showMainPlayerTracks, setShowMainPlayerTracks] = useState(
+    initialMainPlayerTrackRunId !== null
+  );
   const [detectionDisplayMode, setDetectionDisplayMode] =
     useState<ReplayOverlayDisplayMode>("current_only");
   const [trackletDisplayMode, setTrackletDisplayMode] =
@@ -203,6 +223,11 @@ export function ReplayWorkstation({
   }, [initialPoseRunId]);
 
   useEffect(() => {
+    setSelectedMainPlayerTrackRunId(initialMainPlayerTrackRunId);
+    setShowMainPlayerTracks(initialMainPlayerTrackRunId !== null);
+  }, [initialMainPlayerTrackRunId]);
+
+  useEffect(() => {
     setSelectedCourtRunId(initialCourtRunId);
     setShowCourtKeypoints(initialCourtRunId !== null);
     setShowCourtLines(initialCourtRunId !== null);
@@ -246,6 +271,9 @@ export function ReplayWorkstation({
     if (showPoses && selectedPoseRunId !== null) {
       layers.push("pose");
     }
+    if (showMainPlayerTracks && selectedMainPlayerTrackRunId !== null) {
+      layers.push("main_player_tracks");
+    }
     if (showCourtKeypoints && selectedCourtRunId !== null) {
       layers.push("court_keypoints");
     }
@@ -266,6 +294,7 @@ export function ReplayWorkstation({
     selectedCourtRunId,
     selectedDetectionRunId,
     selectedHomographyRunId,
+    selectedMainPlayerTrackRunId,
     selectedPoseRunId,
     selectedProjectionDiagnosticRunId,
     selectedTrackletRunId,
@@ -274,6 +303,7 @@ export function ReplayWorkstation({
     showCourtLines,
     showDetections,
     showHomography,
+    showMainPlayerTracks,
     showPoses,
     showProjectionDiagnostics,
     showTracklets
@@ -287,6 +317,7 @@ export function ReplayWorkstation({
     selectedDetectionRunId ?? "none",
     selectedTrackletRunId ?? "none",
     selectedPoseRunId ?? "none",
+    selectedMainPlayerTrackRunId ?? "none",
     selectedCourtRunId ?? "none",
     selectedHomographyRunId ?? "none",
     selectedProjectionDiagnosticRunId ?? "none",
@@ -316,6 +347,7 @@ export function ReplayWorkstation({
       detectionRunId: selectedDetectionRunId,
       trackletRunId: selectedTrackletRunId,
       poseRunId: selectedPoseRunId,
+      mainPlayerTrackRunId: selectedMainPlayerTrackRunId,
       courtRunId: selectedCourtRunId,
       homographyRunId: selectedHomographyRunId,
       projectionDiagnosticRunId: selectedProjectionDiagnosticRunId,
@@ -350,6 +382,7 @@ export function ReplayWorkstation({
     selectedCourtRunId,
     selectedDetectionRunId,
     selectedHomographyRunId,
+    selectedMainPlayerTrackRunId,
     selectedPoseRunId,
     selectedProjectionDiagnosticRunId,
     selectedTrackletRunId
@@ -363,6 +396,7 @@ export function ReplayWorkstation({
       detectionRunId: selectedDetectionRunId,
       trackletRunId: selectedTrackletRunId,
       poseRunId: selectedPoseRunId,
+      mainPlayerTrackRunId: selectedMainPlayerTrackRunId,
       courtRunId: selectedCourtRunId,
       homographyRunId: selectedHomographyRunId,
       projectionDiagnosticRunId: selectedProjectionDiagnosticRunId,
@@ -391,6 +425,7 @@ export function ReplayWorkstation({
     selectedCourtRunId,
     selectedDetectionRunId,
     selectedHomographyRunId,
+    selectedMainPlayerTrackRunId,
     selectedPoseRunId,
     selectedProjectionDiagnosticRunId,
     selectedTrackletRunId
@@ -433,6 +468,10 @@ export function ReplayWorkstation({
         setSelectedEvidence({ kind: "pose_timeline", item });
         return;
       }
+      if (item.item_type === "main_player_track_assignment") {
+        setSelectedEvidence({ kind: "main_player_track_timeline", item });
+        return;
+      }
       if (item.item_type === "court_keypoint") {
         setSelectedEvidence({ kind: "court_keypoint_timeline", item });
         return;
@@ -468,6 +507,10 @@ export function ReplayWorkstation({
     streamAvailableUntilMs
   );
   const poses = filterPosesAvailableAt(overlayState.chunk?.poses ?? [], streamAvailableUntilMs);
+  const mainPlayerTracks = filterMainPlayerTracksAvailableAt(
+    overlayState.chunk?.main_player_tracks ?? [],
+    streamAvailableUntilMs
+  );
   const courtKeypoints = filterCourtKeypointsAvailableAt(
     overlayState.chunk?.court_keypoints ?? [],
     streamAvailableUntilMs
@@ -528,6 +571,12 @@ export function ReplayWorkstation({
       : selectedEvidence?.kind === "pose_timeline"
         ? selectedEvidence.item.observation_id
         : null;
+  const selectedMainPlayerTrackObservationId =
+    selectedEvidence?.kind === "main_player_track"
+      ? selectedEvidence.item.observation_id
+      : selectedEvidence?.kind === "main_player_track_timeline"
+        ? selectedEvidence.item.observation_id
+        : null;
   const selectedCourtObservationId = courtSelectedObservationId(selectedEvidence);
   const selectedTimelineKey = selectedTimelineItemKey(selectedEvidence);
 
@@ -550,6 +599,7 @@ export function ReplayWorkstation({
           <span className="mini-pill">{replayInfo.frame_time_mode} frame/time</span>
           <span className="mini-pill">{detections.length} detection overlays</span>
           <span className="mini-pill">{tracklets.length} tracklet candidates</span>
+          <span className="mini-pill">{mainPlayerTracks.length} main player track labels</span>
           <span className="mini-pill">{poses.length} pose observations</span>
           <span className="mini-pill">
             {courtKeypoints.length +
@@ -616,6 +666,19 @@ export function ReplayWorkstation({
               replayInfo={replayInfo}
               selectedObservationId={selectedPoseObservationId}
             />
+            <ReplayMainPlayerTrackOverlayLayer
+              currentFrame={playback.frameNumber}
+              currentTimestampMs={playback.timestampMs}
+              enabled={showMainPlayerTracks && selectedMainPlayerTrackRunId !== null}
+              error={overlayState.error}
+              isLoading={overlayState.loading}
+              onSelectTrackAssignment={(item) => {
+                setSelectedEvidence({ kind: "main_player_track", item });
+              }}
+              replayInfo={replayInfo}
+              selectedObservationId={selectedMainPlayerTrackObservationId}
+              tracks={mainPlayerTracks}
+            />
             <ReplayCourtOverlayLayer
               cameraViews={cameraViews}
               courtKeypoints={courtKeypoints}
@@ -667,6 +730,7 @@ export function ReplayWorkstation({
             courtRuns={replayInfo.available_runs.court}
             detectionRuns={replayInfo.available_runs.detection}
             homographyRuns={replayInfo.available_runs.homography}
+            mainPlayerTrackRuns={replayInfo.available_runs.main_player_track}
             projectionDiagnosticRuns={replayInfo.available_runs.projection_diagnostic}
             onSelectedCourtRunChange={(runId) => {
               setSelectedCourtRunId(runId);
@@ -678,6 +742,10 @@ export function ReplayWorkstation({
             }}
             onSelectedHomographyRunChange={(runId) => {
               setSelectedHomographyRunId(runId);
+              setSelectedEvidence(null);
+            }}
+            onSelectedMainPlayerTrackRunChange={(runId) => {
+              setSelectedMainPlayerTrackRunId(runId);
               setSelectedEvidence(null);
             }}
             onSelectedProjectionDiagnosticRunChange={(runId) => {
@@ -698,6 +766,7 @@ export function ReplayWorkstation({
             onToggleCourtKeypoints={setShowCourtKeypoints}
             onToggleCourtLines={setShowCourtLines}
             onToggleHomography={setShowHomography}
+            onToggleMainPlayerTracks={setShowMainPlayerTracks}
             onToggleProjectionDiagnostics={setShowProjectionDiagnostics}
             onTogglePoses={setShowPoses}
             onTrackletDisplayModeChange={setTrackletDisplayMode}
@@ -707,6 +776,7 @@ export function ReplayWorkstation({
             selectedCourtRunId={selectedCourtRunId}
             selectedDetectionRunId={selectedDetectionRunId}
             selectedHomographyRunId={selectedHomographyRunId}
+            selectedMainPlayerTrackRunId={selectedMainPlayerTrackRunId}
             selectedPoseRunId={selectedPoseRunId}
             selectedProjectionDiagnosticRunId={selectedProjectionDiagnosticRunId}
             selectedTrackletRunId={selectedTrackletRunId}
@@ -715,6 +785,7 @@ export function ReplayWorkstation({
             showCourtLines={showCourtLines}
             showDetections={showDetections}
             showHomography={showHomography}
+            showMainPlayerTracks={showMainPlayerTracks}
             showPoses={showPoses}
             showProjectionDiagnostics={showProjectionDiagnostics}
             detectionDisplayMode={detectionDisplayMode}
@@ -733,6 +804,7 @@ export function ReplayWorkstation({
               detections: showDetections,
               tracklets: showTracklets,
               pose: showPoses,
+              main_player_tracks: showMainPlayerTracks,
               court_keypoints: showCourtKeypoints,
               court_lines: showCourtLines,
               camera_view: showCameraView,
@@ -749,6 +821,7 @@ export function ReplayWorkstation({
             selectedCourtRunId={selectedCourtRunId}
             selectedDetectionRunId={selectedDetectionRunId}
             selectedHomographyRunId={selectedHomographyRunId}
+            selectedMainPlayerTrackRunId={selectedMainPlayerTrackRunId}
             selectedPoseRunId={selectedPoseRunId}
             selectedProjectionDiagnosticRunId={selectedProjectionDiagnosticRunId}
             selectedTrackletRunId={selectedTrackletRunId}
@@ -864,12 +937,14 @@ function ReplayLayerControls({
   detectionRuns,
   trackletRuns,
   poseRuns,
+  mainPlayerTrackRuns,
   courtRuns,
   homographyRuns,
   projectionDiagnosticRuns,
   selectedDetectionRunId,
   selectedTrackletRunId,
   selectedPoseRunId,
+  selectedMainPlayerTrackRunId,
   selectedCourtRunId,
   selectedHomographyRunId,
   selectedProjectionDiagnosticRunId,
@@ -879,6 +954,7 @@ function ReplayLayerControls({
   trackletDisplayMode,
   showTrackletPaths,
   showPoses,
+  showMainPlayerTracks,
   showCourtKeypoints,
   showCourtLines,
   showCameraView,
@@ -887,6 +963,7 @@ function ReplayLayerControls({
   onSelectedDetectionRunChange,
   onSelectedTrackletRunChange,
   onSelectedPoseRunChange,
+  onSelectedMainPlayerTrackRunChange,
   onSelectedCourtRunChange,
   onSelectedHomographyRunChange,
   onSelectedProjectionDiagnosticRunChange,
@@ -896,6 +973,7 @@ function ReplayLayerControls({
   onTrackletDisplayModeChange,
   onToggleTrackletPaths,
   onTogglePoses,
+  onToggleMainPlayerTracks,
   onToggleCourtKeypoints,
   onToggleCourtLines,
   onToggleCameraView,
@@ -905,12 +983,14 @@ function ReplayLayerControls({
   detectionRuns: ReplayRunSummary[];
   trackletRuns: ReplayRunSummary[];
   poseRuns: ReplayRunSummary[];
+  mainPlayerTrackRuns: ReplayRunSummary[];
   courtRuns: ReplayRunSummary[];
   homographyRuns: ReplayRunSummary[];
   projectionDiagnosticRuns: ReplayRunSummary[];
   selectedDetectionRunId: string | null;
   selectedTrackletRunId: string | null;
   selectedPoseRunId: string | null;
+  selectedMainPlayerTrackRunId: string | null;
   selectedCourtRunId: string | null;
   selectedHomographyRunId: string | null;
   selectedProjectionDiagnosticRunId: string | null;
@@ -920,6 +1000,7 @@ function ReplayLayerControls({
   trackletDisplayMode: ReplayOverlayDisplayMode;
   showTrackletPaths: boolean;
   showPoses: boolean;
+  showMainPlayerTracks: boolean;
   showCourtKeypoints: boolean;
   showCourtLines: boolean;
   showCameraView: boolean;
@@ -928,6 +1009,7 @@ function ReplayLayerControls({
   onSelectedDetectionRunChange: (runId: string | null) => void;
   onSelectedTrackletRunChange: (runId: string | null) => void;
   onSelectedPoseRunChange: (runId: string | null) => void;
+  onSelectedMainPlayerTrackRunChange: (runId: string | null) => void;
   onSelectedCourtRunChange: (runId: string | null) => void;
   onSelectedHomographyRunChange: (runId: string | null) => void;
   onSelectedProjectionDiagnosticRunChange: (runId: string | null) => void;
@@ -937,6 +1019,7 @@ function ReplayLayerControls({
   onTrackletDisplayModeChange: (mode: ReplayOverlayDisplayMode) => void;
   onToggleTrackletPaths: (enabled: boolean) => void;
   onTogglePoses: (enabled: boolean) => void;
+  onToggleMainPlayerTracks: (enabled: boolean) => void;
   onToggleCourtKeypoints: (enabled: boolean) => void;
   onToggleCourtLines: (enabled: boolean) => void;
   onToggleCameraView: (enabled: boolean) => void;
@@ -997,6 +1080,17 @@ function ReplayLayerControls({
           onChange={onSelectedPoseRunChange}
           runs={poseRuns}
           selectedRunId={selectedPoseRunId}
+        />
+        <LayerToggle
+          checked={showMainPlayerTracks}
+          label="Show main player track candidates"
+          onChange={onToggleMainPlayerTracks}
+        />
+        <RunSelect
+          label="Main player track run"
+          onChange={onSelectedMainPlayerTrackRunChange}
+          runs={mainPlayerTrackRuns}
+          selectedRunId={selectedMainPlayerTrackRunId}
         />
         <LayerToggle
           checked={showCourtKeypoints}
@@ -1181,6 +1275,7 @@ function SelectedRunContext({
   selectedDetectionRunId,
   selectedTrackletRunId,
   selectedPoseRunId,
+  selectedMainPlayerTrackRunId,
   selectedCourtRunId,
   selectedHomographyRunId,
   selectedProjectionDiagnosticRunId
@@ -1189,6 +1284,7 @@ function SelectedRunContext({
   selectedDetectionRunId: string | null;
   selectedTrackletRunId: string | null;
   selectedPoseRunId: string | null;
+  selectedMainPlayerTrackRunId: string | null;
   selectedCourtRunId: string | null;
   selectedHomographyRunId: string | null;
   selectedProjectionDiagnosticRunId: string | null;
@@ -1197,6 +1293,11 @@ function SelectedRunContext({
     ["detection", selectedDetectionRunId, replayInfo.available_runs.detection],
     ["tracklet candidate", selectedTrackletRunId, replayInfo.available_runs.tracklet],
     ["pose observation", selectedPoseRunId, replayInfo.available_runs.pose],
+    [
+      "main player track candidate",
+      selectedMainPlayerTrackRunId,
+      replayInfo.available_runs.main_player_track
+    ],
     ["court evidence", selectedCourtRunId, replayInfo.available_runs.court],
     ["homography candidate", selectedHomographyRunId, replayInfo.available_runs.homography],
     [
@@ -1450,6 +1551,59 @@ function SelectedEvidencePanel({
           Pose observation selected from the evidence timeline. Track-linked poses are candidate
           visual subject evidence only; they do not establish identity, strokes, movement, or
           biomechanics.
+        </p>
+      </EvidencePanel>
+    );
+  }
+
+  if (
+    selectedEvidence.kind === "main_player_track" ||
+    selectedEvidence.kind === "main_player_track_timeline"
+  ) {
+    const item = selectedEvidence.item;
+    const badge =
+      "label" in item
+        ? item.label
+        : "display_label" in item
+          ? item.display_label
+          : "main player track";
+    return (
+      <EvidencePanel title="Selected Main Player Track Candidate" badge={badge}>
+        <DetailRow label="observation id" value={item.observation_id} />
+        <DetailRow label="run id" value={item.run_id} />
+        <DetailRow label="track candidate id" value={item.track_candidate_id ?? "n/a"} />
+        <DetailRow label="track role candidate" value={item.track_role_candidate ?? "n/a"} />
+        <DetailRow label="assignment score" value={formatConfidence(item.assignment_score)} />
+        <DetailRow label="assignment method" value={item.assignment_method ?? "n/a"} />
+        {"track_lock_state" in item ? (
+          <DetailRow label="track lock state" value={item.track_lock_state ?? "n/a"} />
+        ) : null}
+        {"source_track_candidate_observation_id" in item ? (
+          <DetailRow
+            label="track candidate observation"
+            value={item.source_track_candidate_observation_id ?? "n/a"}
+          />
+        ) : null}
+        <DetailRow
+          label="source subject candidate"
+          value={item.source_subject_candidate_observation_id ?? "n/a"}
+        />
+        <DetailRow
+          label="source detection"
+          value={item.source_detection_observation_id ?? "n/a"}
+        />
+        <DetailRow label="frame" value={item.frame_number.toString()} />
+        <DetailRow label="timestamp_ms" value={item.timestamp_ms.toString()} />
+        <DetailRow label="candidate_track_only" value={item.candidate_track_only ? "true" : "false"} />
+        <DetailRow label="not_identity_truth" value={item.not_identity_truth ? "true" : "false"} />
+        <DetailRow label="observation_only" value={item.observation_only ? "true" : "false"} />
+        <DetailRow label="no_adjudication" value={item.no_adjudication ? "true" : "false"} />
+        <a className="quiet-link" href={`/runs/${item.run_id}`}>
+          Open source evidence run
+        </a>
+        <p className="evidence-note">
+          Main player track candidate. This is a visual subject-track assignment only; it is not a
+          player identity, name, server role, or accepted player track.
         </p>
       </EvidencePanel>
     );
@@ -1800,6 +1954,9 @@ function selectedTimelineItemKey(selectedEvidence: SelectedReplayEvidence | null
   }
   if (selectedEvidence.kind === "pose") {
     return `pose:${selectedEvidence.pose.observation_id}`;
+  }
+  if (selectedEvidence.kind === "main_player_track") {
+    return `main_player_track_assignment:${selectedEvidence.item.observation_id}`;
   }
   if (selectedEvidence.kind === "court_keypoint") {
     return `court_keypoint:${selectedEvidence.item.observation_id}`;

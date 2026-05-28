@@ -11,6 +11,7 @@ interface ReplayPageProps {
     mode?: string;
     trackletRunId?: string;
     poseRunId?: string;
+    mainPlayerTrackRunId?: string;
     courtRunId?: string;
     homographyRunId?: string;
     projectionDiagnosticRunId?: string;

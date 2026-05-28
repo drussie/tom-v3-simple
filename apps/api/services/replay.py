@@ -110,6 +110,7 @@ def build_replay_overlay_chunk(
     detection_run_id: str | None = None,
     tracklet_run_id: str | None = None,
     pose_run_id: str | None = None,
+    main_player_track_run_id: str | None = None,
     court_run_id: str | None = None,
     homography_run_id: str | None = None,
     projection_diagnostic_run_id: str | None = None,
@@ -153,6 +154,17 @@ def build_replay_overlay_chunk(
             min_pose_confidence=min_pose_confidence,
         )
         if "pose" in layers
+        else []
+    )
+    main_player_tracks = (
+        build_main_player_track_overlay_items(
+            session=session,
+            media=media,
+            start_ms=start_ms,
+            end_ms=end_ms,
+            main_player_track_run_id=main_player_track_run_id,
+        )
+        if "main_player_tracks" in layers
         else []
     )
     court_keypoints = (
@@ -220,6 +232,7 @@ def build_replay_overlay_chunk(
         "detections": detections,
         "tracklets": tracklets,
         "poses": poses,
+        "main_player_tracks": main_player_tracks,
         "court_keypoints": court_keypoints,
         "court_lines": court_lines,
         "camera_view": camera_view,
@@ -237,6 +250,7 @@ def build_replay_timeline(
     detection_run_id: str | None = None,
     tracklet_run_id: str | None = None,
     pose_run_id: str | None = None,
+    main_player_track_run_id: str | None = None,
     court_run_id: str | None = None,
     homography_run_id: str | None = None,
     projection_diagnostic_run_id: str | None = None,
@@ -258,6 +272,7 @@ def build_replay_timeline(
                     detection_run_id,
                     tracklet_run_id,
                     pose_run_id,
+                    main_player_track_run_id,
                     court_run_id,
                     homography_run_id,
                     projection_diagnostic_run_id,
@@ -300,6 +315,15 @@ def build_replay_timeline(
                     session=session,
                     media=media,
                     pose_run_id=pose_run_id,
+                ),
+            },
+            {
+                "lane_type": "main_player_tracks",
+                "label": "Main player track candidates",
+                "items": build_main_player_track_timeline_items(
+                    session=session,
+                    media=media,
+                    main_player_track_run_id=main_player_track_run_id,
                 ),
             },
             {
@@ -523,6 +547,62 @@ def pose_timeline_item_from_row(pose: PoseObservation) -> dict[str, Any] | None:
         "candidate_subject_only": subject_context.get("candidate_subject_only"),
         "not_identity_truth": subject_context.get("not_identity_truth"),
         **source_metadata,
+    }
+
+
+def build_main_player_track_timeline_items(
+    session: Session,
+    *,
+    media: MediaAsset,
+    main_player_track_run_id: str | None = None,
+) -> list[dict[str, Any]]:
+    query = (
+        select(Observation)
+        .where(
+            Observation.media_id == media.id,
+            Observation.observation_type == "main_player_track_assignment_candidate",
+            Observation.timestamp_start_ms.is_not(None),
+        )
+        .order_by(Observation.timestamp_start_ms, Observation.frame_start, Observation.id)
+    )
+    if main_player_track_run_id is not None:
+        query = query.where(Observation.run_id == main_player_track_run_id)
+
+    items: list[dict[str, Any]] = []
+    for observation in session.scalars(query).all():
+        item = main_player_track_timeline_item_from_observation(observation)
+        if item is not None:
+            items.append(item)
+    return items
+
+
+def main_player_track_timeline_item_from_observation(
+    observation: Observation,
+) -> dict[str, Any] | None:
+    overlay_item = main_player_track_overlay_item_from_observation(observation)
+    if overlay_item is None:
+        return None
+    return {
+        "item_type": "main_player_track_assignment",
+        "observation_id": overlay_item["observation_id"],
+        "run_id": overlay_item["run_id"],
+        "timestamp_ms": overlay_item["timestamp_ms"],
+        "frame_number": overlay_item["frame_number"],
+        "track_candidate_id": overlay_item["track_candidate_id"],
+        "track_role_candidate": overlay_item["track_role_candidate"],
+        "assignment_score": overlay_item["assignment_score"],
+        "assignment_method": overlay_item["assignment_method"],
+        "source_subject_candidate_observation_id": overlay_item[
+            "source_subject_candidate_observation_id"
+        ],
+        "source_detection_observation_id": overlay_item["source_detection_observation_id"],
+        "candidate_track_only": True,
+        "not_identity_truth": True,
+        "observation_only": True,
+        "no_adjudication": True,
+        "display_label": _main_player_track_display_label(
+            overlay_item["track_role_candidate"]
+        ),
     }
 
 
@@ -1055,6 +1135,89 @@ def pose_overlay_item_from_row(pose: PoseObservation) -> dict[str, Any]:
     }
 
 
+def build_main_player_track_overlay_items(
+    session: Session,
+    *,
+    media: MediaAsset,
+    start_ms: int,
+    end_ms: int,
+    main_player_track_run_id: str | None = None,
+) -> list[dict[str, Any]]:
+    timestamp_end = func.coalesce(Observation.timestamp_end_ms, Observation.timestamp_start_ms)
+    query = (
+        select(Observation)
+        .where(
+            Observation.media_id == media.id,
+            Observation.observation_type == "main_player_track_assignment_candidate",
+            Observation.timestamp_start_ms.is_not(None),
+            Observation.timestamp_start_ms <= end_ms,
+            timestamp_end >= start_ms,
+        )
+        .order_by(Observation.timestamp_start_ms, Observation.frame_start, Observation.id)
+    )
+    if main_player_track_run_id is not None:
+        query = query.where(Observation.run_id == main_player_track_run_id)
+
+    items: list[dict[str, Any]] = []
+    for observation in session.scalars(query).all():
+        item = main_player_track_overlay_item_from_observation(observation)
+        if item is not None:
+            items.append(item)
+    return items
+
+
+def main_player_track_overlay_item_from_observation(
+    observation: Observation,
+) -> dict[str, Any] | None:
+    if observation.observation_type != "main_player_track_assignment_candidate":
+        return None
+    payload = observation.payload_jsonb or {}
+    bbox = _bbox_from_payload(payload)
+    frame_number, timestamp_ms = _observation_frame_time(observation)
+    if bbox is None or frame_number is None or timestamp_ms is None:
+        return None
+
+    track_role = _string_or_none(payload.get("track_role_candidate"))
+    track_candidate_id = _string_or_none(payload.get("track_candidate_id"))
+    return {
+        "overlay_type": "main_player_track_assignment",
+        "observation_id": observation.id,
+        "run_id": observation.run_id,
+        "frame_number": frame_number,
+        "timestamp_ms": timestamp_ms,
+        "bbox": bbox,
+        "track_candidate_id": track_candidate_id,
+        "track_role_candidate": track_role,
+        "label": _main_player_track_display_label(track_role),
+        "assignment_score": _numeric(payload.get("assignment_score")),
+        "assignment_method": _string_or_none(payload.get("assignment_method")),
+        "track_lock_state": _string_or_none(payload.get("track_lock_state")),
+        "source_track_candidate_observation_id": _string_or_none(
+            payload.get("source_track_candidate_observation_id")
+        ),
+        "source_subject_candidate_observation_id": _string_or_none(
+            payload.get("source_subject_candidate_observation_id")
+        ),
+        "source_detection_observation_id": _string_or_none(
+            payload.get("source_detection_observation_id")
+        ),
+        "candidate_track_only": True,
+        "candidate_subject_only": _truthy(payload.get("candidate_subject_only")),
+        "not_identity_truth": True,
+        "observation_only": True,
+        "no_adjudication": True,
+        "source_language": "main player track assignment candidate",
+        "coordinate_space": observation.coordinate_space or "image_pixels",
+        "model_registry_id": observation.model_id,
+        "model_name": observation.model.name if observation.model is not None else None,
+        "model_version": observation.model.version if observation.model is not None else None,
+        "runtime_config_id": observation.runtime_config_id,
+        "evidence_source": "main_player_track_assignment",
+        "source_label": "main player track candidate",
+        "model_output_not_truth": False,
+    }
+
+
 def build_court_keypoint_overlay_items(
     session: Session,
     *,
@@ -1316,11 +1479,7 @@ def available_runs_for_media(session: Session, media_id: str) -> dict[str, list[
         "court": _court_run_summaries(session, media_id),
         "homography": _homography_run_summaries(session, media_id),
         "projection_diagnostic": _projection_diagnostic_run_summaries(session, media_id),
-        "main_player_track": _run_summaries_for_observation_types(
-            session,
-            media_id,
-            MAIN_PLAYER_TRACK_TYPES,
-        ),
+        "main_player_track": _main_player_track_run_summaries(session, media_id),
     }
 
 
@@ -1340,6 +1499,14 @@ def normalize_replay_layers(layers: str | list[str] | tuple[str, ...] | None) ->
             layer = "pose"
         if layer == "tracklet":
             layer = "tracklets"
+        if layer in {
+            "main_player_track",
+            "main-player-tracks",
+            "main-player-track",
+            "main_player_track_assignments",
+            "main-player-track-assignments",
+        }:
+            layer = "main_player_tracks"
         if layer in {"court", "court_evidence"}:
             normalized.update(
                 {
@@ -1486,6 +1653,45 @@ def _projection_diagnostic_run_summaries(
                 "is_fixture": False,
                 "is_real_model_output": False,
                 "model_output_not_truth": False,
+            }
+        )
+    return summaries
+
+
+def _main_player_track_run_summaries(session: Session, media_id: str) -> list[dict[str, Any]]:
+    summaries = _run_summaries_for_observation_types(session, media_id, MAIN_PLAYER_TRACK_TYPES)
+    if not summaries:
+        return []
+
+    counts_by_run_type = _counts_by_run_and_type(session, media_id, MAIN_PLAYER_TRACK_TYPES)
+    for summary in summaries:
+        run = session.get(ProcessingRun, summary["run_id"])
+        runtime_payload = run.runtime_config.payload_jsonb if run and run.runtime_config else {}
+        run_metadata = run.metadata_jsonb if run is not None else {}
+        source_detection_run_id = _string_or_none(
+            run_metadata.get("source_detection_run_id")
+        ) or _string_or_none(runtime_payload.get("source_detection_run_id"))
+        source_subject_run_id = _string_or_none(
+            run_metadata.get("source_subject_run_id")
+        ) or _string_or_none(runtime_payload.get("source_subject_run_id"))
+        summary.update(
+            {
+                "evidence_source": "main_player_track_assignment",
+                "source_label": "main player visual track candidates",
+                "source_detection_run_id": source_detection_run_id,
+                "source_subject_run_id": source_subject_run_id,
+                "candidate_track_only": True,
+                "candidate_subject_only": True,
+                "not_identity_truth": True,
+                "is_fixture": False,
+                "is_real_model_output": False,
+                "model_output_not_truth": False,
+                "track_candidate_count": counts_by_run_type.get(
+                    (summary["run_id"], "main_player_track_candidate"), 0
+                ),
+                "track_assignment_count": counts_by_run_type.get(
+                    (summary["run_id"], "main_player_track_assignment_candidate"), 0
+                ),
             }
         )
     return summaries
@@ -2058,6 +2264,14 @@ def _tracklet_label_hint(tracklet: Tracklet) -> str | None:
     if tracklet.track_family == "player":
         return "player_unknown"
     return None
+
+
+def _main_player_track_display_label(track_role: str | None) -> str:
+    if track_role == "near_player_track_candidate":
+        return "NEAR TRACK"
+    if track_role == "far_player_track_candidate":
+        return "FAR TRACK"
+    return "MAIN PLAYER TRACK"
 
 
 def _pose_bbox(pose: PoseObservation) -> dict[str, float | None] | None:

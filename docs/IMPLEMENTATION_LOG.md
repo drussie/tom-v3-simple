@@ -1,5 +1,35 @@
 # TOM v3 Simple - Implementation Log
 
+## Main Player Track Assignment v0.1 Replay Labels and Locking
+
+Status: complete when accepted
+
+### Goal
+
+Make the near/far main player track candidates visible in replay and reduce ball kid / wall-side leakage by treating track assignment as a persistent visual lock rather than simple frame-local grouping.
+
+### Outcome
+
+The repair adds:
+
+- `main_player_track_assignment_v01` as the current assignment method
+- stronger seed selection for near/far visual track candidates
+- center-jump, bbox-area-change, and edge/wall rejection for per-frame assignments
+- gap allowance when a candidate looks implausible
+- `main_player_tracks` replay overlay and timeline payloads
+- `mainPlayerTrackRunId` replay query support
+- selectable `NEAR TRACK` and `FAR TRACK` labels in the replay workstation
+- selected evidence details for track candidate id, role, score, source subject candidate, source detection, and candidate-only warnings
+
+### Non-goals
+
+- No raw detection mutation or deletion.
+- No confirmed player identity, player names, or server/receiver truth.
+- No scoreboard OCR or side-change identity logic.
+- No ball/player court-space projection.
+- No bounce/hit/in-out/rally/point/scoring.
+- No adjudication or accepted/rejected lifecycle.
+
 ## Main Player Track Assignment v0
 
 Status: complete when accepted

@@ -170,6 +170,72 @@ def create_noisy_player_detection_run(
     )
 
 
+def create_far_wall_jump_player_detection_run(
+    *,
+    session: Session,
+    media_id: str,
+    weights_path: Path,
+) -> dict[str, object]:
+    return run_real_detection_replay(
+        session=session,
+        media_id=media_id,
+        weights_path=str(weights_path),
+        model_name="test-tom-v1-player-detector",
+        model_version="track-lock-test",
+        device="cpu",
+        every_n_frames=30,
+        max_frames=3,
+        allowed_roots=[str(weights_path.parent)],
+        probe_runtime=runtime_ok,
+        yolo_result_provider=FakeYoloResultProvider(
+            boxes_by_frame={
+                0: [
+                    {
+                        "xyxy": [270.0, 210.0, 355.0, 355.0],
+                        "confidence": 0.91,
+                        "class_id": 0,
+                        "class_name": "person",
+                    },
+                    {
+                        "xyxy": [285.0, 70.0, 335.0, 160.0],
+                        "confidence": 0.88,
+                        "class_id": 0,
+                        "class_name": "person",
+                    },
+                ],
+                30: [
+                    {
+                        "xyxy": [262.0, 207.0, 350.0, 356.0],
+                        "confidence": 0.90,
+                        "class_id": 0,
+                        "class_name": "person",
+                    },
+                    {
+                        "xyxy": [500.0, 42.0, 545.0, 148.0],
+                        "confidence": 0.99,
+                        "class_id": 0,
+                        "class_name": "person",
+                    },
+                ],
+                60: [
+                    {
+                        "xyxy": [258.0, 206.0, 348.0, 356.0],
+                        "confidence": 0.89,
+                        "class_id": 0,
+                        "class_name": "person",
+                    },
+                    {
+                        "xyxy": [288.0, 72.0, 338.0, 162.0],
+                        "confidence": 0.87,
+                        "class_id": 0,
+                        "class_name": "person",
+                    },
+                ],
+            }
+        ),
+    )
+
+
 def test_main_subject_selector_persists_at_most_two_candidates_per_frame(
     db_session: Session,
     indexed_media,
@@ -397,6 +463,89 @@ def test_main_player_track_assignment_persists_candidate_tracks_and_lineage(
     }
 
 
+def test_main_player_track_assignment_rejects_far_edge_wall_jump(
+    db_session: Session,
+    indexed_media,
+    detection_weights_path: Path,
+    pose_weights_path: Path,
+) -> None:
+    detection = create_far_wall_jump_player_detection_run(
+        session=db_session,
+        media_id=indexed_media.id,
+        weights_path=detection_weights_path,
+    )
+    subject_result = select_main_player_subjects(
+        session=db_session,
+        media_id=indexed_media.id,
+        source_detection_run_id=str(detection["detection_run_id"]),
+        max_frames=3,
+    )
+    assert subject_result["observations"]["far_player_candidate"] == 3
+
+    far_wall_subject = next(
+        (
+            observation
+            for observation in db_session.scalars(
+                select(Observation).where(
+                    Observation.run_id == subject_result["main_subject_run_id"],
+                    Observation.observation_type == "main_player_subject_candidate",
+                    Observation.frame_start == 30,
+                )
+            ).all()
+            if observation.payload_jsonb["subject_role_candidate"] == "far_player_candidate"
+        ),
+        None,
+    )
+    assert far_wall_subject is not None
+
+    track_result = assign_main_player_tracks(
+        session=db_session,
+        media_id=indexed_media.id,
+        source_detection_run_id=str(detection["detection_run_id"]),
+        source_subject_run_id=str(subject_result["main_subject_run_id"]),
+        max_frames=3,
+    )
+
+    assert track_result["ok"] is True
+    assert track_result["assignments"] == {
+        "near_player_track_assignment_candidate": 3,
+        "far_player_track_assignment_candidate": 2,
+        "total": 5,
+    }
+
+    assignments = db_session.scalars(
+        select(Observation).where(
+            Observation.run_id == track_result["main_player_track_run_id"],
+            Observation.observation_type == "main_player_track_assignment_candidate",
+        )
+    ).all()
+    assert len(assignments) == 5
+    assert far_wall_subject.id not in {
+        assignment.payload_jsonb["source_subject_candidate_observation_id"]
+        for assignment in assignments
+    }
+    assert all(assignment.payload_jsonb["not_identity_truth"] is True for assignment in assignments)
+
+    pose_result = run_real_pose_replay(
+        session=db_session,
+        media_id=indexed_media.id,
+        weights_path=str(pose_weights_path),
+        source_detection_run_id=str(detection["detection_run_id"]),
+        source_subject_run_id=str(subject_result["main_subject_run_id"]),
+        source_track_run_id=str(track_result["main_player_track_run_id"]),
+        model_name="test-real-pose",
+        model_version="track-lock-test",
+        device="cpu",
+        every_n_frames=1,
+        max_frames=3,
+        allowed_roots=[str(pose_weights_path.parent)],
+        probe_runtime=runtime_ok,
+        pose_result_provider=FakePoseResultProvider(),
+    )
+    assert pose_result["ok"] is True
+    assert pose_result["observations"] == {"player_pose_observation": 5, "total": 5}
+
+
 def test_real_pose_can_consume_main_player_track_run_and_preserve_track_context(
     db_session: Session,
     indexed_media,
@@ -443,13 +592,13 @@ def test_real_pose_can_consume_main_player_track_run_and_preserve_track_context(
     assert pose_result["source_track_run_id"] == track_result["main_player_track_run_id"]
     assert pose_result["observations"] == {"player_pose_observation": 3, "total": 3}
     assert pose_result["summary"]["source_track_assignment"] == (
-        "main_player_track_assignment_v0"
+        "main_player_track_assignment_v01"
     )
 
     poses = db_session.scalars(select(PoseObservation)).all()
     assert len(poses) == 3
     assert {pose.association_method for pose in poses} == {
-        "main_player_track_assignment_v0_crop_from_player_track_candidate"
+        "main_player_track_assignment_v01_crop_from_player_track_candidate"
     }
     overlay_item = pose_overlay_item_from_row(poses[0])
     assert overlay_item["subject_context"]["candidate_track_only"] is True
