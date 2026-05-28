@@ -58,9 +58,60 @@ weights/
 *.pth
 *.onnx
 *.engine
+*.torchscript
 ```
 
 Do not commit YOLO weights unless the project explicitly changes that policy.
+
+## TOM v1 Local Model Assets
+
+TOM v1 model assets may be copied locally under:
+
+```text
+model_assets/tom_v1/
+```
+
+Expected local inventory:
+
+```text
+model_assets/tom_v1/best_ball_v2_1280.pt          # ball detector
+model_assets/tom_v1/keypoints_model.pth           # court keypoints model, future adapter required
+model_assets/tom_v1/view_classifier_gameplay.pt   # gameplay classifier, future adapter required
+model_assets/tom_v1/yolo26n.pt                    # YOLO26 small variant
+model_assets/tom_v1/yolo26s.pt                    # YOLO26 small variant
+model_assets/tom_v1/yolo26x-pose.pt               # pose model
+model_assets/tom_v1/yolo26x.pt                    # player/object detector
+```
+
+Likely usable through existing TOM v3 optional YOLO detection:
+
+- `best_ball_v2_1280.pt`
+- `yolo26x.pt`
+- `yolo26n.pt`
+- `yolo26s.pt`
+
+Likely usable through existing TOM v3 optional real pose:
+
+- `yolo26x-pose.pt`
+
+Future adapter required:
+
+- `keypoints_model.pth`
+- `view_classifier_gameplay.pt`
+
+Do not force TOM v1 `.pth` court keypoint or gameplay classifier assets through the YOLO detector path unless compatibility is proven.
+
+Bridge helpers:
+
+```bash
+make tom-v1-yolo-probe PYTHON=.venv/bin/python
+make tom-v1-ball-detection MEDIA_ID=<media_id> PYTHON=.venv/bin/python MAX_FRAMES=214
+make tom-v1-player-detection MEDIA_ID=<media_id> PYTHON=.venv/bin/python MAX_FRAMES=214
+make tom-v1-tracklets DETECTION_RUN_ID=<real_detection_run_id> PYTHON=.venv/bin/python
+make tom-v1-pose MEDIA_ID=<media_id> SOURCE_DETECTION_RUN_ID=<player_detection_run_id> PYTHON=.venv/bin/python MAX_FRAMES=214
+```
+
+These are local smoke helpers only. They are not part of default CI and do not make YOLO runtime mandatory.
 
 ## Register Weights
 

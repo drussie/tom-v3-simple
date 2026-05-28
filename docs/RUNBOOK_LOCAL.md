@@ -515,7 +515,121 @@ If local pose weights are not available, skip the real pose smoke and rely on th
 
 Real YOLO detections are model-output observations. Real-detection-derived tracklets are candidate groupings from those observations. Real pose observations are keypoint evidence. These layers do not create movement interpretation, homography, events, scoring, or adjudication.
 
-## 11A. Court / Homography Decision Gate
+## 11A. TOM v1 Model Assets Bridge
+
+The TOM v3 replay/evidence infrastructure is working, but fixture visual quality is not real tracking quality. Fixture ball/player overlays and fixture court lines prove the pipeline; they do not prove real perception quality.
+
+TOM v1 model assets may be tested locally as TOM v3 observation sources. Model weights are local-only and ignored by git.
+
+Expected local inventory:
+
+```text
+model_assets/tom_v1/best_ball_v2_1280.pt          # ball detector
+model_assets/tom_v1/keypoints_model.pth           # court keypoints model, future adapter required
+model_assets/tom_v1/view_classifier_gameplay.pt   # gameplay classifier, future adapter required
+model_assets/tom_v1/yolo26n.pt                    # YOLO26 small variant
+model_assets/tom_v1/yolo26s.pt                    # YOLO26 small variant
+model_assets/tom_v1/yolo26x-pose.pt               # pose model
+model_assets/tom_v1/yolo26x.pt                    # player/object detector
+```
+
+Immediate supported paths:
+
+- likely usable now through existing TOM v3 real YOLO detection: `best_ball_v2_1280.pt`, `yolo26x.pt`, `yolo26n.pt`, `yolo26s.pt`
+- likely usable now through existing TOM v3 real pose: `yolo26x-pose.pt`
+- future TOM v1-specific adapter required: `keypoints_model.pth`, `view_classifier_gameplay.pt`
+
+Probe optional runtime:
+
+```bash
+.venv/bin/python -m apps.worker.cli yolo-runtime-probe --device auto
+```
+
+If unavailable, install optional vision dependencies in a local optional environment. The default fixture demo and default CI still do not require Ultralytics, Torch, OpenCV, or model files.
+
+Fixture-safe setup:
+
+```bash
+DEMO_MEDIA_PATH=demo_assets/sample_point.mp4 \
+TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_tom_v1_bridge.db \
+make demo PYTHON=.venv/bin/python MAX_FRAMES=30
+```
+
+Copy the `media_id` from the demo summary.
+
+TOM v1 ball detection:
+
+```bash
+TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_tom_v1_bridge.db \
+.venv/bin/python -m apps.worker.cli run-real-detection \
+  --media-id <media_id> \
+  --weights model_assets/tom_v1/best_ball_v2_1280.pt \
+  --model-name tom-v1-best-ball-v2-1280 \
+  --model-version v1-local \
+  --device auto \
+  --every-n-frames 1 \
+  --max-frames 214 \
+  --conf 0.10
+```
+
+TOM v1 player/object detection:
+
+```bash
+TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_tom_v1_bridge.db \
+.venv/bin/python -m apps.worker.cli run-real-detection \
+  --media-id <media_id> \
+  --weights model_assets/tom_v1/yolo26x.pt \
+  --model-name tom-v1-yolo26x-player-detector \
+  --model-version v1-local \
+  --device auto \
+  --every-n-frames 1 \
+  --max-frames 214 \
+  --conf 0.25
+```
+
+Candidate tracklets from a real detection run:
+
+```bash
+TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_tom_v1_bridge.db \
+.venv/bin/python -m apps.worker.cli build-tracklets \
+  --detection-run-id <real_detection_run_id> \
+  --run-name tom-v1-model-derived-tracklets
+```
+
+TOM v1 pose from the player detection run:
+
+```bash
+TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_tom_v1_bridge.db \
+.venv/bin/python -m apps.worker.cli run-real-pose \
+  --media-id <media_id> \
+  --source-detection-run-id <player_real_detection_run_id> \
+  --weights model_assets/tom_v1/yolo26x-pose.pt \
+  --model-name tom-v1-yolo26x-pose \
+  --model-version v1-local \
+  --mode crop_from_player_detection \
+  --device auto \
+  --every-n-frames 1 \
+  --max-frames 214 \
+  --conf 0.25
+```
+
+Makefile helpers:
+
+```bash
+make tom-v1-yolo-probe PYTHON=.venv/bin/python
+make tom-v1-ball-detection MEDIA_ID=<media_id> PYTHON=.venv/bin/python MAX_FRAMES=214
+make tom-v1-player-detection MEDIA_ID=<media_id> PYTHON=.venv/bin/python MAX_FRAMES=214
+make tom-v1-tracklets DETECTION_RUN_ID=<real_detection_run_id> PYTHON=.venv/bin/python
+make tom-v1-pose MEDIA_ID=<media_id> SOURCE_DETECTION_RUN_ID=<player_real_detection_run_id> PYTHON=.venv/bin/python MAX_FRAMES=214
+```
+
+Class mapping warning:
+
+The TOM v1 ball model may emit `class 0 = ball`. If real detection returns zero useful detections, lower the confidence threshold, inspect debug payloads/artifacts if available, check class names emitted by Ultralytics, and add an explicit class map only when the model output proves the mapping. Do not relabel unknown classes without evidence.
+
+TOM v1-origin detections and poses are still model-output observations. They do not confirm ball path, player identity, court position, bounce/hit/in-out/rally/point/scoring, or official tennis truth.
+
+## 11B. Court / Homography Decision Gate
 
 Milestone 7E is docs/status only. It decides that court/camera/homography evidence should be implemented as future Blueprint 8 work, not inside Blueprint 7.
 
@@ -540,7 +654,7 @@ court keypoint evidence
 
 Those records should not become bounce/hit/rally/point/scoring conclusions.
 
-## 11B. Blueprint 7 Final Perception Orchestration
+## 11C. Blueprint 7 Final Perception Orchestration
 
 Blueprint 7 is complete. The final local path keeps the fixture-safe baseline separate from optional real runtime work.
 
@@ -621,7 +735,7 @@ make web
 
 Default validation does not require local weights. If local YOLO or pose weights are absent, skip optional real smokes and use the fixture-safe baseline plus plan-only command checks.
 
-## 11C. Court Evidence Schema Contract
+## 11D. Court Evidence Schema Contract
 
 Blueprint 8 has started. Milestone 8A is schema/contract only.
 
@@ -648,7 +762,7 @@ Run schema/persistence tests:
 .venv/bin/python -m pytest tests/test_court_schema.py tests/test_court_observation_persistence.py -q
 ```
 
-## 11D. Fixture Court Evidence Adapter
+## 11E. Fixture Court Evidence Adapter
 
 Milestone 8B adds a deterministic fixture court evidence adapter. First index media through the fixture demo:
 
@@ -693,7 +807,7 @@ camera_view_observation
 
 Fixture court evidence is the source input for homography candidate persistence and later replay overlays, but it is not a real court model.
 
-## 11E. Camera / View Evidence Queries
+## 11F. Camera / View Evidence Queries
 
 Milestone 8C exposes fixture camera/view observations as read-only geometry context evidence.
 
@@ -720,7 +834,7 @@ Expected results:
 
 This is not a confirmed camera state and does not compute homography.
 
-## 11F. Homography Candidate Persistence
+## 11G. Homography Candidate Persistence
 
 Milestone 8D builds candidate homography observations from persisted court evidence.
 
@@ -756,7 +870,7 @@ Expected output includes `homography_run_id`, candidate counts, source counts, s
 
 Homography candidates are candidate geometry evidence only. 8D does not add projection diagnostics, replay court overlays, real court model inference, ball/player court-space projection, bounce/hit/in-out/rally/point/scoring, or adjudication.
 
-## 11G. Court Overlay Replay Workstation
+## 11H. Court Overlay Replay Workstation
 
 Milestone 8E renders persisted court evidence in the replay workstation.
 
@@ -788,7 +902,7 @@ Expected:
 - selected court evidence remains geometry evidence only
 - no projection diagnostics, ball/player court-space projection, bounce, hit, line-call, rally, point, score, or adjudication is produced
 
-## 11H. Projection Diagnostics / Court Review Export
+## 11I. Projection Diagnostics / Court Review Export
 
 Milestone 8F persists projection diagnostic observations from homography candidates and exports TOM-native court review datasets.
 

@@ -15,9 +15,11 @@ tom_v3_dev.db
 node_modules/
 .next/
 *.tsbuildinfo
+# Local model weights and runtime assets. Never commit model binaries.
 model_assets/
 weights/
 *.pt
 *.pth
 *.onnx
 *.engine
+*.torchscript

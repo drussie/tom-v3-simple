@@ -1,5 +1,32 @@
 # TOM v3 Simple - Implementation Log
 
+## TOM v1 Model Assets + Perception Bridge
+
+Status: complete when accepted
+
+### Goal
+
+Add guardrails and runbook support for using local TOM v1 model assets as optional TOM v3 observation sources.
+
+### Outcome
+
+The bridge adds:
+
+- local model asset ignore guardrails, including `*.torchscript`
+- TOM v1 model inventory docs
+- Makefile helpers for TOM v1 YOLO runtime probe, ball detection, player detection, tracklet building, and pose smoke
+- runbook commands for local TOM v1 smoke
+- class mapping risk notes
+
+### Non-goals
+
+- No model files committed.
+- No mandatory YOLO runtime in CI.
+- No TOM v1-specific court keypoint or gameplay classifier adapter.
+- No tracking quality claim.
+- No bounce/hit/in-out/rally/point/scoring.
+- No adjudication.
+
 ## Milestone 8C - Camera / View Evidence Layer
 
 Status: complete

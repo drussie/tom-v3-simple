@@ -80,6 +80,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 8D - Homography Candidate Persistence](milestones/milestone_8d_homography_candidate_persistence.md)
 - [Milestone 8E - Court Overlay in Replay Workstation](milestones/milestone_8e_court_overlay_replay_workstation.md)
 - [Milestone 8F - Projection Diagnostics / Review Export](milestones/milestone_8f_projection_diagnostics_review_export.md)
+- [TOM v1 Model Assets + Perception Bridge](milestones/tom_v1_model_assets_perception_bridge.md)
 
 ## Handoffs
 
@@ -133,6 +134,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 8D Handoff](handoffs/milestone_8d_homography_candidate_persistence_handoff.md)
 - [Milestone 8E Handoff](handoffs/milestone_8e_court_overlay_replay_workstation_handoff.md)
 - [Milestone 8F Handoff](handoffs/milestone_8f_projection_diagnostics_review_export_handoff.md)
+- [TOM v1 Model Assets + Perception Bridge Handoff](handoffs/tom_v1_model_assets_perception_bridge_handoff.md)
 
 ## Agent Reports
 
@@ -186,6 +188,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Milestone 8D Agent Report](agent_reports/milestone_8d_homography_candidate_persistence_report.md)
 - [Milestone 8E Agent Report](agent_reports/milestone_8e_court_overlay_replay_workstation_report.md)
 - [Milestone 8F Agent Report](agent_reports/milestone_8f_projection_diagnostics_review_export_report.md)
+- [TOM v1 Model Assets + Perception Bridge Agent Report](agent_reports/tom_v1_model_assets_perception_bridge_report.md)
 
 ## Blueprints
 
@@ -217,6 +220,7 @@ Use this index as the durable navigation point for project memory, architecture 
 
 - [Real Detection Replay v0](perception/real_detection_replay_v0.md)
 - [Real Pose Replay v0](perception/real_pose_replay_v0.md)
+- [TOM v1 Model Assets Bridge v0](perception/tom_v1_model_assets_bridge_v0.md)
 
 ## Court
 

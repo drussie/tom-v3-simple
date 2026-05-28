@@ -171,6 +171,18 @@ make real-detection MEDIA_ID=<media_id> YOLO_WEIGHTS_PATH=./model_assets/yolo/<m
 
 Real YOLO smoke requires a separate optional runtime environment, local weights outside git, and model registration. See [OPTIONAL_YOLO.md](docs/OPTIONAL_YOLO.md).
 
+TOM v1 local model assets can be tested through the same optional real perception paths when copied under `model_assets/tom_v1/`. The bridge runbook documents `best_ball_v2_1280.pt` for ball detection, `yolo26x.pt` for player/object detection, and `yolo26x-pose.pt` for pose. `keypoints_model.pth` and `view_classifier_gameplay.pt` require future TOM v1-specific adapters.
+
+```bash
+make tom-v1-yolo-probe PYTHON=.venv/bin/python
+make tom-v1-ball-detection MEDIA_ID=<media_id> PYTHON=.venv/bin/python MAX_FRAMES=214
+make tom-v1-player-detection MEDIA_ID=<media_id> PYTHON=.venv/bin/python MAX_FRAMES=214
+make tom-v1-tracklets DETECTION_RUN_ID=<real_detection_run_id> PYTHON=.venv/bin/python
+make tom-v1-pose MEDIA_ID=<media_id> SOURCE_DETECTION_RUN_ID=<player_detection_run_id> PYTHON=.venv/bin/python MAX_FRAMES=214
+```
+
+Model assets are local-only and ignored by git. TOM v1-origin outputs remain observations, not tracking truth or tennis-event conclusions. See [TOM v1 Model Assets Bridge](docs/perception/tom_v1_model_assets_bridge_v0.md).
+
 When a real detection run is selected in the replay workstation, the UI labels it as real model-output evidence and shows available source runtime, model registry, runtime config, class, frame/time owner, and evidence-only metadata. Fixture runs remain labeled as fixture/demo evidence.
 
 Build candidate tracklets from a real detection run:
@@ -207,6 +219,7 @@ Real pose output persists `player_pose_observation` keypoint evidence and can be
 - [Replay Workstation](docs/REPLAY_WORKSTATION.md)
 - [Real Detection Replay](docs/perception/real_detection_replay_v0.md)
 - [Real Pose Replay](docs/perception/real_pose_replay_v0.md)
+- [TOM v1 Model Assets Bridge](docs/perception/tom_v1_model_assets_bridge_v0.md)
 - [Court / Homography Decision](docs/court/court_homography_evidence_decision_v0.md)
 - [Court Evidence Schema](docs/court/court_evidence_schema_v0.md)
 - [Court Template Registry](docs/court/court_template_registry_v0.md)

@@ -58,6 +58,8 @@ Blueprint 7 completes TOM v3's real perception runtime for the replay workstatio
 
 Blueprint 8 has started with geometry evidence work. Milestone 8A adds court keypoint, court line, camera/view, homography candidate, and projection diagnostic storage contracts. Milestone 8B writes fixture court keypoint, line, and camera/view rows. Milestone 8C exposes camera/view rows through read-model APIs. Milestone 8D persists homography candidate rows with lineage from source court evidence. Milestone 8E renders those persisted court rows in the replay workstation through `courtRunId` and `homographyRunId`. Milestone 8F adds projection diagnostic rows and replay support through `projectionDiagnosticRunId`.
 
+The TOM v1 model assets bridge does not add replay architecture. It lets local TOM v1 detector and pose weights be tested through the existing `detectionRunId`, `trackletRunId`, and `poseRunId` replay paths. If a TOM v1 smoke run succeeds, the replay workstation should label the resulting rows as real model-output observations, not fixture evidence or tracking truth.
+
 ## What 6A Added
 
 - `GET /media/{media_id}/replay-info`

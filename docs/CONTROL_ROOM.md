@@ -46,6 +46,8 @@ Blueprint 8 starts the court/camera/homography evidence layer. Milestone 8A adds
 
 8F is still geometry review evidence only. Projection diagnostics are reviewable projected template evidence, not final court models. 8F does not add ball/player court-space projection, stream ingestion, accepted/rejected court lifecycle, or tennis-event interpretation.
 
+Repair/bridge status: TOM v1 local model assets can now be tested through TOM v3's existing optional real detection, real pose, and real-detection-derived tracklet commands. The bridge adds local model guardrails, TOM v1 model inventory docs, and Makefile helpers. It does not commit weights, add mandatory YOLO dependencies, add TOM v1-specific court/view adapters, or claim tracking quality is solved.
+
 ## Canonical Local Demo
 
 Run:
@@ -101,6 +103,7 @@ An observation does not mean the output is correct, a tennis event happened, a s
 - Court/camera/homography evidence decision gate with a Blueprint 8 candidate contract.
 - Blueprint 7 completion review and final perception orchestration runbook.
 - Court/camera/homography schema, typed persistence foundation, fixture court evidence adapter, camera/view evidence read layer, homography candidate persistence, replay court overlays, projection diagnostics, and court review export for Blueprint 8.
+- TOM v1 local model asset bridge runbook and helpers for optional ball detection, player detection, pose, and real-detection-derived tracklet smoke.
 
 ## Explicitly Absent Capabilities
 
@@ -132,6 +135,18 @@ Real YOLO use requires optional dependencies and local weights. YOLO-origin dete
 
 See [OPTIONAL_YOLO.md](OPTIONAL_YOLO.md).
 
+TOM v1 bridge helpers are available for local-only model assets under `model_assets/tom_v1/`:
+
+```bash
+make tom-v1-yolo-probe
+make tom-v1-ball-detection MEDIA_ID=<media_id>
+make tom-v1-player-detection MEDIA_ID=<media_id>
+make tom-v1-tracklets DETECTION_RUN_ID=<real_detection_run_id>
+make tom-v1-pose MEDIA_ID=<media_id> SOURCE_DETECTION_RUN_ID=<player_detection_run_id>
+```
+
+`keypoints_model.pth` and `view_classifier_gameplay.pt` require future TOM v1-specific adapters.
+
 ## Known Limitations
 
 The main limitation registry is [KNOWN_LIMITATIONS.md](KNOWN_LIMITATIONS.md).
@@ -139,6 +154,7 @@ The main limitation registry is [KNOWN_LIMITATIONS.md](KNOWN_LIMITATIONS.md).
 Short version:
 
 - Fixture output is deterministic demo evidence.
+- TOM v1 local model assets are ignored local-only files; smoke quality depends on optional runtime, class mapping, thresholds, and source media.
 - Optional YOLO quality depends on local runtime, weights, model classes, and source media.
 - Optional real pose quality depends on local runtime, pose weights, source detections or frame sampling, and source media.
 - Court/camera/homography evidence now proceeds in Blueprint 8 with schema persistence, fixture adapter foundations, camera/view query/bundle read models, homography candidate persistence, replay court overlays, projection diagnostics, and court review export.
