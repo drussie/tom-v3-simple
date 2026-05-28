@@ -162,6 +162,19 @@ make tom-v1-main-subjects \
 
 This helper selects at most two `main_player_subject_candidate` observations per frame: `near_player_candidate` and `far_player_candidate`. These are pose source candidates only, not identity truth.
 
+Main player track assignment:
+
+```bash
+make tom-v1-main-player-tracks \
+  MEDIA_ID=<media_id> \
+  DETECTION_RUN_ID=<player_real_detection_run_id> \
+  SOURCE_SUBJECT_RUN_ID=<main_subject_run_id> \
+  PYTHON=.venv/bin/python \
+  MAX_FRAMES=214
+```
+
+This helper groups frame-local subject candidates into `near_player_track_candidate` and `far_player_track_candidate` visual track candidates, with per-frame `main_player_track_assignment_candidate` evidence. These are still not identity truth.
+
 Pose from selected main subject candidates:
 
 ```bash
@@ -174,6 +187,20 @@ make tom-v1-pose-main-subjects \
 ```
 
 Filtered pose mode preserves lineage from raw `player_detection` rows to `main_player_subject_candidate` rows and then to `player_pose_observation` rows.
+
+Pose from main player track candidates:
+
+```bash
+make tom-v1-pose-main-tracks \
+  MEDIA_ID=<media_id> \
+  SOURCE_DETECTION_RUN_ID=<player_real_detection_run_id> \
+  SOURCE_SUBJECT_RUN_ID=<main_subject_run_id> \
+  SOURCE_TRACK_RUN_ID=<main_player_track_run_id> \
+  PYTHON=.venv/bin/python \
+  MAX_FRAMES=214
+```
+
+Track-filtered pose mode preserves track assignment metadata on pose observations, including `track_candidate_id`, `track_role_candidate`, and `track_assignment_observation_id`. It remains candidate visual subject evidence only.
 
 ## Runtime / Replay Repair Notes
 

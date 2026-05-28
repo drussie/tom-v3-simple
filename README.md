@@ -179,11 +179,13 @@ make tom-v1-ball-detection MEDIA_ID=<media_id> PYTHON=.venv/bin/python MAX_FRAME
 make tom-v1-player-detection MEDIA_ID=<media_id> PYTHON=.venv/bin/python MAX_FRAMES=214
 make tom-v1-tracklets DETECTION_RUN_ID=<real_detection_run_id> PYTHON=.venv/bin/python
 make tom-v1-main-subjects MEDIA_ID=<media_id> DETECTION_RUN_ID=<player_detection_run_id> PYTHON=.venv/bin/python MAX_FRAMES=214
+make tom-v1-main-player-tracks MEDIA_ID=<media_id> DETECTION_RUN_ID=<player_detection_run_id> SOURCE_SUBJECT_RUN_ID=<main_subject_run_id> PYTHON=.venv/bin/python MAX_FRAMES=214
 make tom-v1-pose MEDIA_ID=<media_id> SOURCE_DETECTION_RUN_ID=<player_detection_run_id> PYTHON=.venv/bin/python MAX_FRAMES=214
 make tom-v1-pose-main-subjects MEDIA_ID=<media_id> SOURCE_DETECTION_RUN_ID=<player_detection_run_id> SOURCE_SUBJECT_RUN_ID=<main_subject_run_id> PYTHON=.venv/bin/python MAX_FRAMES=214
+make tom-v1-pose-main-tracks MEDIA_ID=<media_id> SOURCE_DETECTION_RUN_ID=<player_detection_run_id> SOURCE_SUBJECT_RUN_ID=<main_subject_run_id> SOURCE_TRACK_RUN_ID=<main_player_track_run_id> PYTHON=.venv/bin/python MAX_FRAMES=214
 ```
 
-Model assets are local-only and ignored by git. The TOM v1 helpers pass local model-root guardrails and default image sizes for the known local models. The main subject filter selects near/far pose source candidates only; it does not confirm identity or mutate raw detections. TOM v1-origin outputs remain observations, not tracking truth or tennis-event conclusions. See [TOM v1 Model Assets Bridge](docs/perception/tom_v1_model_assets_bridge_v0.md).
+Model assets are local-only and ignored by git. The TOM v1 helpers pass local model-root guardrails and default image sizes for the known local models. The main subject filter selects near/far pose source candidates, and the main player track assignment groups them into near/far visual track candidates. Neither layer confirms identity or mutates raw detections. TOM v1-origin outputs remain observations, not tracking truth or tennis-event conclusions. See [TOM v1 Model Assets Bridge](docs/perception/tom_v1_model_assets_bridge_v0.md).
 
 When a real detection run is selected in the replay workstation, the UI labels it as real model-output evidence and shows available source runtime, model registry, runtime config, class, frame/time owner, and evidence-only metadata. Fixture runs remain labeled as fixture/demo evidence.
 

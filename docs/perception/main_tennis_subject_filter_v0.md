@@ -84,6 +84,16 @@ relationship_type = pose_from_main_subject_candidate
 
 This preserves the raw source detection and the selection step without promoting either into truth.
 
+Main player track assignment can consume these subject candidates later:
+
+```text
+main_player_subject_candidate
+-> main_player_track_assignment_candidate
+-> player_pose_observation
+```
+
+The track assignment layer adds temporal continuity for pose source selection, but it still does not identify players or confirm tracks.
+
 ## Heuristic v0
 
 The v0 filter uses image-relative bounding box features:

@@ -29,6 +29,7 @@ REQUIRED_SHA256 ?=
 RUN_TRACKLETS ?= false
 SOURCE_DETECTION_RUN_ID ?=
 SOURCE_SUBJECT_RUN_ID ?=
+SOURCE_TRACK_RUN_ID ?=
 LINK_SOURCE_DETECTIONS ?= false
 DEMO_MEDIA_PATH ?=
 VIEWER_BASE_URL ?= http://127.0.0.1:3000
@@ -58,7 +59,7 @@ MIN_KEYPOINT_CONFIDENCE ?= 0.0
 
 export TOM_V3_DATABASE_URL
 
-.PHONY: install web-install test lint migrate api seed verify index-media run-gameplay index-and-run-gameplay run-detection index-and-run-detection extract-frame-artifacts build-tracklets run-pose export-tracklet-review-dataset court-review-export demo demo-fixture demo-plan demo-reset demo-export demo-open replay-open completion-audit completion-check yolo-probe yolo-smoke yolo-runtime-probe register-yolo-model smoke-real-yolo-local real-detection real-pose tom-v1-yolo-probe tom-v1-ball-detection tom-v1-player-detection tom-v1-tracklets tom-v1-main-subjects tom-v1-pose tom-v1-pose-main-subjects court-fixture homography-candidates projection-diagnostics web web-build web-lint smoke all-checks
+.PHONY: install web-install test lint migrate api seed verify index-media run-gameplay index-and-run-gameplay run-detection index-and-run-detection extract-frame-artifacts build-tracklets run-pose export-tracklet-review-dataset court-review-export demo demo-fixture demo-plan demo-reset demo-export demo-open replay-open completion-audit completion-check yolo-probe yolo-smoke yolo-runtime-probe register-yolo-model smoke-real-yolo-local real-detection real-pose tom-v1-yolo-probe tom-v1-ball-detection tom-v1-player-detection tom-v1-tracklets tom-v1-main-subjects tom-v1-main-player-tracks tom-v1-pose tom-v1-pose-main-subjects tom-v1-pose-main-tracks court-fixture homography-candidates projection-diagnostics web web-build web-lint smoke all-checks
 
 install:
 	$(PYTHON) -m pip install -e ".[dev]"
@@ -200,7 +201,7 @@ real-detection:
 real-pose:
 	@if [ -z "$(MEDIA_ID)" ]; then echo "MEDIA_ID is required: make real-pose MEDIA_ID=<media_id> SOURCE_DETECTION_RUN_ID=<run_id> POSE_WEIGHTS_PATH=model_assets/pose/model.pt"; exit 1; fi
 	@if [ -z "$(POSE_WEIGHTS_PATH)" ]; then echo "POSE_WEIGHTS_PATH is required: make real-pose MEDIA_ID=<media_id> SOURCE_DETECTION_RUN_ID=<run_id> POSE_WEIGHTS_PATH=model_assets/pose/model.pt"; exit 1; fi
-	$(PYTHON) -m apps.worker.cli run-real-pose --media-id "$(MEDIA_ID)" --weights "$(POSE_WEIGHTS_PATH)" $(if $(SOURCE_DETECTION_RUN_ID),--source-detection-run-id "$(SOURCE_DETECTION_RUN_ID)",) $(if $(SOURCE_SUBJECT_RUN_ID),--source-subject-run-id "$(SOURCE_SUBJECT_RUN_ID)",) --mode "$(POSE_MODE)" --device "$(YOLO_DEVICE)" --every-n-frames "$(EVERY_N_FRAMES)" --max-frames "$(MAX_FRAMES)" --conf "$(CONF)" --iou "$(IOU)" --viewer-base-url "$(VIEWER_BASE_URL)" $(if $(MODEL_NAME),--model-name "$(MODEL_NAME)",) --model-version "$(MODEL_VERSION)" $(if $(REQUIRED_SHA256),--required-sha256 "$(REQUIRED_SHA256)",) $(if $(IMG_SIZE),--imgsz "$(IMG_SIZE)",) $(if $(FRAME_START),--frame-start "$(FRAME_START)",) $(if $(FRAME_END),--frame-end "$(FRAME_END)",) $(if $(filter true,$(FALLBACK_TO_FULL_FRAME)),--fallback-to-full-frame,--no-fallback-to-full-frame) $(if $(filter true,$(PLAN_ONLY)),--plan-only,)
+	$(PYTHON) -m apps.worker.cli run-real-pose --media-id "$(MEDIA_ID)" --weights "$(POSE_WEIGHTS_PATH)" $(if $(SOURCE_DETECTION_RUN_ID),--source-detection-run-id "$(SOURCE_DETECTION_RUN_ID)",) $(if $(SOURCE_SUBJECT_RUN_ID),--source-subject-run-id "$(SOURCE_SUBJECT_RUN_ID)",) $(if $(SOURCE_TRACK_RUN_ID),--source-track-run-id "$(SOURCE_TRACK_RUN_ID)",) --mode "$(POSE_MODE)" --device "$(YOLO_DEVICE)" --every-n-frames "$(EVERY_N_FRAMES)" --max-frames "$(MAX_FRAMES)" --conf "$(CONF)" --iou "$(IOU)" --viewer-base-url "$(VIEWER_BASE_URL)" $(if $(MODEL_NAME),--model-name "$(MODEL_NAME)",) --model-version "$(MODEL_VERSION)" $(if $(REQUIRED_SHA256),--required-sha256 "$(REQUIRED_SHA256)",) $(if $(IMG_SIZE),--imgsz "$(IMG_SIZE)",) $(if $(FRAME_START),--frame-start "$(FRAME_START)",) $(if $(FRAME_END),--frame-end "$(FRAME_END)",) $(if $(filter true,$(FALLBACK_TO_FULL_FRAME)),--fallback-to-full-frame,--no-fallback-to-full-frame) $(if $(filter true,$(PLAN_ONLY)),--plan-only,)
 
 tom-v1-yolo-probe:
 	$(PYTHON) -m apps.worker.cli yolo-runtime-probe --device "$(YOLO_DEVICE)"
@@ -222,6 +223,12 @@ tom-v1-main-subjects:
 	@if [ -z "$(DETECTION_RUN_ID)" ]; then echo "DETECTION_RUN_ID is required: make tom-v1-main-subjects DETECTION_RUN_ID=<player_detection_run_id>"; exit 1; fi
 	$(PYTHON) -m apps.worker.cli select-main-player-subjects --media-id "$(MEDIA_ID)" --source-detection-run-id "$(DETECTION_RUN_ID)" --run-name main-player-subject-filter-v0 --every-n-frames "$(EVERY_N_FRAMES)" --max-frames "$(MAX_FRAMES)" --viewer-base-url "$(VIEWER_BASE_URL)" $(if $(FRAME_START),--frame-start "$(FRAME_START)",) $(if $(FRAME_END),--frame-end "$(FRAME_END)",) $(if $(filter true,$(PLAN_ONLY)),--plan-only,)
 
+tom-v1-main-player-tracks:
+	@if [ -z "$(MEDIA_ID)" ]; then echo "MEDIA_ID is required: make tom-v1-main-player-tracks MEDIA_ID=<media_id> DETECTION_RUN_ID=<player_detection_run_id> SOURCE_SUBJECT_RUN_ID=<main_subject_run_id>"; exit 1; fi
+	@if [ -z "$(DETECTION_RUN_ID)" ]; then echo "DETECTION_RUN_ID is required: make tom-v1-main-player-tracks DETECTION_RUN_ID=<player_detection_run_id>"; exit 1; fi
+	@if [ -z "$(SOURCE_SUBJECT_RUN_ID)" ]; then echo "SOURCE_SUBJECT_RUN_ID is required: make tom-v1-main-player-tracks SOURCE_SUBJECT_RUN_ID=<main_subject_run_id>"; exit 1; fi
+	$(PYTHON) -m apps.worker.cli assign-main-player-tracks --media-id "$(MEDIA_ID)" --source-detection-run-id "$(DETECTION_RUN_ID)" --source-subject-run-id "$(SOURCE_SUBJECT_RUN_ID)" --run-name main-player-track-assignment-v0 --every-n-frames "$(EVERY_N_FRAMES)" --max-frames "$(MAX_FRAMES)" --viewer-base-url "$(VIEWER_BASE_URL)" $(if $(FRAME_START),--frame-start "$(FRAME_START)",) $(if $(FRAME_END),--frame-end "$(FRAME_END)",) $(if $(filter true,$(PLAN_ONLY)),--plan-only,)
+
 tom-v1-pose:
 	@if [ -z "$(MEDIA_ID)" ]; then echo "MEDIA_ID is required: make tom-v1-pose MEDIA_ID=<media_id> SOURCE_DETECTION_RUN_ID=<player_detection_run_id>"; exit 1; fi
 	@if [ -z "$(SOURCE_DETECTION_RUN_ID)" ]; then echo "SOURCE_DETECTION_RUN_ID is required: make tom-v1-pose SOURCE_DETECTION_RUN_ID=<player_detection_run_id>"; exit 1; fi
@@ -232,6 +239,13 @@ tom-v1-pose-main-subjects:
 	@if [ -z "$(SOURCE_DETECTION_RUN_ID)" ]; then echo "SOURCE_DETECTION_RUN_ID is required: make tom-v1-pose-main-subjects SOURCE_DETECTION_RUN_ID=<player_detection_run_id>"; exit 1; fi
 	@if [ -z "$(SOURCE_SUBJECT_RUN_ID)" ]; then echo "SOURCE_SUBJECT_RUN_ID is required: make tom-v1-pose-main-subjects SOURCE_SUBJECT_RUN_ID=<main_subject_run_id>"; exit 1; fi
 	$(PYTHON) -m apps.worker.cli run-real-pose --media-id "$(MEDIA_ID)" --source-detection-run-id "$(SOURCE_DETECTION_RUN_ID)" --source-subject-run-id "$(SOURCE_SUBJECT_RUN_ID)" --weights "$(TOM_V1_MODEL_ROOT)/yolo26x-pose.pt" --model-name tom-v1-yolo26x-pose --model-version v1-local --mode crop_from_player_detection --device "$(YOLO_DEVICE)" --imgsz "$(if $(IMG_SIZE),$(IMG_SIZE),640)" --every-n-frames "$(EVERY_N_FRAMES)" --max-frames "$(MAX_FRAMES)" --conf "$(TOM_V1_POSE_CONF)" --iou "$(IOU)" --viewer-base-url "$(VIEWER_BASE_URL)" --allowed-root "$(TOM_V1_MODEL_ROOT)" $(if $(FRAME_START),--frame-start "$(FRAME_START)",) $(if $(FRAME_END),--frame-end "$(FRAME_END)",) $(if $(filter true,$(FALLBACK_TO_FULL_FRAME)),--fallback-to-full-frame,--no-fallback-to-full-frame) $(if $(filter true,$(PLAN_ONLY)),--plan-only,)
+
+tom-v1-pose-main-tracks:
+	@if [ -z "$(MEDIA_ID)" ]; then echo "MEDIA_ID is required: make tom-v1-pose-main-tracks MEDIA_ID=<media_id> SOURCE_DETECTION_RUN_ID=<player_detection_run_id> SOURCE_SUBJECT_RUN_ID=<main_subject_run_id> SOURCE_TRACK_RUN_ID=<main_player_track_run_id>"; exit 1; fi
+	@if [ -z "$(SOURCE_DETECTION_RUN_ID)" ]; then echo "SOURCE_DETECTION_RUN_ID is required: make tom-v1-pose-main-tracks SOURCE_DETECTION_RUN_ID=<player_detection_run_id>"; exit 1; fi
+	@if [ -z "$(SOURCE_SUBJECT_RUN_ID)" ]; then echo "SOURCE_SUBJECT_RUN_ID is required: make tom-v1-pose-main-tracks SOURCE_SUBJECT_RUN_ID=<main_subject_run_id>"; exit 1; fi
+	@if [ -z "$(SOURCE_TRACK_RUN_ID)" ]; then echo "SOURCE_TRACK_RUN_ID is required: make tom-v1-pose-main-tracks SOURCE_TRACK_RUN_ID=<main_player_track_run_id>"; exit 1; fi
+	$(PYTHON) -m apps.worker.cli run-real-pose --media-id "$(MEDIA_ID)" --source-detection-run-id "$(SOURCE_DETECTION_RUN_ID)" --source-subject-run-id "$(SOURCE_SUBJECT_RUN_ID)" --source-track-run-id "$(SOURCE_TRACK_RUN_ID)" --weights "$(TOM_V1_MODEL_ROOT)/yolo26x-pose.pt" --model-name tom-v1-yolo26x-pose --model-version v1-local --mode crop_from_player_detection --device "$(YOLO_DEVICE)" --imgsz "$(if $(IMG_SIZE),$(IMG_SIZE),640)" --every-n-frames "$(EVERY_N_FRAMES)" --max-frames "$(MAX_FRAMES)" --conf "$(TOM_V1_POSE_CONF)" --iou "$(IOU)" --viewer-base-url "$(VIEWER_BASE_URL)" --allowed-root "$(TOM_V1_MODEL_ROOT)" $(if $(FRAME_START),--frame-start "$(FRAME_START)",) $(if $(FRAME_END),--frame-end "$(FRAME_END)",) $(if $(filter true,$(FALLBACK_TO_FULL_FRAME)),--fallback-to-full-frame,--no-fallback-to-full-frame) $(if $(filter true,$(PLAN_ONLY)),--plan-only,)
 
 court-fixture:
 	@if [ -z "$(MEDIA_ID)" ]; then echo "MEDIA_ID is required: make court-fixture MEDIA_ID=<media_id>"; exit 1; fi

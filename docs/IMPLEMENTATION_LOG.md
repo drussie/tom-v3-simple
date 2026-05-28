@@ -1,5 +1,34 @@
 # TOM v3 Simple - Implementation Log
 
+## Main Player Track Assignment v0
+
+Status: complete when accepted
+
+### Goal
+
+Add persistent candidate visual tracks for the two primary tennis-player subjects so pose can run from stable near/far track candidates instead of only frame-local subject candidates.
+
+### Outcome
+
+The repair bridge adds:
+
+- `main_player_track_candidate` observation spine rows under the existing `tracking` family
+- `main_player_track_assignment_candidate` per-frame assignment rows
+- `near_player_track_candidate` and `far_player_track_candidate` roles
+- lineage from subject candidates, source detections, and track candidates to assignment rows
+- `run-real-pose --source-track-run-id` support for track-filtered crop-mode pose
+- lineage from track assignment candidates to `player_pose_observation` rows
+- replay pose metadata for track candidate ids, roles, and assignment observations
+- Makefile helpers for TOM v1 main player track assignment and track-filtered pose
+
+### Non-goals
+
+- No raw detection mutation or deletion.
+- No confirmed player identity, player names, or server/receiver truth.
+- No ball/player court-space projection.
+- No bounce/hit/in-out/rally/point/scoring.
+- No adjudication or accepted/rejected lifecycle.
+
 ## Main Tennis Player Subject Filter v0
 
 Status: complete when accepted

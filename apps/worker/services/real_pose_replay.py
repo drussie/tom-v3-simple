@@ -55,6 +55,8 @@ REAL_POSE_WARNINGS = {
     "model_output_not_truth": True,
     "no_fixture_fallback": True,
 }
+MAIN_PLAYER_TRACK_OBSERVATION_TYPE = "main_player_track_candidate"
+MAIN_PLAYER_TRACK_ASSIGNMENT_OBSERVATION_TYPE = "main_player_track_assignment_candidate"
 
 
 class RealPoseReplayError(ValueError):
@@ -65,6 +67,8 @@ class RealPoseReplayError(ValueError):
 class PoseSourceDetection:
     detection: Observation
     subject_candidate: Observation | None = None
+    track_assignment: Observation | None = None
+    track_candidate: Observation | None = None
 
 
 def build_real_pose_replay_plan(
@@ -72,6 +76,7 @@ def build_real_pose_replay_plan(
     weights_path: str = "model_assets/pose/<weights_file>.pt",
     source_detection_run_id: str | None = "<source_detection_run_id>",
     source_subject_run_id: str | None = None,
+    source_track_run_id: str | None = None,
     model_name: str | None = None,
     model_version: str = "v0",
     device: str = "auto",
@@ -98,6 +103,8 @@ def build_real_pose_replay_plan(
         command_parts.append(f"--source-detection-run-id {source_detection_run_id}")
     if source_subject_run_id:
         command_parts.append(f"--source-subject-run-id {source_subject_run_id}")
+    if source_track_run_id:
+        command_parts.append(f"--source-track-run-id {source_track_run_id}")
     if model_name:
         command_parts.append(f"--model-name {model_name}")
     if model_version:
@@ -149,11 +156,13 @@ def build_real_pose_replay_plan(
         },
         "source_detection_run_id": source_detection_run_id,
         "source_subject_run_id": source_subject_run_id,
+        "source_track_run_id": source_track_run_id,
         "fallback_to_full_frame": fallback_to_full_frame,
         "replay_url_template": (
             f"{viewer_base_url}/replay/{media_id}?"
             "detectionRunId=<source_detection_run_id>"
             + ("&subjectRunId=<source_subject_run_id>" if source_subject_run_id else "")
+            + ("&mainPlayerTrackRunId=<source_track_run_id>" if source_track_run_id else "")
             + "&poseRunId=<pose_run_id>"
         ),
         "warnings": dict(REAL_POSE_WARNINGS),
@@ -166,6 +175,7 @@ def run_real_pose_replay(
     weights_path: str | None,
     source_detection_run_id: str | None = None,
     source_subject_run_id: str | None = None,
+    source_track_run_id: str | None = None,
     model_name: str | None = None,
     model_version: str = "v0",
     required_sha256: str | None = None,
@@ -192,6 +202,7 @@ def run_real_pose_replay(
         weights_path=weights_path or "model_assets/pose/<weights_file>.pt",
         source_detection_run_id=source_detection_run_id,
         source_subject_run_id=source_subject_run_id,
+        source_track_run_id=source_track_run_id,
         model_name=model_name,
         model_version=model_version,
         device=device,
@@ -273,6 +284,19 @@ def run_real_pose_replay(
                     runtime_probe=runtime_probe,
                     weights_validation=weights_validation.as_dict(),
                 )
+        if normalized_mode == "crop_from_player_detection" and source_track_run_id:
+            track_validation = _validate_source_track_run(
+                session=session,
+                media=media,
+                source_track_run_id=source_track_run_id,
+            )
+            if track_validation.get("ok") is False:
+                return _failed(
+                    track_validation["status"],
+                    track_validation["message"],
+                    runtime_probe=runtime_probe,
+                    weights_validation=weights_validation.as_dict(),
+                )
 
     run: ProcessingRun | None = None
     step: ProcessingStep | None = None
@@ -300,6 +324,7 @@ def run_real_pose_replay(
             mode=normalized_mode,
             source_detection_run_id=source_detection_run_id,
             source_subject_run_id=source_subject_run_id,
+            source_track_run_id=source_track_run_id,
             fallback_to_full_frame=fallback_to_full_frame,
         )
         run = _create_run(
@@ -308,6 +333,7 @@ def run_real_pose_replay(
             runtime_config=runtime_config,
             source_detection_run_id=source_detection_run_id,
             source_subject_run_id=source_subject_run_id,
+            source_track_run_id=source_track_run_id,
             mode=normalized_mode,
         )
         step = _create_step(
@@ -329,6 +355,7 @@ def run_real_pose_replay(
             media=media,
             source_detection_run_id=source_detection_run_id,
             source_subject_run_id=source_subject_run_id,
+            source_track_run_id=source_track_run_id,
             mode=normalized_mode,
             every_n_frames=every_n_frames,
             frame_start=frame_start,
@@ -355,6 +382,9 @@ def run_real_pose_replay(
                 "conf": conf,
                 "iou": iou,
                 "mode": normalized_mode,
+                "source_detection_run_id": source_detection_run_id,
+                "source_subject_run_id": source_subject_run_id,
+                "source_track_run_id": source_track_run_id,
             },
         )
         result = PoseAdapterResult(
@@ -410,6 +440,7 @@ def run_real_pose_replay(
         media_id=media.id,
         source_detection_run_id=source_detection_run_id,
         source_subject_run_id=source_subject_run_id,
+        source_track_run_id=source_track_run_id,
         pose_run_id=run.id,
         tracklet_run_id=_find_tracklet_run_id(session, source_detection_run_id),
     )
@@ -421,6 +452,7 @@ def run_real_pose_replay(
         "pose_run_id": run.id,
         "source_detection_run_id": source_detection_run_id,
         "source_subject_run_id": source_subject_run_id,
+        "source_track_run_id": source_track_run_id,
         "model_registry_id": model.id,
         "runtime_config_id": runtime_config.id,
         "processing_step_id": step.id,
@@ -534,6 +566,46 @@ def _validate_source_subject_run(
     return {"ok": True}
 
 
+def _validate_source_track_run(
+    *,
+    session: Session,
+    media: MediaAsset,
+    source_track_run_id: str,
+) -> dict[str, Any]:
+    source_run = session.get(ProcessingRun, source_track_run_id)
+    if source_run is None:
+        return {
+            "ok": False,
+            "status": "missing_source_track_run",
+            "message": f"source track run not found: {source_track_run_id}",
+        }
+    if source_run.media_id != media.id:
+        return {
+            "ok": False,
+            "status": "source_track_run_media_mismatch",
+            "message": "source track run media_id does not match pose media_id.",
+        }
+    row = session.scalar(
+        select(Observation)
+        .where(
+            Observation.media_id == media.id,
+            Observation.run_id == source_track_run_id,
+            Observation.observation_type == MAIN_PLAYER_TRACK_ASSIGNMENT_OBSERVATION_TYPE,
+        )
+        .limit(1)
+    )
+    if row is None:
+        return {
+            "ok": False,
+            "status": "no_source_track_assignments",
+            "message": (
+                "source track run contains no main_player_track_assignment_candidate "
+                "observations."
+            ),
+        }
+    return {"ok": True}
+
+
 def _register_pose_model(
     *,
     session: Session,
@@ -610,6 +682,7 @@ def _create_runtime_config(
     mode: str,
     source_detection_run_id: str | None,
     source_subject_run_id: str | None,
+    source_track_run_id: str | None,
     fallback_to_full_frame: bool,
 ) -> RuntimeConfig:
     payload = default_pose_runtime_config_payload(
@@ -637,8 +710,12 @@ def _create_runtime_config(
             "mode": mode,
             "source_detection_run_id": source_detection_run_id,
             "source_subject_run_id": source_subject_run_id,
+            "source_track_run_id": source_track_run_id,
             "source_subject_filter": (
                 "main_tennis_subject_filter_v0" if source_subject_run_id else None
+            ),
+            "source_track_assignment": (
+                "main_player_track_assignment_v0" if source_track_run_id else None
             ),
             "fallback_to_full_frame": fallback_to_full_frame,
             "real_model_output": True,
@@ -667,6 +744,7 @@ def _create_run(
     runtime_config: RuntimeConfig,
     source_detection_run_id: str | None,
     source_subject_run_id: str | None,
+    source_track_run_id: str | None,
     mode: str,
 ) -> ProcessingRun:
     now = datetime.now(UTC)
@@ -682,8 +760,12 @@ def _create_run(
             "source_runtime": REAL_POSE_SOURCE_RUNTIME,
             "source_detection_run_id": source_detection_run_id,
             "source_subject_run_id": source_subject_run_id,
+            "source_track_run_id": source_track_run_id,
             "source_subject_filter": (
                 "main_tennis_subject_filter_v0" if source_subject_run_id else None
+            ),
+            "source_track_assignment": (
+                "main_player_track_assignment_v0" if source_track_run_id else None
             ),
             "mode": mode,
             "evidence_source": "real_pose_model_output",
@@ -738,6 +820,7 @@ def _build_frame_results(
     media: MediaAsset,
     source_detection_run_id: str | None,
     source_subject_run_id: str | None,
+    source_track_run_id: str | None,
     mode: str,
     every_n_frames: int,
     frame_start: int | None,
@@ -752,6 +835,7 @@ def _build_frame_results(
             media=media,
             source_detection_run_id=source_detection_run_id,
             source_subject_run_id=source_subject_run_id,
+            source_track_run_id=source_track_run_id,
             every_n_frames=every_n_frames,
             frame_start=frame_start,
             frame_end=frame_end,
@@ -776,6 +860,7 @@ def _crop_frame_results(
     media: MediaAsset,
     source_detection_run_id: str | None,
     source_subject_run_id: str | None,
+    source_track_run_id: str | None,
     every_n_frames: int,
     frame_start: int | None,
     frame_end: int | None,
@@ -788,6 +873,7 @@ def _crop_frame_results(
         media=media,
         source_detection_run_id=source_detection_run_id,
         source_subject_run_id=source_subject_run_id,
+        source_track_run_id=source_track_run_id,
         every_n_frames=every_n_frames,
         frame_start=frame_start,
         frame_end=frame_end,
@@ -834,8 +920,12 @@ def _crop_frame_results(
         "sampled_frames": frame_numbers,
         "source_detection_run_id": source_detection_run_id,
         "source_subject_run_id": source_subject_run_id,
+        "source_track_run_id": source_track_run_id,
         "source_subject_filter": (
             "main_tennis_subject_filter_v0" if source_subject_run_id else None
+        ),
+        "source_track_assignment": (
+            "main_player_track_assignment_v0" if source_track_run_id else None
         ),
     }
 
@@ -886,11 +976,23 @@ def _source_pose_detections(
     media: MediaAsset,
     source_detection_run_id: str | None,
     source_subject_run_id: str | None,
+    source_track_run_id: str | None,
     every_n_frames: int,
     frame_start: int | None,
     frame_end: int | None,
     max_frames: int | None,
 ) -> list[PoseSourceDetection]:
+    if source_track_run_id:
+        return _source_track_assignment_detections(
+            session=session,
+            media=media,
+            source_detection_run_id=source_detection_run_id,
+            source_track_run_id=source_track_run_id,
+            every_n_frames=every_n_frames,
+            frame_start=frame_start,
+            frame_end=frame_end,
+            max_frames=max_frames,
+        )
     if source_subject_run_id:
         return _source_subject_candidate_detections(
             session=session,
@@ -914,6 +1016,107 @@ def _source_pose_detections(
             max_frames=max_frames,
         )
     ]
+
+
+def _source_track_assignment_detections(
+    *,
+    session: Session,
+    media: MediaAsset,
+    source_detection_run_id: str | None,
+    source_track_run_id: str,
+    every_n_frames: int,
+    frame_start: int | None,
+    frame_end: int | None,
+    max_frames: int | None,
+) -> list[PoseSourceDetection]:
+    if source_detection_run_id is None:
+        raise RealPoseReplayError("source detection run id is required with a track run")
+    if every_n_frames <= 0:
+        raise RealPoseReplayError("every_n_frames must be greater than 0")
+    resolved_start = 0 if frame_start is None else int(frame_start)
+    resolved_end = None if frame_end is None else int(frame_end)
+    if resolved_start < 0:
+        raise RealPoseReplayError("frame_start must be greater than or equal to 0")
+    if resolved_end is not None and resolved_end < 0:
+        raise RealPoseReplayError("frame_end must be greater than or equal to 0")
+    if resolved_end is not None and resolved_start > resolved_end:
+        raise RealPoseReplayError("frame_start must be less than or equal to frame_end")
+
+    query = (
+        select(Observation)
+        .where(
+            Observation.media_id == media.id,
+            Observation.run_id == source_track_run_id,
+            Observation.observation_type == MAIN_PLAYER_TRACK_ASSIGNMENT_OBSERVATION_TYPE,
+            Observation.frame_start.is_not(None),
+            Observation.timestamp_start_ms.is_not(None),
+        )
+        .order_by(Observation.frame_start, Observation.id)
+    )
+    query = query.where(Observation.frame_start >= resolved_start)
+    if resolved_end is not None:
+        query = query.where(Observation.frame_start <= resolved_end)
+    assignments = list(session.scalars(query).all())
+    if every_n_frames > 1:
+        assignments = [
+            assignment
+            for assignment in assignments
+            if assignment.frame_start is not None
+            and (int(assignment.frame_start) - resolved_start) % every_n_frames == 0
+        ]
+    if max_frames is not None:
+        allowed_frames = set(
+            sorted({int(assignment.frame_start) for assignment in assignments})[
+                : max(0, int(max_frames))
+            ]
+        )
+        assignments = [
+            assignment
+            for assignment in assignments
+            if assignment.frame_start is not None
+            and int(assignment.frame_start) in allowed_frames
+        ]
+
+    sources: list[PoseSourceDetection] = []
+    for assignment in assignments:
+        payload = assignment.payload_jsonb or {}
+        detection_id = str(payload.get("source_detection_observation_id") or "")
+        if not detection_id:
+            continue
+        detection = session.get(Observation, detection_id)
+        if detection is None:
+            continue
+        if detection.run_id != source_detection_run_id:
+            continue
+        if detection.observation_type != "player_detection":
+            continue
+        subject_candidate = None
+        subject_candidate_id = str(payload.get("source_subject_candidate_observation_id") or "")
+        if subject_candidate_id:
+            candidate = session.get(Observation, subject_candidate_id)
+            if (
+                candidate is not None
+                and candidate.observation_type == "main_player_subject_candidate"
+            ):
+                subject_candidate = candidate
+        track_candidate = None
+        track_candidate_id = str(payload.get("source_track_candidate_observation_id") or "")
+        if track_candidate_id:
+            candidate = session.get(Observation, track_candidate_id)
+            if (
+                candidate is not None
+                and candidate.observation_type == MAIN_PLAYER_TRACK_OBSERVATION_TYPE
+            ):
+                track_candidate = candidate
+        sources.append(
+            PoseSourceDetection(
+                detection=detection,
+                subject_candidate=subject_candidate,
+                track_assignment=assignment,
+                track_candidate=track_candidate,
+            )
+        )
+    return sources
 
 
 def _source_subject_candidate_detections(
@@ -1116,11 +1319,18 @@ def _frame_result_with_source_context(
     detection = source.detection
     subject_candidate = source.subject_candidate
     subject_payload = subject_candidate.payload_jsonb if subject_candidate is not None else {}
-    association_method = (
-        "main_tennis_subject_filter_v0_crop_from_player_detection"
-        if subject_candidate is not None
-        else "crop_from_player_detection"
+    track_assignment = source.track_assignment
+    track_payload = track_assignment.payload_jsonb if track_assignment is not None else {}
+    track_candidate = source.track_candidate
+    track_candidate_payload = (
+        track_candidate.payload_jsonb if track_candidate is not None else {}
     )
+    if track_assignment is not None:
+        association_method = "main_player_track_assignment_v0_crop_from_player_track_candidate"
+    elif subject_candidate is not None:
+        association_method = "main_tennis_subject_filter_v0_crop_from_player_detection"
+    else:
+        association_method = "crop_from_player_detection"
     frame_result = _frame_result_with_defaults(
         raw_result,
         frame_number=frame_number,
@@ -1152,18 +1362,55 @@ def _frame_result_with_source_context(
                 None if subject_candidate is None else subject_candidate.run_id
             ),
             "subject_role_candidate": subject_payload.get("subject_role_candidate"),
+            "track_assignment_observation_id": (
+                None if track_assignment is None else track_assignment.id
+            ),
+            "track_candidate_observation_id": (
+                None if track_candidate is None else track_candidate.id
+            ),
+            "source_track_run_id": (
+                None if track_assignment is None else track_assignment.run_id
+            ),
+            "track_candidate_id": track_payload.get("track_candidate_id")
+            or track_candidate_payload.get("track_candidate_id"),
+            "track_role_candidate": track_payload.get("track_role_candidate")
+            or track_candidate_payload.get("track_role_candidate"),
             "selection_method": subject_payload.get("selection_method"),
             "selection_score": subject_payload.get("selection_score"),
             "candidate_subject_only": subject_candidate is not None,
+            "candidate_track_only": track_assignment is not None,
             "not_identity_truth": subject_candidate is not None,
             "association_status": "candidate",
             "association_method": association_method,
             "association_confidence": (
-                subject_payload.get("selection_score")
+                track_payload.get("assignment_score")
+                if track_assignment is not None
+                else subject_payload.get("selection_score")
                 if subject_candidate is not None
                 else detection.confidence
             ),
+            "assignment_method": track_payload.get("assignment_method"),
+            "assignment_score": (
+                track_payload.get("assignment_score")
+                if track_assignment is not None
+                else None
+            ),
+            "source_detection_observation_id": detection.id,
         }
+        if track_assignment is not None:
+            pose_dict["subject_context"].update(
+                {
+                    "not_identity_truth": True,
+                    "observation_only": True,
+                    "no_adjudication": True,
+                }
+            )
+        else:
+            pose_dict["subject_context"].update(
+                {
+                    "not_identity_truth": subject_candidate is not None,
+                }
+            )
         poses.append(pose_dict)
     frame_result["poses"] = poses
     return frame_result
@@ -1365,6 +1612,77 @@ def _lineage_for_pose(
                 },
             )
         )
+    track_assignment_id = subject_context.get("track_assignment_observation_id")
+    if track_assignment_id:
+        track_assignment = session.get(Observation, str(track_assignment_id))
+        if track_assignment is None:
+            raise RealPoseReplayError(
+                f"source track assignment observation not found: {track_assignment_id}"
+            )
+        if track_assignment.observation_type != MAIN_PLAYER_TRACK_ASSIGNMENT_OBSERVATION_TYPE:
+            raise RealPoseReplayError(
+                "pose source track assignment must be a "
+                "main_player_track_assignment_candidate observation: "
+                f"{track_assignment_id}"
+            )
+        lineage.append(
+            ObservationLineageCreate(
+                parent_observation_id=track_assignment.id,
+                relationship_type="pose_from_main_player_track_assignment",
+                processing_step_id=step.id,
+                payload_jsonb={
+                    "source_observation_type": track_assignment.observation_type,
+                    "source_track_run_id": track_assignment.run_id,
+                    "source_runtime": REAL_POSE_SOURCE_RUNTIME,
+                    "track_candidate_id": subject_context.get("track_candidate_id"),
+                    "track_role_candidate": subject_context.get("track_role_candidate"),
+                    "assignment_method": subject_context.get("assignment_method"),
+                    "assignment_score": subject_context.get("assignment_score"),
+                    "candidate_track_only": True,
+                    "not_identity_truth": True,
+                    "observation_only": True,
+                    "no_adjudication": True,
+                    "frame_number": pose.frame_number,
+                    "association_status": pose.association_status,
+                    "association_method": pose.association_method,
+                    "frame_time_owner": "media_indexing",
+                },
+            )
+        )
+    track_candidate_id = subject_context.get("track_candidate_observation_id")
+    if track_candidate_id:
+        track_candidate = session.get(Observation, str(track_candidate_id))
+        if track_candidate is None:
+            raise RealPoseReplayError(
+                f"source track candidate observation not found: {track_candidate_id}"
+            )
+        if track_candidate.observation_type != MAIN_PLAYER_TRACK_OBSERVATION_TYPE:
+            raise RealPoseReplayError(
+                "pose source track candidate must be a main_player_track_candidate "
+                f"observation: {track_candidate_id}"
+            )
+        lineage.append(
+            ObservationLineageCreate(
+                parent_observation_id=track_candidate.id,
+                relationship_type="pose_from_main_player_track_candidate",
+                processing_step_id=step.id,
+                payload_jsonb={
+                    "source_observation_type": track_candidate.observation_type,
+                    "source_track_run_id": track_candidate.run_id,
+                    "source_runtime": REAL_POSE_SOURCE_RUNTIME,
+                    "track_candidate_id": subject_context.get("track_candidate_id"),
+                    "track_role_candidate": subject_context.get("track_role_candidate"),
+                    "candidate_track_only": True,
+                    "not_identity_truth": True,
+                    "observation_only": True,
+                    "no_adjudication": True,
+                    "frame_number": pose.frame_number,
+                    "association_status": pose.association_status,
+                    "association_method": pose.association_method,
+                    "frame_time_owner": "media_indexing",
+                },
+            )
+        )
     return lineage
 
 
@@ -1401,9 +1719,21 @@ def _pose_payload(
         ),
         "source_subject_run_id": subject_context.get("source_subject_run_id"),
         "subject_role_candidate": subject_context.get("subject_role_candidate"),
+        "source_track_run_id": subject_context.get("source_track_run_id"),
+        "track_assignment_observation_id": subject_context.get(
+            "track_assignment_observation_id"
+        ),
+        "track_candidate_observation_id": subject_context.get(
+            "track_candidate_observation_id"
+        ),
+        "track_candidate_id": subject_context.get("track_candidate_id"),
+        "track_role_candidate": subject_context.get("track_role_candidate"),
+        "assignment_method": subject_context.get("assignment_method"),
+        "assignment_score": subject_context.get("assignment_score"),
         "selection_method": subject_context.get("selection_method"),
         "selection_score": subject_context.get("selection_score"),
         "candidate_subject_only": bool(subject_context.get("candidate_subject_only")),
+        "candidate_track_only": bool(subject_context.get("candidate_track_only")),
         "not_identity_truth": bool(subject_context.get("not_identity_truth")),
         "subject_tracklet_id": pose.subject_tracklet_id,
         "subject_track_point_id": pose.subject_track_point_id,
@@ -1497,6 +1827,7 @@ def _replay_url(
     media_id: str,
     source_detection_run_id: str | None,
     source_subject_run_id: str | None,
+    source_track_run_id: str | None,
     pose_run_id: str,
     tracklet_run_id: str | None,
 ) -> str:
@@ -1507,6 +1838,8 @@ def _replay_url(
         params.append(f"trackletRunId={tracklet_run_id}")
     if source_subject_run_id:
         params.append(f"subjectRunId={source_subject_run_id}")
+    if source_track_run_id:
+        params.append(f"mainPlayerTrackRunId={source_track_run_id}")
     params.append(f"poseRunId={pose_run_id}")
     return f"{viewer_base_url}/replay/{media_id}?{'&'.join(params)}"
 

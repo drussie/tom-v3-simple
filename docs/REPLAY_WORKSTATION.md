@@ -62,6 +62,8 @@ The TOM v1 model assets bridge does not add replay architecture. It lets local T
 
 The main tennis-player subject filter can reduce TOM v1 player-detection pose sources before replay. It persists `main_player_subject_candidate` rows for `near_player_candidate` and `far_player_candidate` source candidates, then real pose can consume that `source_subject_run_id`. Replay then shows cleaner pose evidence because pose was only run on selected candidates. This remains observation-only and does not confirm player identity.
 
+Main player track assignment can further reduce frame-local subject noise by persisting `main_player_track_candidate` rows for `near_player_track_candidate` and `far_player_track_candidate`, plus per-frame `main_player_track_assignment_candidate` rows. Real pose can consume `source_track_run_id` so keypoint evidence is generated only from detections attached to those visual track candidates. Replay pose detail shows the track candidate id/role when available. These are still candidate visual tracks, not player identity truth.
+
 Dense real model-output runs can produce visually noisy overlays. The replay workstation provides display-only controls for detection and tracklet evidence:
 
 - Current only
@@ -576,6 +578,18 @@ For TOM v1 filtered pose replay, first run the main subject filter:
 ```
 
 Then run pose with `--source-subject-run-id <main_subject_run_id>`. Raw detections remain inspectable; the subject run only controls pose source selection.
+
+For TOM v1 main player track-filtered pose replay, assign visual track candidates after the subject filter:
+
+```bash
+.venv/bin/python -m apps.worker.cli assign-main-player-tracks \
+  --media-id <media_id> \
+  --source-detection-run-id <player_real_detection_run_id> \
+  --source-subject-run-id <main_subject_run_id> \
+  --max-frames 214
+```
+
+Then run pose with `--source-track-run-id <main_player_track_run_id>` in addition to the detection and subject run ids. Replay pose details show the candidate visual track context when present. This does not confirm player names, identity, side, server/receiver role, or tennis events.
 
 For court geometry evidence replay:
 

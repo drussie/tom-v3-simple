@@ -271,6 +271,7 @@ export interface ReplayAvailableRuns {
   court: ReplayRunSummary[];
   homography: ReplayRunSummary[];
   projection_diagnostic: ReplayRunSummary[];
+  main_player_track: ReplayRunSummary[];
 }
 
 export interface ReplayInfo {
@@ -384,6 +385,19 @@ export interface ReplayPoseSubjectContext {
   association_status: string;
   association_method: string | null;
   association_confidence: number | null;
+  source_subject_run_id?: string | null;
+  subject_candidate_observation_id?: string | null;
+  subject_role_candidate?: string | null;
+  source_track_run_id?: string | null;
+  track_assignment_observation_id?: string | null;
+  track_candidate_observation_id?: string | null;
+  track_candidate_id?: string | null;
+  track_role_candidate?: string | null;
+  assignment_method?: string | null;
+  assignment_score?: number | null;
+  candidate_subject_only?: boolean;
+  candidate_track_only?: boolean;
+  not_identity_truth?: boolean;
 }
 
 export interface ReplayPoseOverlay {
@@ -405,6 +419,17 @@ export interface ReplayPoseOverlay {
   keypoints: ReplayPoseKeypoint[];
   edges: [string, string][];
   subject_context: ReplayPoseSubjectContext;
+  source_track_run_id?: string | null;
+  track_assignment_observation_id?: string | null;
+  track_candidate_observation_id?: string | null;
+  track_candidate_id?: string | null;
+  track_role_candidate?: string | null;
+  candidate_track_only?: boolean;
+  source_subject_run_id?: string | null;
+  subject_candidate_observation_id?: string | null;
+  subject_role_candidate?: string | null;
+  candidate_subject_only?: boolean;
+  not_identity_truth?: boolean;
   source_language: "pose keypoint evidence";
   evidence_source?: "real_pose_model_output" | "fixture_demo" | "persisted_evidence" | string;
   source_label?: string | null;
@@ -649,6 +674,17 @@ export interface ReplayDetectionTimelineItem {
   runtime_config_id?: string | null;
   is_fixture?: boolean;
   is_real_model_output?: boolean;
+  source_track_run_id?: string | null;
+  track_assignment_observation_id?: string | null;
+  track_candidate_observation_id?: string | null;
+  track_candidate_id?: string | null;
+  track_role_candidate?: string | null;
+  candidate_track_only?: boolean;
+  source_subject_run_id?: string | null;
+  subject_candidate_observation_id?: string | null;
+  subject_role_candidate?: string | null;
+  candidate_subject_only?: boolean;
+  not_identity_truth?: boolean;
 }
 
 export interface ReplayTrackletTimelineItem {
@@ -696,6 +732,17 @@ export interface ReplayPoseTimelineItem {
   runtime_config_id?: string | null;
   is_fixture?: boolean;
   is_real_model_output?: boolean;
+  source_track_run_id?: string | null;
+  track_assignment_observation_id?: string | null;
+  track_candidate_observation_id?: string | null;
+  track_candidate_id?: string | null;
+  track_role_candidate?: string | null;
+  candidate_track_only?: boolean;
+  source_subject_run_id?: string | null;
+  subject_candidate_observation_id?: string | null;
+  subject_role_candidate?: string | null;
+  candidate_subject_only?: boolean;
+  not_identity_truth?: boolean;
 }
 
 export interface ReplayAnnotationTimelineItem {

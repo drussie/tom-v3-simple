@@ -1156,6 +1156,10 @@ function AvailableRunsPanel({ replayInfo }: { replayInfo: ReplayInfo }) {
       <div className="panel-body run-group-list">
         <RunGroup title="Detection observations" runs={replayInfo.available_runs.detection} />
         <RunGroup title="Tracklet candidates" runs={replayInfo.available_runs.tracklet} />
+        <RunGroup
+          title="Main player track candidates"
+          runs={replayInfo.available_runs.main_player_track}
+        />
         <RunGroup title="Pose observations" runs={replayInfo.available_runs.pose} />
         <RunGroup title="Court evidence" runs={replayInfo.available_runs.court} />
         <RunGroup title="Homography candidates" runs={replayInfo.available_runs.homography} />
@@ -1427,12 +1431,25 @@ function SelectedEvidencePanel({
           label="keypoints"
           value={`${item.keypoints_present_count} present / ${item.keypoints_missing_count} missing`}
         />
+        {item.track_candidate_id ? (
+          <DetailRow label="track candidate" value={item.track_candidate_id} />
+        ) : null}
+        {item.track_role_candidate ? (
+          <DetailRow label="track role candidate" value={item.track_role_candidate} />
+        ) : null}
+        {item.track_assignment_observation_id ? (
+          <DetailRow
+            label="track assignment observation"
+            value={item.track_assignment_observation_id}
+          />
+        ) : null}
         <a className="quiet-link" href={`/runs/${item.run_id}`}>
           Open source evidence run
         </a>
         <p className="evidence-note">
-          Pose observation selected from the evidence timeline. Keypoint evidence only; it does not
-          classify strokes, movement, or biomechanics.
+          Pose observation selected from the evidence timeline. Track-linked poses are candidate
+          visual subject evidence only; they do not establish identity, strokes, movement, or
+          biomechanics.
         </p>
       </EvidencePanel>
     );
@@ -1666,12 +1683,24 @@ function SelectedEvidencePanel({
         value={`${pose.subject_context.subject_ref_type} · ${pose.subject_context.association_status}`}
       />
       <DetailRow label="association method" value={pose.subject_context.association_method ?? "n/a"} />
+      {pose.subject_context.track_candidate_id ? (
+        <DetailRow label="track candidate" value={pose.subject_context.track_candidate_id} />
+      ) : null}
+      {pose.subject_context.track_role_candidate ? (
+        <DetailRow label="track role candidate" value={pose.subject_context.track_role_candidate} />
+      ) : null}
+      {pose.subject_context.track_assignment_observation_id ? (
+        <DetailRow
+          label="track assignment observation"
+          value={pose.subject_context.track_assignment_observation_id}
+        />
+      ) : null}
       <a className="quiet-link" href={`/runs/${pose.run_id}`}>
         Open source evidence run
       </a>
       <p className="evidence-note">
-        Pose observation. Keypoint evidence only; it does not classify strokes, movement, or
-        biomechanics.
+        Pose observation. Track-linked poses are candidate visual subject evidence only; they do not
+        establish identity, strokes, movement, or biomechanics.
       </p>
     </EvidencePanel>
   );
@@ -1828,6 +1857,9 @@ function formatReplayRunSourceLabel(run: ReplayRunSummary): string {
   ) {
     return "real-detection-derived tracklet candidates";
   }
+  if (run.evidence_source === "main_player_track_assignment") {
+    return "main player visual track candidates";
+  }
   if (run.evidence_source === "fixture_derived_tracklet") {
     return "fixture-derived tracklet candidates";
   }
@@ -1866,6 +1898,9 @@ function sourceDisplayLabel(
 function poseSourceDisplayLabel(
   item: ReplayPoseOverlay | Extract<ReplayTimelineItem, { item_type: "pose" }>
 ): string {
+  if (item.candidate_track_only || item.track_candidate_id) {
+    return "Main player track candidate pose evidence";
+  }
   if (item.evidence_source === "real_pose_model_output" || item.real_model_output) {
     return "Real pose model output";
   }

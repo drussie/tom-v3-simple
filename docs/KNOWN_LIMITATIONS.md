@@ -21,6 +21,7 @@ This registry makes TOM v3 Simple boundaries explicit.
 - Real pose quality depends on the chosen pose model, source media, source player detections or frame sampling, device, and confidence settings.
 - Real pose observations are keypoint evidence; they do not establish movement, stroke, serve, split-step, biomechanics, or body-state conclusions.
 - Main tennis-player subject filtering selects `near_player_candidate` and `far_player_candidate` pose source candidates only; it does not confirm player identity or delete raw detections.
+- Main player track assignment groups those frame-local candidates into `near_player_track_candidate` and `far_player_track_candidate` visual track candidates only; it does not confirm identity, player names, server/receiver role, side changes, or track truth.
 - Fixture pose output is demo evidence only.
 - Blueprint 8A adds court/camera/homography schema and typed persistence contracts.
 - Blueprint 8B adds deterministic fixture court keypoint, line, and camera/view evidence only.
@@ -46,6 +47,7 @@ This registry makes TOM v3 Simple boundaries explicit.
 - Pose observations may be associated with the wrong subject candidate.
 - Real crop-mode pose observations inherit the source player detection limitations.
 - Filtered crop-mode pose observations also inherit the main subject filter heuristic limitations.
+- Track-filtered crop-mode pose observations also inherit main player track assignment limitations, including possible gaps or wrong temporary visual assignments.
 - Full-frame real pose observations may be unassociated with a source player detection.
 - Missing keypoints are recorded as missing evidence; they are not inferred.
 - Review annotations do not mutate observations.

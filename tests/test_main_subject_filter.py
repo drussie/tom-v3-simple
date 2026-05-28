@@ -19,6 +19,7 @@ from tom_v3_storage.media_indexer import index_media_file
 from tom_v3_video.probe import VideoProbeResult
 
 from apps.api.services.replay import pose_overlay_item_from_row, pose_timeline_item_from_row
+from apps.worker.services.main_player_track_assignment import assign_main_player_tracks
 from apps.worker.services.main_subject_filter import select_main_player_subjects
 from apps.worker.services.real_detection_replay import run_real_detection_replay
 from apps.worker.services.real_pose_replay import run_real_pose_replay
@@ -301,6 +302,190 @@ def test_real_pose_can_consume_main_subject_run_and_preserve_candidate_lineage(
     assert {row.relationship_type for row in lineage} == {
         "pose_from_subject_detection_candidate",
         "pose_from_main_subject_candidate",
+    }
+
+
+def test_main_player_track_assignment_persists_candidate_tracks_and_lineage(
+    db_session: Session,
+    indexed_media,
+    detection_weights_path: Path,
+) -> None:
+    detection = create_noisy_player_detection_run(
+        session=db_session,
+        media_id=indexed_media.id,
+        weights_path=detection_weights_path,
+    )
+    subject_result = select_main_player_subjects(
+        session=db_session,
+        media_id=indexed_media.id,
+        source_detection_run_id=str(detection["detection_run_id"]),
+        max_frames=3,
+    )
+
+    result = assign_main_player_tracks(
+        session=db_session,
+        media_id=indexed_media.id,
+        source_detection_run_id=str(detection["detection_run_id"]),
+        source_subject_run_id=str(subject_result["main_subject_run_id"]),
+        max_frames=3,
+    )
+
+    assert result["ok"] is True
+    assert result["tracks"] == {
+        "near_player_track_candidate": 1,
+        "far_player_track_candidate": 1,
+        "total": 2,
+    }
+    assert result["assignments"] == {
+        "near_player_track_assignment_candidate": 2,
+        "far_player_track_assignment_candidate": 1,
+        "total": 3,
+    }
+    assert result["warnings"]["not_identity_truth"] is True
+
+    track_observations = db_session.scalars(
+        select(Observation).where(
+            Observation.run_id == result["main_player_track_run_id"],
+            Observation.observation_type == "main_player_track_candidate",
+        )
+    ).all()
+    assert len(track_observations) == 2
+    assert {
+        observation.payload_jsonb["track_role_candidate"]
+        for observation in track_observations
+    } == {"near_player_track_candidate", "far_player_track_candidate"}
+    for observation in track_observations:
+        assert observation.observation_family == "tracking"
+        assert observation.payload_jsonb["candidate_track_only"] is True
+        assert observation.payload_jsonb["not_identity_truth"] is True
+        assert observation.payload_jsonb["observation_only"] is True
+
+    assignment_observations = db_session.scalars(
+        select(Observation).where(
+            Observation.run_id == result["main_player_track_run_id"],
+            Observation.observation_type == "main_player_track_assignment_candidate",
+        )
+    ).all()
+    assert len(assignment_observations) == 3
+    assert max(
+        sum(
+            1
+            for observation in assignment_observations
+            if observation.frame_start == frame
+        )
+        for frame in {observation.frame_start for observation in assignment_observations}
+    ) <= 2
+    for observation in assignment_observations:
+        assert observation.payload_jsonb["source_subject_candidate_observation_id"]
+        assert observation.payload_jsonb["source_detection_observation_id"]
+        assert observation.payload_jsonb["source_track_candidate_observation_id"]
+        assert observation.payload_jsonb["candidate_track_only"] is True
+        assert observation.payload_jsonb["not_identity_truth"] is True
+
+    lineage = db_session.scalars(
+        select(ObservationLineage).where(
+            ObservationLineage.child_observation_id.in_(
+                [observation.id for observation in assignment_observations]
+            )
+        )
+    ).all()
+    assert len(lineage) == 9
+    assert {row.relationship_type for row in lineage} == {
+        "main_player_track_assignment_from_subject_candidate",
+        "main_player_track_assignment_from_player_detection",
+        "main_player_track_assignment_for_track_candidate",
+    }
+
+
+def test_real_pose_can_consume_main_player_track_run_and_preserve_track_context(
+    db_session: Session,
+    indexed_media,
+    detection_weights_path: Path,
+    pose_weights_path: Path,
+) -> None:
+    detection = create_noisy_player_detection_run(
+        session=db_session,
+        media_id=indexed_media.id,
+        weights_path=detection_weights_path,
+    )
+    subject_result = select_main_player_subjects(
+        session=db_session,
+        media_id=indexed_media.id,
+        source_detection_run_id=str(detection["detection_run_id"]),
+        max_frames=3,
+    )
+    track_result = assign_main_player_tracks(
+        session=db_session,
+        media_id=indexed_media.id,
+        source_detection_run_id=str(detection["detection_run_id"]),
+        source_subject_run_id=str(subject_result["main_subject_run_id"]),
+        max_frames=3,
+    )
+
+    pose_result = run_real_pose_replay(
+        session=db_session,
+        media_id=indexed_media.id,
+        weights_path=str(pose_weights_path),
+        source_detection_run_id=str(detection["detection_run_id"]),
+        source_subject_run_id=str(subject_result["main_subject_run_id"]),
+        source_track_run_id=str(track_result["main_player_track_run_id"]),
+        model_name="test-real-pose",
+        model_version="track-assignment-test",
+        device="cpu",
+        every_n_frames=1,
+        max_frames=3,
+        allowed_roots=[str(pose_weights_path.parent)],
+        probe_runtime=runtime_ok,
+        pose_result_provider=FakePoseResultProvider(),
+    )
+
+    assert pose_result["ok"] is True
+    assert pose_result["source_track_run_id"] == track_result["main_player_track_run_id"]
+    assert pose_result["observations"] == {"player_pose_observation": 3, "total": 3}
+    assert pose_result["summary"]["source_track_assignment"] == (
+        "main_player_track_assignment_v0"
+    )
+
+    poses = db_session.scalars(select(PoseObservation)).all()
+    assert len(poses) == 3
+    assert {pose.association_method for pose in poses} == {
+        "main_player_track_assignment_v0_crop_from_player_track_candidate"
+    }
+    overlay_item = pose_overlay_item_from_row(poses[0])
+    assert overlay_item["subject_context"]["candidate_track_only"] is True
+    assert overlay_item["subject_context"]["not_identity_truth"] is True
+    assert overlay_item["subject_context"]["track_candidate_id"]
+    assert overlay_item["track_role_candidate"] in {
+        "near_player_track_candidate",
+        "far_player_track_candidate",
+    }
+    timeline_item = pose_timeline_item_from_row(poses[0])
+    assert timeline_item is not None
+    assert timeline_item["candidate_track_only"] is True
+
+    pose_observations = db_session.scalars(
+        select(Observation).where(Observation.observation_type == "player_pose_observation")
+    ).all()
+    for observation in pose_observations:
+        assert observation.payload_jsonb["track_assignment_observation_id"]
+        assert observation.payload_jsonb["track_candidate_observation_id"]
+        assert observation.payload_jsonb["track_candidate_id"]
+        assert observation.payload_jsonb["candidate_track_only"] is True
+        assert observation.payload_jsonb["not_identity_truth"] is True
+
+    lineage = db_session.scalars(
+        select(ObservationLineage).where(
+            ObservationLineage.child_observation_id.in_(
+                [observation.id for observation in pose_observations]
+            )
+        )
+    ).all()
+    assert len(lineage) == 12
+    assert {row.relationship_type for row in lineage} == {
+        "pose_from_subject_detection_candidate",
+        "pose_from_main_subject_candidate",
+        "pose_from_main_player_track_assignment",
+        "pose_from_main_player_track_candidate",
     }
 
 

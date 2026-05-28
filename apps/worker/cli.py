@@ -31,6 +31,7 @@ from apps.worker.services.frame_artifacts import extract_frame_artifacts_for_run
 from apps.worker.services.gameplay_adapter import run_gameplay_adapter
 from apps.worker.services.homography_candidate_builder import build_homography_candidates
 from apps.worker.services.local_demo import run_local_fixture_demo
+from apps.worker.services.main_player_track_assignment import assign_main_player_tracks
 from apps.worker.services.main_subject_filter import select_main_player_subjects
 from apps.worker.services.media_indexer import index_media
 from apps.worker.services.pose_adapter import run_pose_adapter
@@ -472,6 +473,11 @@ def main() -> None:
     real_pose_parser.add_argument("--weights", required=True)
     real_pose_parser.add_argument("--source-detection-run-id")
     real_pose_parser.add_argument("--source-subject-run-id")
+    real_pose_parser.add_argument(
+        "--source-track-run-id",
+        "--source-main-player-track-run-id",
+        dest="source_track_run_id",
+    )
     real_pose_parser.add_argument("--model-name")
     real_pose_parser.add_argument("--model-version", default="v0")
     real_pose_parser.add_argument("--required-sha256")
@@ -527,6 +533,27 @@ def main() -> None:
     )
     main_subject_parser.add_argument("--skip-create-db", action="store_true")
     main_subject_parser.set_defaults(handler=_handle_select_main_player_subjects)
+
+    main_track_parser = subcommands.add_parser(
+        "assign-main-player-tracks",
+        help="Assign near/far main tennis-player track candidates from subject candidates.",
+    )
+    main_track_parser.add_argument("--media-id", required=True)
+    main_track_parser.add_argument("--source-detection-run-id", required=True)
+    main_track_parser.add_argument("--source-subject-run-id", required=True)
+    main_track_parser.add_argument("--run-name", default="main-player-track-assignment-v0")
+    main_track_parser.add_argument("--every-n-frames", type=int, default=1)
+    main_track_parser.add_argument("--frame-start", type=int)
+    main_track_parser.add_argument("--frame-end", type=int)
+    main_track_parser.add_argument("--max-frames", type=int, default=214)
+    main_track_parser.add_argument("--viewer-base-url", default="http://127.0.0.1:3000")
+    main_track_parser.add_argument(
+        "--plan-only",
+        action="store_true",
+        help="Print the main player track assignment plan without touching observations.",
+    )
+    main_track_parser.add_argument("--skip-create-db", action="store_true")
+    main_track_parser.set_defaults(handler=_handle_assign_main_player_tracks)
 
     fixture_court_parser = subcommands.add_parser(
         "run-fixture-court",
@@ -1014,6 +1041,7 @@ def _handle_run_real_pose(
         weights_path=args.weights,
         source_detection_run_id=args.source_detection_run_id,
         source_subject_run_id=getattr(args, "source_subject_run_id", None),
+        source_track_run_id=getattr(args, "source_track_run_id", None),
         model_name=args.model_name,
         model_version=args.model_version,
         required_sha256=args.required_sha256,
@@ -1041,6 +1069,25 @@ def _handle_select_main_player_subjects(
         session=session,
         media_id=args.media_id,
         source_detection_run_id=args.source_detection_run_id,
+        run_name=args.run_name,
+        every_n_frames=args.every_n_frames,
+        frame_start=args.frame_start,
+        frame_end=args.frame_end,
+        max_frames=args.max_frames,
+        viewer_base_url=args.viewer_base_url,
+        plan_only=args.plan_only,
+    )
+
+
+def _handle_assign_main_player_tracks(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    return assign_main_player_tracks(
+        session=session,
+        media_id=args.media_id,
+        source_detection_run_id=args.source_detection_run_id,
+        source_subject_run_id=args.source_subject_run_id,
         run_name=args.run_name,
         every_n_frames=args.every_n_frames,
         frame_start=args.frame_start,

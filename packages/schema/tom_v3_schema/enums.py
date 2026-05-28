@@ -102,7 +102,18 @@ class RelationshipType(StrEnum):
     main_subject_candidate_from_player_detection = (
         "main_subject_candidate_from_player_detection"
     )
+    main_player_track_assignment_from_subject_candidate = (
+        "main_player_track_assignment_from_subject_candidate"
+    )
+    main_player_track_assignment_from_player_detection = (
+        "main_player_track_assignment_from_player_detection"
+    )
+    main_player_track_assignment_for_track_candidate = (
+        "main_player_track_assignment_for_track_candidate"
+    )
     pose_from_main_subject_candidate = "pose_from_main_subject_candidate"
+    pose_from_main_player_track_assignment = "pose_from_main_player_track_assignment"
+    pose_from_main_player_track_candidate = "pose_from_main_player_track_candidate"
     subject_context_candidate = "subject_context_candidate"
     pose_from_track_point_candidate = "pose_from_track_point_candidate"
     homography_from_court_keypoints_candidate = "homography_from_court_keypoints_candidate"

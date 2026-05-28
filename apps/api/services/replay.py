@@ -40,6 +40,10 @@ CAMERA_VIEW_TYPES = {"camera_view_observation"}
 COURT_EVIDENCE_TYPES = COURT_KEYPOINT_TYPES | COURT_LINE_TYPES | CAMERA_VIEW_TYPES
 HOMOGRAPHY_TYPES = {"homography_candidate_observation"}
 PROJECTION_DIAGNOSTIC_TYPES = {"projection_diagnostic_observation"}
+MAIN_PLAYER_TRACK_TYPES = {
+    "main_player_track_candidate",
+    "main_player_track_assignment_candidate",
+}
 
 
 def timestamp_ms_to_replay_frame(media: MediaAsset, timestamp_ms: int | float | None) -> int:
@@ -506,6 +510,16 @@ def pose_timeline_item_from_row(pose: PoseObservation) -> dict[str, Any] | None:
         ),
         "source_subject_run_id": subject_context.get("source_subject_run_id"),
         "subject_role_candidate": subject_context.get("subject_role_candidate"),
+        "source_track_run_id": subject_context.get("source_track_run_id"),
+        "track_assignment_observation_id": subject_context.get(
+            "track_assignment_observation_id"
+        ),
+        "track_candidate_observation_id": subject_context.get(
+            "track_candidate_observation_id"
+        ),
+        "track_candidate_id": subject_context.get("track_candidate_id"),
+        "track_role_candidate": subject_context.get("track_role_candidate"),
+        "candidate_track_only": subject_context.get("candidate_track_only"),
         "candidate_subject_only": subject_context.get("candidate_subject_only"),
         "not_identity_truth": subject_context.get("not_identity_truth"),
         **source_metadata,
@@ -1024,6 +1038,16 @@ def pose_overlay_item_from_row(pose: PoseObservation) -> dict[str, Any]:
         ),
         "source_subject_run_id": subject_context.get("source_subject_run_id"),
         "subject_role_candidate": subject_context.get("subject_role_candidate"),
+        "source_track_run_id": subject_context.get("source_track_run_id"),
+        "track_assignment_observation_id": subject_context.get(
+            "track_assignment_observation_id"
+        ),
+        "track_candidate_observation_id": subject_context.get(
+            "track_candidate_observation_id"
+        ),
+        "track_candidate_id": subject_context.get("track_candidate_id"),
+        "track_role_candidate": subject_context.get("track_role_candidate"),
+        "candidate_track_only": subject_context.get("candidate_track_only"),
         "candidate_subject_only": subject_context.get("candidate_subject_only"),
         "not_identity_truth": subject_context.get("not_identity_truth"),
         "source_language": "pose keypoint evidence",
@@ -1292,6 +1316,11 @@ def available_runs_for_media(session: Session, media_id: str) -> dict[str, list[
         "court": _court_run_summaries(session, media_id),
         "homography": _homography_run_summaries(session, media_id),
         "projection_diagnostic": _projection_diagnostic_run_summaries(session, media_id),
+        "main_player_track": _run_summaries_for_observation_types(
+            session,
+            media_id,
+            MAIN_PLAYER_TRACK_TYPES,
+        ),
     }
 
 
@@ -1747,6 +1776,32 @@ def _pose_subject_context(pose: PoseObservation) -> dict[str, Any]:
             payload.get("subject_role_candidate")
             or metadata_subject_context.get("subject_role_candidate")
         ),
+        "source_track_run_id": (
+            payload.get("source_track_run_id")
+            or metadata_subject_context.get("source_track_run_id")
+        ),
+        "track_assignment_observation_id": (
+            payload.get("track_assignment_observation_id")
+            or metadata_subject_context.get("track_assignment_observation_id")
+        ),
+        "track_candidate_observation_id": (
+            payload.get("track_candidate_observation_id")
+            or metadata_subject_context.get("track_candidate_observation_id")
+        ),
+        "track_candidate_id": (
+            payload.get("track_candidate_id")
+            or metadata_subject_context.get("track_candidate_id")
+        ),
+        "track_role_candidate": (
+            payload.get("track_role_candidate")
+            or metadata_subject_context.get("track_role_candidate")
+        ),
+        "assignment_method": (
+            payload.get("assignment_method") or metadata_subject_context.get("assignment_method")
+        ),
+        "assignment_score": (
+            payload.get("assignment_score") or metadata_subject_context.get("assignment_score")
+        ),
         "selection_method": (
             payload.get("selection_method") or metadata_subject_context.get("selection_method")
         ),
@@ -1756,6 +1811,10 @@ def _pose_subject_context(pose: PoseObservation) -> dict[str, Any]:
         "candidate_subject_only": bool(
             payload.get("candidate_subject_only")
             or metadata_subject_context.get("candidate_subject_only")
+        ),
+        "candidate_track_only": bool(
+            payload.get("candidate_track_only")
+            or metadata_subject_context.get("candidate_track_only")
         ),
         "not_identity_truth": bool(
             payload.get("not_identity_truth") or metadata_subject_context.get("not_identity_truth")
