@@ -1,5 +1,34 @@
 # TOM v3 Simple - Implementation Log
 
+## Main Tennis Player Subject Filter v0
+
+Status: complete when accepted
+
+### Goal
+
+Reduce TOM v1 player-detection pose noise by selecting at most two tennis-player subject candidates per frame before crop-mode pose inference.
+
+### Outcome
+
+The repair bridge adds:
+
+- `main_player_subject_candidate` observation spine rows under the existing `tracking` family
+- `near_player_candidate` and `far_player_candidate` roles
+- deterministic v0 scoring from image-relative bbox features
+- model registry, runtime config, processing run, and processing step provenance
+- lineage from raw `player_detection` rows to subject candidates
+- `run-real-pose --source-subject-run-id` support for filtered crop-mode pose
+- lineage from selected subject candidates to `player_pose_observation` rows
+- Makefile helpers for TOM v1 main subject selection and filtered pose
+
+### Non-goals
+
+- No raw detection mutation or deletion.
+- No confirmed player identity.
+- No ball/player court-space projection.
+- No bounce/hit/in-out/rally/point/scoring.
+- No adjudication or accepted/rejected lifecycle.
+
 ## TOM v1 Pose Runtime + Replay Display Policy Repair
 
 Status: complete when accepted

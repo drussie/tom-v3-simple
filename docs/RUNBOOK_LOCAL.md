@@ -619,6 +619,41 @@ TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_tom_v1_bridge.db \
   --allowed-root model_assets/tom_v1
 ```
 
+Main tennis-player subject filter:
+
+```bash
+TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_tom_v1_bridge.db \
+.venv/bin/python -m apps.worker.cli select-main-player-subjects \
+  --media-id <media_id> \
+  --source-detection-run-id <player_real_detection_run_id> \
+  --run-name main-player-subject-filter-v0 \
+  --frame-start 0 \
+  --frame-end 214 \
+  --max-frames 214
+```
+
+This persists at most two `main_player_subject_candidate` rows per frame: `near_player_candidate` and `far_player_candidate`. These rows are pose source candidates only. They do not identify players, mutate raw detections, or decide tennis events.
+
+TOM v1 pose from selected main subject candidates:
+
+```bash
+TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_tom_v1_bridge.db \
+.venv/bin/python -m apps.worker.cli run-real-pose \
+  --media-id <media_id> \
+  --source-detection-run-id <player_real_detection_run_id> \
+  --source-subject-run-id <main_subject_run_id> \
+  --weights model_assets/tom_v1/yolo26x-pose.pt \
+  --model-name tom-v1-yolo26x-pose \
+  --model-version v1-local \
+  --mode crop_from_player_detection \
+  --device auto \
+  --imgsz 640 \
+  --every-n-frames 1 \
+  --max-frames 214 \
+  --conf 0.25 \
+  --allowed-root model_assets/tom_v1
+```
+
 Makefile helpers:
 
 ```bash
@@ -626,7 +661,9 @@ make tom-v1-yolo-probe PYTHON=.venv/bin/python
 make tom-v1-ball-detection MEDIA_ID=<media_id> PYTHON=.venv/bin/python MAX_FRAMES=214
 make tom-v1-player-detection MEDIA_ID=<media_id> PYTHON=.venv/bin/python MAX_FRAMES=214
 make tom-v1-tracklets DETECTION_RUN_ID=<real_detection_run_id> PYTHON=.venv/bin/python
+make tom-v1-main-subjects MEDIA_ID=<media_id> DETECTION_RUN_ID=<player_real_detection_run_id> PYTHON=.venv/bin/python MAX_FRAMES=214
 make tom-v1-pose MEDIA_ID=<media_id> SOURCE_DETECTION_RUN_ID=<player_real_detection_run_id> PYTHON=.venv/bin/python MAX_FRAMES=214
+make tom-v1-pose-main-subjects MEDIA_ID=<media_id> SOURCE_DETECTION_RUN_ID=<player_real_detection_run_id> SOURCE_SUBJECT_RUN_ID=<main_subject_run_id> PYTHON=.venv/bin/python MAX_FRAMES=214
 ```
 
 The TOM v1 Makefile helpers pass `--allowed-root "$(TOM_V1_MODEL_ROOT)"` and default image sizes that match the local smoke path: 1280 for `best_ball_v2_1280.pt`, 640 for `yolo26x.pt`, and 640 for `yolo26x-pose.pt`. Override with `IMG_SIZE=<value>` only when testing a deliberate alternate model input size.

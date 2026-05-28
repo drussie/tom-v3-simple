@@ -60,6 +60,8 @@ Blueprint 8 has started with geometry evidence work. Milestone 8A adds court key
 
 The TOM v1 model assets bridge does not add replay architecture. It lets local TOM v1 detector and pose weights be tested through the existing `detectionRunId`, `trackletRunId`, and `poseRunId` replay paths. If a TOM v1 smoke run succeeds, the replay workstation should label the resulting rows as real model-output observations, not fixture evidence or tracking truth.
 
+The main tennis-player subject filter can reduce TOM v1 player-detection pose sources before replay. It persists `main_player_subject_candidate` rows for `near_player_candidate` and `far_player_candidate` source candidates, then real pose can consume that `source_subject_run_id`. Replay then shows cleaner pose evidence because pose was only run on selected candidates. This remains observation-only and does not confirm player identity.
+
 Dense real model-output runs can produce visually noisy overlays. The replay workstation provides display-only controls for detection and tracklet evidence:
 
 - Current only
@@ -563,6 +565,17 @@ If a tracklet run exists too:
 ```text
 http://127.0.0.1:3000/replay/<media_id>?detectionRunId=<real_detection_run_id>&trackletRunId=<real_tracklet_run_id>&poseRunId=<real_pose_run_id>
 ```
+
+For TOM v1 filtered pose replay, first run the main subject filter:
+
+```bash
+.venv/bin/python -m apps.worker.cli select-main-player-subjects \
+  --media-id <media_id> \
+  --source-detection-run-id <player_real_detection_run_id> \
+  --max-frames 214
+```
+
+Then run pose with `--source-subject-run-id <main_subject_run_id>`. Raw detections remain inspectable; the subject run only controls pose source selection.
 
 For court geometry evidence replay:
 

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections import Counter
 from collections.abc import Callable, Mapping, Sequence
+from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -60,10 +61,17 @@ class RealPoseReplayError(ValueError):
     pass
 
 
+@dataclass(frozen=True)
+class PoseSourceDetection:
+    detection: Observation
+    subject_candidate: Observation | None = None
+
+
 def build_real_pose_replay_plan(
     media_id: str = "<media_id>",
     weights_path: str = "model_assets/pose/<weights_file>.pt",
     source_detection_run_id: str | None = "<source_detection_run_id>",
+    source_subject_run_id: str | None = None,
     model_name: str | None = None,
     model_version: str = "v0",
     device: str = "auto",
@@ -88,6 +96,8 @@ def build_real_pose_replay_plan(
     ]
     if source_detection_run_id:
         command_parts.append(f"--source-detection-run-id {source_detection_run_id}")
+    if source_subject_run_id:
+        command_parts.append(f"--source-subject-run-id {source_subject_run_id}")
     if model_name:
         command_parts.append(f"--model-name {model_name}")
     if model_version:
@@ -138,10 +148,13 @@ def build_real_pose_replay_plan(
             "requires_pose_weights": True,
         },
         "source_detection_run_id": source_detection_run_id,
+        "source_subject_run_id": source_subject_run_id,
         "fallback_to_full_frame": fallback_to_full_frame,
         "replay_url_template": (
             f"{viewer_base_url}/replay/{media_id}?"
-            "detectionRunId=<source_detection_run_id>&poseRunId=<pose_run_id>"
+            "detectionRunId=<source_detection_run_id>"
+            + ("&subjectRunId=<source_subject_run_id>" if source_subject_run_id else "")
+            + "&poseRunId=<pose_run_id>"
         ),
         "warnings": dict(REAL_POSE_WARNINGS),
     }
@@ -152,6 +165,7 @@ def run_real_pose_replay(
     media_id: str,
     weights_path: str | None,
     source_detection_run_id: str | None = None,
+    source_subject_run_id: str | None = None,
     model_name: str | None = None,
     model_version: str = "v0",
     required_sha256: str | None = None,
@@ -177,6 +191,7 @@ def run_real_pose_replay(
         media_id=media_id,
         weights_path=weights_path or "model_assets/pose/<weights_file>.pt",
         source_detection_run_id=source_detection_run_id,
+        source_subject_run_id=source_subject_run_id,
         model_name=model_name,
         model_version=model_version,
         device=device,
@@ -245,6 +260,19 @@ def run_real_pose_replay(
                     weights_validation=weights_validation.as_dict(),
                 )
             normalized_mode = "full_frame"
+        if normalized_mode == "crop_from_player_detection" and source_subject_run_id:
+            subject_validation = _validate_source_subject_run(
+                session=session,
+                media=media,
+                source_subject_run_id=source_subject_run_id,
+            )
+            if subject_validation.get("ok") is False:
+                return _failed(
+                    subject_validation["status"],
+                    subject_validation["message"],
+                    runtime_probe=runtime_probe,
+                    weights_validation=weights_validation.as_dict(),
+                )
 
     run: ProcessingRun | None = None
     step: ProcessingStep | None = None
@@ -271,6 +299,7 @@ def run_real_pose_replay(
             max_frames=max_frames,
             mode=normalized_mode,
             source_detection_run_id=source_detection_run_id,
+            source_subject_run_id=source_subject_run_id,
             fallback_to_full_frame=fallback_to_full_frame,
         )
         run = _create_run(
@@ -278,6 +307,7 @@ def run_real_pose_replay(
             media=media,
             runtime_config=runtime_config,
             source_detection_run_id=source_detection_run_id,
+            source_subject_run_id=source_subject_run_id,
             mode=normalized_mode,
         )
         step = _create_step(
@@ -298,6 +328,7 @@ def run_real_pose_replay(
             session=session,
             media=media,
             source_detection_run_id=source_detection_run_id,
+            source_subject_run_id=source_subject_run_id,
             mode=normalized_mode,
             every_n_frames=every_n_frames,
             frame_start=frame_start,
@@ -378,6 +409,7 @@ def run_real_pose_replay(
         viewer_base_url=viewer_base_url,
         media_id=media.id,
         source_detection_run_id=source_detection_run_id,
+        source_subject_run_id=source_subject_run_id,
         pose_run_id=run.id,
         tracklet_run_id=_find_tracklet_run_id(session, source_detection_run_id),
     )
@@ -388,6 +420,7 @@ def run_real_pose_replay(
         "media_id": media.id,
         "pose_run_id": run.id,
         "source_detection_run_id": source_detection_run_id,
+        "source_subject_run_id": source_subject_run_id,
         "model_registry_id": model.id,
         "runtime_config_id": runtime_config.id,
         "processing_step_id": step.id,
@@ -460,6 +493,43 @@ def _validate_source_detection_run(
             "ok": False,
             "status": "no_source_player_detections",
             "message": "source detection run contains no player_detection observations.",
+        }
+    return {"ok": True}
+
+
+def _validate_source_subject_run(
+    *,
+    session: Session,
+    media: MediaAsset,
+    source_subject_run_id: str,
+) -> dict[str, Any]:
+    source_run = session.get(ProcessingRun, source_subject_run_id)
+    if source_run is None:
+        return {
+            "ok": False,
+            "status": "missing_source_subject_run",
+            "message": f"source subject run not found: {source_subject_run_id}",
+        }
+    if source_run.media_id != media.id:
+        return {
+            "ok": False,
+            "status": "source_subject_run_media_mismatch",
+            "message": "source subject run media_id does not match pose media_id.",
+        }
+    row = session.scalar(
+        select(Observation)
+        .where(
+            Observation.media_id == media.id,
+            Observation.run_id == source_subject_run_id,
+            Observation.observation_type == "main_player_subject_candidate",
+        )
+        .limit(1)
+    )
+    if row is None:
+        return {
+            "ok": False,
+            "status": "no_source_subject_candidates",
+            "message": "source subject run contains no main_player_subject_candidate observations.",
         }
     return {"ok": True}
 
@@ -539,6 +609,7 @@ def _create_runtime_config(
     max_frames: int | None,
     mode: str,
     source_detection_run_id: str | None,
+    source_subject_run_id: str | None,
     fallback_to_full_frame: bool,
 ) -> RuntimeConfig:
     payload = default_pose_runtime_config_payload(
@@ -565,6 +636,10 @@ def _create_runtime_config(
             "max_frames": max_frames,
             "mode": mode,
             "source_detection_run_id": source_detection_run_id,
+            "source_subject_run_id": source_subject_run_id,
+            "source_subject_filter": (
+                "main_tennis_subject_filter_v0" if source_subject_run_id else None
+            ),
             "fallback_to_full_frame": fallback_to_full_frame,
             "real_model_output": True,
             "model_output_not_truth": True,
@@ -591,6 +666,7 @@ def _create_run(
     media: MediaAsset,
     runtime_config: RuntimeConfig,
     source_detection_run_id: str | None,
+    source_subject_run_id: str | None,
     mode: str,
 ) -> ProcessingRun:
     now = datetime.now(UTC)
@@ -605,6 +681,10 @@ def _create_run(
             "source": "worker real pose replay",
             "source_runtime": REAL_POSE_SOURCE_RUNTIME,
             "source_detection_run_id": source_detection_run_id,
+            "source_subject_run_id": source_subject_run_id,
+            "source_subject_filter": (
+                "main_tennis_subject_filter_v0" if source_subject_run_id else None
+            ),
             "mode": mode,
             "evidence_source": "real_pose_model_output",
             "source_label": "real pose model output",
@@ -657,6 +737,7 @@ def _build_frame_results(
     session: Session,
     media: MediaAsset,
     source_detection_run_id: str | None,
+    source_subject_run_id: str | None,
     mode: str,
     every_n_frames: int,
     frame_start: int | None,
@@ -670,6 +751,7 @@ def _build_frame_results(
             session=session,
             media=media,
             source_detection_run_id=source_detection_run_id,
+            source_subject_run_id=source_subject_run_id,
             every_n_frames=every_n_frames,
             frame_start=frame_start,
             frame_end=frame_end,
@@ -693,6 +775,7 @@ def _crop_frame_results(
     session: Session,
     media: MediaAsset,
     source_detection_run_id: str | None,
+    source_subject_run_id: str | None,
     every_n_frames: int,
     frame_start: int | None,
     frame_end: int | None,
@@ -700,19 +783,20 @@ def _crop_frame_results(
     provider: PoseResultProvider,
     frame_source: YoloFrameSource | None,
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
-    detections = _source_player_detections(
+    sources = _source_pose_detections(
         session=session,
         media=media,
         source_detection_run_id=source_detection_run_id,
+        source_subject_run_id=source_subject_run_id,
         every_n_frames=every_n_frames,
         frame_start=frame_start,
         frame_end=frame_end,
         max_frames=max_frames,
     )
-    if not detections:
+    if not sources:
         raise RealPoseReplayError("no source player_detection observations selected for pose")
 
-    frame_numbers = sorted({int(detection.frame_start) for detection in detections})
+    frame_numbers = sorted({int(source.detection.frame_start) for source in sources})
     frame_inputs = _frame_inputs_by_number(
         media=media,
         sampled_frames=frame_numbers,
@@ -720,7 +804,8 @@ def _crop_frame_results(
         frame_source=frame_source,
     )
     frame_results: list[dict[str, Any]] = []
-    for detection in detections:
+    for source in sources:
+        detection = source.detection
         payload = _merged_payload(detection)
         bbox = _bbox(payload)
         if bbox is None:
@@ -737,17 +822,21 @@ def _crop_frame_results(
                 frame_number=int(detection.frame_start),
                 timestamp_ms=int(detection.timestamp_start_ms),
                 bbox=bbox,
-                detection=detection,
+                source=source,
             )
         )
 
     return frame_results, {
         "mode": "crop_from_player_detection",
         "frames_considered": len(frame_numbers),
-        "source_player_detections_considered": len(detections),
+        "source_player_detections_considered": len(sources),
         "frames_processed": len(frame_results),
         "sampled_frames": frame_numbers,
         "source_detection_run_id": source_detection_run_id,
+        "source_subject_run_id": source_subject_run_id,
+        "source_subject_filter": (
+            "main_tennis_subject_filter_v0" if source_subject_run_id else None
+        ),
     }
 
 
@@ -789,6 +878,117 @@ def _full_frame_results(
         "frames_processed": len(frame_results),
         "sampled_frames": sampled_frames,
     }
+
+
+def _source_pose_detections(
+    *,
+    session: Session,
+    media: MediaAsset,
+    source_detection_run_id: str | None,
+    source_subject_run_id: str | None,
+    every_n_frames: int,
+    frame_start: int | None,
+    frame_end: int | None,
+    max_frames: int | None,
+) -> list[PoseSourceDetection]:
+    if source_subject_run_id:
+        return _source_subject_candidate_detections(
+            session=session,
+            media=media,
+            source_detection_run_id=source_detection_run_id,
+            source_subject_run_id=source_subject_run_id,
+            every_n_frames=every_n_frames,
+            frame_start=frame_start,
+            frame_end=frame_end,
+            max_frames=max_frames,
+        )
+    return [
+        PoseSourceDetection(detection=detection)
+        for detection in _source_player_detections(
+            session=session,
+            media=media,
+            source_detection_run_id=source_detection_run_id,
+            every_n_frames=every_n_frames,
+            frame_start=frame_start,
+            frame_end=frame_end,
+            max_frames=max_frames,
+        )
+    ]
+
+
+def _source_subject_candidate_detections(
+    *,
+    session: Session,
+    media: MediaAsset,
+    source_detection_run_id: str | None,
+    source_subject_run_id: str,
+    every_n_frames: int,
+    frame_start: int | None,
+    frame_end: int | None,
+    max_frames: int | None,
+) -> list[PoseSourceDetection]:
+    if source_detection_run_id is None:
+        raise RealPoseReplayError("source detection run id is required with a subject run")
+    if every_n_frames <= 0:
+        raise RealPoseReplayError("every_n_frames must be greater than 0")
+    resolved_start = 0 if frame_start is None else int(frame_start)
+    resolved_end = None if frame_end is None else int(frame_end)
+    if resolved_start < 0:
+        raise RealPoseReplayError("frame_start must be greater than or equal to 0")
+    if resolved_end is not None and resolved_end < 0:
+        raise RealPoseReplayError("frame_end must be greater than or equal to 0")
+    if resolved_end is not None and resolved_start > resolved_end:
+        raise RealPoseReplayError("frame_start must be less than or equal to frame_end")
+
+    query = (
+        select(Observation)
+        .where(
+            Observation.media_id == media.id,
+            Observation.run_id == source_subject_run_id,
+            Observation.observation_type == "main_player_subject_candidate",
+            Observation.frame_start.is_not(None),
+            Observation.timestamp_start_ms.is_not(None),
+        )
+        .order_by(Observation.frame_start, Observation.id)
+    )
+    query = query.where(Observation.frame_start >= resolved_start)
+    if resolved_end is not None:
+        query = query.where(Observation.frame_start <= resolved_end)
+    candidates = list(session.scalars(query).all())
+    if every_n_frames > 1:
+        candidates = [
+            candidate
+            for candidate in candidates
+            if candidate.frame_start is not None
+            and (int(candidate.frame_start) - resolved_start) % every_n_frames == 0
+        ]
+    if max_frames is not None:
+        max_frame_count = max(0, int(max_frames))
+        allowed_frames = set(
+            sorted({int(candidate.frame_start) for candidate in candidates})[:max_frame_count]
+        )
+        candidates = [
+            candidate
+            for candidate in candidates
+            if candidate.frame_start is not None and int(candidate.frame_start) in allowed_frames
+        ]
+
+    sources: list[PoseSourceDetection] = []
+    for candidate in candidates:
+        source_detection_id = str(
+            (candidate.payload_jsonb or {}).get("source_detection_observation_id") or ""
+        )
+        if not source_detection_id:
+            continue
+        detection = session.get(Observation, source_detection_id)
+        if detection is None:
+            continue
+        if detection.run_id != source_detection_run_id:
+            continue
+        if detection.observation_type != "player_detection":
+            continue
+        sources.append(PoseSourceDetection(detection=detection, subject_candidate=candidate))
+    return sources
 
 
 def _source_player_detections(
@@ -911,8 +1111,16 @@ def _frame_result_with_source_context(
     frame_number: int,
     timestamp_ms: int,
     bbox: dict[str, float],
-    detection: Observation,
+    source: PoseSourceDetection,
 ) -> dict[str, Any]:
+    detection = source.detection
+    subject_candidate = source.subject_candidate
+    subject_payload = subject_candidate.payload_jsonb if subject_candidate is not None else {}
+    association_method = (
+        "main_tennis_subject_filter_v0_crop_from_player_detection"
+        if subject_candidate is not None
+        else "crop_from_player_detection"
+    )
     frame_result = _frame_result_with_defaults(
         raw_result,
         frame_number=frame_number,
@@ -937,9 +1145,24 @@ def _frame_result_with_source_context(
             **dict(pose_dict.get("subject_context") or {}),
             "subject_ref_type": "player_detection",
             "subject_detection_observation_id": detection.id,
+            "subject_candidate_observation_id": (
+                None if subject_candidate is None else subject_candidate.id
+            ),
+            "source_subject_run_id": (
+                None if subject_candidate is None else subject_candidate.run_id
+            ),
+            "subject_role_candidate": subject_payload.get("subject_role_candidate"),
+            "selection_method": subject_payload.get("selection_method"),
+            "selection_score": subject_payload.get("selection_score"),
+            "candidate_subject_only": subject_candidate is not None,
+            "not_identity_truth": subject_candidate is not None,
             "association_status": "candidate",
-            "association_method": "crop_from_player_detection",
-            "association_confidence": detection.confidence,
+            "association_method": association_method,
+            "association_confidence": (
+                subject_payload.get("selection_score")
+                if subject_candidate is not None
+                else detection.confidence
+            ),
         }
         poses.append(pose_dict)
     frame_result["poses"] = poses
@@ -1076,6 +1299,7 @@ def _lineage_for_pose(
     step: ProcessingStep,
 ) -> list[ObservationLineageCreate]:
     lineage: list[ObservationLineageCreate] = []
+    subject_context = dict(pose.metadata_jsonb.get("subject_context") or {})
     if pose.subject_detection_observation_id:
         source = session.get(Observation, pose.subject_detection_observation_id)
         if source is None:
@@ -1106,6 +1330,41 @@ def _lineage_for_pose(
                 },
             )
         )
+    subject_candidate_id = subject_context.get("subject_candidate_observation_id")
+    if subject_candidate_id:
+        subject_candidate = session.get(Observation, str(subject_candidate_id))
+        if subject_candidate is None:
+            raise RealPoseReplayError(
+                f"source subject candidate observation not found: {subject_candidate_id}"
+            )
+        if subject_candidate.observation_type != "main_player_subject_candidate":
+            raise RealPoseReplayError(
+                "pose source subject candidate must be a main_player_subject_candidate "
+                f"observation: {subject_candidate_id}"
+            )
+        lineage.append(
+            ObservationLineageCreate(
+                parent_observation_id=subject_candidate.id,
+                relationship_type="pose_from_main_subject_candidate",
+                processing_step_id=step.id,
+                payload_jsonb={
+                    "source_observation_type": subject_candidate.observation_type,
+                    "source_subject_run_id": subject_candidate.run_id,
+                    "source_runtime": REAL_POSE_SOURCE_RUNTIME,
+                    "selection_method": subject_context.get("selection_method"),
+                    "subject_role_candidate": subject_context.get("subject_role_candidate"),
+                    "selection_score": subject_context.get("selection_score"),
+                    "candidate_subject_only": True,
+                    "not_identity_truth": True,
+                    "observation_only": True,
+                    "no_adjudication": True,
+                    "frame_number": pose.frame_number,
+                    "association_status": pose.association_status,
+                    "association_method": pose.association_method,
+                    "frame_time_owner": "media_indexing",
+                },
+            )
+        )
     return lineage
 
 
@@ -1114,6 +1373,7 @@ def _pose_payload(
     pose: PoseObservationCreate,
     lineage: list[ObservationLineageCreate],
 ) -> dict[str, Any]:
+    subject_context = dict(pose.metadata_jsonb.get("subject_context") or {})
     bbox = None
     if pose.bbox_x is not None and pose.bbox_y is not None:
         bbox = {
@@ -1136,6 +1396,15 @@ def _pose_payload(
         "bbox": bbox,
         "subject_ref_type": pose.subject_ref_type,
         "subject_detection_observation_id": pose.subject_detection_observation_id,
+        "subject_candidate_observation_id": subject_context.get(
+            "subject_candidate_observation_id"
+        ),
+        "source_subject_run_id": subject_context.get("source_subject_run_id"),
+        "subject_role_candidate": subject_context.get("subject_role_candidate"),
+        "selection_method": subject_context.get("selection_method"),
+        "selection_score": subject_context.get("selection_score"),
+        "candidate_subject_only": bool(subject_context.get("candidate_subject_only")),
+        "not_identity_truth": bool(subject_context.get("not_identity_truth")),
         "subject_tracklet_id": pose.subject_tracklet_id,
         "subject_track_point_id": pose.subject_track_point_id,
         "association_status": pose.association_status,
@@ -1227,6 +1496,7 @@ def _replay_url(
     viewer_base_url: str,
     media_id: str,
     source_detection_run_id: str | None,
+    source_subject_run_id: str | None,
     pose_run_id: str,
     tracklet_run_id: str | None,
 ) -> str:
@@ -1235,6 +1505,8 @@ def _replay_url(
         params.append(f"detectionRunId={source_detection_run_id}")
     if tracklet_run_id:
         params.append(f"trackletRunId={tracklet_run_id}")
+    if source_subject_run_id:
+        params.append(f"subjectRunId={source_subject_run_id}")
     params.append(f"poseRunId={pose_run_id}")
     return f"{viewer_base_url}/replay/{media_id}?{'&'.join(params)}"
 

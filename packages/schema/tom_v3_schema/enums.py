@@ -99,6 +99,10 @@ class RelationshipType(StrEnum):
     rendered_from = "rendered_from"
     grouped_with = "grouped_with"
     pose_from_subject_detection_candidate = "pose_from_subject_detection_candidate"
+    main_subject_candidate_from_player_detection = (
+        "main_subject_candidate_from_player_detection"
+    )
+    pose_from_main_subject_candidate = "pose_from_main_subject_candidate"
     subject_context_candidate = "subject_context_candidate"
     pose_from_track_point_candidate = "pose_from_track_point_candidate"
     homography_from_court_keypoints_candidate = "homography_from_court_keypoints_candidate"

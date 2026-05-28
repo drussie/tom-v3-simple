@@ -300,6 +300,8 @@ def normalize_pose_frame_result(
             "inference": dict(inference_metadata or {}),
             "normalization_only": True,
         }
+        if subject_context:
+            metadata["subject_context"] = dict(subject_context)
         if crop_local_keypoints:
             metadata["crop_local_keypoints"] = crop_local_keypoints
 

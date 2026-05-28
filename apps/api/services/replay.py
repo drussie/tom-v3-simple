@@ -490,6 +490,7 @@ def pose_timeline_item_from_row(pose: PoseObservation) -> dict[str, Any] | None:
         return None
 
     source_metadata = _pose_source_metadata(pose)
+    subject_context = _pose_subject_context(pose)
     return {
         "item_type": "pose",
         "observation_id": pose.observation_id,
@@ -500,6 +501,13 @@ def pose_timeline_item_from_row(pose: PoseObservation) -> dict[str, Any] | None:
         "keypoints_present_count": pose.keypoints_present_count,
         "keypoints_missing_count": pose.keypoints_missing_count,
         "display_label": _pose_display_label(source_metadata),
+        "subject_candidate_observation_id": subject_context.get(
+            "subject_candidate_observation_id"
+        ),
+        "source_subject_run_id": subject_context.get("source_subject_run_id"),
+        "subject_role_candidate": subject_context.get("subject_role_candidate"),
+        "candidate_subject_only": subject_context.get("candidate_subject_only"),
+        "not_identity_truth": subject_context.get("not_identity_truth"),
         **source_metadata,
     }
 
@@ -991,6 +999,7 @@ def build_pose_overlay_items(
 def pose_overlay_item_from_row(pose: PoseObservation) -> dict[str, Any]:
     keypoints = _pose_overlay_keypoints(pose.keypoints_jsonb or [])
     source_metadata = _pose_source_metadata(pose)
+    subject_context = _pose_subject_context(pose)
     return {
         "overlay_type": "pose_skeleton",
         "observation_id": pose.observation_id,
@@ -1009,15 +1018,14 @@ def pose_overlay_item_from_row(pose: PoseObservation) -> dict[str, Any]:
         "max_keypoint_confidence": pose.max_keypoint_confidence,
         "keypoints": keypoints,
         "edges": [list(edge) for edge in _pose_edges(pose)],
-        "subject_context": {
-            "subject_ref_type": pose.subject_ref_type,
-            "subject_detection_observation_id": pose.subject_detection_observation_id,
-            "subject_tracklet_id": pose.subject_tracklet_id,
-            "subject_track_point_id": pose.subject_track_point_id,
-            "association_status": pose.association_status,
-            "association_method": pose.association_method,
-            "association_confidence": pose.association_confidence,
-        },
+        "subject_context": subject_context,
+        "subject_candidate_observation_id": subject_context.get(
+            "subject_candidate_observation_id"
+        ),
+        "source_subject_run_id": subject_context.get("source_subject_run_id"),
+        "subject_role_candidate": subject_context.get("subject_role_candidate"),
+        "candidate_subject_only": subject_context.get("candidate_subject_only"),
+        "not_identity_truth": subject_context.get("not_identity_truth"),
         "source_language": "pose keypoint evidence",
         **source_metadata,
     }
@@ -1709,6 +1717,49 @@ def _pose_source_metadata(pose: PoseObservation) -> dict[str, Any]:
         "runtime_config_id": observation.runtime_config_id if observation is not None else None,
         "is_fixture": is_fixture,
         "is_real_model_output": is_real_model_output,
+    }
+
+
+def _pose_subject_context(pose: PoseObservation) -> dict[str, Any]:
+    observation = pose.observation
+    payload = observation.payload_jsonb if observation is not None else {}
+    metadata = pose.metadata_jsonb or {}
+    metadata_subject_context = (
+        metadata.get("subject_context") if isinstance(metadata.get("subject_context"), dict) else {}
+    )
+    return {
+        "subject_ref_type": pose.subject_ref_type,
+        "subject_detection_observation_id": pose.subject_detection_observation_id,
+        "subject_tracklet_id": pose.subject_tracklet_id,
+        "subject_track_point_id": pose.subject_track_point_id,
+        "association_status": pose.association_status,
+        "association_method": pose.association_method,
+        "association_confidence": pose.association_confidence,
+        "subject_candidate_observation_id": (
+            payload.get("subject_candidate_observation_id")
+            or metadata_subject_context.get("subject_candidate_observation_id")
+        ),
+        "source_subject_run_id": (
+            payload.get("source_subject_run_id")
+            or metadata_subject_context.get("source_subject_run_id")
+        ),
+        "subject_role_candidate": (
+            payload.get("subject_role_candidate")
+            or metadata_subject_context.get("subject_role_candidate")
+        ),
+        "selection_method": (
+            payload.get("selection_method") or metadata_subject_context.get("selection_method")
+        ),
+        "selection_score": (
+            payload.get("selection_score") or metadata_subject_context.get("selection_score")
+        ),
+        "candidate_subject_only": bool(
+            payload.get("candidate_subject_only")
+            or metadata_subject_context.get("candidate_subject_only")
+        ),
+        "not_identity_truth": bool(
+            payload.get("not_identity_truth") or metadata_subject_context.get("not_identity_truth")
+        ),
     }
 
 

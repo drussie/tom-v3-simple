@@ -150,6 +150,31 @@ make tom-v1-pose \
 
 This helper uses `yolo26x-pose.pt`, passes `--allowed-root model_assets/tom_v1`, and defaults to `--imgsz 640`.
 
+Main tennis-player subject filtering:
+
+```bash
+make tom-v1-main-subjects \
+  MEDIA_ID=<media_id> \
+  DETECTION_RUN_ID=<player_real_detection_run_id> \
+  PYTHON=.venv/bin/python \
+  MAX_FRAMES=214
+```
+
+This helper selects at most two `main_player_subject_candidate` observations per frame: `near_player_candidate` and `far_player_candidate`. These are pose source candidates only, not identity truth.
+
+Pose from selected main subject candidates:
+
+```bash
+make tom-v1-pose-main-subjects \
+  MEDIA_ID=<media_id> \
+  SOURCE_DETECTION_RUN_ID=<player_real_detection_run_id> \
+  SOURCE_SUBJECT_RUN_ID=<main_subject_run_id> \
+  PYTHON=.venv/bin/python \
+  MAX_FRAMES=214
+```
+
+Filtered pose mode preserves lineage from raw `player_detection` rows to `main_player_subject_candidate` rows and then to `player_pose_observation` rows.
+
 ## Runtime / Replay Repair Notes
 
 The TOM v3 real detection and real pose runtime bridge must omit optional Ultralytics arguments when they are unset. In particular, `imgsz`, `iou`, and `max_det` should not be forwarded as `None` because some Ultralytics versions treat `None` as an invalid explicit value rather than an omitted option.

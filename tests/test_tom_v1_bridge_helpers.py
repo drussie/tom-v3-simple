@@ -19,6 +19,10 @@ def test_tom_v1_make_helpers_include_allowed_root_and_imgsz_defaults() -> None:
     assert '--imgsz "$(if $(IMG_SIZE),$(IMG_SIZE),640)"' in makefile
     assert 'tom-v1-pose:' in makefile
     assert '--weights "$(TOM_V1_MODEL_ROOT)/yolo26x-pose.pt"' in makefile
+    assert "tom-v1-main-subjects:" in makefile
+    assert "select-main-player-subjects" in makefile
+    assert "tom-v1-pose-main-subjects:" in makefile
+    assert '--source-subject-run-id "$(SOURCE_SUBJECT_RUN_ID)"' in makefile
 
 
 def test_replay_display_policy_helpers_define_expected_modes() -> None:
