@@ -8,6 +8,7 @@ import type {
   ReplayHomographyCandidateOverlay,
   ReplayPoseOverlay,
   ReplayProjectionDiagnosticOverlay,
+  ReplayOverlayDisplayMode,
   ReplayRunSummary,
   ReplayTrackletOverlay,
   ReplayTrackPointOverlay
@@ -109,8 +110,23 @@ export function activeReplayDetections(
   detections: ReplayDetectionOverlay[],
   currentTimestampMs: number,
   currentFrame: number,
-  holdMs = 250
+  holdMs = 250,
+  displayMode: ReplayOverlayDisplayMode = "short_trail"
 ): ReplayDetectionOverlay[] {
+  if (displayMode === "full_trail") {
+    return detections;
+  }
+  if (displayMode === "current_only") {
+    const currentFrameDetections = detections.filter(
+      (detection) => detection.frame_number === currentFrame
+    );
+    if (currentFrameDetections.length > 0) {
+      return currentFrameDetections;
+    }
+    return detections.filter(
+      (detection) => Math.abs(detection.timestamp_ms - currentTimestampMs) <= 34
+    );
+  }
   return detections.filter((detection) => {
     const timestampDelta = Math.abs(detection.timestamp_ms - currentTimestampMs);
     if (timestampDelta <= holdMs) {
@@ -124,17 +140,22 @@ export function activeReplayTracklets(
   tracklets: ReplayTrackletOverlay[],
   currentTimestampMs: number,
   currentFrame: number,
-  holdMs = 250
+  holdMs = 250,
+  displayMode: ReplayOverlayDisplayMode = "short_trail"
 ): ReplayTrackletOverlay[] {
+  if (displayMode === "full_trail") {
+    return tracklets;
+  }
   return tracklets.filter((tracklet) => {
-    if (
-      currentTimestampMs >= tracklet.timestamp_start_ms - holdMs &&
-      currentTimestampMs <= tracklet.timestamp_end_ms + holdMs
-    ) {
-      return true;
-    }
     return tracklet.points.some((point) =>
-      isActiveReplayPoint(point.timestamp_ms, point.frame_number, currentTimestampMs, currentFrame, holdMs)
+      isActiveReplayPointForDisplay(
+        point.timestamp_ms,
+        point.frame_number,
+        currentTimestampMs,
+        currentFrame,
+        holdMs,
+        displayMode
+      )
     );
   });
 }
@@ -143,10 +164,21 @@ export function activeReplayTrackPoints(
   points: ReplayTrackPointOverlay[],
   currentTimestampMs: number,
   currentFrame: number,
-  holdMs = 250
+  holdMs = 250,
+  displayMode: ReplayOverlayDisplayMode = "short_trail"
 ): ReplayTrackPointOverlay[] {
+  if (displayMode === "full_trail") {
+    return points;
+  }
   return points.filter((point) =>
-    isActiveReplayPoint(point.timestamp_ms, point.frame_number, currentTimestampMs, currentFrame, holdMs)
+    isActiveReplayPointForDisplay(
+      point.timestamp_ms,
+      point.frame_number,
+      currentTimestampMs,
+      currentFrame,
+      holdMs,
+      displayMode
+    )
   );
 }
 
@@ -219,6 +251,23 @@ export function activeReplayProjectionDiagnostics(
   return diagnostics.filter((item) =>
     isActiveReplayPoint(item.timestamp_ms, item.frame_number, currentTimestampMs, currentFrame, holdMs)
   );
+}
+
+export function isActiveReplayPointForDisplay(
+  timestampMs: number,
+  frameNumber: number,
+  currentTimestampMs: number,
+  currentFrame: number,
+  holdMs: number,
+  displayMode: ReplayOverlayDisplayMode
+): boolean {
+  if (displayMode === "full_trail") {
+    return true;
+  }
+  if (displayMode === "current_only") {
+    return frameNumber === currentFrame || Math.abs(timestampMs - currentTimestampMs) <= 34;
+  }
+  return isActiveReplayPoint(timestampMs, frameNumber, currentTimestampMs, currentFrame, holdMs);
 }
 
 export function filterDetectionsAvailableAt(

@@ -1,5 +1,33 @@
 # TOM v3 Simple - Implementation Log
 
+## TOM v1 Pose Runtime + Replay Display Policy Repair
+
+Status: complete when accepted
+
+### Goal
+
+Repair runtime bridge issues discovered during TOM v1 local model smoke and make dense replay overlays visually reviewable by default.
+
+### Outcome
+
+The repair adds:
+
+- Ultralytics detection and pose prediction calls that omit unset optional kwargs instead of passing `None`
+- safe crop-mode pose frame-bound filtering when frame start/end are omitted
+- TOM v1 helper defaults for `--allowed-root` and known model image sizes
+- replay display modes for current-only, short-trail, and full-trail review
+- optional tracklet trail/path rendering, off by default
+- focused regression tests for runtime kwargs, pose frame bounds, TOM v1 helpers, and replay display policy wiring
+
+### Non-goals
+
+- No model files committed.
+- No persisted observation semantics changed.
+- No real court keypoint or gameplay classifier adapter.
+- No ball/player court-space projection.
+- No bounce/hit/in-out/rally/point/scoring.
+- No adjudication.
+
 ## TOM v1 Model Assets + Perception Bridge
 
 Status: complete when accepted

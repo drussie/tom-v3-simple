@@ -78,15 +78,18 @@ class UltralyticsPoseResultProvider:
                 "real Ultralytics pose prediction requires a decoded image"
             )
         model = self._load_model()
-        predictions = model.predict(
-            frame_input.image,
-            device=self._resolved_device,
-            imgsz=self.config.image_size,
-            conf=self.config.confidence_threshold,
-            iou=self.config.iou_threshold,
-            max_det=self.config.max_det,
-            verbose=False,
-        )
+        predict_kwargs: dict[str, Any] = {
+            "device": self._resolved_device,
+            "conf": self.config.confidence_threshold,
+            "verbose": False,
+        }
+        if self.config.image_size is not None:
+            predict_kwargs["imgsz"] = self.config.image_size
+        if self.config.iou_threshold is not None:
+            predict_kwargs["iou"] = self.config.iou_threshold
+        if self.config.max_det is not None:
+            predict_kwargs["max_det"] = self.config.max_det
+        predictions = model.predict(frame_input.image, **predict_kwargs)
         result = predictions[0] if predictions else None
         return _ultralytics_pose_result_to_frame_dict(frame_input, result)
 

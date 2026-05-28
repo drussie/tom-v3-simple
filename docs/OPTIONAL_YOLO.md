@@ -111,6 +111,8 @@ make tom-v1-tracklets DETECTION_RUN_ID=<real_detection_run_id> PYTHON=.venv/bin/
 make tom-v1-pose MEDIA_ID=<media_id> SOURCE_DETECTION_RUN_ID=<player_detection_run_id> PYTHON=.venv/bin/python MAX_FRAMES=214
 ```
 
+The TOM v1 helpers include `--allowed-root "$(TOM_V1_MODEL_ROOT)"`. They also pass default image sizes for the known local models: 1280 for `best_ball_v2_1280.pt`, 640 for `yolo26x.pt`, and 640 for `yolo26x-pose.pt`. Use `IMG_SIZE=<value>` only for deliberate local experiments.
+
 These are local smoke helpers only. They are not part of default CI and do not make YOLO runtime mandatory.
 
 ## Register Weights

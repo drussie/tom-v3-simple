@@ -567,9 +567,11 @@ TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_tom_v1_bridge.db \
   --model-name tom-v1-best-ball-v2-1280 \
   --model-version v1-local \
   --device auto \
+  --imgsz 1280 \
   --every-n-frames 1 \
   --max-frames 214 \
-  --conf 0.10
+  --conf 0.10 \
+  --allowed-root model_assets/tom_v1
 ```
 
 TOM v1 player/object detection:
@@ -582,9 +584,11 @@ TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_tom_v1_bridge.db \
   --model-name tom-v1-yolo26x-player-detector \
   --model-version v1-local \
   --device auto \
+  --imgsz 640 \
   --every-n-frames 1 \
   --max-frames 214 \
-  --conf 0.25
+  --conf 0.25 \
+  --allowed-root model_assets/tom_v1
 ```
 
 Candidate tracklets from a real detection run:
@@ -608,9 +612,11 @@ TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_tom_v1_bridge.db \
   --model-version v1-local \
   --mode crop_from_player_detection \
   --device auto \
+  --imgsz 640 \
   --every-n-frames 1 \
   --max-frames 214 \
-  --conf 0.25
+  --conf 0.25 \
+  --allowed-root model_assets/tom_v1
 ```
 
 Makefile helpers:
@@ -623,11 +629,23 @@ make tom-v1-tracklets DETECTION_RUN_ID=<real_detection_run_id> PYTHON=.venv/bin/
 make tom-v1-pose MEDIA_ID=<media_id> SOURCE_DETECTION_RUN_ID=<player_real_detection_run_id> PYTHON=.venv/bin/python MAX_FRAMES=214
 ```
 
+The TOM v1 Makefile helpers pass `--allowed-root "$(TOM_V1_MODEL_ROOT)"` and default image sizes that match the local smoke path: 1280 for `best_ball_v2_1280.pt`, 640 for `yolo26x.pt`, and 640 for `yolo26x-pose.pt`. Override with `IMG_SIZE=<value>` only when testing a deliberate alternate model input size.
+
 Class mapping warning:
 
 The TOM v1 ball model may emit `class 0 = ball`. If real detection returns zero useful detections, lower the confidence threshold, inspect debug payloads/artifacts if available, check class names emitted by Ultralytics, and add an explicit class map only when the model output proves the mapping. Do not relabel unknown classes without evidence.
 
 TOM v1-origin detections and poses are still model-output observations. They do not confirm ball path, player identity, court position, bounce/hit/in-out/rally/point/scoring, or official tennis truth.
+
+Replay display policy:
+
+The replay workstation includes display modes for dense real detection/tracklet runs:
+
+- Current only
+- Short trail
+- Full trail
+
+Detection display defaults to current-only. Tracklet point display defaults to short-trail, and tracklet trail/path rendering is off by default. These are visual review controls only; they do not change persisted observations, candidate tracklets, or evidence semantics.
 
 ## 11B. Court / Homography Decision Gate
 

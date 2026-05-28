@@ -181,9 +181,11 @@ make tom-v1-tracklets DETECTION_RUN_ID=<real_detection_run_id> PYTHON=.venv/bin/
 make tom-v1-pose MEDIA_ID=<media_id> SOURCE_DETECTION_RUN_ID=<player_detection_run_id> PYTHON=.venv/bin/python MAX_FRAMES=214
 ```
 
-Model assets are local-only and ignored by git. TOM v1-origin outputs remain observations, not tracking truth or tennis-event conclusions. See [TOM v1 Model Assets Bridge](docs/perception/tom_v1_model_assets_bridge_v0.md).
+Model assets are local-only and ignored by git. The TOM v1 helpers pass local model-root guardrails and default image sizes for the known local models. TOM v1-origin outputs remain observations, not tracking truth or tennis-event conclusions. See [TOM v1 Model Assets Bridge](docs/perception/tom_v1_model_assets_bridge_v0.md).
 
 When a real detection run is selected in the replay workstation, the UI labels it as real model-output evidence and shows available source runtime, model registry, runtime config, class, frame/time owner, and evidence-only metadata. Fixture runs remain labeled as fixture/demo evidence.
+
+Replay detection and tracklet overlays include current-only, short-trail, and full-trail display modes. Detection display defaults to current-only so dense real model-output smoke runs do not look like full-history trails by default.
 
 Build candidate tracklets from a real detection run:
 

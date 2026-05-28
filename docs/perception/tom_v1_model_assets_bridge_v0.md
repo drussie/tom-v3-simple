@@ -113,6 +113,8 @@ make tom-v1-ball-detection \
   YOLO_DEVICE=auto
 ```
 
+This helper uses `best_ball_v2_1280.pt`, passes `--allowed-root model_assets/tom_v1`, and defaults to `--imgsz 1280`.
+
 Player/object detection:
 
 ```bash
@@ -123,6 +125,8 @@ make tom-v1-player-detection \
   EVERY_N_FRAMES=1 \
   YOLO_DEVICE=auto
 ```
+
+This helper uses `yolo26x.pt`, passes `--allowed-root model_assets/tom_v1`, and defaults to `--imgsz 640`.
 
 Candidate tracklets from one real detection run:
 
@@ -143,6 +147,20 @@ make tom-v1-pose \
   EVERY_N_FRAMES=1 \
   YOLO_DEVICE=auto
 ```
+
+This helper uses `yolo26x-pose.pt`, passes `--allowed-root model_assets/tom_v1`, and defaults to `--imgsz 640`.
+
+## Runtime / Replay Repair Notes
+
+The TOM v3 real detection and real pose runtime bridge must omit optional Ultralytics arguments when they are unset. In particular, `imgsz`, `iou`, and `max_det` should not be forwarded as `None` because some Ultralytics versions treat `None` as an invalid explicit value rather than an omitted option.
+
+The replay workstation also has visual display modes for dense real detection and tracklet runs:
+
+- Current only
+- Short trail
+- Full trail
+
+These modes only affect what is shown on screen. They do not change persisted observations, candidate tracklets, pose observations, or evidence-only semantics.
 
 ## Class Mapping Risk
 

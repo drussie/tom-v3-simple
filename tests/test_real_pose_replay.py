@@ -385,6 +385,76 @@ def test_fake_real_pose_persists_pose_lineage_and_replay_payloads(
     assert pose_timeline["real_model_output"] is True
 
 
+def test_crop_mode_handles_none_frame_bounds_safely(
+    db_session: Session,
+    indexed_media,
+    detection_weights_path: Path,
+    pose_weights_path: Path,
+) -> None:
+    detection = run_real_detection_replay(
+        session=db_session,
+        media_id=indexed_media.id,
+        weights_path=str(detection_weights_path),
+        model_name="test-real-yolo-frame-bounds",
+        model_version="pose-bounds-test",
+        device="cpu",
+        every_n_frames=30,
+        max_frames=3,
+        allowed_roots=[str(detection_weights_path.parent)],
+        probe_runtime=runtime_ok,
+        yolo_result_provider=FakeYoloResultProvider(
+            boxes_by_frame={
+                0: [
+                    {
+                        "xyxy": [250.0, 50.0, 330.0, 330.0],
+                        "confidence": 0.88,
+                        "class_id": 0,
+                        "class_name": "person",
+                    }
+                ],
+                30: [
+                    {
+                        "xyxy": [260.0, 50.0, 340.0, 330.0],
+                        "confidence": 0.87,
+                        "class_id": 0,
+                        "class_name": "person",
+                    }
+                ],
+                60: [
+                    {
+                        "xyxy": [270.0, 50.0, 350.0, 330.0],
+                        "confidence": 0.86,
+                        "class_id": 0,
+                        "class_name": "person",
+                    }
+                ],
+            }
+        ),
+    )
+    assert detection["ok"] is True
+
+    result = run_real_pose_replay(
+        session=db_session,
+        media_id=indexed_media.id,
+        weights_path=str(pose_weights_path),
+        source_detection_run_id=str(detection["detection_run_id"]),
+        model_name="test-real-pose-frame-bounds",
+        model_version="pose-bounds-test",
+        device="cpu",
+        every_n_frames=30,
+        frame_start=None,
+        frame_end=None,
+        max_frames=None,
+        allowed_roots=[str(pose_weights_path.parent)],
+        probe_runtime=runtime_ok,
+        pose_result_provider=FakePoseResultProvider(),
+    )
+
+    assert result["ok"] is True
+    assert result["observations"]["player_pose_observation"] == 3
+    assert result["summary"]["sampled_frames"] == [0, 30, 60]
+
+
 def test_failure_does_not_silently_create_fixture_poses(
     db_session: Session,
     indexed_media,

@@ -29,6 +29,7 @@ import type {
   ReplayHomographyCandidateOverlay,
   ReplayInfo,
   ReplayMode,
+  ReplayOverlayDisplayMode,
   ReplayOverlayChunk,
   ReplayPlaybackState,
   ReplayPoseOverlay,
@@ -153,6 +154,11 @@ export function ReplayWorkstation({
   const [showDetections, setShowDetections] = useState(true);
   const [showTracklets, setShowTracklets] = useState(true);
   const [showPoses, setShowPoses] = useState(true);
+  const [detectionDisplayMode, setDetectionDisplayMode] =
+    useState<ReplayOverlayDisplayMode>("current_only");
+  const [trackletDisplayMode, setTrackletDisplayMode] =
+    useState<ReplayOverlayDisplayMode>("short_trail");
+  const [showTrackletPaths, setShowTrackletPaths] = useState(false);
   const [showCourtKeypoints, setShowCourtKeypoints] = useState(initialCourtRunId !== null);
   const [showCourtLines, setShowCourtLines] = useState(initialCourtRunId !== null);
   const [showCameraView, setShowCameraView] = useState(initialCourtRunId !== null);
@@ -568,6 +574,7 @@ export function ReplayWorkstation({
               currentFrame={playback.frameNumber}
               currentTimestampMs={playback.timestampMs}
               detections={detections}
+              displayMode={detectionDisplayMode}
               enabled={showDetections && selectedDetectionRunId !== null}
               error={overlayState.error}
               isLoading={overlayState.loading}
@@ -580,6 +587,7 @@ export function ReplayWorkstation({
             <ReplayTrackletOverlayLayer
               currentFrame={playback.frameNumber}
               currentTimestampMs={playback.timestampMs}
+              displayMode={trackletDisplayMode}
               enabled={showTracklets && selectedTrackletRunId !== null}
               error={overlayState.error}
               isLoading={overlayState.loading}
@@ -592,6 +600,7 @@ export function ReplayWorkstation({
               replayInfo={replayInfo}
               selectedTrackletId={selectedTrackletId}
               selectedTrackPointId={selectedTrackPointId}
+              showPaths={showTrackletPaths}
               tracklets={tracklets}
             />
             <ReplayPoseOverlayLayer
@@ -684,12 +693,15 @@ export function ReplayWorkstation({
               setSelectedEvidence(null);
             }}
             onToggleDetections={setShowDetections}
+            onDetectionDisplayModeChange={setDetectionDisplayMode}
             onToggleCameraView={setShowCameraView}
             onToggleCourtKeypoints={setShowCourtKeypoints}
             onToggleCourtLines={setShowCourtLines}
             onToggleHomography={setShowHomography}
             onToggleProjectionDiagnostics={setShowProjectionDiagnostics}
             onTogglePoses={setShowPoses}
+            onTrackletDisplayModeChange={setTrackletDisplayMode}
+            onToggleTrackletPaths={setShowTrackletPaths}
             onToggleTracklets={setShowTracklets}
             poseRuns={replayInfo.available_runs.pose}
             selectedCourtRunId={selectedCourtRunId}
@@ -705,6 +717,9 @@ export function ReplayWorkstation({
             showHomography={showHomography}
             showPoses={showPoses}
             showProjectionDiagnostics={showProjectionDiagnostics}
+            detectionDisplayMode={detectionDisplayMode}
+            trackletDisplayMode={trackletDisplayMode}
+            showTrackletPaths={showTrackletPaths}
             showTracklets={showTracklets}
             trackletRuns={replayInfo.available_runs.tracklet}
           />
@@ -859,7 +874,10 @@ function ReplayLayerControls({
   selectedHomographyRunId,
   selectedProjectionDiagnosticRunId,
   showDetections,
+  detectionDisplayMode,
   showTracklets,
+  trackletDisplayMode,
+  showTrackletPaths,
   showPoses,
   showCourtKeypoints,
   showCourtLines,
@@ -873,7 +891,10 @@ function ReplayLayerControls({
   onSelectedHomographyRunChange,
   onSelectedProjectionDiagnosticRunChange,
   onToggleDetections,
+  onDetectionDisplayModeChange,
   onToggleTracklets,
+  onTrackletDisplayModeChange,
+  onToggleTrackletPaths,
   onTogglePoses,
   onToggleCourtKeypoints,
   onToggleCourtLines,
@@ -894,7 +915,10 @@ function ReplayLayerControls({
   selectedHomographyRunId: string | null;
   selectedProjectionDiagnosticRunId: string | null;
   showDetections: boolean;
+  detectionDisplayMode: ReplayOverlayDisplayMode;
   showTracklets: boolean;
+  trackletDisplayMode: ReplayOverlayDisplayMode;
+  showTrackletPaths: boolean;
   showPoses: boolean;
   showCourtKeypoints: boolean;
   showCourtLines: boolean;
@@ -908,7 +932,10 @@ function ReplayLayerControls({
   onSelectedHomographyRunChange: (runId: string | null) => void;
   onSelectedProjectionDiagnosticRunChange: (runId: string | null) => void;
   onToggleDetections: (enabled: boolean) => void;
+  onDetectionDisplayModeChange: (mode: ReplayOverlayDisplayMode) => void;
   onToggleTracklets: (enabled: boolean) => void;
+  onTrackletDisplayModeChange: (mode: ReplayOverlayDisplayMode) => void;
+  onToggleTrackletPaths: (enabled: boolean) => void;
   onTogglePoses: (enabled: boolean) => void;
   onToggleCourtKeypoints: (enabled: boolean) => void;
   onToggleCourtLines: (enabled: boolean) => void;
@@ -928,6 +955,11 @@ function ReplayLayerControls({
           label="Show detection observations"
           onChange={onToggleDetections}
         />
+        <DisplayModeSelect
+          label="Detection display"
+          onChange={onDetectionDisplayModeChange}
+          value={detectionDisplayMode}
+        />
         <RunSelect
           label="Detection run"
           onChange={onSelectedDetectionRunChange}
@@ -938,6 +970,16 @@ function ReplayLayerControls({
           checked={showTracklets}
           label="Show tracklet candidates"
           onChange={onToggleTracklets}
+        />
+        <DisplayModeSelect
+          label="Tracklet point display"
+          onChange={onTrackletDisplayModeChange}
+          value={trackletDisplayMode}
+        />
+        <LayerToggle
+          checked={showTrackletPaths}
+          label="Show tracklet trail/path"
+          onChange={onToggleTrackletPaths}
         />
         <RunSelect
           label="Tracklet run"
@@ -1021,6 +1063,30 @@ function LayerToggle({
     <label className="toggle-row">
       <input checked={checked} onChange={(event) => onChange(event.target.checked)} type="checkbox" />
       <span>{label}</span>
+    </label>
+  );
+}
+
+function DisplayModeSelect({
+  label,
+  value,
+  onChange
+}: {
+  label: string;
+  value: ReplayOverlayDisplayMode;
+  onChange: (mode: ReplayOverlayDisplayMode) => void;
+}) {
+  return (
+    <label className="select-row">
+      <span>{label}</span>
+      <select
+        onChange={(event) => onChange(event.target.value as ReplayOverlayDisplayMode)}
+        value={value}
+      >
+        <option value="current_only">Current only</option>
+        <option value="short_trail">Short trail</option>
+        <option value="full_trail">Full trail</option>
+      </select>
     </label>
   );
 }

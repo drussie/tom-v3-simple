@@ -7,7 +7,11 @@ import {
   activeReplayDetections,
   imagePixelRectToOverlayRect
 } from "../lib/replayOverlays";
-import type { ReplayDetectionOverlay as ReplayDetectionOverlayItem, ReplayInfo } from "../lib/types";
+import type {
+  ReplayDetectionOverlay as ReplayDetectionOverlayItem,
+  ReplayInfo,
+  ReplayOverlayDisplayMode
+} from "../lib/types";
 import { formatConfidence } from "../lib/timeline";
 
 interface ReplayDetectionOverlayProps {
@@ -20,6 +24,7 @@ interface ReplayDetectionOverlayProps {
   error: string | null;
   selectedObservationId: string | null;
   onSelectObservation: (detection: ReplayDetectionOverlayItem) => void;
+  displayMode?: ReplayOverlayDisplayMode;
   holdMs?: number;
 }
 
@@ -38,6 +43,7 @@ export function ReplayDetectionOverlay({
   error,
   selectedObservationId,
   onSelectObservation,
+  displayMode = "current_only",
   holdMs = 250
 }: ReplayDetectionOverlayProps) {
   const overlayRef = useRef<HTMLDivElement | null>(null);
@@ -59,8 +65,8 @@ export function ReplayDetectionOverlay({
   }, []);
 
   const activeDetections = useMemo(
-    () => activeReplayDetections(detections, currentTimestampMs, currentFrame, holdMs),
-    [currentFrame, currentTimestampMs, detections, holdMs]
+    () => activeReplayDetections(detections, currentTimestampMs, currentFrame, holdMs, displayMode),
+    [currentFrame, currentTimestampMs, detections, displayMode, holdMs]
   );
 
   const status = overlayStatus({

@@ -296,6 +296,8 @@ export interface ReplayDetectionBBox {
   h: number;
 }
 
+export type ReplayOverlayDisplayMode = "current_only" | "short_trail" | "full_trail";
+
 export interface ReplayDetectionOverlay {
   overlay_type: "detection_bbox";
   observation_id: string;

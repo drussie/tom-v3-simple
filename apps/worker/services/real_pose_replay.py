@@ -803,6 +803,17 @@ def _source_player_detections(
 ) -> list[Observation]:
     if source_detection_run_id is None:
         raise RealPoseReplayError("source detection run id is required in crop mode")
+    if every_n_frames <= 0:
+        raise RealPoseReplayError("every_n_frames must be greater than 0")
+    resolved_start = 0 if frame_start is None else int(frame_start)
+    resolved_end = None if frame_end is None else int(frame_end)
+    if resolved_start < 0:
+        raise RealPoseReplayError("frame_start must be greater than or equal to 0")
+    if resolved_end is not None and resolved_end < 0:
+        raise RealPoseReplayError("frame_end must be greater than or equal to 0")
+    if resolved_end is not None and resolved_start > resolved_end:
+        raise RealPoseReplayError("frame_start must be less than or equal to frame_end")
+
     query = (
         select(Observation)
         .where(
@@ -814,18 +825,16 @@ def _source_player_detections(
         )
         .order_by(Observation.frame_start, Observation.id)
     )
-    if frame_start is not None:
-        query = query.where(Observation.frame_start >= frame_start)
-    if frame_end is not None:
-        query = query.where(Observation.frame_start <= frame_end)
+    query = query.where(Observation.frame_start >= resolved_start)
+    if resolved_end is not None:
+        query = query.where(Observation.frame_start <= resolved_end)
     rows = list(session.scalars(query).all())
     if every_n_frames > 1:
-        start = 0 if frame_start is None else frame_start
         rows = [
             row
             for row in rows
             if row.frame_start is not None
-            and (int(row.frame_start) - start) % every_n_frames == 0
+            and (int(row.frame_start) - resolved_start) % every_n_frames == 0
         ]
     if max_frames is not None:
         rows = rows[: max(1, int(max_frames))]

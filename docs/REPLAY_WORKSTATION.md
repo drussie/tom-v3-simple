@@ -60,6 +60,14 @@ Blueprint 8 has started with geometry evidence work. Milestone 8A adds court key
 
 The TOM v1 model assets bridge does not add replay architecture. It lets local TOM v1 detector and pose weights be tested through the existing `detectionRunId`, `trackletRunId`, and `poseRunId` replay paths. If a TOM v1 smoke run succeeds, the replay workstation should label the resulting rows as real model-output observations, not fixture evidence or tracking truth.
 
+Dense real model-output runs can produce visually noisy overlays. The replay workstation provides display-only controls for detection and tracklet evidence:
+
+- Current only
+- Short trail
+- Full trail
+
+Detection display defaults to current-only. Tracklet point display defaults to short-trail, and tracklet trail/path rendering is off by default. These controls reduce visual trails without mutating persisted observations, candidate tracklets, lineage, or evidence-only semantics.
+
 ## What 6A Added
 
 - `GET /media/{media_id}/replay-info`

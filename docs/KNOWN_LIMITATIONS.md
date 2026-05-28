@@ -8,7 +8,7 @@ This registry makes TOM v3 Simple boundaries explicit.
 - Fixture detection is deterministic demo output.
 - Optional YOLO requires a local optional runtime and local weights outside git.
 - TOM v1 model assets under `model_assets/tom_v1/` are local-only ignored files and are not part of the repository.
-- TOM v1 bridge helpers only prepare smoke commands; they do not prove ball/player tracking quality.
+- TOM v1 bridge helpers can run local smoke when optional runtime and model files are present; they do not prove ball/player tracking quality.
 - TOM v1 ball/player detection smoke depends on optional YOLO runtime compatibility, class mapping, confidence thresholds, source media, and device.
 - TOM v1 `keypoints_model.pth` and `view_classifier_gameplay.pt` require future TOM v1-specific adapters; they are not supported by the existing YOLO detection path unless compatibility is proven later.
 - Real YOLO detection quality depends on the chosen model, class mapping, source video, device, and confidence settings.
@@ -32,6 +32,7 @@ This registry makes TOM v3 Simple boundaries explicit.
 - Homography candidates and overlays are candidate geometry evidence; they do not confirm a court model or camera geometry.
 - Real court/camera/homography runtime is not implemented yet.
 - Projection diagnostics project court template geometry for review only; they do not project ball/player detections into court space.
+- Replay current-only, short-trail, and full-trail controls are display policy only; they do not change persisted evidence or prove tracking correctness.
 - TOM v1 model binaries may exist locally, but they are intentionally not tracked or uploaded.
 
 ## Evidence Limitations

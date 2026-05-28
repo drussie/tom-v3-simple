@@ -9,6 +9,7 @@ import {
 } from "../lib/replayOverlays";
 import type {
   ReplayInfo,
+  ReplayOverlayDisplayMode,
   ReplayTrackletOverlay as ReplayTrackletOverlayItem,
   ReplayTrackPointOverlay
 } from "../lib/types";
@@ -29,6 +30,8 @@ interface ReplayTrackletOverlayProps {
     tracklet: ReplayTrackletOverlayItem,
     point: ReplayTrackPointOverlay
   ) => void;
+  displayMode?: ReplayOverlayDisplayMode;
+  showPaths?: boolean;
   holdMs?: number;
 }
 
@@ -49,6 +52,8 @@ export function ReplayTrackletOverlay({
   selectedTrackPointId,
   onSelectTracklet,
   onSelectTrackPoint,
+  displayMode = "short_trail",
+  showPaths = false,
   holdMs = 250
 }: ReplayTrackletOverlayProps) {
   const overlayRef = useRef<HTMLDivElement | null>(null);
@@ -70,8 +75,8 @@ export function ReplayTrackletOverlay({
   }, []);
 
   const activeTracklets = useMemo(
-    () => activeReplayTracklets(tracklets, currentTimestampMs, currentFrame, holdMs),
-    [currentFrame, currentTimestampMs, holdMs, tracklets]
+    () => activeReplayTracklets(tracklets, currentTimestampMs, currentFrame, holdMs, displayMode),
+    [currentFrame, currentTimestampMs, displayMode, holdMs, tracklets]
   );
 
   const status = overlayStatus({
@@ -92,9 +97,10 @@ export function ReplayTrackletOverlay({
               tracklet.points,
               currentTimestampMs,
               currentFrame,
-              holdMs
+              holdMs,
+              displayMode
             );
-            const pathPoints = selected ? tracklet.points : activePoints;
+            const pathPoints = showPaths ? activePoints : [];
             const scaledPath = pathPoints
               .map((point) => scalePoint(point, replayInfo, overlaySize))
               .filter((point): point is { x: number; y: number } => point !== null);
@@ -106,7 +112,7 @@ export function ReplayTrackletOverlay({
                 }${selected ? " selected" : ""}`}
                 key={tracklet.tracklet_id}
               >
-                {selected && scaledPath.length > 1 ? (
+                {showPaths && scaledPath.length > 1 ? (
                   <polyline
                     className="replay-tracklet-path"
                     onClick={(event) => {
