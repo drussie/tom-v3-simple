@@ -43,7 +43,12 @@ POSE_RUN_ID ?=
 MOTION_SMOOTHING_RUN_ID ?=
 COURT_PROJECTION_RUN_NAME ?= object-to-court-projection-candidates-v0
 COURT_PROJECTION_RUN_ID ?=
+BALL_TRAJECTORY_RUN_NAME ?= ball-trajectory-court-candidate-v0
+BALL_TRAJECTORY_RUN_ID ?=
 HOMOGRAPHY_MAX_GAP_MS ?= 1500
+BALL_TRAJECTORY_MAX_GAP_FRAMES ?= 6
+BALL_TRAJECTORY_MAX_GAP_MS ?= 250
+BALL_TRAJECTORY_MIN_POINTS_PER_SEGMENT ?= 3
 AUDIT_DEMO_ONLY ?= true
 AUDIT_STRICT ?= false
 TOM_V3_AUDIT_REQUIRED ?= false
@@ -266,6 +271,11 @@ tom-v1-object-court-projection:
 	@if [ -z "$(MOTION_SMOOTHING_RUN_ID)" ]; then echo "MOTION_SMOOTHING_RUN_ID is required: make tom-v1-object-court-projection MOTION_SMOOTHING_RUN_ID=<motion_smoothing_run_id>"; exit 1; fi
 	@if [ -z "$(HOMOGRAPHY_RUN_ID)" ]; then echo "HOMOGRAPHY_RUN_ID is required: make tom-v1-object-court-projection HOMOGRAPHY_RUN_ID=<homography_run_id>"; exit 1; fi
 	$(PYTHON) -m apps.worker.cli project-objects-to-court --media-id "$(MEDIA_ID)" --motion-smoothing-run-id "$(MOTION_SMOOTHING_RUN_ID)" --homography-run-id "$(HOMOGRAPHY_RUN_ID)" --run-name "$(COURT_PROJECTION_RUN_NAME)" --homography-max-gap-ms "$(HOMOGRAPHY_MAX_GAP_MS)" --viewer-base-url "$(VIEWER_BASE_URL)" $(if $(filter true,$(PLAN_ONLY)),--plan-only,)
+
+tom-v1-ball-court-trajectory:
+	@if [ -z "$(MEDIA_ID)" ]; then echo "MEDIA_ID is required: make tom-v1-ball-court-trajectory MEDIA_ID=<media_id>"; exit 1; fi
+	@if [ -z "$(COURT_PROJECTION_RUN_ID)" ]; then echo "COURT_PROJECTION_RUN_ID is required: make tom-v1-ball-court-trajectory COURT_PROJECTION_RUN_ID=<court_projection_run_id>"; exit 1; fi
+	$(PYTHON) -m apps.worker.cli build-ball-court-trajectory --media-id "$(MEDIA_ID)" --court-projection-run-id "$(COURT_PROJECTION_RUN_ID)" --run-name "$(BALL_TRAJECTORY_RUN_NAME)" --max-gap-frames "$(BALL_TRAJECTORY_MAX_GAP_FRAMES)" --max-gap-ms "$(BALL_TRAJECTORY_MAX_GAP_MS)" --min-points-per-segment "$(BALL_TRAJECTORY_MIN_POINTS_PER_SEGMENT)" --viewer-base-url "$(VIEWER_BASE_URL)" $(if $(filter true,$(PLAN_ONLY)),--plan-only,)
 
 tom-v1-court-keypoints-probe:
 	$(PYTHON) -m apps.worker.cli tom-v1-court-keypoints-probe --weights "$(TOM_V1_MODEL_ROOT)/keypoints_model.pth" --allowed-root "$(TOM_V1_MODEL_ROOT)"

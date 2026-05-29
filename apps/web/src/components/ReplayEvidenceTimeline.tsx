@@ -31,6 +31,7 @@ interface ReplayEvidenceTimelineProps {
     homography_candidates: boolean;
     projection_diagnostics: boolean;
     court_projection: boolean;
+    ball_trajectory: boolean;
     annotations: boolean;
   };
   onSelectItem: (item: ReplayTimelineItem) => void;
@@ -177,14 +178,21 @@ function TimelineItemButton({
   item: ReplayTimelineItem;
   onSelectItem: (item: ReplayTimelineItem) => void;
 }) {
-  if (item.item_type === "tracklet") {
+  if (
+    item.item_type === "tracklet" ||
+    item.item_type === "ball_trajectory_court_candidate"
+  ) {
     const position = timelineSpanPosition(item, durationMs);
+    const label =
+      item.item_type === "tracklet"
+        ? `${item.display_label}: ${item.timestamp_start_ms}-${item.timestamp_end_ms} ms`
+        : `${item.display_label}: ${item.timestamp_start_ms}-${item.timestamp_end_ms} ms`;
     return (
       <button
-        className={`timeline-lane-item span tracklet${isSelected ? " selected" : ""}`}
+        className={`timeline-lane-item span ${item.item_type}${isSelected ? " selected" : ""}`}
         onClick={() => onSelectItem(item)}
         style={{ left: `${position.left}%`, width: `${position.width}%` }}
-        title={`${item.display_label}: ${item.timestamp_start_ms}-${item.timestamp_end_ms} ms`}
+        title={label}
         type="button"
       >
         <span>{item.display_label}</span>
@@ -237,6 +245,12 @@ function emptyLaneText(laneType: ReplayTimelineLane["lane_type"]): string {
   if (laneType === "projection_diagnostics") {
     return "No projection diagnostics in the selected run.";
   }
+  if (laneType === "court_projection") {
+    return "No court projection candidates in the selected run.";
+  }
+  if (laneType === "ball_trajectory") {
+    return "No ball trajectory court candidates in the selected run.";
+  }
   return "No review annotations for this media/run context.";
 }
 
@@ -270,6 +284,12 @@ function proxyEmptyLaneText(laneType: ReplayTimelineLane["lane_type"]): string {
   }
   if (laneType === "projection_diagnostics") {
     return "No projection diagnostics available at the current live-like edge.";
+  }
+  if (laneType === "court_projection") {
+    return "No court projection candidates available at the current live-like edge.";
+  }
+  if (laneType === "ball_trajectory") {
+    return "No ball trajectory court candidates available at the current live-like edge.";
   }
   return "No review annotations available at the current live-like edge.";
 }

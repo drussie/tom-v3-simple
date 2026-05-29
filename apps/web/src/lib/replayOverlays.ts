@@ -1,5 +1,6 @@
 import type {
   HomographyMatrix3x3,
+  ReplayBallCourtTrajectoryOverlay,
   ReplayCameraViewOverlay,
   ReplayBallCourtProjectionOverlay,
   ReplayCourtKeypointOverlay,
@@ -689,6 +690,23 @@ export function filterMainPlayerCourtProjectionAvailableAt(
     return items;
   }
   return items.filter((item) => item.timestamp_ms <= availableUntilMs);
+}
+
+export function filterBallCourtTrajectoryAvailableAt(
+  items: ReplayBallCourtTrajectoryOverlay[],
+  availableUntilMs: number | null
+): ReplayBallCourtTrajectoryOverlay[] {
+  if (availableUntilMs === null) {
+    return items;
+  }
+  return items
+    .filter((item) => item.timestamp_start_ms <= availableUntilMs)
+    .map((item) => ({
+      ...item,
+      timestamp_end_ms: Math.min(item.timestamp_end_ms, availableUntilMs),
+      points: item.points.filter((point) => point.timestamp_ms <= availableUntilMs)
+    }))
+    .filter((item) => item.points.length > 0);
 }
 
 export function filterSmoothedBallAvailableAt(

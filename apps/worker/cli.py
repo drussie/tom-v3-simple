@@ -24,6 +24,7 @@ from apps.api.services.pose_review_export import export_pose_review_dataset
 from apps.api.services.tracklet_review_export import export_tracklet_review_dataset
 from apps.worker.config import settings
 from apps.worker.pipelines.synthetic_seed import seed_synthetic_run
+from apps.worker.services.ball_court_trajectory import build_ball_court_trajectory
 from apps.worker.services.completion_audit import run_completion_audit
 from apps.worker.services.court_adapter import run_fixture_court_adapter
 from apps.worker.services.court_review_export import export_court_review_dataset
@@ -608,6 +609,31 @@ def main() -> None:
     )
     object_court_projection_parser.add_argument("--skip-create-db", action="store_true")
     object_court_projection_parser.set_defaults(handler=_handle_project_objects_to_court)
+
+    ball_court_trajectory_parser = subcommands.add_parser(
+        "build-ball-court-trajectory",
+        help="Build derived court-space ball trajectory candidate observations.",
+    )
+    ball_court_trajectory_parser.add_argument("--media-id", required=True)
+    ball_court_trajectory_parser.add_argument("--court-projection-run-id", required=True)
+    ball_court_trajectory_parser.add_argument(
+        "--run-name",
+        default="ball-trajectory-court-candidate-v0",
+    )
+    ball_court_trajectory_parser.add_argument("--max-gap-frames", type=int, default=6)
+    ball_court_trajectory_parser.add_argument("--max-gap-ms", type=int, default=250)
+    ball_court_trajectory_parser.add_argument("--min-points-per-segment", type=int, default=3)
+    ball_court_trajectory_parser.add_argument(
+        "--viewer-base-url",
+        default="http://127.0.0.1:3000",
+    )
+    ball_court_trajectory_parser.add_argument(
+        "--plan-only",
+        action="store_true",
+        help="Print the ball court trajectory plan without touching observations.",
+    )
+    ball_court_trajectory_parser.add_argument("--skip-create-db", action="store_true")
+    ball_court_trajectory_parser.set_defaults(handler=_handle_build_ball_court_trajectory)
 
     fixture_court_parser = subcommands.add_parser(
         "run-fixture-court",
@@ -1332,6 +1358,23 @@ def _handle_project_objects_to_court(
         homography_run_id=args.homography_run_id,
         run_name=args.run_name,
         homography_max_gap_ms=args.homography_max_gap_ms,
+        viewer_base_url=args.viewer_base_url,
+        plan_only=args.plan_only,
+    )
+
+
+def _handle_build_ball_court_trajectory(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    return build_ball_court_trajectory(
+        session=session,
+        media_id=args.media_id,
+        court_projection_run_id=args.court_projection_run_id,
+        run_name=args.run_name,
+        max_gap_frames=args.max_gap_frames,
+        max_gap_ms=args.max_gap_ms,
+        min_points_per_segment=args.min_points_per_segment,
         viewer_base_url=args.viewer_base_url,
         plan_only=args.plan_only,
     )

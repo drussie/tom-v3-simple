@@ -2167,3 +2167,32 @@ This repair adds:
 Preset changes are UI/read-model display policy only. They do not mutate observations, change model
 outputs, accept/reject geometry, or add bounce/hit/in-out/rally/point/scoring, identity, OCR, or
 adjudication.
+
+## Ball Trajectory Court Candidate v0
+
+Status: complete
+
+### Goal
+
+Build a derived court-template ball trajectory candidate from existing ball court projection
+candidate observations, with velocity/direction/gap diagnostics and no tennis-event truth.
+
+### Notes
+
+This milestone adds:
+
+- worker `build-ball-court-trajectory`
+- Makefile `tom-v1-ball-court-trajectory`
+- `ball_trajectory_court_candidate` observations
+- `observation_family = trajectory`
+- segment-level ordered court-template trajectory payloads
+- kinematic diagnostics for consecutive projected points
+- gap, short-segment, out-of-template, and homography carry-forward diagnostics
+- lineage from source `ball_court_projection_candidate` rows
+- replay `ballTrajectoryRunId` support
+- replay `ball_court_trajectory` layer and `ball_trajectory` timeline lane
+- a court projection mini-map trajectory path
+
+The trajectory is derived candidate evidence only. It does not add bounce, hit, in/out,
+rally/point/score, player identity, scoreboard OCR, server/receiver logic, accepted/rejected
+lifecycle, or adjudication.

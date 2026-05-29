@@ -52,6 +52,7 @@ export interface FetchReplayOverlayChunkInput {
   homographyRunId?: string | null;
   projectionDiagnosticRunId?: string | null;
   courtProjectionRunId?: string | null;
+  ballTrajectoryRunId?: string | null;
   courtTemporalPersistence?: string | null;
   courtPersistenceMaxGapMs?: number | null;
   minConfidence?: number | null;
@@ -72,6 +73,7 @@ export async function fetchReplayOverlayChunk({
   homographyRunId = null,
   projectionDiagnosticRunId = null,
   courtProjectionRunId = null,
+  ballTrajectoryRunId = null,
   courtTemporalPersistence = null,
   courtPersistenceMaxGapMs = null,
   minConfidence = null,
@@ -110,6 +112,9 @@ export async function fetchReplayOverlayChunk({
   if (courtProjectionRunId !== null) {
     params.set("court_projection_run_id", courtProjectionRunId);
   }
+  if (ballTrajectoryRunId !== null) {
+    params.set("ball_trajectory_run_id", ballTrajectoryRunId);
+  }
   if (courtTemporalPersistence !== null) {
     params.set("court_temporal_persistence", courtTemporalPersistence);
   }
@@ -145,6 +150,7 @@ export interface FetchReplayTimelineInput {
   homographyRunId?: string | null;
   projectionDiagnosticRunId?: string | null;
   courtProjectionRunId?: string | null;
+  ballTrajectoryRunId?: string | null;
   includeAnnotations?: boolean;
 }
 
@@ -159,6 +165,7 @@ export async function fetchReplayTimeline({
   homographyRunId = null,
   projectionDiagnosticRunId = null,
   courtProjectionRunId = null,
+  ballTrajectoryRunId = null,
   includeAnnotations = true
 }: FetchReplayTimelineInput): Promise<ReplayTimeline> {
   const params = new URLSearchParams({
@@ -191,6 +198,9 @@ export async function fetchReplayTimeline({
   }
   if (courtProjectionRunId !== null) {
     params.set("court_projection_run_id", courtProjectionRunId);
+  }
+  if (ballTrajectoryRunId !== null) {
+    params.set("ball_trajectory_run_id", ballTrajectoryRunId);
   }
 
   const response = await fetch(`/api/replay/timeline?${params.toString()}`, {

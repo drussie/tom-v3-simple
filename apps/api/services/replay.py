@@ -44,6 +44,7 @@ COURT_PROJECTION_TYPES = {
     "ball_court_projection_candidate",
     "main_player_court_projection_candidate",
 }
+BALL_TRAJECTORY_TYPES = {"ball_trajectory_court_candidate"}
 MAIN_PLAYER_TRACK_TYPES = {
     "main_player_track_candidate",
     "main_player_track_assignment_candidate",
@@ -132,6 +133,7 @@ def build_replay_overlay_chunk(
     homography_run_id: str | None = None,
     projection_diagnostic_run_id: str | None = None,
     court_projection_run_id: str | None = None,
+    ball_trajectory_run_id: str | None = None,
     court_temporal_persistence: str = COURT_TEMPORAL_PERSISTENCE_CARRY_FORWARD,
     court_persistence_max_gap_ms: int = DEFAULT_COURT_PERSISTENCE_MAX_GAP_MS,
     min_confidence: float | None = None,
@@ -309,6 +311,17 @@ def build_replay_overlay_chunk(
         if "main_player_court_projection" in layers
         else []
     )
+    ball_court_trajectory = (
+        build_ball_court_trajectory_overlay_items(
+            session=session,
+            media=media,
+            start_ms=start_ms,
+            end_ms=end_ms,
+            ball_trajectory_run_id=ball_trajectory_run_id,
+        )
+        if "ball_court_trajectory" in layers
+        else []
+    )
     return {
         "media_id": media.id,
         "start_ms": start_ms,
@@ -330,6 +343,7 @@ def build_replay_overlay_chunk(
         "projection_diagnostics": projection_diagnostics,
         "ball_court_projection": ball_court_projection,
         "main_player_court_projection": main_player_court_projection,
+        "ball_court_trajectory": ball_court_trajectory,
         "court_temporal_persistence": court_temporal_persistence,
         "court_persistence_max_gap_ms": court_persistence_max_gap_ms,
         "observation_only": True,
@@ -350,6 +364,7 @@ def build_replay_timeline(
     homography_run_id: str | None = None,
     projection_diagnostic_run_id: str | None = None,
     court_projection_run_id: str | None = None,
+    ball_trajectory_run_id: str | None = None,
     include_annotations: bool = True,
 ) -> dict[str, Any] | None:
     media = session.get(MediaAsset, media_id)
@@ -374,6 +389,7 @@ def build_replay_timeline(
                     homography_run_id,
                     projection_diagnostic_run_id,
                     court_projection_run_id,
+                    ball_trajectory_run_id,
                 )
                 if run_id is not None
             },
@@ -485,6 +501,15 @@ def build_replay_timeline(
                     session=session,
                     media=media,
                     court_projection_run_id=court_projection_run_id,
+                ),
+            },
+            {
+                "lane_type": "ball_trajectory",
+                "label": "Ball trajectory court candidates",
+                "items": build_ball_trajectory_timeline_items(
+                    session=session,
+                    media=media,
+                    ball_trajectory_run_id=ball_trajectory_run_id,
                 ),
             },
             {
@@ -1037,6 +1062,65 @@ def court_projection_timeline_item_from_observation(
         "not_ball_truth": overlay_item.get("not_ball_truth"),
         "not_player_truth": overlay_item.get("not_player_truth"),
         "not_court_truth": True,
+        "observation_only": True,
+        "no_adjudication": True,
+    }
+
+
+def build_ball_trajectory_timeline_items(
+    session: Session,
+    *,
+    media: MediaAsset,
+    ball_trajectory_run_id: str | None = None,
+) -> list[dict[str, Any]]:
+    query = (
+        select(Observation)
+        .where(
+            Observation.media_id == media.id,
+            Observation.observation_type.in_(sorted(BALL_TRAJECTORY_TYPES)),
+            Observation.timestamp_start_ms.is_not(None),
+        )
+        .order_by(Observation.timestamp_start_ms, Observation.frame_start, Observation.id)
+    )
+    if ball_trajectory_run_id is not None:
+        query = query.where(Observation.run_id == ball_trajectory_run_id)
+
+    items: list[dict[str, Any]] = []
+    for observation in session.scalars(query).all():
+        item = ball_trajectory_timeline_item_from_observation(observation)
+        if item is not None:
+            items.append(item)
+    return items
+
+
+def ball_trajectory_timeline_item_from_observation(
+    observation: Observation,
+) -> dict[str, Any] | None:
+    overlay_item = ball_trajectory_overlay_item_from_observation(observation)
+    if overlay_item is None:
+        return None
+    return {
+        "item_type": "ball_trajectory_court_candidate",
+        "observation_id": observation.id,
+        "run_id": observation.run_id,
+        "timestamp_ms": overlay_item["timestamp_start_ms"],
+        "frame_number": overlay_item["frame_start"],
+        "timestamp_start_ms": overlay_item["timestamp_start_ms"],
+        "timestamp_end_ms": overlay_item["timestamp_end_ms"],
+        "frame_start": overlay_item["frame_start"],
+        "frame_end": overlay_item["frame_end"],
+        "display_label": "ball trajectory court candidate",
+        "point_count": overlay_item["point_count"],
+        "trajectory_method": overlay_item["trajectory_method"],
+        "coordinate_space": overlay_item["coordinate_space"],
+        "source_court_projection_run_id": overlay_item[
+            "source_court_projection_run_id"
+        ],
+        "trajectory_candidate_only": True,
+        "not_ball_truth": True,
+        "not_bounce_truth": True,
+        "not_hit_truth": True,
+        "not_in_out_truth": True,
         "observation_only": True,
         "no_adjudication": True,
     }
@@ -1687,6 +1771,28 @@ def build_main_player_court_projection_overlay_items(
     ]
 
 
+def build_ball_court_trajectory_overlay_items(
+    session: Session,
+    *,
+    media: MediaAsset,
+    start_ms: int,
+    end_ms: int,
+    ball_trajectory_run_id: str | None = None,
+) -> list[dict[str, Any]]:
+    rows = _ball_trajectory_rows(
+        session=session,
+        media=media,
+        start_ms=start_ms,
+        end_ms=end_ms,
+        ball_trajectory_run_id=ball_trajectory_run_id,
+    )
+    return [
+        item
+        for row in rows
+        if (item := ball_trajectory_overlay_item_from_observation(row)) is not None
+    ]
+
+
 def court_projection_overlay_item_from_observation(
     observation: Observation,
 ) -> dict[str, Any] | None:
@@ -1788,6 +1894,85 @@ def court_projection_overlay_item_from_observation(
     }
 
 
+def ball_trajectory_overlay_item_from_observation(
+    observation: Observation,
+) -> dict[str, Any] | None:
+    if observation.observation_type not in BALL_TRAJECTORY_TYPES:
+        return None
+    payload = observation.payload_jsonb or {}
+    points = payload.get("points")
+    if not isinstance(points, list):
+        return None
+    frame_start = _optional_int(payload.get("frame_start") or observation.frame_start)
+    frame_end = _optional_int(payload.get("frame_end") or observation.frame_end)
+    timestamp_start_ms = _optional_int(
+        payload.get("timestamp_start_ms") or observation.timestamp_start_ms
+    )
+    timestamp_end_ms = _optional_int(
+        payload.get("timestamp_end_ms") or observation.timestamp_end_ms
+    )
+    if (
+        frame_start is None
+        or frame_end is None
+        or timestamp_start_ms is None
+        or timestamp_end_ms is None
+    ):
+        return None
+    normalized_points = [
+        point
+        for raw_point in points
+        if (point := _trajectory_point_payload(raw_point)) is not None
+    ]
+    if not normalized_points:
+        return None
+    diagnostics = payload.get("diagnostics") if isinstance(payload.get("diagnostics"), dict) else {}
+    kinematics = payload.get("kinematics") if isinstance(payload.get("kinematics"), list) else []
+    return {
+        "overlay_type": "ball_trajectory_court_candidate",
+        "observation_id": observation.id,
+        "run_id": observation.run_id,
+        "source_court_projection_run_id": _string_or_none(
+            payload.get("source_court_projection_run_id")
+        ),
+        "source_ball_court_projection_observation_ids": (
+            payload.get("source_ball_court_projection_observation_ids") or []
+        ),
+        "trajectory_segment_index": _optional_int(
+            payload.get("trajectory_segment_index")
+        )
+        or 0,
+        "frame_start": frame_start,
+        "frame_end": frame_end,
+        "timestamp_start_ms": timestamp_start_ms,
+        "timestamp_end_ms": timestamp_end_ms,
+        "point_count": _optional_int(payload.get("point_count")) or len(normalized_points),
+        "points": normalized_points,
+        "kinematics": kinematics,
+        "diagnostics": diagnostics,
+        "trajectory_method": _string_or_none(payload.get("trajectory_method")),
+        "coordinate_space": _string_or_none(payload.get("coordinate_space"))
+        or observation.coordinate_space
+        or "court_template_2d",
+        "template_name": _string_or_none(payload.get("template_name")),
+        "template_version": _string_or_none(payload.get("template_version")),
+        "confidence": observation.confidence,
+        "trajectory_candidate_only": True,
+        "not_ball_truth": True,
+        "not_bounce_truth": True,
+        "not_hit_truth": True,
+        "not_in_out_truth": True,
+        "observation_only": True,
+        "no_adjudication": True,
+        "model_registry_id": observation.model_id,
+        "model_name": observation.model.name if observation.model is not None else None,
+        "model_version": observation.model.version if observation.model is not None else None,
+        "runtime_config_id": observation.runtime_config_id,
+        "evidence_source": "ball_trajectory_court_candidate",
+        "source_label": _string_or_none(payload.get("source_label"))
+        or "ball trajectory court candidate",
+    }
+
+
 def _court_projection_rows(
     *,
     session: Session,
@@ -1812,6 +1997,59 @@ def _court_projection_rows(
     if court_projection_run_id is not None:
         query = query.where(Observation.run_id == court_projection_run_id)
     return list(session.scalars(query).all())
+
+
+def _ball_trajectory_rows(
+    *,
+    session: Session,
+    media: MediaAsset,
+    start_ms: int,
+    end_ms: int,
+    ball_trajectory_run_id: str | None,
+) -> list[Observation]:
+    timestamp_end = func.coalesce(Observation.timestamp_end_ms, Observation.timestamp_start_ms)
+    query = (
+        select(Observation)
+        .where(
+            Observation.media_id == media.id,
+            Observation.observation_type.in_(sorted(BALL_TRAJECTORY_TYPES)),
+            Observation.timestamp_start_ms.is_not(None),
+            Observation.timestamp_start_ms <= end_ms,
+            timestamp_end >= start_ms,
+        )
+        .order_by(Observation.timestamp_start_ms, Observation.frame_start, Observation.id)
+    )
+    if ball_trajectory_run_id is not None:
+        query = query.where(Observation.run_id == ball_trajectory_run_id)
+    return list(session.scalars(query).all())
+
+
+def _trajectory_point_payload(raw_point: Any) -> dict[str, Any] | None:
+    if not isinstance(raw_point, dict):
+        return None
+    court_x = _numeric(raw_point.get("court_x"))
+    court_y = _numeric(raw_point.get("court_y"))
+    frame_number = _optional_int(raw_point.get("frame_number"))
+    timestamp_ms = _optional_int(raw_point.get("timestamp_ms"))
+    if court_x is None or court_y is None or frame_number is None or timestamp_ms is None:
+        return None
+    return {
+        "frame_number": frame_number,
+        "timestamp_ms": timestamp_ms,
+        "court_x": court_x,
+        "court_y": court_y,
+        "source_observation_id": _string_or_none(raw_point.get("source_observation_id")),
+        "source_homography_observation_id": _string_or_none(
+            raw_point.get("source_homography_observation_id")
+        ),
+        "homography_time_delta_ms": _optional_int(
+            raw_point.get("homography_time_delta_ms")
+        ),
+        "homography_carried_forward": _truthy(
+            raw_point.get("homography_carried_forward")
+        ),
+        "inside_template_bounds": bool(raw_point.get("inside_template_bounds", True)),
+    }
 
 
 def build_court_keypoint_overlay_items(
@@ -2267,6 +2505,7 @@ def available_runs_for_media(session: Session, media_id: str) -> dict[str, list[
         "homography": _homography_run_summaries(session, media_id),
         "projection_diagnostic": _projection_diagnostic_run_summaries(session, media_id),
         "court_projection": _court_projection_run_summaries(session, media_id),
+        "ball_trajectory": _ball_trajectory_run_summaries(session, media_id),
         "main_player_track": _main_player_track_run_summaries(session, media_id),
         "motion_smoothing": _motion_smoothing_run_summaries(session, media_id),
     }
@@ -2356,6 +2595,14 @@ def normalize_replay_layers(layers: str | list[str] | tuple[str, ...] | None) ->
             "ball_projection",
         }:
             layer = "ball_court_projection"
+        if layer in {
+            "ball_trajectory",
+            "ball-trajectory",
+            "ball_court_trajectory_candidate",
+            "ball_trajectory_court_candidate",
+            "court_ball_trajectory",
+        }:
+            layer = "ball_court_trajectory"
         if layer in {
             "main-player-court-projection",
             "main_player_court_projection_candidate",
@@ -2538,6 +2785,51 @@ def _court_projection_run_summaries(
                 "not_ball_truth": True,
                 "not_player_truth": True,
                 "not_court_truth": True,
+                "observation_only": True,
+                "no_adjudication": True,
+                "is_fixture": False,
+                "is_real_model_output": False,
+                "model_output_not_truth": False,
+            }
+        )
+    return summaries
+
+
+def _ball_trajectory_run_summaries(
+    session: Session,
+    media_id: str,
+) -> list[dict[str, Any]]:
+    summaries = _run_summaries_for_observation_types(session, media_id, BALL_TRAJECTORY_TYPES)
+    if not summaries:
+        return []
+
+    counts_by_run_type = _counts_by_run_and_type(session, media_id, BALL_TRAJECTORY_TYPES)
+    for summary in summaries:
+        run = session.get(ProcessingRun, summary["run_id"])
+        runtime_payload = run.runtime_config.payload_jsonb if run and run.runtime_config else {}
+        run_metadata = run.metadata_jsonb if run is not None else {}
+        source_court_projection_run_id = _string_or_none(
+            run_metadata.get("source_court_projection_run_id")
+        ) or _string_or_none(runtime_payload.get("source_court_projection_run_id"))
+        trajectory_summary = run_metadata.get("trajectory_summary") or {}
+        summary.update(
+            {
+                "evidence_source": "ball_trajectory_court_candidate",
+                "source_label": "ball trajectory court candidate",
+                "source_court_projection_run_id": source_court_projection_run_id,
+                "ball_trajectory_court_candidate_count": counts_by_run_type.get(
+                    (summary["run_id"], "ball_trajectory_court_candidate"), 0
+                ),
+                "source_point_count": (
+                    trajectory_summary.get("source_point_count")
+                    if isinstance(trajectory_summary, dict)
+                    else None
+                ),
+                "trajectory_candidate_only": True,
+                "not_ball_truth": True,
+                "not_bounce_truth": True,
+                "not_hit_truth": True,
+                "not_in_out_truth": True,
                 "observation_only": True,
                 "no_adjudication": True,
                 "is_fixture": False,

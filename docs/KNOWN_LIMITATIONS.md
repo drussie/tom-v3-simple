@@ -82,6 +82,9 @@ This registry makes TOM v3 Simple boundaries explicit.
 - Replay Mode can display object-to-court projection candidates through `courtProjectionRunId` in a
   normalized court mini-map; those points are candidate template projections, not confirmed court
   positions or tennis-event facts.
+- Replay Mode can display `ball_trajectory_court_candidate` paths through `ballTrajectoryRunId`,
+  but these are derived trajectory candidates only; they do not identify bounces, hits, in/out, or
+  scoring events.
 - Replay view presets are display defaults only. Operator view hides raw/debug layers by default,
   and debug/audit view enables them, but neither preset changes persisted observations or proves
   evidence correctness.

@@ -114,6 +114,12 @@ candidate overlays, projection diagnostics, camera/view evidence, raw detection 
 are kept off until the operator enables them. `viewPreset=debug` applies a busy audit preset with
 raw/debug evidence visible when its run ids exist. Both presets are display policy only.
 
+Ball Trajectory Court Candidate v0 adds `ballTrajectoryRunId` replay support for derived
+`ball_trajectory_court_candidate` rows. Replay exposes these through the `ball_court_trajectory`
+payload, a `ball_trajectory` timeline lane, selected evidence details, and a subtle trajectory path
+inside the normalized court-template mini-map. The trajectory is a candidate sequence of projected
+ball evidence; it does not imply bounce, hit, in/out, point, or score.
+
 ## What 6A Added
 
 - `GET /media/{media_id}/replay-info`
@@ -521,18 +527,18 @@ http://127.0.0.1:3000/replay/<media_id>
 Optional context query parameters:
 
 ```text
-?detectionRunId=<run_id>&trackletRunId=<run_id>&poseRunId=<run_id>&courtRunId=<run_id>&homographyRunId=<run_id>&projectionDiagnosticRunId=<run_id>&courtProjectionRunId=<run_id>&viewPreset=operator
+?detectionRunId=<run_id>&trackletRunId=<run_id>&poseRunId=<run_id>&courtRunId=<run_id>&homographyRunId=<run_id>&projectionDiagnosticRunId=<run_id>&courtProjectionRunId=<run_id>&ballTrajectoryRunId=<run_id>&viewPreset=operator
 ```
 
 `detectionRunId`, `trackletRunId`, `poseRunId`, `courtRunId`, `homographyRunId`,
-`projectionDiagnosticRunId`, and `courtProjectionRunId` select the persisted evidence runs used for
-replay overlay playback. `viewPreset=operator|debug` selects the initial replay layer preset;
-operator is the default when the parameter is omitted.
+`projectionDiagnosticRunId`, `courtProjectionRunId`, and `ballTrajectoryRunId` select the persisted
+evidence runs used for replay overlay playback. `viewPreset=operator|debug` selects the initial
+replay layer preset; operator is the default when the parameter is omitted.
 
 Open Stream Proxy Mode:
 
 ```text
-?mode=stream_proxy&detectionRunId=<run_id>&trackletRunId=<run_id>&poseRunId=<run_id>&courtRunId=<run_id>&homographyRunId=<run_id>&projectionDiagnosticRunId=<run_id>&courtProjectionRunId=<run_id>
+?mode=stream_proxy&detectionRunId=<run_id>&trackletRunId=<run_id>&poseRunId=<run_id>&courtRunId=<run_id>&homographyRunId=<run_id>&projectionDiagnosticRunId=<run_id>&courtProjectionRunId=<run_id>&ballTrajectoryRunId=<run_id>
 ```
 
 In Stream Proxy Mode, future evidence is not rendered in overlays or timeline

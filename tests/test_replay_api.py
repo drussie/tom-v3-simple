@@ -28,6 +28,7 @@ from apps.api.services.replay import (
     frame_to_replay_timestamp_ms,
     timestamp_ms_to_replay_frame,
 )
+from apps.worker.services.ball_court_trajectory import build_ball_court_trajectory
 from apps.worker.services.court_adapter import run_fixture_court_adapter
 from apps.worker.services.homography_candidate_builder import build_homography_candidates
 from apps.worker.services.object_court_projection import project_objects_to_court
@@ -654,6 +655,59 @@ def test_replay_overlay_and_timeline_return_court_projection_candidates(
     }
     assert all(item["projection_candidate_only"] is True for item in items)
 
+    trajectory_result = build_ball_court_trajectory(
+        session=db_session,
+        media_id=media.id,
+        court_projection_run_id=projection_result["court_projection_run_id"],
+        min_points_per_segment=1,
+    )
+    assert trajectory_result["ok"] is True
+    info_response = client.get(f"/media/{media.id}/replay-info")
+    assert info_response.status_code == 200
+    trajectory_run = info_response.json()["available_runs"]["ball_trajectory"][0]
+    assert trajectory_run["run_id"] == trajectory_result["ball_trajectory_run_id"]
+    assert trajectory_run["evidence_source"] == "ball_trajectory_court_candidate"
+    assert trajectory_run["ball_trajectory_court_candidate_count"] == 1
+    assert trajectory_run["trajectory_candidate_only"] is True
+
+    trajectory_overlay_response = client.get(
+        "/replay/overlays",
+        params={
+            "media_id": media.id,
+            "start_ms": 0,
+            "end_ms": 2000,
+            "layers": "ball_court_trajectory",
+            "ball_trajectory_run_id": trajectory_result["ball_trajectory_run_id"],
+        },
+    )
+    assert trajectory_overlay_response.status_code == 200
+    trajectory_body = trajectory_overlay_response.json()
+    assert len(trajectory_body["ball_court_trajectory"]) == 1
+    trajectory = trajectory_body["ball_court_trajectory"][0]
+    assert trajectory["overlay_type"] == "ball_trajectory_court_candidate"
+    assert trajectory["point_count"] == 1
+    assert trajectory["trajectory_candidate_only"] is True
+    assert trajectory["not_bounce_truth"] is True
+    assert trajectory["not_hit_truth"] is True
+    assert trajectory["not_in_out_truth"] is True
+
+    trajectory_timeline_response = client.get(
+        "/replay/timeline",
+        params={
+            "media_id": media.id,
+            "ball_trajectory_run_id": trajectory_result["ball_trajectory_run_id"],
+        },
+    )
+    assert trajectory_timeline_response.status_code == 200
+    trajectory_lanes = {
+        lane["lane_type"]: lane for lane in trajectory_timeline_response.json()["lanes"]
+    }
+    trajectory_items = trajectory_lanes["ball_trajectory"]["items"]
+    assert [item["item_type"] for item in trajectory_items] == [
+        "ball_trajectory_court_candidate"
+    ]
+    assert trajectory_items[0]["trajectory_candidate_only"] is True
+
 
 def test_replay_overlay_endpoint_returns_court_and_homography_items(
     client: TestClient,
@@ -1051,6 +1105,7 @@ def test_replay_timeline_endpoint_returns_evidence_lanes(
         "homography_candidates",
         "projection_diagnostics",
         "court_projection",
+        "ball_trajectory",
         "annotations",
     }
 

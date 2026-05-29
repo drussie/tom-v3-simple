@@ -823,6 +823,24 @@ candidate homography rows into normalized `court_template_2d` coordinates. These
 candidate evidence only. They do not confirm ball location, player location, court truth, bounce,
 hit, in/out, point, score, identity, or adjudication.
 
+Ball trajectory court candidate:
+
+```bash
+TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_tom_v1_bridge.db \
+.venv/bin/python -m apps.worker.cli build-ball-court-trajectory \
+  --media-id <media_id> \
+  --court-projection-run-id <court_projection_run_id> \
+  --max-gap-frames 6 \
+  --max-gap-ms 250 \
+  --min-points-per-segment 3 \
+  --viewer-base-url http://127.0.0.1:3000
+```
+
+This creates derived `ball_trajectory_court_candidate` segment rows from ordered
+`ball_court_projection_candidate` points. The trajectory includes velocity, direction, gap,
+out-of-template, and homography carry-forward diagnostics. It is not bounce truth, hit truth,
+in/out truth, rally/point/score logic, or adjudication.
+
 Makefile helpers:
 
 ```bash
@@ -839,6 +857,7 @@ make tom-v1-pose-main-subjects MEDIA_ID=<media_id> SOURCE_DETECTION_RUN_ID=<play
 make tom-v1-pose-main-tracks MEDIA_ID=<media_id> SOURCE_DETECTION_RUN_ID=<player_real_detection_run_id> SOURCE_SUBJECT_RUN_ID=<main_subject_run_id> SOURCE_TRACK_RUN_ID=<main_player_track_run_id> PYTHON=.venv/bin/python MAX_FRAMES=214
 make tom-v1-motion-smoothing MEDIA_ID=<media_id> DETECTION_RUN_ID=<detection_run_id> TRACKLET_RUN_ID=<tracklet_run_id> MAIN_PLAYER_TRACK_RUN_ID=<main_player_track_run_id> POSE_RUN_ID=<pose_run_id> PYTHON=.venv/bin/python
 make tom-v1-object-court-projection MEDIA_ID=<media_id> MOTION_SMOOTHING_RUN_ID=<motion_smoothing_run_id> HOMOGRAPHY_RUN_ID=<homography_run_id> PYTHON=.venv/bin/python
+make tom-v1-ball-court-trajectory MEDIA_ID=<media_id> COURT_PROJECTION_RUN_ID=<court_projection_run_id> PYTHON=.venv/bin/python
 ```
 
 The TOM v1 Makefile helpers pass `--allowed-root "$(TOM_V1_MODEL_ROOT)"` and default image sizes that match the local smoke path: 1280 for `best_ball_v2_1280.pt`, 640 for `yolo26x.pt`, 640 for `yolo26x-pose.pt`, and 224 fixed preprocessing for the recognized court keypoint state dict. Override with `IMG_SIZE=<value>` only when testing a deliberate alternate model input size. The court keypoint adapter records requested image size but uses the recognized 224x224 model input convention.
@@ -870,8 +889,8 @@ Detection display defaults to current-only. Tracklet point display defaults to s
 Replay view presets:
 
 ```text
-/replay/<media_id>?motionSmoothingRunId=<run_id>&courtRunId=<run_id>&homographyRunId=<run_id>&courtProjectionRunId=<run_id>&viewPreset=operator
-/replay/<media_id>?motionSmoothingRunId=<run_id>&courtRunId=<run_id>&homographyRunId=<run_id>&courtProjectionRunId=<run_id>&viewPreset=debug
+/replay/<media_id>?motionSmoothingRunId=<run_id>&courtRunId=<run_id>&homographyRunId=<run_id>&courtProjectionRunId=<run_id>&ballTrajectoryRunId=<run_id>&viewPreset=operator
+/replay/<media_id>?motionSmoothingRunId=<run_id>&courtRunId=<run_id>&homographyRunId=<run_id>&courtProjectionRunId=<run_id>&ballTrajectoryRunId=<run_id>&viewPreset=debug
 ```
 
 `operator` is the default when `viewPreset` is omitted. It keeps the replay clean by showing stable

@@ -99,10 +99,19 @@ def test_replay_display_policy_helpers_define_expected_modes() -> None:
     assert "showProjectionDiagnostics: false" in workstation
     assert "showBallCourtProjection: context.hasCourtProjectionRun" in workstation
     assert "showMainPlayerCourtProjection: context.hasCourtProjectionRun" in workstation
+    assert "showBallCourtTrajectory: context.hasBallTrajectoryRun" in workstation
     assert "showSmoothedBall: context.hasMotionSmoothingRun" in workstation
     assert "showSmoothedPlayerBoxes: context.hasMotionSmoothingRun" in workstation
     assert "showSmoothedPoses: context.hasMotionSmoothingRun" in workstation
     assert "courtTemporalPersistence: \"carry_forward\"" in workstation
     assert "viewPreset?: string" in (
         ROOT / "apps/web/src/app/replay/[mediaId]/page.tsx"
+    ).read_text()
+    assert "ballTrajectoryRunId?: string" in (
+        ROOT / "apps/web/src/app/replay/[mediaId]/page.tsx"
+    ).read_text()
+    assert "ReplayBallCourtTrajectoryOverlay" in (ROOT / "apps/web/src/lib/types.ts").read_text()
+    assert "ballTrajectoryRunId" in (ROOT / "apps/web/src/lib/api.ts").read_text()
+    assert "BALL TRAJECTORY CANDIDATE" in (
+        ROOT / "apps/web/src/components/ReplayCourtProjectionMiniMap.tsx"
     ).read_text()

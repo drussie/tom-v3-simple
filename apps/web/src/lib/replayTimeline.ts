@@ -2,7 +2,6 @@ import type {
   ReplayTimelineItem,
   ReplayTimelineLane,
   ReplaySmoothedMotionTimelineItem,
-  ReplayTrackletTimelineItem
 } from "./types";
 
 export function timelinePointPercent(
@@ -16,7 +15,7 @@ export function timelinePointPercent(
 }
 
 export function timelineSpanPosition(
-  item: ReplayTrackletTimelineItem,
+  item: { timestamp_start_ms: number; timestamp_end_ms: number },
   durationMs: number | null
 ): { left: number; width: number } {
   if (durationMs === null || durationMs <= 0) {
@@ -33,7 +32,10 @@ export function timelineSpanPosition(
 }
 
 export function timelineItemTimestampMs(item: ReplayTimelineItem): number {
-  if (item.item_type === "tracklet") {
+  if (
+    item.item_type === "tracklet" ||
+    item.item_type === "ball_trajectory_court_candidate"
+  ) {
     return item.timestamp_start_ms;
   }
   return item.timestamp_ms;
@@ -76,6 +78,9 @@ export function timelineItemKey(item: ReplayTimelineItem): string {
   ) {
     return `${item.item_type}:${item.observation_id}`;
   }
+  if (item.item_type === "ball_trajectory_court_candidate") {
+    return `ball_trajectory_court_candidate:${item.observation_id}`;
+  }
   if (item.item_type === "annotation") {
     return `annotation:${item.annotation_id}`;
   }
@@ -99,7 +104,10 @@ export function timelineItemAvailableAt(
   if (availableUntilMs === null) {
     return true;
   }
-  if (item.item_type === "tracklet") {
+  if (
+    item.item_type === "tracklet" ||
+    item.item_type === "ball_trajectory_court_candidate"
+  ) {
     return item.timestamp_start_ms <= availableUntilMs;
   }
   return item.timestamp_ms <= availableUntilMs;
@@ -115,7 +123,10 @@ export function timelineLaneItemsAvailableAt(
   return lane.items
     .filter((item) => timelineItemAvailableAt(item, availableUntilMs))
     .map((item) => {
-      if (item.item_type !== "tracklet") {
+      if (
+        item.item_type !== "tracklet" &&
+        item.item_type !== "ball_trajectory_court_candidate"
+      ) {
         return item;
       }
       return {

@@ -123,3 +123,8 @@ This milestone does not add:
 - adjudication
 
 Court projection candidates are prerequisites for future event-candidate work, not event truth.
+
+Ball Trajectory Court Candidate v0 consumes `ball_court_projection_candidate` rows to build
+`ball_trajectory_court_candidate` segments with velocity, direction, gap, and carry-forward
+diagnostics. That downstream layer remains candidate evidence; it does not infer bounce, hit,
+in/out, point, or score.

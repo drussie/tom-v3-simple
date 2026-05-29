@@ -1,6 +1,7 @@
 "use client";
 
 import type {
+  ReplayBallCourtTrajectoryOverlay,
   ReplayBallCourtProjectionOverlay,
   ReplayMainPlayerCourtProjectionOverlay
 } from "../lib/types";
@@ -11,11 +12,14 @@ import {
 
 interface ReplayCourtProjectionMiniMapProps {
   ballProjections: ReplayBallCourtProjectionOverlay[];
+  ballTrajectories: ReplayBallCourtTrajectoryOverlay[];
   mainPlayerProjections: ReplayMainPlayerCourtProjectionOverlay[];
   currentTimestampMs: number;
   currentFrame: number;
   showBall: boolean;
+  showBallTrajectory: boolean;
   showPlayers: boolean;
+  onSelectBallTrajectory: (item: ReplayBallCourtTrajectoryOverlay) => void;
   selectedObservationId?: string | null;
   onSelectBallProjection: (item: ReplayBallCourtProjectionOverlay) => void;
   onSelectMainPlayerProjection: (item: ReplayMainPlayerCourtProjectionOverlay) => void;
@@ -26,11 +30,14 @@ const COURT_HEIGHT = 180;
 
 export function ReplayCourtProjectionMiniMap({
   ballProjections,
+  ballTrajectories,
   mainPlayerProjections,
   currentTimestampMs,
   currentFrame,
   showBall,
+  showBallTrajectory,
   showPlayers,
+  onSelectBallTrajectory,
   selectedObservationId = null,
   onSelectBallProjection,
   onSelectMainPlayerProjection
@@ -45,8 +52,11 @@ export function ReplayCourtProjectionMiniMap({
         currentFrame
       )
     : [];
+  const activeTrajectories = showBallTrajectory
+    ? activeReplayBallCourtTrajectories(ballTrajectories, currentTimestampMs, currentFrame)
+    : [];
 
-  if (activeBall.length === 0 && activePlayers.length === 0) {
+  if (activeBall.length === 0 && activePlayers.length === 0 && activeTrajectories.length === 0) {
     return (
       <section className="replay-court-projection-panel">
         <div>
@@ -82,6 +92,26 @@ export function ReplayCourtProjectionMiniMap({
         <line className="court-map-line muted" x1="236" y1="8" x2="236" y2="172" />
         <line className="court-map-line muted" x1="8" y1="48" x2="312" y2="48" />
         <line className="court-map-line muted" x1="8" y1="132" x2="312" y2="132" />
+        {activeTrajectories.map((item) => {
+          const points = trajectoryPointsToSvgPath(item, currentTimestampMs);
+          if (points.length < 2) {
+            return null;
+          }
+          return (
+            <g
+              key={item.observation_id}
+              className={`court-trajectory-group ${
+                selectedObservationId === item.observation_id ? "selected" : ""
+              }`}
+              onClick={() => onSelectBallTrajectory(item)}
+            >
+              <polyline points={points.map((point) => `${point.x},${point.y}`).join(" ")} />
+              <text x={points[points.length - 1].x + 7} y={points[points.length - 1].y - 5}>
+                BALL TRAJECTORY CANDIDATE
+              </text>
+            </g>
+          );
+        })}
         {activePlayers.map((item) => {
           const point = templatePointToSvg(item.court_point.x, item.court_point.y);
           const role = item.track_role_candidate?.includes("near")
@@ -136,6 +166,31 @@ function templatePointToSvg(x: number, y: number): { x: number; y: number } {
     x: 8 + clamp01(x) * 304,
     y: 8 + clamp01(y) * 164
   };
+}
+
+function activeReplayBallCourtTrajectories(
+  items: ReplayBallCourtTrajectoryOverlay[],
+  currentTimestampMs: number,
+  currentFrame: number
+): ReplayBallCourtTrajectoryOverlay[] {
+  return items.filter((item) => {
+    if (
+      currentTimestampMs >= item.timestamp_start_ms &&
+      currentTimestampMs <= item.timestamp_end_ms
+    ) {
+      return true;
+    }
+    return currentFrame >= item.frame_start && currentFrame <= item.frame_end;
+  });
+}
+
+function trajectoryPointsToSvgPath(
+  item: ReplayBallCourtTrajectoryOverlay,
+  currentTimestampMs: number
+): { x: number; y: number }[] {
+  const visiblePoints = item.points.filter((point) => point.timestamp_ms <= currentTimestampMs);
+  const points = visiblePoints.length >= 2 ? visiblePoints : item.points;
+  return points.map((point) => templatePointToSvg(point.court_x, point.court_y));
 }
 
 function clamp01(value: number): number {

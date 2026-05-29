@@ -8,6 +8,7 @@ import {
   filterCameraViewsAvailableAt,
   filterCourtKeypointsAvailableAt,
   filterCourtLinesAvailableAt,
+  filterBallCourtTrajectoryAvailableAt,
   filterBallCourtProjectionAvailableAt,
   filterDetectionsAvailableAt,
   filterHomographyCandidatesAvailableAt,
@@ -28,6 +29,7 @@ import {
   timelineItemTimestampMs
 } from "../lib/replayTimeline";
 import type {
+  ReplayBallCourtTrajectoryOverlay,
   ReplayDetectionOverlay,
   ReplayBallCourtProjectionOverlay,
   ReplayCameraViewOverlay,
@@ -86,6 +88,7 @@ interface ReplayWorkstationProps {
     homographyRunId?: string;
     projectionDiagnosticRunId?: string;
     courtProjectionRunId?: string;
+    ballTrajectoryRunId?: string;
     viewPreset?: string;
   };
 }
@@ -129,6 +132,8 @@ type SelectedReplayEvidence =
   | { kind: "ball_court_projection"; item: ReplayBallCourtProjectionOverlay }
   | { kind: "main_player_court_projection"; item: ReplayMainPlayerCourtProjectionOverlay }
   | { kind: "court_projection_timeline"; item: Extract<ReplayTimelineItem, { item_type: "ball_court_projection_candidate" | "main_player_court_projection_candidate" }> }
+  | { kind: "ball_trajectory"; item: ReplayBallCourtTrajectoryOverlay }
+  | { kind: "ball_trajectory_timeline"; item: Extract<ReplayTimelineItem, { item_type: "ball_trajectory_court_candidate" }> }
   | { kind: "annotation"; item: Extract<ReplayTimelineItem, { item_type: "annotation" }> };
 
 interface ReplayLayerPresetContext {
@@ -141,6 +146,7 @@ interface ReplayLayerPresetContext {
   hasHomographyRun: boolean;
   hasProjectionDiagnosticRun: boolean;
   hasCourtProjectionRun: boolean;
+  hasBallTrajectoryRun: boolean;
 }
 
 interface ReplayLayerPresetVisibility {
@@ -160,6 +166,7 @@ interface ReplayLayerPresetVisibility {
   showProjectionDiagnostics: boolean;
   showBallCourtProjection: boolean;
   showMainPlayerCourtProjection: boolean;
+  showBallCourtTrajectory: boolean;
   detectionDisplayMode: ReplayOverlayDisplayMode;
   trackletDisplayMode: ReplayOverlayDisplayMode;
   smoothedMotionDisplayMode: ReplayOverlayDisplayMode;
@@ -193,6 +200,7 @@ export function applyLayerPreset(
       showProjectionDiagnostics: context.hasProjectionDiagnosticRun,
       showBallCourtProjection: context.hasCourtProjectionRun,
       showMainPlayerCourtProjection: context.hasCourtProjectionRun,
+      showBallCourtTrajectory: context.hasBallTrajectoryRun,
       detectionDisplayMode: "short_trail",
       trackletDisplayMode: "full_trail",
       smoothedMotionDisplayMode: "short_trail",
@@ -218,6 +226,7 @@ export function applyLayerPreset(
     showProjectionDiagnostics: false,
     showBallCourtProjection: context.hasCourtProjectionRun,
     showMainPlayerCourtProjection: context.hasCourtProjectionRun,
+    showBallCourtTrajectory: context.hasBallTrajectoryRun,
     detectionDisplayMode: "current_only",
     trackletDisplayMode: "short_trail",
     smoothedMotionDisplayMode: "current_only",
@@ -235,7 +244,8 @@ function presetContextFromRunIds({
   courtRunId,
   homographyRunId,
   projectionDiagnosticRunId,
-  courtProjectionRunId
+  courtProjectionRunId,
+  ballTrajectoryRunId
 }: {
   detectionRunId: string | null;
   trackletRunId: string | null;
@@ -246,6 +256,7 @@ function presetContextFromRunIds({
   homographyRunId: string | null;
   projectionDiagnosticRunId: string | null;
   courtProjectionRunId: string | null;
+  ballTrajectoryRunId: string | null;
 }): ReplayLayerPresetContext {
   return {
     hasDetectionRun: detectionRunId !== null,
@@ -256,7 +267,8 @@ function presetContextFromRunIds({
     hasCourtRun: courtRunId !== null,
     hasHomographyRun: homographyRunId !== null,
     hasProjectionDiagnosticRun: projectionDiagnosticRunId !== null,
-    hasCourtProjectionRun: courtProjectionRunId !== null
+    hasCourtProjectionRun: courtProjectionRunId !== null,
+    hasBallTrajectoryRun: ballTrajectoryRunId !== null
   };
 }
 
@@ -324,6 +336,14 @@ export function ReplayWorkstation({
       ),
     [replayInfo.available_runs.court_projection, selectedRuns.courtProjectionRunId]
   );
+  const initialBallTrajectoryRunId = useMemo(
+    () =>
+      selectInitialReplayRun(
+        replayInfo.available_runs.ball_trajectory,
+        selectedRuns.ballTrajectoryRunId
+      ),
+    [replayInfo.available_runs.ball_trajectory, selectedRuns.ballTrajectoryRunId]
+  );
   const initialCourtTemporalPersistence = useMemo<ReplayCourtTemporalPersistence>(() => {
     return selectedRuns.courtTemporalPersistence === "off" ? "off" : "carry_forward";
   }, [selectedRuns.courtTemporalPersistence]);
@@ -346,9 +366,11 @@ export function ReplayWorkstation({
         courtRunId: initialCourtRunId,
         homographyRunId: initialHomographyRunId,
         projectionDiagnosticRunId: initialProjectionDiagnosticRunId,
-        courtProjectionRunId: initialCourtProjectionRunId
+        courtProjectionRunId: initialCourtProjectionRunId,
+        ballTrajectoryRunId: initialBallTrajectoryRunId
       }),
     [
+      initialBallTrajectoryRunId,
       initialCourtProjectionRunId,
       initialCourtRunId,
       initialDetectionRunId,
@@ -388,6 +410,9 @@ export function ReplayWorkstation({
   const [selectedCourtProjectionRunId, setSelectedCourtProjectionRunId] = useState<
     string | null
   >(initialCourtProjectionRunId);
+  const [selectedBallTrajectoryRunId, setSelectedBallTrajectoryRunId] = useState<string | null>(
+    initialBallTrajectoryRunId
+  );
   const [replayLayerPreset, setReplayLayerPreset] =
     useState<ReplayLayerPreset>(initialReplayLayerPreset);
   const [showDetections, setShowDetections] = useState(initialLayerPresetState.showDetections);
@@ -433,6 +458,9 @@ export function ReplayWorkstation({
   );
   const [showMainPlayerCourtProjection, setShowMainPlayerCourtProjection] = useState(
     initialLayerPresetState.showMainPlayerCourtProjection
+  );
+  const [showBallCourtTrajectory, setShowBallCourtTrajectory] = useState(
+    initialLayerPresetState.showBallCourtTrajectory
   );
   const [courtTemporalPersistence, setCourtTemporalPersistence] =
     useState<ReplayCourtTemporalPersistence>(initialLayerPresetState.courtTemporalPersistence);
@@ -483,6 +511,7 @@ export function ReplayWorkstation({
       setShowProjectionDiagnostics(presetState.showProjectionDiagnostics);
       setShowBallCourtProjection(presetState.showBallCourtProjection);
       setShowMainPlayerCourtProjection(presetState.showMainPlayerCourtProjection);
+      setShowBallCourtTrajectory(presetState.showBallCourtTrajectory);
       setDetectionDisplayMode(presetState.detectionDisplayMode);
       setTrackletDisplayMode(presetState.trackletDisplayMode);
       setSmoothedMotionDisplayMode(presetState.smoothedMotionDisplayMode);
@@ -531,6 +560,10 @@ export function ReplayWorkstation({
   }, [initialCourtProjectionRunId]);
 
   useEffect(() => {
+    setSelectedBallTrajectoryRunId(initialBallTrajectoryRunId);
+  }, [initialBallTrajectoryRunId]);
+
+  useEffect(() => {
     applyReplayLayerPresetState(initialReplayLayerPreset, initialLayerPresetContext);
   }, [applyReplayLayerPresetState, initialLayerPresetContext, initialReplayLayerPreset]);
 
@@ -557,9 +590,11 @@ export function ReplayWorkstation({
         courtRunId: selectedCourtRunId,
         homographyRunId: selectedHomographyRunId,
         projectionDiagnosticRunId: selectedProjectionDiagnosticRunId,
-        courtProjectionRunId: selectedCourtProjectionRunId
+        courtProjectionRunId: selectedCourtProjectionRunId,
+        ballTrajectoryRunId: selectedBallTrajectoryRunId
       }),
     [
+      selectedBallTrajectoryRunId,
       selectedCourtProjectionRunId,
       selectedCourtRunId,
       selectedDetectionRunId,
@@ -635,8 +670,12 @@ export function ReplayWorkstation({
     if (showMainPlayerCourtProjection && selectedCourtProjectionRunId !== null) {
       layers.push("main_player_court_projection");
     }
+    if (showBallCourtTrajectory && selectedBallTrajectoryRunId !== null) {
+      layers.push("ball_court_trajectory");
+    }
     return layers;
   }, [
+    selectedBallTrajectoryRunId,
     selectedCourtRunId,
     selectedCourtProjectionRunId,
     selectedDetectionRunId,
@@ -657,6 +696,7 @@ export function ReplayWorkstation({
     showPoses,
     showProjectionDiagnostics,
     showMainPlayerCourtProjection,
+    showBallCourtTrajectory,
     showSmoothedBall,
     showSmoothedPlayerBoxes,
     showSmoothedPoses,
@@ -677,6 +717,7 @@ export function ReplayWorkstation({
     selectedHomographyRunId ?? "none",
     selectedProjectionDiagnosticRunId ?? "none",
     selectedCourtProjectionRunId ?? "none",
+    selectedBallTrajectoryRunId ?? "none",
     courtTemporalPersistence,
     courtPersistenceMaxGapMs,
     layersParam || "none",
@@ -711,6 +752,7 @@ export function ReplayWorkstation({
       homographyRunId: selectedHomographyRunId,
       projectionDiagnosticRunId: selectedProjectionDiagnosticRunId,
       courtProjectionRunId: selectedCourtProjectionRunId,
+      ballTrajectoryRunId: selectedBallTrajectoryRunId,
       courtTemporalPersistence,
       courtPersistenceMaxGapMs,
       layers: layersParam
@@ -745,6 +787,7 @@ export function ReplayWorkstation({
     replayInfo.media_id,
     selectedCourtRunId,
     selectedCourtProjectionRunId,
+    selectedBallTrajectoryRunId,
     selectedDetectionRunId,
     selectedHomographyRunId,
     selectedMainPlayerTrackRunId,
@@ -768,6 +811,7 @@ export function ReplayWorkstation({
       homographyRunId: selectedHomographyRunId,
       projectionDiagnosticRunId: selectedProjectionDiagnosticRunId,
       courtProjectionRunId: selectedCourtProjectionRunId,
+      ballTrajectoryRunId: selectedBallTrajectoryRunId,
       includeAnnotations: true
     })
       .then((timeline) => {
@@ -790,6 +834,7 @@ export function ReplayWorkstation({
     };
   }, [
     replayInfo.media_id,
+    selectedBallTrajectoryRunId,
     selectedCourtRunId,
     selectedCourtProjectionRunId,
     selectedDetectionRunId,
@@ -873,6 +918,10 @@ export function ReplayWorkstation({
         setSelectedEvidence({ kind: "court_projection_timeline", item });
         return;
       }
+      if (item.item_type === "ball_trajectory_court_candidate") {
+        setSelectedEvidence({ kind: "ball_trajectory_timeline", item });
+        return;
+      }
       if (item.item_type === "annotation") {
         setSelectedEvidence({ kind: "annotation", item });
       }
@@ -934,6 +983,10 @@ export function ReplayWorkstation({
     overlayState.chunk?.main_player_court_projection ?? [],
     streamAvailableUntilMs
   );
+  const ballCourtTrajectory = filterBallCourtTrajectoryAvailableAt(
+    overlayState.chunk?.ball_court_trajectory ?? [],
+    streamAvailableUntilMs
+  );
   const totalTimelineItemCount = useMemo(
     () =>
       timelineState.timeline?.lanes.reduce((count, lane) => count + lane.items.length, 0) ?? 0,
@@ -991,7 +1044,9 @@ export function ReplayWorkstation({
   const selectedCourtProjectionObservationId =
     selectedEvidence?.kind === "ball_court_projection" ||
     selectedEvidence?.kind === "main_player_court_projection" ||
-    selectedEvidence?.kind === "court_projection_timeline"
+    selectedEvidence?.kind === "court_projection_timeline" ||
+    selectedEvidence?.kind === "ball_trajectory" ||
+    selectedEvidence?.kind === "ball_trajectory_timeline"
       ? selectedEvidence.item.observation_id
       : null;
   const selectedTimelineKey = selectedTimelineItemKey(selectedEvidence);
@@ -1170,17 +1225,22 @@ export function ReplayWorkstation({
           </ReplayVideoPlayer>
           <ReplayCourtProjectionMiniMap
             ballProjections={ballCourtProjection}
+            ballTrajectories={ballCourtTrajectory}
             currentFrame={playback.frameNumber}
             currentTimestampMs={playback.timestampMs}
             mainPlayerProjections={mainPlayerCourtProjection}
             onSelectBallProjection={(item) => {
               setSelectedEvidence({ kind: "ball_court_projection", item });
             }}
+            onSelectBallTrajectory={(item) => {
+              setSelectedEvidence({ kind: "ball_trajectory", item });
+            }}
             onSelectMainPlayerProjection={(item) => {
               setSelectedEvidence({ kind: "main_player_court_projection", item });
             }}
             selectedObservationId={selectedCourtProjectionObservationId}
             showBall={showBallCourtProjection && selectedCourtProjectionRunId !== null}
+            showBallTrajectory={showBallCourtTrajectory && selectedBallTrajectoryRunId !== null}
             showPlayers={showMainPlayerCourtProjection && selectedCourtProjectionRunId !== null}
           />
           <ReplayModeControls
@@ -1195,6 +1255,7 @@ export function ReplayWorkstation({
             totalTimelineItemCount={totalTimelineItemCount}
           />
           <ReplayLayerControls
+            ballTrajectoryRuns={replayInfo.available_runs.ball_trajectory}
             courtRuns={replayInfo.available_runs.court}
             courtProjectionRuns={replayInfo.available_runs.court_projection}
             detectionRuns={replayInfo.available_runs.detection}
@@ -1232,6 +1293,10 @@ export function ReplayWorkstation({
               setSelectedCourtProjectionRunId(runId);
               setSelectedEvidence(null);
             }}
+            onSelectedBallTrajectoryRunChange={(runId) => {
+              setSelectedBallTrajectoryRunId(runId);
+              setSelectedEvidence(null);
+            }}
             onSelectedPoseRunChange={(runId) => {
               setSelectedPoseRunId(runId);
               setSelectedEvidence(null);
@@ -1250,6 +1315,7 @@ export function ReplayWorkstation({
             onToggleMainPlayerTracks={setShowMainPlayerTracks}
             onToggleProjectionDiagnostics={setShowProjectionDiagnostics}
             onToggleBallCourtProjection={setShowBallCourtProjection}
+            onToggleBallCourtTrajectory={setShowBallCourtTrajectory}
             onToggleMainPlayerCourtProjection={setShowMainPlayerCourtProjection}
             onTogglePoses={setShowPoses}
             onPoseVisualStyleChange={setPoseVisualStyle}
@@ -1279,8 +1345,10 @@ export function ReplayWorkstation({
             selectedPoseRunId={selectedPoseRunId}
             selectedProjectionDiagnosticRunId={selectedProjectionDiagnosticRunId}
             selectedCourtProjectionRunId={selectedCourtProjectionRunId}
+            selectedBallTrajectoryRunId={selectedBallTrajectoryRunId}
             selectedTrackletRunId={selectedTrackletRunId}
             showBallCourtProjection={showBallCourtProjection}
+            showBallCourtTrajectory={showBallCourtTrajectory}
             showCameraView={showCameraView}
             showCourtKeypoints={showCourtKeypoints}
             showRawCourtKeypoints={showRawCourtKeypoints}
@@ -1322,6 +1390,7 @@ export function ReplayWorkstation({
               homography_candidates: showHomography,
               projection_diagnostics: showProjectionDiagnostics,
               court_projection: showBallCourtProjection || showMainPlayerCourtProjection,
+              ball_trajectory: showBallCourtTrajectory,
               annotations: true
             }}
             onSelectItem={handleTimelineItemSelect}
@@ -1337,6 +1406,7 @@ export function ReplayWorkstation({
             selectedMotionSmoothingRunId={selectedMotionSmoothingRunId}
             selectedPoseRunId={selectedPoseRunId}
             selectedCourtProjectionRunId={selectedCourtProjectionRunId}
+            selectedBallTrajectoryRunId={selectedBallTrajectoryRunId}
             selectedProjectionDiagnosticRunId={selectedProjectionDiagnosticRunId}
             selectedTrackletRunId={selectedTrackletRunId}
           />
@@ -1448,6 +1518,7 @@ function ReplayModeControls({
 }
 
 function ReplayLayerControls({
+  ballTrajectoryRuns,
   detectionRuns,
   trackletRuns,
   poseRuns,
@@ -1467,6 +1538,7 @@ function ReplayLayerControls({
   selectedHomographyRunId,
   selectedProjectionDiagnosticRunId,
   selectedCourtProjectionRunId,
+  selectedBallTrajectoryRunId,
   showDetections,
   detectionDisplayMode,
   showTracklets,
@@ -1489,6 +1561,7 @@ function ReplayLayerControls({
   showProjectionDiagnostics,
   showBallCourtProjection,
   showMainPlayerCourtProjection,
+  showBallCourtTrajectory,
   onReplayLayerPresetChange,
   onSelectedDetectionRunChange,
   onSelectedTrackletRunChange,
@@ -1499,6 +1572,7 @@ function ReplayLayerControls({
   onSelectedHomographyRunChange,
   onSelectedProjectionDiagnosticRunChange,
   onSelectedCourtProjectionRunChange,
+  onSelectedBallTrajectoryRunChange,
   onToggleDetections,
   onDetectionDisplayModeChange,
   onToggleTracklets,
@@ -1520,8 +1594,10 @@ function ReplayLayerControls({
   onToggleHomography,
   onToggleProjectionDiagnostics,
   onToggleBallCourtProjection,
-  onToggleMainPlayerCourtProjection
+  onToggleMainPlayerCourtProjection,
+  onToggleBallCourtTrajectory
 }: {
+  ballTrajectoryRuns: ReplayRunSummary[];
   detectionRuns: ReplayRunSummary[];
   trackletRuns: ReplayRunSummary[];
   poseRuns: ReplayRunSummary[];
@@ -1541,6 +1617,7 @@ function ReplayLayerControls({
   selectedHomographyRunId: string | null;
   selectedProjectionDiagnosticRunId: string | null;
   selectedCourtProjectionRunId: string | null;
+  selectedBallTrajectoryRunId: string | null;
   showDetections: boolean;
   detectionDisplayMode: ReplayOverlayDisplayMode;
   showTracklets: boolean;
@@ -1563,6 +1640,7 @@ function ReplayLayerControls({
   showProjectionDiagnostics: boolean;
   showBallCourtProjection: boolean;
   showMainPlayerCourtProjection: boolean;
+  showBallCourtTrajectory: boolean;
   onReplayLayerPresetChange: (preset: ReplayLayerPreset) => void;
   onSelectedDetectionRunChange: (runId: string | null) => void;
   onSelectedTrackletRunChange: (runId: string | null) => void;
@@ -1573,6 +1651,7 @@ function ReplayLayerControls({
   onSelectedHomographyRunChange: (runId: string | null) => void;
   onSelectedProjectionDiagnosticRunChange: (runId: string | null) => void;
   onSelectedCourtProjectionRunChange: (runId: string | null) => void;
+  onSelectedBallTrajectoryRunChange: (runId: string | null) => void;
   onToggleDetections: (enabled: boolean) => void;
   onDetectionDisplayModeChange: (mode: ReplayOverlayDisplayMode) => void;
   onToggleTracklets: (enabled: boolean) => void;
@@ -1595,6 +1674,7 @@ function ReplayLayerControls({
   onToggleProjectionDiagnostics: (enabled: boolean) => void;
   onToggleBallCourtProjection: (enabled: boolean) => void;
   onToggleMainPlayerCourtProjection: (enabled: boolean) => void;
+  onToggleBallCourtTrajectory: (enabled: boolean) => void;
 }) {
   return (
     <section className="panel">
@@ -1773,6 +1853,17 @@ function ReplayLayerControls({
           onChange={onSelectedCourtProjectionRunChange}
           runs={courtProjectionRuns}
           selectedRunId={selectedCourtProjectionRunId}
+        />
+        <LayerToggle
+          checked={showBallCourtTrajectory}
+          label="Show ball trajectory court candidate"
+          onChange={onToggleBallCourtTrajectory}
+        />
+        <RunSelect
+          label="Ball trajectory run"
+          onChange={onSelectedBallTrajectoryRunChange}
+          runs={ballTrajectoryRuns}
+          selectedRunId={selectedBallTrajectoryRunId}
         />
         <p className="evidence-note">
           Overlays are synchronized persisted evidence. Court geometry layers are candidates for
@@ -1970,6 +2061,10 @@ function AvailableRunsPanel({ replayInfo }: { replayInfo: ReplayInfo }) {
           runs={replayInfo.available_runs.court_projection}
         />
         <RunGroup
+          title="Ball trajectory court candidates"
+          runs={replayInfo.available_runs.ball_trajectory}
+        />
+        <RunGroup
           title="Gameplay/view-state observations"
           runs={replayInfo.available_runs.gameplay}
         />
@@ -1988,7 +2083,8 @@ function SelectedRunContext({
   selectedCourtRunId,
   selectedHomographyRunId,
   selectedProjectionDiagnosticRunId,
-  selectedCourtProjectionRunId
+  selectedCourtProjectionRunId,
+  selectedBallTrajectoryRunId
 }: {
   replayInfo: ReplayInfo;
   selectedDetectionRunId: string | null;
@@ -2000,6 +2096,7 @@ function SelectedRunContext({
   selectedHomographyRunId: string | null;
   selectedProjectionDiagnosticRunId: string | null;
   selectedCourtProjectionRunId: string | null;
+  selectedBallTrajectoryRunId: string | null;
 }) {
   const selected = [
     ["detection", selectedDetectionRunId, replayInfo.available_runs.detection],
@@ -2026,6 +2123,11 @@ function SelectedRunContext({
       "court projection candidate",
       selectedCourtProjectionRunId,
       replayInfo.available_runs.court_projection
+    ],
+    [
+      "ball trajectory court candidate",
+      selectedBallTrajectoryRunId,
+      replayInfo.available_runs.ball_trajectory
     ]
   ] as const;
 
@@ -2706,6 +2808,75 @@ function SelectedEvidencePanel({
     );
   }
 
+  if (
+    selectedEvidence.kind === "ball_trajectory" ||
+    selectedEvidence.kind === "ball_trajectory_timeline"
+  ) {
+    const item = selectedEvidence.item;
+    const diagnostics =
+      "diagnostics" in item && item.diagnostics !== undefined ? item.diagnostics : null;
+    return (
+      <EvidencePanel
+        title="Selected Ball Trajectory Court Candidate"
+        badge="trajectory candidate"
+      >
+        <DetailRow label="observation id" value={item.observation_id} />
+        <DetailRow label="run id" value={item.run_id} />
+        <DetailRow label="frame range" value={`${item.frame_start}-${item.frame_end}`} />
+        <DetailRow
+          label="timestamp range"
+          value={`${item.timestamp_start_ms}-${item.timestamp_end_ms} ms`}
+        />
+        <DetailRow label="point count" value={item.point_count.toString()} />
+        <DetailRow label="trajectory method" value={item.trajectory_method ?? "n/a"} />
+        <DetailRow label="coordinate space" value={item.coordinate_space} />
+        <DetailRow
+          label="source court projection run"
+          value={item.source_court_projection_run_id ?? "n/a"}
+        />
+        {diagnostics !== null ? (
+          <>
+            <DetailRow
+              label="gap splits"
+              value={String(diagnostics.segment_split_count ?? diagnostics.gap_count ?? "n/a")}
+            />
+            <DetailRow
+              label="out-of-template"
+              value={String(diagnostics.out_of_template_count ?? "n/a")}
+            />
+            <DetailRow
+              label="homography carry-forward"
+              value={String(diagnostics.homography_carried_forward_count ?? "n/a")}
+            />
+          </>
+        ) : null}
+        <DetailRow
+          label="trajectory_candidate_only"
+          value={item.trajectory_candidate_only ? "true" : "false"}
+        />
+        <DetailRow label="not_ball_truth" value={item.not_ball_truth ? "true" : "false"} />
+        <DetailRow
+          label="not_bounce_truth"
+          value={item.not_bounce_truth ? "true" : "false"}
+        />
+        <DetailRow label="not_hit_truth" value={item.not_hit_truth ? "true" : "false"} />
+        <DetailRow
+          label="not_in_out_truth"
+          value={item.not_in_out_truth ? "true" : "false"}
+        />
+        <DetailRow label="observation_only" value={item.observation_only ? "true" : "false"} />
+        <DetailRow label="no_adjudication" value={item.no_adjudication ? "true" : "false"} />
+        <a className="quiet-link" href={`/runs/${item.run_id}`}>
+          Open source evidence run
+        </a>
+        <p className="evidence-note">
+          Ball trajectory court candidate evidence only. It is a derived sequence of projected ball
+          candidates and does not imply bounce, hit, in/out, point, or score.
+        </p>
+      </EvidencePanel>
+    );
+  }
+
   if (selectedEvidence.kind === "annotation") {
     const { item } = selectedEvidence;
     return (
@@ -2958,6 +3129,9 @@ function selectedTimelineItemKey(selectedEvidence: SelectedReplayEvidence | null
     selectedEvidence.kind === "ball_court_projection" ||
     selectedEvidence.kind === "main_player_court_projection"
   ) {
+    return `${selectedEvidence.item.overlay_type}:${selectedEvidence.item.observation_id}`;
+  }
+  if (selectedEvidence.kind === "ball_trajectory") {
     return `${selectedEvidence.item.overlay_type}:${selectedEvidence.item.observation_id}`;
   }
   return timelineItemKey(selectedEvidence.item);

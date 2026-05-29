@@ -33,6 +33,7 @@ def get_replay_overlays(
     homography_run_id: str | None = None,
     projection_diagnostic_run_id: str | None = None,
     court_projection_run_id: str | None = None,
+    ball_trajectory_run_id: str | None = None,
     court_temporal_persistence: str = Query(default="carry_forward"),
     court_persistence_max_gap_ms: int = Query(
         default=DEFAULT_COURT_PERSISTENCE_MAX_GAP_MS,
@@ -72,6 +73,7 @@ def get_replay_overlays(
         homography_run_id=homography_run_id,
         projection_diagnostic_run_id=projection_diagnostic_run_id,
         court_projection_run_id=court_projection_run_id,
+        ball_trajectory_run_id=ball_trajectory_run_id,
         court_temporal_persistence=normalized_court_temporal_persistence,
         court_persistence_max_gap_ms=court_persistence_max_gap_ms,
         min_confidence=min_confidence,
@@ -95,6 +97,7 @@ def get_replay_timeline(
     homography_run_id: str | None = None,
     projection_diagnostic_run_id: str | None = None,
     court_projection_run_id: str | None = None,
+    ball_trajectory_run_id: str | None = None,
     include_annotations: bool = True,
 ) -> dict[str, object]:
     timeline = build_replay_timeline(
@@ -109,6 +112,7 @@ def get_replay_timeline(
         homography_run_id=homography_run_id,
         projection_diagnostic_run_id=projection_diagnostic_run_id,
         court_projection_run_id=court_projection_run_id,
+        ball_trajectory_run_id=ball_trajectory_run_id,
         include_annotations=include_annotations,
     )
     if timeline is None:

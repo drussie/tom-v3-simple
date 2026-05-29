@@ -966,6 +966,11 @@ pre {
   background: var(--blue);
 }
 
+.timeline-lane-item.span.ball_trajectory_court_candidate {
+  background: color-mix(in srgb, var(--amber) 55%, white);
+  border-color: var(--amber);
+}
+
 .timeline-lane-item.tick.annotation {
   background: var(--blue);
 }
@@ -1117,6 +1122,35 @@ pre {
 .court-projection-point-group.selected circle {
   filter: drop-shadow(0 0 5px rgba(27, 37, 40, 0.45));
   stroke-width: 4;
+}
+
+.court-trajectory-group {
+  cursor: pointer;
+}
+
+.court-trajectory-group polyline {
+  fill: none;
+  opacity: 0.76;
+  stroke: var(--amber);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2.5;
+}
+
+.court-trajectory-group text {
+  fill: var(--ink);
+  font-size: 8px;
+  font-weight: 800;
+  opacity: 0.78;
+  paint-order: stroke;
+  stroke: var(--surface);
+  stroke-width: 3px;
+}
+
+.court-trajectory-group.selected polyline {
+  filter: drop-shadow(0 0 5px rgba(27, 37, 40, 0.45));
+  opacity: 1;
+  stroke-width: 3.5;
 }
 
 .detail-row,
