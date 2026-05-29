@@ -608,6 +608,21 @@ def main() -> None:
     real_court_keypoints_parser.add_argument("--max-frames", type=int, default=214)
     real_court_keypoints_parser.add_argument("--viewer-base-url", default="http://127.0.0.1:3000")
     real_court_keypoints_parser.add_argument(
+        "--preprocessing-mode",
+        default="full_frame_resize_224",
+        help="Court keypoint preprocessing assumption. Currently only full_frame_resize_224.",
+    )
+    real_court_keypoints_parser.add_argument(
+        "--coordinate-interpretation",
+        default="output_as_pixels_224",
+        help="Court keypoint output coordinate assumption. Currently only output_as_pixels_224.",
+    )
+    real_court_keypoints_parser.add_argument(
+        "--emit-debug-artifacts",
+        action="store_true",
+        help="Persist calibration debug JSON metadata artifacts for sampled frames.",
+    )
+    real_court_keypoints_parser.add_argument(
         "--derive-lines",
         action=argparse.BooleanOptionalAction,
         default=True,
@@ -1197,6 +1212,9 @@ def _handle_run_real_court_keypoints(
         allowed_roots=args.allowed_roots,
         viewer_base_url=args.viewer_base_url,
         derive_lines=args.derive_lines,
+        preprocessing_mode=args.preprocessing_mode,
+        coordinate_interpretation=args.coordinate_interpretation,
+        emit_debug_artifacts=args.emit_debug_artifacts,
         plan_only=args.plan_only,
     )
 

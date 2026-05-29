@@ -777,6 +777,7 @@ def _source_court_evidence_metadata(
     camera: CameraViewObservation | None,
 ) -> dict[str, Any]:
     keypoint_metadata = keypoint.metadata_jsonb or {}
+    keypoint_raw_payload = keypoint.raw_model_payload_jsonb or {}
     line_metadata = line.metadata_jsonb if line is not None else {}
     camera_metadata = camera.metadata_jsonb if camera is not None else {}
     keypoint_real_model_output = bool(
@@ -802,6 +803,23 @@ def _source_court_evidence_metadata(
         "source_court_keypoint_fixture_court_evidence": keypoint_fixture,
         "source_court_keypoint_model_output_not_truth": keypoint_real_model_output
         or bool(keypoint_metadata.get("model_output_not_truth")),
+        "source_court_keypoint_preprocessing_mode": keypoint_raw_payload.get(
+            "preprocessing_mode"
+        ),
+        "source_court_keypoint_coordinate_interpretation": keypoint_raw_payload.get(
+            "coordinate_interpretation"
+        ),
+        "source_court_keypoint_mapping_version": (
+            keypoint_raw_payload.get("mapping_version")
+            or keypoint_raw_payload.get("adapter_mapping_version")
+        ),
+        "source_court_keypoint_uncalibrated_mapping": bool(
+            keypoint_metadata.get("uncalibrated_tom_v1_keypoint_mapping")
+            or keypoint_raw_payload.get("uncalibrated_tom_v1_keypoint_mapping")
+            or keypoint_metadata.get("calibration_audit_v0")
+            or keypoint_raw_payload.get("calibration_audit_v0")
+        ),
+        "homography_from_uncalibrated_tom_v1_keypoints": keypoint_real_model_output,
         "source_court_line_derived_from_real_keypoints": line_derived_from_real_keypoints,
         "source_court_line_fixture_court_evidence": bool(
             line_metadata.get("fixture_court_evidence")

@@ -34,6 +34,7 @@ interface ReplayCourtOverlayProps {
   currentTimestampMs: number;
   currentFrame: number;
   showCourtKeypoints: boolean;
+  showRawCourtKeypoints: boolean;
   showCourtLines: boolean;
   showCameraView: boolean;
   showHomography: boolean;
@@ -126,6 +127,7 @@ export function ReplayCourtOverlay({
   currentTimestampMs,
   currentFrame,
   showCourtKeypoints,
+  showRawCourtKeypoints,
   showCourtLines,
   showCameraView,
   showHomography,
@@ -192,6 +194,7 @@ export function ReplayCourtOverlay({
   );
   const anyLayerEnabled =
     showCourtKeypoints ||
+    showRawCourtKeypoints ||
     showCourtLines ||
     showCameraView ||
     showHomography ||
@@ -204,6 +207,7 @@ export function ReplayCourtOverlay({
     projectionDiagnostics.length;
   const activeCount =
     (showCourtKeypoints ? activeKeypoints.length : 0) +
+    (showRawCourtKeypoints ? activeKeypoints.length : 0) +
     (showCourtLines ? activeLines.length : 0) +
     (showCameraView ? activeCameraViews.length : 0) +
     (showHomography ? activeHomographies.length : 0) +
@@ -256,6 +260,18 @@ export function ReplayCourtOverlay({
                 />
               ))
             : null}
+          {showRawCourtKeypoints
+            ? activeKeypoints.map((keypointEvidence) => (
+                <RawTomV1CourtKeypointGroup
+                  key={`${keypointEvidence.observation_id}:raw`}
+                  keypointEvidence={keypointEvidence}
+                  onSelect={onSelectCourtKeypoint}
+                  overlaySize={overlaySize}
+                  replayInfo={replayInfo}
+                  selected={keypointEvidence.observation_id === selectedObservationId}
+                />
+              ))
+            : null}
           {showCourtKeypoints
             ? activeKeypoints.map((keypointEvidence) => (
                 <CourtKeypointGroup
@@ -295,6 +311,79 @@ export function ReplayCourtOverlay({
       ) : null}
       {status !== null ? <div className="replay-overlay-status court">{status}</div> : null}
     </div>
+  );
+}
+
+function RawTomV1CourtKeypointGroup({
+  keypointEvidence,
+  replayInfo,
+  overlaySize,
+  selected,
+  onSelect
+}: {
+  keypointEvidence: ReplayCourtKeypointOverlay;
+  replayInfo: ReplayInfo;
+  overlaySize: OverlaySize;
+  selected: boolean;
+  onSelect: (item: ReplayCourtKeypointOverlay) => void;
+}) {
+  const points = (keypointEvidence.raw_tom_v1_keypoints ?? [])
+    .map((keypoint) => {
+      if (
+        !keypoint.present ||
+        typeof keypoint.image_x !== "number" ||
+        typeof keypoint.image_y !== "number"
+      ) {
+        return null;
+      }
+      const scaled = imagePixelPointToOverlayPoint(
+        keypoint.image_x,
+        keypoint.image_y,
+        replayInfo.width,
+        replayInfo.height,
+        overlaySize.width,
+        overlaySize.height
+      );
+      return scaled === null ? null : { keypoint, ...scaled };
+    })
+    .filter(
+      (
+        point
+      ): point is {
+        keypoint: NonNullable<ReplayCourtKeypointOverlay["raw_tom_v1_keypoints"]>[number];
+        x: number;
+        y: number;
+      } => point !== null
+    );
+  return (
+    <g
+      aria-label={`raw TOM v1 court keypoint evidence frame ${keypointEvidence.frame_number}`}
+      className={`replay-raw-court-keypoint-group${selected ? " selected" : ""}`}
+      onClick={(event) => {
+        event.stopPropagation();
+        onSelect(keypointEvidence);
+      }}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          onSelect(keypointEvidence);
+        }
+      }}
+      role="button"
+      tabIndex={0}
+    >
+      {points.map(({ keypoint, x, y }) => (
+        <g
+          className="replay-raw-court-keypoint"
+          key={`${keypointEvidence.observation_id}:raw:${keypoint.source_index}`}
+        >
+          <circle cx={x} cy={y} r={selected ? 5 : 4} />
+          <text x={x + 6} y={y + 14}>
+            {keypoint.label}
+          </text>
+        </g>
+      ))}
+    </g>
   );
 }
 

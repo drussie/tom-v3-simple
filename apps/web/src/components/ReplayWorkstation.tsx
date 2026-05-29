@@ -179,6 +179,9 @@ export function ReplayWorkstation({
   const [trackletDisplayMode, setTrackletDisplayMode] =
     useState<ReplayOverlayDisplayMode>("short_trail");
   const [showTrackletPaths, setShowTrackletPaths] = useState(false);
+  const [showRawCourtKeypoints, setShowRawCourtKeypoints] = useState(
+    initialCourtRunId !== null
+  );
   const [showCourtKeypoints, setShowCourtKeypoints] = useState(initialCourtRunId !== null);
   const [showCourtLines, setShowCourtLines] = useState(initialCourtRunId !== null);
   const [showCameraView, setShowCameraView] = useState(initialCourtRunId !== null);
@@ -229,6 +232,7 @@ export function ReplayWorkstation({
 
   useEffect(() => {
     setSelectedCourtRunId(initialCourtRunId);
+    setShowRawCourtKeypoints(initialCourtRunId !== null);
     setShowCourtKeypoints(initialCourtRunId !== null);
     setShowCourtLines(initialCourtRunId !== null);
     setShowCameraView(initialCourtRunId !== null);
@@ -274,7 +278,7 @@ export function ReplayWorkstation({
     if (showMainPlayerTracks && selectedMainPlayerTrackRunId !== null) {
       layers.push("main_player_tracks");
     }
-    if (showCourtKeypoints && selectedCourtRunId !== null) {
+    if ((showCourtKeypoints || showRawCourtKeypoints) && selectedCourtRunId !== null) {
       layers.push("court_keypoints");
     }
     if (showCourtLines && selectedCourtRunId !== null) {
@@ -300,6 +304,7 @@ export function ReplayWorkstation({
     selectedTrackletRunId,
     showCameraView,
     showCourtKeypoints,
+    showRawCourtKeypoints,
     showCourtLines,
     showDetections,
     showHomography,
@@ -708,6 +713,7 @@ export function ReplayWorkstation({
               selectedObservationId={selectedCourtObservationId}
               showCameraView={showCameraView && selectedCourtRunId !== null}
               showCourtKeypoints={showCourtKeypoints && selectedCourtRunId !== null}
+              showRawCourtKeypoints={showRawCourtKeypoints && selectedCourtRunId !== null}
               showCourtLines={showCourtLines && selectedCourtRunId !== null}
               showHomography={showHomography && selectedHomographyRunId !== null}
               showProjectionDiagnostics={
@@ -764,6 +770,7 @@ export function ReplayWorkstation({
             onDetectionDisplayModeChange={setDetectionDisplayMode}
             onToggleCameraView={setShowCameraView}
             onToggleCourtKeypoints={setShowCourtKeypoints}
+            onToggleRawCourtKeypoints={setShowRawCourtKeypoints}
             onToggleCourtLines={setShowCourtLines}
             onToggleHomography={setShowHomography}
             onToggleMainPlayerTracks={setShowMainPlayerTracks}
@@ -782,6 +789,7 @@ export function ReplayWorkstation({
             selectedTrackletRunId={selectedTrackletRunId}
             showCameraView={showCameraView}
             showCourtKeypoints={showCourtKeypoints}
+            showRawCourtKeypoints={showRawCourtKeypoints}
             showCourtLines={showCourtLines}
             showDetections={showDetections}
             showHomography={showHomography}
@@ -805,7 +813,7 @@ export function ReplayWorkstation({
               tracklets: showTracklets,
               pose: showPoses,
               main_player_tracks: showMainPlayerTracks,
-              court_keypoints: showCourtKeypoints,
+              court_keypoints: showCourtKeypoints || showRawCourtKeypoints,
               court_lines: showCourtLines,
               camera_view: showCameraView,
               homography_candidates: showHomography,
@@ -955,6 +963,7 @@ function ReplayLayerControls({
   showTrackletPaths,
   showPoses,
   showMainPlayerTracks,
+  showRawCourtKeypoints,
   showCourtKeypoints,
   showCourtLines,
   showCameraView,
@@ -974,6 +983,7 @@ function ReplayLayerControls({
   onToggleTrackletPaths,
   onTogglePoses,
   onToggleMainPlayerTracks,
+  onToggleRawCourtKeypoints,
   onToggleCourtKeypoints,
   onToggleCourtLines,
   onToggleCameraView,
@@ -1001,6 +1011,7 @@ function ReplayLayerControls({
   showTrackletPaths: boolean;
   showPoses: boolean;
   showMainPlayerTracks: boolean;
+  showRawCourtKeypoints: boolean;
   showCourtKeypoints: boolean;
   showCourtLines: boolean;
   showCameraView: boolean;
@@ -1020,6 +1031,7 @@ function ReplayLayerControls({
   onToggleTrackletPaths: (enabled: boolean) => void;
   onTogglePoses: (enabled: boolean) => void;
   onToggleMainPlayerTracks: (enabled: boolean) => void;
+  onToggleRawCourtKeypoints: (enabled: boolean) => void;
   onToggleCourtKeypoints: (enabled: boolean) => void;
   onToggleCourtLines: (enabled: boolean) => void;
   onToggleCameraView: (enabled: boolean) => void;
@@ -1093,8 +1105,13 @@ function ReplayLayerControls({
           selectedRunId={selectedMainPlayerTrackRunId}
         />
         <LayerToggle
+          checked={showRawCourtKeypoints}
+          label="Show raw TOM v1 court keypoints"
+          onChange={onToggleRawCourtKeypoints}
+        />
+        <LayerToggle
           checked={showCourtKeypoints}
-          label="Show court keypoint evidence"
+          label="Show mapped TOM v3 court keypoints"
           onChange={onToggleCourtKeypoints}
         />
         <LayerToggle
@@ -1611,6 +1628,16 @@ function SelectedEvidencePanel({
 
   if (selectedEvidence.kind === "court_keypoint" || selectedEvidence.kind === "court_keypoint_timeline") {
     const item = selectedEvidence.item;
+    const rawPointCount =
+      "raw_tom_v1_keypoints" in item ? item.raw_tom_v1_keypoints?.length ?? 0 : null;
+    const preprocessingMode = "preprocessing_mode" in item ? item.preprocessing_mode : null;
+    const coordinateInterpretation =
+      "coordinate_interpretation" in item ? item.coordinate_interpretation : null;
+    const mappingVersion = "mapping_version" in item ? item.mapping_version : null;
+    const inferredKeypoints =
+      "inferred_tom_v3_keypoints" in item ? item.inferred_tom_v3_keypoints ?? [] : [];
+    const calibrationWarning =
+      "calibration_warning" in item ? item.calibration_warning : null;
     return (
       <EvidencePanel title="Selected Court Keypoint Evidence" badge="court keypoints">
         <DetailRow label="observation id" value={item.observation_id} />
@@ -1624,6 +1651,17 @@ function SelectedEvidencePanel({
         />
         <DetailRow label="mean confidence" value={formatConfidence(item.mean_keypoint_confidence)} />
         <DetailRow label="source" value={courtSourceDisplayLabel(item)} />
+        <DetailRow label="raw TOM v1 points" value={rawPointCount?.toString() ?? "n/a"} />
+        <DetailRow label="preprocessing mode" value={preprocessingMode ?? "n/a"} />
+        <DetailRow
+          label="coordinate interpretation"
+          value={coordinateInterpretation ?? "n/a"}
+        />
+        <DetailRow label="mapping version" value={mappingVersion ?? "n/a"} />
+        <DetailRow
+          label="inferred keypoints"
+          value={inferredKeypoints.length > 0 ? inferredKeypoints.join(", ") : "n/a"}
+        />
         <DetailRow label="model registry id" value={item.model_registry_id ?? "n/a"} />
         <DetailRow
           label="model"
@@ -1634,8 +1672,8 @@ function SelectedEvidencePanel({
           Open source evidence run
         </a>
         <p className="evidence-note">
-          Court keypoint evidence only. It is not a confirmed court model and does not imply
-          bounce, in/out, point, or score.
+          {calibrationWarning ??
+            "Court keypoint evidence only. It is not a confirmed court model and does not imply bounce, in/out, point, or score."}
         </p>
       </EvidencePanel>
     );
@@ -2096,6 +2134,8 @@ function courtSourceDisplayLabel(item: {
   candidate_geometry?: boolean;
   diagnostic_geometry?: boolean;
   not_ball_player_projection?: boolean;
+  uncalibrated_tom_v1_keypoint_mapping?: boolean;
+  calibration_warning?: string | null;
 }): string {
   if (
     item.diagnostic_geometry ||

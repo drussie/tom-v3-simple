@@ -652,10 +652,44 @@ TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_tom_v1_bridge.db \
   --every-n-frames 30 \
   --max-frames 214 \
   --allowed-root model_assets/tom_v1 \
+  --preprocessing-mode full_frame_resize_224 \
+  --coordinate-interpretation output_as_pixels_224 \
   --viewer-base-url http://127.0.0.1:3000
 ```
 
 This persists real model-output `court_keypoint_observation` rows and, when enough keypoints are present, derived `court_line_observation` candidates. The keypoints and lines are geometry evidence only, not court truth.
+
+TOM v1 court keypoint calibration audit:
+
+```bash
+TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_tom_v1_bridge.db \
+.venv/bin/python -m apps.worker.cli run-real-court-keypoints \
+  --media-id <media_id> \
+  --weights model_assets/tom_v1/keypoints_model.pth \
+  --model-name tom-v1-court-keypoints \
+  --model-version v1-local \
+  --device auto \
+  --img-size 224 \
+  --every-n-frames 30 \
+  --max-frames 214 \
+  --allowed-root model_assets/tom_v1 \
+  --preprocessing-mode full_frame_resize_224 \
+  --coordinate-interpretation output_as_pixels_224 \
+  --emit-debug-artifacts \
+  --viewer-base-url http://127.0.0.1:3000
+```
+
+Equivalent helper:
+
+```bash
+make tom-v1-court-keypoint-audit \
+  PYTHON=.venv/bin/python \
+  MEDIA_ID=<media_id> \
+  MAX_FRAMES=214 \
+  EVERY_N_FRAMES=30
+```
+
+The audit run records raw TOM v1 points, scaled image-space raw points, mapped TOM v3 points, inferred keypoints, preprocessing mode, and coordinate interpretation in the observation payload and optional debug artifacts. In replay, inspect raw `raw_0..raw_13` keypoints before mapped keypoints, derived lines, homography, or diagnostics. Current court/homography output is not trusted until this visual calibration is reviewed.
 
 Homography and projection diagnostics from real court keypoints:
 
@@ -677,7 +711,7 @@ Replay with the real court run:
 /replay/<media_id>?courtRunId=<real_court_run_id>&homographyRunId=<homography_run_id>&projectionDiagnosticRunId=<projection_diagnostic_run_id>
 ```
 
-Replay labels distinguish `real court keypoint model output`, `derived court line candidate`, `homography candidate`, and `projection diagnostic`. These labels describe provenance, not correctness.
+Replay labels distinguish raw TOM v1 keypoint evidence, mapped TOM v3 keypoint evidence, `real court keypoint model output`, `derived court line candidate`, `homography candidate`, and `projection diagnostic`. These labels describe provenance and calibration context, not correctness.
 
 Main tennis-player subject filter:
 

@@ -1241,6 +1241,7 @@ def build_court_keypoint_overlay_items(
 
 
 def court_keypoint_overlay_item_from_row(row: CourtKeypointObservation) -> dict[str, Any]:
+    raw_payload = row.raw_model_payload_jsonb or {}
     return {
         "overlay_type": "court_keypoint_evidence",
         "observation_id": row.observation_id,
@@ -1251,6 +1252,25 @@ def court_keypoint_overlay_item_from_row(row: CourtKeypointObservation) -> dict[
         "court_keypoint_schema": row.court_keypoint_schema,
         "schema_version": row.schema_version,
         "keypoints": _court_keypoints(row.keypoints_jsonb or []),
+        "mapped_keypoints": _court_keypoints(row.keypoints_jsonb or []),
+        "raw_tom_v1_keypoints": _raw_tom_v1_keypoints(raw_payload),
+        "preprocessing_mode": _string_or_none(raw_payload.get("preprocessing_mode")),
+        "coordinate_interpretation": _string_or_none(
+            raw_payload.get("coordinate_interpretation")
+        ),
+        "raw_output_coordinate_assumption": _string_or_none(
+            raw_payload.get("coordinate_interpretation")
+        ),
+        "model_input_size": _numeric(raw_payload.get("model_input_size")),
+        "output_reference_size": _numeric(raw_payload.get("output_reference_size")),
+        "mapping_version": _string_or_none(
+            raw_payload.get("mapping_version")
+            or raw_payload.get("adapter_mapping_version")
+        ),
+        "inferred_tom_v3_keypoints": raw_payload.get("inferred_tom_v3_keypoints") or [],
+        "uncalibrated_tom_v1_keypoint_mapping": _truthy(
+            raw_payload.get("uncalibrated_tom_v1_keypoint_mapping")
+        ),
         "keypoint_count": row.keypoint_count,
         "keypoints_present_count": row.keypoints_present_count,
         "keypoints_missing_count": row.keypoints_missing_count,
@@ -2071,6 +2091,14 @@ def _court_source_metadata(
         or _truthy(metadata.get("tom_v1_court_keypoint_model_output"))
         or _truthy(payload.get("tom_v1_court_keypoint_model_output"))
     )
+    uncalibrated_mapping = (
+        _truthy(metadata.get("uncalibrated_tom_v1_keypoint_mapping"))
+        or _truthy(payload.get("uncalibrated_tom_v1_keypoint_mapping"))
+        or _truthy(metadata.get("homography_from_uncalibrated_tom_v1_keypoints"))
+        or _truthy(payload.get("homography_from_uncalibrated_tom_v1_keypoints"))
+        or _truthy(metadata.get("calibration_audit_v0"))
+        or _truthy(payload.get("calibration_audit_v0"))
+    )
     model_output_not_truth = (
         real_model_output
         or _truthy(metadata.get("model_output_not_truth"))
@@ -2123,6 +2151,15 @@ def _court_source_metadata(
         "is_real_model_output": real_model_output,
         "real_model_output": real_model_output,
         "model_output_not_truth": model_output_not_truth,
+        "uncalibrated_tom_v1_keypoint_mapping": uncalibrated_mapping,
+        "calibration_audit_v0": _truthy(metadata.get("calibration_audit_v0"))
+        or _truthy(payload.get("calibration_audit_v0")),
+        "calibration_warning": (
+            "Homography/court geometry is built from uncalibrated TOM v1 "
+            "keypoint mapping. Use for visual audit only."
+            if uncalibrated_mapping
+            else None
+        ),
     }
 
 
@@ -2351,6 +2388,40 @@ def _court_keypoints(keypoints: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 "present": bool(keypoint.get("present")),
                 "visibility": keypoint.get("visibility"),
                 "source_index": keypoint.get("source_index"),
+            }
+        )
+    return normalized
+
+
+def _raw_tom_v1_keypoints(raw_payload: dict[str, Any]) -> list[dict[str, Any]]:
+    raw_keypoints = raw_payload.get("tom_v1_raw_keypoints") or []
+    scaled_keypoints = raw_payload.get("raw_keypoints_scaled_to_image") or []
+    scaled_by_index = {
+        item.get("source_index"): item for item in scaled_keypoints if isinstance(item, dict)
+    }
+    normalized: list[dict[str, Any]] = []
+    for index, raw_keypoint in enumerate(raw_keypoints):
+        if not isinstance(raw_keypoint, dict):
+            continue
+        scaled = scaled_by_index.get(raw_keypoint.get("source_index", index), {})
+        normalized.append(
+            {
+                "source_index": int(raw_keypoint.get("source_index", index)),
+                "label": f"raw_{int(raw_keypoint.get('source_index', index))}",
+                "raw_name": raw_keypoint.get("name") or scaled.get("raw_name"),
+                "raw_x": _numeric(raw_keypoint.get("x")),
+                "raw_y": _numeric(raw_keypoint.get("y")),
+                "image_x": _numeric(scaled.get("image_x")),
+                "image_y": _numeric(scaled.get("image_y")),
+                "confidence": _numeric(
+                    scaled.get("confidence", raw_keypoint.get("confidence"))
+                ),
+                "present": bool(scaled.get("present")),
+                "visibility": scaled.get("visibility"),
+                "coordinate_interpretation": (
+                    scaled.get("coordinate_interpretation")
+                    or raw_payload.get("coordinate_interpretation")
+                ),
             }
         )
     return normalized

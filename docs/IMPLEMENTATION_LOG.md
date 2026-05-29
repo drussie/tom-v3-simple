@@ -1985,3 +1985,27 @@ Milestone 8F created:
 - Milestone 8F docs, handoff, and agent report
 
 8F does not add ball/player court-space projection, real court model inference, accepted/rejected court lifecycle, bounce/hit/in-out/rally/point/scoring, stream ingestion, tennis-event interpretation, or adjudication.
+
+## Repair - TOM v1 Court Keypoint Visual Calibration Audit v0
+
+Status: complete
+
+### Goal
+
+Expose raw TOM v1 court keypoint model output separately from TOM v3 mapped keypoints so court/homography misalignment can be diagnosed before geometry repair.
+
+### Notes
+
+This repair adds:
+
+- explicit `preprocessing_mode = full_frame_resize_224`
+- explicit `coordinate_interpretation = output_as_pixels_224`
+- clear failure for unsupported calibration modes
+- raw TOM v1 keypoint payloads scaled into image pixels
+- replay payload fields for `raw_tom_v1_keypoints` and mapped keypoints
+- replay toggles for raw TOM v1 keypoints and mapped TOM v3 keypoints
+- optional `tom_v1_court_keypoint_calibration_debug_json` artifacts
+- uncalibrated TOM v1 keypoint mapping warnings on court and homography evidence
+- docs for the calibration audit workflow
+
+This repair does not make court geometry correct. It makes the current court error inspectable without adding court truth, accepted/rejected lifecycle, ball/player court projection, bounce/hit/in-out/rally/point/scoring, player identity, scoreboard OCR, or adjudication.

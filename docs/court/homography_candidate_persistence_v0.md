@@ -15,7 +15,7 @@ indexed media
 -> source court evidence lineage
 ```
 
-The same persistence path can also consume real model-output `court_keypoint_observation` rows from the TOM v1 court keypoint adapter. In that case, homography metadata preserves source provenance such as `source_court_evidence_source = real_model_output` and `source_court_keypoint_real_model_output = true`.
+The same persistence path can also consume real model-output `court_keypoint_observation` rows from the TOM v1 court keypoint adapter. In that case, homography metadata preserves source provenance such as `source_court_evidence_source = real_model_output` and `source_court_keypoint_real_model_output = true`. The calibration audit also preserves source preprocessing mode, coordinate interpretation, mapping version, and `source_court_keypoint_uncalibrated_mapping`.
 
 Homography candidates are candidate geometry evidence. They are not confirmed court models, true transforms, in/out decisions, bounce locations, hit events, rally state, point reconstruction, or score evidence.
 

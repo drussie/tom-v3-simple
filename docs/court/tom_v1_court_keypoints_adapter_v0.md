@@ -25,6 +25,15 @@ The adapter uses `torchvision.models.resnet50(weights=None)` with a 28-value out
 
 The model appears to emit coordinates in a 224x224 model-input pixel space. The CLI accepts `--img-size` for run documentation and compatibility, but the recognized v0 adapter uses a fixed 224x224 preprocessing path and scales the output back to source image pixels.
 
+Visual calibration is still required. The current assumptions are explicit, not proven:
+
+```text
+preprocessing_mode = full_frame_resize_224
+coordinate_interpretation = output_as_pixels_224
+```
+
+Use the calibration audit overlay before relying on mapped keypoints, derived lines, homography candidates, or projection diagnostics.
+
 ## CLI
 
 Probe the local model without writing observations:
@@ -48,8 +57,12 @@ Run court keypoints:
   --every-n-frames 30 \
   --max-frames 214 \
   --allowed-root model_assets/tom_v1 \
+  --preprocessing-mode full_frame_resize_224 \
+  --coordinate-interpretation output_as_pixels_224 \
   --viewer-base-url http://127.0.0.1:3000
 ```
+
+For calibration debugging, add `--emit-debug-artifacts` or use `make tom-v1-court-keypoint-audit`.
 
 Makefile helpers:
 
@@ -67,6 +80,9 @@ Metadata preserves:
 - `fixture_court_evidence = false`
 - `real_model_output = true`
 - `model_output_not_truth = true`
+- `preprocessing_mode = full_frame_resize_224`
+- `coordinate_interpretation = output_as_pixels_224`
+- `uncalibrated_tom_v1_keypoint_mapping = true`
 - `geometry_evidence_only = true`
 - `observation_only = true`
 - `no_adjudication = true`
@@ -91,10 +107,14 @@ Existing `build-homography-candidates` and `build-projection-diagnostics` comman
 
 This provenance helps replay and review distinguish real model-output court evidence from fixture court evidence.
 
+Homography rows built from TOM v1 court keypoints are marked as coming from an uncalibrated TOM v1 keypoint mapping. This is a visual audit warning, not a rejection or truth lifecycle.
+
 ## Replay Labels
 
 Replay payloads now distinguish:
 
+- raw TOM v1 court keypoints
+- mapped TOM v3 court keypoints
 - fixture court evidence
 - real court keypoint model output
 - derived court line candidate

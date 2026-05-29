@@ -33,6 +33,7 @@ This registry makes TOM v3 Simple boundaries explicit.
 - Camera/view summaries are geometry context read models; they do not confirm camera state or homography validity.
 - Homography candidates and overlays are candidate geometry evidence; they do not confirm a court model or camera geometry.
 - Real TOM v1 court keypoint model output can be persisted as court evidence, but mapping/preprocessing and homography fit quality still require visual audit. It is model-output geometry evidence, not court truth.
+- TOM v1 court keypoint calibration now exposes raw `raw_0..raw_13` points and mapped TOM v3 points separately, but this does not make the court geometry trusted. It only makes preprocessing, coordinate interpretation, mapping, and homography errors easier to diagnose.
 - Real camera/view runtime is not implemented yet.
 - Projection diagnostics project court template geometry for review only; they do not project ball/player detections into court space.
 - Replay current-only, short-trail, and full-trail controls are display policy only; they do not change persisted evidence or prove tracking correctness.

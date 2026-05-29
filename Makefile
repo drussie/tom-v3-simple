@@ -24,6 +24,9 @@ TOM_V1_BALL_CONF ?= 0.10
 TOM_V1_PLAYER_CONF ?= 0.25
 TOM_V1_POSE_CONF ?= 0.25
 TOM_V1_COURT_KEYPOINT_IMG_SIZE ?= 224
+COURT_KEYPOINT_PREPROCESSING_MODE ?= full_frame_resize_224
+COURT_KEYPOINT_COORDINATE_INTERPRETATION ?= output_as_pixels_224
+EMIT_DEBUG_ARTIFACTS ?= false
 MODEL_NAME ?=
 MODEL_VERSION ?= v0
 REQUIRED_SHA256 ?=
@@ -61,7 +64,7 @@ DERIVE_LINES ?= true
 
 export TOM_V3_DATABASE_URL
 
-.PHONY: install web-install test lint migrate api seed verify index-media run-gameplay index-and-run-gameplay run-detection index-and-run-detection extract-frame-artifacts build-tracklets run-pose export-tracklet-review-dataset court-review-export demo demo-fixture demo-plan demo-reset demo-export demo-open replay-open completion-audit completion-check yolo-probe yolo-smoke yolo-runtime-probe register-yolo-model smoke-real-yolo-local real-detection real-pose tom-v1-yolo-probe tom-v1-ball-detection tom-v1-player-detection tom-v1-tracklets tom-v1-main-subjects tom-v1-main-player-tracks tom-v1-pose tom-v1-pose-main-subjects tom-v1-pose-main-tracks tom-v1-court-keypoints-probe tom-v1-court-keypoints court-fixture homography-candidates projection-diagnostics web web-build web-lint smoke all-checks
+.PHONY: install web-install test lint migrate api seed verify index-media run-gameplay index-and-run-gameplay run-detection index-and-run-detection extract-frame-artifacts build-tracklets run-pose export-tracklet-review-dataset court-review-export demo demo-fixture demo-plan demo-reset demo-export demo-open replay-open completion-audit completion-check yolo-probe yolo-smoke yolo-runtime-probe register-yolo-model smoke-real-yolo-local real-detection real-pose tom-v1-yolo-probe tom-v1-ball-detection tom-v1-player-detection tom-v1-tracklets tom-v1-main-subjects tom-v1-main-player-tracks tom-v1-pose tom-v1-pose-main-subjects tom-v1-pose-main-tracks tom-v1-court-keypoints-probe tom-v1-court-keypoints tom-v1-court-keypoint-audit court-fixture homography-candidates projection-diagnostics web web-build web-lint smoke all-checks
 
 install:
 	$(PYTHON) -m pip install -e ".[dev]"
@@ -254,7 +257,11 @@ tom-v1-court-keypoints-probe:
 
 tom-v1-court-keypoints:
 	@if [ -z "$(MEDIA_ID)" ]; then echo "MEDIA_ID is required: make tom-v1-court-keypoints MEDIA_ID=<media_id>"; exit 1; fi
-	$(PYTHON) -m apps.worker.cli run-real-court-keypoints --media-id "$(MEDIA_ID)" --weights "$(TOM_V1_MODEL_ROOT)/keypoints_model.pth" --model-name tom-v1-court-keypoints --model-version v1-local --device "$(YOLO_DEVICE)" --img-size "$(if $(IMG_SIZE),$(IMG_SIZE),$(TOM_V1_COURT_KEYPOINT_IMG_SIZE))" --every-n-frames "$(EVERY_N_FRAMES)" --max-frames "$(MAX_FRAMES)" --viewer-base-url "$(VIEWER_BASE_URL)" --allowed-root "$(TOM_V1_MODEL_ROOT)" $(if $(FRAME_START),--frame-start "$(FRAME_START)",) $(if $(FRAME_END),--frame-end "$(FRAME_END)",) $(if $(filter false,$(DERIVE_LINES)),--no-derive-lines,--derive-lines) $(if $(filter true,$(PLAN_ONLY)),--plan-only,)
+	$(PYTHON) -m apps.worker.cli run-real-court-keypoints --media-id "$(MEDIA_ID)" --weights "$(TOM_V1_MODEL_ROOT)/keypoints_model.pth" --model-name tom-v1-court-keypoints --model-version v1-local --device "$(YOLO_DEVICE)" --img-size "$(if $(IMG_SIZE),$(IMG_SIZE),$(TOM_V1_COURT_KEYPOINT_IMG_SIZE))" --every-n-frames "$(EVERY_N_FRAMES)" --max-frames "$(MAX_FRAMES)" --viewer-base-url "$(VIEWER_BASE_URL)" --allowed-root "$(TOM_V1_MODEL_ROOT)" --preprocessing-mode "$(COURT_KEYPOINT_PREPROCESSING_MODE)" --coordinate-interpretation "$(COURT_KEYPOINT_COORDINATE_INTERPRETATION)" $(if $(FRAME_START),--frame-start "$(FRAME_START)",) $(if $(FRAME_END),--frame-end "$(FRAME_END)",) $(if $(filter false,$(DERIVE_LINES)),--no-derive-lines,--derive-lines) $(if $(filter true,$(EMIT_DEBUG_ARTIFACTS)),--emit-debug-artifacts,) $(if $(filter true,$(PLAN_ONLY)),--plan-only,)
+
+tom-v1-court-keypoint-audit:
+	@if [ -z "$(MEDIA_ID)" ]; then echo "MEDIA_ID is required: make tom-v1-court-keypoint-audit MEDIA_ID=<media_id>"; exit 1; fi
+	$(MAKE) tom-v1-court-keypoints MEDIA_ID="$(MEDIA_ID)" PYTHON="$(PYTHON)" YOLO_DEVICE="$(YOLO_DEVICE)" IMG_SIZE="$(if $(IMG_SIZE),$(IMG_SIZE),224)" EVERY_N_FRAMES="$(EVERY_N_FRAMES)" MAX_FRAMES="$(MAX_FRAMES)" VIEWER_BASE_URL="$(VIEWER_BASE_URL)" COURT_KEYPOINT_PREPROCESSING_MODE="$(COURT_KEYPOINT_PREPROCESSING_MODE)" COURT_KEYPOINT_COORDINATE_INTERPRETATION="$(COURT_KEYPOINT_COORDINATE_INTERPRETATION)" EMIT_DEBUG_ARTIFACTS=true DERIVE_LINES="$(DERIVE_LINES)" PLAN_ONLY="$(PLAN_ONLY)"
 
 court-fixture:
 	@if [ -z "$(MEDIA_ID)" ]; then echo "MEDIA_ID is required: make court-fixture MEDIA_ID=<media_id>"; exit 1; fi

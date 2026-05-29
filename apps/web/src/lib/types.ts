@@ -501,6 +501,9 @@ export interface ReplayCourtEvidenceSource {
   is_fixture?: boolean;
   is_real_model_output?: boolean;
   model_output_not_truth?: boolean;
+  calibration_audit_v0?: boolean;
+  uncalibrated_tom_v1_keypoint_mapping?: boolean;
+  calibration_warning?: string | null;
   frame_time_owner?: string | null;
 }
 
@@ -514,6 +517,20 @@ export interface ReplayCourtKeypoint {
   source_index?: number | null;
 }
 
+export interface ReplayRawTomV1CourtKeypoint {
+  source_index: number;
+  label: string;
+  raw_name?: string | null;
+  raw_x: number | null;
+  raw_y: number | null;
+  image_x: number | null;
+  image_y: number | null;
+  confidence: number | null;
+  present: boolean;
+  visibility?: string | null;
+  coordinate_interpretation?: string | null;
+}
+
 export interface ReplayCourtKeypointOverlay extends ReplayCourtEvidenceSource {
   overlay_type: "court_keypoint_evidence";
   observation_id: string;
@@ -524,6 +541,15 @@ export interface ReplayCourtKeypointOverlay extends ReplayCourtEvidenceSource {
   court_keypoint_schema: string;
   schema_version: string;
   keypoints: ReplayCourtKeypoint[];
+  mapped_keypoints?: ReplayCourtKeypoint[];
+  raw_tom_v1_keypoints?: ReplayRawTomV1CourtKeypoint[];
+  preprocessing_mode?: string | null;
+  coordinate_interpretation?: string | null;
+  raw_output_coordinate_assumption?: string | null;
+  model_input_size?: number | null;
+  output_reference_size?: number | null;
+  mapping_version?: string | null;
+  inferred_tom_v3_keypoints?: string[];
   keypoint_count: number;
   keypoints_present_count: number;
   keypoints_missing_count: number;

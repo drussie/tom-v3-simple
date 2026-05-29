@@ -456,6 +456,7 @@ pre {
 }
 
 .replay-court-keypoint-group,
+.replay-raw-court-keypoint-group,
 .replay-court-line-group,
 .replay-homography-group,
 .replay-projection-diagnostic-group {
@@ -466,6 +467,12 @@ pre {
 .replay-court-keypoint circle {
   fill: var(--violet);
   stroke: #ffffff;
+  stroke-width: 1.5;
+}
+
+.replay-raw-court-keypoint circle {
+  fill: #22d3ee;
+  stroke: rgba(16, 23, 25, 0.92);
   stroke-width: 1.5;
 }
 
@@ -481,7 +488,24 @@ pre {
   text-transform: capitalize;
 }
 
+.replay-raw-court-keypoint text {
+  fill: #cffafe;
+  font-size: 10px;
+  font-weight: 900;
+  paint-order: stroke;
+  pointer-events: none;
+  stroke: rgba(16, 23, 25, 0.95);
+  stroke-linejoin: round;
+  stroke-width: 3px;
+  text-transform: none;
+}
+
 .replay-court-keypoint-group.selected .replay-court-keypoint circle {
+  fill: var(--amber);
+  stroke-width: 3;
+}
+
+.replay-raw-court-keypoint-group.selected .replay-raw-court-keypoint circle {
   fill: var(--amber);
   stroke-width: 3;
 }

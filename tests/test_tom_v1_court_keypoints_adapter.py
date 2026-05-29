@@ -17,6 +17,7 @@ from tom_v3_storage.db_models import (
     Base,
     CourtKeypointObservation,
     CourtLineObservation,
+    EvidenceArtifact,
     HomographyCandidateObservation,
     MediaAsset,
     Observation,
@@ -188,6 +189,7 @@ def test_real_court_keypoint_run_persists_model_output_evidence(
         result_provider=FakeCourtKeypointResultProvider(),
         every_n_frames=30,
         max_frames=3,
+        emit_debug_artifacts=True,
     )
 
     assert result["ok"] is True
@@ -198,6 +200,7 @@ def test_real_court_keypoint_run_persists_model_output_evidence(
         "total": 6,
     }
     assert result["warnings"]["real_model_output"] is True
+    assert result["calibration_debug"]["debug_artifact_count"] == 3
 
     keypoint = db_session.scalar(
         select(CourtKeypointObservation).where(
@@ -211,6 +214,15 @@ def test_real_court_keypoint_run_persists_model_output_evidence(
     assert keypoint.metadata_jsonb["real_model_output"] is True
     assert keypoint.metadata_jsonb["fixture_court_evidence"] is False
     assert keypoint.metadata_jsonb["model_output_not_truth"] is True
+    assert keypoint.raw_model_payload_jsonb["preprocessing_mode"] == "full_frame_resize_224"
+    assert (
+        keypoint.raw_model_payload_jsonb["coordinate_interpretation"]
+        == "output_as_pixels_224"
+    )
+    assert len(keypoint.raw_model_payload_jsonb["tom_v1_raw_keypoints"]) == 14
+    assert len(keypoint.raw_model_payload_jsonb["raw_keypoints_scaled_to_image"]) == 14
+    assert keypoint.raw_model_payload_jsonb["mapped_tom_v3_keypoints"]
+    assert keypoint.raw_model_payload_jsonb["uncalibrated_tom_v1_keypoint_mapping"] is True
     assert line is not None
     assert line.metadata_jsonb["line_source"] == "derived_from_real_keypoint_observations"
     assert line.metadata_jsonb["candidate_line_only"] is True
@@ -220,6 +232,23 @@ def test_real_court_keypoint_run_persists_model_output_evidence(
     assert overlay["source_label"] == "real court keypoint model output"
     assert overlay["is_real_model_output"] is True
     assert overlay["model_output_not_truth"] is True
+    assert overlay["preprocessing_mode"] == "full_frame_resize_224"
+    assert overlay["coordinate_interpretation"] == "output_as_pixels_224"
+    assert overlay["raw_tom_v1_keypoints"][0]["label"] == "raw_0"
+    assert overlay["raw_tom_v1_keypoints"][0]["image_x"] is not None
+    assert overlay["mapped_keypoints"][0]["name"] == "near_left_baseline_corner"
+    assert overlay["uncalibrated_tom_v1_keypoint_mapping"] is True
+
+    artifact = db_session.scalar(
+        select(EvidenceArtifact).where(
+            EvidenceArtifact.target_observation_id == keypoint.observation_id
+        )
+    )
+    assert artifact is not None
+    assert artifact.artifact_type == "tom_v1_court_keypoint_calibration_debug_json"
+    assert artifact.metadata_jsonb["raw_keypoints_scaled_to_image"]
+    assert artifact.metadata_jsonb["mapped_tom_v3_keypoints"]
+    assert artifact.metadata_jsonb["warnings"]["not_court_truth"] is True
 
 
 def test_cli_handler_plan_only_for_real_court_keypoints(db_session: Session) -> None:
@@ -240,6 +269,9 @@ def test_cli_handler_plan_only_for_real_court_keypoints(db_session: Session) -> 
             allowed_roots=["model_assets/tom_v1"],
             viewer_base_url="http://127.0.0.1:3000",
             derive_lines=True,
+            preprocessing_mode="full_frame_resize_224",
+            coordinate_interpretation="output_as_pixels_224",
+            emit_debug_artifacts=True,
             plan_only=True,
         ),
     )
@@ -248,6 +280,25 @@ def test_cli_handler_plan_only_for_real_court_keypoints(db_session: Session) -> 
     assert result["status"] == "planned"
     assert "run-real-court-keypoints" in result["plan"]["command"]
     assert result["plan"]["runtime"]["recognized_model_input_size"] == 224
+    assert result["plan"]["runtime"]["preprocessing_mode"] == "full_frame_resize_224"
+    assert result["plan"]["court_schema"]["emit_debug_artifacts"] is True
+
+
+def test_real_court_keypoint_run_rejects_unsupported_calibration_modes(
+    db_session: Session,
+    indexed_media: MediaAsset,
+) -> None:
+    result = run_real_court_keypoint_replay(
+        session=db_session,
+        media_id=indexed_media.id,
+        weights_path=None,
+        result_provider=FakeCourtKeypointResultProvider(),
+        preprocessing_mode="letterbox_224",
+    )
+
+    assert result["ok"] is False
+    assert result["status"] == "unsupported_preprocessing_mode"
+    assert "only full_frame_resize_224" in result["message"]
 
 
 def test_homography_builder_preserves_real_court_source_metadata(
@@ -279,6 +330,16 @@ def test_homography_builder_preserves_real_court_source_metadata(
     assert homography.metadata_jsonb["source_court_evidence_source"] == "real_model_output"
     assert homography.metadata_jsonb["source_court_keypoint_real_model_output"] is True
     assert homography.metadata_jsonb["source_court_line_derived_from_real_keypoints"] is True
+    assert (
+        homography.metadata_jsonb["source_court_keypoint_preprocessing_mode"]
+        == "full_frame_resize_224"
+    )
+    assert (
+        homography.metadata_jsonb["source_court_keypoint_coordinate_interpretation"]
+        == "output_as_pixels_224"
+    )
+    assert homography.metadata_jsonb["source_court_keypoint_uncalibrated_mapping"] is True
+    assert homography.metadata_jsonb["homography_from_uncalibrated_tom_v1_keypoints"] is True
 
     lineage = db_session.scalars(
         select(ObservationLineage).where(

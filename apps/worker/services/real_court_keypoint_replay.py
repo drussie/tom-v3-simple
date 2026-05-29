@@ -8,13 +8,17 @@ from typing import Any
 
 from sqlalchemy.orm import Session
 from tom_v3_model_adapters.court_keypoints import (
+    TOM_V1_COURT_KEYPOINT_COORDINATE_INTERPRETATION,
+    TOM_V1_COURT_KEYPOINT_PREPROCESSING_MODE,
     CourtKeypointAdapterError,
     CourtKeypointResultProvider,
     probe_tom_v1_court_keypoint_model,
     run_court_keypoint_frame_inference,
+    validate_court_keypoint_calibration_options,
     validate_court_keypoint_weights,
 )
 from tom_v3_observations.writer import ObservationWriter
+from tom_v3_schema.artifacts import EvidenceArtifactCreate
 from tom_v3_schema.court import (
     COURT_KEYPOINT_SCHEMA,
     COURT_KEYPOINT_SCHEMA_VERSION,
@@ -66,6 +70,9 @@ def build_real_court_keypoint_plan(
     frame_end: int | None = None,
     max_frames: int | None = 214,
     derive_lines: bool = True,
+    preprocessing_mode: str = TOM_V1_COURT_KEYPOINT_PREPROCESSING_MODE,
+    coordinate_interpretation: str = TOM_V1_COURT_KEYPOINT_COORDINATE_INTERPRETATION,
+    emit_debug_artifacts: bool = False,
     viewer_base_url: str = "http://127.0.0.1:3000",
 ) -> dict[str, Any]:
     command_parts = [
@@ -89,6 +96,10 @@ def build_real_court_keypoint_plan(
         command_parts.append(f"--max-frames {max_frames}")
     if not derive_lines:
         command_parts.append("--no-derive-lines")
+    command_parts.append(f"--preprocessing-mode {preprocessing_mode}")
+    command_parts.append(f"--coordinate-interpretation {coordinate_interpretation}")
+    if emit_debug_artifacts:
+        command_parts.append("--emit-debug-artifacts")
     return {
         "steps": [
             "validate_media",
@@ -114,6 +125,8 @@ def build_real_court_keypoint_plan(
             "device": device,
             "requested_img_size": img_size,
             "recognized_model_input_size": 224,
+            "preprocessing_mode": preprocessing_mode,
+            "coordinate_interpretation": coordinate_interpretation,
             "requires_local_weights": True,
         },
         "court_schema": {
@@ -122,6 +135,7 @@ def build_real_court_keypoint_plan(
             "court_template_name": COURT_TEMPLATE_NAME,
             "court_template_version": COURT_TEMPLATE_VERSION,
             "derive_line_candidates": derive_lines,
+            "emit_debug_artifacts": emit_debug_artifacts,
         },
         "replay_url_template": (
             f"{viewer_base_url.rstrip('/')}/replay/{media_id}?courtRunId=<run_id>"
@@ -147,10 +161,22 @@ def run_real_court_keypoint_replay(
     allowed_roots: Sequence[str] | None = None,
     viewer_base_url: str = "http://127.0.0.1:3000",
     derive_lines: bool = True,
+    preprocessing_mode: str = TOM_V1_COURT_KEYPOINT_PREPROCESSING_MODE,
+    coordinate_interpretation: str = TOM_V1_COURT_KEYPOINT_COORDINATE_INTERPRETATION,
+    emit_debug_artifacts: bool = False,
     plan_only: bool = False,
     result_provider: CourtKeypointResultProvider | None = None,
     frame_source: Any | None = None,
 ) -> dict[str, Any]:
+    try:
+        validate_court_keypoint_calibration_options(
+            preprocessing_mode=preprocessing_mode,
+            coordinate_interpretation=coordinate_interpretation,
+        )
+    except CourtKeypointAdapterError as exc:
+        status = str(exc).split(":", maxsplit=1)[0]
+        return _failed(status, str(exc))
+
     plan = build_real_court_keypoint_plan(
         media_id=media_id,
         weights_path=weights_path or "model_assets/tom_v1/keypoints_model.pth",
@@ -163,6 +189,9 @@ def run_real_court_keypoint_replay(
         frame_end=frame_end,
         max_frames=max_frames,
         derive_lines=derive_lines,
+        preprocessing_mode=preprocessing_mode,
+        coordinate_interpretation=coordinate_interpretation,
+        emit_debug_artifacts=emit_debug_artifacts,
         viewer_base_url=viewer_base_url,
     )
     if plan_only:
@@ -230,6 +259,9 @@ def run_real_court_keypoint_replay(
         frame_end=frame_end,
         max_frames=max_frames,
         derive_lines=derive_lines,
+        preprocessing_mode=preprocessing_mode,
+        coordinate_interpretation=coordinate_interpretation,
+        emit_debug_artifacts=emit_debug_artifacts,
     )
     run = _create_run(
         session=session,
@@ -256,6 +288,8 @@ def run_real_court_keypoint_replay(
                 "weights_sha256": weights_validation.sha256 if weights_validation else None,
                 "device": device,
                 "img_size": img_size,
+                "preprocessing_mode": preprocessing_mode,
+                "coordinate_interpretation": coordinate_interpretation,
                 "model_registry_id": model.id,
                 "runtime_config_id": runtime_config.id,
             },
@@ -269,6 +303,7 @@ def run_real_court_keypoint_replay(
             runtime_config=runtime_config,
             frame_results=frame_results,
             derive_lines=derive_lines,
+            emit_debug_artifacts=emit_debug_artifacts,
         )
     except Exception as exc:
         _mark_failed(session=session, run=run, step=step, message=str(exc))
@@ -304,6 +339,12 @@ def run_real_court_keypoint_replay(
         "observation_ids": [observation.id for observation in observations],
         "model_probe": model_probe,
         "weights_validation": weights_validation.as_dict() if weights_validation else None,
+        "calibration_debug": {
+            "preprocessing_mode": preprocessing_mode,
+            "coordinate_interpretation": coordinate_interpretation,
+            "emit_debug_artifacts": emit_debug_artifacts,
+            "debug_artifact_count": len(frame_results) if emit_debug_artifacts else 0,
+        },
         "replay_url": f"{viewer_base_url.rstrip('/')}/replay/{media.id}?courtRunId={run.id}",
         "warnings": dict(REAL_COURT_KEYPOINT_WARNINGS),
     }
@@ -366,6 +407,9 @@ def _create_runtime_config(
     frame_end: int | None,
     max_frames: int | None,
     derive_lines: bool,
+    preprocessing_mode: str,
+    coordinate_interpretation: str,
+    emit_debug_artifacts: bool,
 ) -> RuntimeConfig:
     runtime_config = RuntimeConfig(
         config_name="real-court-keypoint-replay-config",
@@ -378,6 +422,10 @@ def _create_runtime_config(
             "device": device,
             "requested_img_size": img_size,
             "recognized_model_input_size": 224,
+            "preprocessing_mode": preprocessing_mode,
+            "coordinate_interpretation": coordinate_interpretation,
+            "supported_preprocessing_modes": ["full_frame_resize_224"],
+            "supported_coordinate_interpretations": ["output_as_pixels_224"],
             "frame_sampling": {
                 "mode": "every_n_frames",
                 "every_n_frames": every_n_frames,
@@ -390,7 +438,10 @@ def _create_runtime_config(
             "court_template_name": COURT_TEMPLATE_NAME,
             "court_template_version": COURT_TEMPLATE_VERSION,
             "derive_line_candidates": derive_lines,
+            "emit_debug_artifacts": emit_debug_artifacts,
             "line_source": "derived_from_real_keypoint_observations",
+            "calibration_audit_v0": True,
+            "uncalibrated_tom_v1_keypoint_mapping": True,
             "real_model_output": True,
             "model_output_not_truth": True,
             "fixture_court_evidence": False,
@@ -424,8 +475,10 @@ def _create_run(
         runtime_config_id=runtime_config.id,
         metadata_jsonb={
             "blueprint": 8,
-            "milestone": "tom-v1-court-keypoints-homography-adapter",
+            "milestone": "tom-v1-court-keypoint-visual-calibration-audit-v0",
             "adapter_name": "tom-v1-court-keypoints",
+            "calibration_audit_v0": True,
+            "uncalibrated_tom_v1_keypoint_mapping": True,
             "real_model_output": True,
             "model_output_not_truth": True,
             "fixture_court_evidence": False,
@@ -480,6 +533,7 @@ def _persist_court_keypoint_results(
     runtime_config: RuntimeConfig,
     frame_results: list[dict[str, Any]],
     derive_lines: bool,
+    emit_debug_artifacts: bool,
 ) -> list[Observation]:
     writer = ObservationWriter(session)
     observations: list[Observation] = []
@@ -510,6 +564,17 @@ def _persist_court_keypoint_results(
                     observation_type="court_keypoint_observation",
                     step=step,
                     typed_payload=keypoint_observation.model_dump(mode="json"),
+                ),
+                artifacts=(
+                    [
+                        _calibration_debug_artifact(
+                            media=media,
+                            run=run,
+                            frame_result=frame_result,
+                        )
+                    ]
+                    if emit_debug_artifacts
+                    else []
                 ),
                 idempotency_key=(
                     f"{run.id}:tom-v1-court-keypoint:{keypoint_observation.frame_number}"
@@ -629,6 +694,8 @@ def _keypoint_metadata(frame_index: int) -> dict[str, Any]:
         "real_model_output": True,
         "model_output_not_truth": True,
         "tom_v1_court_keypoint_model_output": True,
+        "calibration_audit_v0": True,
+        "uncalibrated_tom_v1_keypoint_mapping": True,
         "adapter_frame_index": frame_index,
         "observation_only": True,
         "no_adjudication": True,
@@ -664,6 +731,9 @@ def _observation_payload(
         "fixture_court_evidence": False,
         "real_model_output": True,
         "model_output_not_truth": True,
+        "calibration_audit_v0": True,
+        "uncalibrated_tom_v1_keypoint_mapping": True,
+        "homography_from_uncalibrated_tom_v1_keypoints": True,
         "observation_only": True,
         "no_adjudication": True,
         "geometry_evidence_only": True,
@@ -694,6 +764,8 @@ def _mark_completed(
         "camera_view_observation_count": 0,
         "total_observation_count": sum(counts.values()),
         "inference_summary": inference_summary,
+        "calibration_audit_v0": True,
+        "uncalibrated_tom_v1_keypoint_mapping": True,
         "real_model_output": True,
         "model_output_not_truth": True,
         "observation_only": True,
@@ -751,6 +823,52 @@ def _failed(status: str, message: str, **extra: Any) -> dict[str, Any]:
     }
     result.update(extra)
     return result
+
+
+def _calibration_debug_artifact(
+    *,
+    media: MediaAsset,
+    run: ProcessingRun,
+    frame_result: dict[str, Any],
+) -> EvidenceArtifactCreate:
+    raw_payload = frame_result.get("raw_model_payload") or {}
+    metadata = {
+        "export_version": "tom_v1_court_keypoint_calibration_frame_v0",
+        "frame_number": frame_result["frame_number"],
+        "timestamp_ms": frame_result["timestamp_ms"],
+        "image_width": frame_result["image_width"],
+        "image_height": frame_result["image_height"],
+        "preprocessing_mode": raw_payload.get("preprocessing_mode"),
+        "coordinate_interpretation": raw_payload.get("coordinate_interpretation"),
+        "raw_output_coordinate_assumption": raw_payload.get("coordinate_interpretation"),
+        "raw_model_output": raw_payload.get("tom_v1_raw_keypoints"),
+        "tom_v1_raw_keypoint_names": raw_payload.get("tom_v1_raw_keypoint_names"),
+        "raw_keypoints_scaled_to_image": raw_payload.get("raw_keypoints_scaled_to_image"),
+        "mapped_tom_v3_keypoints": raw_payload.get("mapped_tom_v3_keypoints"),
+        "inferred_keypoints": raw_payload.get("inferred_tom_v3_keypoints"),
+        "mapping_version": raw_payload.get("mapping_version"),
+        "warnings": {
+            "geometry_evidence_only": True,
+            "observation_only": True,
+            "no_adjudication": True,
+            "not_court_truth": True,
+            "uncalibrated_tom_v1_keypoint_mapping": True,
+        },
+    }
+    return EvidenceArtifactCreate(
+        media_id=media.id,
+        run_id=run.id,
+        artifact_type="tom_v1_court_keypoint_calibration_debug_json",
+        uri=(
+            "file:///dev/artifacts/court-calibration/"
+            f"{run.id}/frame-{frame_result['frame_number']}.json"
+        ),
+        frame_start=frame_result["frame_number"],
+        frame_end=frame_result["frame_number"],
+        timestamp_start_ms=frame_result["timestamp_ms"],
+        timestamp_end_ms=frame_result["timestamp_ms"],
+        metadata_jsonb=metadata,
+    )
 
 
 def _local_media_path(media: MediaAsset) -> str | None:

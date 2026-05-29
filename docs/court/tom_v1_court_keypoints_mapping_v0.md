@@ -4,6 +4,15 @@ The TOM v1 `keypoints_model.pth` bridge maps a 14-point raw model output into TO
 
 The raw model output is interpreted as 14 xy pairs in model-input pixel space. The v0 adapter scales those coordinates from a 224x224 reference space into source image pixels.
 
+This is now treated as a calibration assumption:
+
+```text
+preprocessing_mode = full_frame_resize_224
+coordinate_interpretation = output_as_pixels_224
+```
+
+The visual calibration audit exposes raw `raw_0..raw_13` points separately from mapped TOM v3 points so this assumption can be reviewed before repairing homography.
+
 ## Direct Mapping
 
 ```text
@@ -38,6 +47,8 @@ The adapter also preserves raw names for all 14 TOM v1 outputs in `raw_model_pay
 13 center_service_t_near
 ```
 
+Replay payloads expose these as `raw_tom_v1_keypoints`, with source-index labels `raw_0` through `raw_13` and image-space coordinates under the current coordinate interpretation.
+
 ## Inferred TOM v3 Points
 
 TOM v3's `tennis_court_v0` schema requires 12 keypoints. Four are inferred by the adapter:
@@ -61,3 +72,5 @@ This mapping is v0 and should be reviewed against real replay overlays. If the p
 - a homography fit that is too simple for the view
 
 Poor fit is still useful evidence. It should be reported as model/mapping/geometry uncertainty, not hidden or relabeled as court truth.
+
+If raw points are visibly wrong, the next repair should investigate preprocessing or coordinate interpretation before changing the mapping. If raw points are plausible but TOM v3 labels are wrong, repair the mapping. If raw and mapped points are plausible but the candidate geometry is still wrong, repair the homography fit.

@@ -81,6 +81,8 @@ Requires future TOM v1-specific adapters:
 
 Do not force `.pth` court keypoint or gameplay classifier assets through the YOLO detector path unless compatibility is proven. The court keypoint model is handled by `tom-v1-court-keypoints-probe` and `run-real-court-keypoints`.
 
+The court keypoint path now has a calibration audit surface. It can display raw TOM v1 `raw_0..raw_13` outputs separately from mapped TOM v3 keypoints and can emit calibration debug artifacts. The adapter runs, but court/homography alignment remains untrusted until raw keypoint calibration is visually reviewed.
+
 ## Runtime Probe
 
 Probe optional runtime support:

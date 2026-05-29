@@ -58,7 +58,7 @@ Blueprint 7 completes TOM v3's real perception runtime for the replay workstatio
 
 Blueprint 8 has started with geometry evidence work. Milestone 8A adds court keypoint, court line, camera/view, homography candidate, and projection diagnostic storage contracts. Milestone 8B writes fixture court keypoint, line, and camera/view rows. Milestone 8C exposes camera/view rows through read-model APIs. Milestone 8D persists homography candidate rows with lineage from source court evidence. Milestone 8E renders those persisted court rows in the replay workstation through `courtRunId` and `homographyRunId`. Milestone 8F adds projection diagnostic rows and replay support through `projectionDiagnosticRunId`.
 
-The TOM v1 court keypoint adapter can now write real model-output `court_keypoint_observation` rows through `courtRunId`. Replay labels distinguish fixture court evidence from real court keypoint model output and derived court line candidates. Homography and projection diagnostic overlays built from those rows remain candidate geometry evidence and review diagnostics, not court truth.
+The TOM v1 court keypoint adapter can now write real model-output `court_keypoint_observation` rows through `courtRunId`. Replay labels distinguish fixture court evidence from real court keypoint model output and derived court line candidates. The court calibration audit adds separate raw TOM v1 keypoint and mapped TOM v3 keypoint toggles so `raw_0..raw_13` can be visually checked before trusting mapping or homography. Homography and projection diagnostic overlays built from those rows remain candidate geometry evidence and review diagnostics, not court truth.
 
 The TOM v1 model assets bridge does not add replay architecture. It lets local TOM v1 detector and pose weights be tested through the existing `detectionRunId`, `trackletRunId`, and `poseRunId` replay paths. If a TOM v1 smoke run succeeds, the replay workstation should label the resulting rows as real model-output observations, not fixture evidence or tracking truth.
 
@@ -214,6 +214,8 @@ create backend stream sessions or ingest real streams.
 Blueprint 8 replay layers now include:
 
 - court keypoint evidence
+- raw TOM v1 court keypoint evidence
+- mapped TOM v3 court keypoint evidence
 - court line evidence
 - camera/view evidence
 - homography candidate
@@ -294,6 +296,8 @@ Real YOLO detection replay runs appear in the same detection run group because t
 - fixture detection runs as fixture/demo evidence
 
 The optional fields include `evidence_source`, `source_label`, `source_runtime`, `model_name`, `model_version`, `model_registry_id`, `runtime_config_id`, `is_fixture`, and `is_real_model_output`.
+
+Court keypoint payloads from the TOM v1 adapter also include `raw_tom_v1_keypoints`, `mapped_keypoints`, `preprocessing_mode`, `coordinate_interpretation`, `mapping_version`, `inferred_tom_v3_keypoints`, and an uncalibrated mapping warning. These are calibration/debug fields, not correctness claims.
 
 Real-detection-derived tracklet runs appear in the tracklet run group. Their optional metadata includes `evidence_source`, `source_label`, `source_detection_run_id`, `source_detection_evidence_source`, `source_detection_runtime`, and `is_real_detection_derived`.
 

@@ -26,6 +26,14 @@ from tom_v3_model_adapters.yolo_runtime import (
 TOM_V1_COURT_KEYPOINT_MODEL_INPUT_SIZE = 224
 TOM_V1_COURT_KEYPOINT_OUTPUT_PAIR_COUNT = 14
 TOM_V1_COURT_KEYPOINT_OUTPUT_REFERENCE_SIZE = 224.0
+TOM_V1_COURT_KEYPOINT_PREPROCESSING_MODE = "full_frame_resize_224"
+TOM_V1_COURT_KEYPOINT_COORDINATE_INTERPRETATION = "output_as_pixels_224"
+SUPPORTED_TOM_V1_COURT_KEYPOINT_PREPROCESSING_MODES = {
+    TOM_V1_COURT_KEYPOINT_PREPROCESSING_MODE
+}
+SUPPORTED_TOM_V1_COURT_KEYPOINT_COORDINATE_INTERPRETATIONS = {
+    TOM_V1_COURT_KEYPOINT_COORDINATE_INTERPRETATION
+}
 
 TOM_V1_RAW_COURT_KEYPOINT_NAMES = [
     "far_left_baseline_corner",
@@ -164,6 +172,10 @@ class TorchvisionResNetCourtKeypointProvider:
                 "requested_device": self.requested_device,
                 "resolved_device": self._resolved_device,
                 "requested_image_size": self.requested_image_size,
+                "preprocessing_mode": TOM_V1_COURT_KEYPOINT_PREPROCESSING_MODE,
+                "coordinate_interpretation": (
+                    TOM_V1_COURT_KEYPOINT_COORDINATE_INTERPRETATION
+                ),
                 "model_input_size": self.model_input_size,
                 "output_reference_size": self.output_reference_size,
                 "raw_output_pair_count": len(raw_keypoints),
@@ -458,6 +470,18 @@ def run_court_keypoint_frame_inference(
     if frame_count is None:
         raise CourtKeypointAdapterError("court keypoint inference requires indexed frame_count")
     inference_metadata = inference_metadata or {}
+    preprocessing_mode = str(
+        inference_metadata.get("preprocessing_mode")
+        or TOM_V1_COURT_KEYPOINT_PREPROCESSING_MODE
+    )
+    coordinate_interpretation = str(
+        inference_metadata.get("coordinate_interpretation")
+        or TOM_V1_COURT_KEYPOINT_COORDINATE_INTERPRETATION
+    )
+    validate_court_keypoint_calibration_options(
+        preprocessing_mode=preprocessing_mode,
+        coordinate_interpretation=coordinate_interpretation,
+    )
     provider = result_provider or TorchvisionResNetCourtKeypointProvider(
         weights_path=str(inference_metadata.get("weights_path") or ""),
         device=str(inference_metadata.get("device") or "cpu"),
@@ -498,6 +522,8 @@ def run_court_keypoint_frame_inference(
         "frame_sample_rate": frame_sample_rate,
         "max_frames": max_frames,
         "source_runtime": "tom_v1_court_keypoints",
+        "preprocessing_mode": preprocessing_mode,
+        "coordinate_interpretation": coordinate_interpretation,
         "model_input_size": TOM_V1_COURT_KEYPOINT_MODEL_INPUT_SIZE,
         "raw_output_pair_count": TOM_V1_COURT_KEYPOINT_OUTPUT_PAIR_COUNT,
         "mapping_status": "tom_v1_14_point_to_tom_v3_12_point_mapping_v0",
@@ -512,10 +538,28 @@ def normalize_tom_v1_court_keypoint_frame_result(
     raw_keypoints = list(frame_result.get("raw_keypoints") or [])
     image_width = int(frame_result.get("image_width") or 0)
     image_height = int(frame_result.get("image_height") or 0)
+    preprocessing_mode = str(
+        inference_metadata.get("preprocessing_mode")
+        or TOM_V1_COURT_KEYPOINT_PREPROCESSING_MODE
+    )
+    coordinate_interpretation = str(
+        inference_metadata.get("coordinate_interpretation")
+        or TOM_V1_COURT_KEYPOINT_COORDINATE_INTERPRETATION
+    )
+    validate_court_keypoint_calibration_options(
+        preprocessing_mode=preprocessing_mode,
+        coordinate_interpretation=coordinate_interpretation,
+    )
     if len(raw_keypoints) != TOM_V1_COURT_KEYPOINT_OUTPUT_PAIR_COUNT:
         raise CourtKeypointAdapterError(
             "TOM v1 court keypoint output must contain 14 raw keypoint pairs."
         )
+    raw_keypoints_scaled_to_image = scale_tom_v1_raw_keypoints_for_image(
+        raw_keypoints,
+        image_width=image_width,
+        image_height=image_height,
+        coordinate_interpretation=coordinate_interpretation,
+    )
     v3_keypoints = map_tom_v1_raw_keypoints_to_tom_v3(
         raw_keypoints,
         image_width=image_width,
@@ -531,7 +575,9 @@ def normalize_tom_v1_court_keypoint_frame_result(
             **dict(frame_result.get("raw_model_payload") or {}),
             "tom_v1_raw_keypoints": raw_keypoints,
             "tom_v1_raw_keypoint_names": TOM_V1_RAW_COURT_KEYPOINT_NAMES,
+            "raw_keypoints_scaled_to_image": raw_keypoints_scaled_to_image,
             "tom_v1_to_tom_v3_mapping": DIRECT_TOM_V1_TO_TOM_V3_KEYPOINT_INDEX,
+            "mapped_tom_v3_keypoints": v3_keypoints,
             "inferred_tom_v3_keypoints": [
                 "left_net_post",
                 "right_net_post",
@@ -539,11 +585,76 @@ def normalize_tom_v1_court_keypoint_frame_result(
                 "center_mark_far",
             ],
             "adapter_mapping_version": "tom_v1_14_point_to_tom_v3_12_point_mapping_v0",
+            "mapping_version": "tom_v1_14_point_to_tom_v3_12_point_mapping_v0",
+            "preprocessing_mode": preprocessing_mode,
+            "coordinate_interpretation": coordinate_interpretation,
             "model_input_size": TOM_V1_COURT_KEYPOINT_MODEL_INPUT_SIZE,
             "output_reference_size": TOM_V1_COURT_KEYPOINT_OUTPUT_REFERENCE_SIZE,
+            "calibration_audit_v0": True,
+            "uncalibrated_tom_v1_keypoint_mapping": True,
             "inference_metadata": dict(inference_metadata),
         },
     }
+
+
+def validate_court_keypoint_calibration_options(
+    *,
+    preprocessing_mode: str,
+    coordinate_interpretation: str,
+) -> None:
+    if preprocessing_mode not in SUPPORTED_TOM_V1_COURT_KEYPOINT_PREPROCESSING_MODES:
+        raise CourtKeypointAdapterError(
+            "unsupported_preprocessing_mode: only full_frame_resize_224 is implemented "
+            "in this audit pass."
+        )
+    if (
+        coordinate_interpretation
+        not in SUPPORTED_TOM_V1_COURT_KEYPOINT_COORDINATE_INTERPRETATIONS
+    ):
+        raise CourtKeypointAdapterError(
+            "unsupported_coordinate_interpretation: only output_as_pixels_224 is "
+            "implemented in this audit pass."
+        )
+
+
+def scale_tom_v1_raw_keypoints_for_image(
+    raw_keypoints: Sequence[Mapping[str, Any]],
+    *,
+    image_width: int,
+    image_height: int,
+    coordinate_interpretation: str = TOM_V1_COURT_KEYPOINT_COORDINATE_INTERPRETATION,
+) -> list[dict[str, Any]]:
+    validate_court_keypoint_calibration_options(
+        preprocessing_mode=TOM_V1_COURT_KEYPOINT_PREPROCESSING_MODE,
+        coordinate_interpretation=coordinate_interpretation,
+    )
+    scaled = []
+    for index, raw_keypoint in enumerate(raw_keypoints):
+        point = _scale_raw_keypoint(
+            raw_keypoint,
+            image_width=image_width,
+            image_height=image_height,
+        )
+        scaled.append(
+            {
+                "source_index": int(raw_keypoint.get("source_index", index)),
+                "raw_name": str(
+                    raw_keypoint.get("name")
+                    or TOM_V1_RAW_COURT_KEYPOINT_NAMES[index]
+                    if index < len(TOM_V1_RAW_COURT_KEYPOINT_NAMES)
+                    else f"raw_{index}"
+                ),
+                "raw_x": _optional_float(raw_keypoint.get("x")),
+                "raw_y": _optional_float(raw_keypoint.get("y")),
+                "image_x": point["x"],
+                "image_y": point["y"],
+                "confidence": point["confidence"],
+                "present": point["present"],
+                "visibility": point["visibility"],
+                "coordinate_interpretation": coordinate_interpretation,
+            }
+        )
+    return scaled
 
 
 def map_tom_v1_raw_keypoints_to_tom_v3(
