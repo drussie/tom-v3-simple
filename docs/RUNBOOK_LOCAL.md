@@ -1215,6 +1215,21 @@ cd apps/web
 NEXT_PUBLIC_TOM_V3_API_BASE_URL=http://127.0.0.1:8000 npm run dev
 ```
 
+To review sparse court geometry without flicker, open replay with temporal display persistence:
+
+```text
+/replay/<media_id>?courtRunId=<court_run_id>&homographyRunId=<homography_run_id>&projectionDiagnosticRunId=<projection_diagnostic_run_id>&courtTemporalPersistence=carry_forward&courtPersistenceMaxGapMs=1500
+```
+
+The Next replay page passes these settings to `GET /replay/overlays` as:
+
+```text
+court_temporal_persistence=carry_forward
+court_persistence_max_gap_ms=1500
+```
+
+This is a display/read-model policy only. It carries candidate geometry forward for review and does not confirm a court model, in/out, bounce location, player court position, point, or score.
+
 If you want a fresh demo database without deleting existing data:
 
 ```bash

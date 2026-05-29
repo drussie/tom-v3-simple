@@ -38,3 +38,6 @@ def test_replay_display_policy_helpers_define_expected_modes() -> None:
     assert "isActiveReplayPointForDisplay" in source
     assert "activeReplayMainPlayerTracks" in source
     assert "filterMainPlayerTracksAvailableAt" in source
+    assert "activeReplayCourtEvidence" in source
+    assert 'item.temporal_display_mode === "carry_forward"' in source
+    assert "current_replay_timestamp_ms" in source

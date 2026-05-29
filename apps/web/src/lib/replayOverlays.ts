@@ -211,9 +211,7 @@ export function activeReplayCourtKeypoints(
   currentFrame: number,
   holdMs = 250
 ): ReplayCourtKeypointOverlay[] {
-  return keypoints.filter((item) =>
-    isActiveReplayPoint(item.timestamp_ms, item.frame_number, currentTimestampMs, currentFrame, holdMs)
-  );
+  return activeReplayCourtEvidence(keypoints, currentTimestampMs, currentFrame, holdMs);
 }
 
 export function activeReplayCourtLines(
@@ -222,9 +220,7 @@ export function activeReplayCourtLines(
   currentFrame: number,
   holdMs = 250
 ): ReplayCourtLineOverlay[] {
-  return lines.filter((item) =>
-    isActiveReplayPoint(item.timestamp_ms, item.frame_number, currentTimestampMs, currentFrame, holdMs)
-  );
+  return activeReplayCourtEvidence(lines, currentTimestampMs, currentFrame, holdMs);
 }
 
 export function activeReplayCameraViews(
@@ -249,9 +245,7 @@ export function activeReplayHomographyCandidates(
   currentFrame: number,
   holdMs = 250
 ): ReplayHomographyCandidateOverlay[] {
-  return homographies.filter((item) =>
-    isActiveReplayPoint(item.timestamp_ms, item.frame_number, currentTimestampMs, currentFrame, holdMs)
-  );
+  return activeReplayCourtEvidence(homographies, currentTimestampMs, currentFrame, holdMs);
 }
 
 export function activeReplayProjectionDiagnostics(
@@ -260,9 +254,62 @@ export function activeReplayProjectionDiagnostics(
   currentFrame: number,
   holdMs = 250
 ): ReplayProjectionDiagnosticOverlay[] {
-  return diagnostics.filter((item) =>
-    isActiveReplayPoint(item.timestamp_ms, item.frame_number, currentTimestampMs, currentFrame, holdMs)
-  );
+  return activeReplayCourtEvidence(diagnostics, currentTimestampMs, currentFrame, holdMs);
+}
+
+function activeReplayCourtEvidence<
+  T extends {
+    timestamp_ms: number;
+    frame_number: number;
+    temporal_display_mode?: string;
+    active_from_ms?: number | null;
+    active_until_ms?: number | null;
+    carried_forward?: boolean;
+    current_replay_timestamp_ms?: number | null;
+  }
+>(
+  items: T[],
+  currentTimestampMs: number,
+  currentFrame: number,
+  holdMs: number
+): T[] {
+  return items
+    .filter((item) => {
+      if (
+        item.temporal_display_mode === "carry_forward" &&
+        typeof item.active_from_ms === "number" &&
+        typeof item.active_until_ms === "number"
+      ) {
+        return (
+          currentTimestampMs >= item.active_from_ms &&
+          currentTimestampMs <= item.active_until_ms
+        );
+      }
+      return isActiveReplayPoint(
+        item.timestamp_ms,
+        item.frame_number,
+        currentTimestampMs,
+        currentFrame,
+        holdMs
+      );
+    })
+    .map((item) => {
+      if (
+        item.temporal_display_mode !== "carry_forward" ||
+        typeof item.active_from_ms !== "number" ||
+        typeof item.active_until_ms !== "number"
+      ) {
+        return item;
+      }
+      const isAtSourceTime =
+        item.frame_number === currentFrame ||
+        Math.abs(item.timestamp_ms - currentTimestampMs) <= Math.max(holdMs, 34);
+      return {
+        ...item,
+        carried_forward: !isAtSourceTime,
+        current_replay_timestamp_ms: currentTimestampMs
+      };
+    });
 }
 
 export function isActiveReplayPointForDisplay(

@@ -5,8 +5,11 @@ from sqlalchemy.orm import Session
 
 from apps.api.db import get_session
 from apps.api.services.replay import (
+    COURT_TEMPORAL_PERSISTENCE_MODES,
+    DEFAULT_COURT_PERSISTENCE_MAX_GAP_MS,
     build_replay_overlay_chunk,
     build_replay_timeline,
+    normalize_court_temporal_persistence,
     normalize_replay_layers,
 )
 
@@ -28,6 +31,12 @@ def get_replay_overlays(
     court_run_id: str | None = None,
     homography_run_id: str | None = None,
     projection_diagnostic_run_id: str | None = None,
+    court_temporal_persistence: str = Query(default="carry_forward"),
+    court_persistence_max_gap_ms: int = Query(
+        default=DEFAULT_COURT_PERSISTENCE_MAX_GAP_MS,
+        ge=0,
+        le=60000,
+    ),
     min_confidence: float | None = Query(default=None, ge=0.0, le=1.0),
     min_pose_confidence: float | None = Query(default=None, ge=0.0, le=1.0),
 ) -> dict[str, object]:
@@ -36,6 +45,15 @@ def get_replay_overlays(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="start_ms must be less than or equal to end_ms",
         )
+    raw_court_temporal_persistence = court_temporal_persistence.strip().lower().replace("-", "_")
+    if raw_court_temporal_persistence not in COURT_TEMPORAL_PERSISTENCE_MODES:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="court_temporal_persistence must be off or carry_forward",
+        )
+    normalized_court_temporal_persistence = normalize_court_temporal_persistence(
+        court_temporal_persistence
+    )
 
     chunk = build_replay_overlay_chunk(
         session,
@@ -50,6 +68,8 @@ def get_replay_overlays(
         court_run_id=court_run_id,
         homography_run_id=homography_run_id,
         projection_diagnostic_run_id=projection_diagnostic_run_id,
+        court_temporal_persistence=normalized_court_temporal_persistence,
+        court_persistence_max_gap_ms=court_persistence_max_gap_ms,
         min_confidence=min_confidence,
         min_pose_confidence=min_pose_confidence,
     )

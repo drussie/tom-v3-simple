@@ -13,6 +13,8 @@ interface ReplayPageProps {
     poseRunId?: string;
     mainPlayerTrackRunId?: string;
     courtRunId?: string;
+    courtTemporalPersistence?: string;
+    courtPersistenceMaxGapMs?: string;
     homographyRunId?: string;
     projectionDiagnosticRunId?: string;
   }>;

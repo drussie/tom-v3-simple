@@ -632,6 +632,117 @@ def test_replay_overlay_endpoint_returns_projection_diagnostic_items(
     assert diagnostic["source_label"] == "projection diagnostic"
 
 
+def test_replay_overlay_endpoint_carries_forward_court_geometry_within_gap(
+    client: TestClient,
+    db_session: Session,
+    tmp_path,
+) -> None:
+    media_path = tmp_path / "sample.mp4"
+    media_path.write_bytes(b"tom-v3-video")
+    media = _seed_media(db_session, media_path)
+    court_result, homography_result = _seed_court_and_homography(db_session, media.id)
+    projection_result = build_projection_diagnostics(
+        session=db_session,
+        media_id=media.id,
+        homography_run_id=str(homography_result["homography_run_id"]),
+    )
+    assert projection_result["ok"] is True
+
+    response = client.get(
+        "/replay/overlays",
+        params={
+            "media_id": media.id,
+            "start_ms": 900,
+            "end_ms": 950,
+            "layers": (
+                "court_keypoints,court_lines,homography_candidates,"
+                "projection_diagnostics"
+            ),
+            "court_run_id": court_result["court_run_id"],
+            "homography_run_id": homography_result["homography_run_id"],
+            "projection_diagnostic_run_id": projection_result[
+                "projection_diagnostic_run_id"
+            ],
+            "court_temporal_persistence": "carry_forward",
+            "court_persistence_max_gap_ms": 1500,
+        },
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert len(body["court_keypoints"]) == 1
+    assert len(body["court_lines"]) == 1
+    assert len(body["homography_candidates"]) == 1
+    assert len(body["projection_diagnostics"]) == 1
+    for item in (
+        body["court_keypoints"]
+        + body["court_lines"]
+        + body["homography_candidates"]
+        + body["projection_diagnostics"]
+    ):
+        assert item["temporal_display_mode"] == "carry_forward"
+        assert item["carried_forward"] is True
+        assert item["active_from_ms"] == 0
+        assert item["active_until_ms"] == 1500
+        assert item["source_observation_id"] == item["observation_id"]
+        assert item["source_frame_number"] == 0
+        assert item["source_observation_timestamp_ms"] == 0
+        assert item["court_persistence_max_gap_ms"] == 1500
+        assert item["carry_forward_boundary"] == "max_gap_ms"
+        assert item["camera_view_boundary_available"] is False
+        assert item["candidate_geometry_only"] is True
+        assert item["not_court_truth"] is True
+
+
+def test_replay_overlay_endpoint_does_not_carry_stale_or_disabled_court_geometry(
+    client: TestClient,
+    db_session: Session,
+    tmp_path,
+) -> None:
+    media_path = tmp_path / "sample.mp4"
+    media_path.write_bytes(b"tom-v3-video")
+    media = _seed_media(db_session, media_path)
+    court_result, homography_result = _seed_court_and_homography(db_session, media.id)
+
+    stale_response = client.get(
+        "/replay/overlays",
+        params={
+            "media_id": media.id,
+            "start_ms": 1700,
+            "end_ms": 1750,
+            "layers": "court_keypoints,court_lines,homography_candidates",
+            "court_run_id": court_result["court_run_id"],
+            "homography_run_id": homography_result["homography_run_id"],
+            "court_temporal_persistence": "carry_forward",
+            "court_persistence_max_gap_ms": 1500,
+        },
+    )
+    assert stale_response.status_code == 200
+    stale_body = stale_response.json()
+    assert stale_body["court_keypoints"] == []
+    assert stale_body["court_lines"] == []
+    assert stale_body["homography_candidates"] == []
+
+    off_response = client.get(
+        "/replay/overlays",
+        params={
+            "media_id": media.id,
+            "start_ms": 900,
+            "end_ms": 950,
+            "layers": "court_keypoints,court_lines,homography_candidates",
+            "court_run_id": court_result["court_run_id"],
+            "homography_run_id": homography_result["homography_run_id"],
+            "court_temporal_persistence": "off",
+            "court_persistence_max_gap_ms": 1500,
+        },
+    )
+    assert off_response.status_code == 200
+    off_body = off_response.json()
+    assert off_body["court_keypoints"] == []
+    assert off_body["court_lines"] == []
+    assert off_body["homography_candidates"] == []
+
+
 def test_replay_overlay_endpoint_filters_court_and_homography_runs(
     client: TestClient,
     db_session: Session,

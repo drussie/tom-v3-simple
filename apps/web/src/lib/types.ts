@@ -304,6 +304,7 @@ export interface ReplayDetectionBBox {
 }
 
 export type ReplayOverlayDisplayMode = "current_only" | "short_trail" | "full_trail";
+export type ReplayCourtTemporalPersistence = "off" | "carry_forward";
 
 export interface ReplayDetectionOverlay {
   overlay_type: "detection_bbox";
@@ -505,6 +506,20 @@ export interface ReplayCourtEvidenceSource {
   uncalibrated_tom_v1_keypoint_mapping?: boolean;
   calibration_warning?: string | null;
   frame_time_owner?: string | null;
+  temporal_display_mode?: ReplayCourtTemporalPersistence | string;
+  carried_forward?: boolean;
+  active_from_ms?: number | null;
+  active_until_ms?: number | null;
+  source_observation_id?: string | null;
+  source_frame_number?: number | null;
+  source_observation_timestamp_ms?: number | null;
+  current_replay_timestamp_ms?: number | null;
+  court_persistence_max_gap_ms?: number | null;
+  carry_forward_boundary?: string | null;
+  camera_view_boundary_available?: boolean;
+  temporal_display_candidate?: boolean;
+  candidate_geometry_only?: boolean;
+  not_court_truth?: boolean;
 }
 
 export interface ReplayCourtKeypoint {
@@ -700,6 +715,8 @@ export interface ReplayOverlayChunk {
   camera_view: ReplayCameraViewOverlay[];
   homography_candidates: ReplayHomographyCandidateOverlay[];
   projection_diagnostics: ReplayProjectionDiagnosticOverlay[];
+  court_temporal_persistence?: ReplayCourtTemporalPersistence | string;
+  court_persistence_max_gap_ms?: number;
   observation_only: boolean;
   no_adjudication: boolean;
 }

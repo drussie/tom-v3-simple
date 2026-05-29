@@ -50,6 +50,8 @@ export interface FetchReplayOverlayChunkInput {
   courtRunId?: string | null;
   homographyRunId?: string | null;
   projectionDiagnosticRunId?: string | null;
+  courtTemporalPersistence?: string | null;
+  courtPersistenceMaxGapMs?: number | null;
   minConfidence?: number | null;
   minPoseConfidence?: number | null;
 }
@@ -66,6 +68,8 @@ export async function fetchReplayOverlayChunk({
   courtRunId = null,
   homographyRunId = null,
   projectionDiagnosticRunId = null,
+  courtTemporalPersistence = null,
+  courtPersistenceMaxGapMs = null,
   minConfidence = null,
   minPoseConfidence = null
 }: FetchReplayOverlayChunkInput): Promise<ReplayOverlayChunk> {
@@ -95,6 +99,12 @@ export async function fetchReplayOverlayChunk({
   }
   if (projectionDiagnosticRunId !== null) {
     params.set("projection_diagnostic_run_id", projectionDiagnosticRunId);
+  }
+  if (courtTemporalPersistence !== null) {
+    params.set("court_temporal_persistence", courtTemporalPersistence);
+  }
+  if (courtPersistenceMaxGapMs !== null) {
+    params.set("court_persistence_max_gap_ms", courtPersistenceMaxGapMs.toString());
   }
   if (minConfidence !== null) {
     params.set("min_confidence", minConfidence.toString());

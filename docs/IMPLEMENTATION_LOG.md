@@ -2009,3 +2009,26 @@ This repair adds:
 - docs for the calibration audit workflow
 
 This repair does not make court geometry correct. It makes the current court error inspectable without adding court truth, accepted/rejected lifecycle, ball/player court projection, bounce/hit/in-out/rally/point/scoring, player identity, scoreboard OCR, or adjudication.
+
+## Repair - Court Geometry Temporal Persistence v0
+
+Status: complete
+
+### Goal
+
+Keep sparse court geometry evidence visually stable in replay by carrying the latest candidate geometry forward until the next source observation or a bounded max-gap window.
+
+### Notes
+
+This repair adds:
+
+- `court_temporal_persistence=off|carry_forward` on `GET /replay/overlays`
+- `court_persistence_max_gap_ms`, defaulting to `1500`
+- replay/read-model carry-forward for court keypoints, court lines, homography candidates, and projection diagnostics
+- overlay metadata for source observation id, source frame/time, active display window, carry boundary, and `not_court_truth`
+- replay controls for temporal persistence mode and max gap
+- a visible carried-forward candidate geometry badge in the court overlay
+- selected evidence details for source frame/time and active display window
+- regression tests for carry-forward, stale geometry, and disabled persistence
+
+This repair creates no new persisted court observations and does not make court geometry true. It does not add court truth, accepted/rejected lifecycle, ball/player court-space projection, bounce/hit/in-out/rally/point/scoring, identity, OCR, or adjudication.

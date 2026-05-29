@@ -157,6 +157,8 @@ The replay workstation can display projected template keypoints and lines as pro
 
 This overlay is display-only. It does not write diagnostic rows from the frontend and does not project objects into court space.
 
+Replay may carry projection diagnostic overlays forward with `court_temporal_persistence=carry_forward` so sparse diagnostic geometry remains visible between sampled source frames. This carry-forward is a bounded display policy only; the source diagnostic observation remains unchanged and no ball/player projection is created.
+
 ## Non-Goals
 
 8F does not add:

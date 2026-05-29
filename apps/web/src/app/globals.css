@@ -361,6 +361,22 @@ pre {
   bottom: 230px;
 }
 
+.replay-court-temporal-badge {
+  background: rgba(16, 23, 25, 0.78);
+  border: 1px solid rgba(20, 184, 166, 0.72);
+  border-radius: 6px;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 800;
+  left: 14px;
+  letter-spacing: 0;
+  padding: 7px 9px;
+  pointer-events: none;
+  position: absolute;
+  text-transform: uppercase;
+  top: 88px;
+}
+
 .replay-tracklet-path,
 .replay-pose-edge,
 .replay-court-line,
@@ -708,7 +724,8 @@ pre {
   text-transform: uppercase;
 }
 
-.select-row select {
+.select-row select,
+.select-row input {
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 6px;

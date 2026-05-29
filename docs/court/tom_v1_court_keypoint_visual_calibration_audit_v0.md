@@ -85,6 +85,12 @@ Open replay with the resulting `courtRunId` and enable:
 
 Inspect raw points first. If `raw_0..raw_13` are not near the painted court structure, homography repair is premature. If raw points look plausible but mapped TOM v3 labels are wrong, the keypoint order/mapping is the likely repair target. If mapped keypoints are plausible but homography is wrong, the fit method is the likely target.
 
+## Temporal Replay Persistence
+
+Sparse court keypoint runs can sample every 30 frames. Replay may use `court_temporal_persistence=carry_forward` to keep the latest candidate court geometry visible until the next source observation or a bounded max-gap window.
+
+Temporal persistence does not change this audit boundary. Raw TOM v1 keypoints, mapped TOM v3 keypoints, derived lines, homography candidates, and projection diagnostics remain candidate geometry evidence. Carry-forward is only a display/read-model policy for stable inspection.
+
 ## Boundary
 
 This audit does not add court truth, confirmed homography, accepted/rejected court lifecycle, ball/player court-space projection, bounce/hit/in-out, point reconstruction, scoring, player identity, scoreboard OCR, or adjudication.

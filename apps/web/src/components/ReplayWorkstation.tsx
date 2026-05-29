@@ -25,6 +25,8 @@ import {
 import type {
   ReplayDetectionOverlay,
   ReplayCameraViewOverlay,
+  ReplayCourtEvidenceSource,
+  ReplayCourtTemporalPersistence,
   ReplayCourtKeypointOverlay,
   ReplayCourtLineOverlay,
   ReplayHomographyCandidateOverlay,
@@ -63,6 +65,8 @@ interface ReplayWorkstationProps {
     poseRunId?: string;
     mainPlayerTrackRunId?: string;
     courtRunId?: string;
+    courtTemporalPersistence?: string;
+    courtPersistenceMaxGapMs?: string;
     homographyRunId?: string;
     projectionDiagnosticRunId?: string;
   };
@@ -150,6 +154,13 @@ export function ReplayWorkstation({
       selectedRuns.projectionDiagnosticRunId
     ]
   );
+  const initialCourtTemporalPersistence = useMemo<ReplayCourtTemporalPersistence>(() => {
+    return selectedRuns.courtTemporalPersistence === "off" ? "off" : "carry_forward";
+  }, [selectedRuns.courtTemporalPersistence]);
+  const initialCourtPersistenceMaxGapMs = useMemo(() => {
+    const parsed = Number.parseInt(selectedRuns.courtPersistenceMaxGapMs ?? "", 10);
+    return Number.isFinite(parsed) && parsed >= 0 ? parsed : 1500;
+  }, [selectedRuns.courtPersistenceMaxGapMs]);
 
   const [selectedDetectionRunId, setSelectedDetectionRunId] = useState<string | null>(
     initialDetectionRunId
@@ -188,6 +199,11 @@ export function ReplayWorkstation({
   const [showHomography, setShowHomography] = useState(initialHomographyRunId !== null);
   const [showProjectionDiagnostics, setShowProjectionDiagnostics] = useState(
     initialProjectionDiagnosticRunId !== null
+  );
+  const [courtTemporalPersistence, setCourtTemporalPersistence] =
+    useState<ReplayCourtTemporalPersistence>(initialCourtTemporalPersistence);
+  const [courtPersistenceMaxGapMs, setCourtPersistenceMaxGapMs] = useState(
+    initialCourtPersistenceMaxGapMs
   );
   const [replayMode, setReplayMode] = useState<ReplayMode>(initialMode);
   const [streamLiveEdgeMs, setStreamLiveEdgeMs] = useState(0);
@@ -251,6 +267,14 @@ export function ReplayWorkstation({
   useEffect(() => {
     setReplayMode(initialMode);
   }, [initialMode]);
+
+  useEffect(() => {
+    setCourtTemporalPersistence(initialCourtTemporalPersistence);
+  }, [initialCourtTemporalPersistence]);
+
+  useEffect(() => {
+    setCourtPersistenceMaxGapMs(initialCourtPersistenceMaxGapMs);
+  }, [initialCourtPersistenceMaxGapMs]);
 
   useEffect(() => {
     if (replayMode === "stream_proxy") {
@@ -326,6 +350,8 @@ export function ReplayWorkstation({
     selectedCourtRunId ?? "none",
     selectedHomographyRunId ?? "none",
     selectedProjectionDiagnosticRunId ?? "none",
+    courtTemporalPersistence,
+    courtPersistenceMaxGapMs,
     layersParam || "none",
     currentChunkStart,
     currentChunkEnd
@@ -356,6 +382,8 @@ export function ReplayWorkstation({
       courtRunId: selectedCourtRunId,
       homographyRunId: selectedHomographyRunId,
       projectionDiagnosticRunId: selectedProjectionDiagnosticRunId,
+      courtTemporalPersistence,
+      courtPersistenceMaxGapMs,
       layers: layersParam
     })
       .then((chunk) => {
@@ -379,6 +407,8 @@ export function ReplayWorkstation({
     };
   }, [
     chunkKey,
+    courtPersistenceMaxGapMs,
+    courtTemporalPersistence,
     currentChunkEnd,
     currentChunkStart,
     enabledLayers.length,
@@ -776,6 +806,16 @@ export function ReplayWorkstation({
             onToggleMainPlayerTracks={setShowMainPlayerTracks}
             onToggleProjectionDiagnostics={setShowProjectionDiagnostics}
             onTogglePoses={setShowPoses}
+            onCourtTemporalPersistenceChange={(mode) => {
+              chunkCache.current.clear();
+              setCourtTemporalPersistence(mode);
+              setSelectedEvidence(null);
+            }}
+            onCourtPersistenceMaxGapMsChange={(maxGapMs) => {
+              chunkCache.current.clear();
+              setCourtPersistenceMaxGapMs(maxGapMs);
+              setSelectedEvidence(null);
+            }}
             onTrackletDisplayModeChange={setTrackletDisplayMode}
             onToggleTrackletPaths={setShowTrackletPaths}
             onToggleTracklets={setShowTracklets}
@@ -791,6 +831,8 @@ export function ReplayWorkstation({
             showCourtKeypoints={showCourtKeypoints}
             showRawCourtKeypoints={showRawCourtKeypoints}
             showCourtLines={showCourtLines}
+            courtTemporalPersistence={courtTemporalPersistence}
+            courtPersistenceMaxGapMs={courtPersistenceMaxGapMs}
             showDetections={showDetections}
             showHomography={showHomography}
             showMainPlayerTracks={showMainPlayerTracks}
@@ -966,6 +1008,8 @@ function ReplayLayerControls({
   showRawCourtKeypoints,
   showCourtKeypoints,
   showCourtLines,
+  courtTemporalPersistence,
+  courtPersistenceMaxGapMs,
   showCameraView,
   showHomography,
   showProjectionDiagnostics,
@@ -986,6 +1030,8 @@ function ReplayLayerControls({
   onToggleRawCourtKeypoints,
   onToggleCourtKeypoints,
   onToggleCourtLines,
+  onCourtTemporalPersistenceChange,
+  onCourtPersistenceMaxGapMsChange,
   onToggleCameraView,
   onToggleHomography,
   onToggleProjectionDiagnostics
@@ -1014,6 +1060,8 @@ function ReplayLayerControls({
   showRawCourtKeypoints: boolean;
   showCourtKeypoints: boolean;
   showCourtLines: boolean;
+  courtTemporalPersistence: ReplayCourtTemporalPersistence;
+  courtPersistenceMaxGapMs: number;
   showCameraView: boolean;
   showHomography: boolean;
   showProjectionDiagnostics: boolean;
@@ -1034,6 +1082,8 @@ function ReplayLayerControls({
   onToggleRawCourtKeypoints: (enabled: boolean) => void;
   onToggleCourtKeypoints: (enabled: boolean) => void;
   onToggleCourtLines: (enabled: boolean) => void;
+  onCourtTemporalPersistenceChange: (mode: ReplayCourtTemporalPersistence) => void;
+  onCourtPersistenceMaxGapMsChange: (maxGapMs: number) => void;
   onToggleCameraView: (enabled: boolean) => void;
   onToggleHomography: (enabled: boolean) => void;
   onToggleProjectionDiagnostics: (enabled: boolean) => void;
@@ -1124,6 +1174,23 @@ function ReplayLayerControls({
           label="Show camera/view evidence"
           onChange={onToggleCameraView}
         />
+        <CourtTemporalPersistenceSelect
+          onChange={onCourtTemporalPersistenceChange}
+          value={courtTemporalPersistence}
+        />
+        <label className="select-row">
+          <span>Court carry-forward max gap</span>
+          <input
+            min={0}
+            onChange={(event) => {
+              const parsed = Number.parseInt(event.target.value, 10);
+              onCourtPersistenceMaxGapMsChange(Number.isFinite(parsed) ? Math.max(0, parsed) : 0);
+            }}
+            step={100}
+            type="number"
+            value={courtPersistenceMaxGapMs}
+          />
+        </label>
         <RunSelect
           label="Court evidence run"
           onChange={onSelectedCourtRunChange}
@@ -1197,6 +1264,27 @@ function DisplayModeSelect({
         <option value="current_only">Current only</option>
         <option value="short_trail">Short trail</option>
         <option value="full_trail">Full trail</option>
+      </select>
+    </label>
+  );
+}
+
+function CourtTemporalPersistenceSelect({
+  value,
+  onChange
+}: {
+  value: ReplayCourtTemporalPersistence;
+  onChange: (mode: ReplayCourtTemporalPersistence) => void;
+}) {
+  return (
+    <label className="select-row">
+      <span>Court geometry temporal persistence</span>
+      <select
+        onChange={(event) => onChange(event.target.value as ReplayCourtTemporalPersistence)}
+        value={value}
+      >
+        <option value="carry_forward">Carry forward latest candidate</option>
+        <option value="off">Off</option>
       </select>
     </label>
   );
@@ -1662,6 +1750,7 @@ function SelectedEvidencePanel({
           label="inferred keypoints"
           value={inferredKeypoints.length > 0 ? inferredKeypoints.join(", ") : "n/a"}
         />
+        <TemporalDisplayDetails item={item} />
         <DetailRow label="model registry id" value={item.model_registry_id ?? "n/a"} />
         <DetailRow
           label="model"
@@ -1691,6 +1780,7 @@ function SelectedEvidencePanel({
         <DetailRow label="line classes" value={(item.line_classes ?? []).join(", ") || "n/a"} />
         <DetailRow label="mean confidence" value={formatConfidence(item.mean_line_confidence)} />
         <DetailRow label="source" value={courtSourceDisplayLabel(item)} />
+        <TemporalDisplayDetails item={item} />
         <DetailRow label="model registry id" value={item.model_registry_id ?? "n/a"} />
         <DetailRow
           label="model"
@@ -1755,6 +1845,7 @@ function SelectedEvidencePanel({
           value={item.reprojection_error_mean?.toString() ?? "n/a"}
         />
         <DetailRow label="confidence" value={formatConfidence(item.confidence)} />
+        <TemporalDisplayDetails item={item} />
         {"source_court_keypoint_observation_id" in item ? (
           <>
             <DetailRow
@@ -1812,6 +1903,7 @@ function SelectedEvidencePanel({
         <DetailRow label="projected lines" value={projectedLines?.toString() ?? "n/a"} />
         <DetailRow label="confidence" value={formatConfidence(item.confidence)} />
         <DetailRow label="source" value={courtSourceDisplayLabel(item)} />
+        <TemporalDisplayDetails item={item} />
         <DetailRow label="model registry id" value={item.model_registry_id ?? "n/a"} />
         <DetailRow label="runtime config id" value={item.runtime_config_id ?? "n/a"} />
         <a className="quiet-link" href={`/runs/${item.run_id}`}>
@@ -1895,6 +1987,51 @@ function SelectedEvidencePanel({
         establish identity, strokes, movement, or biomechanics.
       </p>
     </EvidencePanel>
+  );
+}
+
+function TemporalDisplayDetails({ item }: { item: ReplayCourtEvidenceSource }) {
+  if (!item.temporal_display_mode) {
+    return null;
+  }
+  return (
+    <>
+      <DetailRow label="temporal display" value={item.temporal_display_mode} />
+      <DetailRow label="carried forward" value={item.carried_forward ? "true" : "false"} />
+      <DetailRow
+        label="source observation"
+        value={item.source_observation_id ?? "n/a"}
+      />
+      <DetailRow
+        label="source frame"
+        value={item.source_frame_number?.toString() ?? "n/a"}
+      />
+      <DetailRow
+        label="source timestamp_ms"
+        value={item.source_observation_timestamp_ms?.toString() ?? "n/a"}
+      />
+      <DetailRow
+        label="current timestamp_ms"
+        value={item.current_replay_timestamp_ms?.toString() ?? "n/a"}
+      />
+      <DetailRow
+        label="active window"
+        value={`${item.active_from_ms ?? "n/a"} - ${item.active_until_ms ?? "n/a"} ms`}
+      />
+      <DetailRow
+        label="persistence max gap"
+        value={item.court_persistence_max_gap_ms?.toString() ?? "n/a"}
+      />
+      <DetailRow
+        label="carry boundary"
+        value={item.carry_forward_boundary ?? "n/a"}
+      />
+      <DetailRow
+        label="camera boundary available"
+        value={item.camera_view_boundary_available ? "true" : "false"}
+      />
+      <DetailRow label="not court truth" value={item.not_court_truth ? "true" : "false"} />
+    </>
   );
 }
 

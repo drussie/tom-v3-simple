@@ -212,6 +212,11 @@ export function ReplayCourtOverlay({
     (showCameraView ? activeCameraViews.length : 0) +
     (showHomography ? activeHomographies.length : 0) +
     (showProjectionDiagnostics ? activeProjectionDiagnostics.length : 0);
+  const hasCarriedForwardCourtGeometry =
+    activeKeypoints.some((item) => item.carried_forward) ||
+    activeLines.some((item) => item.carried_forward) ||
+    activeHomographies.some((item) => item.carried_forward) ||
+    activeProjectionDiagnostics.some((item) => item.carried_forward);
   const status = overlayStatus({
     enabled: anyLayerEnabled,
     isLoading,
@@ -307,6 +312,11 @@ export function ReplayCourtOverlay({
               </span>
             </button>
           ))}
+        </div>
+      ) : null}
+      {hasCarriedForwardCourtGeometry ? (
+        <div className="replay-court-temporal-badge">
+          carried-forward candidate geometry
         </div>
       ) : null}
       {status !== null ? <div className="replay-overlay-status court">{status}</div> : null}

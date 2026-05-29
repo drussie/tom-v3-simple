@@ -143,6 +143,8 @@ The replay URL is consumed by Milestone 8E court overlays. 8D itself does not ad
 
 Milestone 8F consumes persisted homography candidate rows as source evidence for projection diagnostics. A homography candidate remains a candidate coordinate transform even when a diagnostic row or review export references it. 8F does not change homography candidate semantics and does not use the candidate to create ball/player court-space projections.
 
+Replay may carry homography candidate overlays forward with `court_temporal_persistence=carry_forward` so sparse candidate geometry remains visible between sampled source frames. This is a display/read-model policy only. It does not create accepted geometry and does not change homography candidate semantics.
+
 ## Non-Goals
 
 8D does not add:

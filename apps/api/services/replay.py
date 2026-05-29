@@ -44,6 +44,13 @@ MAIN_PLAYER_TRACK_TYPES = {
     "main_player_track_candidate",
     "main_player_track_assignment_candidate",
 }
+COURT_TEMPORAL_PERSISTENCE_OFF = "off"
+COURT_TEMPORAL_PERSISTENCE_CARRY_FORWARD = "carry_forward"
+DEFAULT_COURT_PERSISTENCE_MAX_GAP_MS = 1500
+COURT_TEMPORAL_PERSISTENCE_MODES = {
+    COURT_TEMPORAL_PERSISTENCE_OFF,
+    COURT_TEMPORAL_PERSISTENCE_CARRY_FORWARD,
+}
 
 
 def timestamp_ms_to_replay_frame(media: MediaAsset, timestamp_ms: int | float | None) -> int:
@@ -114,12 +121,18 @@ def build_replay_overlay_chunk(
     court_run_id: str | None = None,
     homography_run_id: str | None = None,
     projection_diagnostic_run_id: str | None = None,
+    court_temporal_persistence: str = COURT_TEMPORAL_PERSISTENCE_CARRY_FORWARD,
+    court_persistence_max_gap_ms: int = DEFAULT_COURT_PERSISTENCE_MAX_GAP_MS,
     min_confidence: float | None = None,
     min_pose_confidence: float | None = None,
 ) -> dict[str, Any] | None:
     media = session.get(MediaAsset, media_id)
     if media is None:
         return None
+    court_temporal_persistence = normalize_court_temporal_persistence(
+        court_temporal_persistence
+    )
+    court_persistence_max_gap_ms = max(0, int(court_persistence_max_gap_ms))
 
     detections = (
         build_detection_overlay_items(
@@ -174,6 +187,8 @@ def build_replay_overlay_chunk(
             start_ms=start_ms,
             end_ms=end_ms,
             court_run_id=court_run_id,
+            temporal_persistence=court_temporal_persistence,
+            persistence_max_gap_ms=court_persistence_max_gap_ms,
         )
         if "court_keypoints" in layers
         else []
@@ -185,6 +200,8 @@ def build_replay_overlay_chunk(
             start_ms=start_ms,
             end_ms=end_ms,
             court_run_id=court_run_id,
+            temporal_persistence=court_temporal_persistence,
+            persistence_max_gap_ms=court_persistence_max_gap_ms,
         )
         if "court_lines" in layers
         else []
@@ -207,6 +224,8 @@ def build_replay_overlay_chunk(
             start_ms=start_ms,
             end_ms=end_ms,
             homography_run_id=homography_run_id,
+            temporal_persistence=court_temporal_persistence,
+            persistence_max_gap_ms=court_persistence_max_gap_ms,
         )
         if "homography_candidates" in layers
         else []
@@ -218,6 +237,8 @@ def build_replay_overlay_chunk(
             start_ms=start_ms,
             end_ms=end_ms,
             projection_diagnostic_run_id=projection_diagnostic_run_id,
+            temporal_persistence=court_temporal_persistence,
+            persistence_max_gap_ms=court_persistence_max_gap_ms,
         )
         if "projection_diagnostics" in layers
         else []
@@ -238,6 +259,8 @@ def build_replay_overlay_chunk(
         "camera_view": camera_view,
         "homography_candidates": homography_candidates,
         "projection_diagnostics": projection_diagnostics,
+        "court_temporal_persistence": court_temporal_persistence,
+        "court_persistence_max_gap_ms": court_persistence_max_gap_ms,
         "observation_only": True,
         "no_adjudication": True,
     }
@@ -1225,19 +1248,30 @@ def build_court_keypoint_overlay_items(
     start_ms: int,
     end_ms: int,
     court_run_id: str | None = None,
+    temporal_persistence: str = COURT_TEMPORAL_PERSISTENCE_CARRY_FORWARD,
+    persistence_max_gap_ms: int = DEFAULT_COURT_PERSISTENCE_MAX_GAP_MS,
 ) -> list[dict[str, Any]]:
-    query = (
-        select(CourtKeypointObservation)
-        .where(
-            CourtKeypointObservation.media_id == media.id,
-            CourtKeypointObservation.timestamp_ms >= start_ms,
-            CourtKeypointObservation.timestamp_ms <= end_ms,
-        )
-        .order_by(CourtKeypointObservation.timestamp_ms, CourtKeypointObservation.observation_id)
+    rows = _temporally_persisted_court_rows(
+        session=session,
+        row_model=CourtKeypointObservation,
+        media_id=media.id,
+        start_ms=start_ms,
+        end_ms=end_ms,
+        run_id=court_run_id,
+        temporal_persistence=temporal_persistence,
+        persistence_max_gap_ms=persistence_max_gap_ms,
     )
-    if court_run_id is not None:
-        query = query.where(CourtKeypointObservation.run_id == court_run_id)
-    return [court_keypoint_overlay_item_from_row(row) for row in session.scalars(query).all()]
+    return [
+        _annotate_court_temporal_display_item(
+            court_keypoint_overlay_item_from_row(row),
+            row=row,
+            carried_from_previous=carried_from_previous,
+            next_timestamp_ms=next_timestamp_ms,
+            temporal_persistence=temporal_persistence,
+            persistence_max_gap_ms=persistence_max_gap_ms,
+        )
+        for row, carried_from_previous, next_timestamp_ms in rows
+    ]
 
 
 def court_keypoint_overlay_item_from_row(row: CourtKeypointObservation) -> dict[str, Any]:
@@ -1289,19 +1323,30 @@ def build_court_line_overlay_items(
     start_ms: int,
     end_ms: int,
     court_run_id: str | None = None,
+    temporal_persistence: str = COURT_TEMPORAL_PERSISTENCE_CARRY_FORWARD,
+    persistence_max_gap_ms: int = DEFAULT_COURT_PERSISTENCE_MAX_GAP_MS,
 ) -> list[dict[str, Any]]:
-    query = (
-        select(CourtLineObservation)
-        .where(
-            CourtLineObservation.media_id == media.id,
-            CourtLineObservation.timestamp_ms >= start_ms,
-            CourtLineObservation.timestamp_ms <= end_ms,
-        )
-        .order_by(CourtLineObservation.timestamp_ms, CourtLineObservation.observation_id)
+    rows = _temporally_persisted_court_rows(
+        session=session,
+        row_model=CourtLineObservation,
+        media_id=media.id,
+        start_ms=start_ms,
+        end_ms=end_ms,
+        run_id=court_run_id,
+        temporal_persistence=temporal_persistence,
+        persistence_max_gap_ms=persistence_max_gap_ms,
     )
-    if court_run_id is not None:
-        query = query.where(CourtLineObservation.run_id == court_run_id)
-    return [court_line_overlay_item_from_row(row) for row in session.scalars(query).all()]
+    return [
+        _annotate_court_temporal_display_item(
+            court_line_overlay_item_from_row(row),
+            row=row,
+            carried_from_previous=carried_from_previous,
+            next_timestamp_ms=next_timestamp_ms,
+            temporal_persistence=temporal_persistence,
+            persistence_max_gap_ms=persistence_max_gap_ms,
+        )
+        for row, carried_from_previous, next_timestamp_ms in rows
+    ]
 
 
 def court_line_overlay_item_from_row(row: CourtLineObservation) -> dict[str, Any]:
@@ -1379,23 +1424,29 @@ def build_homography_candidate_overlay_items(
     start_ms: int,
     end_ms: int,
     homography_run_id: str | None = None,
+    temporal_persistence: str = COURT_TEMPORAL_PERSISTENCE_CARRY_FORWARD,
+    persistence_max_gap_ms: int = DEFAULT_COURT_PERSISTENCE_MAX_GAP_MS,
 ) -> list[dict[str, Any]]:
-    query = (
-        select(HomographyCandidateObservation)
-        .where(
-            HomographyCandidateObservation.media_id == media.id,
-            HomographyCandidateObservation.timestamp_ms >= start_ms,
-            HomographyCandidateObservation.timestamp_ms <= end_ms,
-        )
-        .order_by(
-            HomographyCandidateObservation.timestamp_ms,
-            HomographyCandidateObservation.observation_id,
-        )
+    rows = _temporally_persisted_court_rows(
+        session=session,
+        row_model=HomographyCandidateObservation,
+        media_id=media.id,
+        start_ms=start_ms,
+        end_ms=end_ms,
+        run_id=homography_run_id,
+        temporal_persistence=temporal_persistence,
+        persistence_max_gap_ms=persistence_max_gap_ms,
     )
-    if homography_run_id is not None:
-        query = query.where(HomographyCandidateObservation.run_id == homography_run_id)
     return [
-        homography_candidate_overlay_item_from_row(row) for row in session.scalars(query).all()
+        _annotate_court_temporal_display_item(
+            homography_candidate_overlay_item_from_row(row),
+            row=row,
+            carried_from_previous=carried_from_previous,
+            next_timestamp_ms=next_timestamp_ms,
+            temporal_persistence=temporal_persistence,
+            persistence_max_gap_ms=persistence_max_gap_ms,
+        )
+        for row, carried_from_previous, next_timestamp_ms in rows
     ]
 
 
@@ -1442,24 +1493,29 @@ def build_projection_diagnostic_overlay_items(
     start_ms: int,
     end_ms: int,
     projection_diagnostic_run_id: str | None = None,
+    temporal_persistence: str = COURT_TEMPORAL_PERSISTENCE_CARRY_FORWARD,
+    persistence_max_gap_ms: int = DEFAULT_COURT_PERSISTENCE_MAX_GAP_MS,
 ) -> list[dict[str, Any]]:
-    query = (
-        select(ProjectionDiagnosticObservation)
-        .where(
-            ProjectionDiagnosticObservation.media_id == media.id,
-            ProjectionDiagnosticObservation.timestamp_ms >= start_ms,
-            ProjectionDiagnosticObservation.timestamp_ms <= end_ms,
-        )
-        .order_by(
-            ProjectionDiagnosticObservation.timestamp_ms,
-            ProjectionDiagnosticObservation.observation_id,
-        )
+    rows = _temporally_persisted_court_rows(
+        session=session,
+        row_model=ProjectionDiagnosticObservation,
+        media_id=media.id,
+        start_ms=start_ms,
+        end_ms=end_ms,
+        run_id=projection_diagnostic_run_id,
+        temporal_persistence=temporal_persistence,
+        persistence_max_gap_ms=persistence_max_gap_ms,
     )
-    if projection_diagnostic_run_id is not None:
-        query = query.where(ProjectionDiagnosticObservation.run_id == projection_diagnostic_run_id)
     return [
-        projection_diagnostic_overlay_item_from_row(row)
-        for row in session.scalars(query).all()
+        _annotate_court_temporal_display_item(
+            projection_diagnostic_overlay_item_from_row(row),
+            row=row,
+            carried_from_previous=carried_from_previous,
+            next_timestamp_ms=next_timestamp_ms,
+            temporal_persistence=temporal_persistence,
+            persistence_max_gap_ms=persistence_max_gap_ms,
+        )
+        for row, carried_from_previous, next_timestamp_ms in rows
     ]
 
 
@@ -1488,6 +1544,144 @@ def projection_diagnostic_overlay_item_from_row(
             evidence_source="projection_diagnostic",
         ),
     }
+
+
+def normalize_court_temporal_persistence(value: str | None) -> str:
+    if value is None:
+        return COURT_TEMPORAL_PERSISTENCE_CARRY_FORWARD
+    normalized = value.strip().lower().replace("-", "_")
+    if normalized in COURT_TEMPORAL_PERSISTENCE_MODES:
+        return normalized
+    return COURT_TEMPORAL_PERSISTENCE_OFF
+
+
+def _temporally_persisted_court_rows(
+    *,
+    session: Session,
+    row_model: Any,
+    media_id: str,
+    start_ms: int,
+    end_ms: int,
+    run_id: str | None,
+    temporal_persistence: str,
+    persistence_max_gap_ms: int,
+) -> list[tuple[Any, bool, int | None]]:
+    timestamp_column = row_model.timestamp_ms
+    observation_id_column = row_model.observation_id
+    mode = normalize_court_temporal_persistence(temporal_persistence)
+    max_gap_ms = max(0, int(persistence_max_gap_ms))
+    fetch_start_ms = start_ms
+    fetch_end_ms = end_ms
+    if mode == COURT_TEMPORAL_PERSISTENCE_CARRY_FORWARD and max_gap_ms > 0:
+        fetch_start_ms = max(0, start_ms - max_gap_ms)
+        fetch_end_ms = end_ms + max_gap_ms
+
+    query = (
+        select(row_model)
+        .where(
+            row_model.media_id == media_id,
+            timestamp_column >= fetch_start_ms,
+            timestamp_column <= fetch_end_ms,
+        )
+        .order_by(timestamp_column, observation_id_column)
+    )
+    if run_id is not None:
+        query = query.where(row_model.run_id == run_id)
+
+    rows = session.scalars(query).all()
+    if mode != COURT_TEMPORAL_PERSISTENCE_CARRY_FORWARD or max_gap_ms <= 0:
+        return [
+            (row, False, None)
+            for row in rows
+            if start_ms <= _row_timestamp_ms(row) <= end_ms
+        ]
+
+    included: list[tuple[Any, bool, int | None]] = []
+    latest_previous_index: int | None = None
+    for index, row in enumerate(rows):
+        timestamp_ms = _row_timestamp_ms(row)
+        if timestamp_ms < start_ms and start_ms - timestamp_ms <= max_gap_ms:
+            latest_previous_index = index
+        if start_ms <= timestamp_ms <= end_ms:
+            included.append((row, False, _next_row_timestamp_ms(rows, index)))
+
+    if latest_previous_index is not None:
+        previous_row = rows[latest_previous_index]
+        included.insert(
+            0,
+            (
+                previous_row,
+                True,
+                _next_row_timestamp_ms(rows, latest_previous_index),
+            ),
+        )
+
+    seen: set[str] = set()
+    deduped: list[tuple[Any, bool, int | None]] = []
+    for row, carried_from_previous, next_timestamp_ms in included:
+        observation_id = str(row.observation_id)
+        if observation_id in seen:
+            continue
+        seen.add(observation_id)
+        deduped.append((row, carried_from_previous, next_timestamp_ms))
+    return deduped
+
+
+def _annotate_court_temporal_display_item(
+    item: dict[str, Any],
+    *,
+    row: Any,
+    carried_from_previous: bool,
+    next_timestamp_ms: int | None,
+    temporal_persistence: str,
+    persistence_max_gap_ms: int,
+) -> dict[str, Any]:
+    mode = normalize_court_temporal_persistence(temporal_persistence)
+    source_timestamp_ms = _row_timestamp_ms(row)
+    source_frame_number = getattr(row, "frame_number", item.get("frame_number"))
+    max_gap_ms = max(0, int(persistence_max_gap_ms))
+    active_until_ms = source_timestamp_ms
+    if mode == COURT_TEMPORAL_PERSISTENCE_CARRY_FORWARD and max_gap_ms > 0:
+        active_until_ms = source_timestamp_ms + max_gap_ms
+        if next_timestamp_ms is not None:
+            active_until_ms = min(active_until_ms, next_timestamp_ms)
+
+    item.update(
+        {
+            "temporal_display_mode": mode,
+            "carried_forward": carried_from_previous,
+            "active_from_ms": source_timestamp_ms,
+            "active_until_ms": active_until_ms,
+            "source_observation_id": row.observation_id,
+            "source_frame_number": source_frame_number,
+            "source_observation_timestamp_ms": source_timestamp_ms,
+            "court_persistence_max_gap_ms": max_gap_ms,
+            "carry_forward_boundary": (
+                "next_observation_or_max_gap_ms"
+                if next_timestamp_ms is not None
+                and mode == COURT_TEMPORAL_PERSISTENCE_CARRY_FORWARD
+                else "max_gap_ms"
+            ),
+            "camera_view_boundary_available": False,
+            "temporal_display_candidate": mode == COURT_TEMPORAL_PERSISTENCE_CARRY_FORWARD,
+            "candidate_geometry_only": True,
+            "not_court_truth": True,
+        }
+    )
+    return item
+
+
+def _row_timestamp_ms(row: Any) -> int:
+    timestamp = getattr(row, "timestamp_ms", None)
+    if timestamp is None:
+        return 0
+    return int(timestamp)
+
+
+def _next_row_timestamp_ms(rows: list[Any], index: int) -> int | None:
+    if index + 1 >= len(rows):
+        return None
+    return _row_timestamp_ms(rows[index + 1])
 
 
 def available_runs_for_media(session: Session, media_id: str) -> dict[str, list[dict[str, Any]]]:
