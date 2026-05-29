@@ -30,6 +30,7 @@ from apps.api.services.replay import (
 )
 from apps.worker.services.court_adapter import run_fixture_court_adapter
 from apps.worker.services.homography_candidate_builder import build_homography_candidates
+from apps.worker.services.object_court_projection import project_objects_to_court
 from apps.worker.services.projection_diagnostic_builder import build_projection_diagnostics
 
 
@@ -583,6 +584,77 @@ def test_replay_overlay_and_timeline_return_smoothed_motion_items(
     assert all(item["smoothed_candidate_only"] is True for item in smoothed_items)
 
 
+def test_replay_overlay_and_timeline_return_court_projection_candidates(
+    client: TestClient,
+    db_session: Session,
+    tmp_path,
+) -> None:
+    media_path = tmp_path / "sample.mp4"
+    media_path.write_bytes(b"tom-v3-video")
+    media = _seed_media(db_session, media_path)
+    motion_run = _seed_motion_smoothing_run(db_session, media.id)
+    _, homography_result = _seed_court_and_homography(db_session, media.id)
+    projection_result = project_objects_to_court(
+        session=db_session,
+        media_id=media.id,
+        motion_smoothing_run_id=motion_run.id,
+        homography_run_id=str(homography_result["homography_run_id"]),
+        homography_max_gap_ms=1500,
+    )
+    assert projection_result["ok"] is True
+
+    info_response = client.get(f"/media/{media.id}/replay-info")
+    assert info_response.status_code == 200
+    court_projection_run = info_response.json()["available_runs"]["court_projection"][0]
+    assert court_projection_run["run_id"] == projection_result["court_projection_run_id"]
+    assert court_projection_run["evidence_source"] == "court_projection_candidate"
+    assert court_projection_run["ball_court_projection_count"] == 1
+    assert court_projection_run["main_player_court_projection_count"] == 1
+    assert court_projection_run["projection_candidate_only"] is True
+
+    overlay_response = client.get(
+        "/replay/overlays",
+        params={
+            "media_id": media.id,
+            "start_ms": 0,
+            "end_ms": 2000,
+            "layers": "ball_court_projection,main_player_court_projection",
+            "court_projection_run_id": projection_result["court_projection_run_id"],
+        },
+    )
+    assert overlay_response.status_code == 200
+    body = overlay_response.json()
+    assert len(body["ball_court_projection"]) == 1
+    assert len(body["main_player_court_projection"]) == 1
+    ball = body["ball_court_projection"][0]
+    player = body["main_player_court_projection"][0]
+    assert ball["overlay_type"] == "ball_court_projection_candidate"
+    assert ball["court_coordinate_space"] == "court_template_2d"
+    assert ball["projection_candidate_only"] is True
+    assert ball["not_ball_truth"] is True
+    assert ball["not_court_truth"] is True
+    assert player["overlay_type"] == "main_player_court_projection_candidate"
+    assert player["track_role_candidate"] == "near_player_track_candidate"
+    assert player["not_player_truth"] is True
+    assert player["not_identity_truth"] is True
+
+    timeline_response = client.get(
+        "/replay/timeline",
+        params={
+            "media_id": media.id,
+            "court_projection_run_id": projection_result["court_projection_run_id"],
+        },
+    )
+    assert timeline_response.status_code == 200
+    lanes = {lane["lane_type"]: lane for lane in timeline_response.json()["lanes"]}
+    items = lanes["court_projection"]["items"]
+    assert {item["item_type"] for item in items} == {
+        "ball_court_projection_candidate",
+        "main_player_court_projection_candidate",
+    }
+    assert all(item["projection_candidate_only"] is True for item in items)
+
+
 def test_replay_overlay_endpoint_returns_court_and_homography_items(
     client: TestClient,
     db_session: Session,
@@ -978,6 +1050,7 @@ def test_replay_timeline_endpoint_returns_evidence_lanes(
         "camera_view",
         "homography_candidates",
         "projection_diagnostics",
+        "court_projection",
         "annotations",
     }
 

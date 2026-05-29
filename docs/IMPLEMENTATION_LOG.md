@@ -2107,3 +2107,36 @@ observations, smoothed pose candidates, lineage, and evidence semantics are unch
 
 No forehand/backhand classification, stroke detection, hit detection, bounce detection, scoring,
 player identity, biomechanics truth, accepted/rejected lifecycle, or adjudication was added.
+
+## Object-to-Court Projection Candidates v0
+
+Status: complete
+
+### Goal
+
+Project existing smoothed image-space ball and main-player candidate evidence into normalized
+court-template coordinates using existing homography candidate rows, while preserving evidence-only
+semantics.
+
+### Notes
+
+This milestone adds:
+
+- worker `project-objects-to-court`
+- Makefile `tom-v1-object-court-projection`
+- `ball_court_projection_candidate` observations
+- `main_player_court_projection_candidate` observations
+- `observation_family = projection`
+- lineage from source smoothed object observations and source homography candidates
+- replay `courtProjectionRunId` support
+- replay layers for `ball_court_projection` and `main_player_court_projection`
+- a `court_projection` timeline lane
+- a normalized court-template mini-map for current ball/near/far projection candidates
+- selected evidence detail for source image point/anchor, court point, homography match policy, and
+  no-adjudication warnings
+- tests for projection math, homography matching, persistence, lineage, replay payloads, and plan
+  mode
+
+The projected points are candidate template coordinates only. This milestone does not add bounce,
+hit, in/out, rally/point/score, player identity, scoreboard OCR, server/receiver logic,
+accepted/rejected lifecycle, or adjudication.

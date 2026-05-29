@@ -141,9 +141,15 @@ The CLI returns JSON with:
 
 The replay URL is consumed by Milestone 8E court overlays. 8D itself does not add replay court overlays.
 
-Milestone 8F consumes persisted homography candidate rows as source evidence for projection diagnostics. A homography candidate remains a candidate coordinate transform even when a diagnostic row or review export references it. 8F does not change homography candidate semantics and does not use the candidate to create ball/player court-space projections.
+Milestone 8F consumes persisted homography candidate rows as source evidence for projection diagnostics. A homography candidate remains a candidate coordinate transform even when a diagnostic row or review export references it. 8F does not change homography candidate semantics and does not itself create ball/player court-space projections.
 
 Replay may carry homography candidate overlays forward with `court_temporal_persistence=carry_forward` so sparse candidate geometry remains visible between sampled source frames. This is a display/read-model policy only. It does not create accepted geometry and does not change homography candidate semantics.
+
+Object-to-Court Projection Candidates v0 can use homography candidate rows to project smoothed
+image-space ball and main-player box candidates into normalized `court_template_2d` coordinates.
+That downstream use preserves homography semantics: the transform is still a candidate coordinate
+transform, and projected object rows are candidate evidence rather than ball truth, player truth, or
+court truth.
 
 ## Non-Goals
 
@@ -152,7 +158,7 @@ Replay may carry homography candidate overlays forward with `court_temporal_pers
 - projection diagnostics
 - replay court overlays
 - real court model inference
-- ball/player court-space projection
+- confirmed ball/player court-space projection truth
 - bounce/hit/in-out/rally/point/scoring
 - real stream ingestion
 - adjudication

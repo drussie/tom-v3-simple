@@ -1,11 +1,13 @@
 import type {
   HomographyMatrix3x3,
   ReplayCameraViewOverlay,
+  ReplayBallCourtProjectionOverlay,
   ReplayCourtKeypointOverlay,
   ReplayCourtLineOverlay,
   ReplayDetectionBBox,
   ReplayDetectionOverlay,
   ReplayHomographyCandidateOverlay,
+  ReplayMainPlayerCourtProjectionOverlay,
   ReplayMainPlayerTrackOverlay,
   ReplayPoseOverlay,
   ReplayPoseLimbSide,
@@ -269,6 +271,38 @@ export function activeReplayProjectionDiagnostics(
   holdMs = 250
 ): ReplayProjectionDiagnosticOverlay[] {
   return activeReplayCourtEvidence(diagnostics, currentTimestampMs, currentFrame, holdMs);
+}
+
+export function activeReplayBallCourtProjection(
+  items: ReplayBallCourtProjectionOverlay[],
+  currentTimestampMs: number,
+  currentFrame: number,
+  holdMs = 125
+): ReplayBallCourtProjectionOverlay[] {
+  const selected = selectNearestCurrentSmoothedCandidate(
+    items,
+    currentTimestampMs,
+    currentFrame,
+    holdMs,
+    (item) => item.confidence
+  );
+  return selected === null ? [] : [selected];
+}
+
+export function activeReplayMainPlayerCourtProjection(
+  items: ReplayMainPlayerCourtProjectionOverlay[],
+  currentTimestampMs: number,
+  currentFrame: number,
+  holdMs = 125
+): ReplayMainPlayerCourtProjectionOverlay[] {
+  return selectCurrentSmoothedCandidatesByKey(
+    items,
+    currentTimestampMs,
+    currentFrame,
+    holdMs,
+    (item) => item.track_role_candidate ?? item.track_candidate_id ?? item.observation_id,
+    (item) => item.confidence
+  );
 }
 
 export function activeReplaySmoothedBall(
@@ -635,6 +669,26 @@ export function filterProjectionDiagnosticsAvailableAt(
     return diagnostics;
   }
   return diagnostics.filter((item) => item.timestamp_ms <= availableUntilMs);
+}
+
+export function filterBallCourtProjectionAvailableAt(
+  items: ReplayBallCourtProjectionOverlay[],
+  availableUntilMs: number | null
+): ReplayBallCourtProjectionOverlay[] {
+  if (availableUntilMs === null) {
+    return items;
+  }
+  return items.filter((item) => item.timestamp_ms <= availableUntilMs);
+}
+
+export function filterMainPlayerCourtProjectionAvailableAt(
+  items: ReplayMainPlayerCourtProjectionOverlay[],
+  availableUntilMs: number | null
+): ReplayMainPlayerCourtProjectionOverlay[] {
+  if (availableUntilMs === null) {
+    return items;
+  }
+  return items.filter((item) => item.timestamp_ms <= availableUntilMs);
 }
 
 export function filterSmoothedBallAvailableAt(

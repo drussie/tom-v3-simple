@@ -40,6 +40,10 @@ CAMERA_VIEW_TYPES = {"camera_view_observation"}
 COURT_EVIDENCE_TYPES = COURT_KEYPOINT_TYPES | COURT_LINE_TYPES | CAMERA_VIEW_TYPES
 HOMOGRAPHY_TYPES = {"homography_candidate_observation"}
 PROJECTION_DIAGNOSTIC_TYPES = {"projection_diagnostic_observation"}
+COURT_PROJECTION_TYPES = {
+    "ball_court_projection_candidate",
+    "main_player_court_projection_candidate",
+}
 MAIN_PLAYER_TRACK_TYPES = {
     "main_player_track_candidate",
     "main_player_track_assignment_candidate",
@@ -127,6 +131,7 @@ def build_replay_overlay_chunk(
     court_run_id: str | None = None,
     homography_run_id: str | None = None,
     projection_diagnostic_run_id: str | None = None,
+    court_projection_run_id: str | None = None,
     court_temporal_persistence: str = COURT_TEMPORAL_PERSISTENCE_CARRY_FORWARD,
     court_persistence_max_gap_ms: int = DEFAULT_COURT_PERSISTENCE_MAX_GAP_MS,
     min_confidence: float | None = None,
@@ -282,6 +287,28 @@ def build_replay_overlay_chunk(
         if "projection_diagnostics" in layers
         else []
     )
+    ball_court_projection = (
+        build_ball_court_projection_overlay_items(
+            session=session,
+            media=media,
+            start_ms=start_ms,
+            end_ms=end_ms,
+            court_projection_run_id=court_projection_run_id,
+        )
+        if "ball_court_projection" in layers
+        else []
+    )
+    main_player_court_projection = (
+        build_main_player_court_projection_overlay_items(
+            session=session,
+            media=media,
+            start_ms=start_ms,
+            end_ms=end_ms,
+            court_projection_run_id=court_projection_run_id,
+        )
+        if "main_player_court_projection" in layers
+        else []
+    )
     return {
         "media_id": media.id,
         "start_ms": start_ms,
@@ -301,6 +328,8 @@ def build_replay_overlay_chunk(
         "camera_view": camera_view,
         "homography_candidates": homography_candidates,
         "projection_diagnostics": projection_diagnostics,
+        "ball_court_projection": ball_court_projection,
+        "main_player_court_projection": main_player_court_projection,
         "court_temporal_persistence": court_temporal_persistence,
         "court_persistence_max_gap_ms": court_persistence_max_gap_ms,
         "observation_only": True,
@@ -320,6 +349,7 @@ def build_replay_timeline(
     court_run_id: str | None = None,
     homography_run_id: str | None = None,
     projection_diagnostic_run_id: str | None = None,
+    court_projection_run_id: str | None = None,
     include_annotations: bool = True,
 ) -> dict[str, Any] | None:
     media = session.get(MediaAsset, media_id)
@@ -343,6 +373,7 @@ def build_replay_timeline(
                     court_run_id,
                     homography_run_id,
                     projection_diagnostic_run_id,
+                    court_projection_run_id,
                 )
                 if run_id is not None
             },
@@ -445,6 +476,15 @@ def build_replay_timeline(
                     session=session,
                     media=media,
                     projection_diagnostic_run_id=projection_diagnostic_run_id,
+                ),
+            },
+            {
+                "lane_type": "court_projection",
+                "label": "Court projection candidates",
+                "items": build_court_projection_timeline_items(
+                    session=session,
+                    media=media,
+                    court_projection_run_id=court_projection_run_id,
                 ),
             },
             {
@@ -932,6 +972,73 @@ def projection_diagnostic_timeline_item_from_row(
             "projection diagnostic",
             evidence_source="projection_diagnostic",
         ),
+    }
+
+
+def build_court_projection_timeline_items(
+    session: Session,
+    *,
+    media: MediaAsset,
+    court_projection_run_id: str | None = None,
+) -> list[dict[str, Any]]:
+    query = (
+        select(Observation)
+        .where(
+            Observation.media_id == media.id,
+            Observation.observation_type.in_(sorted(COURT_PROJECTION_TYPES)),
+            Observation.timestamp_start_ms.is_not(None),
+        )
+        .order_by(Observation.timestamp_start_ms, Observation.frame_start, Observation.id)
+    )
+    if court_projection_run_id is not None:
+        query = query.where(Observation.run_id == court_projection_run_id)
+
+    items: list[dict[str, Any]] = []
+    for observation in session.scalars(query).all():
+        item = court_projection_timeline_item_from_observation(observation)
+        if item is not None:
+            items.append(item)
+    return items
+
+
+def court_projection_timeline_item_from_observation(
+    observation: Observation,
+) -> dict[str, Any] | None:
+    overlay_item = court_projection_overlay_item_from_observation(observation)
+    if overlay_item is None:
+        return None
+    item_type = (
+        "ball_court_projection_candidate"
+        if observation.observation_type == "ball_court_projection_candidate"
+        else "main_player_court_projection_candidate"
+    )
+    return {
+        "item_type": item_type,
+        "observation_id": observation.id,
+        "run_id": observation.run_id,
+        "timestamp_ms": overlay_item["timestamp_ms"],
+        "frame_number": overlay_item["frame_number"],
+        "display_label": (
+            "ball court projection candidate"
+            if item_type == "ball_court_projection_candidate"
+            else "main player court projection candidate"
+        ),
+        "court_point": overlay_item["court_point"],
+        "court_coordinate_space": overlay_item["court_coordinate_space"],
+        "projection_method": overlay_item["projection_method"],
+        "source_homography_observation_id": overlay_item[
+            "source_homography_observation_id"
+        ],
+        "homography_time_delta_ms": overlay_item["homography_time_delta_ms"],
+        "homography_carried_forward": overlay_item["homography_carried_forward"],
+        "track_candidate_id": overlay_item.get("track_candidate_id"),
+        "track_role_candidate": overlay_item.get("track_role_candidate"),
+        "projection_candidate_only": True,
+        "not_ball_truth": overlay_item.get("not_ball_truth"),
+        "not_player_truth": overlay_item.get("not_player_truth"),
+        "not_court_truth": True,
+        "observation_only": True,
+        "no_adjudication": True,
     }
 
 
@@ -1534,6 +1641,179 @@ def _motion_smoothing_rows(
     return list(session.scalars(query).all())
 
 
+def build_ball_court_projection_overlay_items(
+    session: Session,
+    *,
+    media: MediaAsset,
+    start_ms: int,
+    end_ms: int,
+    court_projection_run_id: str | None = None,
+) -> list[dict[str, Any]]:
+    rows = _court_projection_rows(
+        session=session,
+        media=media,
+        start_ms=start_ms,
+        end_ms=end_ms,
+        court_projection_run_id=court_projection_run_id,
+        observation_type="ball_court_projection_candidate",
+    )
+    return [
+        item
+        for row in rows
+        if (item := court_projection_overlay_item_from_observation(row)) is not None
+    ]
+
+
+def build_main_player_court_projection_overlay_items(
+    session: Session,
+    *,
+    media: MediaAsset,
+    start_ms: int,
+    end_ms: int,
+    court_projection_run_id: str | None = None,
+) -> list[dict[str, Any]]:
+    rows = _court_projection_rows(
+        session=session,
+        media=media,
+        start_ms=start_ms,
+        end_ms=end_ms,
+        court_projection_run_id=court_projection_run_id,
+        observation_type="main_player_court_projection_candidate",
+    )
+    return [
+        item
+        for row in rows
+        if (item := court_projection_overlay_item_from_observation(row)) is not None
+    ]
+
+
+def court_projection_overlay_item_from_observation(
+    observation: Observation,
+) -> dict[str, Any] | None:
+    if observation.observation_type not in COURT_PROJECTION_TYPES:
+        return None
+    payload = observation.payload_jsonb or {}
+    frame_number, timestamp_ms = _observation_frame_time(observation)
+    court_point = payload.get("court_point")
+    if (
+        frame_number is None
+        or timestamp_ms is None
+        or not isinstance(court_point, dict)
+        or _numeric(court_point.get("x")) is None
+        or _numeric(court_point.get("y")) is None
+    ):
+        return None
+    common = {
+        "observation_id": observation.id,
+        "run_id": observation.run_id,
+        "frame_number": frame_number,
+        "timestamp_ms": timestamp_ms,
+        "court_point": {
+            "x": _numeric(court_point.get("x")),
+            "y": _numeric(court_point.get("y")),
+        },
+        "court_coordinate_space": _string_or_none(
+            payload.get("court_coordinate_space")
+        )
+        or "court_template_2d",
+        "template_name": _string_or_none(payload.get("template_name")),
+        "template_version": _string_or_none(payload.get("template_version")),
+        "projection_method": _string_or_none(payload.get("projection_method")),
+        "source_motion_smoothing_run_id": _string_or_none(
+            payload.get("source_motion_smoothing_run_id")
+        ),
+        "source_homography_run_id": _string_or_none(
+            payload.get("source_homography_run_id")
+        ),
+        "source_homography_observation_id": _string_or_none(
+            payload.get("source_homography_observation_id")
+            or payload.get("source_homography_candidate_observation_id")
+        ),
+        "source_homography_status": _string_or_none(
+            payload.get("source_homography_status")
+        ),
+        "source_homography_confidence": _numeric(
+            payload.get("source_homography_confidence")
+        ),
+        "homography_match_policy": _string_or_none(
+            payload.get("homography_match_policy")
+        ),
+        "homography_time_delta_ms": _optional_int(
+            payload.get("homography_time_delta_ms")
+        ),
+        "homography_carried_forward": _truthy(payload.get("homography_carried_forward")),
+        "homography_source_frame_number": _optional_int(
+            payload.get("homography_source_frame_number")
+        ),
+        "projection_frame_number": _optional_int(payload.get("projection_frame_number")),
+        "source_observation_ids": payload.get("source_observation_ids") or [],
+        "confidence": observation.confidence,
+        "projection_candidate_only": True,
+        "not_court_truth": True,
+        "observation_only": True,
+        "no_adjudication": True,
+        "coordinate_space": observation.coordinate_space or "court_template_2d",
+        "model_registry_id": observation.model_id,
+        "model_name": observation.model.name if observation.model is not None else None,
+        "model_version": observation.model.version if observation.model is not None else None,
+        "runtime_config_id": observation.runtime_config_id,
+        "evidence_source": "court_projection_candidate",
+        "source_label": _string_or_none(payload.get("source_label"))
+        or "court projection candidate",
+    }
+    if observation.observation_type == "ball_court_projection_candidate":
+        return {
+            "overlay_type": "ball_court_projection_candidate",
+            **common,
+            "source_ball_observation_id": _string_or_none(
+                payload.get("source_ball_observation_id")
+            ),
+            "image_point": _point_payload(payload.get("image_point")),
+            "not_ball_truth": True,
+        }
+    return {
+        "overlay_type": "main_player_court_projection_candidate",
+        **common,
+        "source_player_box_observation_id": _string_or_none(
+            payload.get("source_player_box_observation_id")
+        ),
+        "source_main_player_track_run_id": _string_or_none(
+            payload.get("source_main_player_track_run_id")
+        ),
+        "track_candidate_id": _string_or_none(payload.get("track_candidate_id")),
+        "track_role_candidate": _string_or_none(payload.get("track_role_candidate")),
+        "image_anchor": _anchor_payload(payload.get("image_anchor")),
+        "not_player_truth": True,
+        "not_identity_truth": True,
+    }
+
+
+def _court_projection_rows(
+    *,
+    session: Session,
+    media: MediaAsset,
+    start_ms: int,
+    end_ms: int,
+    court_projection_run_id: str | None,
+    observation_type: str,
+) -> list[Observation]:
+    timestamp_end = func.coalesce(Observation.timestamp_end_ms, Observation.timestamp_start_ms)
+    query = (
+        select(Observation)
+        .where(
+            Observation.media_id == media.id,
+            Observation.observation_type == observation_type,
+            Observation.timestamp_start_ms.is_not(None),
+            Observation.timestamp_start_ms <= end_ms,
+            timestamp_end >= start_ms,
+        )
+        .order_by(Observation.timestamp_start_ms, Observation.frame_start, Observation.id)
+    )
+    if court_projection_run_id is not None:
+        query = query.where(Observation.run_id == court_projection_run_id)
+    return list(session.scalars(query).all())
+
+
 def build_court_keypoint_overlay_items(
     session: Session,
     *,
@@ -1986,6 +2266,7 @@ def available_runs_for_media(session: Session, media_id: str) -> dict[str, list[
         "court": _court_run_summaries(session, media_id),
         "homography": _homography_run_summaries(session, media_id),
         "projection_diagnostic": _projection_diagnostic_run_summaries(session, media_id),
+        "court_projection": _court_projection_run_summaries(session, media_id),
         "main_player_track": _main_player_track_run_summaries(session, media_id),
         "motion_smoothing": _motion_smoothing_run_summaries(session, media_id),
     }
@@ -2060,6 +2341,28 @@ def normalize_replay_layers(layers: str | list[str] | tuple[str, ...] | None) ->
             layer = "homography_candidates"
         if layer in {"projection", "projection-diagnostics", "projection_diagnostic"}:
             layer = "projection_diagnostics"
+        if layer in {
+            "court_projection",
+            "court-projection",
+            "object_court_projection",
+            "object-to-court-projection",
+            "court_projection_candidates",
+        }:
+            normalized.update({"ball_court_projection", "main_player_court_projection"})
+            continue
+        if layer in {
+            "ball-court-projection",
+            "ball_court_projection_candidate",
+            "ball_projection",
+        }:
+            layer = "ball_court_projection"
+        if layer in {
+            "main-player-court-projection",
+            "main_player_court_projection_candidate",
+            "player_court_projection",
+            "main_player_projection",
+        }:
+            layer = "main_player_court_projection"
         normalized.add(layer)
     return normalized
 
@@ -2188,6 +2491,55 @@ def _projection_diagnostic_run_summaries(
                 "diagnostic_geometry": True,
                 "geometry_evidence_only": True,
                 "not_ball_player_projection": True,
+                "is_fixture": False,
+                "is_real_model_output": False,
+                "model_output_not_truth": False,
+            }
+        )
+    return summaries
+
+
+def _court_projection_run_summaries(
+    session: Session,
+    media_id: str,
+) -> list[dict[str, Any]]:
+    summaries = _run_summaries_for_observation_types(
+        session,
+        media_id,
+        COURT_PROJECTION_TYPES,
+    )
+    if not summaries:
+        return []
+
+    counts_by_run_type = _counts_by_run_and_type(session, media_id, COURT_PROJECTION_TYPES)
+    for summary in summaries:
+        run = session.get(ProcessingRun, summary["run_id"])
+        runtime_payload = run.runtime_config.payload_jsonb if run and run.runtime_config else {}
+        run_metadata = run.metadata_jsonb if run is not None else {}
+        source_motion_smoothing_run_id = _string_or_none(
+            run_metadata.get("source_motion_smoothing_run_id")
+        ) or _string_or_none(runtime_payload.get("source_motion_smoothing_run_id"))
+        source_homography_run_id = _string_or_none(
+            run_metadata.get("source_homography_run_id")
+        ) or _string_or_none(runtime_payload.get("source_homography_run_id"))
+        summary.update(
+            {
+                "evidence_source": "court_projection_candidate",
+                "source_label": "court projection candidates",
+                "source_motion_smoothing_run_id": source_motion_smoothing_run_id,
+                "source_homography_run_id": source_homography_run_id,
+                "ball_court_projection_count": counts_by_run_type.get(
+                    (summary["run_id"], "ball_court_projection_candidate"), 0
+                ),
+                "main_player_court_projection_count": counts_by_run_type.get(
+                    (summary["run_id"], "main_player_court_projection_candidate"), 0
+                ),
+                "projection_candidate_only": True,
+                "not_ball_truth": True,
+                "not_player_truth": True,
+                "not_court_truth": True,
+                "observation_only": True,
+                "no_adjudication": True,
                 "is_fixture": False,
                 "is_real_model_output": False,
                 "model_output_not_truth": False,
@@ -2827,6 +3179,8 @@ def _source_label(evidence_source: str) -> str:
         return "court evidence"
     if evidence_source == "homography_candidate":
         return "homography candidate"
+    if evidence_source == "court_projection_candidate":
+        return "court projection candidate"
     return "persisted evidence"
 
 
@@ -2861,6 +3215,37 @@ def _bbox_from_payload(payload: dict[str, Any]) -> dict[str, float] | None:
     if width <= 0 or height <= 0:
         return None
     return {"x": x, "y": y, "w": width, "h": height}
+
+
+def _point_payload(value: Any) -> dict[str, float] | None:
+    if not isinstance(value, dict):
+        return None
+    x = _numeric(value.get("x"))
+    y = _numeric(value.get("y"))
+    if x is None or y is None:
+        return None
+    return {"x": x, "y": y}
+
+
+def _anchor_payload(value: Any) -> dict[str, Any] | None:
+    if not isinstance(value, dict):
+        return None
+    point = _point_payload(value)
+    if point is None:
+        return None
+    anchor: dict[str, Any] = {
+        "anchor_type": _string_or_none(value.get("anchor_type")) or "image_point",
+        **point,
+    }
+    bbox = value.get("bbox")
+    if isinstance(bbox, dict):
+        x = _numeric(bbox.get("x"))
+        y = _numeric(bbox.get("y"))
+        width = _numeric(bbox.get("width", bbox.get("w")))
+        height = _numeric(bbox.get("height", bbox.get("h")))
+        if x is not None and y is not None and width is not None and height is not None:
+            anchor["bbox"] = {"x": x, "y": y, "w": width, "h": height}
+    return anchor
 
 
 def _track_point_bbox(point: TrackPoint, payload: dict[str, Any]) -> dict[str, float] | None:

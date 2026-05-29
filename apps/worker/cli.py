@@ -36,6 +36,7 @@ from apps.worker.services.main_player_track_assignment import assign_main_player
 from apps.worker.services.main_subject_filter import select_main_player_subjects
 from apps.worker.services.media_indexer import index_media
 from apps.worker.services.motion_smoothing import smooth_motion_candidates
+from apps.worker.services.object_court_projection import project_objects_to_court
 from apps.worker.services.pose_adapter import run_pose_adapter
 from apps.worker.services.projection_diagnostic_builder import build_projection_diagnostics
 from apps.worker.services.real_court_keypoint_replay import run_real_court_keypoint_replay
@@ -579,6 +580,34 @@ def main() -> None:
     )
     motion_smoothing_parser.add_argument("--skip-create-db", action="store_true")
     motion_smoothing_parser.set_defaults(handler=_handle_smooth_motion_candidates)
+
+    object_court_projection_parser = subcommands.add_parser(
+        "project-objects-to-court",
+        help="Project smoothed ball/player candidates into candidate court-template coordinates.",
+    )
+    object_court_projection_parser.add_argument("--media-id", required=True)
+    object_court_projection_parser.add_argument("--motion-smoothing-run-id", required=True)
+    object_court_projection_parser.add_argument("--homography-run-id", required=True)
+    object_court_projection_parser.add_argument(
+        "--run-name",
+        default="object-to-court-projection-candidates-v0",
+    )
+    object_court_projection_parser.add_argument(
+        "--homography-max-gap-ms",
+        type=int,
+        default=1500,
+    )
+    object_court_projection_parser.add_argument(
+        "--viewer-base-url",
+        default="http://127.0.0.1:3000",
+    )
+    object_court_projection_parser.add_argument(
+        "--plan-only",
+        action="store_true",
+        help="Print the object-to-court projection plan without touching observations.",
+    )
+    object_court_projection_parser.add_argument("--skip-create-db", action="store_true")
+    object_court_projection_parser.set_defaults(handler=_handle_project_objects_to_court)
 
     fixture_court_parser = subcommands.add_parser(
         "run-fixture-court",
@@ -1287,6 +1316,22 @@ def _handle_build_projection_diagnostics(
         run_name=args.run_name,
         frame_start=args.frame_start,
         frame_end=args.frame_end,
+        viewer_base_url=args.viewer_base_url,
+        plan_only=args.plan_only,
+    )
+
+
+def _handle_project_objects_to_court(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    return project_objects_to_court(
+        session=session,
+        media_id=args.media_id,
+        motion_smoothing_run_id=args.motion_smoothing_run_id,
+        homography_run_id=args.homography_run_id,
+        run_name=args.run_name,
+        homography_max_gap_ms=args.homography_max_gap_ms,
         viewer_base_url=args.viewer_base_url,
         plan_only=args.plan_only,
     )

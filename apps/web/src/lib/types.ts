@@ -249,6 +249,7 @@ export interface ReplayRunSummary {
   source_tracklet_run_id?: string | null;
   source_main_player_track_run_id?: string | null;
   source_pose_run_id?: string | null;
+  source_motion_smoothing_run_id?: string | null;
   source_detection_evidence_source?: string | null;
   source_detection_source_label?: string | null;
   source_detection_runtime?: string | null;
@@ -262,8 +263,14 @@ export interface ReplayRunSummary {
   camera_view_count?: number;
   candidate_count?: number;
   projection_diagnostic_count?: number;
+  ball_court_projection_count?: number;
+  main_player_court_projection_count?: number;
   candidate_geometry?: boolean;
   diagnostic_geometry?: boolean;
+  projection_candidate_only?: boolean;
+  not_ball_truth?: boolean;
+  not_player_truth?: boolean;
+  not_court_truth?: boolean;
   geometry_evidence_only?: boolean;
   not_ball_player_projection?: boolean;
   candidate_track_only?: boolean;
@@ -285,6 +292,7 @@ export interface ReplayAvailableRuns {
   court: ReplayRunSummary[];
   homography: ReplayRunSummary[];
   projection_diagnostic: ReplayRunSummary[];
+  court_projection: ReplayRunSummary[];
   main_player_track: ReplayRunSummary[];
   motion_smoothing: ReplayRunSummary[];
 }
@@ -776,6 +784,69 @@ export interface ReplayProjectionDiagnosticOverlay extends ReplayCourtEvidenceSo
   confidence: number | null;
 }
 
+export interface ReplayCourtProjectionPoint {
+  x: number;
+  y: number;
+}
+
+export interface ReplayCourtProjectionImageAnchor extends ReplayCourtProjectionPoint {
+  anchor_type: string;
+  bbox?: ReplayDetectionBBox;
+}
+
+export interface ReplayCourtProjectionBase {
+  observation_id: string;
+  run_id: string;
+  frame_number: number;
+  timestamp_ms: number;
+  court_point: ReplayCourtProjectionPoint;
+  court_coordinate_space: "court_template_2d" | string;
+  template_name: string | null;
+  template_version: string | null;
+  projection_method: string | null;
+  source_motion_smoothing_run_id: string | null;
+  source_homography_run_id: string | null;
+  source_homography_observation_id: string | null;
+  source_homography_status: string | null;
+  source_homography_confidence: number | null;
+  homography_match_policy: string | null;
+  homography_time_delta_ms: number | null;
+  homography_carried_forward: boolean;
+  homography_source_frame_number: number | null;
+  projection_frame_number: number | null;
+  source_observation_ids: string[];
+  confidence: number | null;
+  projection_candidate_only: boolean;
+  not_court_truth: boolean;
+  observation_only: boolean;
+  no_adjudication: boolean;
+  coordinate_space: "court_template_2d" | string;
+  evidence_source?: string;
+  source_label?: string | null;
+  model_registry_id?: string | null;
+  model_name?: string | null;
+  model_version?: string | null;
+  runtime_config_id?: string | null;
+}
+
+export interface ReplayBallCourtProjectionOverlay extends ReplayCourtProjectionBase {
+  overlay_type: "ball_court_projection_candidate";
+  source_ball_observation_id: string | null;
+  image_point: ReplayCourtProjectionPoint | null;
+  not_ball_truth: boolean;
+}
+
+export interface ReplayMainPlayerCourtProjectionOverlay extends ReplayCourtProjectionBase {
+  overlay_type: "main_player_court_projection_candidate";
+  source_player_box_observation_id: string | null;
+  source_main_player_track_run_id: string | null;
+  track_candidate_id: string | null;
+  track_role_candidate: string | null;
+  image_anchor: ReplayCourtProjectionImageAnchor | null;
+  not_player_truth: boolean;
+  not_identity_truth: boolean;
+}
+
 export interface ReplayOverlayChunk {
   media_id: string;
   start_ms: number;
@@ -795,6 +866,8 @@ export interface ReplayOverlayChunk {
   camera_view: ReplayCameraViewOverlay[];
   homography_candidates: ReplayHomographyCandidateOverlay[];
   projection_diagnostics: ReplayProjectionDiagnosticOverlay[];
+  ball_court_projection: ReplayBallCourtProjectionOverlay[];
+  main_player_court_projection: ReplayMainPlayerCourtProjectionOverlay[];
   court_temporal_persistence?: ReplayCourtTemporalPersistence | string;
   court_persistence_max_gap_ms?: number;
   observation_only: boolean;
@@ -1015,6 +1088,29 @@ export interface ReplayProjectionDiagnosticTimelineItem extends ReplayCourtEvide
   display_label: string;
 }
 
+export interface ReplayCourtProjectionTimelineItem {
+  item_type: "ball_court_projection_candidate" | "main_player_court_projection_candidate";
+  observation_id: string;
+  run_id: string;
+  timestamp_ms: number;
+  frame_number: number;
+  display_label: string;
+  court_point: ReplayCourtProjectionPoint;
+  court_coordinate_space: string;
+  projection_method: string | null;
+  source_homography_observation_id: string | null;
+  homography_time_delta_ms: number | null;
+  homography_carried_forward: boolean;
+  track_candidate_id?: string | null;
+  track_role_candidate?: string | null;
+  projection_candidate_only: boolean;
+  not_ball_truth?: boolean | null;
+  not_player_truth?: boolean | null;
+  not_court_truth: boolean;
+  observation_only: boolean;
+  no_adjudication: boolean;
+}
+
 export interface ReplaySmoothedMotionTimelineItem {
   item_type:
     | "smoothed_ball_position_candidate"
@@ -1045,6 +1141,7 @@ export type ReplayTimelineItem =
   | ReplayCameraViewTimelineItem
   | ReplayHomographyCandidateTimelineItem
   | ReplayProjectionDiagnosticTimelineItem
+  | ReplayCourtProjectionTimelineItem
   | ReplayAnnotationTimelineItem;
 
 export interface ReplayTimelineLane {
@@ -1059,6 +1156,7 @@ export interface ReplayTimelineLane {
     | "camera_view"
     | "homography_candidates"
     | "projection_diagnostics"
+    | "court_projection"
     | "annotations";
   label: string;
   items: ReplayTimelineItem[];

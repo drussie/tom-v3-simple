@@ -41,6 +41,7 @@ class ObservationFamily(StrEnum):
     pose = "pose"
     court = "court"
     homography = "homography"
+    projection = "projection"
     tracking = "tracking"
     artifact = "artifact"
 
@@ -128,6 +129,9 @@ class RelationshipType(StrEnum):
         "smoothed_from_main_player_track_assignment"
     )
     smoothed_from_pose_observation = "smoothed_from_pose_observation"
+    projected_from_smoothed_ball_position = "projected_from_smoothed_ball_position"
+    projected_from_smoothed_main_player_box = "projected_from_smoothed_main_player_box"
+    projected_with_homography_candidate = "projected_with_homography_candidate"
 
 
 class CoordinateSpace(StrEnum):

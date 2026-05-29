@@ -18,6 +18,7 @@ interface ReplayPageProps {
     courtPersistenceMaxGapMs?: string;
     homographyRunId?: string;
     projectionDiagnosticRunId?: string;
+    courtProjectionRunId?: string;
   }>;
 }
 

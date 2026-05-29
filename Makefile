@@ -41,6 +41,9 @@ VIEWER_BASE_URL ?= http://127.0.0.1:3000
 TRACKLET_RUN_ID ?=
 POSE_RUN_ID ?=
 MOTION_SMOOTHING_RUN_ID ?=
+COURT_PROJECTION_RUN_NAME ?= object-to-court-projection-candidates-v0
+COURT_PROJECTION_RUN_ID ?=
+HOMOGRAPHY_MAX_GAP_MS ?= 1500
 AUDIT_DEMO_ONLY ?= true
 AUDIT_STRICT ?= false
 TOM_V3_AUDIT_REQUIRED ?= false
@@ -66,7 +69,7 @@ DERIVE_LINES ?= true
 
 export TOM_V3_DATABASE_URL
 
-.PHONY: install web-install test lint migrate api seed verify index-media run-gameplay index-and-run-gameplay run-detection index-and-run-detection extract-frame-artifacts build-tracklets run-pose export-tracklet-review-dataset court-review-export demo demo-fixture demo-plan demo-reset demo-export demo-open replay-open completion-audit completion-check yolo-probe yolo-smoke yolo-runtime-probe register-yolo-model smoke-real-yolo-local real-detection real-pose tom-v1-yolo-probe tom-v1-ball-detection tom-v1-player-detection tom-v1-tracklets tom-v1-main-subjects tom-v1-main-player-tracks tom-v1-pose tom-v1-pose-main-subjects tom-v1-pose-main-tracks tom-v1-motion-smoothing tom-v1-court-keypoints-probe tom-v1-court-keypoints tom-v1-court-keypoint-audit court-fixture homography-candidates projection-diagnostics web web-build web-lint smoke all-checks
+.PHONY: install web-install test lint migrate api seed verify index-media run-gameplay index-and-run-gameplay run-detection index-and-run-detection extract-frame-artifacts build-tracklets run-pose export-tracklet-review-dataset court-review-export demo demo-fixture demo-plan demo-reset demo-export demo-open replay-open completion-audit completion-check yolo-probe yolo-smoke yolo-runtime-probe register-yolo-model smoke-real-yolo-local real-detection real-pose tom-v1-yolo-probe tom-v1-ball-detection tom-v1-player-detection tom-v1-tracklets tom-v1-main-subjects tom-v1-main-player-tracks tom-v1-pose tom-v1-pose-main-subjects tom-v1-pose-main-tracks tom-v1-motion-smoothing tom-v1-court-keypoints-probe tom-v1-court-keypoints tom-v1-court-keypoint-audit tom-v1-object-court-projection court-fixture homography-candidates projection-diagnostics web web-build web-lint smoke all-checks
 
 install:
 	$(PYTHON) -m pip install -e ".[dev]"
@@ -257,6 +260,12 @@ tom-v1-pose-main-tracks:
 tom-v1-motion-smoothing:
 	@if [ -z "$(MEDIA_ID)" ]; then echo "MEDIA_ID is required: make tom-v1-motion-smoothing MEDIA_ID=<media_id>"; exit 1; fi
 	$(PYTHON) -m apps.worker.cli smooth-motion-candidates --media-id "$(MEDIA_ID)" $(if $(DETECTION_RUN_ID),--detection-run-id "$(DETECTION_RUN_ID)",) $(if $(TRACKLET_RUN_ID),--tracklet-run-id "$(TRACKLET_RUN_ID)",) $(if $(MAIN_PLAYER_TRACK_RUN_ID),--main-player-track-run-id "$(MAIN_PLAYER_TRACK_RUN_ID)",) $(if $(POSE_RUN_ID),--pose-run-id "$(POSE_RUN_ID)",) --run-name motion-smoothing-stable-replay-candidates-v0 --viewer-base-url "$(VIEWER_BASE_URL)" $(if $(filter true,$(PLAN_ONLY)),--plan-only,)
+
+tom-v1-object-court-projection:
+	@if [ -z "$(MEDIA_ID)" ]; then echo "MEDIA_ID is required: make tom-v1-object-court-projection MEDIA_ID=<media_id>"; exit 1; fi
+	@if [ -z "$(MOTION_SMOOTHING_RUN_ID)" ]; then echo "MOTION_SMOOTHING_RUN_ID is required: make tom-v1-object-court-projection MOTION_SMOOTHING_RUN_ID=<motion_smoothing_run_id>"; exit 1; fi
+	@if [ -z "$(HOMOGRAPHY_RUN_ID)" ]; then echo "HOMOGRAPHY_RUN_ID is required: make tom-v1-object-court-projection HOMOGRAPHY_RUN_ID=<homography_run_id>"; exit 1; fi
+	$(PYTHON) -m apps.worker.cli project-objects-to-court --media-id "$(MEDIA_ID)" --motion-smoothing-run-id "$(MOTION_SMOOTHING_RUN_ID)" --homography-run-id "$(HOMOGRAPHY_RUN_ID)" --run-name "$(COURT_PROJECTION_RUN_NAME)" --homography-max-gap-ms "$(HOMOGRAPHY_MAX_GAP_MS)" --viewer-base-url "$(VIEWER_BASE_URL)" $(if $(filter true,$(PLAN_ONLY)),--plan-only,)
 
 tom-v1-court-keypoints-probe:
 	$(PYTHON) -m apps.worker.cli tom-v1-court-keypoints-probe --weights "$(TOM_V1_MODEL_ROOT)/keypoints_model.pth" --allowed-root "$(TOM_V1_MODEL_ROOT)"

@@ -20,6 +20,10 @@ Raw observations remain immutable and inspectable. Smoothing is a derived read/r
 future input candidate for trajectory review. It is not ball truth, pose truth, player identity,
 court-space reasoning, bounce/hit/in-out, point, or score.
 
+Downstream object-to-court projection can consume these smoothed candidates as image-space source
+evidence. That projection remains derived candidate evidence and does not change smoothing outputs
+into object truth or tennis-event conclusions.
+
 ## Observation Types
 
 ### smoothed_ball_position_candidate
@@ -130,7 +134,7 @@ This milestone does not add:
 - bounce detection
 - hit detection
 - in/out decisions
-- ball/player court-space projection
+- confirmed ball/player court-space projection truth
 - player identity
 - server/receiver logic
 - scoreboard OCR

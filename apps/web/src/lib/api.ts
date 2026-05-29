@@ -51,6 +51,7 @@ export interface FetchReplayOverlayChunkInput {
   courtRunId?: string | null;
   homographyRunId?: string | null;
   projectionDiagnosticRunId?: string | null;
+  courtProjectionRunId?: string | null;
   courtTemporalPersistence?: string | null;
   courtPersistenceMaxGapMs?: number | null;
   minConfidence?: number | null;
@@ -70,6 +71,7 @@ export async function fetchReplayOverlayChunk({
   courtRunId = null,
   homographyRunId = null,
   projectionDiagnosticRunId = null,
+  courtProjectionRunId = null,
   courtTemporalPersistence = null,
   courtPersistenceMaxGapMs = null,
   minConfidence = null,
@@ -105,6 +107,9 @@ export async function fetchReplayOverlayChunk({
   if (projectionDiagnosticRunId !== null) {
     params.set("projection_diagnostic_run_id", projectionDiagnosticRunId);
   }
+  if (courtProjectionRunId !== null) {
+    params.set("court_projection_run_id", courtProjectionRunId);
+  }
   if (courtTemporalPersistence !== null) {
     params.set("court_temporal_persistence", courtTemporalPersistence);
   }
@@ -139,6 +144,7 @@ export interface FetchReplayTimelineInput {
   courtRunId?: string | null;
   homographyRunId?: string | null;
   projectionDiagnosticRunId?: string | null;
+  courtProjectionRunId?: string | null;
   includeAnnotations?: boolean;
 }
 
@@ -152,6 +158,7 @@ export async function fetchReplayTimeline({
   courtRunId = null,
   homographyRunId = null,
   projectionDiagnosticRunId = null,
+  courtProjectionRunId = null,
   includeAnnotations = true
 }: FetchReplayTimelineInput): Promise<ReplayTimeline> {
   const params = new URLSearchParams({
@@ -181,6 +188,9 @@ export async function fetchReplayTimeline({
   }
   if (projectionDiagnosticRunId !== null) {
     params.set("projection_diagnostic_run_id", projectionDiagnosticRunId);
+  }
+  if (courtProjectionRunId !== null) {
+    params.set("court_projection_run_id", courtProjectionRunId);
   }
 
   const response = await fetch(`/api/replay/timeline?${params.toString()}`, {

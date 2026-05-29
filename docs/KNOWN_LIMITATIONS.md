@@ -36,7 +36,10 @@ This registry makes TOM v3 Simple boundaries explicit.
 - TOM v1 court keypoint calibration now exposes raw `raw_0..raw_13` points and mapped TOM v3 points separately, but this does not make the court geometry trusted. It only makes preprocessing, coordinate interpretation, mapping, and homography errors easier to diagnose.
 - Court geometry temporal persistence carries sparse candidate geometry forward in replay to reduce flicker, but it is display policy only. It does not confirm court geometry and currently uses max-gap/next-observation boundaries rather than real camera-cut boundaries.
 - Real camera/view runtime is not implemented yet.
-- Projection diagnostics project court template geometry for review only; they do not project ball/player detections into court space.
+- Object-to-court projection candidates can project smoothed ball and main-player box candidates into
+  normalized `court_template_2d` coordinates through candidate homographies. They remain derived
+  candidate evidence and do not prove ball location, player location, court truth, bounce, hit,
+  in/out, point, score, or identity.
 - Replay current-only, short-trail, and full-trail controls are display policy only; they do not change persisted evidence or prove tracking correctness.
 - Motion smoothing creates derived replay candidate evidence only. Smoothed ball, player-box, and pose candidates can reduce jitter, but they are not true ball positions, confirmed player boxes, actual pose, trajectory physics, bounce/hit/in-out, point, or score.
 - TOM v1 model binaries may exist locally, but they are intentionally not tracked or uploaded.
@@ -76,6 +79,9 @@ This registry makes TOM v3 Simple boundaries explicit.
 - Replay Mode can display projection diagnostic evidence through `projectionDiagnosticRunId`.
 - Replay Mode can display selectable `NEAR TRACK` / `FAR TRACK` main player track candidate labels through `mainPlayerTrackRunId`; these labels are visual track candidate labels, not identities.
 - Replay Mode can display smoothed replay candidates through `motionSmoothingRunId`; these overlays are visual smoothing candidates, not object truth or tennis-event interpretation.
+- Replay Mode can display object-to-court projection candidates through `courtProjectionRunId` in a
+  normalized court mini-map; those points are candidate template projections, not confirmed court
+  positions or tennis-event facts.
 - Homography candidate overlays and projection diagnostic overlays are display-only candidate geometry; they are not final court models.
 - Camera/view evidence can be queried through API read models and viewed in the replay court evidence context.
 - The fixture court keypoint/line adapter remains available for demos. The TOM v1 court keypoint adapter can write real model-output keypoint rows and derived line candidates, but those rows still require review and do not establish a confirmed court model.
@@ -92,9 +98,9 @@ TOM v3 Simple does not include:
 
 - confirmed homography
 - confirmed court model
-- court-space reasoning
+- confirmed court-space reasoning
 - line-call conclusions
-- court-space projection of detections
+- confirmed court-space projection of detections
 - bounce detection
 - hit detection
 - stroke classification

@@ -70,7 +70,16 @@ export function timelineItemKey(item: ReplayTimelineItem): string {
   if (item.item_type === "projection_diagnostic") {
     return `projection_diagnostic:${item.observation_id}`;
   }
-  return `annotation:${item.annotation_id}`;
+  if (
+    item.item_type === "ball_court_projection_candidate" ||
+    item.item_type === "main_player_court_projection_candidate"
+  ) {
+    return `${item.item_type}:${item.observation_id}`;
+  }
+  if (item.item_type === "annotation") {
+    return `annotation:${item.annotation_id}`;
+  }
+  return `timeline:${item.observation_id}`;
 }
 
 function isSmoothedMotionTimelineItem(

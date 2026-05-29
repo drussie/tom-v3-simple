@@ -30,6 +30,7 @@ interface ReplayEvidenceTimelineProps {
     camera_view: boolean;
     homography_candidates: boolean;
     projection_diagnostics: boolean;
+    court_projection: boolean;
     annotations: boolean;
   };
   onSelectItem: (item: ReplayTimelineItem) => void;

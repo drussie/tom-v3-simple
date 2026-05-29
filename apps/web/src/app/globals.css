@@ -961,6 +961,11 @@ pre {
   background: var(--green);
 }
 
+.timeline-lane-item.tick.ball_court_projection_candidate,
+.timeline-lane-item.tick.main_player_court_projection_candidate {
+  background: var(--blue);
+}
+
 .timeline-lane-item.tick.annotation {
   background: var(--blue);
 }
@@ -1030,6 +1035,88 @@ pre {
   font-size: 12px;
   font-weight: 800;
   text-decoration: none;
+}
+
+.replay-court-projection-panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+  padding: 14px;
+}
+
+.replay-court-projection-header {
+  align-items: start;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.replay-court-projection-header h3,
+.replay-court-projection-panel h3 {
+  font-size: 15px;
+  line-height: 1.25;
+  margin: 2px 0 0;
+}
+
+.replay-court-projection-map {
+  aspect-ratio: 16 / 9;
+  background: color-mix(in srgb, var(--green) 10%, var(--surface));
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  width: 100%;
+}
+
+.court-map-surface {
+  fill: color-mix(in srgb, var(--green) 11%, white);
+  stroke: var(--green);
+  stroke-width: 1.5;
+}
+
+.court-map-line {
+  stroke: color-mix(in srgb, var(--green) 76%, var(--ink));
+  stroke-width: 1;
+}
+
+.court-map-line.muted {
+  opacity: 0.65;
+}
+
+.court-projection-point-group {
+  cursor: pointer;
+}
+
+.court-projection-point-group circle {
+  fill: var(--surface);
+  stroke-width: 3;
+}
+
+.court-projection-point-group text {
+  fill: var(--ink);
+  font-size: 9px;
+  font-weight: 800;
+  paint-order: stroke;
+  stroke: var(--surface);
+  stroke-width: 3px;
+}
+
+.court-projection-point-group.ball circle {
+  stroke: var(--amber);
+}
+
+.court-projection-point-group.player.near circle {
+  stroke: var(--blue);
+}
+
+.court-projection-point-group.player.far circle {
+  stroke: var(--rose);
+}
+
+.court-projection-point-group.selected circle {
+  filter: drop-shadow(0 0 5px rgba(27, 37, 40, 0.45));
+  stroke-width: 4;
 }
 
 .detail-row,

@@ -805,6 +805,24 @@ runs are supplied. These rows are replay smoothing candidates only. They do not 
 detections, tracklets, main player track assignments, or pose observations, and they do not decide
 bounce, hit, in/out, point, score, player identity, or court-space position.
 
+Object-to-court projection candidates:
+
+```bash
+TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_tom_v1_bridge.db \
+.venv/bin/python -m apps.worker.cli project-objects-to-court \
+  --media-id <media_id> \
+  --motion-smoothing-run-id <motion_smoothing_run_id> \
+  --homography-run-id <homography_run_id> \
+  --homography-max-gap-ms 1500 \
+  --viewer-base-url http://127.0.0.1:3000
+```
+
+This creates derived `ball_court_projection_candidate` and
+`main_player_court_projection_candidate` rows by projecting smoothed image-space candidates through
+candidate homography rows into normalized `court_template_2d` coordinates. These projections are
+candidate evidence only. They do not confirm ball location, player location, court truth, bounce,
+hit, in/out, point, score, identity, or adjudication.
+
 Makefile helpers:
 
 ```bash
@@ -820,6 +838,7 @@ make tom-v1-pose MEDIA_ID=<media_id> SOURCE_DETECTION_RUN_ID=<player_real_detect
 make tom-v1-pose-main-subjects MEDIA_ID=<media_id> SOURCE_DETECTION_RUN_ID=<player_real_detection_run_id> SOURCE_SUBJECT_RUN_ID=<main_subject_run_id> PYTHON=.venv/bin/python MAX_FRAMES=214
 make tom-v1-pose-main-tracks MEDIA_ID=<media_id> SOURCE_DETECTION_RUN_ID=<player_real_detection_run_id> SOURCE_SUBJECT_RUN_ID=<main_subject_run_id> SOURCE_TRACK_RUN_ID=<main_player_track_run_id> PYTHON=.venv/bin/python MAX_FRAMES=214
 make tom-v1-motion-smoothing MEDIA_ID=<media_id> DETECTION_RUN_ID=<detection_run_id> TRACKLET_RUN_ID=<tracklet_run_id> MAIN_PLAYER_TRACK_RUN_ID=<main_player_track_run_id> POSE_RUN_ID=<pose_run_id> PYTHON=.venv/bin/python
+make tom-v1-object-court-projection MEDIA_ID=<media_id> MOTION_SMOOTHING_RUN_ID=<motion_smoothing_run_id> HOMOGRAPHY_RUN_ID=<homography_run_id> PYTHON=.venv/bin/python
 ```
 
 The TOM v1 Makefile helpers pass `--allowed-root "$(TOM_V1_MODEL_ROOT)"` and default image sizes that match the local smoke path: 1280 for `best_ball_v2_1280.pt`, 640 for `yolo26x.pt`, 640 for `yolo26x-pose.pt`, and 224 fixed preprocessing for the recognized court keypoint state dict. Override with `IMG_SIZE=<value>` only when testing a deliberate alternate model input size. The court keypoint adapter records requested image size but uses the recognized 224x224 model input convention.
@@ -1293,8 +1312,9 @@ python -m apps.worker.cli completion-audit --no-demo-only
 - Real pose replay is optional and locally gated by pose runtime and weights.
 - Pose is keypoint evidence only, not movement interpretation.
 - Tracklets are candidates, not official rallies or points.
-- Homography candidates and projection diagnostics are geometry evidence only, not final court models.
-- No ball/player court-space projection, bounce, hit, rally, point, score, or adjudication is produced.
+- Homography candidates, projection diagnostics, and object-to-court projection candidates are
+  evidence only, not final court models or object truth.
+- No bounce, hit, rally, point, score, or adjudication is produced.
 - Cloud deployment, auth, production streaming, and multi-camera reasoning are out of scope.
 
 ## 15. Completion Checklist

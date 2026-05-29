@@ -42,7 +42,7 @@ Milestone 7C builds candidate tracklets from real detection runs through the exi
 
 Milestone 7D adds optional real pose replay runs that persist `player_pose_observation` keypoint evidence and render through `poseRunId`. Pose keypoints are evidence only and do not interpret movement, strokes, biomechanics, court position, or tennis events.
 
-Milestone 7E decides that court/camera/homography evidence belongs in Blueprint 8. Blueprint 8E adds replay overlays for persisted court keypoint evidence, court line evidence, camera/view evidence, and homography candidates. Milestone 8F adds projection diagnostic replay payloads/details for persisted diagnostic observations. Ball/player court-space coordinate transforms remain future work.
+Milestone 7E decides that court/camera/homography evidence belongs in Blueprint 8. Blueprint 8E adds replay overlays for persisted court keypoint evidence, court line evidence, camera/view evidence, and homography candidates. Milestone 8F adds projection diagnostic replay payloads/details for persisted diagnostic observations. Object-to-Court Projection Candidates v0 adds derived ball and main-player court-template projection candidates through `courtProjectionRunId`; these remain evidence-only candidates, not court truth or tennis-event conclusions.
 
 Milestone 7F closes Blueprint 7 with the final perception orchestration path:
 
@@ -97,6 +97,14 @@ Pose overlays default to a limb-only visual style for both raw and smoothed pose
 limbs render blue, right-side limbs render red, and neutral/cross-body lines stay subtle. Operators
 can switch to `Limbs + joints` or `Joints only/debug` when they need to audit raw keypoint markers.
 This is display-only styling; it does not classify strokes, body mechanics, hits, or tennis events.
+
+Object-to-Court Projection Candidates v0 adds `courtProjectionRunId` replay support for derived
+`ball_court_projection_candidate` and `main_player_court_projection_candidate` rows. Replay exposes
+these through `ball_court_projection` and `main_player_court_projection` payloads, a
+`court_projection` timeline lane, selected evidence details, and a normalized court-template
+mini-map. The mini-map labels points as `BALL CANDIDATE`, `NEAR PLAYER CANDIDATE`, and
+`FAR PLAYER CANDIDATE`. It intentionally does not draw those normalized template coordinates over
+the broadcast video or present them as true object locations.
 
 ## What 6A Added
 
@@ -332,7 +340,7 @@ Real pose replay runs appear in the pose run group. Their optional metadata incl
 `GET /replay/overlays` returns replay overlay data for a media/time window:
 
 ```text
-GET /replay/overlays?media_id=<media_id>&start_ms=0&end_ms=2000&layers=detections,tracklets,pose,court_keypoints,court_lines,camera_view,homography_candidates,projection_diagnostics&detection_run_id=<run_id>&tracklet_run_id=<run_id>&pose_run_id=<run_id>&court_run_id=<run_id>&homography_run_id=<run_id>&projection_diagnostic_run_id=<run_id>
+GET /replay/overlays?media_id=<media_id>&start_ms=0&end_ms=2000&layers=detections,tracklets,pose,court_keypoints,court_lines,camera_view,homography_candidates,projection_diagnostics,ball_court_projection,main_player_court_projection&detection_run_id=<run_id>&tracklet_run_id=<run_id>&pose_run_id=<run_id>&court_run_id=<run_id>&homography_run_id=<run_id>&projection_diagnostic_run_id=<run_id>&court_projection_run_id=<run_id>
 ```
 
 The response includes selected overlay families:
@@ -431,7 +439,7 @@ For 7D, selected pose detail shows source runtime, model registry id, model name
 and optional run filters:
 
 ```text
-GET /replay/timeline?media_id=<media_id>&detection_run_id=<run_id>&tracklet_run_id=<run_id>&pose_run_id=<run_id>&court_run_id=<run_id>&homography_run_id=<run_id>&projection_diagnostic_run_id=<run_id>
+GET /replay/timeline?media_id=<media_id>&detection_run_id=<run_id>&tracklet_run_id=<run_id>&pose_run_id=<run_id>&court_run_id=<run_id>&homography_run_id=<run_id>&projection_diagnostic_run_id=<run_id>&court_projection_run_id=<run_id>
 ```
 
 The response includes:
@@ -449,6 +457,7 @@ The response includes:
     { "lane_type": "tracklets", "label": "Tracklet candidates", "items": [] },
     { "lane_type": "pose", "label": "Pose observations", "items": [] },
     { "lane_type": "projection_diagnostics", "label": "Projection diagnostics", "items": [] },
+    { "lane_type": "court_projection", "label": "Court projection candidates", "items": [] },
     { "lane_type": "annotations", "label": "Review annotations", "items": [] }
   ]
 }
@@ -504,15 +513,17 @@ http://127.0.0.1:3000/replay/<media_id>
 Optional context query parameters:
 
 ```text
-?detectionRunId=<run_id>&trackletRunId=<run_id>&poseRunId=<run_id>&courtRunId=<run_id>&homographyRunId=<run_id>&projectionDiagnosticRunId=<run_id>
+?detectionRunId=<run_id>&trackletRunId=<run_id>&poseRunId=<run_id>&courtRunId=<run_id>&homographyRunId=<run_id>&projectionDiagnosticRunId=<run_id>&courtProjectionRunId=<run_id>
 ```
 
-`detectionRunId`, `trackletRunId`, `poseRunId`, `courtRunId`, `homographyRunId`, and `projectionDiagnosticRunId` select the persisted evidence runs used for replay overlay playback.
+`detectionRunId`, `trackletRunId`, `poseRunId`, `courtRunId`, `homographyRunId`,
+`projectionDiagnosticRunId`, and `courtProjectionRunId` select the persisted evidence runs used for
+replay overlay playback.
 
 Open Stream Proxy Mode:
 
 ```text
-?mode=stream_proxy&detectionRunId=<run_id>&trackletRunId=<run_id>&poseRunId=<run_id>&courtRunId=<run_id>&homographyRunId=<run_id>&projectionDiagnosticRunId=<run_id>
+?mode=stream_proxy&detectionRunId=<run_id>&trackletRunId=<run_id>&poseRunId=<run_id>&courtRunId=<run_id>&homographyRunId=<run_id>&projectionDiagnosticRunId=<run_id>&courtProjectionRunId=<run_id>
 ```
 
 In Stream Proxy Mode, future evidence is not rendered in overlays or timeline
