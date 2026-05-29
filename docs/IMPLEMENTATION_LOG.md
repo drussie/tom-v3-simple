@@ -1,5 +1,34 @@
 # TOM v3 Simple - Implementation Log
 
+## TOM v1 Court Keypoints + Homography Adapter
+
+Status: complete when accepted
+
+### Goal
+
+Bridge `model_assets/tom_v1/keypoints_model.pth` into the TOM v3 court evidence system so court geometry can be generated from real model output instead of only fixture geometry.
+
+### Outcome
+
+The repair bridge adds:
+
+- `tom-v1-court-keypoints-probe` for local model inspection
+- `run-real-court-keypoints` for real court keypoint observation persistence
+- a TOM v1 ResNet50 fc28 keypoint adapter with fixed 224x224 preprocessing
+- v0 mapping from 14 TOM v1 raw points to TOM v3's 12-point `tennis_court_v0` schema
+- derived court line candidates when required keypoints are present
+- replay metadata that distinguishes fixture court evidence from real court keypoint model output
+- homography source metadata that preserves whether source court evidence came from real keypoints
+- focused tests using a fake court keypoint provider, with no model-file requirement
+
+### Non-goals
+
+- No court truth or accepted/rejected lifecycle.
+- No ball/player court-space projection.
+- No bounce/hit/in-out/rally/point/scoring.
+- No player names, scoreboard OCR, or server/receiver logic.
+- No adjudication.
+
 ## Main Player Track Assignment v0.1 Replay Labels and Locking
 
 Status: complete when accepted

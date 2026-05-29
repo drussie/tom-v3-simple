@@ -4,6 +4,7 @@ from collections.abc import Callable
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
+from tom_v3_model_adapters.court_keypoints import probe_tom_v1_court_keypoint_model
 from tom_v3_model_adapters.yolo_runtime import probe_yolo_runtime
 from tom_v3_model_adapters.yolo_weights import (
     YoloClassMappingError,
@@ -36,6 +37,7 @@ from apps.worker.services.main_subject_filter import select_main_player_subjects
 from apps.worker.services.media_indexer import index_media
 from apps.worker.services.pose_adapter import run_pose_adapter
 from apps.worker.services.projection_diagnostic_builder import build_projection_diagnostics
+from apps.worker.services.real_court_keypoint_replay import run_real_court_keypoint_replay
 from apps.worker.services.real_detection_replay import run_real_detection_replay
 from apps.worker.services.real_pose_replay import run_real_pose_replay
 from apps.worker.services.real_yolo_smoke import run_real_yolo_local_smoke
@@ -571,6 +573,58 @@ def main() -> None:
     )
     fixture_court_parser.add_argument("--skip-create-db", action="store_true")
     fixture_court_parser.set_defaults(handler=_handle_run_fixture_court)
+
+    court_keypoint_probe_parser = subcommands.add_parser(
+        "tom-v1-court-keypoints-probe",
+        help="Inspect local TOM v1 court keypoint weights without writing observations.",
+    )
+    court_keypoint_probe_parser.add_argument("--weights", required=True)
+    court_keypoint_probe_parser.add_argument(
+        "--allowed-root",
+        action="append",
+        dest="allowed_roots",
+        help="Allowed local root for weights. May be supplied more than once.",
+    )
+    court_keypoint_probe_parser.add_argument("--skip-create-db", action="store_true")
+    court_keypoint_probe_parser.set_defaults(
+        handler=_handle_tom_v1_court_keypoints_probe,
+        skip_create_db=True,
+    )
+
+    real_court_keypoints_parser = subcommands.add_parser(
+        "run-real-court-keypoints",
+        help="Run local TOM v1 court keypoint model output into court evidence observations.",
+    )
+    real_court_keypoints_parser.add_argument("--media-id", required=True)
+    real_court_keypoints_parser.add_argument("--weights", required=True)
+    real_court_keypoints_parser.add_argument("--model-name", default="tom-v1-court-keypoints")
+    real_court_keypoints_parser.add_argument("--model-version", default="v1-local")
+    real_court_keypoints_parser.add_argument("--run-name", default="real-court-keypoints-replay")
+    real_court_keypoints_parser.add_argument("--device", default="auto")
+    real_court_keypoints_parser.add_argument("--img-size", type=int, default=224)
+    real_court_keypoints_parser.add_argument("--every-n-frames", type=int, default=30)
+    real_court_keypoints_parser.add_argument("--frame-start", type=int)
+    real_court_keypoints_parser.add_argument("--frame-end", type=int)
+    real_court_keypoints_parser.add_argument("--max-frames", type=int, default=214)
+    real_court_keypoints_parser.add_argument("--viewer-base-url", default="http://127.0.0.1:3000")
+    real_court_keypoints_parser.add_argument(
+        "--derive-lines",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+    )
+    real_court_keypoints_parser.add_argument(
+        "--allowed-root",
+        action="append",
+        dest="allowed_roots",
+        help="Allowed local root for weights. May be supplied more than once.",
+    )
+    real_court_keypoints_parser.add_argument(
+        "--plan-only",
+        action="store_true",
+        help="Print the real court keypoint plan without touching observations.",
+    )
+    real_court_keypoints_parser.add_argument("--skip-create-db", action="store_true")
+    real_court_keypoints_parser.set_defaults(handler=_handle_run_real_court_keypoints)
 
     homography_parser = subcommands.add_parser(
         "build-homography-candidates",
@@ -1109,6 +1163,40 @@ def _handle_run_fixture_court(
         max_frames=args.max_frames,
         run_name=args.run_name,
         viewer_base_url=args.viewer_base_url,
+        plan_only=args.plan_only,
+    )
+
+
+def _handle_tom_v1_court_keypoints_probe(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    return probe_tom_v1_court_keypoint_model(
+        weights_path=args.weights,
+        allowed_roots=args.allowed_roots,
+    )
+
+
+def _handle_run_real_court_keypoints(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    return run_real_court_keypoint_replay(
+        session=session,
+        media_id=args.media_id,
+        weights_path=args.weights,
+        model_name=args.model_name,
+        model_version=args.model_version,
+        run_name=args.run_name,
+        device=args.device,
+        img_size=args.img_size,
+        every_n_frames=args.every_n_frames,
+        frame_start=args.frame_start,
+        frame_end=args.frame_end,
+        max_frames=args.max_frames,
+        allowed_roots=args.allowed_roots,
+        viewer_base_url=args.viewer_base_url,
+        derive_lines=args.derive_lines,
         plan_only=args.plan_only,
     )
 

@@ -1561,14 +1561,19 @@ def _court_run_summaries(session: Session, media_id: str) -> list[dict[str, Any]
     counts_by_run_type = _counts_by_run_and_type(session, media_id, COURT_EVIDENCE_TYPES)
     for summary in summaries:
         run_id = summary["run_id"]
+        is_real_model_output = bool(summary.get("is_real_model_output"))
+        is_fixture = bool(summary.get("is_fixture"))
+        evidence_source = (
+            "real_model_output"
+            if is_real_model_output
+            else "fixture_court_evidence"
+            if is_fixture
+            else "court_evidence"
+        )
         summary.update(
             {
-                "evidence_source": "fixture_court_evidence"
-                if summary.get("is_fixture")
-                else "court_evidence",
-                "source_label": "fixture court evidence"
-                if summary.get("is_fixture")
-                else "court evidence",
+                "evidence_source": evidence_source,
+                "source_label": _source_label(evidence_source),
                 "court_keypoint_count": counts_by_run_type.get(
                     (run_id, "court_keypoint_observation"), 0
                 ),
@@ -1579,8 +1584,9 @@ def _court_run_summaries(session: Session, media_id: str) -> list[dict[str, Any]
                     (run_id, "camera_view_observation"), 0
                 ),
                 "geometry_evidence_only": True,
-                "is_real_model_output": False,
-                "model_output_not_truth": False,
+                "is_fixture": is_fixture,
+                "is_real_model_output": is_real_model_output,
+                "model_output_not_truth": is_real_model_output,
             }
         )
     return summaries
@@ -2059,6 +2065,17 @@ def _court_source_metadata(
     diagnostic_geometry = _truthy(metadata.get("diagnostic_geometry")) or _truthy(
         payload.get("diagnostic_geometry")
     )
+    real_model_output = (
+        _truthy(metadata.get("real_model_output"))
+        or _truthy(payload.get("real_model_output"))
+        or _truthy(metadata.get("tom_v1_court_keypoint_model_output"))
+        or _truthy(payload.get("tom_v1_court_keypoint_model_output"))
+    )
+    model_output_not_truth = (
+        real_model_output
+        or _truthy(metadata.get("model_output_not_truth"))
+        or _truthy(payload.get("model_output_not_truth"))
+    )
     geometry_evidence_only = (
         _truthy(metadata.get("geometry_evidence_only"))
         or _truthy(payload.get("geometry_evidence_only"))
@@ -2074,12 +2091,19 @@ def _court_source_metadata(
             resolved_evidence_source = "fixture_court_evidence"
         elif fixture_camera_view_evidence:
             resolved_evidence_source = "fixture_camera_view_evidence"
+        elif real_model_output:
+            resolved_evidence_source = "real_model_output"
         else:
             resolved_evidence_source = "court_evidence"
+    resolved_source_label = source_label
+    if real_model_output and source_label == "court keypoint evidence":
+        resolved_source_label = "real court keypoint model output"
+    elif real_model_output and source_label == "court line evidence":
+        resolved_source_label = "derived court line candidate"
 
     return {
         "evidence_source": resolved_evidence_source,
-        "source_label": source_label,
+        "source_label": resolved_source_label,
         "source_runtime": _string_or_none(payload.get("source_runtime"))
         or _string_or_none(metadata.get("source_runtime")),
         "model_registry_id": row.model_id,
@@ -2096,8 +2120,9 @@ def _court_source_metadata(
         "observation_only": True,
         "no_adjudication": True,
         "is_fixture": fixture_court_evidence or fixture_camera_view_evidence,
-        "is_real_model_output": False,
-        "model_output_not_truth": False,
+        "is_real_model_output": real_model_output,
+        "real_model_output": real_model_output,
+        "model_output_not_truth": model_output_not_truth,
     }
 
 
@@ -2183,6 +2208,8 @@ def _source_label(evidence_source: str) -> str:
         return "real pose model output"
     if evidence_source == "real_model_output":
         return "real model output"
+    if evidence_source == "court_real_model_output":
+        return "real court keypoint model output"
     if evidence_source == "fixture_demo":
         return "fixture evidence"
     if evidence_source == "real_detection_derived_tracklet":

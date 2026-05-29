@@ -10,7 +10,7 @@ This registry makes TOM v3 Simple boundaries explicit.
 - TOM v1 model assets under `model_assets/tom_v1/` are local-only ignored files and are not part of the repository.
 - TOM v1 bridge helpers can run local smoke when optional runtime and model files are present; they do not prove ball/player tracking quality.
 - TOM v1 ball/player detection smoke depends on optional YOLO runtime compatibility, class mapping, confidence thresholds, source media, and device.
-- TOM v1 `keypoints_model.pth` and `view_classifier_gameplay.pt` require future TOM v1-specific adapters; they are not supported by the existing YOLO detection path unless compatibility is proven later.
+- TOM v1 `keypoints_model.pth` is supported through the TOM v1 court keypoint adapter path, not through YOLO. TOM v1 `view_classifier_gameplay.pt` still requires a future TOM v1-specific adapter.
 - Real YOLO detection quality depends on the chosen model, class mapping, source video, device, and confidence settings.
 - Real YOLO detection replay is optional and local-runtime dependent.
 - Real YOLO detections are model-output observations; they do not establish ball/player state.
@@ -32,7 +32,8 @@ This registry makes TOM v3 Simple boundaries explicit.
 - Fixture court evidence is schema/provenance plumbing, not a real court model.
 - Camera/view summaries are geometry context read models; they do not confirm camera state or homography validity.
 - Homography candidates and overlays are candidate geometry evidence; they do not confirm a court model or camera geometry.
-- Real court/camera/homography runtime is not implemented yet.
+- Real TOM v1 court keypoint model output can be persisted as court evidence, but mapping/preprocessing and homography fit quality still require visual audit. It is model-output geometry evidence, not court truth.
+- Real camera/view runtime is not implemented yet.
 - Projection diagnostics project court template geometry for review only; they do not project ball/player detections into court space.
 - Replay current-only, short-trail, and full-trail controls are display policy only; they do not change persisted evidence or prove tracking correctness.
 - TOM v1 model binaries may exist locally, but they are intentionally not tracked or uploaded.
@@ -70,7 +71,7 @@ This registry makes TOM v3 Simple boundaries explicit.
 - Replay Mode can display selectable `NEAR TRACK` / `FAR TRACK` main player track candidate labels through `mainPlayerTrackRunId`; these labels are visual track candidate labels, not identities.
 - Homography candidate overlays and projection diagnostic overlays are display-only candidate geometry; they are not final court models.
 - Camera/view evidence can be queried through API read models and viewed in the replay court evidence context.
-- The court keypoint/line adapter is fixture-only; no real court keypoint or line model is implemented yet.
+- The fixture court keypoint/line adapter remains available for demos. The TOM v1 court keypoint adapter can write real model-output keypoint rows and derived line candidates, but those rows still require review and do not establish a confirmed court model.
 - There is no production deployment workflow.
 - There is no auth or user management.
 - There is no cloud storage lifecycle.

@@ -71,12 +71,15 @@ Likely usable through the existing TOM v3 real pose path:
 
 - `model_assets/tom_v1/yolo26x-pose.pt`
 
-Requires future TOM v1-specific adapters:
+Usable through the TOM v1 court keypoint adapter:
 
 - `model_assets/tom_v1/keypoints_model.pth`
+
+Requires future TOM v1-specific adapters:
+
 - `model_assets/tom_v1/view_classifier_gameplay.pt`
 
-Do not force `.pth` court keypoint or gameplay classifier assets through the YOLO detector path unless compatibility is proven.
+Do not force `.pth` court keypoint or gameplay classifier assets through the YOLO detector path unless compatibility is proven. The court keypoint model is handled by `tom-v1-court-keypoints-probe` and `run-real-court-keypoints`.
 
 ## Runtime Probe
 
@@ -149,6 +152,24 @@ make tom-v1-pose \
 ```
 
 This helper uses `yolo26x-pose.pt`, passes `--allowed-root model_assets/tom_v1`, and defaults to `--imgsz 640`.
+
+Court keypoint probe:
+
+```bash
+make tom-v1-court-keypoints-probe PYTHON=.venv/bin/python
+```
+
+Real court keypoints:
+
+```bash
+make tom-v1-court-keypoints \
+  MEDIA_ID=<media_id> \
+  PYTHON=.venv/bin/python \
+  MAX_FRAMES=214 \
+  EVERY_N_FRAMES=30
+```
+
+This helper uses `keypoints_model.pth`, passes `--allowed-root model_assets/tom_v1`, and writes real model-output `court_keypoint_observation` rows plus derived `court_line_observation` candidates when enough keypoints are present. The recognized TOM v1 keypoint state dict uses fixed 224x224 preprocessing and records requested image size as runtime metadata.
 
 Main tennis-player subject filtering:
 

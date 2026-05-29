@@ -33,6 +33,8 @@ adapter or model output
 -> replayable evidence
 ```
 
+Current repair/bridge status: fixture court evidence remains available for schema and replay demos, but it is not visually trusted on real video. The TOM v1 court keypoint adapter now provides a real model-output path from `model_assets/tom_v1/keypoints_model.pth` into `court_keypoint_observation` rows and derived court line candidates. Homography and projection diagnostics built from those rows are still candidate geometry evidence, not court truth.
+
 Court evidence should not mean:
 
 - bounce location

@@ -6,6 +6,8 @@ Projection diagnostics are review evidence. They project the normalized court te
 
 They do not confirm a court model, project ball/player observations into court space, decide line calls, infer bounce/hit events, or add adjudication.
 
+Projection diagnostics can now be built from homography candidates whose source court keypoints came from the TOM v1 real court keypoint adapter. Those diagnostics are still review evidence. A better-looking projection is not a verified court, and a poor projection should be treated as evidence of model, mapping, preprocessing, or fit uncertainty.
+
 ## Flow
 
 ```text

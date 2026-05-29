@@ -537,7 +537,8 @@ Immediate supported paths:
 
 - likely usable now through existing TOM v3 real YOLO detection: `best_ball_v2_1280.pt`, `yolo26x.pt`, `yolo26n.pt`, `yolo26s.pt`
 - likely usable now through existing TOM v3 real pose: `yolo26x-pose.pt`
-- future TOM v1-specific adapter required: `keypoints_model.pth`, `view_classifier_gameplay.pt`
+- usable through the TOM v1 court keypoint adapter: `keypoints_model.pth`
+- future TOM v1-specific adapter required: `view_classifier_gameplay.pt`
 
 Probe optional runtime:
 
@@ -618,6 +619,65 @@ TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_tom_v1_bridge.db \
   --conf 0.25 \
   --allowed-root model_assets/tom_v1
 ```
+
+TOM v1 court keypoint probe:
+
+```bash
+TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_tom_v1_bridge.db \
+.venv/bin/python -m apps.worker.cli tom-v1-court-keypoints-probe \
+  --weights model_assets/tom_v1/keypoints_model.pth \
+  --allowed-root model_assets/tom_v1
+```
+
+Expected local format:
+
+```text
+load_strategy = torch_load_state_dict
+recognized_architecture = torchvision_resnet50_fc28_xy224
+raw_output_pair_count = 14
+expected_adapter_status = ready
+```
+
+TOM v1 real court keypoints:
+
+```bash
+TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_tom_v1_bridge.db \
+.venv/bin/python -m apps.worker.cli run-real-court-keypoints \
+  --media-id <media_id> \
+  --weights model_assets/tom_v1/keypoints_model.pth \
+  --model-name tom-v1-court-keypoints \
+  --model-version v1-local \
+  --device auto \
+  --img-size 640 \
+  --every-n-frames 30 \
+  --max-frames 214 \
+  --allowed-root model_assets/tom_v1 \
+  --viewer-base-url http://127.0.0.1:3000
+```
+
+This persists real model-output `court_keypoint_observation` rows and, when enough keypoints are present, derived `court_line_observation` candidates. The keypoints and lines are geometry evidence only, not court truth.
+
+Homography and projection diagnostics from real court keypoints:
+
+```bash
+TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_tom_v1_bridge.db \
+.venv/bin/python -m apps.worker.cli build-homography-candidates \
+  --media-id <media_id> \
+  --court-run-id <real_court_run_id>
+
+TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_tom_v1_bridge.db \
+.venv/bin/python -m apps.worker.cli build-projection-diagnostics \
+  --media-id <media_id> \
+  --homography-run-id <homography_run_id>
+```
+
+Replay with the real court run:
+
+```text
+/replay/<media_id>?courtRunId=<real_court_run_id>&homographyRunId=<homography_run_id>&projectionDiagnosticRunId=<projection_diagnostic_run_id>
+```
+
+Replay labels distinguish `real court keypoint model output`, `derived court line candidate`, `homography candidate`, and `projection diagnostic`. These labels describe provenance, not correctness.
 
 Main tennis-player subject filter:
 
@@ -701,12 +761,14 @@ make tom-v1-player-detection MEDIA_ID=<media_id> PYTHON=.venv/bin/python MAX_FRA
 make tom-v1-tracklets DETECTION_RUN_ID=<real_detection_run_id> PYTHON=.venv/bin/python
 make tom-v1-main-subjects MEDIA_ID=<media_id> DETECTION_RUN_ID=<player_real_detection_run_id> PYTHON=.venv/bin/python MAX_FRAMES=214
 make tom-v1-main-player-tracks MEDIA_ID=<media_id> DETECTION_RUN_ID=<player_real_detection_run_id> SOURCE_SUBJECT_RUN_ID=<main_subject_run_id> PYTHON=.venv/bin/python MAX_FRAMES=214
+make tom-v1-court-keypoints-probe PYTHON=.venv/bin/python
+make tom-v1-court-keypoints MEDIA_ID=<media_id> PYTHON=.venv/bin/python MAX_FRAMES=214 EVERY_N_FRAMES=30
 make tom-v1-pose MEDIA_ID=<media_id> SOURCE_DETECTION_RUN_ID=<player_real_detection_run_id> PYTHON=.venv/bin/python MAX_FRAMES=214
 make tom-v1-pose-main-subjects MEDIA_ID=<media_id> SOURCE_DETECTION_RUN_ID=<player_real_detection_run_id> SOURCE_SUBJECT_RUN_ID=<main_subject_run_id> PYTHON=.venv/bin/python MAX_FRAMES=214
 make tom-v1-pose-main-tracks MEDIA_ID=<media_id> SOURCE_DETECTION_RUN_ID=<player_real_detection_run_id> SOURCE_SUBJECT_RUN_ID=<main_subject_run_id> SOURCE_TRACK_RUN_ID=<main_player_track_run_id> PYTHON=.venv/bin/python MAX_FRAMES=214
 ```
 
-The TOM v1 Makefile helpers pass `--allowed-root "$(TOM_V1_MODEL_ROOT)"` and default image sizes that match the local smoke path: 1280 for `best_ball_v2_1280.pt`, 640 for `yolo26x.pt`, and 640 for `yolo26x-pose.pt`. Override with `IMG_SIZE=<value>` only when testing a deliberate alternate model input size.
+The TOM v1 Makefile helpers pass `--allowed-root "$(TOM_V1_MODEL_ROOT)"` and default image sizes that match the local smoke path: 1280 for `best_ball_v2_1280.pt`, 640 for `yolo26x.pt`, 640 for `yolo26x-pose.pt`, and 224 fixed preprocessing for the recognized court keypoint state dict. Override with `IMG_SIZE=<value>` only when testing a deliberate alternate model input size. The court keypoint adapter records requested image size but uses the recognized 224x224 model input convention.
 
 Class mapping warning:
 

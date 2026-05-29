@@ -2090,6 +2090,9 @@ function courtSourceDisplayLabel(item: {
   source_label?: string | null;
   fixture_court_evidence?: boolean;
   fixture_camera_view_evidence?: boolean;
+  real_model_output?: boolean;
+  is_real_model_output?: boolean;
+  model_output_not_truth?: boolean;
   candidate_geometry?: boolean;
   diagnostic_geometry?: boolean;
   not_ball_player_projection?: boolean;
@@ -2112,6 +2115,13 @@ function courtSourceDisplayLabel(item: {
     item.evidence_source === "fixture_camera_view_evidence"
   ) {
     return "Fixture camera/view evidence";
+  }
+  if (
+    item.real_model_output ||
+    item.is_real_model_output ||
+    item.evidence_source === "real_model_output"
+  ) {
+    return item.source_label ?? "Real court keypoint model output";
   }
   return item.source_label ?? "Court geometry evidence";
 }

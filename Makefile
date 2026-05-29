@@ -23,6 +23,7 @@ TOM_V1_MODEL_ROOT ?= model_assets/tom_v1
 TOM_V1_BALL_CONF ?= 0.10
 TOM_V1_PLAYER_CONF ?= 0.25
 TOM_V1_POSE_CONF ?= 0.25
+TOM_V1_COURT_KEYPOINT_IMG_SIZE ?= 224
 MODEL_NAME ?=
 MODEL_VERSION ?= v0
 REQUIRED_SHA256 ?=
@@ -56,10 +57,11 @@ HOMOGRAPHY_RUN_ID ?=
 PROJECTION_DIAGNOSTIC_RUN_NAME ?= projection-diagnostic-builder
 PROJECTION_DIAGNOSTIC_RUN_ID ?=
 MIN_KEYPOINT_CONFIDENCE ?= 0.0
+DERIVE_LINES ?= true
 
 export TOM_V3_DATABASE_URL
 
-.PHONY: install web-install test lint migrate api seed verify index-media run-gameplay index-and-run-gameplay run-detection index-and-run-detection extract-frame-artifacts build-tracklets run-pose export-tracklet-review-dataset court-review-export demo demo-fixture demo-plan demo-reset demo-export demo-open replay-open completion-audit completion-check yolo-probe yolo-smoke yolo-runtime-probe register-yolo-model smoke-real-yolo-local real-detection real-pose tom-v1-yolo-probe tom-v1-ball-detection tom-v1-player-detection tom-v1-tracklets tom-v1-main-subjects tom-v1-main-player-tracks tom-v1-pose tom-v1-pose-main-subjects tom-v1-pose-main-tracks court-fixture homography-candidates projection-diagnostics web web-build web-lint smoke all-checks
+.PHONY: install web-install test lint migrate api seed verify index-media run-gameplay index-and-run-gameplay run-detection index-and-run-detection extract-frame-artifacts build-tracklets run-pose export-tracklet-review-dataset court-review-export demo demo-fixture demo-plan demo-reset demo-export demo-open replay-open completion-audit completion-check yolo-probe yolo-smoke yolo-runtime-probe register-yolo-model smoke-real-yolo-local real-detection real-pose tom-v1-yolo-probe tom-v1-ball-detection tom-v1-player-detection tom-v1-tracklets tom-v1-main-subjects tom-v1-main-player-tracks tom-v1-pose tom-v1-pose-main-subjects tom-v1-pose-main-tracks tom-v1-court-keypoints-probe tom-v1-court-keypoints court-fixture homography-candidates projection-diagnostics web web-build web-lint smoke all-checks
 
 install:
 	$(PYTHON) -m pip install -e ".[dev]"
@@ -246,6 +248,13 @@ tom-v1-pose-main-tracks:
 	@if [ -z "$(SOURCE_SUBJECT_RUN_ID)" ]; then echo "SOURCE_SUBJECT_RUN_ID is required: make tom-v1-pose-main-tracks SOURCE_SUBJECT_RUN_ID=<main_subject_run_id>"; exit 1; fi
 	@if [ -z "$(SOURCE_TRACK_RUN_ID)" ]; then echo "SOURCE_TRACK_RUN_ID is required: make tom-v1-pose-main-tracks SOURCE_TRACK_RUN_ID=<main_player_track_run_id>"; exit 1; fi
 	$(PYTHON) -m apps.worker.cli run-real-pose --media-id "$(MEDIA_ID)" --source-detection-run-id "$(SOURCE_DETECTION_RUN_ID)" --source-subject-run-id "$(SOURCE_SUBJECT_RUN_ID)" --source-track-run-id "$(SOURCE_TRACK_RUN_ID)" --weights "$(TOM_V1_MODEL_ROOT)/yolo26x-pose.pt" --model-name tom-v1-yolo26x-pose --model-version v1-local --mode crop_from_player_detection --device "$(YOLO_DEVICE)" --imgsz "$(if $(IMG_SIZE),$(IMG_SIZE),640)" --every-n-frames "$(EVERY_N_FRAMES)" --max-frames "$(MAX_FRAMES)" --conf "$(TOM_V1_POSE_CONF)" --iou "$(IOU)" --viewer-base-url "$(VIEWER_BASE_URL)" --allowed-root "$(TOM_V1_MODEL_ROOT)" $(if $(FRAME_START),--frame-start "$(FRAME_START)",) $(if $(FRAME_END),--frame-end "$(FRAME_END)",) $(if $(filter true,$(FALLBACK_TO_FULL_FRAME)),--fallback-to-full-frame,--no-fallback-to-full-frame) $(if $(filter true,$(PLAN_ONLY)),--plan-only,)
+
+tom-v1-court-keypoints-probe:
+	$(PYTHON) -m apps.worker.cli tom-v1-court-keypoints-probe --weights "$(TOM_V1_MODEL_ROOT)/keypoints_model.pth" --allowed-root "$(TOM_V1_MODEL_ROOT)"
+
+tom-v1-court-keypoints:
+	@if [ -z "$(MEDIA_ID)" ]; then echo "MEDIA_ID is required: make tom-v1-court-keypoints MEDIA_ID=<media_id>"; exit 1; fi
+	$(PYTHON) -m apps.worker.cli run-real-court-keypoints --media-id "$(MEDIA_ID)" --weights "$(TOM_V1_MODEL_ROOT)/keypoints_model.pth" --model-name tom-v1-court-keypoints --model-version v1-local --device "$(YOLO_DEVICE)" --img-size "$(if $(IMG_SIZE),$(IMG_SIZE),$(TOM_V1_COURT_KEYPOINT_IMG_SIZE))" --every-n-frames "$(EVERY_N_FRAMES)" --max-frames "$(MAX_FRAMES)" --viewer-base-url "$(VIEWER_BASE_URL)" --allowed-root "$(TOM_V1_MODEL_ROOT)" $(if $(FRAME_START),--frame-start "$(FRAME_START)",) $(if $(FRAME_END),--frame-end "$(FRAME_END)",) $(if $(filter false,$(DERIVE_LINES)),--no-derive-lines,--derive-lines) $(if $(filter true,$(PLAN_ONLY)),--plan-only,)
 
 court-fixture:
 	@if [ -z "$(MEDIA_ID)" ]; then echo "MEDIA_ID is required: make court-fixture MEDIA_ID=<media_id>"; exit 1; fi

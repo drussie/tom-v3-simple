@@ -15,6 +15,8 @@ indexed media
 -> source court evidence lineage
 ```
 
+The same persistence path can also consume real model-output `court_keypoint_observation` rows from the TOM v1 court keypoint adapter. In that case, homography metadata preserves source provenance such as `source_court_evidence_source = real_model_output` and `source_court_keypoint_real_model_output = true`.
+
 Homography candidates are candidate geometry evidence. They are not confirmed court models, true transforms, in/out decisions, bounce locations, hit events, rally state, point reconstruction, or score evidence.
 
 ## Command
@@ -56,7 +58,7 @@ The v0 builder consumes persisted `court_keypoint_observation` rows from a sourc
 - uses a bounded builder confidence score
 - links optional source `court_line_observation` and `camera_view_observation` rows from the same frame when present
 
-The v0 matrix method is a lightweight axis-aligned affine fit suitable for deterministic fixture evidence. It is intentionally labeled as candidate geometry, not a confirmed court model.
+The v0 matrix method is a lightweight axis-aligned affine fit. It can be used with fixture or real keypoint rows, but it is still intentionally labeled as candidate geometry, not a confirmed court model. If real keypoints produce a poor overlay, treat that as model/mapping/fit uncertainty.
 
 ## Persisted Observation
 

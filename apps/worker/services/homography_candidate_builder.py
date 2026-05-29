@@ -617,7 +617,12 @@ def _persist_homography_candidates(
             source_line_count=line_count,
             confidence=candidate["confidence"],
             status="candidate",
-            metadata_jsonb=_metadata(candidate, line=line, camera=camera),
+            metadata_jsonb=_metadata(candidate, keypoint=keypoint, line=line, camera=camera),
+        )
+        source_metadata = _source_court_evidence_metadata(
+            keypoint=keypoint,
+            line=line,
+            camera=camera,
         )
         observations.append(
             writer.write(
@@ -638,6 +643,7 @@ def _persist_homography_candidates(
                     payload_jsonb=_observation_payload(
                         step=step,
                         typed_payload=homography.model_dump(mode="json"),
+                        source_metadata=source_metadata,
                     ),
                     idempotency_key=(
                         f"{run.id}:homography-candidate:{keypoint.frame_number}"
@@ -667,6 +673,7 @@ def _lineage(
         "candidate_geometry": True,
         "observation_only": True,
         "no_adjudication": True,
+        **_source_court_evidence_metadata(keypoint=keypoint, line=line, camera=camera),
     }
     lineage = [
         ObservationLineageCreate(
@@ -709,6 +716,7 @@ def _lineage(
 def _metadata(
     candidate: dict[str, Any],
     *,
+    keypoint: CourtKeypointObservation,
     line: CourtLineObservation | None,
     camera: CameraViewObservation | None,
 ) -> dict[str, Any]:
@@ -727,6 +735,7 @@ def _metadata(
         "source_camera_view_observation_id": (
             camera.observation_id if camera is not None else None
         ),
+        **_source_court_evidence_metadata(keypoint=keypoint, line=line, camera=camera),
         "no_projection_diagnostics": True,
         "no_ball_player_court_projection": True,
         "no_tennis_event_interpretation": True,
@@ -737,6 +746,7 @@ def _observation_payload(
     *,
     step: ProcessingStep,
     typed_payload: dict[str, Any],
+    source_metadata: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     return {
         "observation_type": "homography_candidate_observation",
@@ -752,10 +762,56 @@ def _observation_payload(
         "frame_time_owner": "media_indexing",
         "court_template_name": COURT_TEMPLATE_NAME,
         "court_template_version": COURT_TEMPLATE_VERSION,
+        **(source_metadata or {}),
         "no_projection_diagnostics": True,
         "no_ball_player_court_projection": True,
         "no_tennis_event_interpretation": True,
         "typed_payload": typed_payload,
+    }
+
+
+def _source_court_evidence_metadata(
+    *,
+    keypoint: CourtKeypointObservation,
+    line: CourtLineObservation | None,
+    camera: CameraViewObservation | None,
+) -> dict[str, Any]:
+    keypoint_metadata = keypoint.metadata_jsonb or {}
+    line_metadata = line.metadata_jsonb if line is not None else {}
+    camera_metadata = camera.metadata_jsonb if camera is not None else {}
+    keypoint_real_model_output = bool(
+        keypoint_metadata.get("real_model_output")
+        or keypoint_metadata.get("tom_v1_court_keypoint_model_output")
+    )
+    keypoint_fixture = bool(keypoint_metadata.get("fixture_court_evidence"))
+    line_derived_from_real_keypoints = bool(
+        line_metadata.get("line_source") == "derived_from_real_keypoint_observations"
+        or line_metadata.get("real_model_output")
+    )
+    camera_fixture = bool(camera_metadata.get("fixture_camera_view_evidence"))
+    evidence_source = (
+        "real_model_output"
+        if keypoint_real_model_output
+        else "fixture_court_evidence"
+        if keypoint_fixture
+        else "court_evidence"
+    )
+    return {
+        "source_court_evidence_source": evidence_source,
+        "source_court_keypoint_real_model_output": keypoint_real_model_output,
+        "source_court_keypoint_fixture_court_evidence": keypoint_fixture,
+        "source_court_keypoint_model_output_not_truth": keypoint_real_model_output
+        or bool(keypoint_metadata.get("model_output_not_truth")),
+        "source_court_line_derived_from_real_keypoints": line_derived_from_real_keypoints,
+        "source_court_line_fixture_court_evidence": bool(
+            line_metadata.get("fixture_court_evidence")
+        ),
+        "source_camera_view_fixture_evidence": camera_fixture,
+        "source_court_keypoint_observation_id": keypoint.observation_id,
+        "source_court_line_observation_id": line.observation_id if line is not None else None,
+        "source_camera_view_observation_id": (
+            camera.observation_id if camera is not None else None
+        ),
     }
 
 
