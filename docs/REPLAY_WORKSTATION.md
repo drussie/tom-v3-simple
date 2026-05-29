@@ -93,6 +93,11 @@ smoothed ball candidate, one near-player box candidate, one far-player box candi
 smoothed pose per active main-player track. Short-trail and full-trail/debug modes remain available
 for audit when an operator intentionally wants to inspect neighboring smoothed candidates.
 
+Pose overlays default to a limb-only visual style for both raw and smoothed pose evidence. Left-side
+limbs render blue, right-side limbs render red, and neutral/cross-body lines stay subtle. Operators
+can switch to `Limbs + joints` or `Joints only/debug` when they need to audit raw keypoint markers.
+This is display-only styling; it does not classify strokes, body mechanics, hits, or tennis events.
+
 ## What 6A Added
 
 - `GET /media/{media_id}/replay-info`

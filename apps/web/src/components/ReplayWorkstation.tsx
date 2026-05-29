@@ -40,6 +40,7 @@ import type {
   ReplayOverlayChunk,
   ReplayPlaybackState,
   ReplayPoseOverlay,
+  ReplayPoseVisualStyle,
   ReplayProjectionDiagnosticOverlay,
   ReplayRunSummary,
   ReplaySeekRequest,
@@ -224,6 +225,8 @@ export function ReplayWorkstation({
     useState<ReplayOverlayDisplayMode>("short_trail");
   const [smoothedMotionDisplayMode, setSmoothedMotionDisplayMode] =
     useState<ReplayOverlayDisplayMode>("current_only");
+  const [poseVisualStyle, setPoseVisualStyle] =
+    useState<ReplayPoseVisualStyle>("limbs_only");
   const [showTrackletPaths, setShowTrackletPaths] = useState(false);
   const [showRawCourtKeypoints, setShowRawCourtKeypoints] = useState(
     initialCourtRunId !== null
@@ -790,6 +793,7 @@ export function ReplayWorkstation({
               onSelectPose={(pose) => {
                 setSelectedEvidence({ kind: "pose", pose });
               }}
+              poseVisualStyle={poseVisualStyle}
               poses={poses}
               replayInfo={replayInfo}
               selectedObservationId={selectedPoseObservationId}
@@ -828,6 +832,7 @@ export function ReplayWorkstation({
                 setSelectedEvidence({ kind: "smoothed_pose", item });
               }}
               replayInfo={replayInfo}
+              poseVisualStyle={poseVisualStyle}
               selectedObservationId={selectedSmoothedMotionObservationId}
               smoothedBall={smoothedBall}
               smoothedPlayerBoxes={smoothedPlayerBoxes}
@@ -934,6 +939,7 @@ export function ReplayWorkstation({
             onToggleMainPlayerTracks={setShowMainPlayerTracks}
             onToggleProjectionDiagnostics={setShowProjectionDiagnostics}
             onTogglePoses={setShowPoses}
+            onPoseVisualStyleChange={setPoseVisualStyle}
             onToggleSmoothedBall={setShowSmoothedBall}
             onToggleSmoothedPlayerBoxes={setShowSmoothedPlayerBoxes}
             onToggleSmoothedPoses={setShowSmoothedPoses}
@@ -969,6 +975,7 @@ export function ReplayWorkstation({
             showDetections={showDetections}
             showHomography={showHomography}
             showMainPlayerTracks={showMainPlayerTracks}
+            poseVisualStyle={poseVisualStyle}
             showPoses={showPoses}
             showProjectionDiagnostics={showProjectionDiagnostics}
             showSmoothedBall={showSmoothedBall}
@@ -1145,6 +1152,7 @@ function ReplayLayerControls({
   trackletDisplayMode,
   showTrackletPaths,
   showPoses,
+  poseVisualStyle,
   showMainPlayerTracks,
   showSmoothedBall,
   smoothedMotionDisplayMode,
@@ -1172,6 +1180,7 @@ function ReplayLayerControls({
   onTrackletDisplayModeChange,
   onToggleTrackletPaths,
   onTogglePoses,
+  onPoseVisualStyleChange,
   onToggleMainPlayerTracks,
   onToggleSmoothedBall,
   onToggleSmoothedPlayerBoxes,
@@ -1208,6 +1217,7 @@ function ReplayLayerControls({
   trackletDisplayMode: ReplayOverlayDisplayMode;
   showTrackletPaths: boolean;
   showPoses: boolean;
+  poseVisualStyle: ReplayPoseVisualStyle;
   showMainPlayerTracks: boolean;
   showSmoothedBall: boolean;
   smoothedMotionDisplayMode: ReplayOverlayDisplayMode;
@@ -1235,6 +1245,7 @@ function ReplayLayerControls({
   onTrackletDisplayModeChange: (mode: ReplayOverlayDisplayMode) => void;
   onToggleTrackletPaths: (enabled: boolean) => void;
   onTogglePoses: (enabled: boolean) => void;
+  onPoseVisualStyleChange: (style: ReplayPoseVisualStyle) => void;
   onToggleMainPlayerTracks: (enabled: boolean) => void;
   onToggleSmoothedBall: (enabled: boolean) => void;
   onToggleSmoothedPlayerBoxes: (enabled: boolean) => void;
@@ -1298,6 +1309,7 @@ function ReplayLayerControls({
           label="Show pose observations"
           onChange={onTogglePoses}
         />
+        <PoseVisualStyleSelect onChange={onPoseVisualStyleChange} value={poseVisualStyle} />
         <RunSelect
           label="Pose run"
           onChange={onSelectedPoseRunChange}
@@ -1451,6 +1463,28 @@ function DisplayModeSelect({
         <option value="current_only">Current only</option>
         <option value="short_trail">Short trail</option>
         <option value="full_trail">Full trail</option>
+      </select>
+    </label>
+  );
+}
+
+function PoseVisualStyleSelect({
+  value,
+  onChange
+}: {
+  value: ReplayPoseVisualStyle;
+  onChange: (style: ReplayPoseVisualStyle) => void;
+}) {
+  return (
+    <label className="select-row">
+      <span>Pose visual style</span>
+      <select
+        onChange={(event) => onChange(event.target.value as ReplayPoseVisualStyle)}
+        value={value}
+      >
+        <option value="limbs_only">Limbs only</option>
+        <option value="limbs_and_joints">Limbs + joints</option>
+        <option value="joints_only">Joints only/debug</option>
       </select>
     </label>
   );

@@ -7,12 +7,14 @@ import {
   activeReplaySmoothedPlayerBoxes,
   activeReplaySmoothedPoses,
   imagePixelPointToOverlayPoint,
-  imagePixelRectToOverlayRect
+  imagePixelRectToOverlayRect,
+  poseEdgeSideClass
 } from "../lib/replayOverlays";
 import type {
   ReplayInfo,
   ReplayOverlayDisplayMode,
   ReplayPoseKeypoint,
+  ReplayPoseVisualStyle,
   ReplaySmoothedBallOverlay,
   ReplaySmoothedPlayerBoxOverlay,
   ReplaySmoothedPoseOverlay
@@ -33,6 +35,7 @@ interface ReplaySmoothedMotionOverlayProps {
   error: string | null;
   selectedObservationId: string | null;
   displayMode?: ReplayOverlayDisplayMode;
+  poseVisualStyle?: ReplayPoseVisualStyle;
   onSelectSmoothedBall: (item: ReplaySmoothedBallOverlay) => void;
   onSelectSmoothedPlayerBox: (item: ReplaySmoothedPlayerBoxOverlay) => void;
   onSelectSmoothedPose: (item: ReplaySmoothedPoseOverlay) => void;
@@ -64,6 +67,7 @@ export function ReplaySmoothedMotionOverlay({
   error,
   selectedObservationId,
   displayMode = "current_only",
+  poseVisualStyle = "limbs_only",
   onSelectSmoothedBall,
   onSelectSmoothedPlayerBox,
   onSelectSmoothedPose,
@@ -206,6 +210,8 @@ export function ReplaySmoothedMotionOverlay({
                   scaledKeypoints.map((keypoint) => [keypoint.keypoint.name, keypoint])
                 );
                 const selected = selectedObservationId === pose.observation_id;
+                const showLimbs = poseVisualStyle !== "joints_only";
+                const showJoints = poseVisualStyle !== "limbs_only";
                 return (
                   <g
                     aria-label={`smoothed pose candidate ${formatConfidence(
@@ -226,30 +232,35 @@ export function ReplaySmoothedMotionOverlay({
                     role="button"
                     tabIndex={0}
                   >
-                    {pose.edges.map(([start, end]) => {
-                      const startPoint = byName.get(start);
-                      const endPoint = byName.get(end);
-                      if (startPoint === undefined || endPoint === undefined) {
-                        return null;
-                      }
-                      return (
-                        <line
-                          key={`${pose.observation_id}:${start}:${end}`}
-                          x1={startPoint.x}
-                          x2={endPoint.x}
-                          y1={startPoint.y}
-                          y2={endPoint.y}
-                        />
-                      );
-                    })}
-                    {scaledKeypoints.map((keypoint) => (
-                      <circle
-                        cx={keypoint.x}
-                        cy={keypoint.y}
-                        key={`${pose.observation_id}:${keypoint.keypoint.index}`}
-                        r={selected ? 5 : 4}
-                      />
-                    ))}
+                    {showLimbs
+                      ? pose.edges.map(([start, end]) => {
+                          const startPoint = byName.get(start);
+                          const endPoint = byName.get(end);
+                          if (startPoint === undefined || endPoint === undefined) {
+                            return null;
+                          }
+                          return (
+                            <line
+                              className={`replay-smoothed-pose-edge pose-limb-${poseEdgeSideClass(start, end)}`}
+                              key={`${pose.observation_id}:${start}:${end}`}
+                              x1={startPoint.x}
+                              x2={endPoint.x}
+                              y1={startPoint.y}
+                              y2={endPoint.y}
+                            />
+                          );
+                        })
+                      : null}
+                    {showJoints
+                      ? scaledKeypoints.map((keypoint) => (
+                          <circle
+                            cx={keypoint.x}
+                            cy={keypoint.y}
+                            key={`${pose.observation_id}:${keypoint.keypoint.index}`}
+                            r={selected ? 5 : 4}
+                          />
+                        ))
+                      : null}
                   </g>
                 );
               })

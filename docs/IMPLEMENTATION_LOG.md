@@ -2083,3 +2083,27 @@ adds a shared smoothed motion display mode:
 Current-only selection prefers exact frame matches, then nearest timestamp, then confidence, then
 deterministic observation id ordering. This remains a replay/read-model display policy; smoothed
 candidate observations stay immutable and evidence-only.
+
+## Pose Limb-Only Sided Replay Visuals
+
+Status: complete
+
+### Goal
+
+Repair replay pose rendering so raw and smoothed pose evidence defaults to limb lines only, with
+side-colored limbs and optional debug joint markers.
+
+### Notes
+
+The replay workstation now has a shared pose visual style control:
+
+- `Limbs only`
+- `Limbs + joints`
+- `Joints only/debug`
+
+`Limbs only` is the default. Left-side limbs render blue, right-side limbs render red, and neutral
+torso/head/cross-body edges render subtly. The repair changes only the SVG replay presentation; pose
+observations, smoothed pose candidates, lineage, and evidence semantics are unchanged.
+
+No forehand/backhand classification, stroke detection, hit detection, bounce detection, scoring,
+player identity, biomechanics truth, accepted/rejected lifecycle, or adjudication was added.

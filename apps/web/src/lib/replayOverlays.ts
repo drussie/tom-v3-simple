@@ -8,6 +8,7 @@ import type {
   ReplayHomographyCandidateOverlay,
   ReplayMainPlayerTrackOverlay,
   ReplayPoseOverlay,
+  ReplayPoseLimbSide,
   ReplayProjectionDiagnosticOverlay,
   ReplayOverlayDisplayMode,
   ReplayRunSummary,
@@ -195,6 +196,16 @@ export function activeReplayPoses(
   return poses.filter((pose) =>
     isActiveReplayPoint(pose.timestamp_ms, pose.frame_number, currentTimestampMs, currentFrame, holdMs)
   );
+}
+
+export function poseEdgeSideClass(start: string, end: string): ReplayPoseLimbSide {
+  if (start.startsWith("left_") && end.startsWith("left_")) {
+    return "left";
+  }
+  if (start.startsWith("right_") && end.startsWith("right_")) {
+    return "right";
+  }
+  return "neutral";
 }
 
 export function activeReplayMainPlayerTracks(

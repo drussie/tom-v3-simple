@@ -5,9 +5,15 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import {
   activeReplayPoses,
   imagePixelPointToOverlayPoint,
-  imagePixelRectToOverlayRect
+  imagePixelRectToOverlayRect,
+  poseEdgeSideClass
 } from "../lib/replayOverlays";
-import type { ReplayInfo, ReplayPoseKeypoint, ReplayPoseOverlay as ReplayPoseOverlayItem } from "../lib/types";
+import type {
+  ReplayInfo,
+  ReplayPoseKeypoint,
+  ReplayPoseOverlay as ReplayPoseOverlayItem,
+  ReplayPoseVisualStyle
+} from "../lib/types";
 import { formatConfidence } from "../lib/timeline";
 
 interface ReplayPoseOverlayProps {
@@ -19,6 +25,7 @@ interface ReplayPoseOverlayProps {
   isLoading: boolean;
   error: string | null;
   selectedObservationId: string | null;
+  poseVisualStyle?: ReplayPoseVisualStyle;
   onSelectPose: (pose: ReplayPoseOverlayItem) => void;
   holdMs?: number;
 }
@@ -43,6 +50,7 @@ export function ReplayPoseOverlay({
   isLoading,
   error,
   selectedObservationId,
+  poseVisualStyle = "limbs_only",
   onSelectPose,
   holdMs = 250
 }: ReplayPoseOverlayProps) {
@@ -85,6 +93,8 @@ export function ReplayPoseOverlay({
             const scaledKeypoints = scalePoseKeypoints(pose, replayInfo, overlaySize);
             const byName = new Map(scaledKeypoints.map((keypoint) => [keypoint.keypoint.name, keypoint]));
             const selected = pose.observation_id === selectedObservationId;
+            const showLimbs = poseVisualStyle !== "joints_only";
+            const showJoints = poseVisualStyle !== "limbs_only";
             const bbox = pose.bbox
               ? imagePixelRectToOverlayRect(
                   pose.bbox,
@@ -123,32 +133,36 @@ export function ReplayPoseOverlay({
                     y={bbox.y}
                   />
                 ) : null}
-                {pose.edges.map(([start, end]) => {
-                  const startPoint = byName.get(start);
-                  const endPoint = byName.get(end);
-                  if (startPoint === undefined || endPoint === undefined) {
-                    return null;
-                  }
-                  return (
-                    <line
-                      className="replay-pose-edge"
-                      key={`${pose.observation_id}:${start}:${end}`}
-                      x1={startPoint.x}
-                      x2={endPoint.x}
-                      y1={startPoint.y}
-                      y2={endPoint.y}
-                    />
-                  );
-                })}
-                {scaledKeypoints.map((keypoint) => (
-                  <circle
-                    className={keypointClassName(keypoint.keypoint)}
-                    cx={keypoint.x}
-                    cy={keypoint.y}
-                    key={`${pose.observation_id}:${keypoint.keypoint.index}`}
-                    r={selected ? 5 : 4}
-                  />
-                ))}
+                {showLimbs
+                  ? pose.edges.map(([start, end]) => {
+                      const startPoint = byName.get(start);
+                      const endPoint = byName.get(end);
+                      if (startPoint === undefined || endPoint === undefined) {
+                        return null;
+                      }
+                      return (
+                        <line
+                          className={`replay-pose-edge pose-limb-${poseEdgeSideClass(start, end)}`}
+                          key={`${pose.observation_id}:${start}:${end}`}
+                          x1={startPoint.x}
+                          x2={endPoint.x}
+                          y1={startPoint.y}
+                          y2={endPoint.y}
+                        />
+                      );
+                    })
+                  : null}
+                {showJoints
+                  ? scaledKeypoints.map((keypoint) => (
+                      <circle
+                        className={keypointClassName(keypoint.keypoint)}
+                        cx={keypoint.x}
+                        cy={keypoint.y}
+                        key={`${pose.observation_id}:${keypoint.keypoint.index}`}
+                        r={selected ? 5 : 4}
+                      />
+                    ))
+                  : null}
                 {bbox !== null ? (
                   <text className="replay-pose-label" x={bbox.x} y={Math.max(14, bbox.y - 8)}>
                     pose evidence {formatConfidence(pose.pose_confidence)}

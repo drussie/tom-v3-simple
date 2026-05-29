@@ -479,16 +479,46 @@ pre {
   stroke-width: 4;
 }
 
+.replay-pose-group .pose-limb-left,
+.replay-smoothed-pose .pose-limb-left {
+  stroke: #3b82f6;
+}
+
+.replay-pose-group .pose-limb-right,
+.replay-smoothed-pose .pose-limb-right {
+  stroke: #ef4444;
+}
+
+.replay-pose-group .pose-limb-neutral,
+.replay-smoothed-pose .pose-limb-neutral {
+  stroke: rgba(226, 232, 240, 0.64);
+}
+
+.replay-pose-group .pose-limb-left,
+.replay-pose-group .pose-limb-right,
+.replay-pose-group .pose-limb-neutral {
+  stroke-width: 3;
+}
+
+.replay-smoothed-pose .pose-limb-left,
+.replay-smoothed-pose .pose-limb-right,
+.replay-smoothed-pose .pose-limb-neutral {
+  stroke-width: 4;
+}
+
 .replay-smoothed-pose circle {
   fill: #14b8a6;
   stroke: #ffffff;
   stroke-width: 1.5;
 }
 
-.replay-smoothed-pose.selected circle,
-.replay-smoothed-pose.selected line {
+.replay-smoothed-pose.selected circle {
   stroke: var(--amber);
   stroke-width: 3;
+}
+
+.replay-smoothed-pose.selected line {
+  stroke-width: 5;
 }
 
 .replay-smoothed-ball circle {

@@ -37,6 +37,8 @@ def test_replay_display_policy_helpers_define_expected_modes() -> None:
     source = (ROOT / "apps/web/src/lib/replayOverlays.ts").read_text()
     workstation = (ROOT / "apps/web/src/components/ReplayWorkstation.tsx").read_text()
     overlay = (ROOT / "apps/web/src/components/ReplaySmoothedMotionOverlay.tsx").read_text()
+    pose_overlay = (ROOT / "apps/web/src/components/ReplayPoseOverlay.tsx").read_text()
+    css = (ROOT / "apps/web/src/app/globals.css").read_text()
 
     assert 'displayMode === "current_only"' in source
     assert 'displayMode === "short_trail"' in source or '"short_trail"' in source
@@ -60,6 +62,26 @@ def test_replay_display_policy_helpers_define_expected_modes() -> None:
     assert 'displayMode = "current_only"' in overlay
     assert "labelBallIds" in overlay
     assert "labelBoxIds" in overlay
+    assert 'ReplayPoseVisualStyle = "limbs_only" | "limbs_and_joints" | "joints_only"' in (
+        ROOT / "apps/web/src/lib/types.ts"
+    ).read_text()
+    assert "poseEdgeSideClass" in source
+    assert 'start.startsWith("left_") && end.startsWith("left_")' in source
+    assert 'start.startsWith("right_") && end.startsWith("right_")' in source
+    assert 'useState<ReplayPoseVisualStyle>("limbs_only")' in workstation
+    assert "Pose visual style" in workstation
+    assert "poseVisualStyle={poseVisualStyle}" in workstation
+    assert 'poseVisualStyle = "limbs_only"' in pose_overlay
+    assert 'poseVisualStyle = "limbs_only"' in overlay
+    assert 'const showLimbs = poseVisualStyle !== "joints_only"' in pose_overlay
+    assert 'const showJoints = poseVisualStyle !== "limbs_only"' in pose_overlay
+    assert 'const showLimbs = poseVisualStyle !== "joints_only"' in overlay
+    assert 'const showJoints = poseVisualStyle !== "limbs_only"' in overlay
+    assert "pose-limb-${poseEdgeSideClass(start, end)}" in pose_overlay
+    assert "replay-smoothed-pose-edge" in overlay
+    assert ".replay-pose-group .pose-limb-left" in css
+    assert ".replay-pose-group .pose-limb-right" in css
+    assert ".replay-pose-group .pose-limb-neutral" in css
     assert "activeReplayCourtEvidence" in source
     assert 'item.temporal_display_mode === "carry_forward"' in source
     assert "current_replay_timestamp_ms" in source
