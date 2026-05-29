@@ -786,6 +786,25 @@ TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_tom_v1_bridge.db \
   --allowed-root model_assets/tom_v1
 ```
 
+Motion smoothing / stable replay candidates:
+
+```bash
+TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_tom_v1_bridge.db \
+.venv/bin/python -m apps.worker.cli smooth-motion-candidates \
+  --media-id <media_id> \
+  --detection-run-id <player_or_ball_detection_run_id> \
+  --tracklet-run-id <tracklet_run_id> \
+  --main-player-track-run-id <main_player_track_run_id> \
+  --pose-run-id <track_filtered_pose_run_id> \
+  --run-name motion-smoothing-stable-replay-candidates-v0
+```
+
+This creates derived `smoothed_ball_position_candidate`,
+`smoothed_main_player_box_candidate`, and `smoothed_pose_candidate` rows when the matching source
+runs are supplied. These rows are replay smoothing candidates only. They do not mutate raw
+detections, tracklets, main player track assignments, or pose observations, and they do not decide
+bounce, hit, in/out, point, score, player identity, or court-space position.
+
 Makefile helpers:
 
 ```bash
@@ -800,6 +819,7 @@ make tom-v1-court-keypoints MEDIA_ID=<media_id> PYTHON=.venv/bin/python MAX_FRAM
 make tom-v1-pose MEDIA_ID=<media_id> SOURCE_DETECTION_RUN_ID=<player_real_detection_run_id> PYTHON=.venv/bin/python MAX_FRAMES=214
 make tom-v1-pose-main-subjects MEDIA_ID=<media_id> SOURCE_DETECTION_RUN_ID=<player_real_detection_run_id> SOURCE_SUBJECT_RUN_ID=<main_subject_run_id> PYTHON=.venv/bin/python MAX_FRAMES=214
 make tom-v1-pose-main-tracks MEDIA_ID=<media_id> SOURCE_DETECTION_RUN_ID=<player_real_detection_run_id> SOURCE_SUBJECT_RUN_ID=<main_subject_run_id> SOURCE_TRACK_RUN_ID=<main_player_track_run_id> PYTHON=.venv/bin/python MAX_FRAMES=214
+make tom-v1-motion-smoothing MEDIA_ID=<media_id> DETECTION_RUN_ID=<detection_run_id> TRACKLET_RUN_ID=<tracklet_run_id> MAIN_PLAYER_TRACK_RUN_ID=<main_player_track_run_id> POSE_RUN_ID=<pose_run_id> PYTHON=.venv/bin/python
 ```
 
 The TOM v1 Makefile helpers pass `--allowed-root "$(TOM_V1_MODEL_ROOT)"` and default image sizes that match the local smoke path: 1280 for `best_ball_v2_1280.pt`, 640 for `yolo26x.pt`, 640 for `yolo26x-pose.pt`, and 224 fixed preprocessing for the recognized court keypoint state dict. Override with `IMG_SIZE=<value>` only when testing a deliberate alternate model input size. The court keypoint adapter records requested image size but uses the recognized 224x224 model input convention.
@@ -827,6 +847,17 @@ The replay workstation includes display modes for dense real detection/tracklet 
 - Full trail
 
 Detection display defaults to current-only. Tracklet point display defaults to short-trail, and tracklet trail/path rendering is off by default. These are visual review controls only; they do not change persisted observations, candidate tracklets, or evidence semantics.
+
+Motion smoothing replay:
+
+```text
+/replay/<media_id>?motionSmoothingRunId=<motion_smoothing_run_id>
+```
+
+When `motionSmoothingRunId` is present, replay can show smoothed ball, smoothed main player box,
+and smoothed pose candidate layers. Raw detections, raw tracklet points, and raw pose observations
+remain available as audit layers. Smoothed overlays are derived candidate evidence, not object
+truth or tennis-event interpretation.
 
 ## 11B. Court / Homography Decision Gate
 

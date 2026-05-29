@@ -35,6 +35,7 @@ from apps.worker.services.local_demo import run_local_fixture_demo
 from apps.worker.services.main_player_track_assignment import assign_main_player_tracks
 from apps.worker.services.main_subject_filter import select_main_player_subjects
 from apps.worker.services.media_indexer import index_media
+from apps.worker.services.motion_smoothing import smooth_motion_candidates
 from apps.worker.services.pose_adapter import run_pose_adapter
 from apps.worker.services.projection_diagnostic_builder import build_projection_diagnostics
 from apps.worker.services.real_court_keypoint_replay import run_real_court_keypoint_replay
@@ -556,6 +557,28 @@ def main() -> None:
     )
     main_track_parser.add_argument("--skip-create-db", action="store_true")
     main_track_parser.set_defaults(handler=_handle_assign_main_player_tracks)
+
+    motion_smoothing_parser = subcommands.add_parser(
+        "smooth-motion-candidates",
+        help="Build derived smoothed ball/player/pose replay candidate observations.",
+    )
+    motion_smoothing_parser.add_argument("--media-id", required=True)
+    motion_smoothing_parser.add_argument("--detection-run-id")
+    motion_smoothing_parser.add_argument("--tracklet-run-id")
+    motion_smoothing_parser.add_argument("--main-player-track-run-id")
+    motion_smoothing_parser.add_argument("--pose-run-id")
+    motion_smoothing_parser.add_argument(
+        "--run-name",
+        default="motion-smoothing-stable-replay-candidates-v0",
+    )
+    motion_smoothing_parser.add_argument("--viewer-base-url", default="http://127.0.0.1:3000")
+    motion_smoothing_parser.add_argument(
+        "--plan-only",
+        action="store_true",
+        help="Print the motion smoothing plan without touching observations.",
+    )
+    motion_smoothing_parser.add_argument("--skip-create-db", action="store_true")
+    motion_smoothing_parser.set_defaults(handler=_handle_smooth_motion_candidates)
 
     fixture_court_parser = subcommands.add_parser(
         "run-fixture-court",
@@ -1162,6 +1185,23 @@ def _handle_assign_main_player_tracks(
         frame_start=args.frame_start,
         frame_end=args.frame_end,
         max_frames=args.max_frames,
+        viewer_base_url=args.viewer_base_url,
+        plan_only=args.plan_only,
+    )
+
+
+def _handle_smooth_motion_candidates(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    return smooth_motion_candidates(
+        session=session,
+        media_id=args.media_id,
+        detection_run_id=args.detection_run_id,
+        tracklet_run_id=args.tracklet_run_id,
+        main_player_track_run_id=args.main_player_track_run_id,
+        pose_run_id=args.pose_run_id,
+        run_name=args.run_name,
         viewer_base_url=args.viewer_base_url,
         plan_only=args.plan_only,
     )

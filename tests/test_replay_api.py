@@ -525,6 +525,64 @@ def test_replay_overlay_endpoint_returns_main_player_track_assignment_items(
     assert track["no_adjudication"] is True
 
 
+def test_replay_overlay_and_timeline_return_smoothed_motion_items(
+    client: TestClient,
+    db_session: Session,
+    tmp_path,
+) -> None:
+    media_path = tmp_path / "sample.mp4"
+    media_path.write_bytes(b"tom-v3-video")
+    media = _seed_media(db_session, media_path)
+    run = _seed_motion_smoothing_run(db_session, media.id)
+
+    info_response = client.get(f"/media/{media.id}/replay-info")
+    assert info_response.status_code == 200
+    motion_runs = info_response.json()["available_runs"]["motion_smoothing"]
+    assert motion_runs[0]["run_id"] == run.id
+    assert motion_runs[0]["smoothed_candidate_only"] is True
+
+    overlay_response = client.get(
+        "/replay/overlays",
+        params={
+            "media_id": media.id,
+            "start_ms": 0,
+            "end_ms": 2000,
+            "layers": "smoothed_ball,smoothed_player_boxes,smoothed_pose",
+            "motion_smoothing_run_id": run.id,
+        },
+    )
+
+    assert overlay_response.status_code == 200
+    body = overlay_response.json()
+    assert len(body["smoothed_ball"]) == 1
+    assert len(body["smoothed_player_boxes"]) == 1
+    assert len(body["smoothed_pose"]) == 1
+    assert body["smoothed_ball"][0]["overlay_type"] == "smoothed_ball_position_candidate"
+    assert body["smoothed_ball"][0]["not_ball_truth"] is True
+    assert body["smoothed_player_boxes"][0]["track_role_candidate"] == (
+        "near_player_track_candidate"
+    )
+    assert body["smoothed_player_boxes"][0]["not_identity_truth"] is True
+    assert body["smoothed_pose"][0]["not_pose_truth"] is True
+
+    timeline_response = client.get(
+        "/replay/timeline",
+        params={
+            "media_id": media.id,
+            "motion_smoothing_run_id": run.id,
+        },
+    )
+    assert timeline_response.status_code == 200
+    lanes = {lane["lane_type"]: lane for lane in timeline_response.json()["lanes"]}
+    smoothed_items = lanes["smoothed_motion"]["items"]
+    assert {item["item_type"] for item in smoothed_items} == {
+        "smoothed_ball_position_candidate",
+        "smoothed_main_player_box_candidate",
+        "smoothed_pose_candidate",
+    }
+    assert all(item["smoothed_candidate_only"] is True for item in smoothed_items)
+
+
 def test_replay_overlay_endpoint_returns_court_and_homography_items(
     client: TestClient,
     db_session: Session,
@@ -914,6 +972,7 @@ def test_replay_timeline_endpoint_returns_evidence_lanes(
         "tracklets",
         "pose",
         "main_player_tracks",
+        "smoothed_motion",
         "court_keypoints",
         "court_lines",
         "camera_view",
@@ -946,6 +1005,7 @@ def test_replay_timeline_endpoint_returns_evidence_lanes(
     assert pose_item["display_label"] == "pose observation"
 
     assert lanes["main_player_tracks"]["items"] == []
+    assert lanes["smoothed_motion"]["items"] == []
 
     annotation_item = lanes["annotations"]["items"][0]
     assert annotation_item["item_type"] == "annotation"
@@ -1440,6 +1500,125 @@ def _seed_main_player_track_run(
                 "no_adjudication": True,
             },
         )
+    )
+    session.commit()
+    session.refresh(run)
+    return run
+
+
+def _seed_motion_smoothing_run(
+    session: Session,
+    media_id: str,
+    run_name: str = "motion-smoothing-stable-replay-candidates-v0",
+) -> ProcessingRun:
+    run = ProcessingRun(
+        media_id=media_id,
+        run_name=run_name,
+        run_status="completed",
+        started_at=datetime.now(UTC),
+        completed_at=datetime.now(UTC),
+        metadata_jsonb={
+            "evidence_source": "motion_smoothing_candidate",
+            "source_label": "smoothed replay candidate evidence",
+            "smoothed_candidate_only": True,
+            "not_truth": True,
+            "source_detection_run_id": "detection-run",
+            "source_tracklet_run_id": "tracklet-run",
+            "source_main_player_track_run_id": "main-player-track-run",
+            "source_pose_run_id": "pose-run",
+        },
+    )
+    session.add(run)
+    session.flush()
+    common = {
+        "smoothed_candidate_only": True,
+        "not_truth": True,
+        "observation_only": True,
+        "no_adjudication": True,
+    }
+    session.add_all(
+        [
+            Observation(
+                media_id=media_id,
+                run_id=run.id,
+                observation_family="tracking",
+                observation_type="smoothed_ball_position_candidate",
+                granularity="frame",
+                frame_start=30,
+                frame_end=30,
+                timestamp_start_ms=1000,
+                timestamp_end_ms=1000,
+                confidence=0.82,
+                coordinate_space="image_pixels",
+                payload_jsonb={
+                    **common,
+                    "source_detection_run_id": "detection-run",
+                    "source_tracklet_run_id": "tracklet-run",
+                    "source_tracklet_id": "tracklet-id",
+                    "source_track_point_id": "track-point-id",
+                    "x": 120.0,
+                    "y": 80.0,
+                    "bbox": {"x": 114.0, "y": 74.0, "w": 12.0, "h": 12.0},
+                    "smoothing_method": "rolling_median_no_long_gap_interpolation_v0",
+                    "source_observation_ids": ["track-point-observation"],
+                    "not_ball_truth": True,
+                },
+            ),
+            Observation(
+                media_id=media_id,
+                run_id=run.id,
+                observation_family="tracking",
+                observation_type="smoothed_main_player_box_candidate",
+                granularity="frame",
+                frame_start=30,
+                frame_end=30,
+                timestamp_start_ms=1000,
+                timestamp_end_ms=1000,
+                confidence=0.86,
+                coordinate_space="image_pixels",
+                payload_jsonb={
+                    **common,
+                    "source_main_player_track_run_id": "main-player-track-run",
+                    "source_track_assignment_observation_id": "track-assignment-observation",
+                    "track_candidate_id": "near_player_track_candidate_001",
+                    "track_role_candidate": "near_player_track_candidate",
+                    "bbox": {"x": 100.0, "y": 120.0, "w": 80.0, "h": 180.0},
+                    "smoothing_method": "exponential_moving_average_bbox_v0",
+                    "source_observation_ids": ["track-assignment-observation"],
+                    "not_identity_truth": True,
+                },
+            ),
+            Observation(
+                media_id=media_id,
+                run_id=run.id,
+                observation_family="pose",
+                observation_type="smoothed_pose_candidate",
+                granularity="frame",
+                frame_start=30,
+                frame_end=30,
+                timestamp_start_ms=1000,
+                timestamp_end_ms=1000,
+                confidence=0.74,
+                coordinate_space="image_pixels",
+                payload_jsonb={
+                    **common,
+                    "source_pose_run_id": "pose-run",
+                    "source_pose_observation_id": "pose-observation",
+                    "source_track_run_id": "main-player-track-run",
+                    "track_assignment_observation_id": "track-assignment-observation",
+                    "track_candidate_id": "near_player_track_candidate_001",
+                    "track_role_candidate": "near_player_track_candidate",
+                    "skeleton_format": "coco17",
+                    "skeleton_version": "v1",
+                    "keypoints": _pose_keypoints(),
+                    "edges": [["left_shoulder", "right_shoulder"]],
+                    "bbox": {"x": 100.0, "y": 120.0, "w": 80.0, "h": 180.0},
+                    "smoothing_method": "per_keypoint_ema_v0",
+                    "source_observation_ids": ["pose-observation"],
+                    "not_pose_truth": True,
+                },
+            ),
+        ]
     )
     session.commit()
     session.refresh(run)

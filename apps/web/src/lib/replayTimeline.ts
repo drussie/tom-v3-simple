@@ -1,6 +1,7 @@
 import type {
   ReplayTimelineItem,
   ReplayTimelineLane,
+  ReplaySmoothedMotionTimelineItem,
   ReplayTrackletTimelineItem
 } from "./types";
 
@@ -51,6 +52,9 @@ export function timelineItemKey(item: ReplayTimelineItem): string {
   if (item.item_type === "main_player_track_assignment") {
     return `main_player_track_assignment:${item.observation_id}`;
   }
+  if (isSmoothedMotionTimelineItem(item)) {
+    return `${item.item_type}:${item.observation_id}`;
+  }
   if (item.item_type === "court_keypoint") {
     return `court_keypoint:${item.observation_id}`;
   }
@@ -67,6 +71,16 @@ export function timelineItemKey(item: ReplayTimelineItem): string {
     return `projection_diagnostic:${item.observation_id}`;
   }
   return `annotation:${item.annotation_id}`;
+}
+
+function isSmoothedMotionTimelineItem(
+  item: ReplayTimelineItem
+): item is ReplaySmoothedMotionTimelineItem {
+  return (
+    item.item_type === "smoothed_ball_position_candidate" ||
+    item.item_type === "smoothed_main_player_box_candidate" ||
+    item.item_type === "smoothed_pose_candidate"
+  );
 }
 
 export function timelineItemAvailableAt(

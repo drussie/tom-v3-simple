@@ -76,6 +76,18 @@ Dense real model-output runs can produce visually noisy overlays. The replay wor
 
 Detection display defaults to current-only. Tracklet point display defaults to short-trail, and tracklet trail/path rendering is off by default. These controls reduce visual trails without mutating persisted observations, candidate tracklets, lineage, or evidence-only semantics.
 
+Motion Smoothing / Stable Replay Candidates v0 adds derived replay candidate layers through
+`motionSmoothingRunId`:
+
+- `smoothed_ball_position_candidate`
+- `smoothed_main_player_box_candidate`
+- `smoothed_pose_candidate`
+
+Replay can render smoothed ball, smoothed near/far main-player boxes, and smoothed pose skeletons by
+default when a motion smoothing run is selected. Raw detection, tracklet, and pose evidence remains
+available for audit. These layers are derived candidate evidence only; they do not establish ball
+truth, pose truth, player identity, bounce, hit, in/out, point, score, or court-space position.
+
 ## What 6A Added
 
 - `GET /media/{media_id}/replay-info`

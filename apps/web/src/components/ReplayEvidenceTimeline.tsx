@@ -24,6 +24,7 @@ interface ReplayEvidenceTimelineProps {
     tracklets: boolean;
     pose: boolean;
     main_player_tracks: boolean;
+    smoothed_motion: boolean;
     court_keypoints: boolean;
     court_lines: boolean;
     camera_view: boolean;
@@ -217,6 +218,9 @@ function emptyLaneText(laneType: ReplayTimelineLane["lane_type"]): string {
   if (laneType === "main_player_tracks") {
     return "No main player track assignments in the selected run.";
   }
+  if (laneType === "smoothed_motion") {
+    return "No smoothed motion candidates in the selected run.";
+  }
   if (laneType === "court_keypoints") {
     return "No court keypoint evidence in the selected run.";
   }
@@ -247,6 +251,9 @@ function proxyEmptyLaneText(laneType: ReplayTimelineLane["lane_type"]): string {
   }
   if (laneType === "main_player_tracks") {
     return "No main player track assignments available at the current live-like edge.";
+  }
+  if (laneType === "smoothed_motion") {
+    return "No smoothed motion candidates available at the current live-like edge.";
   }
   if (laneType === "court_keypoints") {
     return "No court keypoint evidence available at the current live-like edge.";

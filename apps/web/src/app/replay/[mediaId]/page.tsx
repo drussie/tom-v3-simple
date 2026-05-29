@@ -12,6 +12,7 @@ interface ReplayPageProps {
     trackletRunId?: string;
     poseRunId?: string;
     mainPlayerTrackRunId?: string;
+    motionSmoothingRunId?: string;
     courtRunId?: string;
     courtTemporalPersistence?: string;
     courtPersistenceMaxGapMs?: string;

@@ -235,6 +235,30 @@ Replay can show these track assignments with:
 
 The visible `NEAR TRACK` and `FAR TRACK` labels are candidate visual track labels. They are not player names, identity truth, or accepted tracks.
 
+Motion smoothing for stable replay:
+
+```bash
+make tom-v1-motion-smoothing \
+  MEDIA_ID=<media_id> \
+  DETECTION_RUN_ID=<detection_run_id> \
+  TRACKLET_RUN_ID=<tracklet_run_id> \
+  MAIN_PLAYER_TRACK_RUN_ID=<main_player_track_run_id> \
+  POSE_RUN_ID=<pose_run_id> \
+  PYTHON=.venv/bin/python
+```
+
+This helper creates derived smoothed replay candidates for the ball marker, near/far main-player
+boxes, and pose skeletons. The output is selected in replay with:
+
+```text
+/replay/<media_id>?motionSmoothingRunId=<motion_smoothing_run_id>
+```
+
+Smoothed candidates do not replace raw TOM v1-origin detections, tracklets, pose rows, or main
+player track assignments. They reduce visual jitter for replay and prepare future trajectory review,
+but they are not true ball position, confirmed player boxes, actual pose, bounce/hit/in-out, point,
+or score.
+
 ## Runtime / Replay Repair Notes
 
 The TOM v3 real detection and real pose runtime bridge must omit optional Ultralytics arguments when they are unset. In particular, `imgsz`, `iou`, and `max_det` should not be forwarded as `None` because some Ultralytics versions treat `None` as an invalid explicit value rather than an omitted option.

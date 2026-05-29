@@ -47,6 +47,7 @@ export interface FetchReplayOverlayChunkInput {
   trackletRunId?: string | null;
   poseRunId?: string | null;
   mainPlayerTrackRunId?: string | null;
+  motionSmoothingRunId?: string | null;
   courtRunId?: string | null;
   homographyRunId?: string | null;
   projectionDiagnosticRunId?: string | null;
@@ -65,6 +66,7 @@ export async function fetchReplayOverlayChunk({
   trackletRunId = null,
   poseRunId = null,
   mainPlayerTrackRunId = null,
+  motionSmoothingRunId = null,
   courtRunId = null,
   homographyRunId = null,
   projectionDiagnosticRunId = null,
@@ -90,6 +92,9 @@ export async function fetchReplayOverlayChunk({
   }
   if (mainPlayerTrackRunId !== null) {
     params.set("main_player_track_run_id", mainPlayerTrackRunId);
+  }
+  if (motionSmoothingRunId !== null) {
+    params.set("motion_smoothing_run_id", motionSmoothingRunId);
   }
   if (courtRunId !== null) {
     params.set("court_run_id", courtRunId);
@@ -130,6 +135,7 @@ export interface FetchReplayTimelineInput {
   trackletRunId?: string | null;
   poseRunId?: string | null;
   mainPlayerTrackRunId?: string | null;
+  motionSmoothingRunId?: string | null;
   courtRunId?: string | null;
   homographyRunId?: string | null;
   projectionDiagnosticRunId?: string | null;
@@ -142,6 +148,7 @@ export async function fetchReplayTimeline({
   trackletRunId = null,
   poseRunId = null,
   mainPlayerTrackRunId = null,
+  motionSmoothingRunId = null,
   courtRunId = null,
   homographyRunId = null,
   projectionDiagnosticRunId = null,
@@ -162,6 +169,9 @@ export async function fetchReplayTimeline({
   }
   if (mainPlayerTrackRunId !== null) {
     params.set("main_player_track_run_id", mainPlayerTrackRunId);
+  }
+  if (motionSmoothingRunId !== null) {
+    params.set("motion_smoothing_run_id", motionSmoothingRunId);
   }
   if (courtRunId !== null) {
     params.set("court_run_id", courtRunId);

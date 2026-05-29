@@ -27,6 +27,10 @@ def test_tom_v1_make_helpers_include_allowed_root_and_imgsz_defaults() -> None:
     assert '--source-subject-run-id "$(SOURCE_SUBJECT_RUN_ID)"' in makefile
     assert "tom-v1-pose-main-tracks:" in makefile
     assert '--source-track-run-id "$(SOURCE_TRACK_RUN_ID)"' in makefile
+    assert "tom-v1-motion-smoothing:" in makefile
+    assert "smooth-motion-candidates" in makefile
+    assert '--main-player-track-run-id "$(MAIN_PLAYER_TRACK_RUN_ID)"' in makefile
+    assert "--run-name motion-smoothing-stable-replay-candidates-v0" in makefile
 
 
 def test_replay_display_policy_helpers_define_expected_modes() -> None:
@@ -38,6 +42,9 @@ def test_replay_display_policy_helpers_define_expected_modes() -> None:
     assert "isActiveReplayPointForDisplay" in source
     assert "activeReplayMainPlayerTracks" in source
     assert "filterMainPlayerTracksAvailableAt" in source
+    assert "activeReplaySmoothedBall" in source
+    assert "activeReplaySmoothedPlayerBoxes" in source
+    assert "activeReplaySmoothedPoses" in source
     assert "activeReplayCourtEvidence" in source
     assert 'item.temporal_display_mode === "carry_forward"' in source
     assert "current_replay_timestamp_ms" in source

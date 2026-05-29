@@ -2032,3 +2032,31 @@ This repair adds:
 - regression tests for carry-forward, stale geometry, and disabled persistence
 
 This repair creates no new persisted court observations and does not make court geometry true. It does not add court truth, accepted/rejected lifecycle, ball/player court-space projection, bounce/hit/in-out/rally/point/scoring, identity, OCR, or adjudication.
+
+## Motion Smoothing / Stable Replay Candidates v0
+
+Status: complete
+
+### Goal
+
+Create derived, stable replay candidate overlays for ball position, near/far main-player boxes, and
+pose keypoints while preserving raw observations unchanged.
+
+### Notes
+
+This milestone adds:
+
+- worker `smooth-motion-candidates`
+- Makefile `tom-v1-motion-smoothing`
+- `smoothed_ball_position_candidate` observations
+- `smoothed_main_player_box_candidate` observations
+- `smoothed_pose_candidate` observations
+- lineage from source ball detection/track point, main-player track assignment, and pose rows
+- replay `motionSmoothingRunId` support
+- replay layers for `smoothed_ball`, `smoothed_player_boxes`, and `smoothed_pose`
+- a `smoothed_motion` timeline lane
+- selected evidence detail for smoothing method, source observations, and warning metadata
+- tests for smoothing persistence, long-gap behavior, lineage, replay payloads, and helper commands
+
+This milestone does not add bounce/hit/in-out, rally/point/score, player identity, scoreboard OCR,
+server/receiver logic, court-space projection, accepted/rejected lifecycle, or adjudication.

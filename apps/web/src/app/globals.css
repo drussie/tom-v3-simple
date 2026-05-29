@@ -361,6 +361,10 @@ pre {
   bottom: 230px;
 }
 
+.replay-overlay-status.smoothed-motion {
+  bottom: 284px;
+}
+
 .replay-court-temporal-badge {
   background: rgba(16, 23, 25, 0.78);
   border: 1px solid rgba(20, 184, 166, 0.72);
@@ -379,6 +383,7 @@ pre {
 
 .replay-tracklet-path,
 .replay-pose-edge,
+.replay-smoothed-pose line,
 .replay-court-line,
 .replay-homography-line,
 .replay-projection-diagnostic-line {
@@ -433,6 +438,68 @@ pre {
 .replay-pose-group {
   cursor: pointer;
   pointer-events: auto;
+}
+
+.replay-smoothed-box,
+.replay-smoothed-pose,
+.replay-smoothed-ball {
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.replay-smoothed-box rect {
+  fill: rgba(20, 184, 166, 0.06);
+  stroke: #14b8a6;
+  stroke-width: 3;
+}
+
+.replay-smoothed-box.far rect {
+  stroke: #f97316;
+}
+
+.replay-smoothed-box.selected rect {
+  stroke: var(--amber);
+  stroke-width: 4;
+}
+
+.replay-smoothed-box text,
+.replay-smoothed-ball text {
+  fill: #ffffff;
+  font-size: 11px;
+  font-weight: 900;
+  paint-order: stroke;
+  pointer-events: none;
+  stroke: rgba(16, 23, 25, 0.96);
+  stroke-linejoin: round;
+  stroke-width: 4px;
+}
+
+.replay-smoothed-pose line {
+  stroke: rgba(20, 184, 166, 0.92);
+  stroke-width: 4;
+}
+
+.replay-smoothed-pose circle {
+  fill: #14b8a6;
+  stroke: #ffffff;
+  stroke-width: 1.5;
+}
+
+.replay-smoothed-pose.selected circle,
+.replay-smoothed-pose.selected line {
+  stroke: var(--amber);
+  stroke-width: 3;
+}
+
+.replay-smoothed-ball circle {
+  fill: #facc15;
+  stroke: rgba(16, 23, 25, 0.92);
+  stroke-width: 2.5;
+}
+
+.replay-smoothed-ball.selected circle {
+  stroke: #ffffff;
+  stroke-width: 4;
 }
 
 .replay-pose-bbox {

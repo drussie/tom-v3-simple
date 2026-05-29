@@ -44,6 +44,11 @@ MAIN_PLAYER_TRACK_TYPES = {
     "main_player_track_candidate",
     "main_player_track_assignment_candidate",
 }
+MOTION_SMOOTHING_TYPES = {
+    "smoothed_ball_position_candidate",
+    "smoothed_main_player_box_candidate",
+    "smoothed_pose_candidate",
+}
 COURT_TEMPORAL_PERSISTENCE_OFF = "off"
 COURT_TEMPORAL_PERSISTENCE_CARRY_FORWARD = "carry_forward"
 DEFAULT_COURT_PERSISTENCE_MAX_GAP_MS = 1500
@@ -118,6 +123,7 @@ def build_replay_overlay_chunk(
     tracklet_run_id: str | None = None,
     pose_run_id: str | None = None,
     main_player_track_run_id: str | None = None,
+    motion_smoothing_run_id: str | None = None,
     court_run_id: str | None = None,
     homography_run_id: str | None = None,
     projection_diagnostic_run_id: str | None = None,
@@ -178,6 +184,39 @@ def build_replay_overlay_chunk(
             main_player_track_run_id=main_player_track_run_id,
         )
         if "main_player_tracks" in layers
+        else []
+    )
+    smoothed_ball = (
+        build_smoothed_ball_overlay_items(
+            session=session,
+            media=media,
+            start_ms=start_ms,
+            end_ms=end_ms,
+            motion_smoothing_run_id=motion_smoothing_run_id,
+        )
+        if "smoothed_ball" in layers
+        else []
+    )
+    smoothed_player_boxes = (
+        build_smoothed_player_box_overlay_items(
+            session=session,
+            media=media,
+            start_ms=start_ms,
+            end_ms=end_ms,
+            motion_smoothing_run_id=motion_smoothing_run_id,
+        )
+        if "smoothed_player_boxes" in layers
+        else []
+    )
+    smoothed_pose = (
+        build_smoothed_pose_overlay_items(
+            session=session,
+            media=media,
+            start_ms=start_ms,
+            end_ms=end_ms,
+            motion_smoothing_run_id=motion_smoothing_run_id,
+        )
+        if "smoothed_pose" in layers
         else []
     )
     court_keypoints = (
@@ -254,6 +293,9 @@ def build_replay_overlay_chunk(
         "tracklets": tracklets,
         "poses": poses,
         "main_player_tracks": main_player_tracks,
+        "smoothed_ball": smoothed_ball,
+        "smoothed_player_boxes": smoothed_player_boxes,
+        "smoothed_pose": smoothed_pose,
         "court_keypoints": court_keypoints,
         "court_lines": court_lines,
         "camera_view": camera_view,
@@ -274,6 +316,7 @@ def build_replay_timeline(
     tracklet_run_id: str | None = None,
     pose_run_id: str | None = None,
     main_player_track_run_id: str | None = None,
+    motion_smoothing_run_id: str | None = None,
     court_run_id: str | None = None,
     homography_run_id: str | None = None,
     projection_diagnostic_run_id: str | None = None,
@@ -296,6 +339,7 @@ def build_replay_timeline(
                     tracklet_run_id,
                     pose_run_id,
                     main_player_track_run_id,
+                    motion_smoothing_run_id,
                     court_run_id,
                     homography_run_id,
                     projection_diagnostic_run_id,
@@ -347,6 +391,15 @@ def build_replay_timeline(
                     session=session,
                     media=media,
                     main_player_track_run_id=main_player_track_run_id,
+                ),
+            },
+            {
+                "lane_type": "smoothed_motion",
+                "label": "Smoothed motion candidates",
+                "items": build_smoothed_motion_timeline_items(
+                    session=session,
+                    media=media,
+                    motion_smoothing_run_id=motion_smoothing_run_id,
                 ),
             },
             {
@@ -626,6 +679,60 @@ def main_player_track_timeline_item_from_observation(
         "display_label": _main_player_track_display_label(
             overlay_item["track_role_candidate"]
         ),
+    }
+
+
+def build_smoothed_motion_timeline_items(
+    session: Session,
+    *,
+    media: MediaAsset,
+    motion_smoothing_run_id: str | None = None,
+) -> list[dict[str, Any]]:
+    query = (
+        select(Observation)
+        .where(
+            Observation.media_id == media.id,
+            Observation.observation_type.in_(sorted(MOTION_SMOOTHING_TYPES)),
+            Observation.timestamp_start_ms.is_not(None),
+        )
+        .order_by(Observation.timestamp_start_ms, Observation.frame_start, Observation.id)
+    )
+    if motion_smoothing_run_id is not None:
+        query = query.where(Observation.run_id == motion_smoothing_run_id)
+
+    items: list[dict[str, Any]] = []
+    for observation in session.scalars(query).all():
+        item = smoothed_motion_timeline_item_from_observation(observation)
+        if item is not None:
+            items.append(item)
+    return items
+
+
+def smoothed_motion_timeline_item_from_observation(
+    observation: Observation,
+) -> dict[str, Any] | None:
+    overlay_item = smoothed_motion_overlay_item_from_observation(observation)
+    if overlay_item is None:
+        return None
+    display_label = {
+        "smoothed_ball_position_candidate": "smoothed ball position candidate",
+        "smoothed_main_player_box_candidate": "smoothed main player box candidate",
+        "smoothed_pose_candidate": "smoothed pose candidate",
+    }.get(observation.observation_type, "smoothed motion candidate")
+    return {
+        "item_type": observation.observation_type,
+        "observation_id": observation.id,
+        "run_id": observation.run_id,
+        "timestamp_ms": overlay_item["timestamp_ms"],
+        "frame_number": overlay_item["frame_number"],
+        "display_label": display_label,
+        "smoothing_method": overlay_item.get("smoothing_method"),
+        "source_observation_ids": overlay_item.get("source_observation_ids", []),
+        "track_candidate_id": overlay_item.get("track_candidate_id"),
+        "track_role_candidate": overlay_item.get("track_role_candidate"),
+        "smoothed_candidate_only": True,
+        "observation_only": True,
+        "no_adjudication": True,
     }
 
 
@@ -1241,6 +1348,192 @@ def main_player_track_overlay_item_from_observation(
     }
 
 
+def build_smoothed_ball_overlay_items(
+    session: Session,
+    *,
+    media: MediaAsset,
+    start_ms: int,
+    end_ms: int,
+    motion_smoothing_run_id: str | None = None,
+) -> list[dict[str, Any]]:
+    rows = _motion_smoothing_rows(
+        session=session,
+        media=media,
+        start_ms=start_ms,
+        end_ms=end_ms,
+        motion_smoothing_run_id=motion_smoothing_run_id,
+        observation_type="smoothed_ball_position_candidate",
+    )
+    return [
+        item
+        for row in rows
+        if (item := smoothed_motion_overlay_item_from_observation(row)) is not None
+    ]
+
+
+def build_smoothed_player_box_overlay_items(
+    session: Session,
+    *,
+    media: MediaAsset,
+    start_ms: int,
+    end_ms: int,
+    motion_smoothing_run_id: str | None = None,
+) -> list[dict[str, Any]]:
+    rows = _motion_smoothing_rows(
+        session=session,
+        media=media,
+        start_ms=start_ms,
+        end_ms=end_ms,
+        motion_smoothing_run_id=motion_smoothing_run_id,
+        observation_type="smoothed_main_player_box_candidate",
+    )
+    return [
+        item
+        for row in rows
+        if (item := smoothed_motion_overlay_item_from_observation(row)) is not None
+    ]
+
+
+def build_smoothed_pose_overlay_items(
+    session: Session,
+    *,
+    media: MediaAsset,
+    start_ms: int,
+    end_ms: int,
+    motion_smoothing_run_id: str | None = None,
+) -> list[dict[str, Any]]:
+    rows = _motion_smoothing_rows(
+        session=session,
+        media=media,
+        start_ms=start_ms,
+        end_ms=end_ms,
+        motion_smoothing_run_id=motion_smoothing_run_id,
+        observation_type="smoothed_pose_candidate",
+    )
+    return [
+        item
+        for row in rows
+        if (item := smoothed_motion_overlay_item_from_observation(row)) is not None
+    ]
+
+
+def smoothed_motion_overlay_item_from_observation(
+    observation: Observation,
+) -> dict[str, Any] | None:
+    if observation.observation_type not in MOTION_SMOOTHING_TYPES:
+        return None
+    payload = observation.payload_jsonb or {}
+    frame_number, timestamp_ms = _observation_frame_time(observation)
+    if frame_number is None or timestamp_ms is None:
+        return None
+    common = {
+        "observation_id": observation.id,
+        "run_id": observation.run_id,
+        "frame_number": frame_number,
+        "timestamp_ms": timestamp_ms,
+        "smoothing_method": _string_or_none(payload.get("smoothing_method")),
+        "source_observation_ids": payload.get("source_observation_ids") or [],
+        "smoothed_candidate_only": True,
+        "not_truth": True,
+        "observation_only": True,
+        "no_adjudication": True,
+        "source_language": "smoothed replay candidate evidence",
+        "coordinate_space": observation.coordinate_space or "image_pixels",
+        "model_registry_id": observation.model_id,
+        "model_name": observation.model.name if observation.model is not None else None,
+        "model_version": observation.model.version if observation.model is not None else None,
+        "runtime_config_id": observation.runtime_config_id,
+        "evidence_source": "motion_smoothing_candidate",
+        "source_label": "smoothed replay candidate",
+    }
+    if observation.observation_type == "smoothed_ball_position_candidate":
+        bbox = _bbox_from_payload(payload)
+        x = _numeric(payload.get("x"))
+        y = _numeric(payload.get("y"))
+        if bbox is None or x is None or y is None:
+            return None
+        return {
+            "overlay_type": "smoothed_ball_position_candidate",
+            **common,
+            "x": x,
+            "y": y,
+            "bbox": bbox,
+            "confidence": observation.confidence,
+            "source_detection_run_id": _string_or_none(payload.get("source_detection_run_id")),
+            "source_tracklet_run_id": _string_or_none(payload.get("source_tracklet_run_id")),
+            "source_tracklet_id": _string_or_none(payload.get("source_tracklet_id")),
+            "source_track_point_id": _string_or_none(payload.get("source_track_point_id")),
+            "not_ball_truth": True,
+        }
+    if observation.observation_type == "smoothed_main_player_box_candidate":
+        bbox = _bbox_from_payload(payload)
+        if bbox is None:
+            return None
+        return {
+            "overlay_type": "smoothed_main_player_box_candidate",
+            **common,
+            "bbox": bbox,
+            "confidence": observation.confidence,
+            "source_main_player_track_run_id": _string_or_none(
+                payload.get("source_main_player_track_run_id")
+            ),
+            "source_track_assignment_observation_id": _string_or_none(
+                payload.get("source_track_assignment_observation_id")
+            ),
+            "track_candidate_id": _string_or_none(payload.get("track_candidate_id")),
+            "track_role_candidate": _string_or_none(payload.get("track_role_candidate")),
+            "not_identity_truth": True,
+        }
+    keypoints = payload.get("keypoints")
+    if not isinstance(keypoints, list):
+        return None
+    return {
+        "overlay_type": "smoothed_pose_candidate",
+        **common,
+        "pose_confidence": observation.confidence,
+        "skeleton_format": _string_or_none(payload.get("skeleton_format")) or "coco17",
+        "skeleton_version": _string_or_none(payload.get("skeleton_version")) or "v0",
+        "keypoints": _pose_overlay_keypoints(keypoints),
+        "edges": payload.get("edges") or [],
+        "bbox": _bbox_from_payload(payload),
+        "source_pose_run_id": _string_or_none(payload.get("source_pose_run_id")),
+        "source_pose_observation_id": _string_or_none(payload.get("source_pose_observation_id")),
+        "source_track_run_id": _string_or_none(payload.get("source_track_run_id")),
+        "track_assignment_observation_id": _string_or_none(
+            payload.get("track_assignment_observation_id")
+        ),
+        "track_candidate_id": _string_or_none(payload.get("track_candidate_id")),
+        "track_role_candidate": _string_or_none(payload.get("track_role_candidate")),
+        "not_pose_truth": True,
+    }
+
+
+def _motion_smoothing_rows(
+    *,
+    session: Session,
+    media: MediaAsset,
+    start_ms: int,
+    end_ms: int,
+    motion_smoothing_run_id: str | None,
+    observation_type: str,
+) -> list[Observation]:
+    timestamp_end = func.coalesce(Observation.timestamp_end_ms, Observation.timestamp_start_ms)
+    query = (
+        select(Observation)
+        .where(
+            Observation.media_id == media.id,
+            Observation.observation_type == observation_type,
+            Observation.timestamp_start_ms.is_not(None),
+            Observation.timestamp_start_ms <= end_ms,
+            timestamp_end >= start_ms,
+        )
+        .order_by(Observation.timestamp_start_ms, Observation.frame_start, Observation.id)
+    )
+    if motion_smoothing_run_id is not None:
+        query = query.where(Observation.run_id == motion_smoothing_run_id)
+    return list(session.scalars(query).all())
+
+
 def build_court_keypoint_overlay_items(
     session: Session,
     *,
@@ -1694,6 +1987,7 @@ def available_runs_for_media(session: Session, media_id: str) -> dict[str, list[
         "homography": _homography_run_summaries(session, media_id),
         "projection_diagnostic": _projection_diagnostic_run_summaries(session, media_id),
         "main_player_track": _main_player_track_run_summaries(session, media_id),
+        "motion_smoothing": _motion_smoothing_run_summaries(session, media_id),
     }
 
 
@@ -1721,6 +2015,30 @@ def normalize_replay_layers(layers: str | list[str] | tuple[str, ...] | None) ->
             "main-player-track-assignments",
         }:
             layer = "main_player_tracks"
+        if layer in {
+            "smoothed",
+            "motion_smoothing",
+            "motion-smoothing",
+            "smoothed_motion",
+            "stable_replay_candidates",
+        }:
+            normalized.update({"smoothed_ball", "smoothed_player_boxes", "smoothed_pose"})
+            continue
+        if layer in {
+            "smoothed-ball",
+            "smoothed_ball_position",
+            "smoothed_ball_position_candidate",
+        }:
+            layer = "smoothed_ball"
+        if layer in {
+            "smoothed-player-boxes",
+            "smoothed_player_box",
+            "smoothed_main_player_boxes",
+            "smoothed_main_player_box_candidate",
+        }:
+            layer = "smoothed_player_boxes"
+        if layer in {"smoothed-pose", "smoothed_poses", "smoothed_pose_candidate"}:
+            layer = "smoothed_pose"
         if layer in {"court", "court_evidence"}:
             normalized.update(
                 {
@@ -1912,6 +2230,58 @@ def _main_player_track_run_summaries(session: Session, media_id: str) -> list[di
                 "track_assignment_count": counts_by_run_type.get(
                     (summary["run_id"], "main_player_track_assignment_candidate"), 0
                 ),
+            }
+        )
+    return summaries
+
+
+def _motion_smoothing_run_summaries(session: Session, media_id: str) -> list[dict[str, Any]]:
+    summaries = _run_summaries_for_observation_types(session, media_id, MOTION_SMOOTHING_TYPES)
+    if not summaries:
+        return []
+
+    counts_by_run_type = _counts_by_run_and_type(session, media_id, MOTION_SMOOTHING_TYPES)
+    for summary in summaries:
+        run = session.get(ProcessingRun, summary["run_id"])
+        runtime_payload = run.runtime_config.payload_jsonb if run and run.runtime_config else {}
+        run_metadata = run.metadata_jsonb if run is not None else {}
+        source_run_ids = runtime_payload.get("source_run_ids")
+        if not isinstance(source_run_ids, dict):
+            source_run_ids = {}
+        summary.update(
+            {
+                "evidence_source": "motion_smoothing_candidate",
+                "source_label": "smoothed replay candidate evidence",
+                "source_detection_run_id": _string_or_none(
+                    run_metadata.get("source_detection_run_id")
+                )
+                or _string_or_none(source_run_ids.get("detection_run_id")),
+                "source_tracklet_run_id": _string_or_none(
+                    run_metadata.get("source_tracklet_run_id")
+                )
+                or _string_or_none(source_run_ids.get("tracklet_run_id")),
+                "source_main_player_track_run_id": _string_or_none(
+                    run_metadata.get("source_main_player_track_run_id")
+                )
+                or _string_or_none(source_run_ids.get("main_player_track_run_id")),
+                "source_pose_run_id": _string_or_none(run_metadata.get("source_pose_run_id"))
+                or _string_or_none(source_run_ids.get("pose_run_id")),
+                "smoothed_ball_count": counts_by_run_type.get(
+                    (summary["run_id"], "smoothed_ball_position_candidate"), 0
+                ),
+                "smoothed_player_box_count": counts_by_run_type.get(
+                    (summary["run_id"], "smoothed_main_player_box_candidate"), 0
+                ),
+                "smoothed_pose_count": counts_by_run_type.get(
+                    (summary["run_id"], "smoothed_pose_candidate"), 0
+                ),
+                "smoothed_candidate_only": True,
+                "not_truth": True,
+                "observation_only": True,
+                "no_adjudication": True,
+                "is_fixture": False,
+                "is_real_model_output": False,
+                "model_output_not_truth": False,
             }
         )
     return summaries

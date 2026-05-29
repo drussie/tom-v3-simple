@@ -246,6 +246,9 @@ export interface ReplayRunSummary {
   is_real_model_output?: boolean;
   is_real_detection_derived?: boolean;
   source_detection_run_id?: string | null;
+  source_tracklet_run_id?: string | null;
+  source_main_player_track_run_id?: string | null;
+  source_pose_run_id?: string | null;
   source_detection_evidence_source?: string | null;
   source_detection_source_label?: string | null;
   source_detection_runtime?: string | null;
@@ -267,6 +270,11 @@ export interface ReplayRunSummary {
   candidate_subject_only?: boolean;
   not_identity_truth?: boolean;
   model_output_not_truth?: boolean;
+  smoothed_ball_count?: number;
+  smoothed_player_box_count?: number;
+  smoothed_pose_count?: number;
+  smoothed_candidate_only?: boolean;
+  not_truth?: boolean;
 }
 
 export interface ReplayAvailableRuns {
@@ -278,6 +286,7 @@ export interface ReplayAvailableRuns {
   homography: ReplayRunSummary[];
   projection_diagnostic: ReplayRunSummary[];
   main_player_track: ReplayRunSummary[];
+  motion_smoothing: ReplayRunSummary[];
 }
 
 export interface ReplayInfo {
@@ -481,6 +490,72 @@ export interface ReplayMainPlayerTrackOverlay {
   model_version?: string | null;
   runtime_config_id?: string | null;
   model_output_not_truth?: boolean;
+}
+
+export interface ReplaySmoothedCandidateSource {
+  overlay_type:
+    | "smoothed_ball_position_candidate"
+    | "smoothed_main_player_box_candidate"
+    | "smoothed_pose_candidate";
+  observation_id: string;
+  run_id: string;
+  frame_number: number;
+  timestamp_ms: number;
+  smoothing_method: string | null;
+  source_observation_ids: string[];
+  smoothed_candidate_only: boolean;
+  not_truth: boolean;
+  observation_only: boolean;
+  no_adjudication: boolean;
+  source_language: "smoothed replay candidate evidence";
+  coordinate_space: "image_pixels";
+  evidence_source?: string;
+  source_label?: string | null;
+  model_registry_id?: string | null;
+  model_name?: string | null;
+  model_version?: string | null;
+  runtime_config_id?: string | null;
+}
+
+export interface ReplaySmoothedBallOverlay extends ReplaySmoothedCandidateSource {
+  overlay_type: "smoothed_ball_position_candidate";
+  x: number;
+  y: number;
+  bbox: ReplayDetectionBBox;
+  confidence: number | null;
+  source_detection_run_id?: string | null;
+  source_tracklet_run_id?: string | null;
+  source_tracklet_id?: string | null;
+  source_track_point_id?: string | null;
+  not_ball_truth: boolean;
+}
+
+export interface ReplaySmoothedPlayerBoxOverlay extends ReplaySmoothedCandidateSource {
+  overlay_type: "smoothed_main_player_box_candidate";
+  bbox: ReplayDetectionBBox;
+  confidence: number | null;
+  source_main_player_track_run_id?: string | null;
+  source_track_assignment_observation_id?: string | null;
+  track_candidate_id?: string | null;
+  track_role_candidate?: string | null;
+  not_identity_truth: boolean;
+}
+
+export interface ReplaySmoothedPoseOverlay extends ReplaySmoothedCandidateSource {
+  overlay_type: "smoothed_pose_candidate";
+  pose_confidence: number | null;
+  skeleton_format: string;
+  skeleton_version: string;
+  keypoints: ReplayPoseKeypoint[];
+  edges: [string, string][];
+  bbox: ReplayDetectionBBox | null;
+  source_pose_run_id?: string | null;
+  source_pose_observation_id?: string | null;
+  source_track_run_id?: string | null;
+  track_assignment_observation_id?: string | null;
+  track_candidate_id?: string | null;
+  track_role_candidate?: string | null;
+  not_pose_truth: boolean;
 }
 
 export interface ReplayCourtEvidenceSource {
@@ -710,6 +785,9 @@ export interface ReplayOverlayChunk {
   tracklets: ReplayTrackletOverlay[];
   poses: ReplayPoseOverlay[];
   main_player_tracks: ReplayMainPlayerTrackOverlay[];
+  smoothed_ball: ReplaySmoothedBallOverlay[];
+  smoothed_player_boxes: ReplaySmoothedPlayerBoxOverlay[];
+  smoothed_pose: ReplaySmoothedPoseOverlay[];
   court_keypoints: ReplayCourtKeypointOverlay[];
   court_lines: ReplayCourtLineOverlay[];
   camera_view: ReplayCameraViewOverlay[];
@@ -935,11 +1013,31 @@ export interface ReplayProjectionDiagnosticTimelineItem extends ReplayCourtEvide
   display_label: string;
 }
 
+export interface ReplaySmoothedMotionTimelineItem {
+  item_type:
+    | "smoothed_ball_position_candidate"
+    | "smoothed_main_player_box_candidate"
+    | "smoothed_pose_candidate";
+  observation_id: string;
+  run_id: string;
+  timestamp_ms: number;
+  frame_number: number;
+  display_label: string;
+  smoothing_method: string | null;
+  source_observation_ids: string[];
+  track_candidate_id?: string | null;
+  track_role_candidate?: string | null;
+  smoothed_candidate_only: boolean;
+  observation_only: boolean;
+  no_adjudication: boolean;
+}
+
 export type ReplayTimelineItem =
   | ReplayDetectionTimelineItem
   | ReplayTrackletTimelineItem
   | ReplayPoseTimelineItem
   | ReplayMainPlayerTrackTimelineItem
+  | ReplaySmoothedMotionTimelineItem
   | ReplayCourtKeypointTimelineItem
   | ReplayCourtLineTimelineItem
   | ReplayCameraViewTimelineItem
@@ -953,6 +1051,7 @@ export interface ReplayTimelineLane {
     | "tracklets"
     | "pose"
     | "main_player_tracks"
+    | "smoothed_motion"
     | "court_keypoints"
     | "court_lines"
     | "camera_view"

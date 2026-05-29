@@ -13,6 +13,9 @@ import {
   filterMainPlayerTracksAvailableAt,
   filterPosesAvailableAt,
   filterProjectionDiagnosticsAvailableAt,
+  filterSmoothedBallAvailableAt,
+  filterSmoothedPlayerBoxesAvailableAt,
+  filterSmoothedPosesAvailableAt,
   filterTrackletsAvailableAt,
   selectInitialReplayRun
 } from "../lib/replayOverlays";
@@ -40,6 +43,10 @@ import type {
   ReplayProjectionDiagnosticOverlay,
   ReplayRunSummary,
   ReplaySeekRequest,
+  ReplaySmoothedBallOverlay,
+  ReplaySmoothedMotionTimelineItem,
+  ReplaySmoothedPlayerBoxOverlay,
+  ReplaySmoothedPoseOverlay,
   ReplayTimeline,
   ReplayTimelineItem,
   ReplayTrackletOverlay,
@@ -51,6 +58,7 @@ import { ReplayDetectionOverlay as ReplayDetectionOverlayLayer } from "./ReplayD
 import { ReplayEvidenceTimeline } from "./ReplayEvidenceTimeline";
 import { ReplayMainPlayerTrackOverlay as ReplayMainPlayerTrackOverlayLayer } from "./ReplayMainPlayerTrackOverlay";
 import { ReplayPoseOverlay as ReplayPoseOverlayLayer } from "./ReplayPoseOverlay";
+import { ReplaySmoothedMotionOverlay as ReplaySmoothedMotionOverlayLayer } from "./ReplaySmoothedMotionOverlay";
 import { ReplayTrackletOverlay as ReplayTrackletOverlayLayer } from "./ReplayTrackletOverlay";
 import { ReplayVideoPlayer } from "./ReplayVideoPlayer";
 
@@ -64,6 +72,7 @@ interface ReplayWorkstationProps {
     trackletRunId?: string;
     poseRunId?: string;
     mainPlayerTrackRunId?: string;
+    motionSmoothingRunId?: string;
     courtRunId?: string;
     courtTemporalPersistence?: string;
     courtPersistenceMaxGapMs?: string;
@@ -94,6 +103,10 @@ type SelectedReplayEvidence =
   | { kind: "pose_timeline"; item: Extract<ReplayTimelineItem, { item_type: "pose" }> }
   | { kind: "main_player_track"; item: ReplayMainPlayerTrackOverlay }
   | { kind: "main_player_track_timeline"; item: Extract<ReplayTimelineItem, { item_type: "main_player_track_assignment" }> }
+  | { kind: "smoothed_ball"; item: ReplaySmoothedBallOverlay }
+  | { kind: "smoothed_player_box"; item: ReplaySmoothedPlayerBoxOverlay }
+  | { kind: "smoothed_pose"; item: ReplaySmoothedPoseOverlay }
+  | { kind: "smoothed_motion_timeline"; item: ReplaySmoothedMotionTimelineItem }
   | { kind: "court_keypoint"; item: ReplayCourtKeypointOverlay }
   | { kind: "court_keypoint_timeline"; item: Extract<ReplayTimelineItem, { item_type: "court_keypoint" }> }
   | { kind: "court_line"; item: ReplayCourtLineOverlay }
@@ -130,6 +143,14 @@ export function ReplayWorkstation({
         selectedRuns.mainPlayerTrackRunId
       ),
     [replayInfo.available_runs.main_player_track, selectedRuns.mainPlayerTrackRunId]
+  );
+  const initialMotionSmoothingRunId = useMemo(
+    () =>
+      selectInitialReplayRun(
+        replayInfo.available_runs.motion_smoothing,
+        selectedRuns.motionSmoothingRunId
+      ),
+    [replayInfo.available_runs.motion_smoothing, selectedRuns.motionSmoothingRunId]
   );
   const initialCourtRunId = useMemo(
     () => selectInitialReplayRun(replayInfo.available_runs.court, selectedRuns.courtRunId),
@@ -172,6 +193,9 @@ export function ReplayWorkstation({
   const [selectedMainPlayerTrackRunId, setSelectedMainPlayerTrackRunId] = useState<string | null>(
     initialMainPlayerTrackRunId
   );
+  const [selectedMotionSmoothingRunId, setSelectedMotionSmoothingRunId] = useState<string | null>(
+    initialMotionSmoothingRunId
+  );
   const [selectedCourtRunId, setSelectedCourtRunId] = useState<string | null>(initialCourtRunId);
   const [selectedHomographyRunId, setSelectedHomographyRunId] = useState<string | null>(
     initialHomographyRunId
@@ -179,11 +203,20 @@ export function ReplayWorkstation({
   const [selectedProjectionDiagnosticRunId, setSelectedProjectionDiagnosticRunId] = useState<
     string | null
   >(initialProjectionDiagnosticRunId);
-  const [showDetections, setShowDetections] = useState(true);
-  const [showTracklets, setShowTracklets] = useState(true);
-  const [showPoses, setShowPoses] = useState(true);
+  const [showDetections, setShowDetections] = useState(initialMotionSmoothingRunId === null);
+  const [showTracklets, setShowTracklets] = useState(initialMotionSmoothingRunId === null);
+  const [showPoses, setShowPoses] = useState(initialMotionSmoothingRunId === null);
   const [showMainPlayerTracks, setShowMainPlayerTracks] = useState(
     initialMainPlayerTrackRunId !== null
+  );
+  const [showSmoothedBall, setShowSmoothedBall] = useState(
+    initialMotionSmoothingRunId !== null
+  );
+  const [showSmoothedPlayerBoxes, setShowSmoothedPlayerBoxes] = useState(
+    initialMotionSmoothingRunId !== null
+  );
+  const [showSmoothedPoses, setShowSmoothedPoses] = useState(
+    initialMotionSmoothingRunId !== null
   );
   const [detectionDisplayMode, setDetectionDisplayMode] =
     useState<ReplayOverlayDisplayMode>("current_only");
@@ -247,6 +280,18 @@ export function ReplayWorkstation({
   }, [initialMainPlayerTrackRunId]);
 
   useEffect(() => {
+    setSelectedMotionSmoothingRunId(initialMotionSmoothingRunId);
+    setShowSmoothedBall(initialMotionSmoothingRunId !== null);
+    setShowSmoothedPlayerBoxes(initialMotionSmoothingRunId !== null);
+    setShowSmoothedPoses(initialMotionSmoothingRunId !== null);
+    if (initialMotionSmoothingRunId !== null) {
+      setShowDetections(false);
+      setShowTracklets(false);
+      setShowPoses(false);
+    }
+  }, [initialMotionSmoothingRunId]);
+
+  useEffect(() => {
     setSelectedCourtRunId(initialCourtRunId);
     setShowRawCourtKeypoints(initialCourtRunId !== null);
     setShowCourtKeypoints(initialCourtRunId !== null);
@@ -302,6 +347,15 @@ export function ReplayWorkstation({
     if (showMainPlayerTracks && selectedMainPlayerTrackRunId !== null) {
       layers.push("main_player_tracks");
     }
+    if (showSmoothedBall && selectedMotionSmoothingRunId !== null) {
+      layers.push("smoothed_ball");
+    }
+    if (showSmoothedPlayerBoxes && selectedMotionSmoothingRunId !== null) {
+      layers.push("smoothed_player_boxes");
+    }
+    if (showSmoothedPoses && selectedMotionSmoothingRunId !== null) {
+      layers.push("smoothed_pose");
+    }
     if ((showCourtKeypoints || showRawCourtKeypoints) && selectedCourtRunId !== null) {
       layers.push("court_keypoints");
     }
@@ -323,6 +377,7 @@ export function ReplayWorkstation({
     selectedDetectionRunId,
     selectedHomographyRunId,
     selectedMainPlayerTrackRunId,
+    selectedMotionSmoothingRunId,
     selectedPoseRunId,
     selectedProjectionDiagnosticRunId,
     selectedTrackletRunId,
@@ -335,6 +390,9 @@ export function ReplayWorkstation({
     showMainPlayerTracks,
     showPoses,
     showProjectionDiagnostics,
+    showSmoothedBall,
+    showSmoothedPlayerBoxes,
+    showSmoothedPoses,
     showTracklets
   ]);
 
@@ -347,6 +405,7 @@ export function ReplayWorkstation({
     selectedTrackletRunId ?? "none",
     selectedPoseRunId ?? "none",
     selectedMainPlayerTrackRunId ?? "none",
+    selectedMotionSmoothingRunId ?? "none",
     selectedCourtRunId ?? "none",
     selectedHomographyRunId ?? "none",
     selectedProjectionDiagnosticRunId ?? "none",
@@ -379,6 +438,7 @@ export function ReplayWorkstation({
       trackletRunId: selectedTrackletRunId,
       poseRunId: selectedPoseRunId,
       mainPlayerTrackRunId: selectedMainPlayerTrackRunId,
+      motionSmoothingRunId: selectedMotionSmoothingRunId,
       courtRunId: selectedCourtRunId,
       homographyRunId: selectedHomographyRunId,
       projectionDiagnosticRunId: selectedProjectionDiagnosticRunId,
@@ -418,6 +478,7 @@ export function ReplayWorkstation({
     selectedDetectionRunId,
     selectedHomographyRunId,
     selectedMainPlayerTrackRunId,
+    selectedMotionSmoothingRunId,
     selectedPoseRunId,
     selectedProjectionDiagnosticRunId,
     selectedTrackletRunId
@@ -432,6 +493,7 @@ export function ReplayWorkstation({
       trackletRunId: selectedTrackletRunId,
       poseRunId: selectedPoseRunId,
       mainPlayerTrackRunId: selectedMainPlayerTrackRunId,
+      motionSmoothingRunId: selectedMotionSmoothingRunId,
       courtRunId: selectedCourtRunId,
       homographyRunId: selectedHomographyRunId,
       projectionDiagnosticRunId: selectedProjectionDiagnosticRunId,
@@ -461,6 +523,7 @@ export function ReplayWorkstation({
     selectedDetectionRunId,
     selectedHomographyRunId,
     selectedMainPlayerTrackRunId,
+    selectedMotionSmoothingRunId,
     selectedPoseRunId,
     selectedProjectionDiagnosticRunId,
     selectedTrackletRunId
@@ -507,6 +570,10 @@ export function ReplayWorkstation({
         setSelectedEvidence({ kind: "main_player_track_timeline", item });
         return;
       }
+      if (isSmoothedMotionTimelineItem(item)) {
+        setSelectedEvidence({ kind: "smoothed_motion_timeline", item });
+        return;
+      }
       if (item.item_type === "court_keypoint") {
         setSelectedEvidence({ kind: "court_keypoint_timeline", item });
         return;
@@ -544,6 +611,18 @@ export function ReplayWorkstation({
   const poses = filterPosesAvailableAt(overlayState.chunk?.poses ?? [], streamAvailableUntilMs);
   const mainPlayerTracks = filterMainPlayerTracksAvailableAt(
     overlayState.chunk?.main_player_tracks ?? [],
+    streamAvailableUntilMs
+  );
+  const smoothedBall = filterSmoothedBallAvailableAt(
+    overlayState.chunk?.smoothed_ball ?? [],
+    streamAvailableUntilMs
+  );
+  const smoothedPlayerBoxes = filterSmoothedPlayerBoxesAvailableAt(
+    overlayState.chunk?.smoothed_player_boxes ?? [],
+    streamAvailableUntilMs
+  );
+  const smoothedPoses = filterSmoothedPosesAvailableAt(
+    overlayState.chunk?.smoothed_pose ?? [],
     streamAvailableUntilMs
   );
   const courtKeypoints = filterCourtKeypointsAvailableAt(
@@ -612,6 +691,13 @@ export function ReplayWorkstation({
       : selectedEvidence?.kind === "main_player_track_timeline"
         ? selectedEvidence.item.observation_id
         : null;
+  const selectedSmoothedMotionObservationId =
+    selectedEvidence?.kind === "smoothed_ball" ||
+    selectedEvidence?.kind === "smoothed_player_box" ||
+    selectedEvidence?.kind === "smoothed_pose" ||
+    selectedEvidence?.kind === "smoothed_motion_timeline"
+      ? selectedEvidence.item.observation_id
+      : null;
   const selectedCourtObservationId = courtSelectedObservationId(selectedEvidence);
   const selectedTimelineKey = selectedTimelineItemKey(selectedEvidence);
 
@@ -636,6 +722,10 @@ export function ReplayWorkstation({
           <span className="mini-pill">{tracklets.length} tracklet candidates</span>
           <span className="mini-pill">{mainPlayerTracks.length} main player track labels</span>
           <span className="mini-pill">{poses.length} pose observations</span>
+          <span className="mini-pill">
+            {smoothedBall.length + smoothedPlayerBoxes.length + smoothedPoses.length} smoothed
+            candidates
+          </span>
           <span className="mini-pill">
             {courtKeypoints.length +
               courtLines.length +
@@ -714,6 +804,31 @@ export function ReplayWorkstation({
               selectedObservationId={selectedMainPlayerTrackObservationId}
               tracks={mainPlayerTracks}
             />
+            <ReplaySmoothedMotionOverlayLayer
+              currentFrame={playback.frameNumber}
+              currentTimestampMs={playback.timestampMs}
+              enabledBall={showSmoothedBall && selectedMotionSmoothingRunId !== null}
+              enabledPlayerBoxes={
+                showSmoothedPlayerBoxes && selectedMotionSmoothingRunId !== null
+              }
+              enabledPoses={showSmoothedPoses && selectedMotionSmoothingRunId !== null}
+              error={overlayState.error}
+              isLoading={overlayState.loading}
+              onSelectSmoothedBall={(item) => {
+                setSelectedEvidence({ kind: "smoothed_ball", item });
+              }}
+              onSelectSmoothedPlayerBox={(item) => {
+                setSelectedEvidence({ kind: "smoothed_player_box", item });
+              }}
+              onSelectSmoothedPose={(item) => {
+                setSelectedEvidence({ kind: "smoothed_pose", item });
+              }}
+              replayInfo={replayInfo}
+              selectedObservationId={selectedSmoothedMotionObservationId}
+              smoothedBall={smoothedBall}
+              smoothedPlayerBoxes={smoothedPlayerBoxes}
+              smoothedPoses={smoothedPoses}
+            />
             <ReplayCourtOverlayLayer
               cameraViews={cameraViews}
               courtKeypoints={courtKeypoints}
@@ -767,6 +882,7 @@ export function ReplayWorkstation({
             detectionRuns={replayInfo.available_runs.detection}
             homographyRuns={replayInfo.available_runs.homography}
             mainPlayerTrackRuns={replayInfo.available_runs.main_player_track}
+            motionSmoothingRuns={replayInfo.available_runs.motion_smoothing}
             projectionDiagnosticRuns={replayInfo.available_runs.projection_diagnostic}
             onSelectedCourtRunChange={(runId) => {
               setSelectedCourtRunId(runId);
@@ -782,6 +898,13 @@ export function ReplayWorkstation({
             }}
             onSelectedMainPlayerTrackRunChange={(runId) => {
               setSelectedMainPlayerTrackRunId(runId);
+              setSelectedEvidence(null);
+            }}
+            onSelectedMotionSmoothingRunChange={(runId) => {
+              setSelectedMotionSmoothingRunId(runId);
+              setShowSmoothedBall(runId !== null);
+              setShowSmoothedPlayerBoxes(runId !== null);
+              setShowSmoothedPoses(runId !== null);
               setSelectedEvidence(null);
             }}
             onSelectedProjectionDiagnosticRunChange={(runId) => {
@@ -806,6 +929,9 @@ export function ReplayWorkstation({
             onToggleMainPlayerTracks={setShowMainPlayerTracks}
             onToggleProjectionDiagnostics={setShowProjectionDiagnostics}
             onTogglePoses={setShowPoses}
+            onToggleSmoothedBall={setShowSmoothedBall}
+            onToggleSmoothedPlayerBoxes={setShowSmoothedPlayerBoxes}
+            onToggleSmoothedPoses={setShowSmoothedPoses}
             onCourtTemporalPersistenceChange={(mode) => {
               chunkCache.current.clear();
               setCourtTemporalPersistence(mode);
@@ -824,6 +950,7 @@ export function ReplayWorkstation({
             selectedDetectionRunId={selectedDetectionRunId}
             selectedHomographyRunId={selectedHomographyRunId}
             selectedMainPlayerTrackRunId={selectedMainPlayerTrackRunId}
+            selectedMotionSmoothingRunId={selectedMotionSmoothingRunId}
             selectedPoseRunId={selectedPoseRunId}
             selectedProjectionDiagnosticRunId={selectedProjectionDiagnosticRunId}
             selectedTrackletRunId={selectedTrackletRunId}
@@ -838,6 +965,9 @@ export function ReplayWorkstation({
             showMainPlayerTracks={showMainPlayerTracks}
             showPoses={showPoses}
             showProjectionDiagnostics={showProjectionDiagnostics}
+            showSmoothedBall={showSmoothedBall}
+            showSmoothedPlayerBoxes={showSmoothedPlayerBoxes}
+            showSmoothedPoses={showSmoothedPoses}
             detectionDisplayMode={detectionDisplayMode}
             trackletDisplayMode={trackletDisplayMode}
             showTrackletPaths={showTrackletPaths}
@@ -855,6 +985,7 @@ export function ReplayWorkstation({
               tracklets: showTracklets,
               pose: showPoses,
               main_player_tracks: showMainPlayerTracks,
+              smoothed_motion: showSmoothedBall || showSmoothedPlayerBoxes || showSmoothedPoses,
               court_keypoints: showCourtKeypoints || showRawCourtKeypoints,
               court_lines: showCourtLines,
               camera_view: showCameraView,
@@ -872,6 +1003,7 @@ export function ReplayWorkstation({
             selectedDetectionRunId={selectedDetectionRunId}
             selectedHomographyRunId={selectedHomographyRunId}
             selectedMainPlayerTrackRunId={selectedMainPlayerTrackRunId}
+            selectedMotionSmoothingRunId={selectedMotionSmoothingRunId}
             selectedPoseRunId={selectedPoseRunId}
             selectedProjectionDiagnosticRunId={selectedProjectionDiagnosticRunId}
             selectedTrackletRunId={selectedTrackletRunId}
@@ -988,6 +1120,7 @@ function ReplayLayerControls({
   trackletRuns,
   poseRuns,
   mainPlayerTrackRuns,
+  motionSmoothingRuns,
   courtRuns,
   homographyRuns,
   projectionDiagnosticRuns,
@@ -995,6 +1128,7 @@ function ReplayLayerControls({
   selectedTrackletRunId,
   selectedPoseRunId,
   selectedMainPlayerTrackRunId,
+  selectedMotionSmoothingRunId,
   selectedCourtRunId,
   selectedHomographyRunId,
   selectedProjectionDiagnosticRunId,
@@ -1005,6 +1139,9 @@ function ReplayLayerControls({
   showTrackletPaths,
   showPoses,
   showMainPlayerTracks,
+  showSmoothedBall,
+  showSmoothedPlayerBoxes,
+  showSmoothedPoses,
   showRawCourtKeypoints,
   showCourtKeypoints,
   showCourtLines,
@@ -1017,6 +1154,7 @@ function ReplayLayerControls({
   onSelectedTrackletRunChange,
   onSelectedPoseRunChange,
   onSelectedMainPlayerTrackRunChange,
+  onSelectedMotionSmoothingRunChange,
   onSelectedCourtRunChange,
   onSelectedHomographyRunChange,
   onSelectedProjectionDiagnosticRunChange,
@@ -1027,6 +1165,9 @@ function ReplayLayerControls({
   onToggleTrackletPaths,
   onTogglePoses,
   onToggleMainPlayerTracks,
+  onToggleSmoothedBall,
+  onToggleSmoothedPlayerBoxes,
+  onToggleSmoothedPoses,
   onToggleRawCourtKeypoints,
   onToggleCourtKeypoints,
   onToggleCourtLines,
@@ -1040,6 +1181,7 @@ function ReplayLayerControls({
   trackletRuns: ReplayRunSummary[];
   poseRuns: ReplayRunSummary[];
   mainPlayerTrackRuns: ReplayRunSummary[];
+  motionSmoothingRuns: ReplayRunSummary[];
   courtRuns: ReplayRunSummary[];
   homographyRuns: ReplayRunSummary[];
   projectionDiagnosticRuns: ReplayRunSummary[];
@@ -1047,6 +1189,7 @@ function ReplayLayerControls({
   selectedTrackletRunId: string | null;
   selectedPoseRunId: string | null;
   selectedMainPlayerTrackRunId: string | null;
+  selectedMotionSmoothingRunId: string | null;
   selectedCourtRunId: string | null;
   selectedHomographyRunId: string | null;
   selectedProjectionDiagnosticRunId: string | null;
@@ -1057,6 +1200,9 @@ function ReplayLayerControls({
   showTrackletPaths: boolean;
   showPoses: boolean;
   showMainPlayerTracks: boolean;
+  showSmoothedBall: boolean;
+  showSmoothedPlayerBoxes: boolean;
+  showSmoothedPoses: boolean;
   showRawCourtKeypoints: boolean;
   showCourtKeypoints: boolean;
   showCourtLines: boolean;
@@ -1069,6 +1215,7 @@ function ReplayLayerControls({
   onSelectedTrackletRunChange: (runId: string | null) => void;
   onSelectedPoseRunChange: (runId: string | null) => void;
   onSelectedMainPlayerTrackRunChange: (runId: string | null) => void;
+  onSelectedMotionSmoothingRunChange: (runId: string | null) => void;
   onSelectedCourtRunChange: (runId: string | null) => void;
   onSelectedHomographyRunChange: (runId: string | null) => void;
   onSelectedProjectionDiagnosticRunChange: (runId: string | null) => void;
@@ -1079,6 +1226,9 @@ function ReplayLayerControls({
   onToggleTrackletPaths: (enabled: boolean) => void;
   onTogglePoses: (enabled: boolean) => void;
   onToggleMainPlayerTracks: (enabled: boolean) => void;
+  onToggleSmoothedBall: (enabled: boolean) => void;
+  onToggleSmoothedPlayerBoxes: (enabled: boolean) => void;
+  onToggleSmoothedPoses: (enabled: boolean) => void;
   onToggleRawCourtKeypoints: (enabled: boolean) => void;
   onToggleCourtKeypoints: (enabled: boolean) => void;
   onToggleCourtLines: (enabled: boolean) => void;
@@ -1153,6 +1303,27 @@ function ReplayLayerControls({
           onChange={onSelectedMainPlayerTrackRunChange}
           runs={mainPlayerTrackRuns}
           selectedRunId={selectedMainPlayerTrackRunId}
+        />
+        <LayerToggle
+          checked={showSmoothedBall}
+          label="Show smoothed ball candidate"
+          onChange={onToggleSmoothedBall}
+        />
+        <LayerToggle
+          checked={showSmoothedPlayerBoxes}
+          label="Show smoothed main player boxes"
+          onChange={onToggleSmoothedPlayerBoxes}
+        />
+        <LayerToggle
+          checked={showSmoothedPoses}
+          label="Show smoothed pose candidates"
+          onChange={onToggleSmoothedPoses}
+        />
+        <RunSelect
+          label="Motion smoothing run"
+          onChange={onSelectedMotionSmoothingRunChange}
+          runs={motionSmoothingRuns}
+          selectedRunId={selectedMotionSmoothingRunId}
         />
         <LayerToggle
           checked={showRawCourtKeypoints}
@@ -1359,6 +1530,10 @@ function AvailableRunsPanel({ replayInfo }: { replayInfo: ReplayInfo }) {
           title="Main player track candidates"
           runs={replayInfo.available_runs.main_player_track}
         />
+        <RunGroup
+          title="Motion smoothing candidates"
+          runs={replayInfo.available_runs.motion_smoothing}
+        />
         <RunGroup title="Pose observations" runs={replayInfo.available_runs.pose} />
         <RunGroup title="Court evidence" runs={replayInfo.available_runs.court} />
         <RunGroup title="Homography candidates" runs={replayInfo.available_runs.homography} />
@@ -1381,6 +1556,7 @@ function SelectedRunContext({
   selectedTrackletRunId,
   selectedPoseRunId,
   selectedMainPlayerTrackRunId,
+  selectedMotionSmoothingRunId,
   selectedCourtRunId,
   selectedHomographyRunId,
   selectedProjectionDiagnosticRunId
@@ -1390,6 +1566,7 @@ function SelectedRunContext({
   selectedTrackletRunId: string | null;
   selectedPoseRunId: string | null;
   selectedMainPlayerTrackRunId: string | null;
+  selectedMotionSmoothingRunId: string | null;
   selectedCourtRunId: string | null;
   selectedHomographyRunId: string | null;
   selectedProjectionDiagnosticRunId: string | null;
@@ -1402,6 +1579,11 @@ function SelectedRunContext({
       "main player track candidate",
       selectedMainPlayerTrackRunId,
       replayInfo.available_runs.main_player_track
+    ],
+    [
+      "motion smoothing candidate",
+      selectedMotionSmoothingRunId,
+      replayInfo.available_runs.motion_smoothing
     ],
     ["court evidence", selectedCourtRunId, replayInfo.available_runs.court],
     ["homography candidate", selectedHomographyRunId, replayInfo.available_runs.homography],
@@ -1709,6 +1891,83 @@ function SelectedEvidencePanel({
         <p className="evidence-note">
           Main player track candidate. This is a visual subject-track assignment only; it is not a
           player identity, name, server role, or accepted player track.
+        </p>
+      </EvidencePanel>
+    );
+  }
+
+  if (
+    selectedEvidence.kind === "smoothed_ball" ||
+    selectedEvidence.kind === "smoothed_player_box" ||
+    selectedEvidence.kind === "smoothed_pose" ||
+    selectedEvidence.kind === "smoothed_motion_timeline"
+  ) {
+    const item = selectedEvidence.item;
+    const displayType =
+      "overlay_type" in item ? item.overlay_type : item.item_type;
+    const title =
+      displayType === "smoothed_ball_position_candidate"
+        ? "Selected Smoothed Ball Candidate"
+        : displayType === "smoothed_main_player_box_candidate"
+          ? "Selected Smoothed Main Player Box"
+          : "Selected Smoothed Pose Candidate";
+    return (
+      <EvidencePanel title={title} badge="smoothed candidate">
+        <DetailRow label="observation id" value={item.observation_id} />
+        <DetailRow label="run id" value={item.run_id} />
+        <DetailRow label="frame" value={item.frame_number.toString()} />
+        <DetailRow label="timestamp_ms" value={item.timestamp_ms.toString()} />
+        <DetailRow label="smoothing method" value={item.smoothing_method ?? "n/a"} />
+        {"confidence" in item ? (
+          <DetailRow label="confidence" value={formatConfidence(item.confidence)} />
+        ) : null}
+        {"pose_confidence" in item ? (
+          <DetailRow label="pose confidence" value={formatConfidence(item.pose_confidence)} />
+        ) : null}
+        {"source_detection_run_id" in item ? (
+          <DetailRow
+            label="source detection run"
+            value={item.source_detection_run_id ?? "n/a"}
+          />
+        ) : null}
+        {"source_tracklet_run_id" in item ? (
+          <DetailRow
+            label="source tracklet run"
+            value={item.source_tracklet_run_id ?? "n/a"}
+          />
+        ) : null}
+        {"source_main_player_track_run_id" in item ? (
+          <DetailRow
+            label="source main player track run"
+            value={item.source_main_player_track_run_id ?? "n/a"}
+          />
+        ) : null}
+        {"source_pose_run_id" in item ? (
+          <DetailRow label="source pose run" value={item.source_pose_run_id ?? "n/a"} />
+        ) : null}
+        {"track_candidate_id" in item ? (
+          <DetailRow label="track candidate" value={item.track_candidate_id ?? "n/a"} />
+        ) : null}
+        {"track_role_candidate" in item ? (
+          <DetailRow label="track role candidate" value={item.track_role_candidate ?? "n/a"} />
+        ) : null}
+        <DetailRow
+          label="source observations"
+          value={item.source_observation_ids.length.toString()}
+        />
+        <DetailRow
+          label="smoothed_candidate_only"
+          value={item.smoothed_candidate_only ? "true" : "false"}
+        />
+        <DetailRow label="observation_only" value={item.observation_only ? "true" : "false"} />
+        <DetailRow label="no_adjudication" value={item.no_adjudication ? "true" : "false"} />
+        <a className="quiet-link" href={`/runs/${item.run_id}`}>
+          Open source evidence run
+        </a>
+        <p className="evidence-note">
+          Smoothed replay candidate evidence only. It is derived from raw observations for visual
+          stability and does not establish ball truth, pose truth, player identity, bounce, hit,
+          in/out, point, or score.
         </p>
       </EvidencePanel>
     );
@@ -2114,6 +2373,16 @@ function SelectedRunRow({
   );
 }
 
+function isSmoothedMotionTimelineItem(
+  item: ReplayTimelineItem
+): item is ReplaySmoothedMotionTimelineItem {
+  return (
+    item.item_type === "smoothed_ball_position_candidate" ||
+    item.item_type === "smoothed_main_player_box_candidate" ||
+    item.item_type === "smoothed_pose_candidate"
+  );
+}
+
 function selectedTimelineItemKey(selectedEvidence: SelectedReplayEvidence | null): string | null {
   if (selectedEvidence === null) {
     return null;
@@ -2132,6 +2401,13 @@ function selectedTimelineItemKey(selectedEvidence: SelectedReplayEvidence | null
   }
   if (selectedEvidence.kind === "main_player_track") {
     return `main_player_track_assignment:${selectedEvidence.item.observation_id}`;
+  }
+  if (
+    selectedEvidence.kind === "smoothed_ball" ||
+    selectedEvidence.kind === "smoothed_player_box" ||
+    selectedEvidence.kind === "smoothed_pose"
+  ) {
+    return `${selectedEvidence.item.overlay_type}:${selectedEvidence.item.observation_id}`;
   }
   if (selectedEvidence.kind === "court_keypoint") {
     return `court_keypoint:${selectedEvidence.item.observation_id}`;
@@ -2191,6 +2467,9 @@ function formatReplayRunSourceLabel(run: ReplayRunSummary): string {
   }
   if (run.evidence_source === "main_player_track_assignment") {
     return "main player visual track candidates";
+  }
+  if (run.evidence_source === "motion_smoothing_candidate" || run.smoothed_candidate_only) {
+    return "smoothed replay candidates";
   }
   if (run.evidence_source === "fixture_derived_tracklet") {
     return "fixture-derived tracklet candidates";

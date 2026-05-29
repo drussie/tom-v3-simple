@@ -11,6 +11,9 @@ import type {
   ReplayProjectionDiagnosticOverlay,
   ReplayOverlayDisplayMode,
   ReplayRunSummary,
+  ReplaySmoothedBallOverlay,
+  ReplaySmoothedPlayerBoxOverlay,
+  ReplaySmoothedPoseOverlay,
   ReplayTrackletOverlay,
   ReplayTrackPointOverlay
 } from "./types";
@@ -257,6 +260,39 @@ export function activeReplayProjectionDiagnostics(
   return activeReplayCourtEvidence(diagnostics, currentTimestampMs, currentFrame, holdMs);
 }
 
+export function activeReplaySmoothedBall(
+  items: ReplaySmoothedBallOverlay[],
+  currentTimestampMs: number,
+  currentFrame: number,
+  holdMs = 125
+): ReplaySmoothedBallOverlay[] {
+  return items.filter((item) =>
+    isActiveReplayPoint(item.timestamp_ms, item.frame_number, currentTimestampMs, currentFrame, holdMs)
+  );
+}
+
+export function activeReplaySmoothedPlayerBoxes(
+  items: ReplaySmoothedPlayerBoxOverlay[],
+  currentTimestampMs: number,
+  currentFrame: number,
+  holdMs = 125
+): ReplaySmoothedPlayerBoxOverlay[] {
+  return items.filter((item) =>
+    isActiveReplayPoint(item.timestamp_ms, item.frame_number, currentTimestampMs, currentFrame, holdMs)
+  );
+}
+
+export function activeReplaySmoothedPoses(
+  items: ReplaySmoothedPoseOverlay[],
+  currentTimestampMs: number,
+  currentFrame: number,
+  holdMs = 125
+): ReplaySmoothedPoseOverlay[] {
+  return items.filter((item) =>
+    isActiveReplayPoint(item.timestamp_ms, item.frame_number, currentTimestampMs, currentFrame, holdMs)
+  );
+}
+
 function activeReplayCourtEvidence<
   T extends {
     timestamp_ms: number;
@@ -430,6 +466,36 @@ export function filterProjectionDiagnosticsAvailableAt(
     return diagnostics;
   }
   return diagnostics.filter((item) => item.timestamp_ms <= availableUntilMs);
+}
+
+export function filterSmoothedBallAvailableAt(
+  items: ReplaySmoothedBallOverlay[],
+  availableUntilMs: number | null
+): ReplaySmoothedBallOverlay[] {
+  if (availableUntilMs === null) {
+    return items;
+  }
+  return items.filter((item) => item.timestamp_ms <= availableUntilMs);
+}
+
+export function filterSmoothedPlayerBoxesAvailableAt(
+  items: ReplaySmoothedPlayerBoxOverlay[],
+  availableUntilMs: number | null
+): ReplaySmoothedPlayerBoxOverlay[] {
+  if (availableUntilMs === null) {
+    return items;
+  }
+  return items.filter((item) => item.timestamp_ms <= availableUntilMs);
+}
+
+export function filterSmoothedPosesAvailableAt(
+  items: ReplaySmoothedPoseOverlay[],
+  availableUntilMs: number | null
+): ReplaySmoothedPoseOverlay[] {
+  if (availableUntilMs === null) {
+    return items;
+  }
+  return items.filter((item) => item.timestamp_ms <= availableUntilMs);
 }
 
 export function projectTemplatePointWithMatrix(

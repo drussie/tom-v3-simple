@@ -122,6 +122,12 @@ class RelationshipType(StrEnum):
     projection_diagnostic_for_homography_candidate = (
         "projection_diagnostic_for_homography_candidate"
     )
+    smoothed_from_ball_detection = "smoothed_from_ball_detection"
+    smoothed_from_track_point_candidate = "smoothed_from_track_point_candidate"
+    smoothed_from_main_player_track_assignment = (
+        "smoothed_from_main_player_track_assignment"
+    )
+    smoothed_from_pose_observation = "smoothed_from_pose_observation"
 
 
 class CoordinateSpace(StrEnum):
