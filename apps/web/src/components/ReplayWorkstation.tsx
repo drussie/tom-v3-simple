@@ -222,6 +222,8 @@ export function ReplayWorkstation({
     useState<ReplayOverlayDisplayMode>("current_only");
   const [trackletDisplayMode, setTrackletDisplayMode] =
     useState<ReplayOverlayDisplayMode>("short_trail");
+  const [smoothedMotionDisplayMode, setSmoothedMotionDisplayMode] =
+    useState<ReplayOverlayDisplayMode>("current_only");
   const [showTrackletPaths, setShowTrackletPaths] = useState(false);
   const [showRawCourtKeypoints, setShowRawCourtKeypoints] = useState(
     initialCourtRunId !== null
@@ -284,6 +286,7 @@ export function ReplayWorkstation({
     setShowSmoothedBall(initialMotionSmoothingRunId !== null);
     setShowSmoothedPlayerBoxes(initialMotionSmoothingRunId !== null);
     setShowSmoothedPoses(initialMotionSmoothingRunId !== null);
+    setSmoothedMotionDisplayMode("current_only");
     if (initialMotionSmoothingRunId !== null) {
       setShowDetections(false);
       setShowTracklets(false);
@@ -813,6 +816,7 @@ export function ReplayWorkstation({
               }
               enabledPoses={showSmoothedPoses && selectedMotionSmoothingRunId !== null}
               error={overlayState.error}
+              displayMode={smoothedMotionDisplayMode}
               isLoading={overlayState.loading}
               onSelectSmoothedBall={(item) => {
                 setSelectedEvidence({ kind: "smoothed_ball", item });
@@ -905,6 +909,7 @@ export function ReplayWorkstation({
               setShowSmoothedBall(runId !== null);
               setShowSmoothedPlayerBoxes(runId !== null);
               setShowSmoothedPoses(runId !== null);
+              setSmoothedMotionDisplayMode("current_only");
               setSelectedEvidence(null);
             }}
             onSelectedProjectionDiagnosticRunChange={(runId) => {
@@ -932,6 +937,7 @@ export function ReplayWorkstation({
             onToggleSmoothedBall={setShowSmoothedBall}
             onToggleSmoothedPlayerBoxes={setShowSmoothedPlayerBoxes}
             onToggleSmoothedPoses={setShowSmoothedPoses}
+            onSmoothedMotionDisplayModeChange={setSmoothedMotionDisplayMode}
             onCourtTemporalPersistenceChange={(mode) => {
               chunkCache.current.clear();
               setCourtTemporalPersistence(mode);
@@ -966,6 +972,7 @@ export function ReplayWorkstation({
             showPoses={showPoses}
             showProjectionDiagnostics={showProjectionDiagnostics}
             showSmoothedBall={showSmoothedBall}
+            smoothedMotionDisplayMode={smoothedMotionDisplayMode}
             showSmoothedPlayerBoxes={showSmoothedPlayerBoxes}
             showSmoothedPoses={showSmoothedPoses}
             detectionDisplayMode={detectionDisplayMode}
@@ -1140,6 +1147,7 @@ function ReplayLayerControls({
   showPoses,
   showMainPlayerTracks,
   showSmoothedBall,
+  smoothedMotionDisplayMode,
   showSmoothedPlayerBoxes,
   showSmoothedPoses,
   showRawCourtKeypoints,
@@ -1168,6 +1176,7 @@ function ReplayLayerControls({
   onToggleSmoothedBall,
   onToggleSmoothedPlayerBoxes,
   onToggleSmoothedPoses,
+  onSmoothedMotionDisplayModeChange,
   onToggleRawCourtKeypoints,
   onToggleCourtKeypoints,
   onToggleCourtLines,
@@ -1201,6 +1210,7 @@ function ReplayLayerControls({
   showPoses: boolean;
   showMainPlayerTracks: boolean;
   showSmoothedBall: boolean;
+  smoothedMotionDisplayMode: ReplayOverlayDisplayMode;
   showSmoothedPlayerBoxes: boolean;
   showSmoothedPoses: boolean;
   showRawCourtKeypoints: boolean;
@@ -1229,6 +1239,7 @@ function ReplayLayerControls({
   onToggleSmoothedBall: (enabled: boolean) => void;
   onToggleSmoothedPlayerBoxes: (enabled: boolean) => void;
   onToggleSmoothedPoses: (enabled: boolean) => void;
+  onSmoothedMotionDisplayModeChange: (mode: ReplayOverlayDisplayMode) => void;
   onToggleRawCourtKeypoints: (enabled: boolean) => void;
   onToggleCourtKeypoints: (enabled: boolean) => void;
   onToggleCourtLines: (enabled: boolean) => void;
@@ -1318,6 +1329,11 @@ function ReplayLayerControls({
           checked={showSmoothedPoses}
           label="Show smoothed pose candidates"
           onChange={onToggleSmoothedPoses}
+        />
+        <DisplayModeSelect
+          label="Smoothed motion display"
+          onChange={onSmoothedMotionDisplayModeChange}
+          value={smoothedMotionDisplayMode}
         />
         <RunSelect
           label="Motion smoothing run"

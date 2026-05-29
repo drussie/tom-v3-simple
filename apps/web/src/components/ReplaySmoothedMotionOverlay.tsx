@@ -11,6 +11,7 @@ import {
 } from "../lib/replayOverlays";
 import type {
   ReplayInfo,
+  ReplayOverlayDisplayMode,
   ReplayPoseKeypoint,
   ReplaySmoothedBallOverlay,
   ReplaySmoothedPlayerBoxOverlay,
@@ -31,6 +32,7 @@ interface ReplaySmoothedMotionOverlayProps {
   isLoading: boolean;
   error: string | null;
   selectedObservationId: string | null;
+  displayMode?: ReplayOverlayDisplayMode;
   onSelectSmoothedBall: (item: ReplaySmoothedBallOverlay) => void;
   onSelectSmoothedPlayerBox: (item: ReplaySmoothedPlayerBoxOverlay) => void;
   onSelectSmoothedPose: (item: ReplaySmoothedPoseOverlay) => void;
@@ -61,6 +63,7 @@ export function ReplaySmoothedMotionOverlay({
   isLoading,
   error,
   selectedObservationId,
+  displayMode = "current_only",
   onSelectSmoothedBall,
   onSelectSmoothedPlayerBox,
   onSelectSmoothedPose,
@@ -85,8 +88,15 @@ export function ReplaySmoothedMotionOverlay({
   }, []);
 
   const activeBall = useMemo(
-    () => activeReplaySmoothedBall(smoothedBall, currentTimestampMs, currentFrame, holdMs),
-    [currentFrame, currentTimestampMs, holdMs, smoothedBall]
+    () =>
+      activeReplaySmoothedBall(
+        smoothedBall,
+        currentTimestampMs,
+        currentFrame,
+        holdMs,
+        displayMode
+      ),
+    [currentFrame, currentTimestampMs, displayMode, holdMs, smoothedBall]
   );
   const activeBoxes = useMemo(
     () =>
@@ -94,13 +104,47 @@ export function ReplaySmoothedMotionOverlay({
         smoothedPlayerBoxes,
         currentTimestampMs,
         currentFrame,
-        holdMs
+        holdMs,
+        displayMode
       ),
-    [currentFrame, currentTimestampMs, holdMs, smoothedPlayerBoxes]
+    [currentFrame, currentTimestampMs, displayMode, holdMs, smoothedPlayerBoxes]
   );
   const activePoses = useMemo(
-    () => activeReplaySmoothedPoses(smoothedPoses, currentTimestampMs, currentFrame, holdMs),
-    [currentFrame, currentTimestampMs, holdMs, smoothedPoses]
+    () =>
+      activeReplaySmoothedPoses(
+        smoothedPoses,
+        currentTimestampMs,
+        currentFrame,
+        holdMs,
+        displayMode
+      ),
+    [currentFrame, currentTimestampMs, displayMode, holdMs, smoothedPoses]
+  );
+  const labelBallIds = useMemo(
+    () =>
+      new Set(
+        activeReplaySmoothedBall(
+          smoothedBall,
+          currentTimestampMs,
+          currentFrame,
+          holdMs,
+          "current_only"
+        ).map((item) => item.observation_id)
+      ),
+    [currentFrame, currentTimestampMs, holdMs, smoothedBall]
+  );
+  const labelBoxIds = useMemo(
+    () =>
+      new Set(
+        activeReplaySmoothedPlayerBoxes(
+          smoothedPlayerBoxes,
+          currentTimestampMs,
+          currentFrame,
+          holdMs,
+          "current_only"
+        ).map((item) => item.observation_id)
+      ),
+    [currentFrame, currentTimestampMs, holdMs, smoothedPlayerBoxes]
   );
   const enabled = enabledBall || enabledPlayerBoxes || enabledPoses;
   const totalCount = smoothedBall.length + smoothedPlayerBoxes.length + smoothedPoses.length;
@@ -144,11 +188,13 @@ export function ReplaySmoothedMotionOverlay({
                     tabIndex={0}
                   >
                     <rect height={rect.height} width={rect.width} x={rect.x} y={rect.y} />
-                    <text x={rect.x} y={Math.max(14, rect.y - 8)}>
-                      {item.track_role_candidate === "near_player_track_candidate"
-                        ? "SMOOTH NEAR"
-                        : "SMOOTH FAR"}
-                    </text>
+                    {displayMode === "current_only" || labelBoxIds.has(item.observation_id) ? (
+                      <text x={rect.x} y={Math.max(14, rect.y - 8)}>
+                        {item.track_role_candidate === "near_player_track_candidate"
+                          ? "SMOOTH NEAR"
+                          : "SMOOTH FAR"}
+                      </text>
+                    ) : null}
                   </g>
                 );
               })
@@ -243,9 +289,11 @@ export function ReplaySmoothedMotionOverlay({
                     tabIndex={0}
                   >
                     <circle cx={point.x} cy={point.y} r={selected ? 9 : 7} />
-                    <text x={point.x + 10} y={point.y - 8}>
-                      SMOOTH BALL
-                    </text>
+                    {displayMode === "current_only" || labelBallIds.has(item.observation_id) ? (
+                      <text x={point.x + 10} y={point.y - 8}>
+                        SMOOTH BALL
+                      </text>
+                    ) : null}
                   </g>
                 );
               })

@@ -264,21 +264,45 @@ export function activeReplaySmoothedBall(
   items: ReplaySmoothedBallOverlay[],
   currentTimestampMs: number,
   currentFrame: number,
-  holdMs = 125
+  holdMs = 125,
+  displayMode: ReplayOverlayDisplayMode = "current_only"
 ): ReplaySmoothedBallOverlay[] {
-  return items.filter((item) =>
-    isActiveReplayPoint(item.timestamp_ms, item.frame_number, currentTimestampMs, currentFrame, holdMs)
+  if (displayMode === "full_trail") {
+    return items;
+  }
+  if (displayMode === "short_trail") {
+    return activeSmoothedCandidates(items, currentTimestampMs, currentFrame, holdMs);
+  }
+  const selected = selectNearestCurrentSmoothedCandidate(
+    items,
+    currentTimestampMs,
+    currentFrame,
+    holdMs,
+    (item) => item.confidence
   );
+  return selected === null ? [] : [selected];
 }
 
 export function activeReplaySmoothedPlayerBoxes(
   items: ReplaySmoothedPlayerBoxOverlay[],
   currentTimestampMs: number,
   currentFrame: number,
-  holdMs = 125
+  holdMs = 125,
+  displayMode: ReplayOverlayDisplayMode = "current_only"
 ): ReplaySmoothedPlayerBoxOverlay[] {
-  return items.filter((item) =>
-    isActiveReplayPoint(item.timestamp_ms, item.frame_number, currentTimestampMs, currentFrame, holdMs)
+  if (displayMode === "full_trail") {
+    return items;
+  }
+  if (displayMode === "short_trail") {
+    return activeSmoothedCandidates(items, currentTimestampMs, currentFrame, holdMs);
+  }
+  return selectCurrentSmoothedCandidatesByKey(
+    items,
+    currentTimestampMs,
+    currentFrame,
+    holdMs,
+    (item) => item.track_role_candidate ?? item.track_candidate_id ?? item.observation_id,
+    (item) => item.confidence
   );
 }
 
@@ -286,10 +310,88 @@ export function activeReplaySmoothedPoses(
   items: ReplaySmoothedPoseOverlay[],
   currentTimestampMs: number,
   currentFrame: number,
-  holdMs = 125
+  holdMs = 125,
+  displayMode: ReplayOverlayDisplayMode = "current_only"
 ): ReplaySmoothedPoseOverlay[] {
-  return items.filter((item) =>
-    isActiveReplayPoint(item.timestamp_ms, item.frame_number, currentTimestampMs, currentFrame, holdMs)
+  if (displayMode === "full_trail") {
+    return items;
+  }
+  if (displayMode === "short_trail") {
+    return activeSmoothedCandidates(items, currentTimestampMs, currentFrame, holdMs);
+  }
+  return selectCurrentSmoothedCandidatesByKey(
+    items,
+    currentTimestampMs,
+    currentFrame,
+    holdMs,
+    (item) => item.track_candidate_id ?? item.track_role_candidate ?? item.observation_id,
+    (item) => item.pose_confidence
+  );
+}
+
+export function selectNearestCurrentSmoothedCandidate<
+  T extends {
+    observation_id: string;
+    frame_number: number;
+    timestamp_ms: number;
+  }
+>(
+  items: T[],
+  currentTimestampMs: number,
+  currentFrame: number,
+  holdMs: number,
+  confidenceForItem: (item: T) => number | null | undefined
+): T | null {
+  return activeSmoothedCandidates(items, currentTimestampMs, currentFrame, holdMs).sort((a, b) =>
+    compareCurrentSmoothedCandidates(
+      a,
+      b,
+      currentTimestampMs,
+      currentFrame,
+      confidenceForItem
+    )
+  )[0] ?? null;
+}
+
+export function selectCurrentSmoothedCandidatesByKey<
+  T extends {
+    observation_id: string;
+    frame_number: number;
+    timestamp_ms: number;
+  }
+>(
+  items: T[],
+  currentTimestampMs: number,
+  currentFrame: number,
+  holdMs: number,
+  keyForItem: (item: T) => string,
+  confidenceForItem: (item: T) => number | null | undefined
+): T[] {
+  const selected = new Map<string, T>();
+  for (const item of activeSmoothedCandidates(items, currentTimestampMs, currentFrame, holdMs)) {
+    const key = keyForItem(item);
+    const previous = selected.get(key);
+    if (
+      previous === undefined ||
+      compareCurrentSmoothedCandidates(
+        item,
+        previous,
+        currentTimestampMs,
+        currentFrame,
+        confidenceForItem
+      ) < 0
+    ) {
+      selected.set(key, item);
+    }
+  }
+  return Array.from(selected.values()).sort((a, b) =>
+    compareCurrentSmoothedCandidates(
+      a,
+      b,
+      currentTimestampMs,
+      currentFrame,
+      confidenceForItem
+    )
   );
 }
 
@@ -346,6 +448,62 @@ function activeReplayCourtEvidence<
         current_replay_timestamp_ms: currentTimestampMs
       };
     });
+}
+
+function activeSmoothedCandidates<
+  T extends {
+    timestamp_ms: number;
+    frame_number: number;
+  }
+>(
+  items: T[],
+  currentTimestampMs: number,
+  currentFrame: number,
+  holdMs: number
+): T[] {
+  return items.filter((item) =>
+    isActiveReplayPoint(
+      item.timestamp_ms,
+      item.frame_number,
+      currentTimestampMs,
+      currentFrame,
+      holdMs
+    )
+  );
+}
+
+function compareCurrentSmoothedCandidates<
+  T extends {
+    observation_id: string;
+    frame_number: number;
+    timestamp_ms: number;
+  }
+>(
+  a: T,
+  b: T,
+  currentTimestampMs: number,
+  currentFrame: number,
+  confidenceForItem: (item: T) => number | null | undefined
+): number {
+  const aExactFrame = a.frame_number === currentFrame ? 1 : 0;
+  const bExactFrame = b.frame_number === currentFrame ? 1 : 0;
+  if (aExactFrame !== bExactFrame) {
+    return bExactFrame - aExactFrame;
+  }
+
+  const aTimestampDelta = Math.abs(a.timestamp_ms - currentTimestampMs);
+  const bTimestampDelta = Math.abs(b.timestamp_ms - currentTimestampMs);
+  if (aTimestampDelta !== bTimestampDelta) {
+    return aTimestampDelta - bTimestampDelta;
+  }
+
+  const aConfidence = confidenceForItem(a) ?? Number.NEGATIVE_INFINITY;
+  const bConfidence = confidenceForItem(b) ?? Number.NEGATIVE_INFINITY;
+  if (aConfidence !== bConfidence) {
+    return bConfidence - aConfidence;
+  }
+
+  return a.observation_id.localeCompare(b.observation_id);
 }
 
 export function isActiveReplayPointForDisplay(

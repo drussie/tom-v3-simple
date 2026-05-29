@@ -88,6 +88,11 @@ default when a motion smoothing run is selected. Raw detection, tracklet, and po
 available for audit. These layers are derived candidate evidence only; they do not establish ball
 truth, pose truth, player identity, bounce, hit, in/out, point, score, or court-space position.
 
+The smoothed motion display defaults to **Current only**. In that mode replay selects one current
+smoothed ball candidate, one near-player box candidate, one far-player box candidate, and one
+smoothed pose per active main-player track. Short-trail and full-trail/debug modes remain available
+for audit when an operator intentionally wants to inspect neighboring smoothed candidates.
+
 ## What 6A Added
 
 - `GET /media/{media_id}/replay-info`

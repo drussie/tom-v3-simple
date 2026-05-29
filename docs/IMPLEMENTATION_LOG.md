@@ -2060,3 +2060,26 @@ This milestone adds:
 
 This milestone does not add bounce/hit/in-out, rally/point/score, player identity, scoreboard OCR,
 server/receiver logic, court-space projection, accepted/rejected lifecycle, or adjudication.
+
+## Motion Smoothing Replay Current-Only Display Fix
+
+Status: complete
+
+### Goal
+
+Repair smoothed replay display policy so the default motion-smoothing overlay is a stable current
+candidate view instead of a hold-window trail.
+
+### Notes
+
+The original smoothed overlay helper returned every candidate within the active hold window. That
+made one frame show multiple `SMOOTH BALL` markers and stacked near/far smoothed labels. The repair
+adds a shared smoothed motion display mode:
+
+- `current_only`: one nearest current ball, one near box, one far box, and one pose per active track
+- `short_trail`: neighboring candidates for debug review
+- `full_trail`: full chunk/window debug display
+
+Current-only selection prefers exact frame matches, then nearest timestamp, then confidence, then
+deterministic observation id ordering. This remains a replay/read-model display policy; smoothed
+candidate observations stay immutable and evidence-only.

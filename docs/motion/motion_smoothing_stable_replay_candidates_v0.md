@@ -95,6 +95,15 @@ Replay supports these layers:
 When a `motionSmoothingRunId` is selected, the workstation defaults the smoothed layers on and raw
 detection/tracklet/pose layers off. Operators can still toggle raw evidence back on for audit.
 
+The smoothed motion display mode defaults to `current_only`:
+
+- one nearest current `smoothed_ball_position_candidate`
+- at most one `smoothed_main_player_box_candidate` per near/far track role
+- at most one `smoothed_pose_candidate` per track candidate/role
+
+`short_trail` and `full_trail` remain debug display modes. They can show multiple neighboring
+smoothed candidates, with labels reserved for the current selected candidate to reduce visual clutter.
+
 Selected smoothed evidence shows:
 
 - smoothing method

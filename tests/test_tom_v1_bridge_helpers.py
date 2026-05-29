@@ -35,6 +35,8 @@ def test_tom_v1_make_helpers_include_allowed_root_and_imgsz_defaults() -> None:
 
 def test_replay_display_policy_helpers_define_expected_modes() -> None:
     source = (ROOT / "apps/web/src/lib/replayOverlays.ts").read_text()
+    workstation = (ROOT / "apps/web/src/components/ReplayWorkstation.tsx").read_text()
+    overlay = (ROOT / "apps/web/src/components/ReplaySmoothedMotionOverlay.tsx").read_text()
 
     assert 'displayMode === "current_only"' in source
     assert 'displayMode === "short_trail"' in source or '"short_trail"' in source
@@ -45,6 +47,19 @@ def test_replay_display_policy_helpers_define_expected_modes() -> None:
     assert "activeReplaySmoothedBall" in source
     assert "activeReplaySmoothedPlayerBoxes" in source
     assert "activeReplaySmoothedPoses" in source
+    assert 'displayMode: ReplayOverlayDisplayMode = "current_only"' in source
+    assert "selectNearestCurrentSmoothedCandidate" in source
+    assert "selectCurrentSmoothedCandidatesByKey" in source
+    assert "track_role_candidate ?? item.track_candidate_id" in source
+    assert "track_candidate_id ?? item.track_role_candidate" in source
+    assert "bExactFrame - aExactFrame" in source
+    assert "localeCompare" in source
+    assert 'useState<ReplayOverlayDisplayMode>("current_only")' in workstation
+    assert "Smoothed motion display" in workstation
+    assert "displayMode={smoothedMotionDisplayMode}" in workstation
+    assert 'displayMode = "current_only"' in overlay
+    assert "labelBallIds" in overlay
+    assert "labelBoxIds" in overlay
     assert "activeReplayCourtEvidence" in source
     assert 'item.temporal_display_mode === "carry_forward"' in source
     assert "current_replay_timestamp_ms" in source
