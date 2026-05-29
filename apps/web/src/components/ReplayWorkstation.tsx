@@ -38,6 +38,7 @@ import type {
   ReplayHomographyCandidateOverlay,
   ReplayMainPlayerCourtProjectionOverlay,
   ReplayInfo,
+  ReplayLayerPreset,
   ReplayMainPlayerTrackOverlay,
   ReplayMode,
   ReplayOverlayDisplayMode,
@@ -85,6 +86,7 @@ interface ReplayWorkstationProps {
     homographyRunId?: string;
     projectionDiagnosticRunId?: string;
     courtProjectionRunId?: string;
+    viewPreset?: string;
   };
 }
 
@@ -128,6 +130,135 @@ type SelectedReplayEvidence =
   | { kind: "main_player_court_projection"; item: ReplayMainPlayerCourtProjectionOverlay }
   | { kind: "court_projection_timeline"; item: Extract<ReplayTimelineItem, { item_type: "ball_court_projection_candidate" | "main_player_court_projection_candidate" }> }
   | { kind: "annotation"; item: Extract<ReplayTimelineItem, { item_type: "annotation" }> };
+
+interface ReplayLayerPresetContext {
+  hasDetectionRun: boolean;
+  hasTrackletRun: boolean;
+  hasPoseRun: boolean;
+  hasMainPlayerTrackRun: boolean;
+  hasMotionSmoothingRun: boolean;
+  hasCourtRun: boolean;
+  hasHomographyRun: boolean;
+  hasProjectionDiagnosticRun: boolean;
+  hasCourtProjectionRun: boolean;
+}
+
+interface ReplayLayerPresetVisibility {
+  showDetections: boolean;
+  showTracklets: boolean;
+  showTrackletPaths: boolean;
+  showPoses: boolean;
+  showMainPlayerTracks: boolean;
+  showSmoothedBall: boolean;
+  showSmoothedPlayerBoxes: boolean;
+  showSmoothedPoses: boolean;
+  showRawCourtKeypoints: boolean;
+  showCourtKeypoints: boolean;
+  showCourtLines: boolean;
+  showCameraView: boolean;
+  showHomography: boolean;
+  showProjectionDiagnostics: boolean;
+  showBallCourtProjection: boolean;
+  showMainPlayerCourtProjection: boolean;
+  detectionDisplayMode: ReplayOverlayDisplayMode;
+  trackletDisplayMode: ReplayOverlayDisplayMode;
+  smoothedMotionDisplayMode: ReplayOverlayDisplayMode;
+  poseVisualStyle: ReplayPoseVisualStyle;
+  courtTemporalPersistence: ReplayCourtTemporalPersistence;
+}
+
+export function normalizeReplayLayerPreset(value: string | undefined): ReplayLayerPreset {
+  return value === "debug" ? "debug" : "operator";
+}
+
+export function applyLayerPreset(
+  preset: ReplayLayerPreset,
+  context: ReplayLayerPresetContext
+): ReplayLayerPresetVisibility {
+  if (preset === "debug") {
+    return {
+      showDetections: context.hasDetectionRun,
+      showTracklets: context.hasTrackletRun,
+      showTrackletPaths: context.hasTrackletRun,
+      showPoses: context.hasPoseRun,
+      showMainPlayerTracks: context.hasMainPlayerTrackRun,
+      showSmoothedBall: context.hasMotionSmoothingRun,
+      showSmoothedPlayerBoxes: context.hasMotionSmoothingRun,
+      showSmoothedPoses: context.hasMotionSmoothingRun,
+      showRawCourtKeypoints: context.hasCourtRun,
+      showCourtKeypoints: context.hasCourtRun,
+      showCourtLines: context.hasCourtRun,
+      showCameraView: context.hasCourtRun,
+      showHomography: context.hasHomographyRun,
+      showProjectionDiagnostics: context.hasProjectionDiagnosticRun,
+      showBallCourtProjection: context.hasCourtProjectionRun,
+      showMainPlayerCourtProjection: context.hasCourtProjectionRun,
+      detectionDisplayMode: "short_trail",
+      trackletDisplayMode: "full_trail",
+      smoothedMotionDisplayMode: "short_trail",
+      poseVisualStyle: "limbs_and_joints",
+      courtTemporalPersistence: "carry_forward"
+    };
+  }
+
+  return {
+    showDetections: context.hasDetectionRun && !context.hasMotionSmoothingRun,
+    showTracklets: context.hasTrackletRun && !context.hasMotionSmoothingRun,
+    showTrackletPaths: false,
+    showPoses: context.hasPoseRun && !context.hasMotionSmoothingRun,
+    showMainPlayerTracks: context.hasMainPlayerTrackRun && !context.hasMotionSmoothingRun,
+    showSmoothedBall: context.hasMotionSmoothingRun,
+    showSmoothedPlayerBoxes: context.hasMotionSmoothingRun,
+    showSmoothedPoses: context.hasMotionSmoothingRun,
+    showRawCourtKeypoints: false,
+    showCourtKeypoints: context.hasCourtRun,
+    showCourtLines: context.hasCourtRun,
+    showCameraView: false,
+    showHomography: false,
+    showProjectionDiagnostics: false,
+    showBallCourtProjection: context.hasCourtProjectionRun,
+    showMainPlayerCourtProjection: context.hasCourtProjectionRun,
+    detectionDisplayMode: "current_only",
+    trackletDisplayMode: "short_trail",
+    smoothedMotionDisplayMode: "current_only",
+    poseVisualStyle: "limbs_only",
+    courtTemporalPersistence: "carry_forward"
+  };
+}
+
+function presetContextFromRunIds({
+  detectionRunId,
+  trackletRunId,
+  poseRunId,
+  mainPlayerTrackRunId,
+  motionSmoothingRunId,
+  courtRunId,
+  homographyRunId,
+  projectionDiagnosticRunId,
+  courtProjectionRunId
+}: {
+  detectionRunId: string | null;
+  trackletRunId: string | null;
+  poseRunId: string | null;
+  mainPlayerTrackRunId: string | null;
+  motionSmoothingRunId: string | null;
+  courtRunId: string | null;
+  homographyRunId: string | null;
+  projectionDiagnosticRunId: string | null;
+  courtProjectionRunId: string | null;
+}): ReplayLayerPresetContext {
+  return {
+    hasDetectionRun: detectionRunId !== null,
+    hasTrackletRun: trackletRunId !== null,
+    hasPoseRun: poseRunId !== null,
+    hasMainPlayerTrackRun: mainPlayerTrackRunId !== null,
+    hasMotionSmoothingRun: motionSmoothingRunId !== null,
+    hasCourtRun: courtRunId !== null,
+    hasHomographyRun: homographyRunId !== null,
+    hasProjectionDiagnosticRun: projectionDiagnosticRunId !== null,
+    hasCourtProjectionRun: courtProjectionRunId !== null
+  };
+}
 
 export function ReplayWorkstation({
   initialMode = "replay",
@@ -200,6 +331,39 @@ export function ReplayWorkstation({
     const parsed = Number.parseInt(selectedRuns.courtPersistenceMaxGapMs ?? "", 10);
     return Number.isFinite(parsed) && parsed >= 0 ? parsed : 1500;
   }, [selectedRuns.courtPersistenceMaxGapMs]);
+  const initialReplayLayerPreset = useMemo(
+    () => normalizeReplayLayerPreset(selectedRuns.viewPreset),
+    [selectedRuns.viewPreset]
+  );
+  const initialLayerPresetContext = useMemo(
+    () =>
+      presetContextFromRunIds({
+        detectionRunId: initialDetectionRunId,
+        trackletRunId: initialTrackletRunId,
+        poseRunId: initialPoseRunId,
+        mainPlayerTrackRunId: initialMainPlayerTrackRunId,
+        motionSmoothingRunId: initialMotionSmoothingRunId,
+        courtRunId: initialCourtRunId,
+        homographyRunId: initialHomographyRunId,
+        projectionDiagnosticRunId: initialProjectionDiagnosticRunId,
+        courtProjectionRunId: initialCourtProjectionRunId
+      }),
+    [
+      initialCourtProjectionRunId,
+      initialCourtRunId,
+      initialDetectionRunId,
+      initialHomographyRunId,
+      initialMainPlayerTrackRunId,
+      initialMotionSmoothingRunId,
+      initialPoseRunId,
+      initialProjectionDiagnosticRunId,
+      initialTrackletRunId
+    ]
+  );
+  const initialLayerPresetState = useMemo(
+    () => applyLayerPreset(initialReplayLayerPreset, initialLayerPresetContext),
+    [initialLayerPresetContext, initialReplayLayerPreset]
+  );
 
   const [selectedDetectionRunId, setSelectedDetectionRunId] = useState<string | null>(
     initialDetectionRunId
@@ -224,48 +388,54 @@ export function ReplayWorkstation({
   const [selectedCourtProjectionRunId, setSelectedCourtProjectionRunId] = useState<
     string | null
   >(initialCourtProjectionRunId);
-  const [showDetections, setShowDetections] = useState(initialMotionSmoothingRunId === null);
-  const [showTracklets, setShowTracklets] = useState(initialMotionSmoothingRunId === null);
-  const [showPoses, setShowPoses] = useState(initialMotionSmoothingRunId === null);
+  const [replayLayerPreset, setReplayLayerPreset] =
+    useState<ReplayLayerPreset>(initialReplayLayerPreset);
+  const [showDetections, setShowDetections] = useState(initialLayerPresetState.showDetections);
+  const [showTracklets, setShowTracklets] = useState(initialLayerPresetState.showTracklets);
+  const [showPoses, setShowPoses] = useState(initialLayerPresetState.showPoses);
   const [showMainPlayerTracks, setShowMainPlayerTracks] = useState(
-    initialMainPlayerTrackRunId !== null
+    initialLayerPresetState.showMainPlayerTracks
   );
   const [showSmoothedBall, setShowSmoothedBall] = useState(
-    initialMotionSmoothingRunId !== null
+    initialLayerPresetState.showSmoothedBall
   );
   const [showSmoothedPlayerBoxes, setShowSmoothedPlayerBoxes] = useState(
-    initialMotionSmoothingRunId !== null
+    initialLayerPresetState.showSmoothedPlayerBoxes
   );
   const [showSmoothedPoses, setShowSmoothedPoses] = useState(
-    initialMotionSmoothingRunId !== null
+    initialLayerPresetState.showSmoothedPoses
   );
   const [detectionDisplayMode, setDetectionDisplayMode] =
-    useState<ReplayOverlayDisplayMode>("current_only");
+    useState<ReplayOverlayDisplayMode>(initialLayerPresetState.detectionDisplayMode);
   const [trackletDisplayMode, setTrackletDisplayMode] =
-    useState<ReplayOverlayDisplayMode>("short_trail");
+    useState<ReplayOverlayDisplayMode>(initialLayerPresetState.trackletDisplayMode);
   const [smoothedMotionDisplayMode, setSmoothedMotionDisplayMode] =
-    useState<ReplayOverlayDisplayMode>("current_only");
+    useState<ReplayOverlayDisplayMode>(initialLayerPresetState.smoothedMotionDisplayMode);
   const [poseVisualStyle, setPoseVisualStyle] =
-    useState<ReplayPoseVisualStyle>("limbs_only");
-  const [showTrackletPaths, setShowTrackletPaths] = useState(false);
-  const [showRawCourtKeypoints, setShowRawCourtKeypoints] = useState(
-    initialCourtRunId !== null
+    useState<ReplayPoseVisualStyle>(initialLayerPresetState.poseVisualStyle);
+  const [showTrackletPaths, setShowTrackletPaths] = useState(
+    initialLayerPresetState.showTrackletPaths
   );
-  const [showCourtKeypoints, setShowCourtKeypoints] = useState(initialCourtRunId !== null);
-  const [showCourtLines, setShowCourtLines] = useState(initialCourtRunId !== null);
-  const [showCameraView, setShowCameraView] = useState(initialCourtRunId !== null);
-  const [showHomography, setShowHomography] = useState(initialHomographyRunId !== null);
+  const [showRawCourtKeypoints, setShowRawCourtKeypoints] = useState(
+    initialLayerPresetState.showRawCourtKeypoints
+  );
+  const [showCourtKeypoints, setShowCourtKeypoints] = useState(
+    initialLayerPresetState.showCourtKeypoints
+  );
+  const [showCourtLines, setShowCourtLines] = useState(initialLayerPresetState.showCourtLines);
+  const [showCameraView, setShowCameraView] = useState(initialLayerPresetState.showCameraView);
+  const [showHomography, setShowHomography] = useState(initialLayerPresetState.showHomography);
   const [showProjectionDiagnostics, setShowProjectionDiagnostics] = useState(
-    initialProjectionDiagnosticRunId !== null
+    initialLayerPresetState.showProjectionDiagnostics
   );
   const [showBallCourtProjection, setShowBallCourtProjection] = useState(
-    initialCourtProjectionRunId !== null
+    initialLayerPresetState.showBallCourtProjection
   );
   const [showMainPlayerCourtProjection, setShowMainPlayerCourtProjection] = useState(
-    initialCourtProjectionRunId !== null
+    initialLayerPresetState.showMainPlayerCourtProjection
   );
   const [courtTemporalPersistence, setCourtTemporalPersistence] =
-    useState<ReplayCourtTemporalPersistence>(initialCourtTemporalPersistence);
+    useState<ReplayCourtTemporalPersistence>(initialLayerPresetState.courtTemporalPersistence);
   const [courtPersistenceMaxGapMs, setCourtPersistenceMaxGapMs] = useState(
     initialCourtPersistenceMaxGapMs
   );
@@ -293,6 +463,37 @@ export function ReplayWorkstation({
   const [seekRequest, setSeekRequest] = useState<ReplaySeekRequest | null>(null);
   const chunkCache = useRef<Map<string, ReplayOverlayChunk>>(new Map());
 
+  const applyReplayLayerPresetState = useCallback(
+    (preset: ReplayLayerPreset, context: ReplayLayerPresetContext) => {
+      const presetState = applyLayerPreset(preset, context);
+      setReplayLayerPreset(preset);
+      setShowDetections(presetState.showDetections);
+      setShowTracklets(presetState.showTracklets);
+      setShowTrackletPaths(presetState.showTrackletPaths);
+      setShowPoses(presetState.showPoses);
+      setShowMainPlayerTracks(presetState.showMainPlayerTracks);
+      setShowSmoothedBall(presetState.showSmoothedBall);
+      setShowSmoothedPlayerBoxes(presetState.showSmoothedPlayerBoxes);
+      setShowSmoothedPoses(presetState.showSmoothedPoses);
+      setShowRawCourtKeypoints(presetState.showRawCourtKeypoints);
+      setShowCourtKeypoints(presetState.showCourtKeypoints);
+      setShowCourtLines(presetState.showCourtLines);
+      setShowCameraView(presetState.showCameraView);
+      setShowHomography(presetState.showHomography);
+      setShowProjectionDiagnostics(presetState.showProjectionDiagnostics);
+      setShowBallCourtProjection(presetState.showBallCourtProjection);
+      setShowMainPlayerCourtProjection(presetState.showMainPlayerCourtProjection);
+      setDetectionDisplayMode(presetState.detectionDisplayMode);
+      setTrackletDisplayMode(presetState.trackletDisplayMode);
+      setSmoothedMotionDisplayMode(presetState.smoothedMotionDisplayMode);
+      setPoseVisualStyle(presetState.poseVisualStyle);
+      setCourtTemporalPersistence(presetState.courtTemporalPersistence);
+      chunkCache.current.clear();
+      setSelectedEvidence(null);
+    },
+    []
+  );
+
   useEffect(() => {
     setSelectedDetectionRunId(initialDetectionRunId);
   }, [initialDetectionRunId]);
@@ -307,45 +508,31 @@ export function ReplayWorkstation({
 
   useEffect(() => {
     setSelectedMainPlayerTrackRunId(initialMainPlayerTrackRunId);
-    setShowMainPlayerTracks(initialMainPlayerTrackRunId !== null);
   }, [initialMainPlayerTrackRunId]);
 
   useEffect(() => {
     setSelectedMotionSmoothingRunId(initialMotionSmoothingRunId);
-    setShowSmoothedBall(initialMotionSmoothingRunId !== null);
-    setShowSmoothedPlayerBoxes(initialMotionSmoothingRunId !== null);
-    setShowSmoothedPoses(initialMotionSmoothingRunId !== null);
-    setSmoothedMotionDisplayMode("current_only");
-    if (initialMotionSmoothingRunId !== null) {
-      setShowDetections(false);
-      setShowTracklets(false);
-      setShowPoses(false);
-    }
   }, [initialMotionSmoothingRunId]);
 
   useEffect(() => {
     setSelectedCourtRunId(initialCourtRunId);
-    setShowRawCourtKeypoints(initialCourtRunId !== null);
-    setShowCourtKeypoints(initialCourtRunId !== null);
-    setShowCourtLines(initialCourtRunId !== null);
-    setShowCameraView(initialCourtRunId !== null);
   }, [initialCourtRunId]);
 
   useEffect(() => {
     setSelectedHomographyRunId(initialHomographyRunId);
-    setShowHomography(initialHomographyRunId !== null);
   }, [initialHomographyRunId]);
 
   useEffect(() => {
     setSelectedProjectionDiagnosticRunId(initialProjectionDiagnosticRunId);
-    setShowProjectionDiagnostics(initialProjectionDiagnosticRunId !== null);
   }, [initialProjectionDiagnosticRunId]);
 
   useEffect(() => {
     setSelectedCourtProjectionRunId(initialCourtProjectionRunId);
-    setShowBallCourtProjection(initialCourtProjectionRunId !== null);
-    setShowMainPlayerCourtProjection(initialCourtProjectionRunId !== null);
   }, [initialCourtProjectionRunId]);
+
+  useEffect(() => {
+    applyReplayLayerPresetState(initialReplayLayerPreset, initialLayerPresetContext);
+  }, [applyReplayLayerPresetState, initialLayerPresetContext, initialReplayLayerPreset]);
 
   useEffect(() => {
     setReplayMode(initialMode);
@@ -358,6 +545,39 @@ export function ReplayWorkstation({
   useEffect(() => {
     setCourtPersistenceMaxGapMs(initialCourtPersistenceMaxGapMs);
   }, [initialCourtPersistenceMaxGapMs]);
+
+  const currentLayerPresetContext = useMemo(
+    () =>
+      presetContextFromRunIds({
+        detectionRunId: selectedDetectionRunId,
+        trackletRunId: selectedTrackletRunId,
+        poseRunId: selectedPoseRunId,
+        mainPlayerTrackRunId: selectedMainPlayerTrackRunId,
+        motionSmoothingRunId: selectedMotionSmoothingRunId,
+        courtRunId: selectedCourtRunId,
+        homographyRunId: selectedHomographyRunId,
+        projectionDiagnosticRunId: selectedProjectionDiagnosticRunId,
+        courtProjectionRunId: selectedCourtProjectionRunId
+      }),
+    [
+      selectedCourtProjectionRunId,
+      selectedCourtRunId,
+      selectedDetectionRunId,
+      selectedHomographyRunId,
+      selectedMainPlayerTrackRunId,
+      selectedMotionSmoothingRunId,
+      selectedPoseRunId,
+      selectedProjectionDiagnosticRunId,
+      selectedTrackletRunId
+    ]
+  );
+
+  const handleReplayLayerPresetChange = useCallback(
+    (preset: ReplayLayerPreset) => {
+      applyReplayLayerPresetState(preset, currentLayerPresetContext);
+    },
+    [applyReplayLayerPresetState, currentLayerPresetContext]
+  );
 
   useEffect(() => {
     if (replayMode === "stream_proxy") {
@@ -982,6 +1202,8 @@ export function ReplayWorkstation({
             mainPlayerTrackRuns={replayInfo.available_runs.main_player_track}
             motionSmoothingRuns={replayInfo.available_runs.motion_smoothing}
             projectionDiagnosticRuns={replayInfo.available_runs.projection_diagnostic}
+            replayLayerPreset={replayLayerPreset}
+            onReplayLayerPresetChange={handleReplayLayerPresetChange}
             onSelectedCourtRunChange={(runId) => {
               setSelectedCourtRunId(runId);
               setSelectedEvidence(null);
@@ -1000,10 +1222,6 @@ export function ReplayWorkstation({
             }}
             onSelectedMotionSmoothingRunChange={(runId) => {
               setSelectedMotionSmoothingRunId(runId);
-              setShowSmoothedBall(runId !== null);
-              setShowSmoothedPlayerBoxes(runId !== null);
-              setShowSmoothedPoses(runId !== null);
-              setSmoothedMotionDisplayMode("current_only");
               setSelectedEvidence(null);
             }}
             onSelectedProjectionDiagnosticRunChange={(runId) => {
@@ -1012,8 +1230,6 @@ export function ReplayWorkstation({
             }}
             onSelectedCourtProjectionRunChange={(runId) => {
               setSelectedCourtProjectionRunId(runId);
-              setShowBallCourtProjection(runId !== null);
-              setShowMainPlayerCourtProjection(runId !== null);
               setSelectedEvidence(null);
             }}
             onSelectedPoseRunChange={(runId) => {
@@ -1241,6 +1457,7 @@ function ReplayLayerControls({
   homographyRuns,
   projectionDiagnosticRuns,
   courtProjectionRuns,
+  replayLayerPreset,
   selectedDetectionRunId,
   selectedTrackletRunId,
   selectedPoseRunId,
@@ -1272,6 +1489,7 @@ function ReplayLayerControls({
   showProjectionDiagnostics,
   showBallCourtProjection,
   showMainPlayerCourtProjection,
+  onReplayLayerPresetChange,
   onSelectedDetectionRunChange,
   onSelectedTrackletRunChange,
   onSelectedPoseRunChange,
@@ -1313,6 +1531,7 @@ function ReplayLayerControls({
   homographyRuns: ReplayRunSummary[];
   projectionDiagnosticRuns: ReplayRunSummary[];
   courtProjectionRuns: ReplayRunSummary[];
+  replayLayerPreset: ReplayLayerPreset;
   selectedDetectionRunId: string | null;
   selectedTrackletRunId: string | null;
   selectedPoseRunId: string | null;
@@ -1344,6 +1563,7 @@ function ReplayLayerControls({
   showProjectionDiagnostics: boolean;
   showBallCourtProjection: boolean;
   showMainPlayerCourtProjection: boolean;
+  onReplayLayerPresetChange: (preset: ReplayLayerPreset) => void;
   onSelectedDetectionRunChange: (runId: string | null) => void;
   onSelectedTrackletRunChange: (runId: string | null) => void;
   onSelectedPoseRunChange: (runId: string | null) => void;
@@ -1383,6 +1603,10 @@ function ReplayLayerControls({
         <span className="mini-pill">persisted evidence</span>
       </div>
       <div className="panel-body replay-controls">
+        <ReplayLayerPresetSelect
+          onChange={onReplayLayerPresetChange}
+          value={replayLayerPreset}
+        />
         <LayerToggle
           checked={showDetections}
           label="Show detection observations"
@@ -1595,6 +1819,24 @@ function DisplayModeSelect({
         <option value="current_only">Current only</option>
         <option value="short_trail">Short trail</option>
         <option value="full_trail">Full trail</option>
+      </select>
+    </label>
+  );
+}
+
+function ReplayLayerPresetSelect({
+  value,
+  onChange
+}: {
+  value: ReplayLayerPreset;
+  onChange: (preset: ReplayLayerPreset) => void;
+}) {
+  return (
+    <label className="select-row">
+      <span>Replay view preset</span>
+      <select onChange={(event) => onChange(event.target.value as ReplayLayerPreset)} value={value}>
+        <option value="operator">Operator view</option>
+        <option value="debug">Debug / audit view</option>
       </select>
     </label>
   );

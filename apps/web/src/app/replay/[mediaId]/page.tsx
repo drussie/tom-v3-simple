@@ -19,6 +19,7 @@ interface ReplayPageProps {
     homographyRunId?: string;
     projectionDiagnosticRunId?: string;
     courtProjectionRunId?: string;
+    viewPreset?: string;
   }>;
 }
 

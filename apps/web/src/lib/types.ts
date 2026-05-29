@@ -322,6 +322,8 @@ export interface ReplayDetectionBBox {
 
 export type ReplayOverlayDisplayMode = "current_only" | "short_trail" | "full_trail";
 export type ReplayPoseVisualStyle = "limbs_only" | "limbs_and_joints" | "joints_only";
+
+export type ReplayLayerPreset = "operator" | "debug";
 export type ReplayPoseLimbSide = "left" | "right" | "neutral";
 export type ReplayCourtTemporalPersistence = "off" | "carry_forward";
 

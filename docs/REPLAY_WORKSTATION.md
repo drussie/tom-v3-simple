@@ -106,6 +106,14 @@ mini-map. The mini-map labels points as `BALL CANDIDATE`, `NEAR PLAYER CANDIDATE
 `FAR PLAYER CANDIDATE`. It intentionally does not draw those normalized template coordinates over
 the broadcast video or present them as true object locations.
 
+Operator View Default Layer Presets v0 adds a replay view preset control. `viewPreset=operator` is
+the default and opens full replay URLs with stable candidate layers on and raw/debug layers off:
+smoothed ball/player/pose, mapped court keypoints, court lines, court carry-forward, and the court
+projection mini-map are visible when their runs exist. Raw TOM v1 court keypoints, homography
+candidate overlays, projection diagnostics, camera/view evidence, raw detection trails, and raw pose
+are kept off until the operator enables them. `viewPreset=debug` applies a busy audit preset with
+raw/debug evidence visible when its run ids exist. Both presets are display policy only.
+
 ## What 6A Added
 
 - `GET /media/{media_id}/replay-info`
@@ -513,12 +521,13 @@ http://127.0.0.1:3000/replay/<media_id>
 Optional context query parameters:
 
 ```text
-?detectionRunId=<run_id>&trackletRunId=<run_id>&poseRunId=<run_id>&courtRunId=<run_id>&homographyRunId=<run_id>&projectionDiagnosticRunId=<run_id>&courtProjectionRunId=<run_id>
+?detectionRunId=<run_id>&trackletRunId=<run_id>&poseRunId=<run_id>&courtRunId=<run_id>&homographyRunId=<run_id>&projectionDiagnosticRunId=<run_id>&courtProjectionRunId=<run_id>&viewPreset=operator
 ```
 
 `detectionRunId`, `trackletRunId`, `poseRunId`, `courtRunId`, `homographyRunId`,
 `projectionDiagnosticRunId`, and `courtProjectionRunId` select the persisted evidence runs used for
-replay overlay playback.
+replay overlay playback. `viewPreset=operator|debug` selects the initial replay layer preset;
+operator is the default when the parameter is omitted.
 
 Open Stream Proxy Mode:
 

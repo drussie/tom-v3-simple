@@ -867,6 +867,23 @@ The replay workstation includes display modes for dense real detection/tracklet 
 
 Detection display defaults to current-only. Tracklet point display defaults to short-trail, and tracklet trail/path rendering is off by default. These are visual review controls only; they do not change persisted observations, candidate tracklets, or evidence semantics.
 
+Replay view presets:
+
+```text
+/replay/<media_id>?motionSmoothingRunId=<run_id>&courtRunId=<run_id>&homographyRunId=<run_id>&courtProjectionRunId=<run_id>&viewPreset=operator
+/replay/<media_id>?motionSmoothingRunId=<run_id>&courtRunId=<run_id>&homographyRunId=<run_id>&courtProjectionRunId=<run_id>&viewPreset=debug
+```
+
+`operator` is the default when `viewPreset` is omitted. It keeps the replay clean by showing stable
+candidate layers and hiding raw/debug layers by default. Smoothed ball/player/pose candidates,
+mapped court keypoints, court line evidence, court carry-forward, and the court projection mini-map
+are enabled when their runs exist. Raw TOM v1 keypoints, homography overlays, projection
+diagnostics, raw detection trails, raw pose, and camera/view evidence stay off unless explicitly
+enabled.
+
+`debug` enables raw/audit layers when their run ids exist. Selecting either preset only changes UI
+layer toggles. It does not mutate persisted observations or change candidate evidence into truth.
+
 Motion smoothing replay:
 
 ```text

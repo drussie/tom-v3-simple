@@ -94,6 +94,10 @@ The mini-map labels points as `BALL CANDIDATE`, `NEAR PLAYER CANDIDATE`, and
 `FAR PLAYER CANDIDATE`. It intentionally does not draw these court-template coordinates over the
 broadcast video.
 
+Operator view presets keep the mini-map visible when `courtProjectionRunId` is present while hiding
+homography and projection-diagnostic debug overlays by default. Debug/audit view can re-enable those
+raw geometry layers for inspection.
+
 ## Lineage
 
 Relationship types:

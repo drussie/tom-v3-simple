@@ -56,7 +56,8 @@ def test_replay_display_policy_helpers_define_expected_modes() -> None:
     assert "track_candidate_id ?? item.track_role_candidate" in source
     assert "bExactFrame - aExactFrame" in source
     assert "localeCompare" in source
-    assert 'useState<ReplayOverlayDisplayMode>("current_only")' in workstation
+    assert "initialLayerPresetState.detectionDisplayMode" in workstation
+    assert "initialLayerPresetState.smoothedMotionDisplayMode" in workstation
     assert "Smoothed motion display" in workstation
     assert "displayMode={smoothedMotionDisplayMode}" in workstation
     assert 'displayMode = "current_only"' in overlay
@@ -68,7 +69,7 @@ def test_replay_display_policy_helpers_define_expected_modes() -> None:
     assert "poseEdgeSideClass" in source
     assert 'start.startsWith("left_") && end.startsWith("left_")' in source
     assert 'start.startsWith("right_") && end.startsWith("right_")' in source
-    assert 'useState<ReplayPoseVisualStyle>("limbs_only")' in workstation
+    assert "initialLayerPresetState.poseVisualStyle" in workstation
     assert "Pose visual style" in workstation
     assert "poseVisualStyle={poseVisualStyle}" in workstation
     assert 'poseVisualStyle = "limbs_only"' in pose_overlay
@@ -85,3 +86,23 @@ def test_replay_display_policy_helpers_define_expected_modes() -> None:
     assert "activeReplayCourtEvidence" in source
     assert 'item.temporal_display_mode === "carry_forward"' in source
     assert "current_replay_timestamp_ms" in source
+    assert 'ReplayLayerPreset = "operator" | "debug"' in (
+        ROOT / "apps/web/src/lib/types.ts"
+    ).read_text()
+    assert "normalizeReplayLayerPreset" in workstation
+    assert "applyLayerPreset" in workstation
+    assert "Replay view preset" in workstation
+    assert "Operator view" in workstation
+    assert "Debug / audit view" in workstation
+    assert "showRawCourtKeypoints: false" in workstation
+    assert "showHomography: false" in workstation
+    assert "showProjectionDiagnostics: false" in workstation
+    assert "showBallCourtProjection: context.hasCourtProjectionRun" in workstation
+    assert "showMainPlayerCourtProjection: context.hasCourtProjectionRun" in workstation
+    assert "showSmoothedBall: context.hasMotionSmoothingRun" in workstation
+    assert "showSmoothedPlayerBoxes: context.hasMotionSmoothingRun" in workstation
+    assert "showSmoothedPoses: context.hasMotionSmoothingRun" in workstation
+    assert "courtTemporalPersistence: \"carry_forward\"" in workstation
+    assert "viewPreset?: string" in (
+        ROOT / "apps/web/src/app/replay/[mediaId]/page.tsx"
+    ).read_text()

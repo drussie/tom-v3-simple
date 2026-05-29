@@ -82,6 +82,9 @@ This registry makes TOM v3 Simple boundaries explicit.
 - Replay Mode can display object-to-court projection candidates through `courtProjectionRunId` in a
   normalized court mini-map; those points are candidate template projections, not confirmed court
   positions or tennis-event facts.
+- Replay view presets are display defaults only. Operator view hides raw/debug layers by default,
+  and debug/audit view enables them, but neither preset changes persisted observations or proves
+  evidence correctness.
 - Homography candidate overlays and projection diagnostic overlays are display-only candidate geometry; they are not final court models.
 - Camera/view evidence can be queried through API read models and viewed in the replay court evidence context.
 - The fixture court keypoint/line adapter remains available for demos. The TOM v1 court keypoint adapter can write real model-output keypoint rows and derived line candidates, but those rows still require review and do not establish a confirmed court model.

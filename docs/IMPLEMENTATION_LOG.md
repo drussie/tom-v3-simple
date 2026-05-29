@@ -2140,3 +2140,30 @@ This milestone adds:
 The projected points are candidate template coordinates only. This milestone does not add bounce,
 hit, in/out, rally/point/score, player identity, scoreboard OCR, server/receiver logic,
 accepted/rejected lifecycle, or adjudication.
+
+## Operator View Default Layer Presets v0
+
+Status: complete
+
+### Goal
+
+Make replay open in a clean operator view when full run ids are present, while preserving a busy
+debug/audit preset and all manual layer controls.
+
+### Notes
+
+This repair adds:
+
+- `ReplayLayerPreset = operator | debug`
+- `viewPreset=operator|debug` URL support
+- deterministic `applyLayerPreset(...)` layer defaults
+- a replay view preset select in the overlay controls
+- operator defaults that show smoothed ball/player/pose, mapped court keypoints, court lines, court
+  carry-forward, and court projection mini-map when the matching runs exist
+- operator defaults that keep raw TOM v1 keypoints, homography overlays, projection diagnostics,
+  camera/view evidence, raw pose, and raw trails off until manually enabled
+- debug/audit defaults that enable raw and geometry-debug layers when their run ids exist
+
+Preset changes are UI/read-model display policy only. They do not mutate observations, change model
+outputs, accept/reject geometry, or add bounce/hit/in-out/rally/point/scoring, identity, OCR, or
+adjudication.
