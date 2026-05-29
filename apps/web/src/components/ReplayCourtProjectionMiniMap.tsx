@@ -8,7 +8,7 @@ import type {
 } from "../lib/types";
 import {
   activeReplayBallCourtProjection,
-  activeReplayEventCandidates,
+  eventCandidateMarkerState,
   activeReplayMainPlayerCourtProjection
 } from "../lib/replayOverlays";
 
@@ -64,7 +64,7 @@ export function ReplayCourtProjectionMiniMap({
     ? activeReplayBallCourtTrajectories(ballTrajectories, currentTimestampMs, currentFrame)
     : [];
   const activeEventCandidates = showEventCandidates
-    ? activeReplayEventCandidates(eventCandidates, currentTimestampMs, currentFrame)
+    ? eventCandidates
     : [];
 
   if (
@@ -172,11 +172,17 @@ export function ReplayCourtProjectionMiniMap({
           const point = templatePointToSvg(item.court_point.x, item.court_point.y);
           const isHit = item.candidate_type === "hit_candidate";
           const label = isHit ? "HIT CANDIDATE" : "BOUNCE CANDIDATE";
+          const markerState = eventCandidateMarkerState(
+            item,
+            currentTimestampMs,
+            currentFrame,
+            selectedObservationId
+          );
           return (
             <g
               key={item.observation_id}
               className={`court-event-candidate-group ${isHit ? "hit" : "bounce"} ${
-                selectedObservationId === item.observation_id ? "selected" : ""
+                markerState
               }`}
               onClick={() => onSelectEventCandidate(item)}
             >

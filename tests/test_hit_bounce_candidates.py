@@ -167,6 +167,86 @@ def test_bounce_candidate_away_from_players_direction_change(db_session: Session
     assert bounce.payload_jsonb["not_bounce_truth"] is True
 
 
+def test_player_proximate_trajectory_change_is_prioritized_as_hit(
+    db_session: Session,
+) -> None:
+    media = _seed_media(db_session)
+    trajectory_run, _ = _seed_trajectory_run(
+        db_session,
+        media.id,
+        points=[
+            (0, 0, 0.20, 0.20),
+            (1, 33, 0.30, 0.20),
+            (2, 66, 0.30, 0.35),
+        ],
+    )
+    projection_run = _seed_projection_run(
+        db_session,
+        media.id,
+        players=[(1, 33, 0.56, 0.39, "near_player_track_candidate")],
+    )
+
+    result = build_hit_bounce_candidates(
+        session=db_session,
+        media_id=media.id,
+        ball_trajectory_run_id=trajectory_run.id,
+        court_projection_run_id=projection_run.id,
+    )
+
+    assert result["ok"] is True
+    assert result["observations"]["hit_candidate"] == 1
+    assert result["observations"]["bounce_candidate"] == 0
+    hit = db_session.scalar(
+        select(Observation).where(
+            Observation.run_id == result["event_candidate_run_id"],
+            Observation.observation_type == "hit_candidate",
+        )
+    )
+    assert hit is not None
+    assert "player_proximate_event_priority" in hit.payload_jsonb["reason_codes"]
+    assert hit.payload_jsonb["classification_priority"] == "hit_first_when_player_proximate"
+    assert hit.payload_jsonb["player_proximity_gate"]["threshold"] == 0.33
+    assert hit.payload_jsonb["candidate_decision"]["suppressed_candidate_types"] == [
+        "bounce_candidate"
+    ]
+
+
+def test_conflict_resolution_prefers_hit_over_same_window_bounce(
+    db_session: Session,
+) -> None:
+    media = _seed_media(db_session)
+    trajectory_run, _ = _seed_trajectory_run(
+        db_session,
+        media.id,
+        points=[
+            (0, 0, 0.20, 0.20),
+            (1, 33, 0.30, 0.20),
+            (2, 66, 0.30, 0.35),
+            (8, 250, 0.60, 0.60),
+            (9, 300, 0.70, 0.60),
+            (10, 350, 0.70, 0.75),
+        ],
+    )
+    projection_run = _seed_projection_run(
+        db_session,
+        media.id,
+        players=[(1, 33, 0.31, 0.22, "near_player_track_candidate")],
+    )
+
+    result = build_hit_bounce_candidates(
+        session=db_session,
+        media_id=media.id,
+        ball_trajectory_run_id=trajectory_run.id,
+        court_projection_run_id=projection_run.id,
+        candidate_dedupe_ms=500,
+    )
+
+    assert result["ok"] is True
+    assert result["observations"]["hit_candidate"] == 1
+    assert result["observations"]["bounce_candidate"] == 0
+    assert result["candidate_summary"]["suppressed_bounce_conflict_count"] >= 1
+
+
 def test_candidate_dedupe_keeps_highest_confidence_per_window(
     db_session: Session,
 ) -> None:
@@ -209,7 +289,7 @@ def test_candidate_dedupe_keeps_highest_confidence_per_window(
         )
     )
     assert hit is not None
-    assert hit.frame_start == 3
+    assert "player_proximate_event_priority" in hit.payload_jsonb["reason_codes"]
 
 
 def test_event_candidate_replay_payloads_are_exposed(db_session: Session) -> None:
@@ -254,11 +334,27 @@ def test_event_candidate_replay_payloads_are_exposed(db_session: Session) -> Non
     assert overlays[0]["court_point"] == {"x": 0.3, "y": 0.2}
     assert overlays[0]["image_point"] == {"x": 300.0, "y": 100.0}
     assert overlays[0]["image_marker_source"] == "source_ball_court_projection_image_point"
+    assert overlays[0]["classification_priority"] == "hit_first_when_player_proximate"
+    assert overlays[0]["player_proximity_gate"]["nearest_player_found"] is True
+    assert overlays[0]["candidate_decision"]["selected_candidate_type"] == "hit_candidate"
     assert len(timeline_items) == 1
     assert timeline_items[0]["item_type"] == "hit_candidate"
     assert timeline_items[0]["image_point"] == {"x": 300.0, "y": 100.0}
     assert timeline_items[0]["image_marker_source"] == "source_ball_court_projection_image_point"
+    assert timeline_items[0]["classification_priority"] == "hit_first_when_player_proximate"
     assert timeline_items[0]["candidate_only"] is True
+
+    persistent_overlays = build_event_candidate_overlay_items(
+        session=db_session,
+        media=media,
+        start_ms=1000,
+        end_ms=1200,
+        event_candidate_run_id=result["event_candidate_run_id"],
+        observation_type="hit_candidate",
+    )
+    assert [item["observation_id"] for item in persistent_overlays] == [
+        overlays[0]["observation_id"]
+    ]
 
 
 def test_event_candidate_replay_payload_handles_missing_source_image_point(

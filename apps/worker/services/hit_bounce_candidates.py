@@ -39,6 +39,8 @@ HIT_CANDIDATE_METHOD = "trajectory_player_proximity_hit_candidate_v0"
 BOUNCE_CANDIDATE_METHOD = "trajectory_shape_bounce_candidate_v0"
 EVENT_CANDIDATE_METHOD = "hit_bounce_candidate_evidence_v0"
 DEFAULT_HIT_PLAYER_DISTANCE_MAX_TEMPLATE = 0.18
+DEFAULT_HIT_PLAYER_REVIEW_DISTANCE_MAX_TEMPLATE = 0.33
+DEFAULT_HIT_NEAR_PLAYER_DIRECTION_DELTA_DEGREES = 15.0
 DEFAULT_BOUNCE_PLAYER_DISTANCE_MIN_TEMPLATE = 0.18
 DEFAULT_HIT_MIN_DIRECTION_DELTA_DEGREES = 25.0
 DEFAULT_BOUNCE_MIN_DIRECTION_DELTA_DEGREES = 20.0
@@ -62,6 +64,12 @@ EVENT_CANDIDATE_WARNINGS = {
 @dataclass(frozen=True)
 class HitBounceCandidateConfig:
     hit_player_distance_max_template: float = DEFAULT_HIT_PLAYER_DISTANCE_MAX_TEMPLATE
+    hit_player_review_distance_max_template: float = (
+        DEFAULT_HIT_PLAYER_REVIEW_DISTANCE_MAX_TEMPLATE
+    )
+    hit_near_player_direction_delta_degrees: float = (
+        DEFAULT_HIT_NEAR_PLAYER_DIRECTION_DELTA_DEGREES
+    )
     bounce_player_distance_min_template: float = DEFAULT_BOUNCE_PLAYER_DISTANCE_MIN_TEMPLATE
     hit_min_direction_delta_degrees: float = DEFAULT_HIT_MIN_DIRECTION_DELTA_DEGREES
     bounce_min_direction_delta_degrees: float = DEFAULT_BOUNCE_MIN_DIRECTION_DELTA_DEGREES
@@ -72,6 +80,12 @@ class HitBounceCandidateConfig:
     def as_dict(self) -> dict[str, float | int]:
         return {
             "hit_player_distance_max_template": self.hit_player_distance_max_template,
+            "hit_player_review_distance_max_template": (
+                self.hit_player_review_distance_max_template
+            ),
+            "hit_near_player_direction_delta_degrees": (
+                self.hit_near_player_direction_delta_degrees
+            ),
             "bounce_player_distance_min_template": self.bounce_player_distance_min_template,
             "hit_min_direction_delta_degrees": self.hit_min_direction_delta_degrees,
             "bounce_min_direction_delta_degrees": self.bounce_min_direction_delta_degrees,
@@ -134,6 +148,8 @@ class EventCandidateDraft:
     nearest_player: NearestPlayerContext | None
     reason_codes: list[str]
     confidence: float
+    player_proximity_gate: dict[str, Any]
+    candidate_decision: dict[str, Any]
 
     @property
     def timestamp_ms(self) -> int:
@@ -187,11 +203,18 @@ def build_hit_bounce_candidates_plan(
         "candidate_method": EVENT_CANDIDATE_METHOD,
         "hit_candidate_method": HIT_CANDIDATE_METHOD,
         "bounce_candidate_method": BOUNCE_CANDIDATE_METHOD,
+        "classification_priority": "hit_first_when_player_proximate",
         "coordinate_space": CoordinateSpace.court_template_2d,
         "court_template_name": COURT_TEMPLATE_NAME,
         "court_template_version": COURT_TEMPLATE_VERSION,
         "thresholds": {
             "hit_player_distance_max_template": hit_player_distance_max_template,
+            "hit_player_review_distance_max_template": (
+                DEFAULT_HIT_PLAYER_REVIEW_DISTANCE_MAX_TEMPLATE
+            ),
+            "hit_near_player_direction_delta_degrees": (
+                DEFAULT_HIT_NEAR_PLAYER_DIRECTION_DELTA_DEGREES
+            ),
             "bounce_player_distance_min_template": bounce_player_distance_min_template,
             "hit_min_direction_delta_degrees": hit_min_direction_delta_degrees,
             "bounce_min_direction_delta_degrees": bounce_min_direction_delta_degrees,
@@ -309,6 +332,11 @@ def build_hit_bounce_candidates(
             bounce_drafts,
             candidate_dedupe_ms=config.candidate_dedupe_ms,
         )
+        deduped_bounces, suppressed_bounce_conflict_count = suppress_bounces_near_hits(
+            deduped_hits,
+            deduped_bounces,
+            candidate_dedupe_ms=config.candidate_dedupe_ms,
+        )
         writer = ObservationWriter(session)
         observations = _persist_event_candidates(
             writer=writer,
@@ -334,6 +362,8 @@ def build_hit_bounce_candidates(
         "bounce_candidate_count": len(bounce_drafts),
         "deduped_hit_candidate_count": len(deduped_hits),
         "deduped_bounce_candidate_count": len(deduped_bounces),
+        "suppressed_bounce_conflict_count": suppressed_bounce_conflict_count,
+        "classification_priority": "hit_first_when_player_proximate",
     }
     _mark_completed(
         session=session,
@@ -452,12 +482,7 @@ def evaluate_event_candidates(
                 player_projections,
                 time_window_ms=config.player_time_window_ms,
             )
-            if (
-                nearest_player is not None
-                and nearest_player.distance_template_units
-                <= config.hit_player_distance_max_template
-                and context.direction_delta_degrees >= config.hit_min_direction_delta_degrees
-            ):
+            if _is_player_proximate_hit_context(context, nearest_player, config):
                 hit_candidates.append(
                     _hit_candidate_from_context(context, nearest_player, config)
                 )
@@ -576,6 +601,54 @@ def dedupe_event_candidates(
     return sorted(kept, key=lambda item: (item.timestamp_ms, item.frame_number))
 
 
+def suppress_bounces_near_hits(
+    hit_candidates: list[EventCandidateDraft],
+    bounce_candidates: list[EventCandidateDraft],
+    *,
+    candidate_dedupe_ms: int,
+) -> tuple[list[EventCandidateDraft], int]:
+    filtered_bounces: list[EventCandidateDraft] = []
+    suppressed_count = 0
+    for bounce in bounce_candidates:
+        suppressing_hit = next(
+            (
+                hit
+                for hit in hit_candidates
+                if abs(hit.timestamp_ms - bounce.timestamp_ms) <= candidate_dedupe_ms
+                and hit.nearest_player is not None
+            ),
+            None,
+        )
+        if suppressing_hit is not None:
+            suppressed_count += 1
+            continue
+        filtered_bounces.append(bounce)
+    return filtered_bounces, suppressed_count
+
+
+def _is_player_proximate_hit_context(
+    context: TrajectoryContext,
+    nearest_player: NearestPlayerContext | None,
+    config: HitBounceCandidateConfig,
+) -> bool:
+    if nearest_player is None:
+        return False
+    if nearest_player.distance_template_units > config.hit_player_review_distance_max_template:
+        return False
+    strong_direction_change = (
+        context.direction_delta_degrees >= config.hit_min_direction_delta_degrees
+    )
+    relaxed_contact_change = (
+        context.direction_delta_degrees
+        >= config.hit_near_player_direction_delta_degrees
+        and context.speed_delta_fraction >= 0.2
+    )
+    close_contact_zone = (
+        nearest_player.distance_template_units <= config.hit_player_distance_max_template
+    )
+    return strong_direction_change or (close_contact_zone and relaxed_contact_change)
+
+
 def _hit_candidate_from_context(
     context: TrajectoryContext,
     nearest_player: NearestPlayerContext,
@@ -583,7 +656,7 @@ def _hit_candidate_from_context(
 ) -> EventCandidateDraft:
     proximity_score = 1.0 - min(
         nearest_player.distance_template_units
-        / max(config.hit_player_distance_max_template, 1e-9),
+        / max(config.hit_player_review_distance_max_template, 1e-9),
         1.0,
     )
     direction_score = min(context.direction_delta_degrees / 90.0, 1.0)
@@ -600,7 +673,11 @@ def _hit_candidate_from_context(
         + 0.10 * speed_score
         + 0.05 * time_score,
     )
-    reason_codes = ["near_main_player_projection", "trajectory_direction_change"]
+    reason_codes = [
+        "near_main_player_projection",
+        "trajectory_direction_change",
+        "player_proximate_event_priority",
+    ]
     if context.speed_delta_fraction >= 0.2:
         reason_codes.append("speed_change_candidate")
     if nearest_player.time_delta_ms <= config.player_time_window_ms:
@@ -612,6 +689,17 @@ def _hit_candidate_from_context(
         nearest_player=nearest_player,
         reason_codes=reason_codes,
         confidence=_round(confidence),
+        player_proximity_gate=_player_proximity_gate_payload(
+            nearest_player=nearest_player,
+            threshold=config.hit_player_review_distance_max_template,
+            away_from_player=False,
+        ),
+        candidate_decision={
+            "selected_candidate_type": HIT_CANDIDATE_OBSERVATION_TYPE,
+            "suppressed_candidate_types": [BOUNCE_CANDIDATE_OBSERVATION_TYPE],
+            "reason": "player_proximate_trajectory_change",
+            "classification_priority": "hit_first_when_player_proximate",
+        },
     )
 
 
@@ -660,6 +748,21 @@ def _bounce_candidate_from_context(
         nearest_player=nearest_player,
         reason_codes=reason_codes,
         confidence=_round(confidence),
+        player_proximity_gate=_player_proximity_gate_payload(
+            nearest_player=nearest_player,
+            threshold=config.bounce_player_distance_min_template,
+            away_from_player=(
+                nearest_player is None
+                or nearest_player.distance_template_units
+                >= config.bounce_player_distance_min_template
+            ),
+        ),
+        candidate_decision={
+            "selected_candidate_type": BOUNCE_CANDIDATE_OBSERVATION_TYPE,
+            "suppressed_candidate_types": [],
+            "reason": "away_from_player_trajectory_change",
+            "classification_priority": "hit_first_when_player_proximate",
+        },
     )
 
 
@@ -724,6 +827,9 @@ def _event_candidate_observation_create(
         "reason_codes": candidate.reason_codes,
         "confidence": candidate.confidence,
         "candidate_method": candidate.candidate_method,
+        "classification_priority": "hit_first_when_player_proximate",
+        "player_proximity_gate": candidate.player_proximity_gate,
+        "candidate_decision": candidate.candidate_decision,
         "coordinate_space": CoordinateSpace.court_template_2d,
         "template_name": COURT_TEMPLATE_NAME,
         "template_version": COURT_TEMPLATE_VERSION,
@@ -906,6 +1012,29 @@ def _nearest_player_payload(nearest_player: NearestPlayerContext) -> dict[str, A
         "court_y": _round(player.court_y),
         "distance_template_units": nearest_player.distance_template_units,
         "time_delta_ms": nearest_player.time_delta_ms,
+    }
+
+
+def _player_proximity_gate_payload(
+    *,
+    nearest_player: NearestPlayerContext | None,
+    threshold: float,
+    away_from_player: bool,
+) -> dict[str, Any]:
+    if nearest_player is None:
+        return {
+            "nearest_player_found": False,
+            "distance_template_units": None,
+            "time_delta_ms": None,
+            "threshold": threshold,
+            "away_from_player": away_from_player,
+        }
+    return {
+        "nearest_player_found": True,
+        "distance_template_units": nearest_player.distance_template_units,
+        "time_delta_ms": nearest_player.time_delta_ms,
+        "threshold": threshold,
+        "away_from_player": away_from_player,
     }
 
 
@@ -1100,6 +1229,17 @@ def _validate_config(config: HitBounceCandidateConfig) -> dict[str, Any] | None:
         return _failed(
             "invalid_hit_player_distance_max_template",
             "hit_player_distance_max_template must be greater than zero",
+        )
+    if config.hit_player_review_distance_max_template < config.hit_player_distance_max_template:
+        return _failed(
+            "invalid_hit_player_review_distance_max_template",
+            "hit_player_review_distance_max_template must be greater than or equal to "
+            "hit_player_distance_max_template",
+        )
+    if config.hit_near_player_direction_delta_degrees < 0:
+        return _failed(
+            "invalid_hit_near_player_direction_delta_degrees",
+            "hit_near_player_direction_delta_degrees must be greater than or equal to zero",
         )
     if config.bounce_player_distance_min_template < 0:
         return _failed(

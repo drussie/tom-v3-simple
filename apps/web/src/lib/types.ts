@@ -335,6 +335,7 @@ export interface ReplayDetectionBBox {
 
 export type ReplayOverlayDisplayMode = "current_only" | "short_trail" | "full_trail";
 export type ReplayPoseVisualStyle = "limbs_only" | "limbs_and_joints" | "joints_only";
+export type ReplayEventCandidateMarkerState = "inactive" | "active" | "selected";
 
 export type ReplayLayerPreset = "operator" | "debug";
 export type ReplayPoseLimbSide = "left" | "right" | "neutral";
@@ -942,6 +943,21 @@ export interface ReplayEventCandidateTrajectoryContext {
   speed_delta_fraction?: number;
 }
 
+export interface ReplayEventCandidatePlayerProximityGate {
+  nearest_player_found: boolean;
+  distance_template_units: number | null;
+  time_delta_ms: number | null;
+  threshold: number;
+  away_from_player?: boolean;
+}
+
+export interface ReplayEventCandidateDecision {
+  selected_candidate_type: string;
+  suppressed_candidate_types: string[];
+  reason: string;
+  classification_priority?: string;
+}
+
 export interface ReplayEventCandidateOverlay {
   overlay_type: "hit_candidate" | "bounce_candidate";
   candidate_type: "hit_candidate" | "bounce_candidate" | string;
@@ -959,6 +975,9 @@ export interface ReplayEventCandidateOverlay {
   confidence: number | null;
   reason_codes: string[];
   candidate_method: string | null;
+  classification_priority: string | null;
+  player_proximity_gate: ReplayEventCandidatePlayerProximityGate | null;
+  candidate_decision: ReplayEventCandidateDecision | null;
   source_ball_trajectory_run_id: string | null;
   source_ball_trajectory_observation_id: string | null;
   source_court_projection_run_id: string | null;
@@ -1293,6 +1312,9 @@ export interface ReplayEventCandidateTimelineItem {
   confidence: number | null;
   reason_codes: string[];
   candidate_method: string | null;
+  classification_priority: string | null;
+  player_proximity_gate: ReplayEventCandidatePlayerProximityGate | null;
+  candidate_decision: ReplayEventCandidateDecision | null;
   source_ball_trajectory_observation_id: string | null;
   source_ball_court_projection_observation_id: string | null;
   source_player_court_projection_observation_id: string | null;

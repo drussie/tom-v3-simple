@@ -7,6 +7,7 @@ import type {
   ReplayCourtLineOverlay,
   ReplayDetectionBBox,
   ReplayDetectionOverlay,
+  ReplayEventCandidateMarkerState,
   ReplayEventCandidateOverlay,
   ReplayHomographyCandidateOverlay,
   ReplayMainPlayerCourtProjectionOverlay,
@@ -322,6 +323,30 @@ export function activeReplayEventCandidates(
       holdMs
     )
   );
+}
+
+export function eventCandidateMarkerState(
+  item: ReplayEventCandidateOverlay,
+  currentTimestampMs: number,
+  currentFrame: number,
+  selectedObservationId: string | null = null,
+  activeWindowMs = 500
+): ReplayEventCandidateMarkerState {
+  if (selectedObservationId === item.observation_id) {
+    return "selected";
+  }
+  if (
+    isActiveReplayPoint(
+      item.timestamp_ms,
+      item.frame_number,
+      currentTimestampMs,
+      currentFrame,
+      activeWindowMs
+    )
+  ) {
+    return "active";
+  }
+  return "inactive";
 }
 
 export function activeReplaySmoothedBall(

@@ -53,9 +53,15 @@ Reason codes include:
 - `trajectory_direction_change`
 - `speed_change_candidate`
 - `within_time_window`
+- `player_proximate_event_priority`
 
 The confidence score is deterministic and capped for v0. It is a candidate score, not a truth
 probability.
+
+Event Candidate Display + Classification Repair v0.1 adds an explicit
+`hit_first_when_player_proximate` priority. A player-proximate trajectory change is evaluated as a
+`hit_candidate` before any bounce consideration for the same context. Payloads include
+`player_proximity_gate` and `candidate_decision` diagnostics for review.
 
 ## Bounce Candidate Method
 
@@ -107,11 +113,13 @@ event_candidates
 ```
 
 The court projection mini-map draws `HIT CANDIDATE` and `BOUNCE CANDIDATE` markers in court-template
-space.
+space. Event Candidate Display + Classification Repair v0.1 keeps those markers visible as
+persistent review pins, with active and selected states.
 
 Event Candidate Video Overlay v0.1 also draws candidate markers on the broadcast video when the
 event candidate's source `ball_court_projection_candidate` contains an image-space `image_point`.
-Those video markers remain candidate visualizations only.
+Those video markers are also persistent review pins in v0.1 and remain candidate visualizations
+only.
 
 ## Boundaries
 

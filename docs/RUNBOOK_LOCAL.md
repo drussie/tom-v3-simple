@@ -1384,7 +1384,9 @@ python -m apps.worker.cli completion-audit --no-demo-only
 - Tracklets are candidates, not official rallies or points.
 - Homography candidates, projection diagnostics, and object-to-court projection candidates are
   evidence only, not final court models or object truth.
-- No bounce, hit, rally, point, score, or adjudication is produced.
+- Hit/bounce event candidates can be produced for review, but they remain candidate evidence only.
+  Persistent replay markers are not hit truth, bounce truth, in/out, rally, point, score, or
+  adjudication.
 - Cloud deployment, auth, production streaming, and multi-camera reasoning are out of scope.
 
 ## 15. Completion Checklist

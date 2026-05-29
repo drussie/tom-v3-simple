@@ -2252,3 +2252,29 @@ This repair adds:
 If the source image point is unavailable, replay keeps the candidate available for timeline and
 mini-map review and returns `image_marker_source = unavailable`. The video marker remains candidate
 visualization only; it is not hit truth, bounce truth, in/out, point, score, or adjudication.
+
+## Event Candidate Display + Classification Repair v0.1
+
+Status: complete
+
+### Goal
+
+Keep event candidate markers visible across the point/video and prioritize player-proximate
+trajectory changes as `hit_candidate` before bounce consideration.
+
+### Notes
+
+This repair adds:
+
+- persistent event candidate video markers
+- persistent event candidate mini-map markers
+- active/inactive/selected marker states
+- selected evidence details for classification priority and player proximity gates
+- `hit_first_when_player_proximate` candidate classification priority
+- `player_proximity_gate` diagnostics
+- `candidate_decision` diagnostics
+- focused tests for hit-first priority and persistent marker helper behavior
+
+The markers and classifications remain derived candidate evidence only. They are not hit truth,
+bounce truth, in/out, rally/point/score, player identity, accepted/rejected lifecycle, or
+adjudication.

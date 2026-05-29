@@ -91,6 +91,12 @@ This registry makes TOM v3 Simple boundaries explicit.
 - Replay Mode can display `hit_candidate` and `bounce_candidate` markers through
   `eventCandidateRunId`; these mini-map and video markers must remain labeled as candidates and do
   not confirm hits, bounces, in/out, points, or scores.
+- Event candidate markers are persistent review pins by default. Persistence helps operators see
+  sparse candidates across the point, but it is display policy only and does not make a candidate
+  true.
+- Event candidate classification prioritizes player-proximate trajectory changes as
+  `hit_candidate` before bounce consideration, but this remains a heuristic candidate label, not
+  contact truth.
 - Event candidate video markers require a source ball court projection image point. If that point
   is unavailable, the candidate remains inspectable in replay but no broadcast-video marker is
   drawn.

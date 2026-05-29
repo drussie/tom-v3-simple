@@ -549,6 +549,15 @@ pre {
   width: 48px;
 }
 
+.replay-event-candidate-video-marker.inactive {
+  opacity: 0.38;
+}
+
+.replay-event-candidate-video-marker.active,
+.replay-event-candidate-video-marker.selected {
+  opacity: 1;
+}
+
 .replay-event-candidate-video-marker .event-marker-shape {
   background: rgba(255, 255, 255, 0.18);
   display: block;
@@ -615,6 +624,20 @@ pre {
     1px 0 2px rgba(16, 23, 25, 0.96),
     -1px 0 2px rgba(16, 23, 25, 0.96);
   top: 0;
+}
+
+.replay-event-candidate-video-marker.inactive .event-marker-label {
+  opacity: 0;
+}
+
+.replay-event-candidate-video-marker.active .event-marker-label,
+.replay-event-candidate-video-marker.selected .event-marker-label {
+  opacity: 1;
+}
+
+.replay-event-candidate-video-marker.active .event-marker-shape,
+.replay-event-candidate-video-marker.active .event-marker-cross {
+  filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.55));
 }
 
 .replay-event-candidate-video-marker.selected .event-marker-shape,
@@ -1255,6 +1278,15 @@ pre {
   cursor: pointer;
 }
 
+.court-event-candidate-group.inactive {
+  opacity: 0.38;
+}
+
+.court-event-candidate-group.active,
+.court-event-candidate-group.selected {
+  opacity: 1;
+}
+
 .court-event-candidate-group path,
 .court-event-candidate-group circle {
   fill: color-mix(in srgb, var(--surface) 85%, white);
@@ -1276,6 +1308,21 @@ pre {
   paint-order: stroke;
   stroke: var(--surface);
   stroke-width: 3px;
+}
+
+.court-event-candidate-group.inactive text {
+  opacity: 0;
+}
+
+.court-event-candidate-group.active text,
+.court-event-candidate-group.selected text {
+  opacity: 1;
+}
+
+.court-event-candidate-group.active path,
+.court-event-candidate-group.active circle {
+  filter: drop-shadow(0 0 4px rgba(27, 37, 40, 0.35));
+  stroke-width: 3;
 }
 
 .court-event-candidate-group.selected path,

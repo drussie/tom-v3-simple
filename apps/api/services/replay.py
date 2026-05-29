@@ -1220,6 +1220,9 @@ def event_candidate_timeline_item_from_observation(
         "confidence": overlay_item["confidence"],
         "reason_codes": overlay_item["reason_codes"],
         "candidate_method": overlay_item["candidate_method"],
+        "classification_priority": overlay_item["classification_priority"],
+        "player_proximity_gate": overlay_item["player_proximity_gate"],
+        "candidate_decision": overlay_item["candidate_decision"],
         "image_point": overlay_item["image_point"],
         "image_marker_source": overlay_item["image_marker_source"],
         "source_ball_trajectory_observation_id": overlay_item[
@@ -1923,6 +1926,7 @@ def build_event_candidate_overlay_items(
         end_ms=end_ms,
         event_candidate_run_id=event_candidate_run_id,
         observation_type=observation_type,
+        persistent_run_markers=event_candidate_run_id is not None,
     )
     items: list[dict[str, Any]] = []
     for row in rows:
@@ -2162,6 +2166,19 @@ def event_candidate_overlay_item_from_observation(
         "confidence": observation.confidence,
         "reason_codes": payload.get("reason_codes") or [],
         "candidate_method": _string_or_none(payload.get("candidate_method")),
+        "classification_priority": _string_or_none(
+            payload.get("classification_priority")
+        ),
+        "player_proximity_gate": (
+            payload.get("player_proximity_gate")
+            if isinstance(payload.get("player_proximity_gate"), dict)
+            else None
+        ),
+        "candidate_decision": (
+            payload.get("candidate_decision")
+            if isinstance(payload.get("candidate_decision"), dict)
+            else None
+        ),
         "source_ball_trajectory_run_id": _string_or_none(
             payload.get("source_ball_trajectory_run_id")
         ),
@@ -2294,6 +2311,7 @@ def _event_candidate_rows(
     end_ms: int,
     event_candidate_run_id: str | None,
     observation_type: str | None,
+    persistent_run_markers: bool = False,
 ) -> list[Observation]:
     timestamp_end = func.coalesce(Observation.timestamp_end_ms, Observation.timestamp_start_ms)
     event_types = (
@@ -2301,16 +2319,22 @@ def _event_candidate_rows(
         if observation_type in EVENT_CANDIDATE_TYPES
         else EVENT_CANDIDATE_TYPES
     )
-    query = (
-        select(Observation)
-        .where(
-            Observation.media_id == media.id,
-            Observation.observation_type.in_(sorted(event_types)),
-            Observation.timestamp_start_ms.is_not(None),
-            Observation.timestamp_start_ms <= end_ms,
-            timestamp_end >= start_ms,
+    filters = [
+        Observation.media_id == media.id,
+        Observation.observation_type.in_(sorted(event_types)),
+        Observation.timestamp_start_ms.is_not(None),
+    ]
+    if not persistent_run_markers:
+        filters.extend(
+            [
+                Observation.timestamp_start_ms <= end_ms,
+                timestamp_end >= start_ms,
+            ]
         )
-        .order_by(Observation.timestamp_start_ms, Observation.frame_start, Observation.id)
+    query = select(Observation).where(*filters).order_by(
+        Observation.timestamp_start_ms,
+        Observation.frame_start,
+        Observation.id,
     )
     if event_candidate_run_id is not None:
         query = query.where(Observation.run_id == event_candidate_run_id)

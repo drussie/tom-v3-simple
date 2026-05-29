@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import {
   activeReplayEventCandidates,
+  eventCandidateMarkerState,
   imagePixelPointToOverlayPoint
 } from "../lib/replayOverlays";
 import type {
@@ -67,7 +68,7 @@ export function ReplayEventCandidateVideoOverlay({
   );
   const drawableCandidates = useMemo(
     () =>
-      activeCandidates
+      eventCandidates
         .map((item) => {
           if (item.image_point === null) {
             return null;
@@ -91,7 +92,7 @@ export function ReplayEventCandidateVideoOverlay({
             point: { x: number; y: number };
           } => entry !== null
         ),
-    [activeCandidates, overlaySize.height, overlaySize.width, replayInfo.height, replayInfo.width]
+    [eventCandidates, overlaySize.height, overlaySize.width, replayInfo.height, replayInfo.width]
   );
   const status = overlayStatus({
     enabled,
@@ -108,7 +109,13 @@ export function ReplayEventCandidateVideoOverlay({
         ? drawableCandidates.map(({ item, point }) => {
             const isHit = item.candidate_type === "hit_candidate";
             const label = isHit ? "HIT CANDIDATE" : "BOUNCE CANDIDATE";
-            const selected = selectedObservationId === item.observation_id;
+            const markerState = eventCandidateMarkerState(
+              item,
+              currentTimestampMs,
+              currentFrame,
+              selectedObservationId,
+              holdMs
+            );
             return (
               <button
                 aria-label={`${label} ${formatConfidence(item.confidence)} frame ${
@@ -116,7 +123,7 @@ export function ReplayEventCandidateVideoOverlay({
                 }`}
                 className={`replay-event-candidate-video-marker ${
                   isHit ? "hit" : "bounce"
-                }${selected ? " selected" : ""}`}
+                } ${markerState}`}
                 key={item.observation_id}
                 onClick={(event) => {
                   event.stopPropagation();

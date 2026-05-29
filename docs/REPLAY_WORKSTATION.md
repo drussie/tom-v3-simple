@@ -694,9 +694,10 @@ http://127.0.0.1:3000/replay/<media_id>?courtProjectionRunId=<court_projection_r
 
 The court projection mini-map can show current ball/player projection candidates, a
 `BALL TRAJECTORY CANDIDATE` path, and `HIT CANDIDATE` / `BOUNCE CANDIDATE` markers. Event candidate
-markers also appear on the broadcast video when replay can resolve the source image point. Both
-surfaces are derived diagnostics only. They are not hit truth, bounce truth, in/out, point, score,
-or adjudication.
+markers also appear on the broadcast video when replay can resolve the source image point. Event
+candidate markers remain visible as persistent review pins, with active and selected states, so
+operators can review the full point without missing sparse markers. Both surfaces are derived
+diagnostics only. They are not hit truth, bounce truth, in/out, point, score, or adjudication.
 
 For Stream Proxy Mode, open:
 

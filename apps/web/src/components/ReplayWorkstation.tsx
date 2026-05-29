@@ -3033,6 +3033,44 @@ function SelectedEvidencePanel({
         <DetailRow label="image marker source" value={item.image_marker_source} />
         <DetailRow label="confidence" value={formatConfidence(item.confidence)} />
         <DetailRow label="candidate method" value={item.candidate_method ?? "n/a"} />
+        <DetailRow label="classification priority" value={item.classification_priority ?? "n/a"} />
+        {item.player_proximity_gate !== null ? (
+          <>
+            <DetailRow
+              label="player gate found"
+              value={item.player_proximity_gate.nearest_player_found ? "true" : "false"}
+            />
+            <DetailRow
+              label="player gate distance"
+              value={
+                item.player_proximity_gate.distance_template_units === null
+                  ? "n/a"
+                  : item.player_proximity_gate.distance_template_units.toFixed(4)
+              }
+            />
+            <DetailRow
+              label="player gate threshold"
+              value={item.player_proximity_gate.threshold.toFixed(4)}
+            />
+          </>
+        ) : null}
+        {item.candidate_decision !== null ? (
+          <>
+            <DetailRow
+              label="candidate decision"
+              value={item.candidate_decision.selected_candidate_type}
+            />
+            <DetailRow
+              label="suppressed candidate types"
+              value={
+                item.candidate_decision.suppressed_candidate_types.length > 0
+                  ? item.candidate_decision.suppressed_candidate_types.join(", ")
+                  : "none"
+              }
+            />
+            <DetailRow label="decision reason" value={item.candidate_decision.reason} />
+          </>
+        ) : null}
         <DetailRow
           label="reason codes"
           value={item.reason_codes.length > 0 ? item.reason_codes.join(", ") : "n/a"}

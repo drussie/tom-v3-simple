@@ -48,15 +48,20 @@ The video overlay draws:
 
 Labels must include `CANDIDATE`.
 
-The marker appears near the candidate timestamp using a short display hold window so timeline-click
-inspection is practical without making the marker look persistent or adjudicated.
+Event Candidate Display + Classification Repair v0.1 changes the display policy to persistent
+review pins. All selected event candidates remain visible across the point/video, inactive markers
+are subdued, active markers are highlighted near the current replay timestamp, and selected markers
+receive the strongest outline. This persistence is a replay review policy only; it does not make a
+candidate adjudicated.
 
 ## Mini-Map
 
-The existing court projection mini-map remains unchanged:
+The court projection mini-map uses the same persistent marker principle:
 
 - event candidates are shown in normalized court-template coordinates
 - the video overlay uses image-space coordinates from the source ball court projection
+- inactive markers remain visible but subdued
+- active and selected markers are highlighted
 
 ## Boundaries
 
