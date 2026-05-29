@@ -137,9 +137,14 @@ def test_replay_display_policy_helpers_define_expected_modes() -> None:
     assert "image_marker_source" in (ROOT / "apps/web/src/lib/types.ts").read_text()
     assert "HIT CANDIDATE" in event_overlay
     assert "BOUNCE CANDIDATE" in event_overlay
+    assert 'isHit ? "triangle" : "ring"' in event_overlay
+    assert "event-marker-cross" not in event_overlay
     assert ".replay-event-candidate-video-marker" in css
     assert ".replay-event-candidate-video-marker.inactive" in css
     assert ".court-event-candidate-group.inactive" in css
+    assert ".replay-event-candidate-video-marker.hit .event-marker-shape" in css
+    assert ".replay-event-candidate-video-marker.bounce .event-marker-shape" in css
+    assert ".event-marker-cross" not in css
     assert "tom-v1-hit-bounce-candidates:" in makefile
     assert "build-hit-bounce-candidates" in makefile
     assert '--ball-trajectory-run-id "$(BALL_TRAJECTORY_RUN_ID)"' in makefile

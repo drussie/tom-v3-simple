@@ -132,9 +132,7 @@ export function ReplayEventCandidateVideoOverlay({
                 style={eventCandidateMarkerStyle(point)}
                 type="button"
               >
-                <span className="event-marker-shape" />
-                <span className="event-marker-cross horizontal" />
-                <span className="event-marker-cross vertical" />
+                <span className={`event-marker-shape ${isHit ? "triangle" : "ring"}`} />
                 <span className="event-marker-label">{label}</span>
               </button>
             );
