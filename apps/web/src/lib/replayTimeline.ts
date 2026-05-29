@@ -81,6 +81,9 @@ export function timelineItemKey(item: ReplayTimelineItem): string {
   if (item.item_type === "ball_trajectory_court_candidate") {
     return `ball_trajectory_court_candidate:${item.observation_id}`;
   }
+  if (item.item_type === "hit_candidate" || item.item_type === "bounce_candidate") {
+    return `${item.item_type}:${item.observation_id}`;
+  }
   if (item.item_type === "annotation") {
     return `annotation:${item.annotation_id}`;
   }

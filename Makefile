@@ -45,10 +45,17 @@ COURT_PROJECTION_RUN_NAME ?= object-to-court-projection-candidates-v0
 COURT_PROJECTION_RUN_ID ?=
 BALL_TRAJECTORY_RUN_NAME ?= ball-trajectory-court-candidate-v0
 BALL_TRAJECTORY_RUN_ID ?=
+EVENT_CANDIDATE_RUN_NAME ?= hit-bounce-candidate-evidence-v0
+EVENT_CANDIDATE_RUN_ID ?=
 HOMOGRAPHY_MAX_GAP_MS ?= 1500
 BALL_TRAJECTORY_MAX_GAP_FRAMES ?= 6
 BALL_TRAJECTORY_MAX_GAP_MS ?= 250
 BALL_TRAJECTORY_MIN_POINTS_PER_SEGMENT ?= 3
+HIT_PLAYER_DISTANCE_MAX_TEMPLATE ?= 0.18
+BOUNCE_PLAYER_DISTANCE_MIN_TEMPLATE ?= 0.18
+HIT_MIN_DIRECTION_DELTA_DEGREES ?= 25
+BOUNCE_MIN_DIRECTION_DELTA_DEGREES ?= 20
+CANDIDATE_DEDUPE_MS ?= 500
 AUDIT_DEMO_ONLY ?= true
 AUDIT_STRICT ?= false
 TOM_V3_AUDIT_REQUIRED ?= false
@@ -74,7 +81,7 @@ DERIVE_LINES ?= true
 
 export TOM_V3_DATABASE_URL
 
-.PHONY: install web-install test lint migrate api seed verify index-media run-gameplay index-and-run-gameplay run-detection index-and-run-detection extract-frame-artifacts build-tracklets run-pose export-tracklet-review-dataset court-review-export demo demo-fixture demo-plan demo-reset demo-export demo-open replay-open completion-audit completion-check yolo-probe yolo-smoke yolo-runtime-probe register-yolo-model smoke-real-yolo-local real-detection real-pose tom-v1-yolo-probe tom-v1-ball-detection tom-v1-player-detection tom-v1-tracklets tom-v1-main-subjects tom-v1-main-player-tracks tom-v1-pose tom-v1-pose-main-subjects tom-v1-pose-main-tracks tom-v1-motion-smoothing tom-v1-court-keypoints-probe tom-v1-court-keypoints tom-v1-court-keypoint-audit tom-v1-object-court-projection court-fixture homography-candidates projection-diagnostics web web-build web-lint smoke all-checks
+.PHONY: install web-install test lint migrate api seed verify index-media run-gameplay index-and-run-gameplay run-detection index-and-run-detection extract-frame-artifacts build-tracklets run-pose export-tracklet-review-dataset court-review-export demo demo-fixture demo-plan demo-reset demo-export demo-open replay-open completion-audit completion-check yolo-probe yolo-smoke yolo-runtime-probe register-yolo-model smoke-real-yolo-local real-detection real-pose tom-v1-yolo-probe tom-v1-ball-detection tom-v1-player-detection tom-v1-tracklets tom-v1-main-subjects tom-v1-main-player-tracks tom-v1-pose tom-v1-pose-main-subjects tom-v1-pose-main-tracks tom-v1-motion-smoothing tom-v1-court-keypoints-probe tom-v1-court-keypoints tom-v1-court-keypoint-audit tom-v1-object-court-projection tom-v1-ball-court-trajectory tom-v1-hit-bounce-candidates court-fixture homography-candidates projection-diagnostics web web-build web-lint smoke all-checks
 
 install:
 	$(PYTHON) -m pip install -e ".[dev]"
@@ -276,6 +283,12 @@ tom-v1-ball-court-trajectory:
 	@if [ -z "$(MEDIA_ID)" ]; then echo "MEDIA_ID is required: make tom-v1-ball-court-trajectory MEDIA_ID=<media_id>"; exit 1; fi
 	@if [ -z "$(COURT_PROJECTION_RUN_ID)" ]; then echo "COURT_PROJECTION_RUN_ID is required: make tom-v1-ball-court-trajectory COURT_PROJECTION_RUN_ID=<court_projection_run_id>"; exit 1; fi
 	$(PYTHON) -m apps.worker.cli build-ball-court-trajectory --media-id "$(MEDIA_ID)" --court-projection-run-id "$(COURT_PROJECTION_RUN_ID)" --run-name "$(BALL_TRAJECTORY_RUN_NAME)" --max-gap-frames "$(BALL_TRAJECTORY_MAX_GAP_FRAMES)" --max-gap-ms "$(BALL_TRAJECTORY_MAX_GAP_MS)" --min-points-per-segment "$(BALL_TRAJECTORY_MIN_POINTS_PER_SEGMENT)" --viewer-base-url "$(VIEWER_BASE_URL)" $(if $(filter true,$(PLAN_ONLY)),--plan-only,)
+
+tom-v1-hit-bounce-candidates:
+	@if [ -z "$(MEDIA_ID)" ]; then echo "MEDIA_ID is required: make tom-v1-hit-bounce-candidates MEDIA_ID=<media_id>"; exit 1; fi
+	@if [ -z "$(BALL_TRAJECTORY_RUN_ID)" ]; then echo "BALL_TRAJECTORY_RUN_ID is required: make tom-v1-hit-bounce-candidates BALL_TRAJECTORY_RUN_ID=<ball_trajectory_run_id>"; exit 1; fi
+	@if [ -z "$(COURT_PROJECTION_RUN_ID)" ]; then echo "COURT_PROJECTION_RUN_ID is required: make tom-v1-hit-bounce-candidates COURT_PROJECTION_RUN_ID=<court_projection_run_id>"; exit 1; fi
+	$(PYTHON) -m apps.worker.cli build-hit-bounce-candidates --media-id "$(MEDIA_ID)" --ball-trajectory-run-id "$(BALL_TRAJECTORY_RUN_ID)" --court-projection-run-id "$(COURT_PROJECTION_RUN_ID)" --run-name "$(EVENT_CANDIDATE_RUN_NAME)" --hit-player-distance-max-template "$(HIT_PLAYER_DISTANCE_MAX_TEMPLATE)" --bounce-player-distance-min-template "$(BOUNCE_PLAYER_DISTANCE_MIN_TEMPLATE)" --hit-min-direction-delta-degrees "$(HIT_MIN_DIRECTION_DELTA_DEGREES)" --bounce-min-direction-delta-degrees "$(BOUNCE_MIN_DIRECTION_DELTA_DEGREES)" --candidate-dedupe-ms "$(CANDIDATE_DEDUPE_MS)" --viewer-base-url "$(VIEWER_BASE_URL)" $(if $(filter true,$(PLAN_ONLY)),--plan-only,)
 
 tom-v1-court-keypoints-probe:
 	$(PYTHON) -m apps.worker.cli tom-v1-court-keypoints-probe --weights "$(TOM_V1_MODEL_ROOT)/keypoints_model.pth" --allowed-root "$(TOM_V1_MODEL_ROOT)"

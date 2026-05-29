@@ -680,6 +680,17 @@ http://127.0.0.1:3000/replay/<media_id>?courtRunId=<court_run_id>&homographyRunI
 
 Projection diagnostics display projected court template evidence only. They do not project ball/player observations into court space.
 
+For court projection, trajectory, and first-pass event-candidate replay:
+
+```text
+http://127.0.0.1:3000/replay/<media_id>?courtProjectionRunId=<court_projection_run_id>&ballTrajectoryRunId=<ball_trajectory_run_id>&eventCandidateRunId=<event_candidate_run_id>&viewPreset=operator
+```
+
+The court projection mini-map can show current ball/player projection candidates, a
+`BALL TRAJECTORY CANDIDATE` path, and `HIT CANDIDATE` / `BOUNCE CANDIDATE` markers. Event candidate
+markers are derived diagnostics only. They are not hit truth, bounce truth, in/out, point, score,
+or adjudication.
+
 For Stream Proxy Mode, open:
 
 ```text

@@ -7,6 +7,7 @@ import type {
   ReplayCourtLineOverlay,
   ReplayDetectionBBox,
   ReplayDetectionOverlay,
+  ReplayEventCandidateOverlay,
   ReplayHomographyCandidateOverlay,
   ReplayMainPlayerCourtProjectionOverlay,
   ReplayMainPlayerTrackOverlay,
@@ -303,6 +304,23 @@ export function activeReplayMainPlayerCourtProjection(
     holdMs,
     (item) => item.track_role_candidate ?? item.track_candidate_id ?? item.observation_id,
     (item) => item.confidence
+  );
+}
+
+export function activeReplayEventCandidates(
+  items: ReplayEventCandidateOverlay[],
+  currentTimestampMs: number,
+  currentFrame: number,
+  holdMs = 250
+): ReplayEventCandidateOverlay[] {
+  return items.filter((item) =>
+    isActiveReplayPoint(
+      item.timestamp_ms,
+      item.frame_number,
+      currentTimestampMs,
+      currentFrame,
+      holdMs
+    )
   );
 }
 
@@ -707,6 +725,16 @@ export function filterBallCourtTrajectoryAvailableAt(
       points: item.points.filter((point) => point.timestamp_ms <= availableUntilMs)
     }))
     .filter((item) => item.points.length > 0);
+}
+
+export function filterEventCandidatesAvailableAt(
+  items: ReplayEventCandidateOverlay[],
+  availableUntilMs: number | null
+): ReplayEventCandidateOverlay[] {
+  if (availableUntilMs === null) {
+    return items;
+  }
+  return items.filter((item) => item.timestamp_ms <= availableUntilMs);
 }
 
 export function filterSmoothedBallAvailableAt(

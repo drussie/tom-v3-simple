@@ -40,6 +40,9 @@ This registry makes TOM v3 Simple boundaries explicit.
   normalized `court_template_2d` coordinates through candidate homographies. They remain derived
   candidate evidence and do not prove ball location, player location, court truth, bounce, hit,
   in/out, point, score, or identity.
+- Hit/bounce candidate evidence can mark possible hit and bounce moments from trajectory shape and
+  main-player projection proximity, but it is deliberately low-authority candidate evidence. It is
+  not hit truth, bounce truth, in/out, rally, point, score, or adjudication.
 - Replay current-only, short-trail, and full-trail controls are display policy only; they do not change persisted evidence or prove tracking correctness.
 - Motion smoothing creates derived replay candidate evidence only. Smoothed ball, player-box, and pose candidates can reduce jitter, but they are not true ball positions, confirmed player boxes, actual pose, trajectory physics, bounce/hit/in-out, point, or score.
 - TOM v1 model binaries may exist locally, but they are intentionally not tracked or uploaded.
@@ -85,6 +88,9 @@ This registry makes TOM v3 Simple boundaries explicit.
 - Replay Mode can display `ball_trajectory_court_candidate` paths through `ballTrajectoryRunId`,
   but these are derived trajectory candidates only; they do not identify bounces, hits, in/out, or
   scoring events.
+- Replay Mode can display `hit_candidate` and `bounce_candidate` markers through
+  `eventCandidateRunId`; these mini-map markers must remain labeled as candidates and do not
+  confirm hits, bounces, in/out, points, or scores.
 - Replay view presets are display defaults only. Operator view hides raw/debug layers by default,
   and debug/audit view enables them, but neither preset changes persisted observations or proves
   evidence correctness.

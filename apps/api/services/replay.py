@@ -45,6 +45,7 @@ COURT_PROJECTION_TYPES = {
     "main_player_court_projection_candidate",
 }
 BALL_TRAJECTORY_TYPES = {"ball_trajectory_court_candidate"}
+EVENT_CANDIDATE_TYPES = {"hit_candidate", "bounce_candidate"}
 MAIN_PLAYER_TRACK_TYPES = {
     "main_player_track_candidate",
     "main_player_track_assignment_candidate",
@@ -134,6 +135,7 @@ def build_replay_overlay_chunk(
     projection_diagnostic_run_id: str | None = None,
     court_projection_run_id: str | None = None,
     ball_trajectory_run_id: str | None = None,
+    event_candidate_run_id: str | None = None,
     court_temporal_persistence: str = COURT_TEMPORAL_PERSISTENCE_CARRY_FORWARD,
     court_persistence_max_gap_ms: int = DEFAULT_COURT_PERSISTENCE_MAX_GAP_MS,
     min_confidence: float | None = None,
@@ -322,6 +324,30 @@ def build_replay_overlay_chunk(
         if "ball_court_trajectory" in layers
         else []
     )
+    hit_candidates = (
+        build_event_candidate_overlay_items(
+            session=session,
+            media=media,
+            start_ms=start_ms,
+            end_ms=end_ms,
+            event_candidate_run_id=event_candidate_run_id,
+            observation_type="hit_candidate",
+        )
+        if "hit_candidates" in layers
+        else []
+    )
+    bounce_candidates = (
+        build_event_candidate_overlay_items(
+            session=session,
+            media=media,
+            start_ms=start_ms,
+            end_ms=end_ms,
+            event_candidate_run_id=event_candidate_run_id,
+            observation_type="bounce_candidate",
+        )
+        if "bounce_candidates" in layers
+        else []
+    )
     return {
         "media_id": media.id,
         "start_ms": start_ms,
@@ -344,6 +370,8 @@ def build_replay_overlay_chunk(
         "ball_court_projection": ball_court_projection,
         "main_player_court_projection": main_player_court_projection,
         "ball_court_trajectory": ball_court_trajectory,
+        "hit_candidates": hit_candidates,
+        "bounce_candidates": bounce_candidates,
         "court_temporal_persistence": court_temporal_persistence,
         "court_persistence_max_gap_ms": court_persistence_max_gap_ms,
         "observation_only": True,
@@ -365,6 +393,7 @@ def build_replay_timeline(
     projection_diagnostic_run_id: str | None = None,
     court_projection_run_id: str | None = None,
     ball_trajectory_run_id: str | None = None,
+    event_candidate_run_id: str | None = None,
     include_annotations: bool = True,
 ) -> dict[str, Any] | None:
     media = session.get(MediaAsset, media_id)
@@ -390,6 +419,7 @@ def build_replay_timeline(
                     projection_diagnostic_run_id,
                     court_projection_run_id,
                     ball_trajectory_run_id,
+                    event_candidate_run_id,
                 )
                 if run_id is not None
             },
@@ -510,6 +540,15 @@ def build_replay_timeline(
                     session=session,
                     media=media,
                     ball_trajectory_run_id=ball_trajectory_run_id,
+                ),
+            },
+            {
+                "lane_type": "event_candidates",
+                "label": "Hit/bounce event candidates",
+                "items": build_event_candidate_timeline_items(
+                    session=session,
+                    media=media,
+                    event_candidate_run_id=event_candidate_run_id,
                 ),
             },
             {
@@ -1120,6 +1159,68 @@ def ball_trajectory_timeline_item_from_observation(
         "not_ball_truth": True,
         "not_bounce_truth": True,
         "not_hit_truth": True,
+        "not_in_out_truth": True,
+        "observation_only": True,
+        "no_adjudication": True,
+    }
+
+
+def build_event_candidate_timeline_items(
+    session: Session,
+    *,
+    media: MediaAsset,
+    event_candidate_run_id: str | None = None,
+) -> list[dict[str, Any]]:
+    query = (
+        select(Observation)
+        .where(
+            Observation.media_id == media.id,
+            Observation.observation_type.in_(sorted(EVENT_CANDIDATE_TYPES)),
+            Observation.timestamp_start_ms.is_not(None),
+        )
+        .order_by(Observation.timestamp_start_ms, Observation.frame_start, Observation.id)
+    )
+    if event_candidate_run_id is not None:
+        query = query.where(Observation.run_id == event_candidate_run_id)
+
+    items: list[dict[str, Any]] = []
+    for observation in session.scalars(query).all():
+        item = event_candidate_timeline_item_from_observation(observation)
+        if item is not None:
+            items.append(item)
+    return items
+
+
+def event_candidate_timeline_item_from_observation(
+    observation: Observation,
+) -> dict[str, Any] | None:
+    overlay_item = event_candidate_overlay_item_from_observation(observation)
+    if overlay_item is None:
+        return None
+    return {
+        "item_type": overlay_item["overlay_type"],
+        "observation_id": observation.id,
+        "run_id": observation.run_id,
+        "timestamp_ms": overlay_item["timestamp_ms"],
+        "frame_number": overlay_item["frame_number"],
+        "display_label": overlay_item["source_label"],
+        "candidate_type": overlay_item["candidate_type"],
+        "court_point": overlay_item["court_point"],
+        "confidence": overlay_item["confidence"],
+        "reason_codes": overlay_item["reason_codes"],
+        "candidate_method": overlay_item["candidate_method"],
+        "source_ball_trajectory_observation_id": overlay_item[
+            "source_ball_trajectory_observation_id"
+        ],
+        "source_ball_court_projection_observation_id": overlay_item[
+            "source_ball_court_projection_observation_id"
+        ],
+        "source_player_court_projection_observation_id": overlay_item[
+            "source_player_court_projection_observation_id"
+        ],
+        "candidate_only": True,
+        "not_hit_truth": True,
+        "not_bounce_truth": True,
         "not_in_out_truth": True,
         "observation_only": True,
         "no_adjudication": True,
@@ -1793,6 +1894,30 @@ def build_ball_court_trajectory_overlay_items(
     ]
 
 
+def build_event_candidate_overlay_items(
+    session: Session,
+    *,
+    media: MediaAsset,
+    start_ms: int,
+    end_ms: int,
+    event_candidate_run_id: str | None = None,
+    observation_type: str | None = None,
+) -> list[dict[str, Any]]:
+    rows = _event_candidate_rows(
+        session=session,
+        media=media,
+        start_ms=start_ms,
+        end_ms=end_ms,
+        event_candidate_run_id=event_candidate_run_id,
+        observation_type=observation_type,
+    )
+    return [
+        item
+        for row in rows
+        if (item := event_candidate_overlay_item_from_observation(row)) is not None
+    ]
+
+
 def court_projection_overlay_item_from_observation(
     observation: Observation,
 ) -> dict[str, Any] | None:
@@ -1973,6 +2098,87 @@ def ball_trajectory_overlay_item_from_observation(
     }
 
 
+def event_candidate_overlay_item_from_observation(
+    observation: Observation,
+) -> dict[str, Any] | None:
+    if observation.observation_type not in EVENT_CANDIDATE_TYPES:
+        return None
+    payload = observation.payload_jsonb or {}
+    frame_number, timestamp_ms = _observation_frame_time(observation)
+    court_point = payload.get("court_point")
+    if (
+        frame_number is None
+        or timestamp_ms is None
+        or not isinstance(court_point, dict)
+        or _numeric(court_point.get("x")) is None
+        or _numeric(court_point.get("y")) is None
+    ):
+        return None
+    trajectory_context = (
+        payload.get("trajectory_context")
+        if isinstance(payload.get("trajectory_context"), dict)
+        else {}
+    )
+    return {
+        "overlay_type": observation.observation_type,
+        "candidate_type": _string_or_none(payload.get("candidate_type"))
+        or observation.observation_type,
+        "observation_id": observation.id,
+        "run_id": observation.run_id,
+        "frame_number": frame_number,
+        "timestamp_ms": timestamp_ms,
+        "court_point": {
+            "x": _numeric(court_point.get("x")),
+            "y": _numeric(court_point.get("y")),
+        },
+        "confidence": observation.confidence,
+        "reason_codes": payload.get("reason_codes") or [],
+        "candidate_method": _string_or_none(payload.get("candidate_method")),
+        "source_ball_trajectory_run_id": _string_or_none(
+            payload.get("source_ball_trajectory_run_id")
+        ),
+        "source_ball_trajectory_observation_id": _string_or_none(
+            payload.get("source_ball_trajectory_observation_id")
+        ),
+        "source_court_projection_run_id": _string_or_none(
+            payload.get("source_court_projection_run_id")
+        ),
+        "source_ball_court_projection_observation_id": _string_or_none(
+            payload.get("source_ball_court_projection_observation_id")
+        ),
+        "source_player_court_projection_observation_id": _string_or_none(
+            payload.get("source_player_court_projection_observation_id")
+        ),
+        "nearest_player": (
+            payload.get("nearest_player")
+            if isinstance(payload.get("nearest_player"), dict)
+            else None
+        ),
+        "trajectory_context": trajectory_context,
+        "coordinate_space": observation.coordinate_space or "court_template_2d",
+        "template_name": _string_or_none(payload.get("template_name")),
+        "template_version": _string_or_none(payload.get("template_version")),
+        "candidate_only": True,
+        "not_ball_truth": True,
+        "not_hit_truth": True,
+        "not_bounce_truth": True,
+        "not_in_out_truth": True,
+        "observation_only": True,
+        "no_adjudication": True,
+        "model_registry_id": observation.model_id,
+        "model_name": observation.model.name if observation.model is not None else None,
+        "model_version": observation.model.version if observation.model is not None else None,
+        "runtime_config_id": observation.runtime_config_id,
+        "evidence_source": "event_candidate",
+        "source_label": _string_or_none(payload.get("source_label"))
+        or (
+            "hit candidate evidence"
+            if observation.observation_type == "hit_candidate"
+            else "bounce candidate evidence"
+        ),
+    }
+
+
 def _court_projection_rows(
     *,
     session: Session,
@@ -2021,6 +2227,37 @@ def _ball_trajectory_rows(
     )
     if ball_trajectory_run_id is not None:
         query = query.where(Observation.run_id == ball_trajectory_run_id)
+    return list(session.scalars(query).all())
+
+
+def _event_candidate_rows(
+    *,
+    session: Session,
+    media: MediaAsset,
+    start_ms: int,
+    end_ms: int,
+    event_candidate_run_id: str | None,
+    observation_type: str | None,
+) -> list[Observation]:
+    timestamp_end = func.coalesce(Observation.timestamp_end_ms, Observation.timestamp_start_ms)
+    event_types = (
+        {observation_type}
+        if observation_type in EVENT_CANDIDATE_TYPES
+        else EVENT_CANDIDATE_TYPES
+    )
+    query = (
+        select(Observation)
+        .where(
+            Observation.media_id == media.id,
+            Observation.observation_type.in_(sorted(event_types)),
+            Observation.timestamp_start_ms.is_not(None),
+            Observation.timestamp_start_ms <= end_ms,
+            timestamp_end >= start_ms,
+        )
+        .order_by(Observation.timestamp_start_ms, Observation.frame_start, Observation.id)
+    )
+    if event_candidate_run_id is not None:
+        query = query.where(Observation.run_id == event_candidate_run_id)
     return list(session.scalars(query).all())
 
 
@@ -2506,6 +2743,7 @@ def available_runs_for_media(session: Session, media_id: str) -> dict[str, list[
         "projection_diagnostic": _projection_diagnostic_run_summaries(session, media_id),
         "court_projection": _court_projection_run_summaries(session, media_id),
         "ball_trajectory": _ball_trajectory_run_summaries(session, media_id),
+        "event_candidate": _event_candidate_run_summaries(session, media_id),
         "main_player_track": _main_player_track_run_summaries(session, media_id),
         "motion_smoothing": _motion_smoothing_run_summaries(session, media_id),
     }
@@ -2603,6 +2841,19 @@ def normalize_replay_layers(layers: str | list[str] | tuple[str, ...] | None) ->
             "court_ball_trajectory",
         }:
             layer = "ball_court_trajectory"
+        if layer in {
+            "event_candidates",
+            "event-candidates",
+            "hit_bounce_candidates",
+            "hit-bounce-candidates",
+            "hit_bounce_candidate_evidence",
+        }:
+            normalized.update({"hit_candidates", "bounce_candidates"})
+            continue
+        if layer in {"hit_candidate", "hit-candidates", "hit_candidates"}:
+            layer = "hit_candidates"
+        if layer in {"bounce_candidate", "bounce-candidates", "bounce_candidates"}:
+            layer = "bounce_candidates"
         if layer in {
             "main-player-court-projection",
             "main_player_court_projection_candidate",
@@ -2829,6 +3080,57 @@ def _ball_trajectory_run_summaries(
                 "not_ball_truth": True,
                 "not_bounce_truth": True,
                 "not_hit_truth": True,
+                "not_in_out_truth": True,
+                "observation_only": True,
+                "no_adjudication": True,
+                "is_fixture": False,
+                "is_real_model_output": False,
+                "model_output_not_truth": False,
+            }
+        )
+    return summaries
+
+
+def _event_candidate_run_summaries(
+    session: Session,
+    media_id: str,
+) -> list[dict[str, Any]]:
+    summaries = _run_summaries_for_observation_types(session, media_id, EVENT_CANDIDATE_TYPES)
+    if not summaries:
+        return []
+
+    counts_by_run_type = _counts_by_run_and_type(session, media_id, EVENT_CANDIDATE_TYPES)
+    for summary in summaries:
+        run = session.get(ProcessingRun, summary["run_id"])
+        runtime_payload = run.runtime_config.payload_jsonb if run and run.runtime_config else {}
+        run_metadata = run.metadata_jsonb if run is not None else {}
+        source_ball_trajectory_run_id = _string_or_none(
+            run_metadata.get("source_ball_trajectory_run_id")
+        ) or _string_or_none(runtime_payload.get("source_ball_trajectory_run_id"))
+        source_court_projection_run_id = _string_or_none(
+            run_metadata.get("source_court_projection_run_id")
+        ) or _string_or_none(runtime_payload.get("source_court_projection_run_id"))
+        candidate_summary = run_metadata.get("candidate_summary") or {}
+        summary.update(
+            {
+                "evidence_source": "event_candidate",
+                "source_label": "hit/bounce candidate evidence",
+                "source_ball_trajectory_run_id": source_ball_trajectory_run_id,
+                "source_court_projection_run_id": source_court_projection_run_id,
+                "hit_candidate_count": counts_by_run_type.get(
+                    (summary["run_id"], "hit_candidate"), 0
+                ),
+                "bounce_candidate_count": counts_by_run_type.get(
+                    (summary["run_id"], "bounce_candidate"), 0
+                ),
+                "evaluated_trajectory_points": (
+                    candidate_summary.get("evaluated_trajectory_points")
+                    if isinstance(candidate_summary, dict)
+                    else None
+                ),
+                "candidate_only": True,
+                "not_hit_truth": True,
+                "not_bounce_truth": True,
                 "not_in_out_truth": True,
                 "observation_only": True,
                 "no_adjudication": True,
@@ -3473,6 +3775,8 @@ def _source_label(evidence_source: str) -> str:
         return "homography candidate"
     if evidence_source == "court_projection_candidate":
         return "court projection candidate"
+    if evidence_source == "event_candidate":
+        return "hit/bounce candidate evidence"
     return "persisted evidence"
 
 

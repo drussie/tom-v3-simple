@@ -266,11 +266,16 @@ export interface ReplayRunSummary {
   ball_court_projection_count?: number;
   main_player_court_projection_count?: number;
   ball_trajectory_court_candidate_count?: number;
+  hit_candidate_count?: number;
+  bounce_candidate_count?: number;
+  evaluated_trajectory_points?: number | null;
   source_point_count?: number;
   candidate_geometry?: boolean;
   diagnostic_geometry?: boolean;
   projection_candidate_only?: boolean;
   trajectory_candidate_only?: boolean;
+  event_candidate_only?: boolean;
+  candidate_only?: boolean;
   not_ball_truth?: boolean;
   not_player_truth?: boolean;
   not_bounce_truth?: boolean;
@@ -300,6 +305,7 @@ export interface ReplayAvailableRuns {
   projection_diagnostic: ReplayRunSummary[];
   court_projection: ReplayRunSummary[];
   ball_trajectory: ReplayRunSummary[];
+  event_candidate: ReplayRunSummary[];
   main_player_track: ReplayRunSummary[];
   motion_smoothing: ReplayRunSummary[];
 }
@@ -913,6 +919,65 @@ export interface ReplayBallCourtTrajectoryOverlay {
   source_label?: string | null;
 }
 
+export interface ReplayEventCandidateNearestPlayer {
+  track_role_candidate: string | null;
+  track_candidate_id: string | null;
+  source_player_court_projection_observation_id: string | null;
+  court_x: number;
+  court_y: number;
+  distance_template_units: number;
+  time_delta_ms: number;
+}
+
+export interface ReplayEventCandidateTrajectoryContext {
+  previous_frame?: number;
+  next_frame?: number;
+  previous_timestamp_ms?: number;
+  next_timestamp_ms?: number;
+  direction_before_degrees?: number;
+  direction_after_degrees?: number;
+  direction_delta_degrees?: number;
+  speed_before?: number;
+  speed_after?: number;
+  speed_delta_fraction?: number;
+}
+
+export interface ReplayEventCandidateOverlay {
+  overlay_type: "hit_candidate" | "bounce_candidate";
+  candidate_type: "hit_candidate" | "bounce_candidate" | string;
+  observation_id: string;
+  run_id: string;
+  frame_number: number;
+  timestamp_ms: number;
+  court_point: ReplayCourtProjectionPoint;
+  confidence: number | null;
+  reason_codes: string[];
+  candidate_method: string | null;
+  source_ball_trajectory_run_id: string | null;
+  source_ball_trajectory_observation_id: string | null;
+  source_court_projection_run_id: string | null;
+  source_ball_court_projection_observation_id: string | null;
+  source_player_court_projection_observation_id: string | null;
+  nearest_player: ReplayEventCandidateNearestPlayer | null;
+  trajectory_context: ReplayEventCandidateTrajectoryContext;
+  coordinate_space: "court_template_2d" | string;
+  template_name: string | null;
+  template_version: string | null;
+  candidate_only: boolean;
+  not_ball_truth: boolean;
+  not_hit_truth: boolean;
+  not_bounce_truth: boolean;
+  not_in_out_truth: boolean;
+  observation_only: boolean;
+  no_adjudication: boolean;
+  model_registry_id?: string | null;
+  model_name?: string | null;
+  model_version?: string | null;
+  runtime_config_id?: string | null;
+  evidence_source?: string;
+  source_label?: string | null;
+}
+
 export interface ReplayOverlayChunk {
   media_id: string;
   start_ms: number;
@@ -935,6 +1000,8 @@ export interface ReplayOverlayChunk {
   ball_court_projection: ReplayBallCourtProjectionOverlay[];
   main_player_court_projection: ReplayMainPlayerCourtProjectionOverlay[];
   ball_court_trajectory: ReplayBallCourtTrajectoryOverlay[];
+  hit_candidates: ReplayEventCandidateOverlay[];
+  bounce_candidates: ReplayEventCandidateOverlay[];
   court_temporal_persistence?: ReplayCourtTemporalPersistence | string;
   court_persistence_max_gap_ms?: number;
   observation_only: boolean;
@@ -1202,6 +1269,29 @@ export interface ReplayBallTrajectoryTimelineItem {
   no_adjudication: boolean;
 }
 
+export interface ReplayEventCandidateTimelineItem {
+  item_type: "hit_candidate" | "bounce_candidate";
+  observation_id: string;
+  run_id: string;
+  timestamp_ms: number;
+  frame_number: number;
+  display_label: string;
+  candidate_type: "hit_candidate" | "bounce_candidate" | string;
+  court_point: ReplayCourtProjectionPoint;
+  confidence: number | null;
+  reason_codes: string[];
+  candidate_method: string | null;
+  source_ball_trajectory_observation_id: string | null;
+  source_ball_court_projection_observation_id: string | null;
+  source_player_court_projection_observation_id: string | null;
+  candidate_only: boolean;
+  not_hit_truth: boolean;
+  not_bounce_truth: boolean;
+  not_in_out_truth: boolean;
+  observation_only: boolean;
+  no_adjudication: boolean;
+}
+
 export interface ReplaySmoothedMotionTimelineItem {
   item_type:
     | "smoothed_ball_position_candidate"
@@ -1234,6 +1324,7 @@ export type ReplayTimelineItem =
   | ReplayProjectionDiagnosticTimelineItem
   | ReplayCourtProjectionTimelineItem
   | ReplayBallTrajectoryTimelineItem
+  | ReplayEventCandidateTimelineItem
   | ReplayAnnotationTimelineItem;
 
 export interface ReplayTimelineLane {
@@ -1250,6 +1341,7 @@ export interface ReplayTimelineLane {
     | "projection_diagnostics"
     | "court_projection"
     | "ball_trajectory"
+    | "event_candidates"
     | "annotations";
   label: string;
   items: ReplayTimelineItem[];

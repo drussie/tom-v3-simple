@@ -89,6 +89,10 @@ ball_court_trajectory
 The court projection mini-map can draw a subtle `BALL TRAJECTORY CANDIDATE` path alongside current
 ball and main-player projection candidates. The timeline includes a `ball_trajectory` lane.
 
+Downstream event-candidate work may consume `ball_trajectory_court_candidate` rows to propose
+`hit_candidate` and `bounce_candidate` markers. Those markers remain derived candidate evidence;
+they do not convert the trajectory into bounce, hit, in/out, point, or score truth.
+
 ## Boundaries
 
 The trajectory is derived candidate evidence. It is not:

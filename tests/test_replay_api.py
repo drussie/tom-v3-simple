@@ -1106,6 +1106,7 @@ def test_replay_timeline_endpoint_returns_evidence_lanes(
         "projection_diagnostics",
         "court_projection",
         "ball_trajectory",
+        "event_candidates",
         "annotations",
     }
 

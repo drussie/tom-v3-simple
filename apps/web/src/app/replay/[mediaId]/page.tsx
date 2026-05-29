@@ -20,6 +20,7 @@ interface ReplayPageProps {
     projectionDiagnosticRunId?: string;
     courtProjectionRunId?: string;
     ballTrajectoryRunId?: string;
+    eventCandidateRunId?: string;
     viewPreset?: string;
   }>;
 }

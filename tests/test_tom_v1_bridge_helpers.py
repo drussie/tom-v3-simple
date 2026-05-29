@@ -34,6 +34,7 @@ def test_tom_v1_make_helpers_include_allowed_root_and_imgsz_defaults() -> None:
 
 
 def test_replay_display_policy_helpers_define_expected_modes() -> None:
+    makefile = makefile_text()
     source = (ROOT / "apps/web/src/lib/replayOverlays.ts").read_text()
     workstation = (ROOT / "apps/web/src/components/ReplayWorkstation.tsx").read_text()
     overlay = (ROOT / "apps/web/src/components/ReplaySmoothedMotionOverlay.tsx").read_text()
@@ -100,6 +101,7 @@ def test_replay_display_policy_helpers_define_expected_modes() -> None:
     assert "showBallCourtProjection: context.hasCourtProjectionRun" in workstation
     assert "showMainPlayerCourtProjection: context.hasCourtProjectionRun" in workstation
     assert "showBallCourtTrajectory: context.hasBallTrajectoryRun" in workstation
+    assert "showEventCandidates: context.hasEventCandidateRun" in workstation
     assert "showSmoothedBall: context.hasMotionSmoothingRun" in workstation
     assert "showSmoothedPlayerBoxes: context.hasMotionSmoothingRun" in workstation
     assert "showSmoothedPoses: context.hasMotionSmoothingRun" in workstation
@@ -112,6 +114,20 @@ def test_replay_display_policy_helpers_define_expected_modes() -> None:
     ).read_text()
     assert "ReplayBallCourtTrajectoryOverlay" in (ROOT / "apps/web/src/lib/types.ts").read_text()
     assert "ballTrajectoryRunId" in (ROOT / "apps/web/src/lib/api.ts").read_text()
+    assert "eventCandidateRunId" in (ROOT / "apps/web/src/lib/api.ts").read_text()
+    assert "eventCandidateRunId?: string" in (
+        ROOT / "apps/web/src/app/replay/[mediaId]/page.tsx"
+    ).read_text()
     assert "BALL TRAJECTORY CANDIDATE" in (
         ROOT / "apps/web/src/components/ReplayCourtProjectionMiniMap.tsx"
     ).read_text()
+    assert "HIT CANDIDATE" in (
+        ROOT / "apps/web/src/components/ReplayCourtProjectionMiniMap.tsx"
+    ).read_text()
+    assert "BOUNCE CANDIDATE" in (
+        ROOT / "apps/web/src/components/ReplayCourtProjectionMiniMap.tsx"
+    ).read_text()
+    assert "tom-v1-hit-bounce-candidates:" in makefile
+    assert "build-hit-bounce-candidates" in makefile
+    assert '--ball-trajectory-run-id "$(BALL_TRAJECTORY_RUN_ID)"' in makefile
+    assert '--court-projection-run-id "$(COURT_PROJECTION_RUN_ID)"' in makefile

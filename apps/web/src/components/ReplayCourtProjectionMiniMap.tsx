@@ -3,23 +3,28 @@
 import type {
   ReplayBallCourtTrajectoryOverlay,
   ReplayBallCourtProjectionOverlay,
+  ReplayEventCandidateOverlay,
   ReplayMainPlayerCourtProjectionOverlay
 } from "../lib/types";
 import {
   activeReplayBallCourtProjection,
+  activeReplayEventCandidates,
   activeReplayMainPlayerCourtProjection
 } from "../lib/replayOverlays";
 
 interface ReplayCourtProjectionMiniMapProps {
   ballProjections: ReplayBallCourtProjectionOverlay[];
   ballTrajectories: ReplayBallCourtTrajectoryOverlay[];
+  eventCandidates: ReplayEventCandidateOverlay[];
   mainPlayerProjections: ReplayMainPlayerCourtProjectionOverlay[];
   currentTimestampMs: number;
   currentFrame: number;
   showBall: boolean;
   showBallTrajectory: boolean;
+  showEventCandidates: boolean;
   showPlayers: boolean;
   onSelectBallTrajectory: (item: ReplayBallCourtTrajectoryOverlay) => void;
+  onSelectEventCandidate: (item: ReplayEventCandidateOverlay) => void;
   selectedObservationId?: string | null;
   onSelectBallProjection: (item: ReplayBallCourtProjectionOverlay) => void;
   onSelectMainPlayerProjection: (item: ReplayMainPlayerCourtProjectionOverlay) => void;
@@ -31,13 +36,16 @@ const COURT_HEIGHT = 180;
 export function ReplayCourtProjectionMiniMap({
   ballProjections,
   ballTrajectories,
+  eventCandidates,
   mainPlayerProjections,
   currentTimestampMs,
   currentFrame,
   showBall,
   showBallTrajectory,
+  showEventCandidates,
   showPlayers,
   onSelectBallTrajectory,
+  onSelectEventCandidate,
   selectedObservationId = null,
   onSelectBallProjection,
   onSelectMainPlayerProjection
@@ -55,8 +63,16 @@ export function ReplayCourtProjectionMiniMap({
   const activeTrajectories = showBallTrajectory
     ? activeReplayBallCourtTrajectories(ballTrajectories, currentTimestampMs, currentFrame)
     : [];
+  const activeEventCandidates = showEventCandidates
+    ? activeReplayEventCandidates(eventCandidates, currentTimestampMs, currentFrame)
+    : [];
 
-  if (activeBall.length === 0 && activePlayers.length === 0 && activeTrajectories.length === 0) {
+  if (
+    activeBall.length === 0 &&
+    activePlayers.length === 0 &&
+    activeTrajectories.length === 0 &&
+    activeEventCandidates.length === 0
+  ) {
     return (
       <section className="replay-court-projection-panel">
         <div>
@@ -152,10 +168,37 @@ export function ReplayCourtProjectionMiniMap({
             </g>
           );
         })}
+        {activeEventCandidates.map((item) => {
+          const point = templatePointToSvg(item.court_point.x, item.court_point.y);
+          const isHit = item.candidate_type === "hit_candidate";
+          const label = isHit ? "HIT CANDIDATE" : "BOUNCE CANDIDATE";
+          return (
+            <g
+              key={item.observation_id}
+              className={`court-event-candidate-group ${isHit ? "hit" : "bounce"} ${
+                selectedObservationId === item.observation_id ? "selected" : ""
+              }`}
+              onClick={() => onSelectEventCandidate(item)}
+            >
+              {isHit ? (
+                <path
+                  d={`M ${point.x} ${point.y - 7} L ${point.x - 7} ${point.y + 6} L ${
+                    point.x + 7
+                  } ${point.y + 6} Z`}
+                />
+              ) : (
+                <circle cx={point.x} cy={point.y} r="6" />
+              )}
+              <text x={point.x + 8} y={point.y - 8}>
+                {label}
+              </text>
+            </g>
+          );
+        })}
       </svg>
       <p className="subtle">
-        Derived projection evidence only. These points do not imply bounce, hit, in/out, or
-        player position truth.
+        Derived projection and event-candidate evidence only. These points do not imply bounce,
+        hit, in/out, or player position truth.
       </p>
     </section>
   );

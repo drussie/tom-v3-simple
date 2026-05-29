@@ -31,6 +31,7 @@ class ModelFamily(StrEnum):
     homography = "homography"
     tracker = "tracker"
     trajectory = "trajectory"
+    event_candidate = "event_candidate"
     derived = "derived"
     synthetic = "synthetic"
 
@@ -44,6 +45,7 @@ class ObservationFamily(StrEnum):
     homography = "homography"
     projection = "projection"
     trajectory = "trajectory"
+    event_candidate = "event_candidate"
     tracking = "tracking"
     artifact = "artifact"
 
@@ -135,6 +137,11 @@ class RelationshipType(StrEnum):
     projected_from_smoothed_main_player_box = "projected_from_smoothed_main_player_box"
     projected_with_homography_candidate = "projected_with_homography_candidate"
     trajectory_from_ball_court_projection = "trajectory_from_ball_court_projection"
+    candidate_from_ball_trajectory = "candidate_from_ball_trajectory"
+    candidate_from_ball_court_projection = "candidate_from_ball_court_projection"
+    candidate_from_main_player_court_projection = (
+        "candidate_from_main_player_court_projection"
+    )
 
 
 class CoordinateSpace(StrEnum):

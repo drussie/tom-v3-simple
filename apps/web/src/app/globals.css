@@ -966,6 +966,14 @@ pre {
   background: var(--blue);
 }
 
+.timeline-lane-item.tick.hit_candidate {
+  background: var(--rose);
+}
+
+.timeline-lane-item.tick.bounce_candidate {
+  background: var(--amber);
+}
+
 .timeline-lane-item.span.ball_trajectory_court_candidate {
   background: color-mix(in srgb, var(--amber) 55%, white);
   border-color: var(--amber);
@@ -1150,6 +1158,39 @@ pre {
 .court-trajectory-group.selected polyline {
   filter: drop-shadow(0 0 5px rgba(27, 37, 40, 0.45));
   opacity: 1;
+  stroke-width: 3.5;
+}
+
+.court-event-candidate-group {
+  cursor: pointer;
+}
+
+.court-event-candidate-group path,
+.court-event-candidate-group circle {
+  fill: color-mix(in srgb, var(--surface) 85%, white);
+  stroke-width: 2.5;
+}
+
+.court-event-candidate-group.hit path {
+  stroke: var(--rose);
+}
+
+.court-event-candidate-group.bounce circle {
+  stroke: var(--amber);
+}
+
+.court-event-candidate-group text {
+  fill: var(--ink);
+  font-size: 8px;
+  font-weight: 800;
+  paint-order: stroke;
+  stroke: var(--surface);
+  stroke-width: 3px;
+}
+
+.court-event-candidate-group.selected path,
+.court-event-candidate-group.selected circle {
+  filter: drop-shadow(0 0 5px rgba(27, 37, 40, 0.45));
   stroke-width: 3.5;
 }
 

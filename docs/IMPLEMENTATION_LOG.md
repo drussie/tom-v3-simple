@@ -2196,3 +2196,34 @@ This milestone adds:
 The trajectory is derived candidate evidence only. It does not add bounce, hit, in/out,
 rally/point/score, player identity, scoreboard OCR, server/receiver logic, accepted/rejected
 lifecycle, or adjudication.
+
+## Hit/Bounce Candidate Evidence v0
+
+Status: complete
+
+### Goal
+
+Create first-pass `hit_candidate` and `bounce_candidate` evidence markers from court-space ball
+trajectory candidates and main-player court projection candidates without adding truth,
+adjudication, in/out, point, or score logic.
+
+### Notes
+
+This milestone adds:
+
+- worker `build-hit-bounce-candidates`
+- Makefile `tom-v1-hit-bounce-candidates`
+- `hit_candidate` observations
+- `bounce_candidate` observations
+- `observation_family = event_candidate`
+- deterministic trajectory direction/speed diagnostics
+- main-player proximity context for hit candidates
+- away-from-player and inside/near-template context for bounce candidates
+- candidate deduplication by time window
+- lineage from ball trajectory, ball court projection, and main-player court projection parents
+- replay `eventCandidateRunId` support
+- replay `event_candidates` timeline lane
+- court projection mini-map markers labeled `HIT CANDIDATE` and `BOUNCE CANDIDATE`
+
+The candidates are derived evidence only. They are not confirmed hits, confirmed bounces, in/out
+decisions, rally/point/score logic, identity, OCR, accepted/rejected lifecycle, or adjudication.

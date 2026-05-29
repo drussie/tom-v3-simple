@@ -841,6 +841,26 @@ This creates derived `ball_trajectory_court_candidate` segment rows from ordered
 out-of-template, and homography carry-forward diagnostics. It is not bounce truth, hit truth,
 in/out truth, rally/point/score logic, or adjudication.
 
+Hit/bounce candidate evidence:
+
+```bash
+TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_tom_v1_bridge.db \
+.venv/bin/python -m apps.worker.cli build-hit-bounce-candidates \
+  --media-id <media_id> \
+  --ball-trajectory-run-id <ball_trajectory_run_id> \
+  --court-projection-run-id <court_projection_run_id> \
+  --hit-player-distance-max-template 0.18 \
+  --bounce-player-distance-min-template 0.18 \
+  --hit-min-direction-delta-degrees 25 \
+  --bounce-min-direction-delta-degrees 20 \
+  --candidate-dedupe-ms 500 \
+  --viewer-base-url http://127.0.0.1:3000
+```
+
+This creates derived `hit_candidate` and `bounce_candidate` rows from court-space trajectory
+diagnostics and main-player projection proximity. These are candidate markers only. They are not
+hit truth, bounce truth, in/out truth, rally/point/score logic, or adjudication.
+
 Makefile helpers:
 
 ```bash
@@ -858,6 +878,7 @@ make tom-v1-pose-main-tracks MEDIA_ID=<media_id> SOURCE_DETECTION_RUN_ID=<player
 make tom-v1-motion-smoothing MEDIA_ID=<media_id> DETECTION_RUN_ID=<detection_run_id> TRACKLET_RUN_ID=<tracklet_run_id> MAIN_PLAYER_TRACK_RUN_ID=<main_player_track_run_id> POSE_RUN_ID=<pose_run_id> PYTHON=.venv/bin/python
 make tom-v1-object-court-projection MEDIA_ID=<media_id> MOTION_SMOOTHING_RUN_ID=<motion_smoothing_run_id> HOMOGRAPHY_RUN_ID=<homography_run_id> PYTHON=.venv/bin/python
 make tom-v1-ball-court-trajectory MEDIA_ID=<media_id> COURT_PROJECTION_RUN_ID=<court_projection_run_id> PYTHON=.venv/bin/python
+make tom-v1-hit-bounce-candidates MEDIA_ID=<media_id> BALL_TRAJECTORY_RUN_ID=<ball_trajectory_run_id> COURT_PROJECTION_RUN_ID=<court_projection_run_id> PYTHON=.venv/bin/python
 ```
 
 The TOM v1 Makefile helpers pass `--allowed-root "$(TOM_V1_MODEL_ROOT)"` and default image sizes that match the local smoke path: 1280 for `best_ball_v2_1280.pt`, 640 for `yolo26x.pt`, 640 for `yolo26x-pose.pt`, and 224 fixed preprocessing for the recognized court keypoint state dict. Override with `IMG_SIZE=<value>` only when testing a deliberate alternate model input size. The court keypoint adapter records requested image size but uses the recognized 224x224 model input convention.
@@ -889,8 +910,8 @@ Detection display defaults to current-only. Tracklet point display defaults to s
 Replay view presets:
 
 ```text
-/replay/<media_id>?motionSmoothingRunId=<run_id>&courtRunId=<run_id>&homographyRunId=<run_id>&courtProjectionRunId=<run_id>&ballTrajectoryRunId=<run_id>&viewPreset=operator
-/replay/<media_id>?motionSmoothingRunId=<run_id>&courtRunId=<run_id>&homographyRunId=<run_id>&courtProjectionRunId=<run_id>&ballTrajectoryRunId=<run_id>&viewPreset=debug
+/replay/<media_id>?motionSmoothingRunId=<run_id>&courtRunId=<run_id>&homographyRunId=<run_id>&courtProjectionRunId=<run_id>&ballTrajectoryRunId=<run_id>&eventCandidateRunId=<run_id>&viewPreset=operator
+/replay/<media_id>?motionSmoothingRunId=<run_id>&courtRunId=<run_id>&homographyRunId=<run_id>&courtProjectionRunId=<run_id>&ballTrajectoryRunId=<run_id>&eventCandidateRunId=<run_id>&viewPreset=debug
 ```
 
 `operator` is the default when `viewPreset` is omitted. It keeps the replay clean by showing stable
@@ -902,6 +923,10 @@ enabled.
 
 `debug` enables raw/audit layers when their run ids exist. Selecting either preset only changes UI
 layer toggles. It does not mutate persisted observations or change candidate evidence into truth.
+
+When `eventCandidateRunId` is present, replay can show `HIT CANDIDATE` and `BOUNCE CANDIDATE`
+markers on the normalized court mini-map. Labels must include `candidate`; they do not confirm
+hits, bounces, in/out, points, or score.
 
 Motion smoothing replay:
 

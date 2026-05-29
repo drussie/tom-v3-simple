@@ -31,6 +31,7 @@ from apps.worker.services.court_review_export import export_court_review_dataset
 from apps.worker.services.detection_adapter import run_detection_adapter
 from apps.worker.services.frame_artifacts import extract_frame_artifacts_for_run
 from apps.worker.services.gameplay_adapter import run_gameplay_adapter
+from apps.worker.services.hit_bounce_candidates import build_hit_bounce_candidates
 from apps.worker.services.homography_candidate_builder import build_homography_candidates
 from apps.worker.services.local_demo import run_local_fixture_demo
 from apps.worker.services.main_player_track_assignment import assign_main_player_tracks
@@ -634,6 +635,50 @@ def main() -> None:
     )
     ball_court_trajectory_parser.add_argument("--skip-create-db", action="store_true")
     ball_court_trajectory_parser.set_defaults(handler=_handle_build_ball_court_trajectory)
+
+    hit_bounce_parser = subcommands.add_parser(
+        "build-hit-bounce-candidates",
+        help="Build first-pass hit/bounce candidate evidence observations.",
+    )
+    hit_bounce_parser.add_argument("--media-id", required=True)
+    hit_bounce_parser.add_argument("--ball-trajectory-run-id", required=True)
+    hit_bounce_parser.add_argument("--court-projection-run-id", required=True)
+    hit_bounce_parser.add_argument(
+        "--run-name",
+        default="hit-bounce-candidate-evidence-v0",
+    )
+    hit_bounce_parser.add_argument(
+        "--hit-player-distance-max-template",
+        type=float,
+        default=0.18,
+    )
+    hit_bounce_parser.add_argument(
+        "--bounce-player-distance-min-template",
+        type=float,
+        default=0.18,
+    )
+    hit_bounce_parser.add_argument(
+        "--hit-min-direction-delta-degrees",
+        type=float,
+        default=25.0,
+    )
+    hit_bounce_parser.add_argument(
+        "--bounce-min-direction-delta-degrees",
+        type=float,
+        default=20.0,
+    )
+    hit_bounce_parser.add_argument("--candidate-dedupe-ms", type=int, default=500)
+    hit_bounce_parser.add_argument(
+        "--viewer-base-url",
+        default="http://127.0.0.1:3000",
+    )
+    hit_bounce_parser.add_argument(
+        "--plan-only",
+        action="store_true",
+        help="Print the hit/bounce candidate plan without touching observations.",
+    )
+    hit_bounce_parser.add_argument("--skip-create-db", action="store_true")
+    hit_bounce_parser.set_defaults(handler=_handle_build_hit_bounce_candidates)
 
     fixture_court_parser = subcommands.add_parser(
         "run-fixture-court",
@@ -1375,6 +1420,26 @@ def _handle_build_ball_court_trajectory(
         max_gap_frames=args.max_gap_frames,
         max_gap_ms=args.max_gap_ms,
         min_points_per_segment=args.min_points_per_segment,
+        viewer_base_url=args.viewer_base_url,
+        plan_only=args.plan_only,
+    )
+
+
+def _handle_build_hit_bounce_candidates(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    return build_hit_bounce_candidates(
+        session=session,
+        media_id=args.media_id,
+        ball_trajectory_run_id=args.ball_trajectory_run_id,
+        court_projection_run_id=args.court_projection_run_id,
+        run_name=args.run_name,
+        hit_player_distance_max_template=args.hit_player_distance_max_template,
+        bounce_player_distance_min_template=args.bounce_player_distance_min_template,
+        hit_min_direction_delta_degrees=args.hit_min_direction_delta_degrees,
+        bounce_min_direction_delta_degrees=args.bounce_min_direction_delta_degrees,
+        candidate_dedupe_ms=args.candidate_dedupe_ms,
         viewer_base_url=args.viewer_base_url,
         plan_only=args.plan_only,
     )

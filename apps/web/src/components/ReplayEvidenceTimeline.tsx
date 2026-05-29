@@ -32,6 +32,7 @@ interface ReplayEvidenceTimelineProps {
     projection_diagnostics: boolean;
     court_projection: boolean;
     ball_trajectory: boolean;
+    event_candidates: boolean;
     annotations: boolean;
   };
   onSelectItem: (item: ReplayTimelineItem) => void;
@@ -251,6 +252,9 @@ function emptyLaneText(laneType: ReplayTimelineLane["lane_type"]): string {
   if (laneType === "ball_trajectory") {
     return "No ball trajectory court candidates in the selected run.";
   }
+  if (laneType === "event_candidates") {
+    return "No hit/bounce candidate evidence in the selected run.";
+  }
   return "No review annotations for this media/run context.";
 }
 
@@ -290,6 +294,9 @@ function proxyEmptyLaneText(laneType: ReplayTimelineLane["lane_type"]): string {
   }
   if (laneType === "ball_trajectory") {
     return "No ball trajectory court candidates available at the current live-like edge.";
+  }
+  if (laneType === "event_candidates") {
+    return "No hit/bounce candidate evidence available at the current live-like edge.";
   }
   return "No review annotations available at the current live-like edge.";
 }
