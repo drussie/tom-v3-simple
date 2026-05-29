@@ -89,8 +89,11 @@ This registry makes TOM v3 Simple boundaries explicit.
   but these are derived trajectory candidates only; they do not identify bounces, hits, in/out, or
   scoring events.
 - Replay Mode can display `hit_candidate` and `bounce_candidate` markers through
-  `eventCandidateRunId`; these mini-map markers must remain labeled as candidates and do not
-  confirm hits, bounces, in/out, points, or scores.
+  `eventCandidateRunId`; these mini-map and video markers must remain labeled as candidates and do
+  not confirm hits, bounces, in/out, points, or scores.
+- Event candidate video markers require a source ball court projection image point. If that point
+  is unavailable, the candidate remains inspectable in replay but no broadcast-video marker is
+  drawn.
 - Replay view presets are display defaults only. Operator view hides raw/debug layers by default,
   and debug/audit view enables them, but neither preset changes persisted observations or proves
   evidence correctness.

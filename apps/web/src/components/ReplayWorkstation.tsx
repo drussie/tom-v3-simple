@@ -66,6 +66,7 @@ import { formatConfidence } from "../lib/timeline";
 import { ReplayCourtOverlay as ReplayCourtOverlayLayer } from "./ReplayCourtOverlay";
 import { ReplayCourtProjectionMiniMap } from "./ReplayCourtProjectionMiniMap";
 import { ReplayDetectionOverlay as ReplayDetectionOverlayLayer } from "./ReplayDetectionOverlay";
+import { ReplayEventCandidateVideoOverlay } from "./ReplayEventCandidateVideoOverlay";
 import { ReplayEvidenceTimeline } from "./ReplayEvidenceTimeline";
 import { ReplayMainPlayerTrackOverlay as ReplayMainPlayerTrackOverlayLayer } from "./ReplayMainPlayerTrackOverlay";
 import { ReplayPoseOverlay as ReplayPoseOverlayLayer } from "./ReplayPoseOverlay";
@@ -1280,6 +1281,19 @@ export function ReplayWorkstation({
               showProjectionDiagnostics={
                 showProjectionDiagnostics && selectedProjectionDiagnosticRunId !== null
               }
+            />
+            <ReplayEventCandidateVideoOverlay
+              currentFrame={playback.frameNumber}
+              currentTimestampMs={playback.timestampMs}
+              enabled={showEventCandidates && selectedEventCandidateRunId !== null}
+              error={overlayState.error}
+              eventCandidates={eventCandidates}
+              isLoading={overlayState.loading}
+              onSelectEventCandidate={(item) => {
+                setSelectedEvidence({ kind: "event_candidate", item });
+              }}
+              replayInfo={replayInfo}
+              selectedObservationId={selectedCourtProjectionObservationId}
             />
           </ReplayVideoPlayer>
           <ReplayCourtProjectionMiniMap
@@ -3008,6 +3022,15 @@ function SelectedEvidencePanel({
           label="court point"
           value={`${item.court_point.x.toFixed(4)}, ${item.court_point.y.toFixed(4)}`}
         />
+        <DetailRow
+          label="image point"
+          value={
+            item.image_point === null
+              ? "unavailable"
+              : `${item.image_point.x.toFixed(2)}, ${item.image_point.y.toFixed(2)}`
+          }
+        />
+        <DetailRow label="image marker source" value={item.image_marker_source} />
         <DetailRow label="confidence" value={formatConfidence(item.confidence)} />
         <DetailRow label="candidate method" value={item.candidate_method ?? "n/a"} />
         <DetailRow

@@ -120,6 +120,12 @@ payload, a `ball_trajectory` timeline lane, selected evidence details, and a sub
 inside the normalized court-template mini-map. The trajectory is a candidate sequence of projected
 ball evidence; it does not imply bounce, hit, in/out, point, or score.
 
+Hit/Bounce Candidate Evidence v0 adds `eventCandidateRunId` replay support for derived
+`hit_candidate` and `bounce_candidate` rows. Replay exposes them in the `event_candidates` timeline
+lane, the normalized court-template mini-map, selected evidence details, and as broadcast video
+markers when the source ball court projection includes an image-space point. Video labels must say
+`HIT CANDIDATE` or `BOUNCE CANDIDATE`; they do not confirm events or line calls.
+
 ## What 6A Added
 
 - `GET /media/{media_id}/replay-info`
@@ -688,7 +694,8 @@ http://127.0.0.1:3000/replay/<media_id>?courtProjectionRunId=<court_projection_r
 
 The court projection mini-map can show current ball/player projection candidates, a
 `BALL TRAJECTORY CANDIDATE` path, and `HIT CANDIDATE` / `BOUNCE CANDIDATE` markers. Event candidate
-markers are derived diagnostics only. They are not hit truth, bounce truth, in/out, point, score,
+markers also appear on the broadcast video when replay can resolve the source image point. Both
+surfaces are derived diagnostics only. They are not hit truth, bounce truth, in/out, point, score,
 or adjudication.
 
 For Stream Proxy Mode, open:

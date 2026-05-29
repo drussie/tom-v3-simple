@@ -1185,7 +1185,11 @@ def build_event_candidate_timeline_items(
 
     items: list[dict[str, Any]] = []
     for observation in session.scalars(query).all():
-        item = event_candidate_timeline_item_from_observation(observation)
+        item = event_candidate_timeline_item_from_observation(
+            observation,
+            session=session,
+            media_id=media.id,
+        )
         if item is not None:
             items.append(item)
     return items
@@ -1193,8 +1197,15 @@ def build_event_candidate_timeline_items(
 
 def event_candidate_timeline_item_from_observation(
     observation: Observation,
+    *,
+    session: Session | None = None,
+    media_id: str | None = None,
 ) -> dict[str, Any] | None:
-    overlay_item = event_candidate_overlay_item_from_observation(observation)
+    overlay_item = event_candidate_overlay_item_from_observation(
+        observation,
+        session=session,
+        media_id=media_id,
+    )
     if overlay_item is None:
         return None
     return {
@@ -1209,6 +1220,8 @@ def event_candidate_timeline_item_from_observation(
         "confidence": overlay_item["confidence"],
         "reason_codes": overlay_item["reason_codes"],
         "candidate_method": overlay_item["candidate_method"],
+        "image_point": overlay_item["image_point"],
+        "image_marker_source": overlay_item["image_marker_source"],
         "source_ball_trajectory_observation_id": overlay_item[
             "source_ball_trajectory_observation_id"
         ],
@@ -1911,11 +1924,16 @@ def build_event_candidate_overlay_items(
         event_candidate_run_id=event_candidate_run_id,
         observation_type=observation_type,
     )
-    return [
-        item
-        for row in rows
-        if (item := event_candidate_overlay_item_from_observation(row)) is not None
-    ]
+    items: list[dict[str, Any]] = []
+    for row in rows:
+        item = event_candidate_overlay_item_from_observation(
+            row,
+            session=session,
+            media_id=media.id,
+        )
+        if item is not None:
+            items.append(item)
+    return items
 
 
 def court_projection_overlay_item_from_observation(
@@ -2100,6 +2118,9 @@ def ball_trajectory_overlay_item_from_observation(
 
 def event_candidate_overlay_item_from_observation(
     observation: Observation,
+    *,
+    session: Session | None = None,
+    media_id: str | None = None,
 ) -> dict[str, Any] | None:
     if observation.observation_type not in EVENT_CANDIDATE_TYPES:
         return None
@@ -2119,6 +2140,11 @@ def event_candidate_overlay_item_from_observation(
         if isinstance(payload.get("trajectory_context"), dict)
         else {}
     )
+    image_point, image_marker_source = _event_candidate_image_point(
+        session=session,
+        payload=payload,
+        media_id=media_id,
+    )
     return {
         "overlay_type": observation.observation_type,
         "candidate_type": _string_or_none(payload.get("candidate_type"))
@@ -2131,6 +2157,8 @@ def event_candidate_overlay_item_from_observation(
             "x": _numeric(court_point.get("x")),
             "y": _numeric(court_point.get("y")),
         },
+        "image_point": image_point,
+        "image_marker_source": image_marker_source,
         "confidence": observation.confidence,
         "reason_codes": payload.get("reason_codes") or [],
         "candidate_method": _string_or_none(payload.get("candidate_method")),
@@ -2177,6 +2205,34 @@ def event_candidate_overlay_item_from_observation(
             else "bounce candidate evidence"
         ),
     }
+
+
+def _event_candidate_image_point(
+    *,
+    session: Session | None,
+    payload: dict[str, Any],
+    media_id: str | None,
+) -> tuple[dict[str, float] | None, str]:
+    source_projection_id = _string_or_none(
+        payload.get("source_ball_court_projection_observation_id")
+    )
+    if session is not None and source_projection_id is not None:
+        source_observation = session.get(Observation, source_projection_id)
+        if (
+            source_observation is not None
+            and (media_id is None or source_observation.media_id == media_id)
+            and source_observation.observation_type == "ball_court_projection_candidate"
+        ):
+            source_payload = source_observation.payload_jsonb or {}
+            image_point = _point_payload(source_payload.get("image_point"))
+            if image_point is not None:
+                return image_point, "source_ball_court_projection_image_point"
+
+    event_payload_image_point = _point_payload(payload.get("image_point"))
+    if event_payload_image_point is not None:
+        return event_payload_image_point, "event_candidate_payload_image_point"
+
+    return None, "unavailable"
 
 
 def _court_projection_rows(

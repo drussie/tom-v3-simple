@@ -38,6 +38,9 @@ def test_replay_display_policy_helpers_define_expected_modes() -> None:
     source = (ROOT / "apps/web/src/lib/replayOverlays.ts").read_text()
     workstation = (ROOT / "apps/web/src/components/ReplayWorkstation.tsx").read_text()
     overlay = (ROOT / "apps/web/src/components/ReplaySmoothedMotionOverlay.tsx").read_text()
+    event_overlay = (
+        ROOT / "apps/web/src/components/ReplayEventCandidateVideoOverlay.tsx"
+    ).read_text()
     pose_overlay = (ROOT / "apps/web/src/components/ReplayPoseOverlay.tsx").read_text()
     css = (ROOT / "apps/web/src/app/globals.css").read_text()
 
@@ -127,6 +130,12 @@ def test_replay_display_policy_helpers_define_expected_modes() -> None:
     assert "BOUNCE CANDIDATE" in (
         ROOT / "apps/web/src/components/ReplayCourtProjectionMiniMap.tsx"
     ).read_text()
+    assert "ReplayEventCandidateVideoOverlay" in workstation
+    assert "imagePixelPointToOverlayPoint" in event_overlay
+    assert "image_marker_source" in (ROOT / "apps/web/src/lib/types.ts").read_text()
+    assert "HIT CANDIDATE" in event_overlay
+    assert "BOUNCE CANDIDATE" in event_overlay
+    assert ".replay-event-candidate-video-marker" in css
     assert "tom-v1-hit-bounce-candidates:" in makefile
     assert "build-hit-bounce-candidates" in makefile
     assert '--ball-trajectory-run-id "$(BALL_TRAJECTORY_RUN_ID)"' in makefile

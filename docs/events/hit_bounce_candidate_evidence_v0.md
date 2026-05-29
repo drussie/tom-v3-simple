@@ -107,7 +107,11 @@ event_candidates
 ```
 
 The court projection mini-map draws `HIT CANDIDATE` and `BOUNCE CANDIDATE` markers in court-template
-space. The broadcast video overlay remains uncluttered by default.
+space.
+
+Event Candidate Video Overlay v0.1 also draws candidate markers on the broadcast video when the
+event candidate's source `ball_court_projection_candidate` contains an image-space `image_point`.
+Those video markers remain candidate visualizations only.
 
 ## Boundaries
 

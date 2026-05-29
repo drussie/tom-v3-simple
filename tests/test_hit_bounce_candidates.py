@@ -252,9 +252,57 @@ def test_event_candidate_replay_payloads_are_exposed(db_session: Session) -> Non
     assert len(overlays) == 1
     assert overlays[0]["overlay_type"] == "hit_candidate"
     assert overlays[0]["court_point"] == {"x": 0.3, "y": 0.2}
+    assert overlays[0]["image_point"] == {"x": 300.0, "y": 100.0}
+    assert overlays[0]["image_marker_source"] == "source_ball_court_projection_image_point"
     assert len(timeline_items) == 1
     assert timeline_items[0]["item_type"] == "hit_candidate"
+    assert timeline_items[0]["image_point"] == {"x": 300.0, "y": 100.0}
+    assert timeline_items[0]["image_marker_source"] == "source_ball_court_projection_image_point"
     assert timeline_items[0]["candidate_only"] is True
+
+
+def test_event_candidate_replay_payload_handles_missing_source_image_point(
+    db_session: Session,
+) -> None:
+    media = _seed_media(db_session)
+    trajectory_run, ball_projection_ids = _seed_trajectory_run(
+        db_session,
+        media.id,
+        points=[
+            (0, 0, 0.20, 0.20),
+            (1, 33, 0.30, 0.20),
+            (2, 66, 0.30, 0.35),
+        ],
+    )
+    source_projection = db_session.get(Observation, ball_projection_ids[1])
+    assert source_projection is not None
+    source_payload = dict(source_projection.payload_jsonb or {})
+    source_payload.pop("image_point", None)
+    source_projection.payload_jsonb = source_payload
+    projection_run = _seed_projection_run(
+        db_session,
+        media.id,
+        players=[(1, 33, 0.31, 0.22, "far_player_track_candidate")],
+    )
+    result = build_hit_bounce_candidates(
+        session=db_session,
+        media_id=media.id,
+        ball_trajectory_run_id=trajectory_run.id,
+        court_projection_run_id=projection_run.id,
+    )
+
+    overlays = build_event_candidate_overlay_items(
+        session=db_session,
+        media=media,
+        start_ms=0,
+        end_ms=200,
+        event_candidate_run_id=result["event_candidate_run_id"],
+        observation_type="hit_candidate",
+    )
+
+    assert len(overlays) == 1
+    assert overlays[0]["image_point"] is None
+    assert overlays[0]["image_marker_source"] == "unavailable"
 
 
 def test_hit_bounce_candidate_plan_only_and_cli_do_not_mutate(
@@ -409,6 +457,7 @@ def _seed_ball_projection(
         coordinate_space="court_template_2d",
         payload_jsonb={
             "court_point": {"x": court_x, "y": court_y},
+            "image_point": {"x": court_x * 1000.0, "y": court_y * 500.0},
             "projection_candidate_only": True,
             "not_ball_truth": True,
             "not_court_truth": True,

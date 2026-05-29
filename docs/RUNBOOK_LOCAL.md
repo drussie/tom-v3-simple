@@ -861,6 +861,14 @@ This creates derived `hit_candidate` and `bounce_candidate` rows from court-spac
 diagnostics and main-player projection proximity. These are candidate markers only. They are not
 hit truth, bounce truth, in/out truth, rally/point/score logic, or adjudication.
 
+Replay can show those candidates in two places:
+
+- the normalized court mini-map, using candidate court-template coordinates
+- the broadcast video overlay, using the source `ball_court_projection_candidate.image_point`
+
+If an event candidate cannot resolve an image point, the replay API keeps the candidate available
+for timeline/mini-map inspection and reports `image_marker_source = unavailable`.
+
 Makefile helpers:
 
 ```bash
@@ -925,8 +933,9 @@ enabled.
 layer toggles. It does not mutate persisted observations or change candidate evidence into truth.
 
 When `eventCandidateRunId` is present, replay can show `HIT CANDIDATE` and `BOUNCE CANDIDATE`
-markers on the normalized court mini-map. Labels must include `candidate`; they do not confirm
-hits, bounces, in/out, points, or score.
+markers on the normalized court mini-map and, when a source image point is available, on the
+broadcast video. Labels must include `candidate`; they do not confirm hits, bounces, in/out,
+points, or score.
 
 Motion smoothing replay:
 

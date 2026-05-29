@@ -2227,3 +2227,28 @@ This milestone adds:
 
 The candidates are derived evidence only. They are not confirmed hits, confirmed bounces, in/out
 decisions, rally/point/score logic, identity, OCR, accepted/rejected lifecycle, or adjudication.
+
+## Event Candidate Video Overlay v0.1
+
+Status: complete
+
+### Goal
+
+Make existing `hit_candidate` and `bounce_candidate` evidence visible on the broadcast video overlay
+without changing event-candidate generation or truth semantics.
+
+### Notes
+
+This repair adds:
+
+- event candidate replay payload `image_point`
+- event candidate replay payload `image_marker_source`
+- source image-point resolution from `ball_court_projection_candidate.payload.image_point`
+- `ReplayEventCandidateVideoOverlay`
+- broadcast video markers labeled `HIT CANDIDATE` and `BOUNCE CANDIDATE`
+- selected evidence details for image point and marker source
+- docs for video overlay behavior and limitations
+
+If the source image point is unavailable, replay keeps the candidate available for timeline and
+mini-map review and returns `image_marker_source = unavailable`. The video marker remains candidate
+visualization only; it is not hit truth, bounce truth, in/out, point, score, or adjudication.

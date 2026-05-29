@@ -950,6 +950,12 @@ export interface ReplayEventCandidateOverlay {
   frame_number: number;
   timestamp_ms: number;
   court_point: ReplayCourtProjectionPoint;
+  image_point: ReplayCourtProjectionPoint | null;
+  image_marker_source:
+    | "source_ball_court_projection_image_point"
+    | "event_candidate_payload_image_point"
+    | "unavailable"
+    | string;
   confidence: number | null;
   reason_codes: string[];
   candidate_method: string | null;
@@ -1278,6 +1284,12 @@ export interface ReplayEventCandidateTimelineItem {
   display_label: string;
   candidate_type: "hit_candidate" | "bounce_candidate" | string;
   court_point: ReplayCourtProjectionPoint;
+  image_point: ReplayCourtProjectionPoint | null;
+  image_marker_source:
+    | "source_ball_court_projection_image_point"
+    | "event_candidate_payload_image_point"
+    | "unavailable"
+    | string;
   confidence: number | null;
   reason_codes: string[];
   candidate_method: string | null;
