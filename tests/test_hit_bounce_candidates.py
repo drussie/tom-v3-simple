@@ -25,6 +25,7 @@ from apps.worker.services.hit_bounce_candidates import (
     BOUNCE_CANDIDATE_METHOD,
     HIT_CANDIDATE_METHOD,
     HIT_FALLBACK_CANDIDATE_METHOD,
+    IMAGE_SPACE_DIRECTION_CHANGE_HIT_CANDIDATE_METHOD,
     IMAGE_SPACE_NET_AXIS_HIT_CANDIDATE_METHOD,
     NET_AXIS_REVERSAL_HIT_CANDIDATE_METHOD,
     PLAYER_ANCHORED_HIT_CANDIDATE_METHOD,
@@ -40,6 +41,7 @@ from apps.worker.services.hit_bounce_candidates import (
     build_hit_bounce_candidates,
     dedupe_event_candidates_with_rejections,
     suppress_player_anchored_hits_overlapping_bounces,
+    suppress_weak_image_space_direction_change_hits_overlapping_bounces,
     suppress_weak_net_axis_reversal_hits_overlapping_bounces,
 )
 
@@ -149,6 +151,7 @@ def test_hit_candidate_not_produced_when_player_is_far(db_session: Session) -> N
         media_id=media.id,
         ball_trajectory_run_id=trajectory_run.id,
         court_projection_run_id=projection_run.id,
+        image_space_direction_change_hit_enabled=False,
     )
 
     assert result["ok"] is True
@@ -175,6 +178,7 @@ def test_net_axis_reversal_emits_hit_without_player_proximity(
         media_id=media.id,
         ball_trajectory_run_id=trajectory_run.id,
         court_projection_run_id=projection_run.id,
+        image_space_direction_change_hit_enabled=False,
     )
 
     assert result["ok"] is True
@@ -287,6 +291,7 @@ def test_no_net_axis_reversal_does_not_emit_ball_first_hit(
         media_id=media.id,
         ball_trajectory_run_id=trajectory_run.id,
         court_projection_run_id=projection_run.id,
+        image_space_direction_change_hit_enabled=False,
     )
 
     assert result["ok"] is True
@@ -326,6 +331,7 @@ def test_image_space_net_axis_reversal_emits_hit_without_player_proximity(
         media_id=media.id,
         ball_trajectory_run_id=trajectory_run.id,
         court_projection_run_id=projection_run.id,
+        image_space_direction_change_hit_enabled=False,
     )
 
     assert result["ok"] is True
@@ -373,6 +379,7 @@ def test_image_space_reversal_missing_image_points_writes_diagnostics(
         media_id=media.id,
         ball_trajectory_run_id=trajectory_run.id,
         court_projection_run_id=projection_run.id,
+        image_space_direction_change_hit_enabled=False,
     )
 
     assert result["ok"] is True
@@ -432,6 +439,7 @@ def test_image_space_recall_uses_projection_points_outside_trajectory_segments(
         media_id=media.id,
         ball_trajectory_run_id=trajectory_run.id,
         court_projection_run_id=projection_run.id,
+        image_space_direction_change_hit_enabled=False,
     )
 
     assert result["ok"] is True
@@ -475,6 +483,207 @@ def test_image_space_recall_uses_projection_points_outside_trajectory_segments(
     assert overlays[0]["image_space_net_axis_reversal_recall"][
         "player_proximity_required"
     ] is False
+
+
+def test_image_space_direction_change_emits_hit_without_player_proximity(
+    db_session: Session,
+) -> None:
+    media = _seed_media(db_session)
+    trajectory_run, projection_ids = _seed_trajectory_run(
+        db_session,
+        media.id,
+        points=[
+            (0, 0, 0.20, 0.20),
+            (6, 200, 0.30, 0.30),
+            (12, 400, 0.40, 0.40),
+        ],
+    )
+    _update_ball_projection_image_points(
+        db_session,
+        projection_ids,
+        image_points=[
+            (100.0, 100.0),
+            (140.0, 140.0),
+            (120.0, 190.0),
+        ],
+    )
+    projection_run = _seed_projection_run(db_session, media.id, players=[])
+
+    result = build_hit_bounce_candidates(
+        session=db_session,
+        media_id=media.id,
+        ball_trajectory_run_id=trajectory_run.id,
+        court_projection_run_id=projection_run.id,
+    )
+
+    assert result["ok"] is True
+    assert result["observations"]["hit_candidate"] == 1
+    assert (
+        result["candidate_summary"]["image_direction_change_recovered_hit_count"]
+        == 1
+    )
+    assert (
+        result["candidate_summary"]["image_net_axis_reversal_recovered_hit_count"]
+        == 0
+    )
+    hit = db_session.scalar(
+        select(Observation).where(
+            Observation.run_id == result["event_candidate_run_id"],
+            Observation.observation_type == "hit_candidate",
+        )
+    )
+    assert hit is not None
+    assert hit.payload_jsonb["candidate_method"] == (
+        IMAGE_SPACE_DIRECTION_CHANGE_HIT_CANDIDATE_METHOD
+    )
+    recall = hit.payload_jsonb["image_space_direction_change_recall"]
+    assert recall["player_proximity_required"] is False
+    assert recall["image_direction_change_method"] == (
+        "broadcast_image_2d_vector_direction_change_v027"
+    )
+    assert recall["image_direction_delta_degrees"] >= 45.0
+    assert recall["pre_vector_length_pixels"] >= 8.0
+    assert recall["post_vector_length_pixels"] >= 8.0
+    assert "image_space_direction_change" in hit.payload_jsonb["reason_codes"]
+
+    overlays = build_event_candidate_overlay_items(
+        session=db_session,
+        media=media,
+        start_ms=0,
+        end_ms=500,
+        event_candidate_run_id=result["event_candidate_run_id"],
+        observation_type="hit_candidate",
+    )
+    assert overlays[0]["image_space_direction_change_recall"][
+        "player_proximity_required"
+    ] is False
+
+
+def test_image_space_direction_change_missing_image_points_writes_diagnostics(
+    db_session: Session,
+) -> None:
+    media = _seed_media(db_session)
+    trajectory_run, projection_ids = _seed_trajectory_run(
+        db_session,
+        media.id,
+        points=[
+            (0, 0, 0.20, 0.20),
+            (6, 200, 0.30, 0.30),
+            (12, 400, 0.40, 0.40),
+        ],
+    )
+    _remove_ball_projection_image_points(db_session, projection_ids)
+    projection_run = _seed_projection_run(db_session, media.id, players=[])
+
+    result = build_hit_bounce_candidates(
+        session=db_session,
+        media_id=media.id,
+        ball_trajectory_run_id=trajectory_run.id,
+        court_projection_run_id=projection_run.id,
+    )
+
+    assert result["ok"] is True
+    assert result["observations"]["hit_candidate"] == 0
+    assert "missing_image_point" in result["candidate_summary"][
+        "image_direction_change_rejection_reasons"
+    ]
+    diagnostic = next(
+        (
+            row
+            for row in db_session.scalars(
+                select(Observation).where(
+                    Observation.run_id == result["event_candidate_run_id"],
+                    Observation.observation_type
+                    == "event_candidate_rejection_diagnostic",
+                )
+            )
+            if row.payload_jsonb.get("diagnostic_source")
+            == "image_space_direction_change_hit_recall"
+        ),
+        None,
+    )
+    assert diagnostic is not None
+    assert diagnostic.payload_jsonb["image_space_direction_change_recall"][
+        "player_proximity_required"
+    ] is False
+
+
+def test_image_space_direction_change_below_vector_threshold_rejects(
+    db_session: Session,
+) -> None:
+    media = _seed_media(db_session)
+    trajectory_run, projection_ids = _seed_trajectory_run(
+        db_session,
+        media.id,
+        points=[
+            (0, 0, 0.20, 0.20),
+            (6, 200, 0.30, 0.30),
+            (12, 400, 0.40, 0.40),
+        ],
+    )
+    _update_ball_projection_image_points(
+        db_session,
+        projection_ids,
+        image_points=[
+            (100.0, 100.0),
+            (103.0, 103.0),
+            (101.0, 106.0),
+        ],
+    )
+    projection_run = _seed_projection_run(db_session, media.id, players=[])
+
+    result = build_hit_bounce_candidates(
+        session=db_session,
+        media_id=media.id,
+        ball_trajectory_run_id=trajectory_run.id,
+        court_projection_run_id=projection_run.id,
+        image_space_net_axis_hit_enabled=False,
+    )
+
+    assert result["ok"] is True
+    assert result["observations"]["hit_candidate"] == 0
+    assert "image_vector_below_threshold" in result["candidate_summary"][
+        "image_direction_change_rejection_reasons"
+    ]
+
+
+def test_image_space_direction_change_below_delta_rejects(
+    db_session: Session,
+) -> None:
+    media = _seed_media(db_session)
+    trajectory_run, projection_ids = _seed_trajectory_run(
+        db_session,
+        media.id,
+        points=[
+            (0, 0, 0.20, 0.20),
+            (6, 200, 0.30, 0.30),
+            (12, 400, 0.40, 0.40),
+        ],
+    )
+    _update_ball_projection_image_points(
+        db_session,
+        projection_ids,
+        image_points=[
+            (100.0, 100.0),
+            (130.0, 130.0),
+            (170.0, 160.0),
+        ],
+    )
+    projection_run = _seed_projection_run(db_session, media.id, players=[])
+
+    result = build_hit_bounce_candidates(
+        session=db_session,
+        media_id=media.id,
+        ball_trajectory_run_id=trajectory_run.id,
+        court_projection_run_id=projection_run.id,
+        image_space_net_axis_hit_enabled=False,
+    )
+
+    assert result["ok"] is True
+    assert result["observations"]["hit_candidate"] == 0
+    assert "image_direction_delta_below_threshold" in result["candidate_summary"][
+        "image_direction_change_rejection_reasons"
+    ]
 
 
 def test_far_side_style_player_time_offset_hit_fallback(
@@ -1367,6 +1576,61 @@ def test_weak_net_axis_reversal_hit_overlap_with_bounce_is_suppressed() -> None:
     assert "suppressed_by_bounce_candidate_overlap" in diagnostics[0].rejection_reasons
 
 
+def test_weak_image_space_direction_change_hit_before_bounce_is_suppressed() -> None:
+    bounce = _draft_event_candidate(
+        observation_type="bounce_candidate",
+        frame=81,
+        timestamp_ms=2700,
+        court_x=0.28,
+        court_y=0.21,
+        track_role_candidate="near_player_track_candidate",
+        player_distance=0.50,
+        candidate_method=SIDE_ZONE_SEQUENCE_BOUNCE_METHOD,
+        net_axis_reversal=False,
+    )
+    weak_direction_hit = replace(
+        _draft_event_candidate(
+            observation_type="hit_candidate",
+            frame=77,
+            timestamp_ms=2567,
+            court_x=0.31,
+            court_y=0.44,
+            track_role_candidate="far_player_track_candidate",
+            player_distance=0.58,
+            candidate_method=IMAGE_SPACE_DIRECTION_CHANGE_HIT_CANDIDATE_METHOD,
+            net_axis_reversal=False,
+        ),
+        confidence=0.58,
+        reason_codes=[
+            "image_space_direction_change",
+            "image_space_hit_recall",
+            "player_proximity_not_required",
+        ],
+        image_space_direction_change_recall={
+            "player_proximity_required": False,
+            "image_direction_delta_degrees": 50.0,
+            "pre_vector_length_pixels": 40.0,
+            "post_vector_length_pixels": 120.0,
+        },
+    )
+
+    filtered, suppressed_count, diagnostics = (
+        suppress_weak_image_space_direction_change_hits_overlapping_bounces(
+            [weak_direction_hit, bounce],
+            config=HitBounceCandidateConfig(candidate_dedupe_ms=500),
+        )
+    )
+
+    assert [candidate.observation_type for candidate in filtered] == [
+        "bounce_candidate"
+    ]
+    assert suppressed_count == 1
+    assert diagnostics[0].diagnostic_source == (
+        "image_space_direction_change_hit_recall"
+    )
+    assert "suppressed_by_bounce_candidate_overlap" in diagnostics[0].rejection_reasons
+
+
 def test_side_zone_sequence_reclassifies_sample_style_sequence() -> None:
     candidates = [
         _draft_event_candidate(
@@ -1612,6 +1876,10 @@ def test_hit_bounce_candidate_plan_only_and_cli_do_not_mutate(
     assert "--hit-min-net-axis-delta-template 0.015" in result["plan"]["command"]
     assert "--bounce-min-image-y-delta-pixels 2.0" in result["plan"]["command"]
     assert "--image-space-net-axis-min-delta-pixels 4.0" in result["plan"]["command"]
+    assert (
+        "--image-space-direction-change-min-delta-degrees 45.0"
+        in result["plan"]["command"]
+    )
     assert db_session.scalars(select(ProcessingRun)).all() == []
 
     class Args:
@@ -1637,6 +1905,26 @@ def test_hit_bounce_candidate_plan_only_and_cli_do_not_mutate(
         player_anchored_hit_distance_max_template = 0.24
         player_anchored_hit_min_net_axis_delta_template = 0.015
         player_anchored_hit_min_pre_post_gap_ms = 60
+        event_overlap_distance_template = 0.08
+        net_axis_reversal_hit_enabled = True
+        net_axis_reversal_lookback_ms = 700
+        net_axis_reversal_lookahead_ms = 700
+        net_axis_reversal_min_delta_template = 0.015
+        net_axis_reversal_min_pre_post_gap_ms = 60
+        net_axis_reversal_dedupe_distance_template = 0.08
+        image_space_net_axis_hit_enabled = True
+        image_space_net_axis_lookback_ms = 700
+        image_space_net_axis_lookahead_ms = 700
+        image_space_net_axis_min_delta_pixels = 4.0
+        image_space_net_axis_min_pre_post_gap_ms = 60
+        image_space_net_axis_dedupe_distance_pixels = 18.0
+        image_space_direction_change_hit_enabled = True
+        image_space_direction_change_lookback_ms = 700
+        image_space_direction_change_lookahead_ms = 700
+        image_space_direction_change_min_vector_pixels = 8.0
+        image_space_direction_change_min_delta_degrees = 45.0
+        image_space_direction_change_min_pre_post_gap_ms = 60
+        image_space_direction_change_dedupe_distance_pixels = 18.0
         candidate_dedupe_ms = 500
         viewer_base_url = "http://127.0.0.1:3000"
         plan_only = True

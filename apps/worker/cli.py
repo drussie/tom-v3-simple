@@ -802,6 +802,41 @@ def main() -> None:
         type=float,
         default=18.0,
     )
+    hit_bounce_parser.add_argument(
+        "--image-space-direction-change-hit-enabled",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+    )
+    hit_bounce_parser.add_argument(
+        "--image-space-direction-change-lookback-ms",
+        type=int,
+        default=700,
+    )
+    hit_bounce_parser.add_argument(
+        "--image-space-direction-change-lookahead-ms",
+        type=int,
+        default=700,
+    )
+    hit_bounce_parser.add_argument(
+        "--image-space-direction-change-min-vector-pixels",
+        type=float,
+        default=8.0,
+    )
+    hit_bounce_parser.add_argument(
+        "--image-space-direction-change-min-delta-degrees",
+        type=float,
+        default=45.0,
+    )
+    hit_bounce_parser.add_argument(
+        "--image-space-direction-change-min-pre-post-gap-ms",
+        type=int,
+        default=60,
+    )
+    hit_bounce_parser.add_argument(
+        "--image-space-direction-change-dedupe-distance-pixels",
+        type=float,
+        default=18.0,
+    )
     hit_bounce_parser.add_argument("--candidate-dedupe-ms", type=int, default=500)
     hit_bounce_parser.add_argument(
         "--viewer-base-url",
@@ -1663,6 +1698,41 @@ def _handle_build_hit_bounce_candidates(
         image_space_net_axis_dedupe_distance_pixels=getattr(
             args,
             "image_space_net_axis_dedupe_distance_pixels",
+            18.0,
+        ),
+        image_space_direction_change_hit_enabled=getattr(
+            args,
+            "image_space_direction_change_hit_enabled",
+            True,
+        ),
+        image_space_direction_change_lookback_ms=getattr(
+            args,
+            "image_space_direction_change_lookback_ms",
+            700,
+        ),
+        image_space_direction_change_lookahead_ms=getattr(
+            args,
+            "image_space_direction_change_lookahead_ms",
+            700,
+        ),
+        image_space_direction_change_min_vector_pixels=getattr(
+            args,
+            "image_space_direction_change_min_vector_pixels",
+            8.0,
+        ),
+        image_space_direction_change_min_delta_degrees=getattr(
+            args,
+            "image_space_direction_change_min_delta_degrees",
+            45.0,
+        ),
+        image_space_direction_change_min_pre_post_gap_ms=getattr(
+            args,
+            "image_space_direction_change_min_pre_post_gap_ms",
+            60,
+        ),
+        image_space_direction_change_dedupe_distance_pixels=getattr(
+            args,
+            "image_space_direction_change_dedupe_distance_pixels",
             18.0,
         ),
         candidate_dedupe_ms=args.candidate_dedupe_ms,

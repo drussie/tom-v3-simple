@@ -2451,6 +2451,35 @@ This repair improves candidate recall only. Broadcast image-y is a camera-space 
 ball height or calibrated court geometry. It does not add hit truth, bounce truth, in/out,
 rally/point/score logic, player identity, accepted/rejected lifecycle, or adjudication.
 
+## Image-Space Direction-Change Hit Recall v0.2.7
+
+Status: complete
+
+### Goal
+
+Recover the remaining visually obvious far-side hit candidate using full 2D broadcast-image
+direction change, rather than requiring a clean image-y sign reversal.
+
+### Notes
+
+This repair adds:
+
+- `image_space_direction_change_hit_candidate_v027`
+- `broadcast_image_2d_vector_direction_change_v027`
+- `image_space_direction_change_recall` payload and rejection diagnostics
+- CLI/Makefile controls for the image-space direction lookback/lookahead, vector length, angle
+  threshold, pre/post gap, and dedupe distance
+- weak pre-bounce overlap suppression for image-space direction-change hits
+
+The local bridge smoke run produced 5 `hit_candidate` observations, 2 `bounce_candidate`
+observations, and 870 rejection diagnostics. One final hit was recovered by the image-space
+direction-change path at frame 164. One weak image-direction candidate immediately before the frame
+81 bounce was suppressed, preserving the false hit-over-bounce protection.
+
+This repair improves candidate recall only. Full 2D broadcast image direction is still camera-space
+evidence, not calibrated contact truth. It does not add hit truth, bounce truth, in/out,
+rally/point/score logic, player identity, accepted/rejected lifecycle, or adjudication.
+
 ## Player-Anchored Hit Contact-Zone Tightening v0.2.4
 
 Status: complete

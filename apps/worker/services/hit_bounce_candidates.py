@@ -47,6 +47,9 @@ NET_AXIS_REVERSAL_HIT_CANDIDATE_METHOD = "net_axis_reversal_hit_candidate_v025"
 IMAGE_SPACE_NET_AXIS_HIT_CANDIDATE_METHOD = (
     "image_space_net_axis_reversal_hit_candidate_v026"
 )
+IMAGE_SPACE_DIRECTION_CHANGE_HIT_CANDIDATE_METHOD = (
+    "image_space_direction_change_hit_candidate_v027"
+)
 BOUNCE_CANDIDATE_METHOD = "image_vertical_proxy_speed_reduction_bounce_candidate_v024"
 BOUNCE_FALLBACK_CANDIDATE_METHOD = (
     "image_vertical_proxy_speed_reduction_bounce_candidate_v024_fallback"
@@ -57,7 +60,7 @@ PLAYER_ANCHORED_HIT_CANDIDATE_METHOD = (
 SIDE_ZONE_SEQUENCE_HIT_METHOD = "side_zone_sequence_hit_candidate_v024"
 SIDE_ZONE_SEQUENCE_BOUNCE_METHOD = "side_zone_sequence_bounce_candidate_v024"
 EVENT_CANDIDATE_METHOD = (
-    "image_space_net_axis_hit_recall_candidate_evidence_v026"
+    "image_space_direction_change_hit_recall_candidate_evidence_v027"
 )
 COURT_SIDE_SPLIT_Y = 0.50
 COURT_MIDCOURT_MARGIN_Y = 0.05
@@ -93,12 +96,20 @@ DEFAULT_NET_AXIS_REVERSAL_MIN_DELTA_TEMPLATE = 0.015
 DEFAULT_NET_AXIS_REVERSAL_MIN_PRE_POST_GAP_MS = 60
 DEFAULT_NET_AXIS_REVERSAL_DEDUPE_DISTANCE_TEMPLATE = 0.08
 IMAGE_SPACE_NET_AXIS_METHOD = "broadcast_image_y_axis_fallback_v026"
+IMAGE_SPACE_DIRECTION_CHANGE_METHOD = "broadcast_image_2d_vector_direction_change_v027"
 DEFAULT_IMAGE_SPACE_NET_AXIS_HIT_ENABLED = True
 DEFAULT_IMAGE_SPACE_NET_AXIS_LOOKBACK_MS = 700
 DEFAULT_IMAGE_SPACE_NET_AXIS_LOOKAHEAD_MS = 700
 DEFAULT_IMAGE_SPACE_NET_AXIS_MIN_DELTA_PIXELS = 4.0
 DEFAULT_IMAGE_SPACE_NET_AXIS_MIN_PRE_POST_GAP_MS = 60
 DEFAULT_IMAGE_SPACE_NET_AXIS_DEDUPE_DISTANCE_PIXELS = 18.0
+DEFAULT_IMAGE_SPACE_DIRECTION_CHANGE_HIT_ENABLED = True
+DEFAULT_IMAGE_SPACE_DIRECTION_CHANGE_LOOKBACK_MS = 700
+DEFAULT_IMAGE_SPACE_DIRECTION_CHANGE_LOOKAHEAD_MS = 700
+DEFAULT_IMAGE_SPACE_DIRECTION_CHANGE_MIN_VECTOR_PIXELS = 8.0
+DEFAULT_IMAGE_SPACE_DIRECTION_CHANGE_MIN_DELTA_DEGREES = 45.0
+DEFAULT_IMAGE_SPACE_DIRECTION_CHANGE_MIN_PRE_POST_GAP_MS = 60
+DEFAULT_IMAGE_SPACE_DIRECTION_CHANGE_DEDUPE_DISTANCE_PIXELS = 18.0
 HIT_CONFIDENCE_CAP = 0.70
 BOUNCE_CONFIDENCE_CAP = 0.60
 EVENT_CANDIDATE_WARNINGS = {
@@ -181,6 +192,27 @@ class HitBounceCandidateConfig:
     image_space_net_axis_dedupe_distance_pixels: float = (
         DEFAULT_IMAGE_SPACE_NET_AXIS_DEDUPE_DISTANCE_PIXELS
     )
+    image_space_direction_change_hit_enabled: bool = (
+        DEFAULT_IMAGE_SPACE_DIRECTION_CHANGE_HIT_ENABLED
+    )
+    image_space_direction_change_lookback_ms: int = (
+        DEFAULT_IMAGE_SPACE_DIRECTION_CHANGE_LOOKBACK_MS
+    )
+    image_space_direction_change_lookahead_ms: int = (
+        DEFAULT_IMAGE_SPACE_DIRECTION_CHANGE_LOOKAHEAD_MS
+    )
+    image_space_direction_change_min_vector_pixels: float = (
+        DEFAULT_IMAGE_SPACE_DIRECTION_CHANGE_MIN_VECTOR_PIXELS
+    )
+    image_space_direction_change_min_delta_degrees: float = (
+        DEFAULT_IMAGE_SPACE_DIRECTION_CHANGE_MIN_DELTA_DEGREES
+    )
+    image_space_direction_change_min_pre_post_gap_ms: int = (
+        DEFAULT_IMAGE_SPACE_DIRECTION_CHANGE_MIN_PRE_POST_GAP_MS
+    )
+    image_space_direction_change_dedupe_distance_pixels: float = (
+        DEFAULT_IMAGE_SPACE_DIRECTION_CHANGE_DEDUPE_DISTANCE_PIXELS
+    )
 
     def as_dict(self) -> dict[str, float | int | bool]:
         return {
@@ -253,6 +285,27 @@ class HitBounceCandidateConfig:
             ),
             "image_space_net_axis_dedupe_distance_pixels": (
                 self.image_space_net_axis_dedupe_distance_pixels
+            ),
+            "image_space_direction_change_hit_enabled": (
+                self.image_space_direction_change_hit_enabled
+            ),
+            "image_space_direction_change_lookback_ms": (
+                self.image_space_direction_change_lookback_ms
+            ),
+            "image_space_direction_change_lookahead_ms": (
+                self.image_space_direction_change_lookahead_ms
+            ),
+            "image_space_direction_change_min_vector_pixels": (
+                self.image_space_direction_change_min_vector_pixels
+            ),
+            "image_space_direction_change_min_delta_degrees": (
+                self.image_space_direction_change_min_delta_degrees
+            ),
+            "image_space_direction_change_min_pre_post_gap_ms": (
+                self.image_space_direction_change_min_pre_post_gap_ms
+            ),
+            "image_space_direction_change_dedupe_distance_pixels": (
+                self.image_space_direction_change_dedupe_distance_pixels
             ),
         }
 
@@ -330,6 +383,7 @@ class EventCandidateDraft:
     player_anchor_contact_zone: dict[str, Any] | None = None
     net_axis_reversal_recall: dict[str, Any] | None = None
     image_space_net_axis_reversal_recall: dict[str, Any] | None = None
+    image_space_direction_change_recall: dict[str, Any] | None = None
     overlap_suppression: dict[str, Any] | None = None
 
     @property
@@ -357,6 +411,7 @@ class EventCandidateRejectionDiagnostic:
     player_anchor_contact_zone: dict[str, Any] | None = None
     net_axis_reversal_recall: dict[str, Any] | None = None
     image_space_net_axis_reversal_recall: dict[str, Any] | None = None
+    image_space_direction_change_recall: dict[str, Any] | None = None
     overlap_suppression: dict[str, Any] | None = None
 
     @property
@@ -438,6 +493,27 @@ def build_hit_bounce_candidates_plan(
     image_space_net_axis_dedupe_distance_pixels: float = (
         DEFAULT_IMAGE_SPACE_NET_AXIS_DEDUPE_DISTANCE_PIXELS
     ),
+    image_space_direction_change_hit_enabled: bool = (
+        DEFAULT_IMAGE_SPACE_DIRECTION_CHANGE_HIT_ENABLED
+    ),
+    image_space_direction_change_lookback_ms: int = (
+        DEFAULT_IMAGE_SPACE_DIRECTION_CHANGE_LOOKBACK_MS
+    ),
+    image_space_direction_change_lookahead_ms: int = (
+        DEFAULT_IMAGE_SPACE_DIRECTION_CHANGE_LOOKAHEAD_MS
+    ),
+    image_space_direction_change_min_vector_pixels: float = (
+        DEFAULT_IMAGE_SPACE_DIRECTION_CHANGE_MIN_VECTOR_PIXELS
+    ),
+    image_space_direction_change_min_delta_degrees: float = (
+        DEFAULT_IMAGE_SPACE_DIRECTION_CHANGE_MIN_DELTA_DEGREES
+    ),
+    image_space_direction_change_min_pre_post_gap_ms: int = (
+        DEFAULT_IMAGE_SPACE_DIRECTION_CHANGE_MIN_PRE_POST_GAP_MS
+    ),
+    image_space_direction_change_dedupe_distance_pixels: float = (
+        DEFAULT_IMAGE_SPACE_DIRECTION_CHANGE_DEDUPE_DISTANCE_PIXELS
+    ),
     viewer_base_url: str = "http://127.0.0.1:3000",
 ) -> dict[str, Any]:
     bounce_fallback_cli_flag = (
@@ -460,6 +536,11 @@ def build_hit_bounce_candidates_plan(
         if image_space_net_axis_hit_enabled
         else "--no-image-space-net-axis-hit-enabled"
     )
+    image_space_direction_change_cli_flag = (
+        "--image-space-direction-change-hit-enabled"
+        if image_space_direction_change_hit_enabled
+        else "--no-image-space-direction-change-hit-enabled"
+    )
     return {
         "steps": [
             "validate_media_and_source_runs",
@@ -469,6 +550,7 @@ def build_hit_bounce_candidates_plan(
             "evaluate_net_axis_reversal_vertical_proxy_speed_and_player_proximity",
             "evaluate_ball_first_net_axis_reversal_hit_recall",
             "evaluate_image_space_net_axis_hit_recall",
+            "evaluate_image_space_direction_change_hit_recall",
             "evaluate_player_anchored_hit_recall",
             "dedupe_candidate_clusters",
             "apply_side_zone_sequence_classification_prior",
@@ -531,6 +613,19 @@ def build_hit_bounce_candidates_plan(
             f"{image_space_net_axis_min_pre_post_gap_ms} "
             "--image-space-net-axis-dedupe-distance-pixels "
             f"{image_space_net_axis_dedupe_distance_pixels} "
+            f"{image_space_direction_change_cli_flag} "
+            "--image-space-direction-change-lookback-ms "
+            f"{image_space_direction_change_lookback_ms} "
+            "--image-space-direction-change-lookahead-ms "
+            f"{image_space_direction_change_lookahead_ms} "
+            "--image-space-direction-change-min-vector-pixels "
+            f"{image_space_direction_change_min_vector_pixels} "
+            "--image-space-direction-change-min-delta-degrees "
+            f"{image_space_direction_change_min_delta_degrees} "
+            "--image-space-direction-change-min-pre-post-gap-ms "
+            f"{image_space_direction_change_min_pre_post_gap_ms} "
+            "--image-space-direction-change-dedupe-distance-pixels "
+            f"{image_space_direction_change_dedupe_distance_pixels} "
             f"--candidate-dedupe-ms {candidate_dedupe_ms}"
         ),
         "run_name": run_name,
@@ -545,6 +640,9 @@ def build_hit_bounce_candidates_plan(
         ),
         "image_space_net_axis_hit_candidate_method": (
             IMAGE_SPACE_NET_AXIS_HIT_CANDIDATE_METHOD
+        ),
+        "image_space_direction_change_hit_candidate_method": (
+            IMAGE_SPACE_DIRECTION_CHANGE_HIT_CANDIDATE_METHOD
         ),
         "player_anchored_hit_candidate_method": PLAYER_ANCHORED_HIT_CANDIDATE_METHOD,
         "bounce_candidate_method": BOUNCE_CANDIDATE_METHOD,
@@ -617,6 +715,28 @@ def build_hit_bounce_candidates_plan(
             ),
             "image_space_net_axis_dedupe_distance_pixels": (
                 image_space_net_axis_dedupe_distance_pixels
+            ),
+            "image_space_direction_change_hit_enabled": (
+                image_space_direction_change_hit_enabled
+            ),
+            "image_space_direction_change_method": IMAGE_SPACE_DIRECTION_CHANGE_METHOD,
+            "image_space_direction_change_lookback_ms": (
+                image_space_direction_change_lookback_ms
+            ),
+            "image_space_direction_change_lookahead_ms": (
+                image_space_direction_change_lookahead_ms
+            ),
+            "image_space_direction_change_min_vector_pixels": (
+                image_space_direction_change_min_vector_pixels
+            ),
+            "image_space_direction_change_min_delta_degrees": (
+                image_space_direction_change_min_delta_degrees
+            ),
+            "image_space_direction_change_min_pre_post_gap_ms": (
+                image_space_direction_change_min_pre_post_gap_ms
+            ),
+            "image_space_direction_change_dedupe_distance_pixels": (
+                image_space_direction_change_dedupe_distance_pixels
             ),
         },
         "replay_url_template": (
@@ -700,6 +820,27 @@ def build_hit_bounce_candidates(
     image_space_net_axis_dedupe_distance_pixels: float = (
         DEFAULT_IMAGE_SPACE_NET_AXIS_DEDUPE_DISTANCE_PIXELS
     ),
+    image_space_direction_change_hit_enabled: bool = (
+        DEFAULT_IMAGE_SPACE_DIRECTION_CHANGE_HIT_ENABLED
+    ),
+    image_space_direction_change_lookback_ms: int = (
+        DEFAULT_IMAGE_SPACE_DIRECTION_CHANGE_LOOKBACK_MS
+    ),
+    image_space_direction_change_lookahead_ms: int = (
+        DEFAULT_IMAGE_SPACE_DIRECTION_CHANGE_LOOKAHEAD_MS
+    ),
+    image_space_direction_change_min_vector_pixels: float = (
+        DEFAULT_IMAGE_SPACE_DIRECTION_CHANGE_MIN_VECTOR_PIXELS
+    ),
+    image_space_direction_change_min_delta_degrees: float = (
+        DEFAULT_IMAGE_SPACE_DIRECTION_CHANGE_MIN_DELTA_DEGREES
+    ),
+    image_space_direction_change_min_pre_post_gap_ms: int = (
+        DEFAULT_IMAGE_SPACE_DIRECTION_CHANGE_MIN_PRE_POST_GAP_MS
+    ),
+    image_space_direction_change_dedupe_distance_pixels: float = (
+        DEFAULT_IMAGE_SPACE_DIRECTION_CHANGE_DEDUPE_DISTANCE_PIXELS
+    ),
     viewer_base_url: str = "http://127.0.0.1:3000",
     plan_only: bool = False,
 ) -> dict[str, Any]:
@@ -755,6 +896,27 @@ def build_hit_bounce_candidates(
         ),
         image_space_net_axis_dedupe_distance_pixels=(
             image_space_net_axis_dedupe_distance_pixels
+        ),
+        image_space_direction_change_hit_enabled=(
+            image_space_direction_change_hit_enabled
+        ),
+        image_space_direction_change_lookback_ms=(
+            image_space_direction_change_lookback_ms
+        ),
+        image_space_direction_change_lookahead_ms=(
+            image_space_direction_change_lookahead_ms
+        ),
+        image_space_direction_change_min_vector_pixels=(
+            image_space_direction_change_min_vector_pixels
+        ),
+        image_space_direction_change_min_delta_degrees=(
+            image_space_direction_change_min_delta_degrees
+        ),
+        image_space_direction_change_min_pre_post_gap_ms=(
+            image_space_direction_change_min_pre_post_gap_ms
+        ),
+        image_space_direction_change_dedupe_distance_pixels=(
+            image_space_direction_change_dedupe_distance_pixels
         ),
     )
     invalid = _validate_config(config)
@@ -816,6 +978,27 @@ def build_hit_bounce_candidates(
         ),
         image_space_net_axis_dedupe_distance_pixels=(
             image_space_net_axis_dedupe_distance_pixels
+        ),
+        image_space_direction_change_hit_enabled=(
+            image_space_direction_change_hit_enabled
+        ),
+        image_space_direction_change_lookback_ms=(
+            image_space_direction_change_lookback_ms
+        ),
+        image_space_direction_change_lookahead_ms=(
+            image_space_direction_change_lookahead_ms
+        ),
+        image_space_direction_change_min_vector_pixels=(
+            image_space_direction_change_min_vector_pixels
+        ),
+        image_space_direction_change_min_delta_degrees=(
+            image_space_direction_change_min_delta_degrees
+        ),
+        image_space_direction_change_min_pre_post_gap_ms=(
+            image_space_direction_change_min_pre_post_gap_ms
+        ),
+        image_space_direction_change_dedupe_distance_pixels=(
+            image_space_direction_change_dedupe_distance_pixels
         ),
         viewer_base_url=viewer_base_url,
     )
@@ -912,6 +1095,17 @@ def build_hit_bounce_candidates(
         hit_drafts.extend(image_space_net_axis_hit_drafts)
         rejection_diagnostics.extend(image_space_net_axis_rejection_diagnostics)
         (
+            image_space_direction_change_context_count,
+            image_space_direction_change_hit_drafts,
+            image_space_direction_change_rejection_diagnostics,
+        ) = evaluate_image_space_direction_change_hit_recall(
+            trajectory_segments=image_space_trajectory_segments,
+            player_projections=player_projections,
+            config=config,
+        )
+        hit_drafts.extend(image_space_direction_change_hit_drafts)
+        rejection_diagnostics.extend(image_space_direction_change_rejection_diagnostics)
+        (
             player_anchor_context_count,
             player_anchored_hit_drafts,
             player_anchored_rejection_diagnostics,
@@ -971,6 +1165,15 @@ def build_hit_bounce_candidates(
         rejection_diagnostics.extend(image_space_net_axis_overlap_rejections)
         (
             final_candidates,
+            image_space_direction_change_overlap_suppressed_count,
+            image_space_direction_change_overlap_rejections,
+        ) = suppress_weak_image_space_direction_change_hits_overlapping_bounces(
+            final_candidates,
+            config=config,
+        )
+        rejection_diagnostics.extend(image_space_direction_change_overlap_rejections)
+        (
+            final_candidates,
             player_anchor_suppressed_overlap_count,
             player_anchor_overlap_rejections,
         ) = suppress_player_anchored_hits_overlapping_bounces(
@@ -1025,10 +1228,11 @@ def build_hit_bounce_candidates(
             0,
         ),
         "classification_priority": "side_zone_sequence_candidate_prior",
-        "physics_heuristic_version": "v0.2.6",
+        "physics_heuristic_version": "v0.2.7",
         "contact_zone_tightening_version": "v0.2.4",
         "net_axis_reversal_hit_recall_version": "v0.2.5",
         "image_space_net_axis_hit_recall_version": "v0.2.6",
+        "image_space_direction_change_hit_recall_version": "v0.2.7",
         "net_axis_reversal_context_count": net_axis_reversal_context_count,
         "net_axis_reversal_candidate_count": len(net_axis_reversal_hit_drafts),
         "net_axis_reversal_recovered_hit_count": sum(
@@ -1134,6 +1338,75 @@ def build_hit_bounce_candidates(
                 [
                     *image_space_net_axis_rejection_diagnostics,
                     *image_space_net_axis_overlap_rejections,
+                ]
+            ),
+            "player_proximity_required": False,
+        },
+        "image_direction_change_context_count": (
+            image_space_direction_change_context_count
+        ),
+        "image_direction_change_source_point_count": sum(
+            len(segment) for segment in image_space_trajectory_segments
+        ),
+        "image_direction_change_candidate_count": len(
+            image_space_direction_change_hit_drafts
+        ),
+        "image_direction_change_recovered_hit_count": sum(
+            1
+            for candidate in final_candidates
+            if (
+                candidate.original_candidate_method
+                or candidate.candidate_method
+            )
+            == IMAGE_SPACE_DIRECTION_CHANGE_HIT_CANDIDATE_METHOD
+            and candidate.observation_type == HIT_CANDIDATE_OBSERVATION_TYPE
+        ),
+        "image_direction_change_suppressed_overlap_count": (
+            image_space_direction_change_overlap_suppressed_count
+        ),
+        "image_direction_change_rejected_count": (
+            len(image_space_direction_change_rejection_diagnostics)
+            + len(image_space_direction_change_overlap_rejections)
+        ),
+        "image_direction_change_rejection_reasons": _rejection_reason_counts(
+            [
+                *image_space_direction_change_rejection_diagnostics,
+                *image_space_direction_change_overlap_rejections,
+            ]
+        ),
+        "image_space_direction_change_hit_recall": {
+            "enabled": config.image_space_direction_change_hit_enabled,
+            "image_direction_change_method": IMAGE_SPACE_DIRECTION_CHANGE_METHOD,
+            "source_point_count": sum(
+                len(segment) for segment in image_space_trajectory_segments
+            ),
+            "direction_change_context_count": (
+                image_space_direction_change_context_count
+            ),
+            "direction_change_candidate_count": len(
+                image_space_direction_change_hit_drafts
+            ),
+            "direction_change_recovered_hit_count": sum(
+                1
+                for candidate in final_candidates
+                if (
+                    candidate.original_candidate_method
+                    or candidate.candidate_method
+                )
+                == IMAGE_SPACE_DIRECTION_CHANGE_HIT_CANDIDATE_METHOD
+                and candidate.observation_type == HIT_CANDIDATE_OBSERVATION_TYPE
+            ),
+            "direction_change_suppressed_overlap_count": (
+                image_space_direction_change_overlap_suppressed_count
+            ),
+            "direction_change_rejected_count": (
+                len(image_space_direction_change_rejection_diagnostics)
+                + len(image_space_direction_change_overlap_rejections)
+            ),
+            "rejection_reasons": _rejection_reason_counts(
+                [
+                    *image_space_direction_change_rejection_diagnostics,
+                    *image_space_direction_change_overlap_rejections,
                 ]
             ),
             "player_proximity_required": False,
@@ -1656,6 +1929,79 @@ def evaluate_image_space_net_axis_hit_recall(
     return evaluated_contexts, hit_candidates, rejection_diagnostics
 
 
+def evaluate_image_space_direction_change_hit_recall(
+    *,
+    trajectory_segments: list[list[TrajectoryPoint]],
+    player_projections: list[PlayerProjection],
+    config: HitBounceCandidateConfig,
+) -> tuple[int, list[EventCandidateDraft], list[EventCandidateRejectionDiagnostic]]:
+    if not config.image_space_direction_change_hit_enabled:
+        return 0, [], []
+    all_ball_points = _flatten_trajectory_points(trajectory_segments)
+    hit_candidates: list[EventCandidateDraft] = []
+    rejection_diagnostics: list[EventCandidateRejectionDiagnostic] = []
+    evaluated_contexts = 0
+    for anchor in all_ball_points:
+        evaluated_contexts += 1
+        (
+            incoming,
+            outgoing,
+            direction_change,
+            rejection_reasons,
+        ) = _image_space_direction_change_candidate_payload(
+            anchor=anchor,
+            ball_points=all_ball_points,
+            player_projections=player_projections,
+            config=config,
+        )
+        if rejection_reasons:
+            rejection_diagnostics.append(
+                _image_space_direction_change_rejection_diagnostic(
+                    anchor=anchor,
+                    incoming=incoming,
+                    outgoing=outgoing,
+                    player_projections=player_projections,
+                    config=config,
+                    rejection_reasons=rejection_reasons,
+                    image_space_direction_change=direction_change,
+                )
+            )
+            continue
+        assert incoming is not None
+        assert outgoing is not None
+        context = trajectory_context(incoming, anchor, outgoing)
+        if context is None:
+            rejection_diagnostics.append(
+                _image_space_direction_change_rejection_diagnostic(
+                    anchor=anchor,
+                    incoming=incoming,
+                    outgoing=outgoing,
+                    player_projections=player_projections,
+                    config=config,
+                    rejection_reasons=["invalid_image_space_direction_change_context"],
+                    image_space_direction_change=direction_change,
+                )
+            )
+            continue
+        nearest_player = nearest_main_player_projection(
+            anchor,
+            player_projections,
+            time_window_ms=max(
+                config.player_time_window_ms,
+                config.image_space_direction_change_lookback_ms,
+            ),
+        )
+        hit_candidates.append(
+            _image_space_direction_change_hit_candidate_from_context(
+                context,
+                nearest_player,
+                config,
+                image_space_direction_change=direction_change,
+            )
+        )
+    return evaluated_contexts, hit_candidates, rejection_diagnostics
+
+
 def evaluate_player_anchored_hit_recall(
     *,
     trajectory_segments: list[list[TrajectoryPoint]],
@@ -2107,6 +2453,169 @@ def _image_space_net_axis_outgoing_point(
     return min(candidates, key=lambda point: (point.timestamp_ms, point.frame_number), default=None)
 
 
+def _image_space_direction_change_candidate_payload(
+    *,
+    anchor: TrajectoryPoint,
+    ball_points: list[TrajectoryPoint],
+    player_projections: list[PlayerProjection],
+    config: HitBounceCandidateConfig,
+) -> tuple[
+    TrajectoryPoint | None,
+    TrajectoryPoint | None,
+    dict[str, Any],
+    list[str],
+]:
+    nearest_player = nearest_main_player_projection(
+        anchor,
+        player_projections,
+        time_window_ms=max(
+            config.player_time_window_ms,
+            config.image_space_direction_change_lookback_ms,
+        ),
+    )
+    base_payload = {
+        "enabled": config.image_space_direction_change_hit_enabled,
+        "candidate_method": IMAGE_SPACE_DIRECTION_CHANGE_HIT_CANDIDATE_METHOD,
+        "image_direction_change_method": IMAGE_SPACE_DIRECTION_CHANGE_METHOD,
+        "player_proximity_required": False,
+        "anchor_frame": anchor.frame_number,
+        "anchor_timestamp_ms": anchor.timestamp_ms,
+        "lookback_ms": config.image_space_direction_change_lookback_ms,
+        "lookahead_ms": config.image_space_direction_change_lookahead_ms,
+        "min_pre_post_gap_ms": (
+            config.image_space_direction_change_min_pre_post_gap_ms
+        ),
+        "min_vector_pixels": config.image_space_direction_change_min_vector_pixels,
+        "min_direction_delta_degrees": (
+            config.image_space_direction_change_min_delta_degrees
+        ),
+        "anchor_image_point": _image_point_payload(anchor),
+        "nearest_player_found": nearest_player is not None,
+        "nearest_player_distance_template_units": (
+            nearest_player.distance_template_units if nearest_player is not None else None
+        ),
+        "nearest_player_track_role_candidate": (
+            nearest_player.player.track_role_candidate if nearest_player is not None else None
+        ),
+        "player_proximity_used_for_scoring": nearest_player is not None,
+        "court_projection_warning": (
+            "hit candidate uses image-space direction change because airborne hits may "
+            "not project cleanly to court plane"
+        ),
+        "not_hit_truth": True,
+        "observation_only": True,
+        "no_adjudication": True,
+    }
+    if anchor.image_x is None or anchor.image_y is None:
+        return None, None, base_payload, ["missing_image_point"]
+    incoming_window = [
+        point
+        for point in ball_points
+        if point.image_x is not None
+        and point.image_y is not None
+        and anchor.timestamp_ms - config.image_space_direction_change_lookback_ms
+        <= point.timestamp_ms
+        <= anchor.timestamp_ms
+        - config.image_space_direction_change_min_pre_post_gap_ms
+    ]
+    outgoing_window = [
+        point
+        for point in ball_points
+        if point.image_x is not None
+        and point.image_y is not None
+        and anchor.timestamp_ms
+        + config.image_space_direction_change_min_pre_post_gap_ms
+        <= point.timestamp_ms
+        <= anchor.timestamp_ms + config.image_space_direction_change_lookahead_ms
+    ]
+    incoming_candidates = [
+        point
+        for point in incoming_window
+        if _image_vector_length(point, anchor)
+        >= config.image_space_direction_change_min_vector_pixels
+    ]
+    outgoing_candidates = [
+        point
+        for point in outgoing_window
+        if _image_vector_length(anchor, point)
+        >= config.image_space_direction_change_min_vector_pixels
+    ]
+    reasons: list[str] = []
+    if not incoming_window:
+        reasons.append("no_incoming_image_point_in_lookback_window")
+    if not outgoing_window:
+        reasons.append("no_outgoing_image_point_in_lookahead_window")
+    if incoming_window and not incoming_candidates:
+        reasons.append("image_vector_below_threshold")
+    if outgoing_window and not outgoing_candidates:
+        reasons.append("image_vector_below_threshold")
+    best_payload = base_payload
+    best_incoming: TrajectoryPoint | None = None
+    best_outgoing: TrajectoryPoint | None = None
+    best_sort_key: tuple[float, float, int, int] | None = None
+    for incoming in incoming_candidates:
+        for outgoing in outgoing_candidates:
+            payload = _image_space_direction_change_payload(
+                incoming=incoming,
+                anchor=anchor,
+                outgoing=outgoing,
+                player_projections=player_projections,
+                config=config,
+            )
+            delta = float(payload.get("image_direction_delta_degrees") or 0.0)
+            time_span = outgoing.timestamp_ms - incoming.timestamp_ms
+            sort_key = (
+                delta,
+                -abs(
+                    (anchor.timestamp_ms - incoming.timestamp_ms)
+                    - (outgoing.timestamp_ms - anchor.timestamp_ms)
+                ),
+                -time_span,
+                -abs(anchor.frame_number - incoming.frame_number)
+                - abs(outgoing.frame_number - anchor.frame_number),
+            )
+            if best_sort_key is None or sort_key > best_sort_key:
+                best_sort_key = sort_key
+                best_payload = payload
+                best_incoming = incoming
+                best_outgoing = outgoing
+    if best_incoming is None or best_outgoing is None:
+        return (
+            incoming_candidates[-1] if incoming_candidates else None,
+            outgoing_candidates[0] if outgoing_candidates else None,
+            best_payload,
+            sorted(set(reasons)),
+        )
+    if (
+        float(best_payload.get("image_direction_delta_degrees") or 0.0)
+        < config.image_space_direction_change_min_delta_degrees
+    ):
+        reasons.append("image_direction_delta_below_threshold")
+    return best_incoming, best_outgoing, best_payload, sorted(set(reasons))
+
+
+def _image_vector_length(start: TrajectoryPoint, end: TrajectoryPoint) -> float:
+    if (
+        start.image_x is None
+        or start.image_y is None
+        or end.image_x is None
+        or end.image_y is None
+    ):
+        return 0.0
+    return math.hypot(end.image_x - start.image_x, end.image_y - start.image_y)
+
+
+def _image_vector_direction_degrees(start: TrajectoryPoint, end: TrajectoryPoint) -> float:
+    if (
+        start.image_x is None
+        or start.image_y is None
+        or end.image_x is None
+        or end.image_y is None
+    ):
+        return 0.0
+    return math.degrees(math.atan2(end.image_y - start.image_y, end.image_x - start.image_x))
+
+
 def _player_anchor_distance(player: PlayerProjection, point: TrajectoryPoint) -> float:
     return _round(math.hypot(player.court_x - point.court_x, player.court_y - point.court_y))
 
@@ -2267,6 +2776,116 @@ def _image_space_net_axis_reversal_payload(
         "court_projection_warning": (
             "hit candidate uses image-space motion because airborne hits may not "
             "project cleanly to court plane"
+        ),
+        "not_hit_truth": True,
+        "observation_only": True,
+        "no_adjudication": True,
+    }
+
+
+def _image_space_direction_change_payload(
+    *,
+    incoming: TrajectoryPoint,
+    anchor: TrajectoryPoint,
+    outgoing: TrajectoryPoint,
+    player_projections: list[PlayerProjection],
+    config: HitBounceCandidateConfig,
+) -> dict[str, Any]:
+    nearest_player = nearest_main_player_projection(
+        anchor,
+        player_projections,
+        time_window_ms=max(
+            config.player_time_window_ms,
+            config.image_space_direction_change_lookback_ms,
+        ),
+    )
+    dx_before = (
+        anchor.image_x - incoming.image_x
+        if anchor.image_x is not None and incoming.image_x is not None
+        else None
+    )
+    dy_before = (
+        anchor.image_y - incoming.image_y
+        if anchor.image_y is not None and incoming.image_y is not None
+        else None
+    )
+    dx_after = (
+        outgoing.image_x - anchor.image_x
+        if anchor.image_x is not None and outgoing.image_x is not None
+        else None
+    )
+    dy_after = (
+        outgoing.image_y - anchor.image_y
+        if anchor.image_y is not None and outgoing.image_y is not None
+        else None
+    )
+    pre_length = (
+        math.hypot(dx_before, dy_before)
+        if dx_before is not None and dy_before is not None
+        else None
+    )
+    post_length = (
+        math.hypot(dx_after, dy_after)
+        if dx_after is not None and dy_after is not None
+        else None
+    )
+    direction_before = _image_vector_direction_degrees(incoming, anchor)
+    direction_after = _image_vector_direction_degrees(anchor, outgoing)
+    direction_delta = angle_delta_degrees(direction_before, direction_after)
+    min_vector = config.image_space_direction_change_min_vector_pixels
+    min_delta = config.image_space_direction_change_min_delta_degrees
+    return {
+        "enabled": config.image_space_direction_change_hit_enabled,
+        "candidate_method": IMAGE_SPACE_DIRECTION_CHANGE_HIT_CANDIDATE_METHOD,
+        "image_direction_change_method": IMAGE_SPACE_DIRECTION_CHANGE_METHOD,
+        "player_proximity_required": False,
+        "incoming_frame": incoming.frame_number,
+        "incoming_timestamp_ms": incoming.timestamp_ms,
+        "anchor_frame": anchor.frame_number,
+        "anchor_timestamp_ms": anchor.timestamp_ms,
+        "outgoing_frame": outgoing.frame_number,
+        "outgoing_timestamp_ms": outgoing.timestamp_ms,
+        "lookback_ms": config.image_space_direction_change_lookback_ms,
+        "lookahead_ms": config.image_space_direction_change_lookahead_ms,
+        "min_pre_post_gap_ms": (
+            config.image_space_direction_change_min_pre_post_gap_ms
+        ),
+        "incoming_image_point": _image_point_payload(incoming),
+        "anchor_image_point": _image_point_payload(anchor),
+        "outgoing_image_point": _image_point_payload(outgoing),
+        "dx_before": _round(dx_before) if dx_before is not None else None,
+        "dy_before": _round(dy_before) if dy_before is not None else None,
+        "dx_after": _round(dx_after) if dx_after is not None else None,
+        "dy_after": _round(dy_after) if dy_after is not None else None,
+        "direction_before_degrees": _round(direction_before),
+        "direction_after_degrees": _round(direction_after),
+        "image_direction_delta_degrees": _round(direction_delta),
+        "min_direction_delta_degrees": min_delta,
+        "pre_vector_length_pixels": (
+            _round(pre_length) if pre_length is not None else None
+        ),
+        "post_vector_length_pixels": (
+            _round(post_length) if post_length is not None else None
+        ),
+        "min_vector_pixels": min_vector,
+        "direction_change": (
+            pre_length is not None
+            and post_length is not None
+            and pre_length >= min_vector
+            and post_length >= min_vector
+            and direction_delta >= min_delta
+        ),
+        "nearest_player_found": nearest_player is not None,
+        "nearest_player_distance_template_units": (
+            nearest_player.distance_template_units if nearest_player is not None else None
+        ),
+        "nearest_player_track_role_candidate": (
+            nearest_player.player.track_role_candidate if nearest_player is not None else None
+        ),
+        "player_proximity_used_for_scoring": nearest_player is not None,
+        "court_projection_warning": (
+            "hit candidate uses image-space direction change because airborne hits may "
+            "not project cleanly to court plane"
         ),
         "not_hit_truth": True,
         "observation_only": True,
@@ -2554,6 +3173,11 @@ def dedupe_event_candidates_with_rejections(
                 rejection_reasons.append("deduped_by_player_anchored_hit")
             if duplicate.candidate_method == IMAGE_SPACE_NET_AXIS_HIT_CANDIDATE_METHOD:
                 rejection_reasons.append("deduped_by_image_space_net_axis_reversal_hit")
+            if (
+                duplicate.candidate_method
+                == IMAGE_SPACE_DIRECTION_CHANGE_HIT_CANDIDATE_METHOD
+            ):
+                rejection_reasons.append("deduped_by_image_space_direction_change_hit")
             if duplicate.candidate_method == NET_AXIS_REVERSAL_HIT_CANDIDATE_METHOD:
                 rejection_reasons.append("deduped_by_net_axis_reversal_hit")
             rejections.append(
@@ -2580,7 +3204,9 @@ def _candidate_preference_rank(candidate: EventCandidateDraft) -> int:
         return 2
     if candidate.candidate_method == IMAGE_SPACE_NET_AXIS_HIT_CANDIDATE_METHOD:
         return 3
-    return 4
+    if candidate.candidate_method == IMAGE_SPACE_DIRECTION_CHANGE_HIT_CANDIDATE_METHOD:
+        return 4
+    return 5
 
 
 def _should_preserve_pre_anchor_landing_candidate(
@@ -2628,6 +3254,7 @@ def suppress_bounces_near_hits(
                 and hit.nearest_player is not None
                 and not _is_net_axis_reversal_hit_candidate(hit)
                 and not _is_image_space_net_axis_hit_candidate(hit)
+                and not _is_image_space_direction_change_hit_candidate(hit)
             ),
             None,
         )
@@ -2843,6 +3470,79 @@ def suppress_weak_image_space_net_axis_hits_overlapping_bounces(
     )
 
 
+def suppress_weak_image_space_direction_change_hits_overlapping_bounces(
+    candidates: list[EventCandidateDraft],
+    *,
+    config: HitBounceCandidateConfig,
+) -> tuple[
+    list[EventCandidateDraft],
+    int,
+    list[EventCandidateRejectionDiagnostic],
+]:
+    bounces = [
+        candidate
+        for candidate in candidates
+        if candidate.observation_type == BOUNCE_CANDIDATE_OBSERVATION_TYPE
+    ]
+    filtered: list[EventCandidateDraft] = []
+    rejections: list[EventCandidateRejectionDiagnostic] = []
+    suppressed_count = 0
+    for candidate in candidates:
+        if not _is_weak_image_space_direction_change_hit_candidate(
+            candidate,
+            config=config,
+        ):
+            filtered.append(candidate)
+            continue
+        overlapping_bounce = _overlapping_bounce_candidate(
+            candidate,
+            bounces,
+            config=config,
+        )
+        if overlapping_bounce is None:
+            overlapping_bounce = _future_bounce_for_weak_image_direction_hit(
+                candidate,
+                bounces,
+                config=config,
+            )
+        if overlapping_bounce is None:
+            filtered.append(
+                replace(
+                    candidate,
+                    overlap_suppression=_overlap_suppression_payload(
+                        hit=candidate,
+                        bounce=None,
+                        config=config,
+                        suppressed=False,
+                    ),
+                )
+            )
+            continue
+        overlap_payload = _overlap_suppression_payload(
+            hit=candidate,
+            bounce=overlapping_bounce,
+            config=config,
+            suppressed=True,
+        )
+        suppressed_count += 1
+        rejections.append(
+            _rejection_diagnostic_from_candidate(
+                replace(candidate, overlap_suppression=overlap_payload),
+                rejection_reasons=["suppressed_by_bounce_candidate_overlap"],
+                decision_reason="suppressed_by_bounce_candidate_overlap",
+                suppressed_by_observation_type=overlapping_bounce.observation_type,
+                suppressed_by_frame=overlapping_bounce.frame_number,
+                suppressed_by_timestamp_ms=overlapping_bounce.timestamp_ms,
+                overlap_suppression=overlap_payload,
+            )
+        )
+    return (
+        sorted(filtered, key=lambda item: (item.timestamp_ms, item.frame_number)),
+        suppressed_count,
+        rejections,
+    )
+
+
 def _is_player_anchored_hit_candidate(candidate: EventCandidateDraft) -> bool:
     return (
         candidate.observation_type == HIT_CANDIDATE_OBSERVATION_TYPE
@@ -2899,6 +3599,18 @@ def _is_image_space_net_axis_hit_candidate(candidate: EventCandidateDraft) -> bo
     )
 
 
+def _is_image_space_direction_change_hit_candidate(candidate: EventCandidateDraft) -> bool:
+    return (
+        candidate.observation_type == HIT_CANDIDATE_OBSERVATION_TYPE
+        and (
+            candidate.candidate_method
+            == IMAGE_SPACE_DIRECTION_CHANGE_HIT_CANDIDATE_METHOD
+            or candidate.original_candidate_method
+            == IMAGE_SPACE_DIRECTION_CHANGE_HIT_CANDIDATE_METHOD
+        )
+    )
+
+
 def _is_weak_image_space_net_axis_hit_candidate(
     candidate: EventCandidateDraft,
     *,
@@ -2925,6 +3637,73 @@ def _is_weak_image_space_net_axis_hit_candidate(
             or not side_matches
         )
         and candidate.confidence < 0.62
+    )
+
+
+def _is_weak_image_space_direction_change_hit_candidate(
+    candidate: EventCandidateDraft,
+    *,
+    config: HitBounceCandidateConfig,
+) -> bool:
+    if not _is_image_space_direction_change_hit_candidate(candidate):
+        return False
+    recall = candidate.image_space_direction_change_recall or {}
+    direction_delta = float(recall.get("image_direction_delta_degrees") or 0.0)
+    pre_length = float(recall.get("pre_vector_length_pixels") or 0.0)
+    post_length = float(recall.get("post_vector_length_pixels") or 0.0)
+    strong_direction = (
+        direction_delta
+        >= config.image_space_direction_change_min_delta_degrees * 1.35
+    )
+    strong_vector = (
+        min(pre_length, post_length)
+        >= config.image_space_direction_change_min_vector_pixels * 2.0
+    )
+    if candidate.nearest_player is None:
+        return not (strong_direction and strong_vector) and candidate.confidence < 0.62
+    side_matches = _court_side_matches_player_role(
+        _court_side_zone_payload(candidate.trajectory_context.current).get("side"),
+        candidate.nearest_player.player.track_role_candidate,
+    )
+    return (
+        not (strong_direction and strong_vector)
+        and (
+            candidate.nearest_player.distance_template_units
+            > config.hit_player_review_distance_max_template
+            or not side_matches
+        )
+        and candidate.confidence < 0.62
+    )
+
+
+def _future_bounce_for_weak_image_direction_hit(
+    hit: EventCandidateDraft,
+    bounces: list[EventCandidateDraft],
+    *,
+    config: HitBounceCandidateConfig,
+) -> EventCandidateDraft | None:
+    if not _is_image_space_direction_change_hit_candidate(hit):
+        return None
+    if hit.nearest_player is not None:
+        side_matches = _court_side_matches_player_role(
+            _court_side_zone_payload(hit.trajectory_context.current).get("side"),
+            hit.nearest_player.player.track_role_candidate,
+        )
+        if side_matches:
+            return None
+    future_bounces = [
+        bounce
+        for bounce in bounces
+        if 0 <= bounce.timestamp_ms - hit.timestamp_ms <= config.candidate_dedupe_ms
+    ]
+    return min(
+        future_bounces,
+        key=lambda bounce: (
+            bounce.timestamp_ms - hit.timestamp_ms,
+            _candidate_court_distance(hit, bounce),
+            bounce.frame_number,
+        ),
+        default=None,
     )
 
 
@@ -3229,6 +4008,8 @@ def _hit_candidate_can_be_landing_zone_bounce(
 ) -> bool:
     if candidate.candidate_method == IMAGE_SPACE_NET_AXIS_HIT_CANDIDATE_METHOD:
         return False
+    if candidate.candidate_method == IMAGE_SPACE_DIRECTION_CHANGE_HIT_CANDIDATE_METHOD:
+        return False
     if court_landing_zone.get("landing_zone_candidate") is not True:
         return False
     if candidate.candidate_method == HIT_FALLBACK_CANDIDATE_METHOD:
@@ -3259,6 +4040,14 @@ def _final_reason_codes(
             reason_codes.extend(
                 [
                     "image_space_net_axis_reversal",
+                    "player_proximity_not_required",
+                    "airborne_hit_projection_warning",
+                ]
+            )
+        if candidate.candidate_method == IMAGE_SPACE_DIRECTION_CHANGE_HIT_CANDIDATE_METHOD:
+            reason_codes.extend(
+                [
+                    "image_space_direction_change",
                     "player_proximity_not_required",
                     "airborne_hit_projection_warning",
                 ]
@@ -3636,6 +4425,118 @@ def _image_space_net_axis_hit_candidate_from_context(
     )
 
 
+def _image_space_direction_change_hit_candidate_from_context(
+    context: TrajectoryContext,
+    nearest_player: NearestPlayerContext | None,
+    config: HitBounceCandidateConfig,
+    *,
+    image_space_direction_change: dict[str, Any],
+) -> EventCandidateDraft:
+    direction_delta = float(
+        image_space_direction_change.get("image_direction_delta_degrees") or 0.0
+    )
+    pre_length = float(
+        image_space_direction_change.get("pre_vector_length_pixels") or 0.0
+    )
+    post_length = float(
+        image_space_direction_change.get("post_vector_length_pixels") or 0.0
+    )
+    direction_score = min(
+        direction_delta
+        / max(config.image_space_direction_change_min_delta_degrees * 1.8, 1e-9),
+        1.0,
+    )
+    vector_score = min(
+        min(pre_length, post_length)
+        / max(config.image_space_direction_change_min_vector_pixels * 3.0, 1e-9),
+        1.0,
+    )
+    timing_balance = 1.0 - min(
+        abs(
+            (context.current.timestamp_ms - context.previous.timestamp_ms)
+            - (context.next.timestamp_ms - context.current.timestamp_ms)
+        )
+        / max(config.image_space_direction_change_lookback_ms, 1),
+        1.0,
+    )
+    proximity_score = 0.0
+    time_score = 0.0
+    side_score = 0.0
+    if nearest_player is not None:
+        proximity_score = 1.0 - min(
+            nearest_player.distance_template_units
+            / max(config.hit_player_review_distance_max_template, 1e-9),
+            1.0,
+        )
+        time_score = 1.0 - min(
+            nearest_player.time_delta_ms / max(config.player_time_window_ms, 1),
+            1.0,
+        )
+        side_score = (
+            1.0
+            if _court_side_matches_player_role(
+                _court_side_zone_payload(context.current).get("side"),
+                nearest_player.player.track_role_candidate,
+            )
+            else 0.0
+        )
+    confidence = min(
+        HIT_CONFIDENCE_CAP,
+        0.16
+        + 0.34 * direction_score
+        + 0.16 * vector_score
+        + 0.08 * timing_balance
+        + 0.06 * proximity_score
+        + 0.04 * time_score
+        + 0.04 * side_score,
+    )
+    reason_codes = [
+        "image_space_direction_change",
+        "image_space_hit_recall",
+        "player_proximity_not_required",
+        "airborne_hit_projection_warning",
+    ]
+    if nearest_player is not None:
+        reason_codes.extend(
+            [
+                "nearest_main_player_projection",
+                "player_proximity_diagnostic",
+            ]
+        )
+        if side_score > 0:
+            reason_codes.append("side_matches_player_track")
+    return EventCandidateDraft(
+        observation_type=HIT_CANDIDATE_OBSERVATION_TYPE,
+        candidate_method=IMAGE_SPACE_DIRECTION_CHANGE_HIT_CANDIDATE_METHOD,
+        trajectory_context=context,
+        nearest_player=nearest_player,
+        reason_codes=reason_codes,
+        confidence=_round(confidence),
+        player_proximity_gate=_player_proximity_gate_payload(
+            nearest_player=nearest_player,
+            threshold=config.hit_player_review_distance_max_template,
+            away_from_player=False,
+        ),
+        candidate_decision={
+            "selected_candidate_type": HIT_CANDIDATE_OBSERVATION_TYPE,
+            "suppressed_candidate_types": [BOUNCE_CANDIDATE_OBSERVATION_TYPE],
+            "reason": "image_space_direction_change",
+            "classification_priority": (
+                "image_space_direction_change_hit_recall_then_sequence_prior"
+            ),
+            "player_proximity_required": False,
+        },
+        image_space_direction_change_recall=(
+            _image_space_direction_change_recall_payload(
+                context=context,
+                nearest_player=nearest_player,
+                config=config,
+                image_space_direction_change=image_space_direction_change,
+            )
+        ),
+    )
+
+
 def _player_anchored_hit_candidate_from_context(
     context: TrajectoryContext,
     nearest_player: NearestPlayerContext,
@@ -3785,6 +4686,48 @@ def _image_space_net_axis_reversal_recall_payload(
         "court_projection_warning": (
             "hit candidate uses image-space motion because airborne hits may not "
             "project cleanly to court plane"
+        ),
+        "not_hit_truth": True,
+        "observation_only": True,
+        "no_adjudication": True,
+    }
+
+
+def _image_space_direction_change_recall_payload(
+    *,
+    context: TrajectoryContext,
+    nearest_player: NearestPlayerContext | None,
+    config: HitBounceCandidateConfig,
+    image_space_direction_change: dict[str, Any],
+) -> dict[str, Any]:
+    return {
+        **image_space_direction_change,
+        "enabled": config.image_space_direction_change_hit_enabled,
+        "candidate_method": IMAGE_SPACE_DIRECTION_CHANGE_HIT_CANDIDATE_METHOD,
+        "image_direction_change_method": IMAGE_SPACE_DIRECTION_CHANGE_METHOD,
+        "player_proximity_required": False,
+        "incoming_frame": context.previous.frame_number,
+        "incoming_timestamp_ms": context.previous.timestamp_ms,
+        "anchor_frame": context.current.frame_number,
+        "anchor_timestamp_ms": context.current.timestamp_ms,
+        "outgoing_frame": context.next.frame_number,
+        "outgoing_timestamp_ms": context.next.timestamp_ms,
+        "lookback_ms": config.image_space_direction_change_lookback_ms,
+        "lookahead_ms": config.image_space_direction_change_lookahead_ms,
+        "min_pre_post_gap_ms": (
+            config.image_space_direction_change_min_pre_post_gap_ms
+        ),
+        "nearest_player_found": nearest_player is not None,
+        "nearest_player_distance_template_units": (
+            nearest_player.distance_template_units if nearest_player is not None else None
+        ),
+        "nearest_player_track_role_candidate": (
+            nearest_player.player.track_role_candidate if nearest_player is not None else None
+        ),
+        "player_proximity_used_for_scoring": nearest_player is not None,
+        "court_projection_warning": (
+            "hit candidate uses image-space direction change because airborne hits may "
+            "not project cleanly to court plane"
         ),
         "not_hit_truth": True,
         "observation_only": True,
@@ -4259,6 +5202,83 @@ def _image_space_net_axis_rejection_diagnostic(
     )
 
 
+def _image_space_direction_change_rejection_diagnostic(
+    *,
+    anchor: TrajectoryPoint,
+    incoming: TrajectoryPoint | None,
+    outgoing: TrajectoryPoint | None,
+    player_projections: list[PlayerProjection],
+    config: HitBounceCandidateConfig,
+    rejection_reasons: list[str],
+    image_space_direction_change: dict[str, Any] | None = None,
+) -> EventCandidateRejectionDiagnostic:
+    previous = incoming or _synthetic_neighbor_point(
+        anchor,
+        timestamp_ms=anchor.timestamp_ms - 1,
+        frame_number=anchor.frame_number - 1,
+    )
+    next_point = outgoing or _synthetic_neighbor_point(
+        anchor,
+        timestamp_ms=anchor.timestamp_ms + 1,
+        frame_number=anchor.frame_number + 1,
+    )
+    context = trajectory_context(previous, anchor, next_point) or TrajectoryContext(
+        previous=previous,
+        current=anchor,
+        next=next_point,
+        direction_before_degrees=0.0,
+        direction_after_degrees=0.0,
+        direction_delta_degrees=0.0,
+        speed_before=0.0,
+        speed_after=0.0,
+        speed_delta_fraction=0.0,
+    )
+    nearest_player = nearest_main_player_projection(
+        anchor,
+        player_projections,
+        time_window_ms=max(
+            config.player_time_window_ms,
+            config.image_space_direction_change_lookback_ms,
+        ),
+    )
+    recall_payload = _image_space_direction_change_recall_payload(
+        context=context,
+        nearest_player=nearest_player,
+        config=config,
+        image_space_direction_change=image_space_direction_change or {},
+    )
+    recall_payload["diagnostic_only"] = True
+    return EventCandidateRejectionDiagnostic(
+        trajectory_context=context,
+        nearest_player=nearest_player,
+        net_axis_reversal={},
+        vertical_motion_proxy={},
+        speed_reduction={},
+        inside_or_near_court_template=_inside_or_near_template(
+            anchor,
+            config.bounce_inside_template_margin,
+        ),
+        player_proximity_gate=_player_proximity_gate_payload(
+            nearest_player=nearest_player,
+            threshold=config.hit_player_review_distance_max_template,
+            away_from_player=False,
+        ),
+        candidate_decision={
+            "selected_candidate_type": None,
+            "reason": "image_space_direction_change_hit_recall_rejected",
+            "rejection_reasons": rejection_reasons,
+            "classification_priority": (
+                "image_space_direction_change_hit_recall_then_sequence_prior"
+            ),
+            "diagnostic_source": "image_space_direction_change_hit_recall",
+            "player_proximity_required": False,
+        },
+        rejection_reasons=rejection_reasons,
+        diagnostic_source="image_space_direction_change_hit_recall",
+        image_space_direction_change_recall=recall_payload,
+    )
+
+
 def _synthetic_player_anchor_point(player: PlayerProjection) -> TrajectoryPoint:
     return TrajectoryPoint(
         trajectory_observation=player.observation,
@@ -4338,6 +5358,8 @@ def _rejection_diagnostic_from_candidate(
         diagnostic_source=(
             "player_anchored_hit_recall"
             if candidate.candidate_method == PLAYER_ANCHORED_HIT_CANDIDATE_METHOD
+            else "image_space_direction_change_hit_recall"
+            if candidate.candidate_method == IMAGE_SPACE_DIRECTION_CHANGE_HIT_CANDIDATE_METHOD
             else "image_space_net_axis_hit_recall"
             if candidate.candidate_method == IMAGE_SPACE_NET_AXIS_HIT_CANDIDATE_METHOD
             else "net_axis_reversal_hit_recall"
@@ -4350,6 +5372,7 @@ def _rejection_diagnostic_from_candidate(
         image_space_net_axis_reversal_recall=(
             candidate.image_space_net_axis_reversal_recall
         ),
+        image_space_direction_change_recall=candidate.image_space_direction_change_recall,
         overlap_suppression=overlap_suppression or candidate.overlap_suppression,
     )
 
@@ -4543,6 +5566,10 @@ def _event_candidate_observation_create(
         payload["image_space_net_axis_reversal_recall"] = (
             candidate.image_space_net_axis_reversal_recall
         )
+    if candidate.image_space_direction_change_recall is not None:
+        payload["image_space_direction_change_recall"] = (
+            candidate.image_space_direction_change_recall
+        )
     if candidate.overlap_suppression is not None:
         payload["overlap_suppression"] = candidate.overlap_suppression
     if candidate.original_observation_type is not None:
@@ -4686,6 +5713,10 @@ def _event_candidate_diagnostic_observation_create(
     if diagnostic.image_space_net_axis_reversal_recall is not None:
         payload["image_space_net_axis_reversal_recall"] = (
             diagnostic.image_space_net_axis_reversal_recall
+        )
+    if diagnostic.image_space_direction_change_recall is not None:
+        payload["image_space_direction_change_recall"] = (
+            diagnostic.image_space_direction_change_recall
         )
     if diagnostic.overlap_suppression is not None:
         payload["overlap_suppression"] = diagnostic.overlap_suppression
@@ -5001,7 +6032,7 @@ def _register_model(session: Session) -> ModelRegistry:
         select(ModelRegistry)
         .where(
             ModelRegistry.name == "hit-bounce-candidate-evidence",
-            ModelRegistry.version == "v0.2.6",
+            ModelRegistry.version == "v0.2.7",
             ModelRegistry.model_family == "event_candidate",
             ModelRegistry.source == "apps.worker.services.hit_bounce_candidates",
         )
@@ -5011,7 +6042,7 @@ def _register_model(session: Session) -> ModelRegistry:
         return existing
     model = ModelRegistry(
         name="hit-bounce-candidate-evidence",
-        version="v0.2.6",
+        version="v0.2.7",
         model_family="event_candidate",
         source="apps.worker.services.hit_bounce_candidates",
         metadata_jsonb={
@@ -5019,6 +6050,9 @@ def _register_model(session: Session) -> ModelRegistry:
             "hit_candidate_method": HIT_CANDIDATE_METHOD,
             "image_space_net_axis_hit_candidate_method": (
                 IMAGE_SPACE_NET_AXIS_HIT_CANDIDATE_METHOD
+            ),
+            "image_space_direction_change_hit_candidate_method": (
+                IMAGE_SPACE_DIRECTION_CHANGE_HIT_CANDIDATE_METHOD
             ),
             "player_anchored_hit_candidate_method": PLAYER_ANCHORED_HIT_CANDIDATE_METHOD,
             "bounce_candidate_method": BOUNCE_CANDIDATE_METHOD,
@@ -5040,7 +6074,7 @@ def _create_runtime_config(
 ) -> RuntimeConfig:
     runtime_config = RuntimeConfig(
         config_name="hit-bounce-candidate-evidence-config",
-        config_version="v0.2.6",
+        config_version="v0.2.7",
         payload_jsonb={
             "candidate_method": EVENT_CANDIDATE_METHOD,
             "source_ball_trajectory_run_id": ball_trajectory_run_id,
@@ -5100,7 +6134,7 @@ def _create_step(
     now = datetime.now(UTC)
     step = ProcessingStep(
         run_id=run.id,
-        step_name="image_space_net_axis_hit_recall_v026",
+        step_name="image_space_direction_change_hit_recall_v027",
         step_status="running",
         started_at=now,
         runtime_config_id=runtime_config.id,
@@ -5325,6 +6359,37 @@ def _validate_config(config: HitBounceCandidateConfig) -> dict[str, Any] | None:
         return _failed(
             "invalid_image_space_net_axis_dedupe_distance_pixels",
             "image_space_net_axis_dedupe_distance_pixels must be greater than zero",
+        )
+    if config.image_space_direction_change_lookback_ms <= 0:
+        return _failed(
+            "invalid_image_space_direction_change_lookback_ms",
+            "image_space_direction_change_lookback_ms must be greater than zero",
+        )
+    if config.image_space_direction_change_lookahead_ms <= 0:
+        return _failed(
+            "invalid_image_space_direction_change_lookahead_ms",
+            "image_space_direction_change_lookahead_ms must be greater than zero",
+        )
+    if config.image_space_direction_change_min_vector_pixels <= 0:
+        return _failed(
+            "invalid_image_space_direction_change_min_vector_pixels",
+            "image_space_direction_change_min_vector_pixels must be greater than zero",
+        )
+    if config.image_space_direction_change_min_delta_degrees <= 0:
+        return _failed(
+            "invalid_image_space_direction_change_min_delta_degrees",
+            "image_space_direction_change_min_delta_degrees must be greater than zero",
+        )
+    if config.image_space_direction_change_min_pre_post_gap_ms < 0:
+        return _failed(
+            "invalid_image_space_direction_change_min_pre_post_gap_ms",
+            "image_space_direction_change_min_pre_post_gap_ms must be greater "
+            "than or equal to zero",
+        )
+    if config.image_space_direction_change_dedupe_distance_pixels <= 0:
+        return _failed(
+            "invalid_image_space_direction_change_dedupe_distance_pixels",
+            "image_space_direction_change_dedupe_distance_pixels must be greater than zero",
         )
     return None
 

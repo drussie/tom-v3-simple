@@ -3199,6 +3199,45 @@ function SelectedEvidencePanel({
                 )}`
           }
         />
+        <DetailRow
+          label="image direction player required"
+          value={
+            item.image_space_direction_change_recall === null ||
+            item.image_space_direction_change_recall === undefined
+              ? "n/a"
+              : String(
+                  item.image_space_direction_change_recall.player_proximity_required ??
+                    "n/a"
+                )
+          }
+        />
+        <DetailRow
+          label="image direction delta"
+          value={
+            item.image_space_direction_change_recall === null ||
+            item.image_space_direction_change_recall === undefined
+              ? "n/a"
+              : `${String(
+                  item.image_space_direction_change_recall.image_direction_delta_degrees ??
+                    "n/a"
+                )}°`
+          }
+        />
+        <DetailRow
+          label="image direction window"
+          value={
+            item.image_space_direction_change_recall === null ||
+            item.image_space_direction_change_recall === undefined
+              ? "n/a"
+              : `${String(
+                  item.image_space_direction_change_recall.incoming_frame ?? "n/a"
+                )} → ${String(
+                  item.image_space_direction_change_recall.anchor_frame ?? "n/a"
+                )} → ${String(
+                  item.image_space_direction_change_recall.outgoing_frame ?? "n/a"
+                )}`
+          }
+        />
         {item.player_proximity_gate !== null ? (
           <>
             <DetailRow

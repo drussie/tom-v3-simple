@@ -99,3 +99,9 @@ fallback, not universal court geometry or true ball height. An image-space rever
 by camera perspective, detection gaps, projection artifacts, or a real hit-like event. It does not
 prove racket contact and does not establish bounce truth, in/out, score, rally/point state, player
 identity, accepted/rejected lifecycle, or adjudication.
+
+## Follow-On
+
+Image-Space Direction-Change Hit Recall v0.2.7 extends this idea from a single broadcast image-y
+axis reversal to a full 2D incoming/outgoing image-vector angle change. It keeps player proximity as
+diagnostic support only and remains candidate evidence rather than hit truth.

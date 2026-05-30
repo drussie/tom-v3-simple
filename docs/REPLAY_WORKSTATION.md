@@ -156,6 +156,14 @@ frames, image-axis deltas, image points, and `player_proximity_required = false`
 is intended for airborne hit-like candidate events where court-plane homography may be unreliable;
 it is still a `HIT CANDIDATE`, not hit truth.
 
+Image-Space Direction-Change Hit Recall v0.2.7 can add
+`image_space_direction_change_hit_candidate_v027` markers when the full 2D broadcast image vector
+changes direction across an anchor point. Replay selected evidence exposes
+`image_space_direction_change_recall`, including incoming/anchor/outgoing image points, pre/post
+vectors, direction angles, angle delta, and `player_proximity_required = false`. Weak direction
+changes that sit immediately before a bounce candidate are suppressed as diagnostics. This remains
+a `HIT CANDIDATE`, not contact truth.
+
 ## What 6A Added
 
 - `GET /media/{media_id}/replay-info`

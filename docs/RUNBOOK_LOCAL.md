@@ -906,6 +906,15 @@ repair can use `ball_court_projection_candidate.image_point` rows directly, so a
 projection span can recover a hit candidate even when it was not persisted as a trajectory segment.
 It remains candidate evidence only, not hit truth, bounce truth, in/out, score, or adjudication.
 
+The v0.2.7 image-space direction-change hit recall repair adds
+`image_space_direction_change_hit_candidate_v027` candidates from full 2D broadcast image vector
+angle changes. The direction method is
+`broadcast_image_2d_vector_direction_change_v027`. Player proximity is not required; it is
+diagnostic/confidence support only. Weak direction-change candidates immediately before bounce
+candidates are suppressed as diagnostics to avoid restoring false open-court hit-over-bounce
+markers. This remains candidate evidence only, not hit truth, bounce truth, in/out, score, or
+adjudication.
+
 Replay can show those candidates in two places:
 
 - the normalized court mini-map, using candidate court-template coordinates
