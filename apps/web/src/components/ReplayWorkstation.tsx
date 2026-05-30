@@ -3036,6 +3036,47 @@ function SelectedEvidencePanel({
         <DetailRow label="confidence" value={formatConfidence(item.confidence)} />
         <DetailRow label="candidate method" value={item.candidate_method ?? "n/a"} />
         <DetailRow label="classification priority" value={item.classification_priority ?? "n/a"} />
+        <DetailRow
+          label="court side zone"
+          value={String(item.court_side_zone?.side ?? "n/a")}
+        />
+        <DetailRow
+          label="player contact zone"
+          value={
+            item.player_contact_zone === null || item.player_contact_zone === undefined
+              ? "n/a"
+              : String(item.player_contact_zone.in_contact_zone ?? "n/a")
+          }
+        />
+        <DetailRow
+          label="court landing zone"
+          value={
+            item.court_landing_zone === null || item.court_landing_zone === undefined
+              ? "n/a"
+              : String(item.court_landing_zone.landing_zone_candidate ?? "n/a")
+          }
+        />
+        <DetailRow
+          label="reclassification"
+          value={
+            item.candidate_reclassification === null ||
+            item.candidate_reclassification === undefined
+              ? "n/a"
+              : `${String(item.candidate_reclassification.original_candidate_type ?? "n/a")} → ${String(
+                  item.candidate_reclassification.final_candidate_type ?? "n/a"
+                )}`
+          }
+        />
+        <DetailRow
+          label="sequence prior"
+          value={
+            item.candidate_sequence === null || item.candidate_sequence === undefined
+              ? "n/a"
+              : `${String(item.candidate_sequence.previous_candidate_type ?? "start")} → expected ${String(
+                  item.candidate_sequence.expected_candidate_type ?? "n/a"
+                )}`
+          }
+        />
         {item.player_proximity_gate !== null ? (
           <>
             <DetailRow

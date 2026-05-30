@@ -873,6 +873,13 @@ reduction for bounce candidates. The v0.2.1 repair also writes
 contexts can be inspected. These are candidate markers and diagnostics only. They are not hit truth,
 bounce truth, in/out truth, rally/point/score logic, or adjudication.
 
+The v0.2.2 side-zone sequence repair preserves the 2-hit / 2-bounce sample-point recall while adding
+`court_side_zone`, `player_contact_zone`, `court_landing_zone`, `candidate_reclassification`, and
+`candidate_sequence` diagnostics. CLI summaries now include raw candidate counts, final candidate
+counts, reclassification counts, `sequence_prior_applied_count`, and
+`physics_heuristic_version = v0.2.2`. The sequence pass is a candidate label repair only; it does
+not create hit truth, bounce truth, in/out, score, or adjudication.
+
 Replay can show those candidates in two places:
 
 - the normalized court mini-map, using candidate court-template coordinates

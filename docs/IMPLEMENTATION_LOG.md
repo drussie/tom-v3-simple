@@ -2335,3 +2335,31 @@ This repair adds:
 The local bridge smoke run produced 2 `hit_candidate` observations, 2 `bounce_candidate`
 observations, and 29 rejection diagnostics for the sample point. Candidate diagnostics explain
 missing or suppressed contexts; they are not truth, in/out, score, or adjudication.
+
+## Hit/Bounce Side-Zone + Sequence Classification Repair v0.2.2
+
+Status: complete
+
+### Goal
+
+Preserve the v0.2.1 event candidate recall while correcting two visible sample-point label errors
+with bounded side-zone and sequence context.
+
+### Notes
+
+This repair adds:
+
+- `court_side_zone`
+- `player_contact_zone`
+- `court_landing_zone`
+- `candidate_reclassification`
+- `candidate_sequence`
+- CLI summary fields for raw counts, final counts, reclassification counts, and
+  `physics_heuristic_version = v0.2.2`
+
+The local bridge smoke run produced 2 `hit_candidate` observations, 2 `bounce_candidate`
+observations, and 29 rejection diagnostics. It reclassified one raw hit candidate to a
+`bounce_candidate` and one raw bounce candidate to a `hit_candidate`.
+
+The side-zone sequence pass is candidate-label repair only. It does not add hit truth, bounce truth,
+in/out, rally/point/score logic, player identity, accepted/rejected lifecycle, or adjudication.

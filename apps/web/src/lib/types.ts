@@ -1022,6 +1022,11 @@ export interface ReplayEventCandidateOverlay {
   net_axis_reversal: ReplayEventCandidateNetAxisReversal | null;
   vertical_motion_proxy: ReplayEventCandidateVerticalMotionProxy | null;
   speed_reduction: ReplayEventCandidateSpeedReduction | null;
+  court_side_zone?: Record<string, unknown> | null;
+  player_contact_zone?: Record<string, unknown> | null;
+  court_landing_zone?: Record<string, unknown> | null;
+  candidate_reclassification?: Record<string, unknown> | null;
+  candidate_sequence?: Record<string, unknown> | null;
   source_ball_trajectory_run_id: string | null;
   source_ball_trajectory_observation_id: string | null;
   source_court_projection_run_id: string | null;
@@ -1362,6 +1367,11 @@ export interface ReplayEventCandidateTimelineItem {
   net_axis_reversal: ReplayEventCandidateNetAxisReversal | null;
   vertical_motion_proxy: ReplayEventCandidateVerticalMotionProxy | null;
   speed_reduction: ReplayEventCandidateSpeedReduction | null;
+  court_side_zone?: Record<string, unknown> | null;
+  player_contact_zone?: Record<string, unknown> | null;
+  court_landing_zone?: Record<string, unknown> | null;
+  candidate_reclassification?: Record<string, unknown> | null;
+  candidate_sequence?: Record<string, unknown> | null;
   source_ball_trajectory_observation_id: string | null;
   source_ball_court_projection_observation_id: string | null;
   source_player_court_projection_observation_id: string | null;

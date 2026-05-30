@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import math
 from collections import Counter
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import UTC, datetime
 from typing import Any, Literal
 
@@ -39,15 +39,20 @@ EVENT_CANDIDATE_OBSERVATION_TYPES = {
     BOUNCE_CANDIDATE_OBSERVATION_TYPE,
     EVENT_CANDIDATE_REJECTION_DIAGNOSTIC_OBSERVATION_TYPE,
 }
-HIT_CANDIDATE_METHOD = "net_axis_reversal_player_proximity_hit_candidate_v021"
+HIT_CANDIDATE_METHOD = "net_axis_reversal_player_proximity_hit_candidate_v022"
 HIT_FALLBACK_CANDIDATE_METHOD = (
-    "player_proximate_speed_reduction_hit_candidate_fallback_v021"
+    "player_proximate_speed_reduction_hit_candidate_fallback_v022"
 )
-BOUNCE_CANDIDATE_METHOD = "image_vertical_proxy_speed_reduction_bounce_candidate_v021"
+BOUNCE_CANDIDATE_METHOD = "image_vertical_proxy_speed_reduction_bounce_candidate_v022"
 BOUNCE_FALLBACK_CANDIDATE_METHOD = (
-    "image_vertical_proxy_speed_reduction_bounce_candidate_v021_fallback"
+    "image_vertical_proxy_speed_reduction_bounce_candidate_v022_fallback"
 )
-EVENT_CANDIDATE_METHOD = "hit_bounce_recall_diagnostics_candidate_evidence_v021"
+SIDE_ZONE_SEQUENCE_HIT_METHOD = "side_zone_sequence_hit_candidate_v022"
+SIDE_ZONE_SEQUENCE_BOUNCE_METHOD = "side_zone_sequence_bounce_candidate_v022"
+EVENT_CANDIDATE_METHOD = "hit_bounce_side_zone_sequence_candidate_evidence_v022"
+COURT_SIDE_SPLIT_Y = 0.50
+COURT_MIDCOURT_MARGIN_Y = 0.05
+COURT_Y_CONVENTION = "court_y_low_near_high_far_v022"
 DEFAULT_HIT_PLAYER_DISTANCE_MAX_TEMPLATE = 0.18
 DEFAULT_HIT_PLAYER_REVIEW_DISTANCE_MAX_TEMPLATE = 0.33
 DEFAULT_HIT_NEAR_PLAYER_DIRECTION_DELTA_DEGREES = 15.0
@@ -205,6 +210,13 @@ class EventCandidateDraft:
     net_axis_reversal: dict[str, Any] | None = None
     vertical_motion_proxy: dict[str, Any] | None = None
     speed_reduction: dict[str, Any] | None = None
+    original_observation_type: Literal["hit_candidate", "bounce_candidate"] | None = None
+    original_candidate_method: str | None = None
+    court_side_zone: dict[str, Any] | None = None
+    player_contact_zone: dict[str, Any] | None = None
+    court_landing_zone: dict[str, Any] | None = None
+    candidate_reclassification: dict[str, Any] | None = None
+    candidate_sequence: dict[str, Any] | None = None
 
     @property
     def timestamp_ms(self) -> int:
@@ -278,6 +290,7 @@ def build_hit_bounce_candidates_plan(
             "load_source_ball_projection_image_points",
             "evaluate_net_axis_reversal_vertical_proxy_speed_and_player_proximity",
             "dedupe_candidate_clusters",
+            "apply_side_zone_sequence_classification_prior",
             "persist_hit_and_bounce_candidate_observations",
             "write_candidate_source_lineage",
         ],
@@ -312,7 +325,8 @@ def build_hit_bounce_candidates_plan(
         "candidate_method": EVENT_CANDIDATE_METHOD,
         "hit_candidate_method": HIT_CANDIDATE_METHOD,
         "bounce_candidate_method": BOUNCE_CANDIDATE_METHOD,
-        "classification_priority": "hit_first_when_player_proximate",
+        "classification_priority": "side_zone_sequence_candidate_prior",
+        "court_y_convention": COURT_Y_CONVENTION,
         "coordinate_space": CoordinateSpace.court_template_2d,
         "court_template_name": COURT_TEMPLATE_NAME,
         "court_template_version": COURT_TEMPLATE_VERSION,
@@ -519,6 +533,13 @@ def build_hit_bounce_candidates(
         rejection_diagnostics.extend(deduped_hit_rejections)
         rejection_diagnostics.extend(deduped_bounce_rejections)
         rejection_diagnostics.extend(suppressed_bounce_rejections)
+        (
+            final_candidates,
+            sequence_reclassification_summary,
+        ) = apply_side_zone_sequence_classification(
+            [*deduped_hits, *deduped_bounces],
+            config=config,
+        )
         writer = ObservationWriter(session)
         observations = _persist_event_candidates_and_diagnostics(
             writer=writer,
@@ -529,7 +550,7 @@ def build_hit_bounce_candidates(
             runtime_config=runtime_config,
             ball_trajectory_run_id=ball_trajectory_run_id,
             court_projection_run_id=court_projection_run_id,
-            candidates=[*deduped_hits, *deduped_bounces],
+            candidates=final_candidates,
             diagnostics=rejection_diagnostics,
         )
     except Exception as exc:
@@ -543,8 +564,21 @@ def build_hit_bounce_candidates(
         "evaluated_trajectory_points": evaluated_contexts,
         "hit_candidate_count": len(hit_drafts),
         "bounce_candidate_count": len(bounce_drafts),
+        "raw_hit_candidate_count": len(hit_drafts),
+        "raw_bounce_candidate_count": len(bounce_drafts),
         "deduped_hit_candidate_count": len(deduped_hits),
         "deduped_bounce_candidate_count": len(deduped_bounces),
+        "final_hit_candidate_count": sum(
+            1
+            for candidate in final_candidates
+            if candidate.observation_type == HIT_CANDIDATE_OBSERVATION_TYPE
+        ),
+        "final_bounce_candidate_count": sum(
+            1
+            for candidate in final_candidates
+            if candidate.observation_type == BOUNCE_CANDIDATE_OBSERVATION_TYPE
+        ),
+        **sequence_reclassification_summary,
         "suppressed_bounce_conflict_count": suppressed_bounce_conflict_count,
         "rejected_context_count": len(rejection_diagnostics),
         "rejection_reasons": _rejection_reason_counts(rejection_diagnostics),
@@ -552,8 +586,8 @@ def build_hit_bounce_candidates(
             EVENT_CANDIDATE_REJECTION_DIAGNOSTIC_OBSERVATION_TYPE,
             0,
         ),
-        "classification_priority": "hit_first_when_player_proximate",
-        "physics_heuristic_version": "v0.2.1",
+        "classification_priority": "side_zone_sequence_candidate_prior",
+        "physics_heuristic_version": "v0.2.2",
     }
     _mark_completed(
         session=session,
@@ -1106,6 +1140,266 @@ def suppress_bounces_near_hits(
     return filtered_bounces, suppressed_count, rejections
 
 
+def apply_side_zone_sequence_classification(
+    candidates: list[EventCandidateDraft],
+    *,
+    config: HitBounceCandidateConfig,
+) -> tuple[list[EventCandidateDraft], dict[str, int]]:
+    ordered = sorted(candidates, key=lambda item: (item.timestamp_ms, item.frame_number))
+    final_candidates: list[EventCandidateDraft] = []
+    previous_final_type: str | None = None
+    reclassified_hit_to_bounce_count = 0
+    reclassified_bounce_to_hit_count = 0
+    sequence_prior_applied_count = 0
+    for sequence_index, candidate in enumerate(ordered):
+        original_type = candidate.original_observation_type or candidate.observation_type
+        expected_type = _expected_next_candidate_type(previous_final_type)
+        court_side_zone = _court_side_zone_payload(candidate.trajectory_context.current)
+        player_contact_zone = _player_contact_zone_payload(
+            candidate,
+            config=config,
+            court_side_zone=court_side_zone,
+        )
+        court_landing_zone = _court_landing_zone_payload(
+            candidate,
+            config=config,
+            court_side_zone=court_side_zone,
+            player_contact_zone=player_contact_zone,
+        )
+        final_type = candidate.observation_type
+        final_method = candidate.candidate_method
+        reclassification_reason: str | None = None
+        sequence_prior_applied = False
+        if (
+            candidate.observation_type == HIT_CANDIDATE_OBSERVATION_TYPE
+            and expected_type == BOUNCE_CANDIDATE_OBSERVATION_TYPE
+            and _hit_candidate_can_be_landing_zone_bounce(
+                candidate,
+                court_landing_zone=court_landing_zone,
+            )
+        ):
+            final_type = BOUNCE_CANDIDATE_OBSERVATION_TYPE
+            final_method = SIDE_ZONE_SEQUENCE_BOUNCE_METHOD
+            reclassification_reason = "court_landing_zone_over_player_contact_zone"
+            sequence_prior_applied = True
+            reclassified_hit_to_bounce_count += 1
+        elif (
+            candidate.observation_type == BOUNCE_CANDIDATE_OBSERVATION_TYPE
+            and player_contact_zone.get("in_contact_zone") is True
+            and (
+                expected_type == HIT_CANDIDATE_OBSERVATION_TYPE
+                or player_contact_zone.get("side_matches_player_track") is True
+            )
+        ):
+            final_type = HIT_CANDIDATE_OBSERVATION_TYPE
+            final_method = SIDE_ZONE_SEQUENCE_HIT_METHOD
+            reclassification_reason = "player_contact_zone_over_court_landing_zone"
+            sequence_prior_applied = expected_type == HIT_CANDIDATE_OBSERVATION_TYPE
+            reclassified_bounce_to_hit_count += 1
+        if sequence_prior_applied:
+            sequence_prior_applied_count += 1
+        candidate_sequence = {
+            "sequence_index": sequence_index,
+            "previous_candidate_type": previous_final_type,
+            "expected_candidate_type": expected_type,
+            "sequence_prior_applied": sequence_prior_applied,
+            "sequence_pattern": "hit_bounce_alternation_v0",
+        }
+        candidate_reclassification = {
+            "original_candidate_type": original_type,
+            "final_candidate_type": final_type,
+            "reason": reclassification_reason,
+            "reclassified": reclassification_reason is not None,
+        }
+        reason_codes = _final_reason_codes(
+            candidate,
+            final_type=final_type,
+            reclassification_reason=reclassification_reason,
+            sequence_prior_applied=sequence_prior_applied,
+        )
+        final_candidate = replace(
+            candidate,
+            observation_type=final_type,  # type: ignore[arg-type]
+            candidate_method=final_method,
+            reason_codes=reason_codes,
+            original_observation_type=original_type,  # type: ignore[arg-type]
+            original_candidate_method=(
+                candidate.original_candidate_method or candidate.candidate_method
+            ),
+            court_side_zone=court_side_zone,
+            player_contact_zone=player_contact_zone,
+            court_landing_zone=court_landing_zone,
+            candidate_reclassification=candidate_reclassification,
+            candidate_sequence=candidate_sequence,
+            candidate_decision={
+                "selected_candidate_type": final_type,
+                "original_candidate_type": original_type,
+                "suppressed_candidate_types": (
+                    [BOUNCE_CANDIDATE_OBSERVATION_TYPE]
+                    if final_type == HIT_CANDIDATE_OBSERVATION_TYPE
+                    else []
+                ),
+                "reason": reclassification_reason
+                or candidate.candidate_decision.get("reason"),
+                "classification_priority": "side_zone_sequence_candidate_prior",
+            },
+        )
+        final_candidates.append(final_candidate)
+        previous_final_type = final_type
+    return final_candidates, {
+        "reclassified_hit_to_bounce_count": reclassified_hit_to_bounce_count,
+        "reclassified_bounce_to_hit_count": reclassified_bounce_to_hit_count,
+        "sequence_prior_applied_count": sequence_prior_applied_count,
+    }
+
+
+def _expected_next_candidate_type(previous_final_type: str | None) -> str | None:
+    if previous_final_type == HIT_CANDIDATE_OBSERVATION_TYPE:
+        return BOUNCE_CANDIDATE_OBSERVATION_TYPE
+    if previous_final_type == BOUNCE_CANDIDATE_OBSERVATION_TYPE:
+        return HIT_CANDIDATE_OBSERVATION_TYPE
+    return None
+
+
+def _court_side_zone_payload(point: TrajectoryPoint) -> dict[str, Any]:
+    if abs(point.court_y - COURT_SIDE_SPLIT_Y) <= COURT_MIDCOURT_MARGIN_Y:
+        side = "midcourt_net_zone"
+    elif point.court_y < COURT_SIDE_SPLIT_Y:
+        side = "near_side"
+    else:
+        side = "far_side"
+    return {
+        "side": side,
+        "court_y": _round(point.court_y),
+        "side_split_y": COURT_SIDE_SPLIT_Y,
+        "midcourt_margin_y": COURT_MIDCOURT_MARGIN_Y,
+        "court_y_convention": COURT_Y_CONVENTION,
+    }
+
+
+def _player_contact_zone_payload(
+    candidate: EventCandidateDraft,
+    *,
+    config: HitBounceCandidateConfig,
+    court_side_zone: dict[str, Any],
+) -> dict[str, Any]:
+    nearest_player = candidate.nearest_player
+    if nearest_player is None:
+        return {
+            "nearest_player_found": False,
+            "track_role_candidate": None,
+            "distance_template_units": None,
+            "time_delta_ms": None,
+            "in_contact_zone": False,
+            "strong_contact_zone": False,
+            "threshold": config.hit_player_review_distance_max_template,
+            "strong_threshold": config.hit_player_distance_max_template,
+            "side_matches_player_track": False,
+        }
+    side_matches = _court_side_matches_player_role(
+        court_side_zone.get("side"),
+        nearest_player.player.track_role_candidate,
+    )
+    in_contact_zone = (
+        nearest_player.distance_template_units
+        <= config.hit_player_review_distance_max_template
+        and side_matches
+    )
+    strong_contact_zone = (
+        nearest_player.distance_template_units <= config.hit_player_distance_max_template
+        and candidate.net_axis_reversal is not None
+        and candidate.net_axis_reversal.get("reversal") is True
+        and side_matches
+    )
+    return {
+        "nearest_player_found": True,
+        "track_role_candidate": nearest_player.player.track_role_candidate,
+        "track_candidate_id": nearest_player.player.track_candidate_id,
+        "distance_template_units": nearest_player.distance_template_units,
+        "time_delta_ms": nearest_player.time_delta_ms,
+        "in_contact_zone": in_contact_zone,
+        "strong_contact_zone": strong_contact_zone,
+        "threshold": config.hit_player_review_distance_max_template,
+        "strong_threshold": config.hit_player_distance_max_template,
+        "side_matches_player_track": side_matches,
+    }
+
+
+def _court_landing_zone_payload(
+    candidate: EventCandidateDraft,
+    *,
+    config: HitBounceCandidateConfig,
+    court_side_zone: dict[str, Any],
+    player_contact_zone: dict[str, Any],
+) -> dict[str, Any]:
+    inside_or_near = _inside_or_near_template(
+        candidate.trajectory_context.current,
+        config.bounce_inside_template_margin,
+    )
+    away_from_player = (
+        candidate.nearest_player is None
+        or candidate.nearest_player.distance_template_units
+        >= config.bounce_player_distance_min_template
+    )
+    landing_zone_candidate = inside_or_near and (
+        away_from_player or player_contact_zone.get("strong_contact_zone") is not True
+    )
+    return {
+        "inside_or_near_court": inside_or_near,
+        "away_from_player": away_from_player,
+        "side": court_side_zone.get("side"),
+        "landing_zone_candidate": landing_zone_candidate,
+        "margin": config.bounce_inside_template_margin,
+    }
+
+
+def _court_side_matches_player_role(side: Any, role: str | None) -> bool:
+    if role == "near_player_track_candidate":
+        return side == "near_side"
+    if role == "far_player_track_candidate":
+        return side == "far_side"
+    return False
+
+
+def _hit_candidate_can_be_landing_zone_bounce(
+    candidate: EventCandidateDraft,
+    *,
+    court_landing_zone: dict[str, Any],
+) -> bool:
+    if court_landing_zone.get("landing_zone_candidate") is not True:
+        return False
+    if candidate.candidate_method == HIT_FALLBACK_CANDIDATE_METHOD:
+        return True
+    return (
+        candidate.net_axis_reversal is None
+        or candidate.net_axis_reversal.get("reversal") is not True
+    )
+
+
+def _final_reason_codes(
+    candidate: EventCandidateDraft,
+    *,
+    final_type: str,
+    reclassification_reason: str | None,
+    sequence_prior_applied: bool,
+) -> list[str]:
+    reason_codes = list(dict.fromkeys(candidate.reason_codes))
+    if final_type == HIT_CANDIDATE_OBSERVATION_TYPE:
+        reason_codes.extend(["player_contact_zone", "side_matches_player_track"])
+        if sequence_prior_applied:
+            reason_codes.append("sequence_hit_prior")
+    else:
+        reason_codes.append("court_landing_zone")
+        if sequence_prior_applied:
+            reason_codes.append("sequence_bounce_prior")
+    if reclassification_reason is not None:
+        if reclassification_reason == "court_landing_zone_over_player_contact_zone":
+            reason_codes.append("reclassified_from_hit_candidate")
+        elif reclassification_reason == "player_contact_zone_over_court_landing_zone":
+            reason_codes.append("reclassified_from_bounce_candidate")
+    return list(dict.fromkeys(reason_codes))
+
+
 def _hit_signal_for_context(
     context: TrajectoryContext,
     nearest_player: NearestPlayerContext | None,
@@ -1457,7 +1751,7 @@ def _rejection_diagnostic_from_candidate(
         "attempted_candidate_type": candidate.observation_type,
         "reason": decision_reason,
         "rejection_reasons": rejection_reasons,
-        "classification_priority": "hit_first_when_player_proximate",
+        "classification_priority": "side_zone_sequence_candidate_prior",
     }
     if suppressed_by_observation_type is not None:
         candidate_decision["suppressed_by_observation_type"] = (
@@ -1623,7 +1917,7 @@ def _event_candidate_observation_create(
         "reason_codes": candidate.reason_codes,
         "confidence": candidate.confidence,
         "candidate_method": candidate.candidate_method,
-        "classification_priority": "hit_first_when_player_proximate",
+        "classification_priority": "side_zone_sequence_candidate_prior",
         "player_proximity_gate": candidate.player_proximity_gate,
         "candidate_decision": candidate.candidate_decision,
         "coordinate_space": CoordinateSpace.court_template_2d,
@@ -1650,6 +1944,20 @@ def _event_candidate_observation_create(
         payload["vertical_motion_proxy"] = candidate.vertical_motion_proxy
     if candidate.speed_reduction is not None:
         payload["speed_reduction"] = candidate.speed_reduction
+    if candidate.court_side_zone is not None:
+        payload["court_side_zone"] = candidate.court_side_zone
+    if candidate.player_contact_zone is not None:
+        payload["player_contact_zone"] = candidate.player_contact_zone
+    if candidate.court_landing_zone is not None:
+        payload["court_landing_zone"] = candidate.court_landing_zone
+    if candidate.candidate_reclassification is not None:
+        payload["candidate_reclassification"] = candidate.candidate_reclassification
+    if candidate.candidate_sequence is not None:
+        payload["candidate_sequence"] = candidate.candidate_sequence
+    if candidate.original_observation_type is not None:
+        payload["original_candidate_type"] = candidate.original_observation_type
+    if candidate.original_candidate_method is not None:
+        payload["original_candidate_method"] = candidate.original_candidate_method
     lineage = [
         ObservationLineageCreate(
             parent_observation_id=current.trajectory_observation.id,
@@ -2019,7 +2327,7 @@ def _register_model(session: Session) -> ModelRegistry:
         select(ModelRegistry)
         .where(
             ModelRegistry.name == "hit-bounce-candidate-evidence",
-            ModelRegistry.version == "v0.2.1",
+            ModelRegistry.version == "v0.2.2",
             ModelRegistry.model_family == "event_candidate",
             ModelRegistry.source == "apps.worker.services.hit_bounce_candidates",
         )
@@ -2029,7 +2337,7 @@ def _register_model(session: Session) -> ModelRegistry:
         return existing
     model = ModelRegistry(
         name="hit-bounce-candidate-evidence",
-        version="v0.2.1",
+        version="v0.2.2",
         model_family="event_candidate",
         source="apps.worker.services.hit_bounce_candidates",
         metadata_jsonb={
@@ -2054,7 +2362,7 @@ def _create_runtime_config(
 ) -> RuntimeConfig:
     runtime_config = RuntimeConfig(
         config_name="hit-bounce-candidate-evidence-config",
-        config_version="v0.2.1",
+        config_version="v0.2.2",
         payload_jsonb={
             "candidate_method": EVENT_CANDIDATE_METHOD,
             "source_ball_trajectory_run_id": ball_trajectory_run_id,
@@ -2114,7 +2422,7 @@ def _create_step(
     now = datetime.now(UTC)
     step = ProcessingStep(
         run_id=run.id,
-        step_name="hit_bounce_recall_diagnostics_header_repair_v021",
+        step_name="hit_bounce_side_zone_sequence_repair_v022",
         step_status="running",
         started_at=now,
         runtime_config_id=runtime_config.id,

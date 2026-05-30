@@ -108,6 +108,10 @@ This registry makes TOM v3 Simple boundaries explicit.
 - Hit/Bounce Recall Diagnostics + Header Layout Repair v0.2.1 adds a bounded far-side recall
   fallback and rejection diagnostics, but the recovered markers remain candidate evidence rather
   than confirmed hit/bounce events.
+- Hit/Bounce Side-Zone + Sequence Classification Repair v0.2.2 can reclassify raw hit/bounce
+  candidates using court-side zones and a simple event-sequence prior. This improves operator-review
+  labels, but the sequence prior is heuristic candidate evidence only and is not rally, point,
+  score, in/out, or adjudication logic.
 - Event candidate video markers require a source ball court projection image point. If that point
   is unavailable, the candidate remains inspectable in replay but no broadcast-video marker is
   drawn.

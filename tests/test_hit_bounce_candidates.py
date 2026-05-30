@@ -20,7 +20,19 @@ from apps.api.services.replay import (
     build_event_candidate_timeline_items,
 )
 from apps.worker.cli import _handle_build_hit_bounce_candidates
-from apps.worker.services.hit_bounce_candidates import build_hit_bounce_candidates
+from apps.worker.services.hit_bounce_candidates import (
+    BOUNCE_CANDIDATE_METHOD,
+    HIT_CANDIDATE_METHOD,
+    HIT_FALLBACK_CANDIDATE_METHOD,
+    EventCandidateDraft,
+    HitBounceCandidateConfig,
+    NearestPlayerContext,
+    PlayerProjection,
+    TrajectoryContext,
+    TrajectoryPoint,
+    apply_side_zone_sequence_classification,
+    build_hit_bounce_candidates,
+)
 
 
 @pytest.fixture()
@@ -58,7 +70,7 @@ def test_hit_candidate_near_player_direction_change_has_lineage(
     projection_run = _seed_projection_run(
         db_session,
         media.id,
-        players=[(1, 33, 0.31, 0.22, "far_player_track_candidate")],
+        players=[(1, 33, 0.31, 0.22, "near_player_track_candidate")],
     )
 
     result = build_hit_bounce_candidates(
@@ -67,6 +79,7 @@ def test_hit_candidate_near_player_direction_change_has_lineage(
         ball_trajectory_run_id=trajectory_run.id,
         court_projection_run_id=projection_run.id,
         candidate_dedupe_ms=500,
+        hit_player_time_window_ms=40,
     )
 
     assert result["ok"] is True
@@ -173,7 +186,7 @@ def test_far_side_style_player_time_offset_hit_fallback(
         )
     )
     assert hit is not None
-    assert hit.payload_jsonb["candidate_method"].endswith("_fallback_v021")
+    assert hit.payload_jsonb["candidate_method"].endswith("_fallback_v022")
     assert "player_proximate_speed_change_fallback" in hit.payload_jsonb["reason_codes"]
     assert hit.payload_jsonb["net_axis_reversal"]["reversal"] is False
     assert hit.payload_jsonb["nearest_player"]["track_role_candidate"] == (
@@ -376,7 +389,9 @@ def test_player_proximate_trajectory_change_is_prioritized_as_hit(
     )
     assert hit is not None
     assert "player_proximate_event_priority" in hit.payload_jsonb["reason_codes"]
-    assert hit.payload_jsonb["classification_priority"] == "hit_first_when_player_proximate"
+    assert hit.payload_jsonb["classification_priority"] == (
+        "side_zone_sequence_candidate_prior"
+    )
     assert hit.payload_jsonb["player_proximity_gate"]["threshold"] == 0.33
     assert hit.payload_jsonb["candidate_decision"]["suppressed_candidate_types"] == [
         "bounce_candidate"
@@ -411,6 +426,7 @@ def test_conflict_resolution_prefers_hit_over_same_window_bounce(
         ball_trajectory_run_id=trajectory_run.id,
         court_projection_run_id=projection_run.id,
         candidate_dedupe_ms=500,
+        hit_player_time_window_ms=40,
     )
 
     assert result["ok"] is True
@@ -450,6 +466,7 @@ def test_candidate_dedupe_keeps_highest_confidence_per_window(
         ball_trajectory_run_id=trajectory_run.id,
         court_projection_run_id=projection_run.id,
         candidate_dedupe_ms=500,
+        hit_player_time_window_ms=40,
     )
 
     assert result["ok"] is True
@@ -519,7 +536,7 @@ def test_dedupe_does_not_suppress_valid_far_side_event_from_near_side_event(
             (2, 66, 0.40, 0.35),
             (29, 967, 0.4398, 0.8696),
             (30, 1000, 0.4420, 0.8880),
-            (31, 1033, 0.4434, 0.8939),
+            (31, 1033, 0.4434, 0.8390),
         ],
     )
     projection_run = _seed_projection_run(
@@ -537,6 +554,7 @@ def test_dedupe_does_not_suppress_valid_far_side_event_from_near_side_event(
         ball_trajectory_run_id=trajectory_run.id,
         court_projection_run_id=projection_run.id,
         candidate_dedupe_ms=500,
+        hit_player_time_window_ms=40,
     )
 
     assert result["ok"] is True
@@ -555,6 +573,111 @@ def test_dedupe_does_not_suppress_valid_far_side_event_from_near_side_event(
     ]
 
 
+def test_side_zone_sequence_reclassifies_sample_style_sequence() -> None:
+    candidates = [
+        _draft_event_candidate(
+            observation_type="hit_candidate",
+            frame=10,
+            timestamp_ms=333,
+            court_x=0.30,
+            court_y=0.16,
+            track_role_candidate="near_player_track_candidate",
+            player_distance=0.10,
+            candidate_method=HIT_CANDIDATE_METHOD,
+            net_axis_reversal=True,
+        ),
+        _draft_event_candidate(
+            observation_type="hit_candidate",
+            frame=30,
+            timestamp_ms=1000,
+            court_x=0.44,
+            court_y=0.89,
+            track_role_candidate="far_player_track_candidate",
+            player_distance=0.14,
+            candidate_method=HIT_FALLBACK_CANDIDATE_METHOD,
+            net_axis_reversal=False,
+        ),
+        _draft_event_candidate(
+            observation_type="bounce_candidate",
+            frame=81,
+            timestamp_ms=2700,
+            court_x=0.70,
+            court_y=0.21,
+            track_role_candidate="near_player_track_candidate",
+            player_distance=0.44,
+            candidate_method=BOUNCE_CANDIDATE_METHOD,
+            net_axis_reversal=False,
+        ),
+        _draft_event_candidate(
+            observation_type="bounce_candidate",
+            frame=180,
+            timestamp_ms=6000,
+            court_x=0.80,
+            court_y=0.20,
+            track_role_candidate="near_player_track_candidate",
+            player_distance=0.25,
+            candidate_method=BOUNCE_CANDIDATE_METHOD,
+            net_axis_reversal=False,
+        ),
+    ]
+
+    final_candidates, summary = apply_side_zone_sequence_classification(
+        candidates,
+        config=HitBounceCandidateConfig(),
+    )
+
+    assert [candidate.observation_type for candidate in final_candidates] == [
+        "hit_candidate",
+        "bounce_candidate",
+        "bounce_candidate",
+        "hit_candidate",
+    ]
+    assert summary == {
+        "reclassified_hit_to_bounce_count": 1,
+        "reclassified_bounce_to_hit_count": 1,
+        "sequence_prior_applied_count": 2,
+    }
+
+    first_hit, far_bounce, near_bounce, near_hit = final_candidates
+    assert first_hit.candidate_reclassification == {
+        "original_candidate_type": "hit_candidate",
+        "final_candidate_type": "hit_candidate",
+        "reason": None,
+        "reclassified": False,
+    }
+    assert first_hit.court_side_zone is not None
+    assert first_hit.court_side_zone["side"] == "near_side"
+    assert far_bounce.candidate_reclassification == {
+        "original_candidate_type": "hit_candidate",
+        "final_candidate_type": "bounce_candidate",
+        "reason": "court_landing_zone_over_player_contact_zone",
+        "reclassified": True,
+    }
+    assert far_bounce.candidate_method == "side_zone_sequence_bounce_candidate_v022"
+    assert far_bounce.court_side_zone is not None
+    assert far_bounce.court_side_zone["side"] == "far_side"
+    assert far_bounce.court_landing_zone is not None
+    assert far_bounce.court_landing_zone["landing_zone_candidate"] is True
+    assert far_bounce.candidate_sequence is not None
+    assert far_bounce.candidate_sequence["expected_candidate_type"] == "bounce_candidate"
+    assert "reclassified_from_hit_candidate" in far_bounce.reason_codes
+    assert "sequence_bounce_prior" in far_bounce.reason_codes
+
+    assert near_bounce.candidate_reclassification is not None
+    assert near_bounce.candidate_reclassification["reclassified"] is False
+    assert near_hit.candidate_reclassification is not None
+    assert near_hit.candidate_reclassification["original_candidate_type"] == (
+        "bounce_candidate"
+    )
+    assert near_hit.candidate_method == "side_zone_sequence_hit_candidate_v022"
+    assert near_hit.player_contact_zone is not None
+    assert near_hit.player_contact_zone["in_contact_zone"] is True
+    assert near_hit.candidate_sequence is not None
+    assert near_hit.candidate_sequence["expected_candidate_type"] == "hit_candidate"
+    assert "reclassified_from_bounce_candidate" in near_hit.reason_codes
+    assert "sequence_hit_prior" in near_hit.reason_codes
+
+
 def test_event_candidate_replay_payloads_are_exposed(db_session: Session) -> None:
     media = _seed_media(db_session)
     trajectory_run, _ = _seed_trajectory_run(
@@ -569,7 +692,7 @@ def test_event_candidate_replay_payloads_are_exposed(db_session: Session) -> Non
     projection_run = _seed_projection_run(
         db_session,
         media.id,
-        players=[(1, 33, 0.31, 0.22, "far_player_track_candidate")],
+        players=[(1, 33, 0.31, 0.22, "near_player_track_candidate")],
     )
     result = build_hit_bounce_candidates(
         session=db_session,
@@ -597,18 +720,28 @@ def test_event_candidate_replay_payloads_are_exposed(db_session: Session) -> Non
     assert overlays[0]["court_point"] == {"x": 0.3, "y": 0.2}
     assert overlays[0]["image_point"] == {"x": 300.0, "y": 100.0}
     assert overlays[0]["image_marker_source"] == "source_ball_court_projection_image_point"
-    assert overlays[0]["classification_priority"] == "hit_first_when_player_proximate"
+    assert overlays[0]["classification_priority"] == "side_zone_sequence_candidate_prior"
     assert overlays[0]["player_proximity_gate"]["nearest_player_found"] is True
     assert overlays[0]["candidate_decision"]["selected_candidate_type"] == "hit_candidate"
     assert overlays[0]["net_axis_reversal"]["reversal"] is True
     assert overlays[0]["vertical_motion_proxy"] is None
     assert overlays[0]["speed_reduction"] is None
+    assert overlays[0]["court_side_zone"]["side"] == "near_side"
+    assert overlays[0]["player_contact_zone"]["in_contact_zone"] is True
+    assert overlays[0]["candidate_reclassification"]["reclassified"] is False
+    assert overlays[0]["candidate_sequence"]["sequence_index"] == 0
     assert len(timeline_items) == 1
     assert timeline_items[0]["item_type"] == "hit_candidate"
     assert timeline_items[0]["image_point"] == {"x": 300.0, "y": 100.0}
     assert timeline_items[0]["image_marker_source"] == "source_ball_court_projection_image_point"
-    assert timeline_items[0]["classification_priority"] == "hit_first_when_player_proximate"
+    assert timeline_items[0]["classification_priority"] == (
+        "side_zone_sequence_candidate_prior"
+    )
     assert timeline_items[0]["net_axis_reversal"]["axis"] == "court_y"
+    assert timeline_items[0]["court_side_zone"]["side"] == "near_side"
+    assert timeline_items[0]["candidate_sequence"]["sequence_pattern"] == (
+        "hit_bounce_alternation_v0"
+    )
     assert timeline_items[0]["candidate_only"] is True
 
     persistent_overlays = build_event_candidate_overlay_items(
@@ -711,6 +844,111 @@ def test_hit_bounce_candidate_plan_only_and_cli_do_not_mutate(
 
     assert cli_result["ok"] is True
     assert cli_result["status"] == "planned"
+
+
+def _draft_event_candidate(
+    *,
+    observation_type: str,
+    frame: int,
+    timestamp_ms: int,
+    court_x: float,
+    court_y: float,
+    track_role_candidate: str,
+    player_distance: float,
+    candidate_method: str,
+    net_axis_reversal: bool,
+) -> EventCandidateDraft:
+    current = _trajectory_point(frame, timestamp_ms, court_x, court_y)
+    context = TrajectoryContext(
+        previous=_trajectory_point(frame - 1, timestamp_ms - 33, court_x, court_y - 0.03),
+        current=current,
+        next=_trajectory_point(frame + 1, timestamp_ms + 33, court_x, court_y + 0.03),
+        direction_before_degrees=-70.0,
+        direction_after_degrees=70.0,
+        direction_delta_degrees=140.0,
+        speed_before=0.8,
+        speed_after=0.5,
+        speed_delta_fraction=0.37,
+    )
+    player = PlayerProjection(
+        observation=Observation(id=f"player-projection-{frame}"),
+        frame_number=frame,
+        timestamp_ms=timestamp_ms,
+        court_x=court_x,
+        court_y=court_y,
+        track_candidate_id=f"{track_role_candidate}_001",
+        track_role_candidate=track_role_candidate,
+    )
+    nearest_player = NearestPlayerContext(
+        player=player,
+        distance_template_units=player_distance,
+        time_delta_ms=0,
+    )
+    return EventCandidateDraft(
+        observation_type=observation_type,  # type: ignore[arg-type]
+        candidate_method=candidate_method,
+        trajectory_context=context,
+        nearest_player=nearest_player,
+        reason_codes=["near_main_player_projection"],
+        confidence=0.5,
+        player_proximity_gate={
+            "nearest_player_found": True,
+            "distance_template_units": player_distance,
+            "time_delta_ms": 0,
+            "threshold": HitBounceCandidateConfig().hit_player_review_distance_max_template,
+        },
+        candidate_decision={
+            "selected_candidate_type": observation_type,
+            "reason": "synthetic_test_candidate",
+        },
+        net_axis_reversal={
+            "axis": "court_y",
+            "vy_before": -0.03,
+            "vy_after": 0.03,
+            "reversal": net_axis_reversal,
+            "min_axis_delta": 0.015,
+        },
+        vertical_motion_proxy=(
+            {
+                "proxy_type": "image_y_descending_to_ascending_v0",
+                "descending_to_ascending": True,
+            }
+            if observation_type == "bounce_candidate"
+            else None
+        ),
+        speed_reduction=(
+            {
+                "speed_before": 0.8,
+                "speed_after": 0.5,
+                "speed_reduction_fraction": 0.37,
+                "speed_reduced": True,
+            }
+            if observation_type == "bounce_candidate"
+            else None
+        ),
+    )
+
+
+def _trajectory_point(
+    frame: int,
+    timestamp_ms: int,
+    court_x: float,
+    court_y: float,
+) -> TrajectoryPoint:
+    return TrajectoryPoint(
+        trajectory_observation=Observation(id=f"trajectory-{frame}-{timestamp_ms}"),
+        frame_number=frame,
+        timestamp_ms=timestamp_ms,
+        court_x=court_x,
+        court_y=court_y,
+        source_ball_court_projection_observation_id=f"ball-projection-{frame}",
+        source_homography_observation_id=f"homography-{frame}",
+        homography_time_delta_ms=0,
+        homography_carried_forward=False,
+        inside_template_bounds=True,
+        image_x=court_x * 1000.0,
+        image_y=court_y * 500.0,
+    )
 
 
 def _seed_media(session: Session) -> MediaAsset:

@@ -91,3 +91,12 @@ BOUNCE_FALLBACK_MIN_SPEED_REDUCTION_FRACTION
 
 The repair improves recall and diagnostic visibility only. It does not add accepted/rejected event
 truth, in/out calls, scoring, point logic, player identity, server/receiver logic, or adjudication.
+
+## Follow-Up v0.2.2
+
+The follow-up Hit/Bounce Side-Zone + Sequence Classification Repair v0.2.2 adds
+`court_side_zone`, `player_contact_zone`, `court_landing_zone`, `candidate_reclassification`, and
+`candidate_sequence` diagnostics. It can relabel raw candidate outputs after v0.2.1 generation, but
+the relabeled events remain candidate evidence only.
+
+See `docs/events/hit_bounce_side_zone_sequence_repair_v022.md`.

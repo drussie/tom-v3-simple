@@ -135,6 +135,12 @@ Hit/Bounce Recall Diagnostics + Header Layout Repair v0.2.1 adds persisted
 that were not emitted as candidates. The replay header also keeps the media id on one ellipsized
 line so the video starts near the top of the page instead of below a collapsed vertical header.
 
+Hit/Bounce Side-Zone + Sequence Classification Repair v0.2.2 adds selected-evidence diagnostics for
+`court_side_zone`, `player_contact_zone`, `court_landing_zone`, `candidate_reclassification`, and
+`candidate_sequence`. The repair can relabel raw hit/bounce candidates when side-zone and sequence
+context better explain the marker. These labels remain event candidates only; they are not hit
+truth, bounce truth, in/out, score, or adjudication.
+
 ## What 6A Added
 
 - `GET /media/{media_id}/replay-info`
