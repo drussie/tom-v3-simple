@@ -862,6 +862,12 @@ TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_tom_v1_bridge.db \
   --bounce-fallback-enabled \
   --bounce-fallback-min-speed-reduction-fraction 0.35 \
   --event-overlap-distance-template 0.08 \
+  --net-axis-reversal-hit-enabled \
+  --net-axis-reversal-lookback-ms 700 \
+  --net-axis-reversal-lookahead-ms 700 \
+  --net-axis-reversal-min-delta-template 0.015 \
+  --net-axis-reversal-min-pre-post-gap-ms 60 \
+  --net-axis-reversal-dedupe-distance-template 0.08 \
   --candidate-dedupe-ms 500 \
   --viewer-base-url http://127.0.0.1:3000
 ```
@@ -884,6 +890,12 @@ not create hit truth, bounce truth, in/out, score, or adjudication.
 The v0.2.4 player-anchored contact-zone tightening repair adds `player_anchor_contact_zone` and
 `overlap_suppression` diagnostics. Player-anchored hits that overlap final bounce/open-court
 landing clusters are suppressed as diagnostics rather than emitted as final hit candidates.
+
+The v0.2.5 net-axis reversal hit recall repair adds ball-first
+`net_axis_reversal_hit_candidate_v025` candidates from court-template `court_y` direction reversal
+without requiring player proximity. Player proximity is diagnostic/confidence support only for this
+path. The repair keeps bounce-overlap protections and remains candidate evidence only, not hit
+truth, bounce truth, in/out, score, or adjudication.
 
 Replay can show those candidates in two places:
 
@@ -964,6 +976,7 @@ points, or score.
 Selected event-candidate evidence also exposes physics diagnostics when present:
 
 - hit candidates: `net_axis_reversal`
+- ball-first hit recall: `net_axis_reversal_recall`
 - bounce candidates: `vertical_motion_proxy` and `speed_reduction`
 
 Motion smoothing replay:

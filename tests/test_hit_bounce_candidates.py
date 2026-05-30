@@ -25,6 +25,7 @@ from apps.worker.services.hit_bounce_candidates import (
     BOUNCE_CANDIDATE_METHOD,
     HIT_CANDIDATE_METHOD,
     HIT_FALLBACK_CANDIDATE_METHOD,
+    NET_AXIS_REVERSAL_HIT_CANDIDATE_METHOD,
     PLAYER_ANCHORED_HIT_CANDIDATE_METHOD,
     SIDE_ZONE_SEQUENCE_BOUNCE_METHOD,
     SIDE_ZONE_SEQUENCE_HIT_METHOD,
@@ -38,6 +39,7 @@ from apps.worker.services.hit_bounce_candidates import (
     build_hit_bounce_candidates,
     dedupe_event_candidates_with_rejections,
     suppress_player_anchored_hits_overlapping_bounces,
+    suppress_weak_net_axis_reversal_hits_overlapping_bounces,
 )
 
 
@@ -150,6 +152,148 @@ def test_hit_candidate_not_produced_when_player_is_far(db_session: Session) -> N
 
     assert result["ok"] is True
     assert result["observations"]["hit_candidate"] == 0
+
+
+def test_net_axis_reversal_emits_hit_without_player_proximity(
+    db_session: Session,
+) -> None:
+    media = _seed_media(db_session)
+    trajectory_run, _ = _seed_trajectory_run(
+        db_session,
+        media.id,
+        points=[
+            (0, 0, 0.20, 0.30),
+            (6, 200, 0.30, 0.70),
+            (12, 400, 0.40, 0.30),
+        ],
+    )
+    projection_run = _seed_projection_run(db_session, media.id, players=[])
+
+    result = build_hit_bounce_candidates(
+        session=db_session,
+        media_id=media.id,
+        ball_trajectory_run_id=trajectory_run.id,
+        court_projection_run_id=projection_run.id,
+    )
+
+    assert result["ok"] is True
+    assert result["observations"]["hit_candidate"] == 1
+    assert result["candidate_summary"]["net_axis_reversal_recovered_hit_count"] == 1
+    hit = db_session.scalar(
+        select(Observation).where(
+            Observation.run_id == result["event_candidate_run_id"],
+            Observation.observation_type == "hit_candidate",
+        )
+    )
+    assert hit is not None
+    assert hit.payload_jsonb["candidate_method"] == NET_AXIS_REVERSAL_HIT_CANDIDATE_METHOD
+    assert "player_proximity_not_required" in hit.payload_jsonb["reason_codes"]
+    assert hit.payload_jsonb["source_player_court_projection_observation_id"] is None
+    assert hit.payload_jsonb["net_axis_reversal_recall"][
+        "player_proximity_required"
+    ] is False
+    assert hit.payload_jsonb["net_axis_reversal_recall"]["net_axis_reversal"] is True
+
+
+def test_net_axis_reversal_player_proximity_boosts_confidence(
+    db_session: Session,
+) -> None:
+    media_without_player = _seed_media(db_session)
+    trajectory_without_player, _ = _seed_trajectory_run(
+        db_session,
+        media_without_player.id,
+        points=[
+            (0, 0, 0.20, 0.50),
+            (6, 200, 0.25, 0.53),
+            (12, 400, 0.30, 0.50),
+        ],
+    )
+    projection_without_player = _seed_projection_run(
+        db_session,
+        media_without_player.id,
+        players=[],
+    )
+    result_without_player = build_hit_bounce_candidates(
+        session=db_session,
+        media_id=media_without_player.id,
+        ball_trajectory_run_id=trajectory_without_player.id,
+        court_projection_run_id=projection_without_player.id,
+    )
+    hit_without_player = db_session.scalar(
+        select(Observation).where(
+            Observation.run_id == result_without_player["event_candidate_run_id"],
+            Observation.observation_type == "hit_candidate",
+        )
+    )
+    assert hit_without_player is not None
+
+    media_with_player = _seed_media(db_session)
+    trajectory_with_player, _ = _seed_trajectory_run(
+        db_session,
+        media_with_player.id,
+        points=[
+            (0, 0, 0.20, 0.50),
+            (6, 200, 0.25, 0.53),
+            (12, 400, 0.30, 0.50),
+        ],
+    )
+    projection_with_player = _seed_projection_run(
+        db_session,
+        media_with_player.id,
+        players=[(9, 300, 0.25, 0.53, "far_player_track_candidate")],
+    )
+    result_with_player = build_hit_bounce_candidates(
+        session=db_session,
+        media_id=media_with_player.id,
+        ball_trajectory_run_id=trajectory_with_player.id,
+        court_projection_run_id=projection_with_player.id,
+        hit_player_time_window_ms=40,
+    )
+    hit_with_player = db_session.scalar(
+        select(Observation).where(
+            Observation.run_id == result_with_player["event_candidate_run_id"],
+            Observation.observation_type == "hit_candidate",
+        )
+    )
+    assert hit_with_player is not None
+
+    assert hit_with_player.confidence > hit_without_player.confidence
+    assert hit_with_player.payload_jsonb["net_axis_reversal_recall"][
+        "player_proximity_required"
+    ] is False
+    assert hit_with_player.payload_jsonb["net_axis_reversal_recall"][
+        "nearest_player_found"
+    ] is True
+
+
+def test_no_net_axis_reversal_does_not_emit_ball_first_hit(
+    db_session: Session,
+) -> None:
+    media = _seed_media(db_session)
+    trajectory_run, _ = _seed_trajectory_run(
+        db_session,
+        media.id,
+        points=[
+            (0, 0, 0.20, 0.20),
+            (6, 200, 0.30, 0.40),
+            (12, 400, 0.40, 0.60),
+        ],
+    )
+    projection_run = _seed_projection_run(db_session, media.id, players=[])
+
+    result = build_hit_bounce_candidates(
+        session=db_session,
+        media_id=media.id,
+        ball_trajectory_run_id=trajectory_run.id,
+        court_projection_run_id=projection_run.id,
+    )
+
+    assert result["ok"] is True
+    assert result["observations"]["hit_candidate"] == 0
+    assert result["candidate_summary"]["net_axis_reversal_recovered_hit_count"] == 0
+    assert "no_net_axis_reversal" in result["candidate_summary"][
+        "net_axis_reversal_rejection_reasons"
+    ]
 
 
 def test_far_side_style_player_time_offset_hit_fallback(
@@ -607,16 +751,21 @@ def test_rejected_contexts_persist_rejection_reason_diagnostics(
     )
 
     assert result["ok"] is True
-    assert result["observations"]["event_candidate_rejection_diagnostic"] == 1
-    assert result["candidate_summary"]["rejected_context_count"] == 1
+    assert result["observations"]["event_candidate_rejection_diagnostic"] >= 1
+    assert result["candidate_summary"]["rejected_context_count"] >= 1
     assert "no_nearest_player_in_time_window" in result["candidate_summary"][
         "rejection_reasons"
     ]
-    diagnostic = db_session.scalar(
+    diagnostics = db_session.scalars(
         select(Observation).where(
             Observation.run_id == result["event_candidate_run_id"],
             Observation.observation_type == "event_candidate_rejection_diagnostic",
         )
+    ).all()
+    diagnostic = next(
+        row
+        for row in diagnostics
+        if row.payload_jsonb["candidate_decision"]["reason"] == "rejected"
     )
     assert diagnostic is not None
     assert diagnostic.payload_jsonb["candidate_decision"]["reason"] == "rejected"
@@ -986,6 +1135,55 @@ def test_player_anchored_hit_overlap_with_bounce_is_suppressed() -> None:
     ]
     assert diagnostics[0].overlap_suppression is not None
     assert diagnostics[0].overlap_suppression["suppressed"] is True
+
+
+def test_weak_net_axis_reversal_hit_overlap_with_bounce_is_suppressed() -> None:
+    bounce = _draft_event_candidate(
+        observation_type="bounce_candidate",
+        frame=34,
+        timestamp_ms=1133,
+        court_x=0.44,
+        court_y=0.88,
+        track_role_candidate="far_player_track_candidate",
+        player_distance=0.50,
+        candidate_method=SIDE_ZONE_SEQUENCE_BOUNCE_METHOD,
+        net_axis_reversal=False,
+    )
+    weak_reversal_hit = replace(
+        _draft_event_candidate(
+            observation_type="hit_candidate",
+            frame=34,
+            timestamp_ms=1133,
+            court_x=0.445,
+            court_y=0.885,
+            track_role_candidate="far_player_track_candidate",
+            player_distance=0.50,
+            candidate_method=NET_AXIS_REVERSAL_HIT_CANDIDATE_METHOD,
+            net_axis_reversal=True,
+        ),
+        confidence=0.45,
+        nearest_player=None,
+        reason_codes=[
+            "net_axis_reversal",
+            "ball_first_reversal_recall",
+            "player_proximity_not_required",
+        ],
+        net_axis_reversal_recall={"player_proximity_required": False},
+    )
+
+    filtered, suppressed_count, diagnostics = (
+        suppress_weak_net_axis_reversal_hits_overlapping_bounces(
+            [weak_reversal_hit, bounce],
+            config=HitBounceCandidateConfig(),
+        )
+    )
+
+    assert [candidate.observation_type for candidate in filtered] == [
+        "bounce_candidate"
+    ]
+    assert suppressed_count == 1
+    assert diagnostics[0].diagnostic_source == "net_axis_reversal_hit_recall"
+    assert "suppressed_by_bounce_candidate_overlap" in diagnostics[0].rejection_reasons
 
 
 def test_side_zone_sequence_reclassifies_sample_style_sequence() -> None:

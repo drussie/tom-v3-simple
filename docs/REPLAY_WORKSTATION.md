@@ -141,6 +141,13 @@ Hit/Bounce Side-Zone + Sequence Classification Repair v0.2.2 adds selected-evide
 context better explain the marker. These labels remain event candidates only; they are not hit
 truth, bounce truth, in/out, score, or adjudication.
 
+Net-Axis Reversal Hit Recall v0.2.5 can add ball-first `net_axis_reversal_hit_candidate_v025`
+markers when the court-template `court_y` direction reverses across a trajectory anchor point.
+Replay selected evidence exposes `net_axis_reversal_recall` metadata, including the incoming,
+anchor, and outgoing frames and whether player proximity was required. For this recall path, player
+proximity is not required; it is diagnostic/confidence support only. The marker is still a
+`HIT CANDIDATE`, not hit truth.
+
 ## What 6A Added
 
 - `GET /media/{media_id}/replay-info`

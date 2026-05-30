@@ -3141,6 +3141,26 @@ function SelectedEvidencePanel({
               : String(item.overlap_suppression.suppressed ?? "n/a")
           }
         />
+        <DetailRow
+          label="reversal recall player required"
+          value={
+            item.net_axis_reversal_recall === null ||
+            item.net_axis_reversal_recall === undefined
+              ? "n/a"
+              : String(item.net_axis_reversal_recall.player_proximity_required ?? "n/a")
+          }
+        />
+        <DetailRow
+          label="reversal recall window"
+          value={
+            item.net_axis_reversal_recall === null ||
+            item.net_axis_reversal_recall === undefined
+              ? "n/a"
+              : `${String(item.net_axis_reversal_recall.incoming_frame ?? "n/a")} → ${String(
+                  item.net_axis_reversal_recall.anchor_frame ?? "n/a"
+                )} → ${String(item.net_axis_reversal_recall.outgoing_frame ?? "n/a")}`
+          }
+        />
         {item.player_proximity_gate !== null ? (
           <>
             <DetailRow

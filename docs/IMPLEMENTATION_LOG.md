@@ -1,5 +1,36 @@
 # TOM v3 Simple - Implementation Log
 
+## Net-Axis Reversal Hit Recall v0.2.5
+
+Status: complete when accepted
+
+### Goal
+
+Recover sparse hit-candidate markers from ball-first court-template net-axis reversals without
+requiring a matching player projection, while preserving bounce-overlap protections.
+
+### Outcome
+
+The repair adds:
+
+- `net_axis_reversal_hit_candidate_v025`
+- configurable ball-first lookback/lookahead windows around trajectory anchor points
+- `net_axis_reversal_recall` metadata on candidates and diagnostics
+- CLI and Makefile controls for the recall path
+- replay selected-evidence fields for whether player proximity was required and which frames formed
+  the reversal context
+- weak-overlap suppression for ball-first hits near bounce candidates
+- focused tests for no-player recall, proximity confidence support, monotonic non-recall, and
+  overlap suppression
+
+### Non-goals
+
+- No hit truth or bounce truth.
+- No in/out, rally, point, or score.
+- No player identity, scoreboard OCR, or server/receiver logic.
+- No accepted/rejected lifecycle.
+- No adjudication.
+
 ## Hit/Bounce Physics Heuristic Repair v0.2
 
 Status: complete when accepted

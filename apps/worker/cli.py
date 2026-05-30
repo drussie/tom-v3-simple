@@ -742,6 +742,36 @@ def main() -> None:
         type=float,
         default=0.08,
     )
+    hit_bounce_parser.add_argument(
+        "--net-axis-reversal-hit-enabled",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+    )
+    hit_bounce_parser.add_argument(
+        "--net-axis-reversal-lookback-ms",
+        type=int,
+        default=700,
+    )
+    hit_bounce_parser.add_argument(
+        "--net-axis-reversal-lookahead-ms",
+        type=int,
+        default=700,
+    )
+    hit_bounce_parser.add_argument(
+        "--net-axis-reversal-min-delta-template",
+        type=float,
+        default=0.015,
+    )
+    hit_bounce_parser.add_argument(
+        "--net-axis-reversal-min-pre-post-gap-ms",
+        type=int,
+        default=60,
+    )
+    hit_bounce_parser.add_argument(
+        "--net-axis-reversal-dedupe-distance-template",
+        type=float,
+        default=0.08,
+    )
     hit_bounce_parser.add_argument("--candidate-dedupe-ms", type=int, default=500)
     hit_bounce_parser.add_argument(
         "--viewer-base-url",
@@ -1543,6 +1573,36 @@ def _handle_build_hit_bounce_candidates(
         event_overlap_distance_template=getattr(
             args,
             "event_overlap_distance_template",
+            0.08,
+        ),
+        net_axis_reversal_hit_enabled=getattr(
+            args,
+            "net_axis_reversal_hit_enabled",
+            True,
+        ),
+        net_axis_reversal_lookback_ms=getattr(
+            args,
+            "net_axis_reversal_lookback_ms",
+            700,
+        ),
+        net_axis_reversal_lookahead_ms=getattr(
+            args,
+            "net_axis_reversal_lookahead_ms",
+            700,
+        ),
+        net_axis_reversal_min_delta_template=getattr(
+            args,
+            "net_axis_reversal_min_delta_template",
+            0.015,
+        ),
+        net_axis_reversal_min_pre_post_gap_ms=getattr(
+            args,
+            "net_axis_reversal_min_pre_post_gap_ms",
+            60,
+        ),
+        net_axis_reversal_dedupe_distance_template=getattr(
+            args,
+            "net_axis_reversal_dedupe_distance_template",
             0.08,
         ),
         candidate_dedupe_ms=args.candidate_dedupe_ms,

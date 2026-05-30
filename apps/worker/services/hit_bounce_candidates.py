@@ -43,6 +43,7 @@ HIT_CANDIDATE_METHOD = "net_axis_reversal_player_proximity_hit_candidate_v024"
 HIT_FALLBACK_CANDIDATE_METHOD = (
     "player_proximate_speed_reduction_hit_candidate_fallback_v024"
 )
+NET_AXIS_REVERSAL_HIT_CANDIDATE_METHOD = "net_axis_reversal_hit_candidate_v025"
 BOUNCE_CANDIDATE_METHOD = "image_vertical_proxy_speed_reduction_bounce_candidate_v024"
 BOUNCE_FALLBACK_CANDIDATE_METHOD = (
     "image_vertical_proxy_speed_reduction_bounce_candidate_v024_fallback"
@@ -53,7 +54,7 @@ PLAYER_ANCHORED_HIT_CANDIDATE_METHOD = (
 SIDE_ZONE_SEQUENCE_HIT_METHOD = "side_zone_sequence_hit_candidate_v024"
 SIDE_ZONE_SEQUENCE_BOUNCE_METHOD = "side_zone_sequence_bounce_candidate_v024"
 EVENT_CANDIDATE_METHOD = (
-    "player_anchored_hit_contact_zone_tightening_candidate_evidence_v024"
+    "net_axis_reversal_hit_recall_candidate_evidence_v025"
 )
 COURT_SIDE_SPLIT_Y = 0.50
 COURT_MIDCOURT_MARGIN_Y = 0.05
@@ -82,6 +83,12 @@ DEFAULT_PLAYER_ANCHORED_HIT_DISTANCE_MAX_TEMPLATE = 0.24
 DEFAULT_PLAYER_ANCHORED_HIT_MIN_NET_AXIS_DELTA_TEMPLATE = 0.015
 DEFAULT_PLAYER_ANCHORED_HIT_MIN_PRE_POST_GAP_MS = 60
 DEFAULT_EVENT_OVERLAP_DISTANCE_TEMPLATE = 0.08
+DEFAULT_NET_AXIS_REVERSAL_HIT_ENABLED = True
+DEFAULT_NET_AXIS_REVERSAL_LOOKBACK_MS = 700
+DEFAULT_NET_AXIS_REVERSAL_LOOKAHEAD_MS = 700
+DEFAULT_NET_AXIS_REVERSAL_MIN_DELTA_TEMPLATE = 0.015
+DEFAULT_NET_AXIS_REVERSAL_MIN_PRE_POST_GAP_MS = 60
+DEFAULT_NET_AXIS_REVERSAL_DEDUPE_DISTANCE_TEMPLATE = 0.08
 HIT_CONFIDENCE_CAP = 0.70
 BOUNCE_CONFIDENCE_CAP = 0.60
 EVENT_CANDIDATE_WARNINGS = {
@@ -140,6 +147,18 @@ class HitBounceCandidateConfig:
         DEFAULT_PLAYER_ANCHORED_HIT_MIN_PRE_POST_GAP_MS
     )
     event_overlap_distance_template: float = DEFAULT_EVENT_OVERLAP_DISTANCE_TEMPLATE
+    net_axis_reversal_hit_enabled: bool = DEFAULT_NET_AXIS_REVERSAL_HIT_ENABLED
+    net_axis_reversal_lookback_ms: int = DEFAULT_NET_AXIS_REVERSAL_LOOKBACK_MS
+    net_axis_reversal_lookahead_ms: int = DEFAULT_NET_AXIS_REVERSAL_LOOKAHEAD_MS
+    net_axis_reversal_min_delta_template: float = (
+        DEFAULT_NET_AXIS_REVERSAL_MIN_DELTA_TEMPLATE
+    )
+    net_axis_reversal_min_pre_post_gap_ms: int = (
+        DEFAULT_NET_AXIS_REVERSAL_MIN_PRE_POST_GAP_MS
+    )
+    net_axis_reversal_dedupe_distance_template: float = (
+        DEFAULT_NET_AXIS_REVERSAL_DEDUPE_DISTANCE_TEMPLATE
+    )
 
     def as_dict(self) -> dict[str, float | int | bool]:
         return {
@@ -185,6 +204,18 @@ class HitBounceCandidateConfig:
                 self.player_anchored_hit_min_pre_post_gap_ms
             ),
             "event_overlap_distance_template": self.event_overlap_distance_template,
+            "net_axis_reversal_hit_enabled": self.net_axis_reversal_hit_enabled,
+            "net_axis_reversal_lookback_ms": self.net_axis_reversal_lookback_ms,
+            "net_axis_reversal_lookahead_ms": self.net_axis_reversal_lookahead_ms,
+            "net_axis_reversal_min_delta_template": (
+                self.net_axis_reversal_min_delta_template
+            ),
+            "net_axis_reversal_min_pre_post_gap_ms": (
+                self.net_axis_reversal_min_pre_post_gap_ms
+            ),
+            "net_axis_reversal_dedupe_distance_template": (
+                self.net_axis_reversal_dedupe_distance_template
+            ),
         }
 
 
@@ -259,6 +290,7 @@ class EventCandidateDraft:
     candidate_sequence: dict[str, Any] | None = None
     player_anchored_hit_recall: dict[str, Any] | None = None
     player_anchor_contact_zone: dict[str, Any] | None = None
+    net_axis_reversal_recall: dict[str, Any] | None = None
     overlap_suppression: dict[str, Any] | None = None
 
     @property
@@ -284,6 +316,7 @@ class EventCandidateRejectionDiagnostic:
     diagnostic_source: str = "local_trajectory_context"
     player_anchored_hit_recall: dict[str, Any] | None = None
     player_anchor_contact_zone: dict[str, Any] | None = None
+    net_axis_reversal_recall: dict[str, Any] | None = None
     overlap_suppression: dict[str, Any] | None = None
 
     @property
@@ -335,6 +368,18 @@ def build_hit_bounce_candidates_plan(
         DEFAULT_PLAYER_ANCHORED_HIT_MIN_PRE_POST_GAP_MS
     ),
     event_overlap_distance_template: float = DEFAULT_EVENT_OVERLAP_DISTANCE_TEMPLATE,
+    net_axis_reversal_hit_enabled: bool = DEFAULT_NET_AXIS_REVERSAL_HIT_ENABLED,
+    net_axis_reversal_lookback_ms: int = DEFAULT_NET_AXIS_REVERSAL_LOOKBACK_MS,
+    net_axis_reversal_lookahead_ms: int = DEFAULT_NET_AXIS_REVERSAL_LOOKAHEAD_MS,
+    net_axis_reversal_min_delta_template: float = (
+        DEFAULT_NET_AXIS_REVERSAL_MIN_DELTA_TEMPLATE
+    ),
+    net_axis_reversal_min_pre_post_gap_ms: int = (
+        DEFAULT_NET_AXIS_REVERSAL_MIN_PRE_POST_GAP_MS
+    ),
+    net_axis_reversal_dedupe_distance_template: float = (
+        DEFAULT_NET_AXIS_REVERSAL_DEDUPE_DISTANCE_TEMPLATE
+    ),
     viewer_base_url: str = "http://127.0.0.1:3000",
 ) -> dict[str, Any]:
     bounce_fallback_cli_flag = (
@@ -347,6 +392,11 @@ def build_hit_bounce_candidates_plan(
         if player_anchored_hit_enabled
         else "--no-player-anchored-hit-enabled"
     )
+    net_axis_reversal_cli_flag = (
+        "--net-axis-reversal-hit-enabled"
+        if net_axis_reversal_hit_enabled
+        else "--no-net-axis-reversal-hit-enabled"
+    )
     return {
         "steps": [
             "validate_media_and_source_runs",
@@ -354,6 +404,7 @@ def build_hit_bounce_candidates_plan(
             "load_main_player_court_projection_candidates",
             "load_source_ball_projection_image_points",
             "evaluate_net_axis_reversal_vertical_proxy_speed_and_player_proximity",
+            "evaluate_ball_first_net_axis_reversal_hit_recall",
             "evaluate_player_anchored_hit_recall",
             "dedupe_candidate_clusters",
             "apply_side_zone_sequence_classification_prior",
@@ -394,6 +445,17 @@ def build_hit_bounce_candidates_plan(
             f"{player_anchored_hit_min_pre_post_gap_ms} "
             "--event-overlap-distance-template "
             f"{event_overlap_distance_template} "
+            f"{net_axis_reversal_cli_flag} "
+            "--net-axis-reversal-lookback-ms "
+            f"{net_axis_reversal_lookback_ms} "
+            "--net-axis-reversal-lookahead-ms "
+            f"{net_axis_reversal_lookahead_ms} "
+            "--net-axis-reversal-min-delta-template "
+            f"{net_axis_reversal_min_delta_template} "
+            "--net-axis-reversal-min-pre-post-gap-ms "
+            f"{net_axis_reversal_min_pre_post_gap_ms} "
+            "--net-axis-reversal-dedupe-distance-template "
+            f"{net_axis_reversal_dedupe_distance_template} "
             f"--candidate-dedupe-ms {candidate_dedupe_ms}"
         ),
         "run_name": run_name,
@@ -403,6 +465,9 @@ def build_hit_bounce_candidates_plan(
         },
         "candidate_method": EVENT_CANDIDATE_METHOD,
         "hit_candidate_method": HIT_CANDIDATE_METHOD,
+        "net_axis_reversal_hit_candidate_method": (
+            NET_AXIS_REVERSAL_HIT_CANDIDATE_METHOD
+        ),
         "player_anchored_hit_candidate_method": PLAYER_ANCHORED_HIT_CANDIDATE_METHOD,
         "bounce_candidate_method": BOUNCE_CANDIDATE_METHOD,
         "classification_priority": "side_zone_sequence_candidate_prior",
@@ -450,6 +515,18 @@ def build_hit_bounce_candidates_plan(
                 player_anchored_hit_min_pre_post_gap_ms
             ),
             "event_overlap_distance_template": event_overlap_distance_template,
+            "net_axis_reversal_hit_enabled": net_axis_reversal_hit_enabled,
+            "net_axis_reversal_lookback_ms": net_axis_reversal_lookback_ms,
+            "net_axis_reversal_lookahead_ms": net_axis_reversal_lookahead_ms,
+            "net_axis_reversal_min_delta_template": (
+                net_axis_reversal_min_delta_template
+            ),
+            "net_axis_reversal_min_pre_post_gap_ms": (
+                net_axis_reversal_min_pre_post_gap_ms
+            ),
+            "net_axis_reversal_dedupe_distance_template": (
+                net_axis_reversal_dedupe_distance_template
+            ),
         },
         "replay_url_template": (
             f"{viewer_base_url.rstrip('/')}/replay/{media_id}"
@@ -502,6 +579,18 @@ def build_hit_bounce_candidates(
         DEFAULT_PLAYER_ANCHORED_HIT_MIN_PRE_POST_GAP_MS
     ),
     event_overlap_distance_template: float = DEFAULT_EVENT_OVERLAP_DISTANCE_TEMPLATE,
+    net_axis_reversal_hit_enabled: bool = DEFAULT_NET_AXIS_REVERSAL_HIT_ENABLED,
+    net_axis_reversal_lookback_ms: int = DEFAULT_NET_AXIS_REVERSAL_LOOKBACK_MS,
+    net_axis_reversal_lookahead_ms: int = DEFAULT_NET_AXIS_REVERSAL_LOOKAHEAD_MS,
+    net_axis_reversal_min_delta_template: float = (
+        DEFAULT_NET_AXIS_REVERSAL_MIN_DELTA_TEMPLATE
+    ),
+    net_axis_reversal_min_pre_post_gap_ms: int = (
+        DEFAULT_NET_AXIS_REVERSAL_MIN_PRE_POST_GAP_MS
+    ),
+    net_axis_reversal_dedupe_distance_template: float = (
+        DEFAULT_NET_AXIS_REVERSAL_DEDUPE_DISTANCE_TEMPLATE
+    ),
     viewer_base_url: str = "http://127.0.0.1:3000",
     plan_only: bool = False,
 ) -> dict[str, Any]:
@@ -538,6 +627,14 @@ def build_hit_bounce_candidates(
             player_anchored_hit_min_pre_post_gap_ms
         ),
         event_overlap_distance_template=event_overlap_distance_template,
+        net_axis_reversal_hit_enabled=net_axis_reversal_hit_enabled,
+        net_axis_reversal_lookback_ms=net_axis_reversal_lookback_ms,
+        net_axis_reversal_lookahead_ms=net_axis_reversal_lookahead_ms,
+        net_axis_reversal_min_delta_template=net_axis_reversal_min_delta_template,
+        net_axis_reversal_min_pre_post_gap_ms=net_axis_reversal_min_pre_post_gap_ms,
+        net_axis_reversal_dedupe_distance_template=(
+            net_axis_reversal_dedupe_distance_template
+        ),
     )
     invalid = _validate_config(config)
     if invalid is not None:
@@ -579,6 +676,14 @@ def build_hit_bounce_candidates(
             player_anchored_hit_min_pre_post_gap_ms
         ),
         event_overlap_distance_template=event_overlap_distance_template,
+        net_axis_reversal_hit_enabled=net_axis_reversal_hit_enabled,
+        net_axis_reversal_lookback_ms=net_axis_reversal_lookback_ms,
+        net_axis_reversal_lookahead_ms=net_axis_reversal_lookahead_ms,
+        net_axis_reversal_min_delta_template=net_axis_reversal_min_delta_template,
+        net_axis_reversal_min_pre_post_gap_ms=net_axis_reversal_min_pre_post_gap_ms,
+        net_axis_reversal_dedupe_distance_template=(
+            net_axis_reversal_dedupe_distance_template
+        ),
         viewer_base_url=viewer_base_url,
     )
     if plan_only:
@@ -644,6 +749,17 @@ def build_hit_bounce_candidates(
             config=config,
         )
         (
+            net_axis_reversal_context_count,
+            net_axis_reversal_hit_drafts,
+            net_axis_reversal_rejection_diagnostics,
+        ) = evaluate_net_axis_reversal_hit_recall(
+            trajectory_segments=trajectory_segments,
+            player_projections=player_projections,
+            config=config,
+        )
+        hit_drafts.extend(net_axis_reversal_hit_drafts)
+        rejection_diagnostics.extend(net_axis_reversal_rejection_diagnostics)
+        (
             player_anchor_context_count,
             player_anchored_hit_drafts,
             player_anchored_rejection_diagnostics,
@@ -683,6 +799,15 @@ def build_hit_bounce_candidates(
             [*deduped_hits, *deduped_bounces],
             config=config,
         )
+        (
+            final_candidates,
+            net_axis_overlap_suppressed_count,
+            net_axis_overlap_rejections,
+        ) = suppress_weak_net_axis_reversal_hits_overlapping_bounces(
+            final_candidates,
+            config=config,
+        )
+        rejection_diagnostics.extend(net_axis_overlap_rejections)
         (
             final_candidates,
             player_anchor_suppressed_overlap_count,
@@ -739,8 +864,55 @@ def build_hit_bounce_candidates(
             0,
         ),
         "classification_priority": "side_zone_sequence_candidate_prior",
-        "physics_heuristic_version": "v0.2.4",
+        "physics_heuristic_version": "v0.2.5",
         "contact_zone_tightening_version": "v0.2.4",
+        "net_axis_reversal_hit_recall_version": "v0.2.5",
+        "net_axis_reversal_context_count": net_axis_reversal_context_count,
+        "net_axis_reversal_candidate_count": len(net_axis_reversal_hit_drafts),
+        "net_axis_reversal_recovered_hit_count": sum(
+            1
+            for candidate in final_candidates
+            if (
+                candidate.original_candidate_method
+                or candidate.candidate_method
+            )
+            == NET_AXIS_REVERSAL_HIT_CANDIDATE_METHOD
+            and candidate.observation_type == HIT_CANDIDATE_OBSERVATION_TYPE
+        ),
+        "net_axis_reversal_suppressed_overlap_count": (
+            net_axis_overlap_suppressed_count
+        ),
+        "net_axis_reversal_rejected_count": (
+            len(net_axis_reversal_rejection_diagnostics)
+            + len(net_axis_overlap_rejections)
+        ),
+        "net_axis_reversal_rejection_reasons": _rejection_reason_counts(
+            [*net_axis_reversal_rejection_diagnostics, *net_axis_overlap_rejections]
+        ),
+        "net_axis_reversal_hit_recall": {
+            "enabled": config.net_axis_reversal_hit_enabled,
+            "reversal_context_count": net_axis_reversal_context_count,
+            "reversal_candidate_count": len(net_axis_reversal_hit_drafts),
+            "reversal_recovered_hit_count": sum(
+                1
+                for candidate in final_candidates
+                if (
+                    candidate.original_candidate_method
+                    or candidate.candidate_method
+                )
+                == NET_AXIS_REVERSAL_HIT_CANDIDATE_METHOD
+                and candidate.observation_type == HIT_CANDIDATE_OBSERVATION_TYPE
+            ),
+            "reversal_suppressed_overlap_count": net_axis_overlap_suppressed_count,
+            "reversal_rejected_count": (
+                len(net_axis_reversal_rejection_diagnostics)
+                + len(net_axis_overlap_rejections)
+            ),
+            "rejection_reasons": _rejection_reason_counts(
+                [*net_axis_reversal_rejection_diagnostics, *net_axis_overlap_rejections]
+            ),
+            "player_proximity_required": False,
+        },
         "player_anchor_context_count": player_anchor_context_count,
         "player_anchor_candidate_count": len(player_anchored_hit_drafts),
         "player_anchor_recovered_hit_count": sum(
@@ -1023,6 +1195,107 @@ def evaluate_event_candidates(
                 )
             )
     return evaluated_contexts, hit_candidates, bounce_candidates, rejection_diagnostics
+
+
+def evaluate_net_axis_reversal_hit_recall(
+    *,
+    trajectory_segments: list[list[TrajectoryPoint]],
+    player_projections: list[PlayerProjection],
+    config: HitBounceCandidateConfig,
+) -> tuple[int, list[EventCandidateDraft], list[EventCandidateRejectionDiagnostic]]:
+    if not config.net_axis_reversal_hit_enabled:
+        return 0, [], []
+    all_ball_points = _flatten_trajectory_points(trajectory_segments)
+    hit_candidates: list[EventCandidateDraft] = []
+    rejection_diagnostics: list[EventCandidateRejectionDiagnostic] = []
+    evaluated_contexts = 0
+    for anchor in all_ball_points:
+        evaluated_contexts += 1
+        incoming = _net_axis_reversal_incoming_point(anchor, all_ball_points, config=config)
+        outgoing = _net_axis_reversal_outgoing_point(anchor, all_ball_points, config=config)
+        rejection_reasons: list[str] = []
+        if incoming is None:
+            rejection_reasons.append("no_incoming_point_in_lookback_window")
+        if outgoing is None:
+            rejection_reasons.append("no_outgoing_point_in_lookahead_window")
+        if rejection_reasons:
+            rejection_diagnostics.append(
+                _net_axis_reversal_rejection_diagnostic(
+                    anchor=anchor,
+                    incoming=incoming,
+                    outgoing=outgoing,
+                    player_projections=player_projections,
+                    config=config,
+                    rejection_reasons=rejection_reasons,
+                )
+            )
+            continue
+        assert incoming is not None
+        assert outgoing is not None
+        context = trajectory_context(incoming, anchor, outgoing)
+        if context is None:
+            rejection_diagnostics.append(
+                _net_axis_reversal_rejection_diagnostic(
+                    anchor=anchor,
+                    incoming=incoming,
+                    outgoing=outgoing,
+                    player_projections=player_projections,
+                    config=config,
+                    rejection_reasons=["invalid_wide_window_context"],
+                )
+            )
+            continue
+        net_axis_reversal = _ball_first_net_axis_reversal_payload(
+            incoming=incoming,
+            anchor=anchor,
+            outgoing=outgoing,
+            player_projections=player_projections,
+            config=config,
+        )
+        reasons: list[str] = []
+        if net_axis_reversal.get("reversal") is not True:
+            reasons.append("no_net_axis_reversal")
+            if (
+                net_axis_reversal.get("vy_before") is None
+                or net_axis_reversal.get("vy_after") is None
+                or abs(float(net_axis_reversal.get("vy_before") or 0.0))
+                < config.net_axis_reversal_min_delta_template
+                or abs(float(net_axis_reversal.get("vy_after") or 0.0))
+                < config.net_axis_reversal_min_delta_template
+            ):
+                reasons.append("net_axis_delta_below_threshold")
+        if not _inside_or_near_template(anchor, config.bounce_inside_template_margin):
+            reasons.append("not_inside_or_near_court")
+        if reasons:
+            rejection_diagnostics.append(
+                _net_axis_reversal_rejection_diagnostic(
+                    anchor=anchor,
+                    incoming=incoming,
+                    outgoing=outgoing,
+                    player_projections=player_projections,
+                    config=config,
+                    rejection_reasons=reasons,
+                    net_axis_reversal=net_axis_reversal,
+                )
+            )
+            continue
+        nearest_player = nearest_main_player_projection(
+            anchor,
+            player_projections,
+            time_window_ms=max(
+                config.player_time_window_ms,
+                config.net_axis_reversal_lookback_ms,
+            ),
+        )
+        hit_candidates.append(
+            _net_axis_reversal_hit_candidate_from_context(
+                context,
+                nearest_player,
+                config,
+                net_axis_reversal=net_axis_reversal,
+            )
+        )
+    return evaluated_contexts, hit_candidates, rejection_diagnostics
 
 
 def evaluate_player_anchored_hit_recall(
@@ -1398,6 +1671,42 @@ def _player_anchor_outgoing_point(
     return min(candidates, key=lambda point: (point.timestamp_ms, point.frame_number), default=None)
 
 
+def _net_axis_reversal_incoming_point(
+    anchor: TrajectoryPoint,
+    ball_points: list[TrajectoryPoint],
+    *,
+    config: HitBounceCandidateConfig,
+) -> TrajectoryPoint | None:
+    candidates = [
+        point
+        for point in ball_points
+        if anchor.timestamp_ms - config.net_axis_reversal_lookback_ms
+        <= point.timestamp_ms
+        <= anchor.timestamp_ms - config.net_axis_reversal_min_pre_post_gap_ms
+        and abs(anchor.court_y - point.court_y)
+        >= config.net_axis_reversal_min_delta_template
+    ]
+    return max(candidates, key=lambda point: (point.timestamp_ms, point.frame_number), default=None)
+
+
+def _net_axis_reversal_outgoing_point(
+    anchor: TrajectoryPoint,
+    ball_points: list[TrajectoryPoint],
+    *,
+    config: HitBounceCandidateConfig,
+) -> TrajectoryPoint | None:
+    candidates = [
+        point
+        for point in ball_points
+        if anchor.timestamp_ms + config.net_axis_reversal_min_pre_post_gap_ms
+        <= point.timestamp_ms
+        <= anchor.timestamp_ms + config.net_axis_reversal_lookahead_ms
+        and abs(point.court_y - anchor.court_y)
+        >= config.net_axis_reversal_min_delta_template
+    ]
+    return min(candidates, key=lambda point: (point.timestamp_ms, point.frame_number), default=None)
+
+
 def _player_anchor_distance(player: PlayerProjection, point: TrajectoryPoint) -> float:
     return _round(math.hypot(player.court_x - point.court_x, player.court_y - point.court_y))
 
@@ -1430,6 +1739,61 @@ def _wide_window_net_axis_reversal_payload(
         "current_timestamp_ms": anchor.timestamp_ms,
         "outgoing_timestamp_ms": outgoing.timestamp_ms,
         "window_method": "player_anchored_wide_window_v024",
+    }
+
+
+def _ball_first_net_axis_reversal_payload(
+    *,
+    incoming: TrajectoryPoint,
+    anchor: TrajectoryPoint,
+    outgoing: TrajectoryPoint,
+    player_projections: list[PlayerProjection],
+    config: HitBounceCandidateConfig,
+) -> dict[str, Any]:
+    nearest_player = nearest_main_player_projection(
+        anchor,
+        player_projections,
+        time_window_ms=max(
+            config.player_time_window_ms,
+            config.net_axis_reversal_lookback_ms,
+        ),
+    )
+    vy_before = anchor.court_y - incoming.court_y
+    vy_after = outgoing.court_y - anchor.court_y
+    min_delta = config.net_axis_reversal_min_delta_template
+    reversal = (
+        abs(vy_before) >= min_delta
+        and abs(vy_after) >= min_delta
+        and vy_before * vy_after < 0
+    )
+    return {
+        "axis": "court_y",
+        "vy_before": _round(vy_before),
+        "vy_after": _round(vy_after),
+        "reversal": reversal,
+        "min_axis_delta": min_delta,
+        "incoming_frame": incoming.frame_number,
+        "current_frame": anchor.frame_number,
+        "outgoing_frame": outgoing.frame_number,
+        "incoming_timestamp_ms": incoming.timestamp_ms,
+        "current_timestamp_ms": anchor.timestamp_ms,
+        "outgoing_timestamp_ms": outgoing.timestamp_ms,
+        "lookback_ms": config.net_axis_reversal_lookback_ms,
+        "lookahead_ms": config.net_axis_reversal_lookahead_ms,
+        "min_pre_post_gap_ms": config.net_axis_reversal_min_pre_post_gap_ms,
+        "window_method": "ball_first_net_axis_reversal_wide_window_v025",
+        "player_proximity_required": False,
+        "nearest_player_found": nearest_player is not None,
+        "nearest_player_distance_template_units": (
+            nearest_player.distance_template_units if nearest_player is not None else None
+        ),
+        "nearest_player_track_role_candidate": (
+            nearest_player.player.track_role_candidate if nearest_player is not None else None
+        ),
+        "player_proximity_used_for_scoring": nearest_player is not None,
+        "not_hit_truth": True,
+        "observation_only": True,
+        "no_adjudication": True,
     }
 
 
@@ -1681,6 +2045,7 @@ def dedupe_event_candidates_with_rejections(
     for candidate in sorted(
         candidates,
         key=lambda item: (
+            _candidate_preference_rank(item),
             -item.confidence,
             item.timestamp_ms,
             item.frame_number,
@@ -1710,6 +2075,8 @@ def dedupe_event_candidates_with_rejections(
             rejection_reasons = ["deduped_lower_confidence"]
             if duplicate.candidate_method == PLAYER_ANCHORED_HIT_CANDIDATE_METHOD:
                 rejection_reasons.append("deduped_by_player_anchored_hit")
+            if duplicate.candidate_method == NET_AXIS_REVERSAL_HIT_CANDIDATE_METHOD:
+                rejection_reasons.append("deduped_by_net_axis_reversal_hit")
             rejections.append(
                 _rejection_diagnostic_from_candidate(
                     candidate,
@@ -1723,6 +2090,16 @@ def dedupe_event_candidates_with_rejections(
         sorted(kept, key=lambda item: (item.timestamp_ms, item.frame_number)),
         rejections,
     )
+
+
+def _candidate_preference_rank(candidate: EventCandidateDraft) -> int:
+    if candidate.candidate_method == PLAYER_ANCHORED_HIT_CANDIDATE_METHOD:
+        return 0
+    if candidate.candidate_method in {HIT_CANDIDATE_METHOD, HIT_FALLBACK_CANDIDATE_METHOD}:
+        return 1
+    if candidate.candidate_method == NET_AXIS_REVERSAL_HIT_CANDIDATE_METHOD:
+        return 2
+    return 3
 
 
 def _should_preserve_pre_anchor_landing_candidate(
@@ -1768,6 +2145,7 @@ def suppress_bounces_near_hits(
                 for hit in hit_candidates
                 if abs(hit.timestamp_ms - bounce.timestamp_ms) <= candidate_dedupe_ms
                 and hit.nearest_player is not None
+                and not _is_net_axis_reversal_hit_candidate(hit)
             ),
             None,
         )
@@ -1855,12 +2233,111 @@ def suppress_player_anchored_hits_overlapping_bounces(
     )
 
 
+def suppress_weak_net_axis_reversal_hits_overlapping_bounces(
+    candidates: list[EventCandidateDraft],
+    *,
+    config: HitBounceCandidateConfig,
+) -> tuple[
+    list[EventCandidateDraft],
+    int,
+    list[EventCandidateRejectionDiagnostic],
+]:
+    bounces = [
+        candidate
+        for candidate in candidates
+        if candidate.observation_type == BOUNCE_CANDIDATE_OBSERVATION_TYPE
+    ]
+    filtered: list[EventCandidateDraft] = []
+    rejections: list[EventCandidateRejectionDiagnostic] = []
+    suppressed_count = 0
+    for candidate in candidates:
+        if not _is_weak_net_axis_reversal_hit_candidate(candidate, config=config):
+            filtered.append(candidate)
+            continue
+        overlapping_bounce = _overlapping_bounce_candidate(
+            candidate,
+            bounces,
+            config=config,
+        )
+        if overlapping_bounce is None:
+            filtered.append(
+                replace(
+                    candidate,
+                    overlap_suppression=_overlap_suppression_payload(
+                        hit=candidate,
+                        bounce=None,
+                        config=config,
+                        suppressed=False,
+                    ),
+                )
+            )
+            continue
+        overlap_payload = _overlap_suppression_payload(
+            hit=candidate,
+            bounce=overlapping_bounce,
+            config=config,
+            suppressed=True,
+        )
+        suppressed_count += 1
+        rejections.append(
+            _rejection_diagnostic_from_candidate(
+                replace(candidate, overlap_suppression=overlap_payload),
+                rejection_reasons=["suppressed_by_bounce_candidate_overlap"],
+                decision_reason="suppressed_by_bounce_candidate_overlap",
+                suppressed_by_observation_type=overlapping_bounce.observation_type,
+                suppressed_by_frame=overlapping_bounce.frame_number,
+                suppressed_by_timestamp_ms=overlapping_bounce.timestamp_ms,
+                overlap_suppression=overlap_payload,
+            )
+        )
+    return (
+        sorted(filtered, key=lambda item: (item.timestamp_ms, item.frame_number)),
+        suppressed_count,
+        rejections,
+    )
+
+
 def _is_player_anchored_hit_candidate(candidate: EventCandidateDraft) -> bool:
     return (
         candidate.observation_type == HIT_CANDIDATE_OBSERVATION_TYPE
         and (
             candidate.candidate_method == PLAYER_ANCHORED_HIT_CANDIDATE_METHOD
             or candidate.original_candidate_method == PLAYER_ANCHORED_HIT_CANDIDATE_METHOD
+        )
+    )
+
+
+def _is_weak_net_axis_reversal_hit_candidate(
+    candidate: EventCandidateDraft,
+    *,
+    config: HitBounceCandidateConfig,
+) -> bool:
+    if candidate.observation_type != HIT_CANDIDATE_OBSERVATION_TYPE:
+        return False
+    if (
+        candidate.candidate_method != NET_AXIS_REVERSAL_HIT_CANDIDATE_METHOD
+        and candidate.original_candidate_method != NET_AXIS_REVERSAL_HIT_CANDIDATE_METHOD
+    ):
+        return False
+    if candidate.nearest_player is None:
+        return candidate.confidence < 0.62
+    side_matches = _court_side_matches_player_role(
+        _court_side_zone_payload(candidate.trajectory_context.current).get("side"),
+        candidate.nearest_player.player.track_role_candidate,
+    )
+    return (
+        candidate.nearest_player.distance_template_units
+        > config.hit_player_review_distance_max_template
+        or not side_matches
+    ) and candidate.confidence < 0.62
+
+
+def _is_net_axis_reversal_hit_candidate(candidate: EventCandidateDraft) -> bool:
+    return (
+        candidate.observation_type == HIT_CANDIDATE_OBSERVATION_TYPE
+        and (
+            candidate.candidate_method == NET_AXIS_REVERSAL_HIT_CANDIDATE_METHOD
+            or candidate.original_candidate_method == NET_AXIS_REVERSAL_HIT_CANDIDATE_METHOD
         )
     )
 
@@ -2013,6 +2490,7 @@ def apply_side_zone_sequence_classification(
             final_type=final_type,
             reclassification_reason=reclassification_reason,
             sequence_prior_applied=sequence_prior_applied,
+            player_contact_zone=player_contact_zone,
         )
         final_candidate = replace(
             candidate,
@@ -2179,10 +2657,16 @@ def _final_reason_codes(
     final_type: str,
     reclassification_reason: str | None,
     sequence_prior_applied: bool,
+    player_contact_zone: dict[str, Any],
 ) -> list[str]:
     reason_codes = list(dict.fromkeys(candidate.reason_codes))
     if final_type == HIT_CANDIDATE_OBSERVATION_TYPE:
-        reason_codes.extend(["player_contact_zone", "side_matches_player_track"])
+        if player_contact_zone.get("in_contact_zone") is True:
+            reason_codes.append("player_contact_zone")
+        if player_contact_zone.get("side_matches_player_track") is True:
+            reason_codes.append("side_matches_player_track")
+        if candidate.candidate_method == NET_AXIS_REVERSAL_HIT_CANDIDATE_METHOD:
+            reason_codes.append("player_proximity_not_required")
         if sequence_prior_applied:
             reason_codes.append("sequence_hit_prior")
     else:
@@ -2359,6 +2843,98 @@ def _hit_candidate_from_context(
     )
 
 
+def _net_axis_reversal_hit_candidate_from_context(
+    context: TrajectoryContext,
+    nearest_player: NearestPlayerContext | None,
+    config: HitBounceCandidateConfig,
+    *,
+    net_axis_reversal: dict[str, Any],
+) -> EventCandidateDraft:
+    axis_strength = (
+        abs(float(net_axis_reversal.get("vy_before") or 0.0))
+        + abs(float(net_axis_reversal.get("vy_after") or 0.0))
+    ) / max(config.net_axis_reversal_min_delta_template * 4.0, 1e-9)
+    axis_score = min(axis_strength, 1.0)
+    direction_score = min(context.direction_delta_degrees / 90.0, 1.0)
+    inside_score = (
+        1.0
+        if _inside_or_near_template(context.current, config.bounce_inside_template_margin)
+        else 0.0
+    )
+    proximity_score = 0.0
+    time_score = 0.0
+    side_score = 0.0
+    if nearest_player is not None:
+        proximity_score = 1.0 - min(
+            nearest_player.distance_template_units
+            / max(config.hit_player_review_distance_max_template, 1e-9),
+            1.0,
+        )
+        time_score = 1.0 - min(
+            nearest_player.time_delta_ms / max(config.player_time_window_ms, 1),
+            1.0,
+        )
+        side_score = (
+            1.0
+            if _court_side_matches_player_role(
+                _court_side_zone_payload(context.current).get("side"),
+                nearest_player.player.track_role_candidate,
+            )
+            else 0.0
+        )
+    confidence = min(
+        HIT_CONFIDENCE_CAP,
+        0.20
+        + 0.28 * axis_score
+        + 0.16 * direction_score
+        + 0.10 * inside_score
+        + 0.08 * proximity_score
+        + 0.04 * side_score
+        + 0.04 * time_score,
+    )
+    reason_codes = [
+        "net_axis_reversal",
+        "ball_first_reversal_recall",
+        "player_proximity_not_required",
+    ]
+    if nearest_player is not None:
+        reason_codes.extend(
+            [
+                "nearest_main_player_projection",
+                "player_proximity_diagnostic",
+            ]
+        )
+        if side_score > 0:
+            reason_codes.append("side_matches_player_track")
+    return EventCandidateDraft(
+        observation_type=HIT_CANDIDATE_OBSERVATION_TYPE,
+        candidate_method=NET_AXIS_REVERSAL_HIT_CANDIDATE_METHOD,
+        trajectory_context=context,
+        nearest_player=nearest_player,
+        reason_codes=reason_codes,
+        confidence=_round(confidence),
+        player_proximity_gate=_player_proximity_gate_payload(
+            nearest_player=nearest_player,
+            threshold=config.hit_player_review_distance_max_template,
+            away_from_player=False,
+        ),
+        candidate_decision={
+            "selected_candidate_type": HIT_CANDIDATE_OBSERVATION_TYPE,
+            "suppressed_candidate_types": [BOUNCE_CANDIDATE_OBSERVATION_TYPE],
+            "reason": "ball_first_net_axis_reversal",
+            "classification_priority": "net_axis_reversal_hit_recall_then_sequence_prior",
+            "player_proximity_required": False,
+        },
+        net_axis_reversal=net_axis_reversal,
+        net_axis_reversal_recall=_net_axis_reversal_recall_payload(
+            context=context,
+            nearest_player=nearest_player,
+            config=config,
+            net_axis_reversal=net_axis_reversal,
+        ),
+    )
+
+
 def _player_anchored_hit_candidate_from_context(
     context: TrajectoryContext,
     nearest_player: NearestPlayerContext,
@@ -2436,6 +3012,43 @@ def _player_anchored_hit_candidate_from_context(
         player_anchored_hit_recall=recall_payload,
         player_anchor_contact_zone=player_anchor_contact_zone,
     )
+
+
+def _net_axis_reversal_recall_payload(
+    *,
+    context: TrajectoryContext,
+    nearest_player: NearestPlayerContext | None,
+    config: HitBounceCandidateConfig,
+    net_axis_reversal: dict[str, Any],
+) -> dict[str, Any]:
+    return {
+        "enabled": config.net_axis_reversal_hit_enabled,
+        "candidate_method": NET_AXIS_REVERSAL_HIT_CANDIDATE_METHOD,
+        "player_proximity_required": False,
+        "incoming_frame": context.previous.frame_number,
+        "incoming_timestamp_ms": context.previous.timestamp_ms,
+        "anchor_frame": context.current.frame_number,
+        "anchor_timestamp_ms": context.current.timestamp_ms,
+        "outgoing_frame": context.next.frame_number,
+        "outgoing_timestamp_ms": context.next.timestamp_ms,
+        "lookback_ms": config.net_axis_reversal_lookback_ms,
+        "lookahead_ms": config.net_axis_reversal_lookahead_ms,
+        "min_pre_post_gap_ms": config.net_axis_reversal_min_pre_post_gap_ms,
+        "vy_before": net_axis_reversal.get("vy_before"),
+        "vy_after": net_axis_reversal.get("vy_after"),
+        "net_axis_reversal": net_axis_reversal.get("reversal") is True,
+        "nearest_player_found": nearest_player is not None,
+        "nearest_player_distance_template_units": (
+            nearest_player.distance_template_units if nearest_player is not None else None
+        ),
+        "nearest_player_track_role_candidate": (
+            nearest_player.player.track_role_candidate if nearest_player is not None else None
+        ),
+        "player_proximity_used_for_scoring": nearest_player is not None,
+        "not_hit_truth": True,
+        "observation_only": True,
+        "no_adjudication": True,
+    }
 
 
 def _player_anchored_hit_recall_payload(
@@ -2753,6 +3366,81 @@ def _player_anchor_rejection_diagnostic(
     )
 
 
+def _net_axis_reversal_rejection_diagnostic(
+    *,
+    anchor: TrajectoryPoint,
+    incoming: TrajectoryPoint | None,
+    outgoing: TrajectoryPoint | None,
+    player_projections: list[PlayerProjection],
+    config: HitBounceCandidateConfig,
+    rejection_reasons: list[str],
+    net_axis_reversal: dict[str, Any] | None = None,
+) -> EventCandidateRejectionDiagnostic:
+    previous = incoming or _synthetic_neighbor_point(
+        anchor,
+        timestamp_ms=anchor.timestamp_ms - 1,
+        frame_number=anchor.frame_number - 1,
+    )
+    next_point = outgoing or _synthetic_neighbor_point(
+        anchor,
+        timestamp_ms=anchor.timestamp_ms + 1,
+        frame_number=anchor.frame_number + 1,
+    )
+    context = trajectory_context(previous, anchor, next_point) or TrajectoryContext(
+        previous=previous,
+        current=anchor,
+        next=next_point,
+        direction_before_degrees=0.0,
+        direction_after_degrees=0.0,
+        direction_delta_degrees=0.0,
+        speed_before=0.0,
+        speed_after=0.0,
+        speed_delta_fraction=0.0,
+    )
+    nearest_player = nearest_main_player_projection(
+        anchor,
+        player_projections,
+        time_window_ms=max(
+            config.player_time_window_ms,
+            config.net_axis_reversal_lookback_ms,
+        ),
+    )
+    recall_payload = _net_axis_reversal_recall_payload(
+        context=context,
+        nearest_player=nearest_player,
+        config=config,
+        net_axis_reversal=net_axis_reversal or {},
+    )
+    recall_payload["diagnostic_only"] = True
+    return EventCandidateRejectionDiagnostic(
+        trajectory_context=context,
+        nearest_player=nearest_player,
+        net_axis_reversal=net_axis_reversal or {},
+        vertical_motion_proxy={},
+        speed_reduction={},
+        inside_or_near_court_template=_inside_or_near_template(
+            anchor,
+            config.bounce_inside_template_margin,
+        ),
+        player_proximity_gate=_player_proximity_gate_payload(
+            nearest_player=nearest_player,
+            threshold=config.hit_player_review_distance_max_template,
+            away_from_player=False,
+        ),
+        candidate_decision={
+            "selected_candidate_type": None,
+            "reason": "net_axis_reversal_hit_recall_rejected",
+            "rejection_reasons": rejection_reasons,
+            "classification_priority": "net_axis_reversal_hit_recall_then_sequence_prior",
+            "diagnostic_source": "net_axis_reversal_hit_recall",
+            "player_proximity_required": False,
+        },
+        rejection_reasons=rejection_reasons,
+        diagnostic_source="net_axis_reversal_hit_recall",
+        net_axis_reversal_recall=recall_payload,
+    )
+
+
 def _synthetic_player_anchor_point(player: PlayerProjection) -> TrajectoryPoint:
     return TrajectoryPoint(
         trajectory_observation=player.observation,
@@ -2832,10 +3520,13 @@ def _rejection_diagnostic_from_candidate(
         diagnostic_source=(
             "player_anchored_hit_recall"
             if candidate.candidate_method == PLAYER_ANCHORED_HIT_CANDIDATE_METHOD
+            else "net_axis_reversal_hit_recall"
+            if candidate.candidate_method == NET_AXIS_REVERSAL_HIT_CANDIDATE_METHOD
             else "local_trajectory_context"
         ),
         player_anchored_hit_recall=candidate.player_anchored_hit_recall,
         player_anchor_contact_zone=candidate.player_anchor_contact_zone,
+        net_axis_reversal_recall=candidate.net_axis_reversal_recall,
         overlap_suppression=overlap_suppression or candidate.overlap_suppression,
     )
 
@@ -3023,6 +3714,8 @@ def _event_candidate_observation_create(
         payload["player_anchored_hit_recall"] = candidate.player_anchored_hit_recall
     if candidate.player_anchor_contact_zone is not None:
         payload["player_anchor_contact_zone"] = candidate.player_anchor_contact_zone
+    if candidate.net_axis_reversal_recall is not None:
+        payload["net_axis_reversal_recall"] = candidate.net_axis_reversal_recall
     if candidate.overlap_suppression is not None:
         payload["overlap_suppression"] = candidate.overlap_suppression
     if candidate.original_observation_type is not None:
@@ -3157,6 +3850,8 @@ def _event_candidate_diagnostic_observation_create(
         payload["player_anchored_hit_recall"] = diagnostic.player_anchored_hit_recall
     if diagnostic.player_anchor_contact_zone is not None:
         payload["player_anchor_contact_zone"] = diagnostic.player_anchor_contact_zone
+    if diagnostic.net_axis_reversal_recall is not None:
+        payload["net_axis_reversal_recall"] = diagnostic.net_axis_reversal_recall
     if diagnostic.overlap_suppression is not None:
         payload["overlap_suppression"] = diagnostic.overlap_suppression
     lineage = [
@@ -3683,6 +4378,31 @@ def _validate_config(config: HitBounceCandidateConfig) -> dict[str, Any] | None:
         return _failed(
             "invalid_event_overlap_distance_template",
             "event_overlap_distance_template must be greater than zero",
+        )
+    if config.net_axis_reversal_lookback_ms <= 0:
+        return _failed(
+            "invalid_net_axis_reversal_lookback_ms",
+            "net_axis_reversal_lookback_ms must be greater than zero",
+        )
+    if config.net_axis_reversal_lookahead_ms <= 0:
+        return _failed(
+            "invalid_net_axis_reversal_lookahead_ms",
+            "net_axis_reversal_lookahead_ms must be greater than zero",
+        )
+    if config.net_axis_reversal_min_delta_template <= 0:
+        return _failed(
+            "invalid_net_axis_reversal_min_delta_template",
+            "net_axis_reversal_min_delta_template must be greater than zero",
+        )
+    if config.net_axis_reversal_min_pre_post_gap_ms < 0:
+        return _failed(
+            "invalid_net_axis_reversal_min_pre_post_gap_ms",
+            "net_axis_reversal_min_pre_post_gap_ms must be greater than or equal to zero",
+        )
+    if config.net_axis_reversal_dedupe_distance_template <= 0:
+        return _failed(
+            "invalid_net_axis_reversal_dedupe_distance_template",
+            "net_axis_reversal_dedupe_distance_template must be greater than zero",
         )
     return None
 

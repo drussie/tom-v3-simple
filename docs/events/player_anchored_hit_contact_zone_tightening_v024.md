@@ -87,3 +87,12 @@ bounce remained, and the final candidate set stayed candidate-only.
 This repair improves candidate quality and review diagnostics only. It does not add hit truth,
 bounce truth, in/out, rally/point/score logic, player identity, server/receiver logic,
 accepted/rejected lifecycle, or adjudication.
+
+## Follow-Up v0.2.5
+
+The follow-up Net-Axis Reversal Hit Recall v0.2.5 adds a ball-first recall path for
+`net_axis_reversal_hit_candidate_v025`. That path can propose a hit candidate from a `court_y`
+direction reversal without requiring player proximity. Player proximity is diagnostic/confidence
+support only, and the v0.2.4 bounce-overlap protections remain in place.
+
+See `docs/events/net_axis_reversal_hit_recall_v025.md`.

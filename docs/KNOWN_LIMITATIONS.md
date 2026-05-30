@@ -119,6 +119,10 @@ This registry makes TOM v3 Simple boundaries explicit.
 - Player-Anchored Hit Contact-Zone Tightening v0.2.4 suppresses player-anchored hit candidates
   that overlap bounce/open-court landing clusters, but the contact-zone gate is still candidate
   geometry and does not prove racket contact.
+- Net-Axis Reversal Hit Recall v0.2.5 can recover ball-first `hit_candidate` markers from
+  `court_y` direction reversal without requiring player proximity. This improves recall but can
+  still be fooled by sparse trajectories, projection noise, or camera geometry; player proximity is
+  diagnostic support only and the marker is not hit truth.
 - Event candidate video markers require a source ball court projection image point. If that point
   is unavailable, the candidate remains inspectable in replay but no broadcast-video marker is
   drawn.
