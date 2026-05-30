@@ -682,6 +682,31 @@ def main() -> None:
         type=float,
         default=0.05,
     )
+    hit_bounce_parser.add_argument(
+        "--hit-player-time-window-ms",
+        type=int,
+        default=300,
+    )
+    hit_bounce_parser.add_argument(
+        "--hit-contact-fallback-min-speed-delta-fraction",
+        type=float,
+        default=0.45,
+    )
+    hit_bounce_parser.add_argument(
+        "--hit-contact-fallback-min-direction-delta-degrees",
+        type=float,
+        default=5.0,
+    )
+    hit_bounce_parser.add_argument(
+        "--bounce-fallback-enabled",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+    )
+    hit_bounce_parser.add_argument(
+        "--bounce-fallback-min-speed-reduction-fraction",
+        type=float,
+        default=0.35,
+    )
     hit_bounce_parser.add_argument("--candidate-dedupe-ms", type=int, default=500)
     hit_bounce_parser.add_argument(
         "--viewer-base-url",
@@ -1457,6 +1482,17 @@ def _handle_build_hit_bounce_candidates(
         hit_min_net_axis_delta_template=args.hit_min_net_axis_delta_template,
         bounce_min_image_y_delta_pixels=args.bounce_min_image_y_delta_pixels,
         bounce_min_speed_reduction_fraction=args.bounce_min_speed_reduction_fraction,
+        hit_player_time_window_ms=args.hit_player_time_window_ms,
+        hit_contact_fallback_min_speed_delta_fraction=(
+            args.hit_contact_fallback_min_speed_delta_fraction
+        ),
+        hit_contact_fallback_min_direction_delta_degrees=(
+            args.hit_contact_fallback_min_direction_delta_degrees
+        ),
+        bounce_fallback_enabled=args.bounce_fallback_enabled,
+        bounce_fallback_min_speed_reduction_fraction=(
+            args.bounce_fallback_min_speed_reduction_fraction
+        ),
         candidate_dedupe_ms=args.candidate_dedupe_ms,
         viewer_base_url=args.viewer_base_url,
         plan_only=args.plan_only,

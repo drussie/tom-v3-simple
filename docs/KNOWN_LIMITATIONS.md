@@ -45,6 +45,9 @@ This registry makes TOM v3 Simple boundaries explicit.
   evidence. Hit candidates prefer player-proximate `court_y` net-axis reversal. Bounce candidates
   prefer image-y descending-to-ascending proxy plus speed reduction. These are not hit truth,
   bounce truth, in/out, rally, point, score, or adjudication.
+- Hit/bounce rejection diagnostics explain why evaluated contexts were not emitted, deduped, or
+  suppressed. They are diagnostic evidence only and do not create an accepted/rejected truth
+  lifecycle.
 - Replay current-only, short-trail, and full-trail controls are display policy only; they do not change persisted evidence or prove tracking correctness.
 - Motion smoothing creates derived replay candidate evidence only. Smoothed ball, player-box, and pose candidates can reduce jitter, but they are not true ball positions, confirmed player boxes, actual pose, trajectory physics, bounce/hit/in-out, point, or score.
 - TOM v1 model binaries may exist locally, but they are intentionally not tracked or uploaded.
@@ -102,6 +105,9 @@ This registry makes TOM v3 Simple boundaries explicit.
 - Hit/Bounce Physics Heuristic Repair v0.2 makes that heuristic more tennis-specific, but image-y
   is still only a camera-space proxy and `court_y` is only the current template net-axis
   assumption.
+- Hit/Bounce Recall Diagnostics + Header Layout Repair v0.2.1 adds a bounded far-side recall
+  fallback and rejection diagnostics, but the recovered markers remain candidate evidence rather
+  than confirmed hit/bounce events.
 - Event candidate video markers require a source ball court projection image point. If that point
   is unavailable, the candidate remains inspectable in replay but no broadcast-video marker is
   drawn.

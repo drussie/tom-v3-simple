@@ -134,15 +134,22 @@ pre {
 .viewer-header {
   align-items: start;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 18px;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
   margin-bottom: 14px;
+}
+
+.viewer-title {
+  min-width: 0;
 }
 
 .viewer-title h1 {
   font-size: 24px;
   line-height: 1.2;
   margin: 3px 0 8px;
+  max-width: 100%;
+  overflow-wrap: normal;
+  word-break: normal;
 }
 
 .meta-line {
@@ -151,6 +158,23 @@ pre {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+  min-width: 0;
+}
+
+.viewer-summary-badges {
+  align-content: flex-start;
+}
+
+.replay-media-id {
+  display: inline-block;
+  max-width: min(520px, 100%);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: bottom;
+  white-space: nowrap;
+  word-break: normal;
+  overflow-wrap: normal;
 }
 
 .status-pill,

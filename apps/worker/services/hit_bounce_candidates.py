@@ -31,25 +31,39 @@ BALL_COURT_PROJECTION_OBSERVATION_TYPE = "ball_court_projection_candidate"
 MAIN_PLAYER_COURT_PROJECTION_OBSERVATION_TYPE = "main_player_court_projection_candidate"
 HIT_CANDIDATE_OBSERVATION_TYPE = "hit_candidate"
 BOUNCE_CANDIDATE_OBSERVATION_TYPE = "bounce_candidate"
+EVENT_CANDIDATE_REJECTION_DIAGNOSTIC_OBSERVATION_TYPE = (
+    "event_candidate_rejection_diagnostic"
+)
 EVENT_CANDIDATE_OBSERVATION_TYPES = {
     HIT_CANDIDATE_OBSERVATION_TYPE,
     BOUNCE_CANDIDATE_OBSERVATION_TYPE,
+    EVENT_CANDIDATE_REJECTION_DIAGNOSTIC_OBSERVATION_TYPE,
 }
-HIT_CANDIDATE_METHOD = "net_axis_reversal_player_proximity_hit_candidate_v02"
-BOUNCE_CANDIDATE_METHOD = "image_vertical_proxy_speed_reduction_bounce_candidate_v02"
-EVENT_CANDIDATE_METHOD = "hit_bounce_physics_heuristic_candidate_evidence_v02"
+HIT_CANDIDATE_METHOD = "net_axis_reversal_player_proximity_hit_candidate_v021"
+HIT_FALLBACK_CANDIDATE_METHOD = (
+    "player_proximate_speed_reduction_hit_candidate_fallback_v021"
+)
+BOUNCE_CANDIDATE_METHOD = "image_vertical_proxy_speed_reduction_bounce_candidate_v021"
+BOUNCE_FALLBACK_CANDIDATE_METHOD = (
+    "image_vertical_proxy_speed_reduction_bounce_candidate_v021_fallback"
+)
+EVENT_CANDIDATE_METHOD = "hit_bounce_recall_diagnostics_candidate_evidence_v021"
 DEFAULT_HIT_PLAYER_DISTANCE_MAX_TEMPLATE = 0.18
 DEFAULT_HIT_PLAYER_REVIEW_DISTANCE_MAX_TEMPLATE = 0.33
 DEFAULT_HIT_NEAR_PLAYER_DIRECTION_DELTA_DEGREES = 15.0
 DEFAULT_HIT_MIN_NET_AXIS_DELTA_TEMPLATE = 0.015
 DEFAULT_HIT_MIN_SPEED_DELTA_FRACTION = 0.10
+DEFAULT_HIT_CONTACT_FALLBACK_MIN_SPEED_DELTA_FRACTION = 0.45
+DEFAULT_HIT_CONTACT_FALLBACK_MIN_DIRECTION_DELTA_DEGREES = 5.0
 DEFAULT_BOUNCE_PLAYER_DISTANCE_MIN_TEMPLATE = 0.18
 DEFAULT_HIT_MIN_DIRECTION_DELTA_DEGREES = 25.0
 DEFAULT_BOUNCE_MIN_DIRECTION_DELTA_DEGREES = 20.0
 DEFAULT_BOUNCE_MIN_IMAGE_Y_DELTA_PIXELS = 2.0
 DEFAULT_BOUNCE_MIN_SPEED_REDUCTION_FRACTION = 0.05
+DEFAULT_BOUNCE_FALLBACK_ENABLED = True
+DEFAULT_BOUNCE_FALLBACK_MIN_SPEED_REDUCTION_FRACTION = 0.35
 DEFAULT_CANDIDATE_DEDUPE_MS = 500
-DEFAULT_PLAYER_TIME_WINDOW_MS = 200
+DEFAULT_PLAYER_TIME_WINDOW_MS = 300
 DEFAULT_BOUNCE_TEMPLATE_MARGIN = 0.08
 HIT_CONFIDENCE_CAP = 0.70
 BOUNCE_CONFIDENCE_CAP = 0.60
@@ -76,6 +90,12 @@ class HitBounceCandidateConfig:
     )
     hit_min_net_axis_delta_template: float = DEFAULT_HIT_MIN_NET_AXIS_DELTA_TEMPLATE
     hit_min_speed_delta_fraction: float = DEFAULT_HIT_MIN_SPEED_DELTA_FRACTION
+    hit_contact_fallback_min_speed_delta_fraction: float = (
+        DEFAULT_HIT_CONTACT_FALLBACK_MIN_SPEED_DELTA_FRACTION
+    )
+    hit_contact_fallback_min_direction_delta_degrees: float = (
+        DEFAULT_HIT_CONTACT_FALLBACK_MIN_DIRECTION_DELTA_DEGREES
+    )
     bounce_player_distance_min_template: float = DEFAULT_BOUNCE_PLAYER_DISTANCE_MIN_TEMPLATE
     hit_min_direction_delta_degrees: float = DEFAULT_HIT_MIN_DIRECTION_DELTA_DEGREES
     bounce_min_direction_delta_degrees: float = DEFAULT_BOUNCE_MIN_DIRECTION_DELTA_DEGREES
@@ -83,11 +103,15 @@ class HitBounceCandidateConfig:
     bounce_min_speed_reduction_fraction: float = (
         DEFAULT_BOUNCE_MIN_SPEED_REDUCTION_FRACTION
     )
+    bounce_fallback_enabled: bool = DEFAULT_BOUNCE_FALLBACK_ENABLED
+    bounce_fallback_min_speed_reduction_fraction: float = (
+        DEFAULT_BOUNCE_FALLBACK_MIN_SPEED_REDUCTION_FRACTION
+    )
     candidate_dedupe_ms: int = DEFAULT_CANDIDATE_DEDUPE_MS
     player_time_window_ms: int = DEFAULT_PLAYER_TIME_WINDOW_MS
     bounce_inside_template_margin: float = DEFAULT_BOUNCE_TEMPLATE_MARGIN
 
-    def as_dict(self) -> dict[str, float | int]:
+    def as_dict(self) -> dict[str, float | int | bool]:
         return {
             "hit_player_distance_max_template": self.hit_player_distance_max_template,
             "hit_player_review_distance_max_template": (
@@ -98,12 +122,22 @@ class HitBounceCandidateConfig:
             ),
             "hit_min_net_axis_delta_template": self.hit_min_net_axis_delta_template,
             "hit_min_speed_delta_fraction": self.hit_min_speed_delta_fraction,
+            "hit_contact_fallback_min_speed_delta_fraction": (
+                self.hit_contact_fallback_min_speed_delta_fraction
+            ),
+            "hit_contact_fallback_min_direction_delta_degrees": (
+                self.hit_contact_fallback_min_direction_delta_degrees
+            ),
             "bounce_player_distance_min_template": self.bounce_player_distance_min_template,
             "hit_min_direction_delta_degrees": self.hit_min_direction_delta_degrees,
             "bounce_min_direction_delta_degrees": self.bounce_min_direction_delta_degrees,
             "bounce_min_image_y_delta_pixels": self.bounce_min_image_y_delta_pixels,
             "bounce_min_speed_reduction_fraction": (
                 self.bounce_min_speed_reduction_fraction
+            ),
+            "bounce_fallback_enabled": self.bounce_fallback_enabled,
+            "bounce_fallback_min_speed_reduction_fraction": (
+                self.bounce_fallback_min_speed_reduction_fraction
             ),
             "candidate_dedupe_ms": self.candidate_dedupe_ms,
             "player_time_window_ms": self.player_time_window_ms,
@@ -181,6 +215,27 @@ class EventCandidateDraft:
         return self.trajectory_context.current.frame_number
 
 
+@dataclass(frozen=True)
+class EventCandidateRejectionDiagnostic:
+    trajectory_context: TrajectoryContext
+    nearest_player: NearestPlayerContext | None
+    net_axis_reversal: dict[str, Any]
+    vertical_motion_proxy: dict[str, Any]
+    speed_reduction: dict[str, Any]
+    player_proximity_gate: dict[str, Any]
+    candidate_decision: dict[str, Any]
+    rejection_reasons: list[str]
+    inside_or_near_court_template: bool
+
+    @property
+    def timestamp_ms(self) -> int:
+        return self.trajectory_context.current.timestamp_ms
+
+    @property
+    def frame_number(self) -> int:
+        return self.trajectory_context.current.frame_number
+
+
 def build_hit_bounce_candidates_plan(
     *,
     media_id: str = "<media_id>",
@@ -196,9 +251,25 @@ def build_hit_bounce_candidates_plan(
     bounce_min_speed_reduction_fraction: float = (
         DEFAULT_BOUNCE_MIN_SPEED_REDUCTION_FRACTION
     ),
+    hit_player_time_window_ms: int = DEFAULT_PLAYER_TIME_WINDOW_MS,
+    hit_contact_fallback_min_speed_delta_fraction: float = (
+        DEFAULT_HIT_CONTACT_FALLBACK_MIN_SPEED_DELTA_FRACTION
+    ),
+    hit_contact_fallback_min_direction_delta_degrees: float = (
+        DEFAULT_HIT_CONTACT_FALLBACK_MIN_DIRECTION_DELTA_DEGREES
+    ),
+    bounce_fallback_enabled: bool = DEFAULT_BOUNCE_FALLBACK_ENABLED,
+    bounce_fallback_min_speed_reduction_fraction: float = (
+        DEFAULT_BOUNCE_FALLBACK_MIN_SPEED_REDUCTION_FRACTION
+    ),
     candidate_dedupe_ms: int = DEFAULT_CANDIDATE_DEDUPE_MS,
     viewer_base_url: str = "http://127.0.0.1:3000",
 ) -> dict[str, Any]:
+    bounce_fallback_cli_flag = (
+        "--bounce-fallback-enabled"
+        if bounce_fallback_enabled
+        else "--no-bounce-fallback-enabled"
+    )
     return {
         "steps": [
             "validate_media_and_source_runs",
@@ -223,6 +294,14 @@ def build_hit_bounce_candidates_plan(
             f"--hit-min-net-axis-delta-template {hit_min_net_axis_delta_template} "
             f"--bounce-min-image-y-delta-pixels {bounce_min_image_y_delta_pixels} "
             f"--bounce-min-speed-reduction-fraction {bounce_min_speed_reduction_fraction} "
+            f"--hit-player-time-window-ms {hit_player_time_window_ms} "
+            "--hit-contact-fallback-min-speed-delta-fraction "
+            f"{hit_contact_fallback_min_speed_delta_fraction} "
+            "--hit-contact-fallback-min-direction-delta-degrees "
+            f"{hit_contact_fallback_min_direction_delta_degrees} "
+            f"{bounce_fallback_cli_flag} "
+            "--bounce-fallback-min-speed-reduction-fraction "
+            f"{bounce_fallback_min_speed_reduction_fraction} "
             f"--candidate-dedupe-ms {candidate_dedupe_ms}"
         ),
         "run_name": run_name,
@@ -247,11 +326,22 @@ def build_hit_bounce_candidates_plan(
             ),
             "hit_min_net_axis_delta_template": hit_min_net_axis_delta_template,
             "hit_min_speed_delta_fraction": DEFAULT_HIT_MIN_SPEED_DELTA_FRACTION,
+            "hit_contact_fallback_min_speed_delta_fraction": (
+                hit_contact_fallback_min_speed_delta_fraction
+            ),
+            "hit_contact_fallback_min_direction_delta_degrees": (
+                hit_contact_fallback_min_direction_delta_degrees
+            ),
             "bounce_player_distance_min_template": bounce_player_distance_min_template,
             "hit_min_direction_delta_degrees": hit_min_direction_delta_degrees,
             "bounce_min_direction_delta_degrees": bounce_min_direction_delta_degrees,
             "bounce_min_image_y_delta_pixels": bounce_min_image_y_delta_pixels,
             "bounce_min_speed_reduction_fraction": bounce_min_speed_reduction_fraction,
+            "bounce_fallback_enabled": bounce_fallback_enabled,
+            "bounce_fallback_min_speed_reduction_fraction": (
+                bounce_fallback_min_speed_reduction_fraction
+            ),
+            "player_time_window_ms": hit_player_time_window_ms,
             "candidate_dedupe_ms": candidate_dedupe_ms,
         },
         "replay_url_template": (
@@ -280,6 +370,17 @@ def build_hit_bounce_candidates(
     bounce_min_speed_reduction_fraction: float = (
         DEFAULT_BOUNCE_MIN_SPEED_REDUCTION_FRACTION
     ),
+    hit_player_time_window_ms: int = DEFAULT_PLAYER_TIME_WINDOW_MS,
+    hit_contact_fallback_min_speed_delta_fraction: float = (
+        DEFAULT_HIT_CONTACT_FALLBACK_MIN_SPEED_DELTA_FRACTION
+    ),
+    hit_contact_fallback_min_direction_delta_degrees: float = (
+        DEFAULT_HIT_CONTACT_FALLBACK_MIN_DIRECTION_DELTA_DEGREES
+    ),
+    bounce_fallback_enabled: bool = DEFAULT_BOUNCE_FALLBACK_ENABLED,
+    bounce_fallback_min_speed_reduction_fraction: float = (
+        DEFAULT_BOUNCE_FALLBACK_MIN_SPEED_REDUCTION_FRACTION
+    ),
     candidate_dedupe_ms: int = DEFAULT_CANDIDATE_DEDUPE_MS,
     viewer_base_url: str = "http://127.0.0.1:3000",
     plan_only: bool = False,
@@ -290,9 +391,20 @@ def build_hit_bounce_candidates(
         hit_min_direction_delta_degrees=hit_min_direction_delta_degrees,
         bounce_min_direction_delta_degrees=bounce_min_direction_delta_degrees,
         hit_min_net_axis_delta_template=hit_min_net_axis_delta_template,
+        hit_contact_fallback_min_speed_delta_fraction=(
+            hit_contact_fallback_min_speed_delta_fraction
+        ),
+        hit_contact_fallback_min_direction_delta_degrees=(
+            hit_contact_fallback_min_direction_delta_degrees
+        ),
         bounce_min_image_y_delta_pixels=bounce_min_image_y_delta_pixels,
         bounce_min_speed_reduction_fraction=bounce_min_speed_reduction_fraction,
+        bounce_fallback_enabled=bounce_fallback_enabled,
+        bounce_fallback_min_speed_reduction_fraction=(
+            bounce_fallback_min_speed_reduction_fraction
+        ),
         candidate_dedupe_ms=candidate_dedupe_ms,
+        player_time_window_ms=hit_player_time_window_ms,
     )
     invalid = _validate_config(config)
     if invalid is not None:
@@ -309,6 +421,17 @@ def build_hit_bounce_candidates(
         hit_min_net_axis_delta_template=hit_min_net_axis_delta_template,
         bounce_min_image_y_delta_pixels=bounce_min_image_y_delta_pixels,
         bounce_min_speed_reduction_fraction=bounce_min_speed_reduction_fraction,
+        hit_player_time_window_ms=hit_player_time_window_ms,
+        hit_contact_fallback_min_speed_delta_fraction=(
+            hit_contact_fallback_min_speed_delta_fraction
+        ),
+        hit_contact_fallback_min_direction_delta_degrees=(
+            hit_contact_fallback_min_direction_delta_degrees
+        ),
+        bounce_fallback_enabled=bounce_fallback_enabled,
+        bounce_fallback_min_speed_reduction_fraction=(
+            bounce_fallback_min_speed_reduction_fraction
+        ),
         candidate_dedupe_ms=candidate_dedupe_ms,
         viewer_base_url=viewer_base_url,
     )
@@ -364,26 +487,40 @@ def build_hit_bounce_candidates(
             media=media,
             court_projection_run_id=court_projection_run_id,
         )
-        evaluated_contexts, hit_drafts, bounce_drafts = evaluate_event_candidates(
+        (
+            evaluated_contexts,
+            hit_drafts,
+            bounce_drafts,
+            rejection_diagnostics,
+        ) = evaluate_event_candidates(
             trajectory_segments=trajectory_segments,
             player_projections=player_projections,
             config=config,
         )
-        deduped_hits = dedupe_event_candidates(
+        deduped_hits, deduped_hit_rejections = dedupe_event_candidates_with_rejections(
             hit_drafts,
             candidate_dedupe_ms=config.candidate_dedupe_ms,
         )
-        deduped_bounces = dedupe_event_candidates(
-            bounce_drafts,
-            candidate_dedupe_ms=config.candidate_dedupe_ms,
+        deduped_bounces, deduped_bounce_rejections = (
+            dedupe_event_candidates_with_rejections(
+                bounce_drafts,
+                candidate_dedupe_ms=config.candidate_dedupe_ms,
+            )
         )
-        deduped_bounces, suppressed_bounce_conflict_count = suppress_bounces_near_hits(
+        (
+            deduped_bounces,
+            suppressed_bounce_conflict_count,
+            suppressed_bounce_rejections,
+        ) = suppress_bounces_near_hits(
             deduped_hits,
             deduped_bounces,
             candidate_dedupe_ms=config.candidate_dedupe_ms,
         )
+        rejection_diagnostics.extend(deduped_hit_rejections)
+        rejection_diagnostics.extend(deduped_bounce_rejections)
+        rejection_diagnostics.extend(suppressed_bounce_rejections)
         writer = ObservationWriter(session)
-        observations = _persist_event_candidates(
+        observations = _persist_event_candidates_and_diagnostics(
             writer=writer,
             media=media,
             run=run,
@@ -393,6 +530,7 @@ def build_hit_bounce_candidates(
             ball_trajectory_run_id=ball_trajectory_run_id,
             court_projection_run_id=court_projection_run_id,
             candidates=[*deduped_hits, *deduped_bounces],
+            diagnostics=rejection_diagnostics,
         )
     except Exception as exc:
         if run is not None and step is not None:
@@ -408,8 +546,14 @@ def build_hit_bounce_candidates(
         "deduped_hit_candidate_count": len(deduped_hits),
         "deduped_bounce_candidate_count": len(deduped_bounces),
         "suppressed_bounce_conflict_count": suppressed_bounce_conflict_count,
+        "rejected_context_count": len(rejection_diagnostics),
+        "rejection_reasons": _rejection_reason_counts(rejection_diagnostics),
+        "diagnostic_observation_count": counts.get(
+            EVENT_CANDIDATE_REJECTION_DIAGNOSTIC_OBSERVATION_TYPE,
+            0,
+        ),
         "classification_priority": "hit_first_when_player_proximate",
-        "physics_heuristic_version": "v0.2",
+        "physics_heuristic_version": "v0.2.1",
     }
     _mark_completed(
         session=session,
@@ -440,6 +584,10 @@ def build_hit_bounce_candidates(
             HIT_CANDIDATE_OBSERVATION_TYPE: counts.get(HIT_CANDIDATE_OBSERVATION_TYPE, 0),
             BOUNCE_CANDIDATE_OBSERVATION_TYPE: counts.get(
                 BOUNCE_CANDIDATE_OBSERVATION_TYPE, 0
+            ),
+            EVENT_CANDIDATE_REJECTION_DIAGNOSTIC_OBSERVATION_TYPE: counts.get(
+                EVENT_CANDIDATE_REJECTION_DIAGNOSTIC_OBSERVATION_TYPE,
+                0,
             ),
             "total": sum(counts.values()),
         },
@@ -557,9 +705,15 @@ def evaluate_event_candidates(
     trajectory_segments: list[list[TrajectoryPoint]],
     player_projections: list[PlayerProjection],
     config: HitBounceCandidateConfig,
-) -> tuple[int, list[EventCandidateDraft], list[EventCandidateDraft]]:
+) -> tuple[
+    int,
+    list[EventCandidateDraft],
+    list[EventCandidateDraft],
+    list[EventCandidateRejectionDiagnostic],
+]:
     hit_candidates: list[EventCandidateDraft] = []
     bounce_candidates: list[EventCandidateDraft] = []
+    rejection_diagnostics: list[EventCandidateRejectionDiagnostic] = []
     evaluated_contexts = 0
     for segment in trajectory_segments:
         for index in range(1, len(segment) - 1):
@@ -579,28 +733,32 @@ def evaluate_event_candidates(
                 player_projections,
                 time_window_ms=config.player_time_window_ms,
             )
-            if _is_player_proximate_hit_context(
+            hit_signal = _hit_signal_for_context(
                 context,
                 nearest_player,
                 config,
                 net_axis_reversal=net_axis_reversal,
-            ):
+            )
+            if hit_signal is not None:
+                assert nearest_player is not None
                 hit_candidates.append(
                     _hit_candidate_from_context(
                         context,
                         nearest_player,
                         config,
                         net_axis_reversal=net_axis_reversal,
+                        hit_signal=hit_signal,
                     )
                 )
                 continue
-            if _is_bounce_context(
+            bounce_signal = _bounce_signal_for_context(
                 context,
                 nearest_player,
                 config,
                 vertical_motion_proxy=vertical_motion_proxy,
                 speed_reduction=speed_reduction,
-            ):
+            )
+            if bounce_signal is not None:
                 bounce_candidates.append(
                     _bounce_candidate_from_context(
                         context,
@@ -608,9 +766,29 @@ def evaluate_event_candidates(
                         config,
                         vertical_motion_proxy=vertical_motion_proxy,
                         speed_reduction=speed_reduction,
+                        bounce_signal=bounce_signal,
                     )
                 )
-    return evaluated_contexts, hit_candidates, bounce_candidates
+                continue
+            rejection_diagnostics.append(
+                _rejection_diagnostic_from_context(
+                    context,
+                    nearest_player,
+                    config,
+                    net_axis_reversal=net_axis_reversal,
+                    vertical_motion_proxy=vertical_motion_proxy,
+                    speed_reduction=speed_reduction,
+                    rejection_reasons=_rejection_reasons_for_context(
+                        context,
+                        nearest_player,
+                        config,
+                        net_axis_reversal=net_axis_reversal,
+                        vertical_motion_proxy=vertical_motion_proxy,
+                        speed_reduction=speed_reduction,
+                    ),
+                )
+            )
+    return evaluated_contexts, hit_candidates, bounce_candidates, rejection_diagnostics
 
 
 def trajectory_context(
@@ -844,7 +1022,20 @@ def dedupe_event_candidates(
     *,
     candidate_dedupe_ms: int,
 ) -> list[EventCandidateDraft]:
+    kept, _ = dedupe_event_candidates_with_rejections(
+        candidates,
+        candidate_dedupe_ms=candidate_dedupe_ms,
+    )
+    return kept
+
+
+def dedupe_event_candidates_with_rejections(
+    candidates: list[EventCandidateDraft],
+    *,
+    candidate_dedupe_ms: int,
+) -> tuple[list[EventCandidateDraft], list[EventCandidateRejectionDiagnostic]]:
     kept: list[EventCandidateDraft] = []
+    rejections: list[EventCandidateRejectionDiagnostic] = []
     for candidate in sorted(
         candidates,
         key=lambda item: (
@@ -860,9 +1051,19 @@ def dedupe_event_candidates(
             and abs(existing.timestamp_ms - candidate.timestamp_ms) <= candidate_dedupe_ms
             for existing in kept
         ):
+            rejections.append(
+                _rejection_diagnostic_from_candidate(
+                    candidate,
+                    rejection_reasons=["deduped_lower_confidence"],
+                    decision_reason="deduped_lower_confidence",
+                )
+            )
             continue
         kept.append(candidate)
-    return sorted(kept, key=lambda item: (item.timestamp_ms, item.frame_number))
+    return (
+        sorted(kept, key=lambda item: (item.timestamp_ms, item.frame_number)),
+        rejections,
+    )
 
 
 def suppress_bounces_near_hits(
@@ -870,8 +1071,13 @@ def suppress_bounces_near_hits(
     bounce_candidates: list[EventCandidateDraft],
     *,
     candidate_dedupe_ms: int,
-) -> tuple[list[EventCandidateDraft], int]:
+) -> tuple[
+    list[EventCandidateDraft],
+    int,
+    list[EventCandidateRejectionDiagnostic],
+]:
     filtered_bounces: list[EventCandidateDraft] = []
+    rejections: list[EventCandidateRejectionDiagnostic] = []
     suppressed_count = 0
     for bounce in bounce_candidates:
         suppressing_hit = next(
@@ -885,24 +1091,32 @@ def suppress_bounces_near_hits(
         )
         if suppressing_hit is not None:
             suppressed_count += 1
+            rejections.append(
+                _rejection_diagnostic_from_candidate(
+                    bounce,
+                    rejection_reasons=["suppressed_by_hit_candidate"],
+                    decision_reason="suppressed_by_hit_candidate",
+                    suppressed_by_observation_type=suppressing_hit.observation_type,
+                    suppressed_by_frame=suppressing_hit.frame_number,
+                    suppressed_by_timestamp_ms=suppressing_hit.timestamp_ms,
+                )
+            )
             continue
         filtered_bounces.append(bounce)
-    return filtered_bounces, suppressed_count
+    return filtered_bounces, suppressed_count, rejections
 
 
-def _is_player_proximate_hit_context(
+def _hit_signal_for_context(
     context: TrajectoryContext,
     nearest_player: NearestPlayerContext | None,
     config: HitBounceCandidateConfig,
     *,
     net_axis_reversal: dict[str, Any],
-) -> bool:
+) -> Literal["net_axis_reversal", "player_proximate_speed_change_fallback"] | None:
     if nearest_player is None:
-        return False
+        return None
     if nearest_player.distance_template_units > config.hit_player_review_distance_max_template:
-        return False
-    if net_axis_reversal.get("reversal") is not True:
-        return False
+        return None
     strong_direction_change = (
         context.direction_delta_degrees >= config.hit_min_direction_delta_degrees
     )
@@ -917,28 +1131,62 @@ def _is_player_proximate_hit_context(
     close_contact_zone = (
         nearest_player.distance_template_units <= config.hit_player_distance_max_template
     )
-    return strong_direction_change or (close_contact_zone and relaxed_contact_change)
+    if net_axis_reversal.get("reversal") is True and (
+        strong_direction_change or (close_contact_zone and relaxed_contact_change)
+    ):
+        return "net_axis_reversal"
+    fallback_speed_change = (
+        context.speed_delta_fraction
+        >= config.hit_contact_fallback_min_speed_delta_fraction
+    )
+    fallback_direction_change = (
+        context.direction_delta_degrees
+        >= config.hit_contact_fallback_min_direction_delta_degrees
+    )
+    if close_contact_zone and fallback_speed_change and fallback_direction_change:
+        return "player_proximate_speed_change_fallback"
+    return None
 
 
-def _is_bounce_context(
+def _bounce_signal_for_context(
     context: TrajectoryContext,
     nearest_player: NearestPlayerContext | None,
     config: HitBounceCandidateConfig,
     *,
     vertical_motion_proxy: dict[str, Any],
     speed_reduction: dict[str, Any],
-) -> bool:
+) -> Literal["vertical_proxy", "speed_reduction_fallback"] | None:
     away_from_player = (
         nearest_player is None
         or nearest_player.distance_template_units
         >= config.bounce_player_distance_min_template
     )
-    return (
+    inside_or_near_court = _inside_or_near_template(
+        context.current,
+        config.bounce_inside_template_margin,
+    )
+    preferred = (
         away_from_player
         and vertical_motion_proxy.get("descending_to_ascending") is True
         and speed_reduction.get("speed_reduced") is True
-        and _inside_or_near_template(context.current, config.bounce_inside_template_margin)
+        and inside_or_near_court
     )
+    if preferred:
+        return "vertical_proxy"
+    speed_reduction_fraction = float(
+        speed_reduction.get("speed_reduction_fraction") or 0.0
+    )
+    fallback = (
+        config.bounce_fallback_enabled
+        and away_from_player
+        and inside_or_near_court
+        and speed_reduction_fraction
+        >= config.bounce_fallback_min_speed_reduction_fraction
+        and context.direction_delta_degrees >= config.bounce_min_direction_delta_degrees
+    )
+    if fallback:
+        return "speed_reduction_fallback"
+    return None
 
 
 def _hit_candidate_from_context(
@@ -947,6 +1195,7 @@ def _hit_candidate_from_context(
     config: HitBounceCandidateConfig,
     *,
     net_axis_reversal: dict[str, Any],
+    hit_signal: Literal["net_axis_reversal", "player_proximate_speed_change_fallback"],
 ) -> EventCandidateDraft:
     proximity_score = 1.0 - min(
         nearest_player.distance_template_units
@@ -958,6 +1207,8 @@ def _hit_candidate_from_context(
         + (abs(float(net_axis_reversal.get("vy_after") or 0.0)))
     ) / max(config.hit_min_net_axis_delta_template * 4.0, 1e-9)
     axis_score = min(axis_strength, 1.0)
+    if hit_signal == "player_proximate_speed_change_fallback":
+        axis_score *= 0.35
     direction_score = min(context.direction_delta_degrees / 90.0, 1.0)
     speed_score = min(context.speed_delta_fraction, 1.0)
     time_score = 1.0 - min(
@@ -975,17 +1226,29 @@ def _hit_candidate_from_context(
     )
     reason_codes = [
         "near_main_player_projection",
-        "net_axis_reversal",
         "trajectory_direction_change",
         "player_proximate_event_priority",
     ]
+    candidate_method = HIT_CANDIDATE_METHOD
+    decision_reason = "player_proximate_net_axis_reversal"
+    if hit_signal == "net_axis_reversal":
+        reason_codes.append("net_axis_reversal")
+    else:
+        candidate_method = HIT_FALLBACK_CANDIDATE_METHOD
+        decision_reason = "player_proximate_speed_change_fallback"
+        reason_codes.extend(
+            [
+                "player_proximate_speed_change_fallback",
+                "net_axis_reversal_not_required_for_fallback",
+            ]
+        )
     if context.speed_delta_fraction >= config.hit_min_speed_delta_fraction:
         reason_codes.append("speed_change_candidate")
     if nearest_player.time_delta_ms <= config.player_time_window_ms:
         reason_codes.append("within_time_window")
     return EventCandidateDraft(
         observation_type=HIT_CANDIDATE_OBSERVATION_TYPE,
-        candidate_method=HIT_CANDIDATE_METHOD,
+        candidate_method=candidate_method,
         trajectory_context=context,
         nearest_player=nearest_player,
         reason_codes=reason_codes,
@@ -998,7 +1261,7 @@ def _hit_candidate_from_context(
         candidate_decision={
             "selected_candidate_type": HIT_CANDIDATE_OBSERVATION_TYPE,
             "suppressed_candidate_types": [BOUNCE_CANDIDATE_OBSERVATION_TYPE],
-            "reason": "player_proximate_trajectory_change",
+            "reason": decision_reason,
             "classification_priority": "hit_first_when_player_proximate",
         },
         net_axis_reversal=net_axis_reversal,
@@ -1012,6 +1275,7 @@ def _bounce_candidate_from_context(
     *,
     vertical_motion_proxy: dict[str, Any],
     speed_reduction: dict[str, Any],
+    bounce_signal: Literal["vertical_proxy", "speed_reduction_fallback"],
 ) -> EventCandidateDraft:
     image_vy_before = abs(float(vertical_motion_proxy.get("image_vy_before") or 0.0))
     image_vy_after = abs(float(vertical_motion_proxy.get("image_vy_after") or 0.0))
@@ -1052,19 +1316,28 @@ def _bounce_candidate_from_context(
         + 0.20 * away_score
         + 0.15 * inside_score
     )
+    if bounce_signal == "speed_reduction_fallback":
+        confidence = min(confidence, 0.42)
     reason_codes = [
-        "descending_to_ascending_image_proxy",
         "speed_reduction_candidate",
         "away_from_main_player_projection",
         "inside_or_near_court_template",
     ]
+    candidate_method = BOUNCE_CANDIDATE_METHOD
+    decision_reason = "away_from_player_descending_ascending_speed_reduction"
+    if bounce_signal == "vertical_proxy":
+        reason_codes.append("descending_to_ascending_image_proxy")
+    else:
+        candidate_method = BOUNCE_FALLBACK_CANDIDATE_METHOD
+        decision_reason = "away_from_player_speed_reduction_fallback"
+        reason_codes.append("vertical_proxy_partial_or_unavailable")
     if context.direction_delta_degrees >= config.bounce_min_direction_delta_degrees:
         reason_codes.append("trajectory_direction_change")
     if context.speed_delta_fraction >= 0.2:
         reason_codes.append("local_motion_discontinuity")
     return EventCandidateDraft(
         observation_type=BOUNCE_CANDIDATE_OBSERVATION_TYPE,
-        candidate_method=BOUNCE_CANDIDATE_METHOD,
+        candidate_method=candidate_method,
         trajectory_context=context,
         nearest_player=nearest_player,
         reason_codes=reason_codes,
@@ -1081,12 +1354,180 @@ def _bounce_candidate_from_context(
         candidate_decision={
             "selected_candidate_type": BOUNCE_CANDIDATE_OBSERVATION_TYPE,
             "suppressed_candidate_types": [],
-            "reason": "away_from_player_descending_ascending_speed_reduction",
+            "reason": decision_reason,
             "classification_priority": "hit_first_when_player_proximate",
         },
         vertical_motion_proxy=vertical_motion_proxy,
         speed_reduction=speed_reduction,
     )
+
+
+def _rejection_reasons_for_context(
+    context: TrajectoryContext,
+    nearest_player: NearestPlayerContext | None,
+    config: HitBounceCandidateConfig,
+    *,
+    net_axis_reversal: dict[str, Any],
+    vertical_motion_proxy: dict[str, Any],
+    speed_reduction: dict[str, Any],
+) -> list[str]:
+    reasons: list[str] = []
+    if context.previous is None:
+        reasons.append("missing_previous_point")
+    if context.next is None:
+        reasons.append("missing_next_point")
+    if context.current.image_y is None:
+        reasons.append("missing_source_image_point")
+    if nearest_player is None:
+        reasons.append("no_nearest_player_in_time_window")
+    elif nearest_player.distance_template_units > config.hit_player_distance_max_template:
+        reasons.append("player_too_far_for_hit")
+    if net_axis_reversal.get("reversal") is not True:
+        reasons.append("no_net_axis_reversal")
+        if (
+            net_axis_reversal.get("vy_before") is None
+            or net_axis_reversal.get("vy_after") is None
+        ):
+            reasons.append("net_axis_delta_below_threshold")
+    if vertical_motion_proxy.get("descending_to_ascending") is not True:
+        reasons.append("no_descending_to_ascending_proxy")
+    if speed_reduction.get("speed_reduced") is not True:
+        reasons.append("no_speed_reduction")
+    if not _inside_or_near_template(context.current, config.bounce_inside_template_margin):
+        reasons.append("not_inside_or_near_court")
+    if (
+        nearest_player is not None
+        and nearest_player.distance_template_units
+        < config.bounce_player_distance_min_template
+    ):
+        reasons.append("near_player_so_not_bounce")
+    return sorted(set(reasons))
+
+
+def _rejection_diagnostic_from_context(
+    context: TrajectoryContext,
+    nearest_player: NearestPlayerContext | None,
+    config: HitBounceCandidateConfig,
+    *,
+    net_axis_reversal: dict[str, Any],
+    vertical_motion_proxy: dict[str, Any],
+    speed_reduction: dict[str, Any],
+    rejection_reasons: list[str],
+) -> EventCandidateRejectionDiagnostic:
+    return EventCandidateRejectionDiagnostic(
+        trajectory_context=context,
+        nearest_player=nearest_player,
+        net_axis_reversal=net_axis_reversal,
+        vertical_motion_proxy=vertical_motion_proxy,
+        speed_reduction=speed_reduction,
+        inside_or_near_court_template=_inside_or_near_template(
+            context.current,
+            config.bounce_inside_template_margin,
+        ),
+        player_proximity_gate=_player_proximity_gate_payload(
+            nearest_player=nearest_player,
+            threshold=config.hit_player_distance_max_template,
+            away_from_player=(
+                nearest_player is None
+                or nearest_player.distance_template_units
+                >= config.bounce_player_distance_min_template
+            ),
+        ),
+        candidate_decision={
+            "selected_candidate_type": None,
+            "reason": "rejected",
+            "rejection_reasons": rejection_reasons,
+            "classification_priority": "hit_first_when_player_proximate",
+        },
+        rejection_reasons=rejection_reasons,
+    )
+
+
+def _rejection_diagnostic_from_candidate(
+    candidate: EventCandidateDraft,
+    *,
+    rejection_reasons: list[str],
+    decision_reason: str,
+    suppressed_by_observation_type: str | None = None,
+    suppressed_by_frame: int | None = None,
+    suppressed_by_timestamp_ms: int | None = None,
+) -> EventCandidateRejectionDiagnostic:
+    candidate_decision = {
+        "selected_candidate_type": None,
+        "attempted_candidate_type": candidate.observation_type,
+        "reason": decision_reason,
+        "rejection_reasons": rejection_reasons,
+        "classification_priority": "hit_first_when_player_proximate",
+    }
+    if suppressed_by_observation_type is not None:
+        candidate_decision["suppressed_by_observation_type"] = (
+            suppressed_by_observation_type
+        )
+        candidate_decision["suppressed_by_frame"] = suppressed_by_frame
+        candidate_decision["suppressed_by_timestamp_ms"] = suppressed_by_timestamp_ms
+    return EventCandidateRejectionDiagnostic(
+        trajectory_context=candidate.trajectory_context,
+        nearest_player=candidate.nearest_player,
+        net_axis_reversal=candidate.net_axis_reversal or {},
+        vertical_motion_proxy=candidate.vertical_motion_proxy or {},
+        speed_reduction=candidate.speed_reduction or {},
+        player_proximity_gate=candidate.player_proximity_gate,
+        candidate_decision=candidate_decision,
+        rejection_reasons=rejection_reasons,
+        inside_or_near_court_template=_inside_or_near_template(
+            candidate.trajectory_context.current,
+            DEFAULT_BOUNCE_TEMPLATE_MARGIN,
+        ),
+    )
+
+
+def _rejection_reason_counts(
+    diagnostics: list[EventCandidateRejectionDiagnostic],
+) -> dict[str, int]:
+    counts: Counter[str] = Counter()
+    for diagnostic in diagnostics:
+        counts.update(diagnostic.rejection_reasons)
+    return dict(sorted(counts.items()))
+
+
+def _persist_event_candidates_and_diagnostics(
+    *,
+    writer: ObservationWriter,
+    media: MediaAsset,
+    run: ProcessingRun,
+    step: ProcessingStep,
+    model: ModelRegistry,
+    runtime_config: RuntimeConfig,
+    ball_trajectory_run_id: str,
+    court_projection_run_id: str,
+    candidates: list[EventCandidateDraft],
+    diagnostics: list[EventCandidateRejectionDiagnostic],
+) -> list[Any]:
+    observations = _persist_event_candidates(
+        writer=writer,
+        media=media,
+        run=run,
+        step=step,
+        model=model,
+        runtime_config=runtime_config,
+        ball_trajectory_run_id=ball_trajectory_run_id,
+        court_projection_run_id=court_projection_run_id,
+        candidates=candidates,
+    )
+    observations.extend(
+        _persist_event_candidate_diagnostics(
+            writer=writer,
+            media=media,
+            run=run,
+            step=step,
+            model=model,
+            runtime_config=runtime_config,
+            ball_trajectory_run_id=ball_trajectory_run_id,
+            court_projection_run_id=court_projection_run_id,
+            diagnostics=diagnostics,
+        )
+    )
+    return observations
 
 
 def _persist_event_candidates(
@@ -1114,6 +1555,38 @@ def _persist_event_candidates(
                     ball_trajectory_run_id=ball_trajectory_run_id,
                     court_projection_run_id=court_projection_run_id,
                     candidate=candidate,
+                    index=index,
+                )
+            )
+        )
+    return observations
+
+
+def _persist_event_candidate_diagnostics(
+    *,
+    writer: ObservationWriter,
+    media: MediaAsset,
+    run: ProcessingRun,
+    step: ProcessingStep,
+    model: ModelRegistry,
+    runtime_config: RuntimeConfig,
+    ball_trajectory_run_id: str,
+    court_projection_run_id: str,
+    diagnostics: list[EventCandidateRejectionDiagnostic],
+) -> list[Any]:
+    observations = []
+    for index, diagnostic in enumerate(diagnostics):
+        observations.append(
+            writer.write(
+                _event_candidate_diagnostic_observation_create(
+                    media=media,
+                    run=run,
+                    step=step,
+                    model=model,
+                    runtime_config=runtime_config,
+                    ball_trajectory_run_id=ball_trajectory_run_id,
+                    court_projection_run_id=court_projection_run_id,
+                    diagnostic=diagnostic,
                     index=index,
                 )
             )
@@ -1238,6 +1711,136 @@ def _event_candidate_observation_create(
         },
         idempotency_key=(
             f"{run.id}:{candidate.observation_type}:"
+            f"{current.trajectory_observation.id}:{current.frame_number}:{index}"
+        ),
+        lineage=lineage,
+    )
+
+
+def _event_candidate_diagnostic_observation_create(
+    *,
+    media: MediaAsset,
+    run: ProcessingRun,
+    step: ProcessingStep,
+    model: ModelRegistry,
+    runtime_config: RuntimeConfig,
+    ball_trajectory_run_id: str,
+    court_projection_run_id: str,
+    diagnostic: EventCandidateRejectionDiagnostic,
+    index: int,
+) -> ObservationCreate:
+    current = diagnostic.trajectory_context.current
+    payload = {
+        "candidate_type": EVENT_CANDIDATE_REJECTION_DIAGNOSTIC_OBSERVATION_TYPE,
+        "source_ball_trajectory_run_id": ball_trajectory_run_id,
+        "source_ball_trajectory_observation_id": current.trajectory_observation.id,
+        "source_court_projection_run_id": court_projection_run_id,
+        "source_ball_court_projection_observation_id": (
+            current.source_ball_court_projection_observation_id
+        ),
+        "frame_number": current.frame_number,
+        "timestamp_ms": current.timestamp_ms,
+        "court_point": {"x": _round(current.court_x), "y": _round(current.court_y)},
+        "image_point": (
+            {"x": _round(current.image_x), "y": _round(current.image_y)}
+            if current.image_x is not None and current.image_y is not None
+            else None
+        ),
+        "trajectory_context": _trajectory_context_payload(diagnostic.trajectory_context),
+        "net_axis_reversal": diagnostic.net_axis_reversal,
+        "vertical_motion_proxy": diagnostic.vertical_motion_proxy,
+        "speed_reduction": diagnostic.speed_reduction,
+        "player_proximity_gate": diagnostic.player_proximity_gate,
+        "candidate_decision": diagnostic.candidate_decision,
+        "rejection_reasons": diagnostic.rejection_reasons,
+        "inside_or_near_court_template": diagnostic.inside_or_near_court_template,
+        "diagnostic_only": True,
+        "candidate_method": EVENT_CANDIDATE_METHOD,
+        "classification_priority": "hit_first_when_player_proximate",
+        "coordinate_space": CoordinateSpace.court_template_2d,
+        "template_name": COURT_TEMPLATE_NAME,
+        "template_version": COURT_TEMPLATE_VERSION,
+        "source_label": "hit/bounce candidate rejection diagnostic",
+        "evidence_source": "event_candidate_diagnostic",
+        "not_ball_truth": True,
+        **EVENT_CANDIDATE_WARNINGS,
+    }
+    if diagnostic.nearest_player is not None:
+        payload["nearest_player"] = _nearest_player_payload(diagnostic.nearest_player)
+        payload["source_player_court_projection_observation_id"] = (
+            diagnostic.nearest_player.player.observation.id
+        )
+    else:
+        payload["nearest_player"] = None
+        payload["source_player_court_projection_observation_id"] = None
+    lineage = [
+        ObservationLineageCreate(
+            parent_observation_id=current.trajectory_observation.id,
+            relationship_type=RelationshipType.derived_from,
+            processing_step_id=step.id,
+            payload_jsonb={
+                "candidate_type": EVENT_CANDIDATE_REJECTION_DIAGNOSTIC_OBSERVATION_TYPE,
+                "candidate_method": EVENT_CANDIDATE_METHOD,
+                "diagnostic_only": True,
+                **EVENT_CANDIDATE_WARNINGS,
+            },
+        )
+    ]
+    if current.source_ball_court_projection_observation_id is not None:
+        lineage.append(
+            ObservationLineageCreate(
+                parent_observation_id=current.source_ball_court_projection_observation_id,
+                relationship_type=RelationshipType.derived_from,
+                processing_step_id=step.id,
+                payload_jsonb={
+                    "candidate_type": (
+                        EVENT_CANDIDATE_REJECTION_DIAGNOSTIC_OBSERVATION_TYPE
+                    ),
+                    "candidate_method": EVENT_CANDIDATE_METHOD,
+                    "diagnostic_only": True,
+                    **EVENT_CANDIDATE_WARNINGS,
+                },
+            )
+        )
+    if diagnostic.nearest_player is not None:
+        lineage.append(
+            ObservationLineageCreate(
+                parent_observation_id=diagnostic.nearest_player.player.observation.id,
+                relationship_type=RelationshipType.derived_from,
+                processing_step_id=step.id,
+                payload_jsonb={
+                    "candidate_type": (
+                        EVENT_CANDIDATE_REJECTION_DIAGNOSTIC_OBSERVATION_TYPE
+                    ),
+                    "candidate_method": EVENT_CANDIDATE_METHOD,
+                    "diagnostic_only": True,
+                    **EVENT_CANDIDATE_WARNINGS,
+                },
+            )
+        )
+    return ObservationCreate(
+        media_id=media.id,
+        run_id=run.id,
+        observation_family=ObservationFamily.event_candidate,
+        observation_type=EVENT_CANDIDATE_REJECTION_DIAGNOSTIC_OBSERVATION_TYPE,
+        granularity=ObservationGranularity.frame,
+        frame_start=current.frame_number,
+        frame_end=current.frame_number,
+        timestamp_start_ms=current.timestamp_ms,
+        timestamp_end_ms=current.timestamp_ms,
+        confidence=None,
+        model_id=model.id,
+        runtime_config_id=runtime_config.id,
+        coordinate_space=CoordinateSpace.court_template_2d,
+        payload_jsonb={
+            **payload,
+            "processing_step_id": step.id,
+            "not_hit_truth": True,
+            "not_bounce_truth": True,
+            "not_in_out_truth": True,
+        },
+        idempotency_key=(
+            f"{run.id}:{EVENT_CANDIDATE_REJECTION_DIAGNOSTIC_OBSERVATION_TYPE}:"
             f"{current.trajectory_observation.id}:{current.frame_number}:{index}"
         ),
         lineage=lineage,
@@ -1416,7 +2019,7 @@ def _register_model(session: Session) -> ModelRegistry:
         select(ModelRegistry)
         .where(
             ModelRegistry.name == "hit-bounce-candidate-evidence",
-            ModelRegistry.version == "v0.2",
+            ModelRegistry.version == "v0.2.1",
             ModelRegistry.model_family == "event_candidate",
             ModelRegistry.source == "apps.worker.services.hit_bounce_candidates",
         )
@@ -1426,7 +2029,7 @@ def _register_model(session: Session) -> ModelRegistry:
         return existing
     model = ModelRegistry(
         name="hit-bounce-candidate-evidence",
-        version="v0.2",
+        version="v0.2.1",
         model_family="event_candidate",
         source="apps.worker.services.hit_bounce_candidates",
         metadata_jsonb={
@@ -1451,7 +2054,7 @@ def _create_runtime_config(
 ) -> RuntimeConfig:
     runtime_config = RuntimeConfig(
         config_name="hit-bounce-candidate-evidence-config",
-        config_version="v0.2",
+        config_version="v0.2.1",
         payload_jsonb={
             "candidate_method": EVENT_CANDIDATE_METHOD,
             "source_ball_trajectory_run_id": ball_trajectory_run_id,
@@ -1511,7 +2114,7 @@ def _create_step(
     now = datetime.now(UTC)
     step = ProcessingStep(
         run_id=run.id,
-        step_name="hit_bounce_physics_heuristic_repair_v02",
+        step_name="hit_bounce_recall_diagnostics_header_repair_v021",
         step_status="running",
         started_at=now,
         runtime_config_id=runtime_config.id,
@@ -1606,6 +2209,17 @@ def _validate_config(config: HitBounceCandidateConfig) -> dict[str, Any] | None:
             "invalid_hit_min_speed_delta_fraction",
             "hit_min_speed_delta_fraction must be greater than or equal to zero",
         )
+    if config.hit_contact_fallback_min_speed_delta_fraction < 0:
+        return _failed(
+            "invalid_hit_contact_fallback_min_speed_delta_fraction",
+            "hit_contact_fallback_min_speed_delta_fraction must be greater than or equal to zero",
+        )
+    if config.hit_contact_fallback_min_direction_delta_degrees < 0:
+        return _failed(
+            "invalid_hit_contact_fallback_min_direction_delta_degrees",
+            "hit_contact_fallback_min_direction_delta_degrees must be greater than "
+            "or equal to zero",
+        )
     if config.bounce_player_distance_min_template < 0:
         return _failed(
             "invalid_bounce_player_distance_min_template",
@@ -1631,10 +2245,20 @@ def _validate_config(config: HitBounceCandidateConfig) -> dict[str, Any] | None:
             "invalid_bounce_min_speed_reduction_fraction",
             "bounce_min_speed_reduction_fraction must be greater than or equal to zero",
         )
+    if config.bounce_fallback_min_speed_reduction_fraction < 0:
+        return _failed(
+            "invalid_bounce_fallback_min_speed_reduction_fraction",
+            "bounce_fallback_min_speed_reduction_fraction must be greater than or equal to zero",
+        )
     if config.candidate_dedupe_ms < 0:
         return _failed(
             "invalid_candidate_dedupe_ms",
             "candidate_dedupe_ms must be greater than or equal to zero",
+        )
+    if config.player_time_window_ms < 0:
+        return _failed(
+            "invalid_player_time_window_ms",
+            "player_time_window_ms must be greater than or equal to zero",
         )
     return None
 

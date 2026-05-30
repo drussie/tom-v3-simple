@@ -91,6 +91,14 @@ projection evidence.
 If source image points are unavailable, v0.2 does not create a high-confidence bounce candidate
 from the vertical proxy path.
 
+## v0.2.1 Recall Diagnostics Repair
+
+The follow-up v0.2.1 repair adds `event_candidate_rejection_diagnostic` observations and a bounded
+player-proximate speed-change fallback for sparse far-side hit contexts. The fallback is labeled as
+candidate evidence and does not upgrade hits or bounces into truth.
+
+See `docs/events/hit_bounce_recall_diagnostics_header_repair_v021.md`.
+
 ## CLI Thresholds
 
 `build-hit-bounce-candidates` now supports:

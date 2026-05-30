@@ -856,6 +856,11 @@ TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_tom_v1_bridge.db \
   --hit-min-net-axis-delta-template 0.015 \
   --bounce-min-image-y-delta-pixels 2.0 \
   --bounce-min-speed-reduction-fraction 0.05 \
+  --hit-player-time-window-ms 300 \
+  --hit-contact-fallback-min-speed-delta-fraction 0.45 \
+  --hit-contact-fallback-min-direction-delta-degrees 5.0 \
+  --bounce-fallback-enabled \
+  --bounce-fallback-min-speed-reduction-fraction 0.35 \
   --candidate-dedupe-ms 500 \
   --viewer-base-url http://127.0.0.1:3000
 ```
@@ -863,8 +868,10 @@ TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_tom_v1_bridge.db \
 This creates derived `hit_candidate` and `bounce_candidate` rows from court-space trajectory
 diagnostics and main-player projection proximity. The v0.2 repair prefers player-proximate
 `court_y` net-axis reversal for hit candidates and image-y descending-to-ascending proxy plus speed
-reduction for bounce candidates. These are candidate markers only. They are not hit truth, bounce
-truth, in/out truth, rally/point/score logic, or adjudication.
+reduction for bounce candidates. The v0.2.1 repair also writes
+`event_candidate_rejection_diagnostic` rows and a rejection-reason summary so missing candidate
+contexts can be inspected. These are candidate markers and diagnostics only. They are not hit truth,
+bounce truth, in/out truth, rally/point/score logic, or adjudication.
 
 Replay can show those candidates in two places:
 

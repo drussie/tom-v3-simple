@@ -1122,10 +1122,12 @@ export function ReplayWorkstation({
             <span className="mini-pill">
               {replayMode === "stream_proxy" ? "Stream Proxy Mode" : "Replay Mode"}
             </span>
-            <span className="mono">{replayInfo.media_id}</span>
+            <span className="mono replay-media-id" title={replayInfo.media_id}>
+              {replayInfo.media_id}
+            </span>
           </div>
         </div>
-        <div className="meta-line">
+        <div className="meta-line viewer-summary-badges">
           <span className="mini-pill">{replayInfo.frame_time_mode} frame/time</span>
           <span className="mini-pill">{detections.length} detection overlays</span>
           <span className="mini-pill">{tracklets.length} tracklet candidates</span>

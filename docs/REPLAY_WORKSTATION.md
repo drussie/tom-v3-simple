@@ -130,6 +130,11 @@ Hit/Bounce Physics Heuristic Repair v0.2 adds selected-evidence diagnostics for
 `net_axis_reversal`, `vertical_motion_proxy`, and `speed_reduction`. These explain why a candidate
 was proposed; they do not make the candidate true.
 
+Hit/Bounce Recall Diagnostics + Header Layout Repair v0.2.1 adds persisted
+`event_candidate_rejection_diagnostic` rows and rejection-reason summaries for evaluated contexts
+that were not emitted as candidates. The replay header also keeps the media id on one ellipsized
+line so the video starts near the top of the page instead of below a collapsed vertical header.
+
 ## What 6A Added
 
 - `GET /media/{media_id}/replay-info`
@@ -702,6 +707,10 @@ markers also appear on the broadcast video when replay can resolve the source im
 candidate markers remain visible as persistent review pins, with active and selected states, so
 operators can review the full point without missing sparse markers. Both surfaces are derived
 diagnostics only. They are not hit truth, bounce truth, in/out, point, score, or adjudication.
+
+Candidate rejection diagnostics are persisted as event-candidate-family observations for audit.
+They explain why contexts were rejected, deduped, or suppressed; they are not rejected truth and do
+not create an accepted/rejected lifecycle.
 
 Event candidate selected evidence shows the v0.2 physics fields when available: player-proximate
 net-axis reversal for hit candidates, and image-y descending-to-ascending proxy plus speed

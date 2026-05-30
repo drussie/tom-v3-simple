@@ -133,6 +133,54 @@ def test_hit_candidate_not_produced_when_player_is_far(db_session: Session) -> N
     assert result["observations"]["hit_candidate"] == 0
 
 
+def test_far_side_style_player_time_offset_hit_fallback(
+    db_session: Session,
+) -> None:
+    media = _seed_media(db_session)
+    trajectory_run, _ = _seed_trajectory_run(
+        db_session,
+        media.id,
+        points=[
+            (27, 900, 0.4350, 0.8510),
+            (28, 933, 0.4374, 0.8603),
+            (29, 967, 0.4398, 0.8696),
+            (30, 1000, 0.4420, 0.8880),
+            (31, 1033, 0.4434, 0.8939),
+            (32, 1067, 0.4447, 0.8986),
+        ],
+    )
+    projection_run = _seed_projection_run(
+        db_session,
+        media.id,
+        players=[(29, 967, 0.442, 0.750, "far_player_track_candidate")],
+    )
+
+    result = build_hit_bounce_candidates(
+        session=db_session,
+        media_id=media.id,
+        ball_trajectory_run_id=trajectory_run.id,
+        court_projection_run_id=projection_run.id,
+        hit_player_time_window_ms=300,
+        candidate_dedupe_ms=500,
+    )
+
+    assert result["ok"] is True
+    assert result["observations"]["hit_candidate"] == 1
+    hit = db_session.scalar(
+        select(Observation).where(
+            Observation.run_id == result["event_candidate_run_id"],
+            Observation.observation_type == "hit_candidate",
+        )
+    )
+    assert hit is not None
+    assert hit.payload_jsonb["candidate_method"].endswith("_fallback_v021")
+    assert "player_proximate_speed_change_fallback" in hit.payload_jsonb["reason_codes"]
+    assert hit.payload_jsonb["net_axis_reversal"]["reversal"] is False
+    assert hit.payload_jsonb["nearest_player"]["track_role_candidate"] == (
+        "far_player_track_candidate"
+    )
+
+
 def test_bounce_candidate_away_from_players_direction_change(db_session: Session) -> None:
     media = _seed_media(db_session)
     trajectory_run, ball_projection_ids = _seed_trajectory_run(
@@ -248,6 +296,47 @@ def test_bounce_candidate_requires_descending_ascending_proxy(
 
     assert result["ok"] is True
     assert result["observations"]["bounce_candidate"] == 0
+
+
+def test_bounce_fallback_is_low_confidence_and_labeled_when_image_proxy_missing(
+    db_session: Session,
+) -> None:
+    media = _seed_media(db_session)
+    trajectory_run, ball_projection_ids = _seed_trajectory_run(
+        db_session,
+        media.id,
+        points=[
+            (0, 0, 0.20, 0.20),
+            (1, 33, 0.30, 0.50),
+            (2, 66, 0.35, 0.50),
+        ],
+    )
+    _remove_ball_projection_image_points(db_session, ball_projection_ids)
+    projection_run = _seed_projection_run(
+        db_session,
+        media.id,
+        players=[(1, 33, 0.90, 0.90, "near_player_track_candidate")],
+    )
+
+    result = build_hit_bounce_candidates(
+        session=db_session,
+        media_id=media.id,
+        ball_trajectory_run_id=trajectory_run.id,
+        court_projection_run_id=projection_run.id,
+    )
+
+    assert result["ok"] is True
+    assert result["observations"]["bounce_candidate"] == 1
+    bounce = db_session.scalar(
+        select(Observation).where(
+            Observation.run_id == result["event_candidate_run_id"],
+            Observation.observation_type == "bounce_candidate",
+        )
+    )
+    assert bounce is not None
+    assert bounce.confidence <= 0.42
+    assert bounce.payload_jsonb["candidate_method"].endswith("_fallback")
+    assert "vertical_proxy_partial_or_unavailable" in bounce.payload_jsonb["reason_codes"]
 
 
 def test_player_proximate_trajectory_change_is_prioritized_as_hit(
@@ -374,6 +463,96 @@ def test_candidate_dedupe_keeps_highest_confidence_per_window(
     )
     assert hit is not None
     assert "player_proximate_event_priority" in hit.payload_jsonb["reason_codes"]
+
+
+def test_rejected_contexts_persist_rejection_reason_diagnostics(
+    db_session: Session,
+) -> None:
+    media = _seed_media(db_session)
+    trajectory_run, _ = _seed_trajectory_run(
+        db_session,
+        media.id,
+        points=[
+            (0, 0, 0.20, 0.20),
+            (1, 33, 0.30, 0.30),
+            (2, 66, 0.40, 0.40),
+        ],
+    )
+    projection_run = _seed_projection_run(db_session, media.id, players=[])
+
+    result = build_hit_bounce_candidates(
+        session=db_session,
+        media_id=media.id,
+        ball_trajectory_run_id=trajectory_run.id,
+        court_projection_run_id=projection_run.id,
+    )
+
+    assert result["ok"] is True
+    assert result["observations"]["event_candidate_rejection_diagnostic"] == 1
+    assert result["candidate_summary"]["rejected_context_count"] == 1
+    assert "no_nearest_player_in_time_window" in result["candidate_summary"][
+        "rejection_reasons"
+    ]
+    diagnostic = db_session.scalar(
+        select(Observation).where(
+            Observation.run_id == result["event_candidate_run_id"],
+            Observation.observation_type == "event_candidate_rejection_diagnostic",
+        )
+    )
+    assert diagnostic is not None
+    assert diagnostic.payload_jsonb["candidate_decision"]["reason"] == "rejected"
+    assert diagnostic.payload_jsonb["diagnostic_only"] is True
+    assert diagnostic.payload_jsonb["not_hit_truth"] is True
+    assert diagnostic.payload_jsonb["not_bounce_truth"] is True
+
+
+def test_dedupe_does_not_suppress_valid_far_side_event_from_near_side_event(
+    db_session: Session,
+) -> None:
+    media = _seed_media(db_session)
+    trajectory_run, _ = _seed_trajectory_run(
+        db_session,
+        media.id,
+        points=[
+            (0, 0, 0.20, 0.35),
+            (1, 33, 0.30, 0.20),
+            (2, 66, 0.40, 0.35),
+            (29, 967, 0.4398, 0.8696),
+            (30, 1000, 0.4420, 0.8880),
+            (31, 1033, 0.4434, 0.8939),
+        ],
+    )
+    projection_run = _seed_projection_run(
+        db_session,
+        media.id,
+        players=[
+            (1, 33, 0.31, 0.22, "near_player_track_candidate"),
+            (29, 967, 0.442, 0.750, "far_player_track_candidate"),
+        ],
+    )
+
+    result = build_hit_bounce_candidates(
+        session=db_session,
+        media_id=media.id,
+        ball_trajectory_run_id=trajectory_run.id,
+        court_projection_run_id=projection_run.id,
+        candidate_dedupe_ms=500,
+    )
+
+    assert result["ok"] is True
+    assert result["observations"]["hit_candidate"] == 2
+    hits = db_session.scalars(
+        select(Observation)
+        .where(
+            Observation.run_id == result["event_candidate_run_id"],
+            Observation.observation_type == "hit_candidate",
+        )
+        .order_by(Observation.timestamp_start_ms)
+    ).all()
+    assert [hit.payload_jsonb["nearest_player"]["track_role_candidate"] for hit in hits] == [
+        "near_player_track_candidate",
+        "far_player_track_candidate",
+    ]
 
 
 def test_event_candidate_replay_payloads_are_exposed(db_session: Session) -> None:
@@ -519,6 +698,11 @@ def test_hit_bounce_candidate_plan_only_and_cli_do_not_mutate(
         hit_min_net_axis_delta_template = 0.015
         bounce_min_image_y_delta_pixels = 2.0
         bounce_min_speed_reduction_fraction = 0.05
+        hit_player_time_window_ms = 300
+        hit_contact_fallback_min_speed_delta_fraction = 0.45
+        hit_contact_fallback_min_direction_delta_degrees = 5.0
+        bounce_fallback_enabled = True
+        bounce_fallback_min_speed_reduction_fraction = 0.35
         candidate_dedupe_ms = 500
         viewer_base_url = "http://127.0.0.1:3000"
         plan_only = True
@@ -674,6 +858,19 @@ def _update_ball_projection_image_points(
         assert observation is not None
         payload = dict(observation.payload_jsonb or {})
         payload["image_point"] = {"x": image_x, "y": image_y}
+        observation.payload_jsonb = payload
+    session.commit()
+
+
+def _remove_ball_projection_image_points(
+    session: Session,
+    projection_ids: list[str],
+) -> None:
+    for projection_id in projection_ids:
+        observation = session.get(Observation, projection_id)
+        assert observation is not None
+        payload = dict(observation.payload_jsonb or {})
+        payload.pop("image_point", None)
         observation.payload_jsonb = payload
     session.commit()
 

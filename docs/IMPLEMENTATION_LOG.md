@@ -2310,3 +2310,28 @@ This repair adds:
 The markers and classifications remain derived candidate evidence only. They are not hit truth,
 bounce truth, in/out, rally/point/score, player identity, accepted/rejected lifecycle, or
 adjudication.
+
+## Hit/Bounce Recall Diagnostics + Header Layout Repair v0.2.1
+
+Status: complete
+
+### Goal
+
+Preserve near-side event candidates, recover missing far-side candidates where evidence supports
+them, explain rejected contexts, and fix the replay header layout collapse.
+
+### Notes
+
+This repair adds:
+
+- `event_candidate_rejection_diagnostic` observations
+- rejection-reason counts in candidate summaries
+- `player_proximate_speed_reduction_hit_candidate_fallback_v021`
+- configurable `HIT_PLAYER_TIME_WINDOW_MS`
+- configurable hit/bounce fallback thresholds
+- compact replay header layout
+- ellipsized `.replay-media-id`
+
+The local bridge smoke run produced 2 `hit_candidate` observations, 2 `bounce_candidate`
+observations, and 29 rejection diagnostics for the sample point. Candidate diagnostics explain
+missing or suppressed contexts; they are not truth, in/out, score, or adjudication.
