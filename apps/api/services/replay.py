@@ -1234,6 +1234,9 @@ def event_candidate_timeline_item_from_observation(
         "player_anchored_hit_recall": overlay_item["player_anchored_hit_recall"],
         "player_anchor_contact_zone": overlay_item["player_anchor_contact_zone"],
         "net_axis_reversal_recall": overlay_item["net_axis_reversal_recall"],
+        "image_space_net_axis_reversal_recall": overlay_item[
+            "image_space_net_axis_reversal_recall"
+        ],
         "overlap_suppression": overlay_item["overlap_suppression"],
         "image_point": overlay_item["image_point"],
         "image_marker_source": overlay_item["image_marker_source"],
@@ -2244,6 +2247,11 @@ def event_candidate_overlay_item_from_observation(
         "net_axis_reversal_recall": (
             payload.get("net_axis_reversal_recall")
             if isinstance(payload.get("net_axis_reversal_recall"), dict)
+            else None
+        ),
+        "image_space_net_axis_reversal_recall": (
+            payload.get("image_space_net_axis_reversal_recall")
+            if isinstance(payload.get("image_space_net_axis_reversal_recall"), dict)
             else None
         ),
         "overlap_suppression": (

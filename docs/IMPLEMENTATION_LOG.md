@@ -2423,6 +2423,34 @@ recall method, including a far-player anchored hit that used a wide-window `cour
 This repair improves candidate recall only. It does not add hit truth, bounce truth, in/out,
 rally/point/score logic, player identity, accepted/rejected lifecycle, or adjudication.
 
+## Image-Space Net-Axis Hit Recall v0.2.6
+
+Status: complete
+
+### Goal
+
+Recover airborne far-side hit candidates that are visible in broadcast image space but not cleanly
+represented by court-plane `court_y` homography projection.
+
+### Notes
+
+This repair adds:
+
+- `image_space_net_axis_reversal_hit_candidate_v026`
+- `broadcast_image_y_axis_fallback_v026`
+- `image_space_net_axis_reversal_recall` payload and rejection diagnostics
+- direct image-space recall from `ball_court_projection_candidate.image_point` rows when available
+- CLI/Makefile controls for the image-space lookback/lookahead, pixel delta, and dedupe distance
+
+The local bridge smoke run produced 4 `hit_candidate` observations, 2 `bounce_candidate`
+observations, and 796 rejection diagnostics. One final hit was recovered by the image-space recall
+path at frame 54, using incoming frame 34 and outgoing frame 66. Existing bounce candidates
+remained present and no image-space hit was suppressed by bounce overlap.
+
+This repair improves candidate recall only. Broadcast image-y is a camera-space fallback, not true
+ball height or calibrated court geometry. It does not add hit truth, bounce truth, in/out,
+rally/point/score logic, player identity, accepted/rejected lifecycle, or adjudication.
+
 ## Player-Anchored Hit Contact-Zone Tightening v0.2.4
 
 Status: complete

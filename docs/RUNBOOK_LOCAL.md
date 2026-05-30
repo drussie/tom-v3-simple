@@ -897,6 +897,15 @@ without requiring player proximity. Player proximity is diagnostic/confidence su
 path. The repair keeps bounce-overlap protections and remains candidate evidence only, not hit
 truth, bounce truth, in/out, score, or adjudication.
 
+The v0.2.6 image-space net-axis hit recall repair adds
+`image_space_net_axis_reversal_hit_candidate_v026` candidates from broadcast image-y direction
+reversal. The axis method is explicitly labeled `broadcast_image_y_axis_fallback_v026` because this
+is a hardcam image-space fallback for airborne hit-like candidates, not universal camera geometry.
+Player proximity is not required for this path; it is diagnostic/confidence support only. The
+repair can use `ball_court_projection_candidate.image_point` rows directly, so a short or gappy
+projection span can recover a hit candidate even when it was not persisted as a trajectory segment.
+It remains candidate evidence only, not hit truth, bounce truth, in/out, score, or adjudication.
+
 Replay can show those candidates in two places:
 
 - the normalized court mini-map, using candidate court-template coordinates
@@ -1435,6 +1444,9 @@ python -m apps.worker.cli completion-audit --no-demo-only
 - Player-anchored hit contact-zone tightening suppresses anchored hits that overlap final
   bounce/open-court landing clusters. The diagnostics explain the suppression, but they do not
   create hit truth, bounce truth, in/out, score, or adjudication.
+- Image-space net-axis hit recall uses a broadcast image-y fallback to improve airborne hit
+  candidate recall. This is not true camera geometry, true ball height, hit truth, in/out, score,
+  or adjudication.
 - Cloud deployment, auth, production streaming, and multi-camera reasoning are out of scope.
 
 ## 15. Completion Checklist

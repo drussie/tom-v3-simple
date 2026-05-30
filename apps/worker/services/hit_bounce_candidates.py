@@ -44,6 +44,9 @@ HIT_FALLBACK_CANDIDATE_METHOD = (
     "player_proximate_speed_reduction_hit_candidate_fallback_v024"
 )
 NET_AXIS_REVERSAL_HIT_CANDIDATE_METHOD = "net_axis_reversal_hit_candidate_v025"
+IMAGE_SPACE_NET_AXIS_HIT_CANDIDATE_METHOD = (
+    "image_space_net_axis_reversal_hit_candidate_v026"
+)
 BOUNCE_CANDIDATE_METHOD = "image_vertical_proxy_speed_reduction_bounce_candidate_v024"
 BOUNCE_FALLBACK_CANDIDATE_METHOD = (
     "image_vertical_proxy_speed_reduction_bounce_candidate_v024_fallback"
@@ -54,7 +57,7 @@ PLAYER_ANCHORED_HIT_CANDIDATE_METHOD = (
 SIDE_ZONE_SEQUENCE_HIT_METHOD = "side_zone_sequence_hit_candidate_v024"
 SIDE_ZONE_SEQUENCE_BOUNCE_METHOD = "side_zone_sequence_bounce_candidate_v024"
 EVENT_CANDIDATE_METHOD = (
-    "net_axis_reversal_hit_recall_candidate_evidence_v025"
+    "image_space_net_axis_hit_recall_candidate_evidence_v026"
 )
 COURT_SIDE_SPLIT_Y = 0.50
 COURT_MIDCOURT_MARGIN_Y = 0.05
@@ -89,6 +92,13 @@ DEFAULT_NET_AXIS_REVERSAL_LOOKAHEAD_MS = 700
 DEFAULT_NET_AXIS_REVERSAL_MIN_DELTA_TEMPLATE = 0.015
 DEFAULT_NET_AXIS_REVERSAL_MIN_PRE_POST_GAP_MS = 60
 DEFAULT_NET_AXIS_REVERSAL_DEDUPE_DISTANCE_TEMPLATE = 0.08
+IMAGE_SPACE_NET_AXIS_METHOD = "broadcast_image_y_axis_fallback_v026"
+DEFAULT_IMAGE_SPACE_NET_AXIS_HIT_ENABLED = True
+DEFAULT_IMAGE_SPACE_NET_AXIS_LOOKBACK_MS = 700
+DEFAULT_IMAGE_SPACE_NET_AXIS_LOOKAHEAD_MS = 700
+DEFAULT_IMAGE_SPACE_NET_AXIS_MIN_DELTA_PIXELS = 4.0
+DEFAULT_IMAGE_SPACE_NET_AXIS_MIN_PRE_POST_GAP_MS = 60
+DEFAULT_IMAGE_SPACE_NET_AXIS_DEDUPE_DISTANCE_PIXELS = 18.0
 HIT_CONFIDENCE_CAP = 0.70
 BOUNCE_CONFIDENCE_CAP = 0.60
 EVENT_CANDIDATE_WARNINGS = {
@@ -159,6 +169,18 @@ class HitBounceCandidateConfig:
     net_axis_reversal_dedupe_distance_template: float = (
         DEFAULT_NET_AXIS_REVERSAL_DEDUPE_DISTANCE_TEMPLATE
     )
+    image_space_net_axis_hit_enabled: bool = DEFAULT_IMAGE_SPACE_NET_AXIS_HIT_ENABLED
+    image_space_net_axis_lookback_ms: int = DEFAULT_IMAGE_SPACE_NET_AXIS_LOOKBACK_MS
+    image_space_net_axis_lookahead_ms: int = DEFAULT_IMAGE_SPACE_NET_AXIS_LOOKAHEAD_MS
+    image_space_net_axis_min_delta_pixels: float = (
+        DEFAULT_IMAGE_SPACE_NET_AXIS_MIN_DELTA_PIXELS
+    )
+    image_space_net_axis_min_pre_post_gap_ms: int = (
+        DEFAULT_IMAGE_SPACE_NET_AXIS_MIN_PRE_POST_GAP_MS
+    )
+    image_space_net_axis_dedupe_distance_pixels: float = (
+        DEFAULT_IMAGE_SPACE_NET_AXIS_DEDUPE_DISTANCE_PIXELS
+    )
 
     def as_dict(self) -> dict[str, float | int | bool]:
         return {
@@ -216,12 +238,28 @@ class HitBounceCandidateConfig:
             "net_axis_reversal_dedupe_distance_template": (
                 self.net_axis_reversal_dedupe_distance_template
             ),
+            "image_space_net_axis_hit_enabled": self.image_space_net_axis_hit_enabled,
+            "image_space_net_axis_lookback_ms": (
+                self.image_space_net_axis_lookback_ms
+            ),
+            "image_space_net_axis_lookahead_ms": (
+                self.image_space_net_axis_lookahead_ms
+            ),
+            "image_space_net_axis_min_delta_pixels": (
+                self.image_space_net_axis_min_delta_pixels
+            ),
+            "image_space_net_axis_min_pre_post_gap_ms": (
+                self.image_space_net_axis_min_pre_post_gap_ms
+            ),
+            "image_space_net_axis_dedupe_distance_pixels": (
+                self.image_space_net_axis_dedupe_distance_pixels
+            ),
         }
 
 
 @dataclass(frozen=True)
 class TrajectoryPoint:
-    trajectory_observation: Observation
+    trajectory_observation: Observation | None
     frame_number: int
     timestamp_ms: int
     court_x: float
@@ -291,6 +329,7 @@ class EventCandidateDraft:
     player_anchored_hit_recall: dict[str, Any] | None = None
     player_anchor_contact_zone: dict[str, Any] | None = None
     net_axis_reversal_recall: dict[str, Any] | None = None
+    image_space_net_axis_reversal_recall: dict[str, Any] | None = None
     overlap_suppression: dict[str, Any] | None = None
 
     @property
@@ -317,6 +356,7 @@ class EventCandidateRejectionDiagnostic:
     player_anchored_hit_recall: dict[str, Any] | None = None
     player_anchor_contact_zone: dict[str, Any] | None = None
     net_axis_reversal_recall: dict[str, Any] | None = None
+    image_space_net_axis_reversal_recall: dict[str, Any] | None = None
     overlap_suppression: dict[str, Any] | None = None
 
     @property
@@ -380,6 +420,24 @@ def build_hit_bounce_candidates_plan(
     net_axis_reversal_dedupe_distance_template: float = (
         DEFAULT_NET_AXIS_REVERSAL_DEDUPE_DISTANCE_TEMPLATE
     ),
+    image_space_net_axis_hit_enabled: bool = (
+        DEFAULT_IMAGE_SPACE_NET_AXIS_HIT_ENABLED
+    ),
+    image_space_net_axis_lookback_ms: int = (
+        DEFAULT_IMAGE_SPACE_NET_AXIS_LOOKBACK_MS
+    ),
+    image_space_net_axis_lookahead_ms: int = (
+        DEFAULT_IMAGE_SPACE_NET_AXIS_LOOKAHEAD_MS
+    ),
+    image_space_net_axis_min_delta_pixels: float = (
+        DEFAULT_IMAGE_SPACE_NET_AXIS_MIN_DELTA_PIXELS
+    ),
+    image_space_net_axis_min_pre_post_gap_ms: int = (
+        DEFAULT_IMAGE_SPACE_NET_AXIS_MIN_PRE_POST_GAP_MS
+    ),
+    image_space_net_axis_dedupe_distance_pixels: float = (
+        DEFAULT_IMAGE_SPACE_NET_AXIS_DEDUPE_DISTANCE_PIXELS
+    ),
     viewer_base_url: str = "http://127.0.0.1:3000",
 ) -> dict[str, Any]:
     bounce_fallback_cli_flag = (
@@ -397,6 +455,11 @@ def build_hit_bounce_candidates_plan(
         if net_axis_reversal_hit_enabled
         else "--no-net-axis-reversal-hit-enabled"
     )
+    image_space_net_axis_cli_flag = (
+        "--image-space-net-axis-hit-enabled"
+        if image_space_net_axis_hit_enabled
+        else "--no-image-space-net-axis-hit-enabled"
+    )
     return {
         "steps": [
             "validate_media_and_source_runs",
@@ -405,6 +468,7 @@ def build_hit_bounce_candidates_plan(
             "load_source_ball_projection_image_points",
             "evaluate_net_axis_reversal_vertical_proxy_speed_and_player_proximity",
             "evaluate_ball_first_net_axis_reversal_hit_recall",
+            "evaluate_image_space_net_axis_hit_recall",
             "evaluate_player_anchored_hit_recall",
             "dedupe_candidate_clusters",
             "apply_side_zone_sequence_classification_prior",
@@ -456,6 +520,17 @@ def build_hit_bounce_candidates_plan(
             f"{net_axis_reversal_min_pre_post_gap_ms} "
             "--net-axis-reversal-dedupe-distance-template "
             f"{net_axis_reversal_dedupe_distance_template} "
+            f"{image_space_net_axis_cli_flag} "
+            "--image-space-net-axis-lookback-ms "
+            f"{image_space_net_axis_lookback_ms} "
+            "--image-space-net-axis-lookahead-ms "
+            f"{image_space_net_axis_lookahead_ms} "
+            "--image-space-net-axis-min-delta-pixels "
+            f"{image_space_net_axis_min_delta_pixels} "
+            "--image-space-net-axis-min-pre-post-gap-ms "
+            f"{image_space_net_axis_min_pre_post_gap_ms} "
+            "--image-space-net-axis-dedupe-distance-pixels "
+            f"{image_space_net_axis_dedupe_distance_pixels} "
             f"--candidate-dedupe-ms {candidate_dedupe_ms}"
         ),
         "run_name": run_name,
@@ -467,6 +542,9 @@ def build_hit_bounce_candidates_plan(
         "hit_candidate_method": HIT_CANDIDATE_METHOD,
         "net_axis_reversal_hit_candidate_method": (
             NET_AXIS_REVERSAL_HIT_CANDIDATE_METHOD
+        ),
+        "image_space_net_axis_hit_candidate_method": (
+            IMAGE_SPACE_NET_AXIS_HIT_CANDIDATE_METHOD
         ),
         "player_anchored_hit_candidate_method": PLAYER_ANCHORED_HIT_CANDIDATE_METHOD,
         "bounce_candidate_method": BOUNCE_CANDIDATE_METHOD,
@@ -526,6 +604,19 @@ def build_hit_bounce_candidates_plan(
             ),
             "net_axis_reversal_dedupe_distance_template": (
                 net_axis_reversal_dedupe_distance_template
+            ),
+            "image_space_net_axis_hit_enabled": image_space_net_axis_hit_enabled,
+            "image_space_net_axis_method": IMAGE_SPACE_NET_AXIS_METHOD,
+            "image_space_net_axis_lookback_ms": image_space_net_axis_lookback_ms,
+            "image_space_net_axis_lookahead_ms": image_space_net_axis_lookahead_ms,
+            "image_space_net_axis_min_delta_pixels": (
+                image_space_net_axis_min_delta_pixels
+            ),
+            "image_space_net_axis_min_pre_post_gap_ms": (
+                image_space_net_axis_min_pre_post_gap_ms
+            ),
+            "image_space_net_axis_dedupe_distance_pixels": (
+                image_space_net_axis_dedupe_distance_pixels
             ),
         },
         "replay_url_template": (
@@ -591,6 +682,24 @@ def build_hit_bounce_candidates(
     net_axis_reversal_dedupe_distance_template: float = (
         DEFAULT_NET_AXIS_REVERSAL_DEDUPE_DISTANCE_TEMPLATE
     ),
+    image_space_net_axis_hit_enabled: bool = (
+        DEFAULT_IMAGE_SPACE_NET_AXIS_HIT_ENABLED
+    ),
+    image_space_net_axis_lookback_ms: int = (
+        DEFAULT_IMAGE_SPACE_NET_AXIS_LOOKBACK_MS
+    ),
+    image_space_net_axis_lookahead_ms: int = (
+        DEFAULT_IMAGE_SPACE_NET_AXIS_LOOKAHEAD_MS
+    ),
+    image_space_net_axis_min_delta_pixels: float = (
+        DEFAULT_IMAGE_SPACE_NET_AXIS_MIN_DELTA_PIXELS
+    ),
+    image_space_net_axis_min_pre_post_gap_ms: int = (
+        DEFAULT_IMAGE_SPACE_NET_AXIS_MIN_PRE_POST_GAP_MS
+    ),
+    image_space_net_axis_dedupe_distance_pixels: float = (
+        DEFAULT_IMAGE_SPACE_NET_AXIS_DEDUPE_DISTANCE_PIXELS
+    ),
     viewer_base_url: str = "http://127.0.0.1:3000",
     plan_only: bool = False,
 ) -> dict[str, Any]:
@@ -634,6 +743,18 @@ def build_hit_bounce_candidates(
         net_axis_reversal_min_pre_post_gap_ms=net_axis_reversal_min_pre_post_gap_ms,
         net_axis_reversal_dedupe_distance_template=(
             net_axis_reversal_dedupe_distance_template
+        ),
+        image_space_net_axis_hit_enabled=image_space_net_axis_hit_enabled,
+        image_space_net_axis_lookback_ms=image_space_net_axis_lookback_ms,
+        image_space_net_axis_lookahead_ms=image_space_net_axis_lookahead_ms,
+        image_space_net_axis_min_delta_pixels=(
+            image_space_net_axis_min_delta_pixels
+        ),
+        image_space_net_axis_min_pre_post_gap_ms=(
+            image_space_net_axis_min_pre_post_gap_ms
+        ),
+        image_space_net_axis_dedupe_distance_pixels=(
+            image_space_net_axis_dedupe_distance_pixels
         ),
     )
     invalid = _validate_config(config)
@@ -683,6 +804,18 @@ def build_hit_bounce_candidates(
         net_axis_reversal_min_pre_post_gap_ms=net_axis_reversal_min_pre_post_gap_ms,
         net_axis_reversal_dedupe_distance_template=(
             net_axis_reversal_dedupe_distance_template
+        ),
+        image_space_net_axis_hit_enabled=image_space_net_axis_hit_enabled,
+        image_space_net_axis_lookback_ms=image_space_net_axis_lookback_ms,
+        image_space_net_axis_lookahead_ms=image_space_net_axis_lookahead_ms,
+        image_space_net_axis_min_delta_pixels=(
+            image_space_net_axis_min_delta_pixels
+        ),
+        image_space_net_axis_min_pre_post_gap_ms=(
+            image_space_net_axis_min_pre_post_gap_ms
+        ),
+        image_space_net_axis_dedupe_distance_pixels=(
+            image_space_net_axis_dedupe_distance_pixels
         ),
         viewer_base_url=viewer_base_url,
     )
@@ -738,6 +871,14 @@ def build_hit_bounce_candidates(
             media=media,
             court_projection_run_id=court_projection_run_id,
         )
+        image_space_trajectory_segments = (
+            load_ball_projection_points_for_image_space_recall(
+                session=session,
+                media=media,
+                court_projection_run_id=court_projection_run_id,
+            )
+            or trajectory_segments
+        )
         (
             evaluated_contexts,
             hit_drafts,
@@ -759,6 +900,17 @@ def build_hit_bounce_candidates(
         )
         hit_drafts.extend(net_axis_reversal_hit_drafts)
         rejection_diagnostics.extend(net_axis_reversal_rejection_diagnostics)
+        (
+            image_space_net_axis_context_count,
+            image_space_net_axis_hit_drafts,
+            image_space_net_axis_rejection_diagnostics,
+        ) = evaluate_image_space_net_axis_hit_recall(
+            trajectory_segments=image_space_trajectory_segments,
+            player_projections=player_projections,
+            config=config,
+        )
+        hit_drafts.extend(image_space_net_axis_hit_drafts)
+        rejection_diagnostics.extend(image_space_net_axis_rejection_diagnostics)
         (
             player_anchor_context_count,
             player_anchored_hit_drafts,
@@ -808,6 +960,15 @@ def build_hit_bounce_candidates(
             config=config,
         )
         rejection_diagnostics.extend(net_axis_overlap_rejections)
+        (
+            final_candidates,
+            image_space_net_axis_overlap_suppressed_count,
+            image_space_net_axis_overlap_rejections,
+        ) = suppress_weak_image_space_net_axis_hits_overlapping_bounces(
+            final_candidates,
+            config=config,
+        )
+        rejection_diagnostics.extend(image_space_net_axis_overlap_rejections)
         (
             final_candidates,
             player_anchor_suppressed_overlap_count,
@@ -864,9 +1025,10 @@ def build_hit_bounce_candidates(
             0,
         ),
         "classification_priority": "side_zone_sequence_candidate_prior",
-        "physics_heuristic_version": "v0.2.5",
+        "physics_heuristic_version": "v0.2.6",
         "contact_zone_tightening_version": "v0.2.4",
         "net_axis_reversal_hit_recall_version": "v0.2.5",
+        "image_space_net_axis_hit_recall_version": "v0.2.6",
         "net_axis_reversal_context_count": net_axis_reversal_context_count,
         "net_axis_reversal_candidate_count": len(net_axis_reversal_hit_drafts),
         "net_axis_reversal_recovered_hit_count": sum(
@@ -910,6 +1072,69 @@ def build_hit_bounce_candidates(
             ),
             "rejection_reasons": _rejection_reason_counts(
                 [*net_axis_reversal_rejection_diagnostics, *net_axis_overlap_rejections]
+            ),
+            "player_proximity_required": False,
+        },
+        "image_net_axis_reversal_context_count": image_space_net_axis_context_count,
+        "image_net_axis_reversal_source_point_count": sum(
+            len(segment) for segment in image_space_trajectory_segments
+        ),
+        "image_net_axis_reversal_candidate_count": len(
+            image_space_net_axis_hit_drafts
+        ),
+        "image_net_axis_reversal_recovered_hit_count": sum(
+            1
+            for candidate in final_candidates
+            if (
+                candidate.original_candidate_method
+                or candidate.candidate_method
+            )
+            == IMAGE_SPACE_NET_AXIS_HIT_CANDIDATE_METHOD
+            and candidate.observation_type == HIT_CANDIDATE_OBSERVATION_TYPE
+        ),
+        "image_net_axis_reversal_suppressed_overlap_count": (
+            image_space_net_axis_overlap_suppressed_count
+        ),
+        "image_net_axis_reversal_rejected_count": (
+            len(image_space_net_axis_rejection_diagnostics)
+            + len(image_space_net_axis_overlap_rejections)
+        ),
+        "image_net_axis_reversal_rejection_reasons": _rejection_reason_counts(
+            [
+                *image_space_net_axis_rejection_diagnostics,
+                *image_space_net_axis_overlap_rejections,
+            ]
+        ),
+        "image_space_net_axis_hit_recall": {
+            "enabled": config.image_space_net_axis_hit_enabled,
+            "image_axis_method": IMAGE_SPACE_NET_AXIS_METHOD,
+            "source_point_count": sum(
+                len(segment) for segment in image_space_trajectory_segments
+            ),
+            "image_reversal_context_count": image_space_net_axis_context_count,
+            "image_reversal_candidate_count": len(image_space_net_axis_hit_drafts),
+            "image_reversal_recovered_hit_count": sum(
+                1
+                for candidate in final_candidates
+                if (
+                    candidate.original_candidate_method
+                    or candidate.candidate_method
+                )
+                == IMAGE_SPACE_NET_AXIS_HIT_CANDIDATE_METHOD
+                and candidate.observation_type == HIT_CANDIDATE_OBSERVATION_TYPE
+            ),
+            "image_reversal_suppressed_overlap_count": (
+                image_space_net_axis_overlap_suppressed_count
+            ),
+            "image_reversal_rejected_count": (
+                len(image_space_net_axis_rejection_diagnostics)
+                + len(image_space_net_axis_overlap_rejections)
+            ),
+            "rejection_reasons": _rejection_reason_counts(
+                [
+                    *image_space_net_axis_rejection_diagnostics,
+                    *image_space_net_axis_overlap_rejections,
+                ]
             ),
             "player_proximity_required": False,
         },
@@ -1106,6 +1331,30 @@ def load_main_player_court_projections(
     return projections
 
 
+def load_ball_projection_points_for_image_space_recall(
+    *,
+    session: Session,
+    media: MediaAsset,
+    court_projection_run_id: str,
+) -> list[list[TrajectoryPoint]]:
+    rows = session.scalars(
+        select(Observation)
+        .where(
+            Observation.media_id == media.id,
+            Observation.run_id == court_projection_run_id,
+            Observation.observation_type == BALL_COURT_PROJECTION_OBSERVATION_TYPE,
+            Observation.timestamp_start_ms.is_not(None),
+        )
+        .order_by(Observation.timestamp_start_ms, Observation.frame_start, Observation.id)
+    ).all()
+    points: list[TrajectoryPoint] = []
+    for row in rows:
+        point = _ball_projection_point_from_observation(row)
+        if point is not None:
+            points.append(point)
+    return [points] if points else []
+
+
 def evaluate_event_candidates(
     *,
     trajectory_segments: list[list[TrajectoryPoint]],
@@ -1293,6 +1542,115 @@ def evaluate_net_axis_reversal_hit_recall(
                 nearest_player,
                 config,
                 net_axis_reversal=net_axis_reversal,
+            )
+        )
+    return evaluated_contexts, hit_candidates, rejection_diagnostics
+
+
+def evaluate_image_space_net_axis_hit_recall(
+    *,
+    trajectory_segments: list[list[TrajectoryPoint]],
+    player_projections: list[PlayerProjection],
+    config: HitBounceCandidateConfig,
+) -> tuple[int, list[EventCandidateDraft], list[EventCandidateRejectionDiagnostic]]:
+    if not config.image_space_net_axis_hit_enabled:
+        return 0, [], []
+    all_ball_points = _flatten_trajectory_points(trajectory_segments)
+    hit_candidates: list[EventCandidateDraft] = []
+    rejection_diagnostics: list[EventCandidateRejectionDiagnostic] = []
+    evaluated_contexts = 0
+    for anchor in all_ball_points:
+        evaluated_contexts += 1
+        incoming = _image_space_net_axis_incoming_point(
+            anchor,
+            all_ball_points,
+            config=config,
+        )
+        outgoing = _image_space_net_axis_outgoing_point(
+            anchor,
+            all_ball_points,
+            config=config,
+        )
+        rejection_reasons: list[str] = []
+        if anchor.image_x is None or anchor.image_y is None:
+            rejection_reasons.append("missing_image_point")
+        if incoming is None:
+            rejection_reasons.append("no_incoming_image_point_in_lookback_window")
+        if outgoing is None:
+            rejection_reasons.append("no_outgoing_image_point_in_lookahead_window")
+        if rejection_reasons:
+            rejection_diagnostics.append(
+                _image_space_net_axis_rejection_diagnostic(
+                    anchor=anchor,
+                    incoming=incoming,
+                    outgoing=outgoing,
+                    player_projections=player_projections,
+                    config=config,
+                    rejection_reasons=rejection_reasons,
+                )
+            )
+            continue
+        assert incoming is not None
+        assert outgoing is not None
+        context = trajectory_context(incoming, anchor, outgoing)
+        if context is None:
+            rejection_diagnostics.append(
+                _image_space_net_axis_rejection_diagnostic(
+                    anchor=anchor,
+                    incoming=incoming,
+                    outgoing=outgoing,
+                    player_projections=player_projections,
+                    config=config,
+                    rejection_reasons=["invalid_image_space_reversal_context"],
+                )
+            )
+            continue
+        image_reversal = _image_space_net_axis_reversal_payload(
+            incoming=incoming,
+            anchor=anchor,
+            outgoing=outgoing,
+            player_projections=player_projections,
+            config=config,
+        )
+        reasons: list[str] = []
+        if image_reversal.get("image_axis_reversal") is not True:
+            reasons.append("no_image_axis_reversal")
+            if (
+                image_reversal.get("image_axis_before") is None
+                or image_reversal.get("image_axis_after") is None
+                or abs(float(image_reversal.get("image_axis_before") or 0.0))
+                < config.image_space_net_axis_min_delta_pixels
+                or abs(float(image_reversal.get("image_axis_after") or 0.0))
+                < config.image_space_net_axis_min_delta_pixels
+            ):
+                reasons.append("image_axis_delta_below_threshold")
+        if reasons:
+            rejection_diagnostics.append(
+                _image_space_net_axis_rejection_diagnostic(
+                    anchor=anchor,
+                    incoming=incoming,
+                    outgoing=outgoing,
+                    player_projections=player_projections,
+                    config=config,
+                    rejection_reasons=reasons,
+                    image_space_net_axis_reversal=image_reversal,
+                )
+            )
+            continue
+        nearest_player = nearest_main_player_projection(
+            anchor,
+            player_projections,
+            time_window_ms=max(
+                config.player_time_window_ms,
+                config.image_space_net_axis_lookback_ms,
+            ),
+        )
+        hit_candidates.append(
+            _image_space_net_axis_hit_candidate_from_context(
+                context,
+                nearest_player,
+                config,
+                image_space_net_axis_reversal=image_reversal,
             )
         )
     return evaluated_contexts, hit_candidates, rejection_diagnostics
@@ -1707,6 +2065,48 @@ def _net_axis_reversal_outgoing_point(
     return min(candidates, key=lambda point: (point.timestamp_ms, point.frame_number), default=None)
 
 
+def _image_space_net_axis_incoming_point(
+    anchor: TrajectoryPoint,
+    ball_points: list[TrajectoryPoint],
+    *,
+    config: HitBounceCandidateConfig,
+) -> TrajectoryPoint | None:
+    if anchor.image_y is None:
+        return None
+    candidates = [
+        point
+        for point in ball_points
+        if point.image_y is not None
+        and anchor.timestamp_ms - config.image_space_net_axis_lookback_ms
+        <= point.timestamp_ms
+        <= anchor.timestamp_ms - config.image_space_net_axis_min_pre_post_gap_ms
+        and abs(anchor.image_y - point.image_y)
+        >= config.image_space_net_axis_min_delta_pixels
+    ]
+    return max(candidates, key=lambda point: (point.timestamp_ms, point.frame_number), default=None)
+
+
+def _image_space_net_axis_outgoing_point(
+    anchor: TrajectoryPoint,
+    ball_points: list[TrajectoryPoint],
+    *,
+    config: HitBounceCandidateConfig,
+) -> TrajectoryPoint | None:
+    if anchor.image_y is None:
+        return None
+    candidates = [
+        point
+        for point in ball_points
+        if point.image_y is not None
+        and anchor.timestamp_ms + config.image_space_net_axis_min_pre_post_gap_ms
+        <= point.timestamp_ms
+        <= anchor.timestamp_ms + config.image_space_net_axis_lookahead_ms
+        and abs(point.image_y - anchor.image_y)
+        >= config.image_space_net_axis_min_delta_pixels
+    ]
+    return min(candidates, key=lambda point: (point.timestamp_ms, point.frame_number), default=None)
+
+
 def _player_anchor_distance(player: PlayerProjection, point: TrajectoryPoint) -> float:
     return _round(math.hypot(player.court_x - point.court_x, player.court_y - point.court_y))
 
@@ -1791,6 +2191,83 @@ def _ball_first_net_axis_reversal_payload(
             nearest_player.player.track_role_candidate if nearest_player is not None else None
         ),
         "player_proximity_used_for_scoring": nearest_player is not None,
+        "not_hit_truth": True,
+        "observation_only": True,
+        "no_adjudication": True,
+    }
+
+
+def _image_space_net_axis_reversal_payload(
+    *,
+    incoming: TrajectoryPoint,
+    anchor: TrajectoryPoint,
+    outgoing: TrajectoryPoint,
+    player_projections: list[PlayerProjection],
+    config: HitBounceCandidateConfig,
+) -> dict[str, Any]:
+    nearest_player = nearest_main_player_projection(
+        anchor,
+        player_projections,
+        time_window_ms=max(
+            config.player_time_window_ms,
+            config.image_space_net_axis_lookback_ms,
+        ),
+    )
+    image_axis_before = (
+        anchor.image_y - incoming.image_y
+        if anchor.image_y is not None and incoming.image_y is not None
+        else None
+    )
+    image_axis_after = (
+        outgoing.image_y - anchor.image_y
+        if anchor.image_y is not None and outgoing.image_y is not None
+        else None
+    )
+    min_delta = config.image_space_net_axis_min_delta_pixels
+    image_axis_reversal = (
+        image_axis_before is not None
+        and image_axis_after is not None
+        and abs(image_axis_before) >= min_delta
+        and abs(image_axis_after) >= min_delta
+        and image_axis_before * image_axis_after < 0
+    )
+    return {
+        "enabled": config.image_space_net_axis_hit_enabled,
+        "candidate_method": IMAGE_SPACE_NET_AXIS_HIT_CANDIDATE_METHOD,
+        "image_axis_method": IMAGE_SPACE_NET_AXIS_METHOD,
+        "player_proximity_required": False,
+        "incoming_frame": incoming.frame_number,
+        "incoming_timestamp_ms": incoming.timestamp_ms,
+        "anchor_frame": anchor.frame_number,
+        "anchor_timestamp_ms": anchor.timestamp_ms,
+        "outgoing_frame": outgoing.frame_number,
+        "outgoing_timestamp_ms": outgoing.timestamp_ms,
+        "lookback_ms": config.image_space_net_axis_lookback_ms,
+        "lookahead_ms": config.image_space_net_axis_lookahead_ms,
+        "min_pre_post_gap_ms": config.image_space_net_axis_min_pre_post_gap_ms,
+        "image_axis_before": (
+            _round(image_axis_before) if image_axis_before is not None else None
+        ),
+        "image_axis_after": (
+            _round(image_axis_after) if image_axis_after is not None else None
+        ),
+        "image_axis_reversal": image_axis_reversal,
+        "min_image_axis_delta_pixels": min_delta,
+        "incoming_image_point": _image_point_payload(incoming),
+        "anchor_image_point": _image_point_payload(anchor),
+        "outgoing_image_point": _image_point_payload(outgoing),
+        "nearest_player_found": nearest_player is not None,
+        "nearest_player_distance_template_units": (
+            nearest_player.distance_template_units if nearest_player is not None else None
+        ),
+        "nearest_player_track_role_candidate": (
+            nearest_player.player.track_role_candidate if nearest_player is not None else None
+        ),
+        "player_proximity_used_for_scoring": nearest_player is not None,
+        "court_projection_warning": (
+            "hit candidate uses image-space motion because airborne hits may not "
+            "project cleanly to court plane"
+        ),
         "not_hit_truth": True,
         "observation_only": True,
         "no_adjudication": True,
@@ -2075,6 +2552,8 @@ def dedupe_event_candidates_with_rejections(
             rejection_reasons = ["deduped_lower_confidence"]
             if duplicate.candidate_method == PLAYER_ANCHORED_HIT_CANDIDATE_METHOD:
                 rejection_reasons.append("deduped_by_player_anchored_hit")
+            if duplicate.candidate_method == IMAGE_SPACE_NET_AXIS_HIT_CANDIDATE_METHOD:
+                rejection_reasons.append("deduped_by_image_space_net_axis_reversal_hit")
             if duplicate.candidate_method == NET_AXIS_REVERSAL_HIT_CANDIDATE_METHOD:
                 rejection_reasons.append("deduped_by_net_axis_reversal_hit")
             rejections.append(
@@ -2099,7 +2578,9 @@ def _candidate_preference_rank(candidate: EventCandidateDraft) -> int:
         return 1
     if candidate.candidate_method == NET_AXIS_REVERSAL_HIT_CANDIDATE_METHOD:
         return 2
-    return 3
+    if candidate.candidate_method == IMAGE_SPACE_NET_AXIS_HIT_CANDIDATE_METHOD:
+        return 3
+    return 4
 
 
 def _should_preserve_pre_anchor_landing_candidate(
@@ -2146,6 +2627,7 @@ def suppress_bounces_near_hits(
                 if abs(hit.timestamp_ms - bounce.timestamp_ms) <= candidate_dedupe_ms
                 and hit.nearest_player is not None
                 and not _is_net_axis_reversal_hit_candidate(hit)
+                and not _is_image_space_net_axis_hit_candidate(hit)
             ),
             None,
         )
@@ -2297,6 +2779,70 @@ def suppress_weak_net_axis_reversal_hits_overlapping_bounces(
     )
 
 
+def suppress_weak_image_space_net_axis_hits_overlapping_bounces(
+    candidates: list[EventCandidateDraft],
+    *,
+    config: HitBounceCandidateConfig,
+) -> tuple[
+    list[EventCandidateDraft],
+    int,
+    list[EventCandidateRejectionDiagnostic],
+]:
+    bounces = [
+        candidate
+        for candidate in candidates
+        if candidate.observation_type == BOUNCE_CANDIDATE_OBSERVATION_TYPE
+    ]
+    filtered: list[EventCandidateDraft] = []
+    rejections: list[EventCandidateRejectionDiagnostic] = []
+    suppressed_count = 0
+    for candidate in candidates:
+        if not _is_weak_image_space_net_axis_hit_candidate(candidate, config=config):
+            filtered.append(candidate)
+            continue
+        overlapping_bounce = _overlapping_bounce_candidate(
+            candidate,
+            bounces,
+            config=config,
+        )
+        if overlapping_bounce is None:
+            filtered.append(
+                replace(
+                    candidate,
+                    overlap_suppression=_overlap_suppression_payload(
+                        hit=candidate,
+                        bounce=None,
+                        config=config,
+                        suppressed=False,
+                    ),
+                )
+            )
+            continue
+        overlap_payload = _overlap_suppression_payload(
+            hit=candidate,
+            bounce=overlapping_bounce,
+            config=config,
+            suppressed=True,
+        )
+        suppressed_count += 1
+        rejections.append(
+            _rejection_diagnostic_from_candidate(
+                replace(candidate, overlap_suppression=overlap_payload),
+                rejection_reasons=["suppressed_by_bounce_candidate_overlap"],
+                decision_reason="suppressed_by_bounce_candidate_overlap",
+                suppressed_by_observation_type=overlapping_bounce.observation_type,
+                suppressed_by_frame=overlapping_bounce.frame_number,
+                suppressed_by_timestamp_ms=overlapping_bounce.timestamp_ms,
+                overlap_suppression=overlap_payload,
+            )
+        )
+    return (
+        sorted(filtered, key=lambda item: (item.timestamp_ms, item.frame_number)),
+        suppressed_count,
+        rejections,
+    )
+
+
 def _is_player_anchored_hit_candidate(candidate: EventCandidateDraft) -> bool:
     return (
         candidate.observation_type == HIT_CANDIDATE_OBSERVATION_TYPE
@@ -2339,6 +2885,46 @@ def _is_net_axis_reversal_hit_candidate(candidate: EventCandidateDraft) -> bool:
             candidate.candidate_method == NET_AXIS_REVERSAL_HIT_CANDIDATE_METHOD
             or candidate.original_candidate_method == NET_AXIS_REVERSAL_HIT_CANDIDATE_METHOD
         )
+    )
+
+
+def _is_image_space_net_axis_hit_candidate(candidate: EventCandidateDraft) -> bool:
+    return (
+        candidate.observation_type == HIT_CANDIDATE_OBSERVATION_TYPE
+        and (
+            candidate.candidate_method == IMAGE_SPACE_NET_AXIS_HIT_CANDIDATE_METHOD
+            or candidate.original_candidate_method
+            == IMAGE_SPACE_NET_AXIS_HIT_CANDIDATE_METHOD
+        )
+    )
+
+
+def _is_weak_image_space_net_axis_hit_candidate(
+    candidate: EventCandidateDraft,
+    *,
+    config: HitBounceCandidateConfig,
+) -> bool:
+    if not _is_image_space_net_axis_hit_candidate(candidate):
+        return False
+    recall = candidate.image_space_net_axis_reversal_recall or {}
+    before = abs(float(recall.get("image_axis_before") or 0.0))
+    after = abs(float(recall.get("image_axis_after") or 0.0))
+    axis_strength = before + after
+    strong_axis = axis_strength >= config.image_space_net_axis_min_delta_pixels * 6.0
+    if candidate.nearest_player is None:
+        return not strong_axis and candidate.confidence < 0.62
+    side_matches = _court_side_matches_player_role(
+        _court_side_zone_payload(candidate.trajectory_context.current).get("side"),
+        candidate.nearest_player.player.track_role_candidate,
+    )
+    return (
+        not strong_axis
+        and (
+            candidate.nearest_player.distance_template_units
+            > config.hit_player_review_distance_max_template
+            or not side_matches
+        )
+        and candidate.confidence < 0.62
     )
 
 
@@ -2641,6 +3227,8 @@ def _hit_candidate_can_be_landing_zone_bounce(
     *,
     court_landing_zone: dict[str, Any],
 ) -> bool:
+    if candidate.candidate_method == IMAGE_SPACE_NET_AXIS_HIT_CANDIDATE_METHOD:
+        return False
     if court_landing_zone.get("landing_zone_candidate") is not True:
         return False
     if candidate.candidate_method == HIT_FALLBACK_CANDIDATE_METHOD:
@@ -2667,6 +3255,14 @@ def _final_reason_codes(
             reason_codes.append("side_matches_player_track")
         if candidate.candidate_method == NET_AXIS_REVERSAL_HIT_CANDIDATE_METHOD:
             reason_codes.append("player_proximity_not_required")
+        if candidate.candidate_method == IMAGE_SPACE_NET_AXIS_HIT_CANDIDATE_METHOD:
+            reason_codes.extend(
+                [
+                    "image_space_net_axis_reversal",
+                    "player_proximity_not_required",
+                    "airborne_hit_projection_warning",
+                ]
+            )
         if sequence_prior_applied:
             reason_codes.append("sequence_hit_prior")
     else:
@@ -2935,6 +3531,111 @@ def _net_axis_reversal_hit_candidate_from_context(
     )
 
 
+def _image_space_net_axis_hit_candidate_from_context(
+    context: TrajectoryContext,
+    nearest_player: NearestPlayerContext | None,
+    config: HitBounceCandidateConfig,
+    *,
+    image_space_net_axis_reversal: dict[str, Any],
+) -> EventCandidateDraft:
+    axis_strength = (
+        abs(float(image_space_net_axis_reversal.get("image_axis_before") or 0.0))
+        + abs(float(image_space_net_axis_reversal.get("image_axis_after") or 0.0))
+    ) / max(config.image_space_net_axis_min_delta_pixels * 4.0, 1e-9)
+    axis_score = min(axis_strength, 1.0)
+    direction_score = min(context.direction_delta_degrees / 90.0, 1.0)
+    inside_score = (
+        1.0
+        if _inside_or_near_template(context.current, config.bounce_inside_template_margin)
+        else 0.35
+    )
+    timing_balance = 1.0 - min(
+        abs(
+            (context.current.timestamp_ms - context.previous.timestamp_ms)
+            - (context.next.timestamp_ms - context.current.timestamp_ms)
+        )
+        / max(config.image_space_net_axis_lookback_ms, 1),
+        1.0,
+    )
+    proximity_score = 0.0
+    time_score = 0.0
+    side_score = 0.0
+    if nearest_player is not None:
+        proximity_score = 1.0 - min(
+            nearest_player.distance_template_units
+            / max(config.hit_player_review_distance_max_template, 1e-9),
+            1.0,
+        )
+        time_score = 1.0 - min(
+            nearest_player.time_delta_ms / max(config.player_time_window_ms, 1),
+            1.0,
+        )
+        side_score = (
+            1.0
+            if _court_side_matches_player_role(
+                _court_side_zone_payload(context.current).get("side"),
+                nearest_player.player.track_role_candidate,
+            )
+            else 0.0
+        )
+    confidence = min(
+        HIT_CONFIDENCE_CAP,
+        0.18
+        + 0.30 * axis_score
+        + 0.12 * direction_score
+        + 0.08 * timing_balance
+        + 0.06 * inside_score
+        + 0.08 * proximity_score
+        + 0.04 * time_score
+        + 0.04 * side_score,
+    )
+    reason_codes = [
+        "image_space_net_axis_reversal",
+        "image_space_hit_recall",
+        "player_proximity_not_required",
+        "airborne_hit_projection_warning",
+    ]
+    if nearest_player is not None:
+        reason_codes.extend(
+            [
+                "nearest_main_player_projection",
+                "player_proximity_diagnostic",
+            ]
+        )
+        if side_score > 0:
+            reason_codes.append("side_matches_player_track")
+    return EventCandidateDraft(
+        observation_type=HIT_CANDIDATE_OBSERVATION_TYPE,
+        candidate_method=IMAGE_SPACE_NET_AXIS_HIT_CANDIDATE_METHOD,
+        trajectory_context=context,
+        nearest_player=nearest_player,
+        reason_codes=reason_codes,
+        confidence=_round(confidence),
+        player_proximity_gate=_player_proximity_gate_payload(
+            nearest_player=nearest_player,
+            threshold=config.hit_player_review_distance_max_template,
+            away_from_player=False,
+        ),
+        candidate_decision={
+            "selected_candidate_type": HIT_CANDIDATE_OBSERVATION_TYPE,
+            "suppressed_candidate_types": [BOUNCE_CANDIDATE_OBSERVATION_TYPE],
+            "reason": "image_space_net_axis_reversal",
+            "classification_priority": (
+                "image_space_net_axis_hit_recall_then_sequence_prior"
+            ),
+            "player_proximity_required": False,
+        },
+        image_space_net_axis_reversal_recall=(
+            _image_space_net_axis_reversal_recall_payload(
+                context=context,
+                nearest_player=nearest_player,
+                config=config,
+                image_space_net_axis_reversal=image_space_net_axis_reversal,
+            )
+        ),
+    )
+
+
 def _player_anchored_hit_candidate_from_context(
     context: TrajectoryContext,
     nearest_player: NearestPlayerContext,
@@ -3045,6 +3746,46 @@ def _net_axis_reversal_recall_payload(
             nearest_player.player.track_role_candidate if nearest_player is not None else None
         ),
         "player_proximity_used_for_scoring": nearest_player is not None,
+        "not_hit_truth": True,
+        "observation_only": True,
+        "no_adjudication": True,
+    }
+
+
+def _image_space_net_axis_reversal_recall_payload(
+    *,
+    context: TrajectoryContext,
+    nearest_player: NearestPlayerContext | None,
+    config: HitBounceCandidateConfig,
+    image_space_net_axis_reversal: dict[str, Any],
+) -> dict[str, Any]:
+    return {
+        **image_space_net_axis_reversal,
+        "enabled": config.image_space_net_axis_hit_enabled,
+        "candidate_method": IMAGE_SPACE_NET_AXIS_HIT_CANDIDATE_METHOD,
+        "image_axis_method": IMAGE_SPACE_NET_AXIS_METHOD,
+        "player_proximity_required": False,
+        "incoming_frame": context.previous.frame_number,
+        "incoming_timestamp_ms": context.previous.timestamp_ms,
+        "anchor_frame": context.current.frame_number,
+        "anchor_timestamp_ms": context.current.timestamp_ms,
+        "outgoing_frame": context.next.frame_number,
+        "outgoing_timestamp_ms": context.next.timestamp_ms,
+        "lookback_ms": config.image_space_net_axis_lookback_ms,
+        "lookahead_ms": config.image_space_net_axis_lookahead_ms,
+        "min_pre_post_gap_ms": config.image_space_net_axis_min_pre_post_gap_ms,
+        "nearest_player_found": nearest_player is not None,
+        "nearest_player_distance_template_units": (
+            nearest_player.distance_template_units if nearest_player is not None else None
+        ),
+        "nearest_player_track_role_candidate": (
+            nearest_player.player.track_role_candidate if nearest_player is not None else None
+        ),
+        "player_proximity_used_for_scoring": nearest_player is not None,
+        "court_projection_warning": (
+            "hit candidate uses image-space motion because airborne hits may not "
+            "project cleanly to court plane"
+        ),
         "not_hit_truth": True,
         "observation_only": True,
         "no_adjudication": True,
@@ -3441,6 +4182,83 @@ def _net_axis_reversal_rejection_diagnostic(
     )
 
 
+def _image_space_net_axis_rejection_diagnostic(
+    *,
+    anchor: TrajectoryPoint,
+    incoming: TrajectoryPoint | None,
+    outgoing: TrajectoryPoint | None,
+    player_projections: list[PlayerProjection],
+    config: HitBounceCandidateConfig,
+    rejection_reasons: list[str],
+    image_space_net_axis_reversal: dict[str, Any] | None = None,
+) -> EventCandidateRejectionDiagnostic:
+    previous = incoming or _synthetic_neighbor_point(
+        anchor,
+        timestamp_ms=anchor.timestamp_ms - 1,
+        frame_number=anchor.frame_number - 1,
+    )
+    next_point = outgoing or _synthetic_neighbor_point(
+        anchor,
+        timestamp_ms=anchor.timestamp_ms + 1,
+        frame_number=anchor.frame_number + 1,
+    )
+    context = trajectory_context(previous, anchor, next_point) or TrajectoryContext(
+        previous=previous,
+        current=anchor,
+        next=next_point,
+        direction_before_degrees=0.0,
+        direction_after_degrees=0.0,
+        direction_delta_degrees=0.0,
+        speed_before=0.0,
+        speed_after=0.0,
+        speed_delta_fraction=0.0,
+    )
+    nearest_player = nearest_main_player_projection(
+        anchor,
+        player_projections,
+        time_window_ms=max(
+            config.player_time_window_ms,
+            config.image_space_net_axis_lookback_ms,
+        ),
+    )
+    recall_payload = _image_space_net_axis_reversal_recall_payload(
+        context=context,
+        nearest_player=nearest_player,
+        config=config,
+        image_space_net_axis_reversal=image_space_net_axis_reversal or {},
+    )
+    recall_payload["diagnostic_only"] = True
+    return EventCandidateRejectionDiagnostic(
+        trajectory_context=context,
+        nearest_player=nearest_player,
+        net_axis_reversal={},
+        vertical_motion_proxy={},
+        speed_reduction={},
+        inside_or_near_court_template=_inside_or_near_template(
+            anchor,
+            config.bounce_inside_template_margin,
+        ),
+        player_proximity_gate=_player_proximity_gate_payload(
+            nearest_player=nearest_player,
+            threshold=config.hit_player_review_distance_max_template,
+            away_from_player=False,
+        ),
+        candidate_decision={
+            "selected_candidate_type": None,
+            "reason": "image_space_net_axis_hit_recall_rejected",
+            "rejection_reasons": rejection_reasons,
+            "classification_priority": (
+                "image_space_net_axis_hit_recall_then_sequence_prior"
+            ),
+            "diagnostic_source": "image_space_net_axis_hit_recall",
+            "player_proximity_required": False,
+        },
+        rejection_reasons=rejection_reasons,
+        diagnostic_source="image_space_net_axis_hit_recall",
+        image_space_net_axis_reversal_recall=recall_payload,
+    )
+
+
 def _synthetic_player_anchor_point(player: PlayerProjection) -> TrajectoryPoint:
     return TrajectoryPoint(
         trajectory_observation=player.observation,
@@ -3520,6 +4338,8 @@ def _rejection_diagnostic_from_candidate(
         diagnostic_source=(
             "player_anchored_hit_recall"
             if candidate.candidate_method == PLAYER_ANCHORED_HIT_CANDIDATE_METHOD
+            else "image_space_net_axis_hit_recall"
+            if candidate.candidate_method == IMAGE_SPACE_NET_AXIS_HIT_CANDIDATE_METHOD
             else "net_axis_reversal_hit_recall"
             if candidate.candidate_method == NET_AXIS_REVERSAL_HIT_CANDIDATE_METHOD
             else "local_trajectory_context"
@@ -3527,6 +4347,9 @@ def _rejection_diagnostic_from_candidate(
         player_anchored_hit_recall=candidate.player_anchored_hit_recall,
         player_anchor_contact_zone=candidate.player_anchor_contact_zone,
         net_axis_reversal_recall=candidate.net_axis_reversal_recall,
+        image_space_net_axis_reversal_recall=(
+            candidate.image_space_net_axis_reversal_recall
+        ),
         overlap_suppression=overlap_suppression or candidate.overlap_suppression,
     )
 
@@ -3661,7 +4484,7 @@ def _event_candidate_observation_create(
     payload = {
         "candidate_type": candidate.observation_type,
         "source_ball_trajectory_run_id": ball_trajectory_run_id,
-        "source_ball_trajectory_observation_id": current.trajectory_observation.id,
+        "source_ball_trajectory_observation_id": _trajectory_observation_id(current),
         "source_court_projection_run_id": court_projection_run_id,
         "source_ball_court_projection_observation_id": (
             current.source_ball_court_projection_observation_id
@@ -3716,24 +4539,31 @@ def _event_candidate_observation_create(
         payload["player_anchor_contact_zone"] = candidate.player_anchor_contact_zone
     if candidate.net_axis_reversal_recall is not None:
         payload["net_axis_reversal_recall"] = candidate.net_axis_reversal_recall
+    if candidate.image_space_net_axis_reversal_recall is not None:
+        payload["image_space_net_axis_reversal_recall"] = (
+            candidate.image_space_net_axis_reversal_recall
+        )
     if candidate.overlap_suppression is not None:
         payload["overlap_suppression"] = candidate.overlap_suppression
     if candidate.original_observation_type is not None:
         payload["original_candidate_type"] = candidate.original_observation_type
     if candidate.original_candidate_method is not None:
         payload["original_candidate_method"] = candidate.original_candidate_method
-    lineage = [
-        ObservationLineageCreate(
-            parent_observation_id=current.trajectory_observation.id,
-            relationship_type=RelationshipType.candidate_from_ball_trajectory,
-            processing_step_id=step.id,
-            payload_jsonb={
-                "candidate_type": candidate.observation_type,
-                "candidate_method": candidate.candidate_method,
-                **EVENT_CANDIDATE_WARNINGS,
-            },
+    lineage = []
+    trajectory_observation_id = _trajectory_observation_id(current)
+    if trajectory_observation_id is not None:
+        lineage.append(
+            ObservationLineageCreate(
+                parent_observation_id=trajectory_observation_id,
+                relationship_type=RelationshipType.candidate_from_ball_trajectory,
+                processing_step_id=step.id,
+                payload_jsonb={
+                    "candidate_type": candidate.observation_type,
+                    "candidate_method": candidate.candidate_method,
+                    **EVENT_CANDIDATE_WARNINGS,
+                },
+            )
         )
-    ]
     if current.source_ball_court_projection_observation_id is not None:
         lineage.append(
             ObservationLineageCreate(
@@ -3783,7 +4613,8 @@ def _event_candidate_observation_create(
         },
         idempotency_key=(
             f"{run.id}:{candidate.observation_type}:"
-            f"{current.trajectory_observation.id}:{current.frame_number}:{index}"
+            f"{_trajectory_or_projection_source_id(current)}:"
+            f"{current.frame_number}:{index}"
         ),
         lineage=lineage,
     )
@@ -3805,7 +4636,7 @@ def _event_candidate_diagnostic_observation_create(
     payload = {
         "candidate_type": EVENT_CANDIDATE_REJECTION_DIAGNOSTIC_OBSERVATION_TYPE,
         "source_ball_trajectory_run_id": ball_trajectory_run_id,
-        "source_ball_trajectory_observation_id": current.trajectory_observation.id,
+        "source_ball_trajectory_observation_id": _trajectory_observation_id(current),
         "source_court_projection_run_id": court_projection_run_id,
         "source_ball_court_projection_observation_id": (
             current.source_ball_court_projection_observation_id
@@ -3852,21 +4683,30 @@ def _event_candidate_diagnostic_observation_create(
         payload["player_anchor_contact_zone"] = diagnostic.player_anchor_contact_zone
     if diagnostic.net_axis_reversal_recall is not None:
         payload["net_axis_reversal_recall"] = diagnostic.net_axis_reversal_recall
+    if diagnostic.image_space_net_axis_reversal_recall is not None:
+        payload["image_space_net_axis_reversal_recall"] = (
+            diagnostic.image_space_net_axis_reversal_recall
+        )
     if diagnostic.overlap_suppression is not None:
         payload["overlap_suppression"] = diagnostic.overlap_suppression
-    lineage = [
-        ObservationLineageCreate(
-            parent_observation_id=current.trajectory_observation.id,
-            relationship_type=RelationshipType.derived_from,
-            processing_step_id=step.id,
-            payload_jsonb={
-                "candidate_type": EVENT_CANDIDATE_REJECTION_DIAGNOSTIC_OBSERVATION_TYPE,
-                "candidate_method": EVENT_CANDIDATE_METHOD,
-                "diagnostic_only": True,
-                **EVENT_CANDIDATE_WARNINGS,
-            },
+    lineage = []
+    trajectory_observation_id = _trajectory_observation_id(current)
+    if trajectory_observation_id is not None:
+        lineage.append(
+            ObservationLineageCreate(
+                parent_observation_id=trajectory_observation_id,
+                relationship_type=RelationshipType.derived_from,
+                processing_step_id=step.id,
+                payload_jsonb={
+                    "candidate_type": (
+                        EVENT_CANDIDATE_REJECTION_DIAGNOSTIC_OBSERVATION_TYPE
+                    ),
+                    "candidate_method": EVENT_CANDIDATE_METHOD,
+                    "diagnostic_only": True,
+                    **EVENT_CANDIDATE_WARNINGS,
+                },
+            )
         )
-    ]
     if current.source_ball_court_projection_observation_id is not None:
         lineage.append(
             ObservationLineageCreate(
@@ -3922,7 +4762,8 @@ def _event_candidate_diagnostic_observation_create(
         },
         idempotency_key=(
             f"{run.id}:{EVENT_CANDIDATE_REJECTION_DIAGNOSTIC_OBSERVATION_TYPE}:"
-            f"{current.trajectory_observation.id}:{current.frame_number}:{index}"
+            f"{_trajectory_or_projection_source_id(current)}:"
+            f"{current.frame_number}:{index}"
         ),
         lineage=lineage,
     )
@@ -3988,6 +4829,41 @@ def _trajectory_points_from_observation(
             )
         )
     return sorted(points, key=lambda point: (point.timestamp_ms, point.frame_number))
+
+
+def _ball_projection_point_from_observation(row: Observation) -> TrajectoryPoint | None:
+    payload = row.payload_jsonb or {}
+    frame_number = _optional_int(payload.get("frame_number")) or row.frame_start
+    timestamp_ms = _optional_int(payload.get("timestamp_ms")) or row.timestamp_start_ms
+    court_point = payload.get("court_point")
+    if not isinstance(court_point, dict):
+        return None
+    court_x = _number(court_point.get("x"))
+    court_y = _number(court_point.get("y"))
+    image_point = _image_point_tuple(payload.get("image_point"))
+    if frame_number is None or timestamp_ms is None or court_x is None or court_y is None:
+        return None
+    return TrajectoryPoint(
+        trajectory_observation=None,
+        frame_number=frame_number,
+        timestamp_ms=timestamp_ms,
+        court_x=court_x,
+        court_y=court_y,
+        source_ball_court_projection_observation_id=row.id,
+        source_homography_observation_id=_string_or_none(
+            payload.get("source_homography_observation_id")
+        ),
+        homography_time_delta_ms=_optional_int(payload.get("homography_time_delta_ms")),
+        homography_carried_forward=bool(payload.get("homography_carried_forward")),
+        inside_template_bounds=bool(
+            payload.get(
+                "inside_template_bounds",
+                0.0 <= court_x <= 1.0 and 0.0 <= court_y <= 1.0,
+            )
+        ),
+        image_x=image_point[0] if image_point is not None else None,
+        image_y=image_point[1] if image_point is not None else None,
+    )
 
 
 def _player_projection_from_observation(row: Observation) -> PlayerProjection | None:
@@ -4102,12 +4978,30 @@ def _image_point_tuple(value: Any) -> tuple[float, float] | None:
     return (x, y)
 
 
+def _trajectory_observation_id(point: TrajectoryPoint) -> str | None:
+    return point.trajectory_observation.id if point.trajectory_observation else None
+
+
+def _trajectory_or_projection_source_id(point: TrajectoryPoint) -> str:
+    return (
+        _trajectory_observation_id(point)
+        or point.source_ball_court_projection_observation_id
+        or f"{point.frame_number}:{point.timestamp_ms}"
+    )
+
+
+def _image_point_payload(point: TrajectoryPoint) -> dict[str, float] | None:
+    if point.image_x is None or point.image_y is None:
+        return None
+    return {"x": _round(point.image_x), "y": _round(point.image_y)}
+
+
 def _register_model(session: Session) -> ModelRegistry:
     existing = session.scalar(
         select(ModelRegistry)
         .where(
             ModelRegistry.name == "hit-bounce-candidate-evidence",
-            ModelRegistry.version == "v0.2.4",
+            ModelRegistry.version == "v0.2.6",
             ModelRegistry.model_family == "event_candidate",
             ModelRegistry.source == "apps.worker.services.hit_bounce_candidates",
         )
@@ -4117,12 +5011,15 @@ def _register_model(session: Session) -> ModelRegistry:
         return existing
     model = ModelRegistry(
         name="hit-bounce-candidate-evidence",
-        version="v0.2.4",
+        version="v0.2.6",
         model_family="event_candidate",
         source="apps.worker.services.hit_bounce_candidates",
         metadata_jsonb={
             "candidate_method": EVENT_CANDIDATE_METHOD,
             "hit_candidate_method": HIT_CANDIDATE_METHOD,
+            "image_space_net_axis_hit_candidate_method": (
+                IMAGE_SPACE_NET_AXIS_HIT_CANDIDATE_METHOD
+            ),
             "player_anchored_hit_candidate_method": PLAYER_ANCHORED_HIT_CANDIDATE_METHOD,
             "bounce_candidate_method": BOUNCE_CANDIDATE_METHOD,
             **EVENT_CANDIDATE_WARNINGS,
@@ -4143,7 +5040,7 @@ def _create_runtime_config(
 ) -> RuntimeConfig:
     runtime_config = RuntimeConfig(
         config_name="hit-bounce-candidate-evidence-config",
-        config_version="v0.2.4",
+        config_version="v0.2.6",
         payload_jsonb={
             "candidate_method": EVENT_CANDIDATE_METHOD,
             "source_ball_trajectory_run_id": ball_trajectory_run_id,
@@ -4203,7 +5100,7 @@ def _create_step(
     now = datetime.now(UTC)
     step = ProcessingStep(
         run_id=run.id,
-        step_name="player_anchored_hit_contact_zone_tightening_v024",
+        step_name="image_space_net_axis_hit_recall_v026",
         step_status="running",
         started_at=now,
         runtime_config_id=runtime_config.id,
@@ -4403,6 +5300,31 @@ def _validate_config(config: HitBounceCandidateConfig) -> dict[str, Any] | None:
         return _failed(
             "invalid_net_axis_reversal_dedupe_distance_template",
             "net_axis_reversal_dedupe_distance_template must be greater than zero",
+        )
+    if config.image_space_net_axis_lookback_ms <= 0:
+        return _failed(
+            "invalid_image_space_net_axis_lookback_ms",
+            "image_space_net_axis_lookback_ms must be greater than zero",
+        )
+    if config.image_space_net_axis_lookahead_ms <= 0:
+        return _failed(
+            "invalid_image_space_net_axis_lookahead_ms",
+            "image_space_net_axis_lookahead_ms must be greater than zero",
+        )
+    if config.image_space_net_axis_min_delta_pixels <= 0:
+        return _failed(
+            "invalid_image_space_net_axis_min_delta_pixels",
+            "image_space_net_axis_min_delta_pixels must be greater than zero",
+        )
+    if config.image_space_net_axis_min_pre_post_gap_ms < 0:
+        return _failed(
+            "invalid_image_space_net_axis_min_pre_post_gap_ms",
+            "image_space_net_axis_min_pre_post_gap_ms must be greater than or equal to zero",
+        )
+    if config.image_space_net_axis_dedupe_distance_pixels <= 0:
+        return _failed(
+            "invalid_image_space_net_axis_dedupe_distance_pixels",
+            "image_space_net_axis_dedupe_distance_pixels must be greater than zero",
         )
     return None
 

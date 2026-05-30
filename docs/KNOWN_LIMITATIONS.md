@@ -108,6 +108,10 @@ This registry makes TOM v3 Simple boundaries explicit.
 - Hit/Bounce Recall Diagnostics + Header Layout Repair v0.2.1 adds a bounded far-side recall
   fallback and rejection diagnostics, but the recovered markers remain candidate evidence rather
   than confirmed hit/bounce events.
+- Image-Space Net-Axis Hit Recall v0.2.6 uses broadcast image-y as a near/far-axis fallback for
+  airborne hit-like candidate recall. This can recover visually obvious reversals that court-plane
+  projection misses, but it is not true camera geometry, not hit truth, and not in/out or scoring
+  evidence.
 - Hit/Bounce Side-Zone + Sequence Classification Repair v0.2.2 can reclassify raw hit/bounce
   candidates using court-side zones and a simple event-sequence prior. This improves operator-review
   labels, but the sequence prior is heuristic candidate evidence only and is not rally, point,

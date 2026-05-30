@@ -95,3 +95,11 @@ This repair improves candidate recall and diagnostics only. A net-axis reversal 
 projection error, sparse trajectory segmentation, camera effects, or a real hit-like event. It does
 not prove racket contact and does not establish bounce truth, in/out, score, rally/point state,
 player identity, accepted/rejected lifecycle, or adjudication.
+
+## Follow-Up v0.2.6
+
+Image-Space Net-Axis Hit Recall v0.2.6 adds a separate
+`image_space_net_axis_reversal_hit_candidate_v026` path for airborne hit-like events where
+court-plane `court_y` can be distorted. It uses `ball_court_projection_candidate.image_point`
+evidence and the explicit `broadcast_image_y_axis_fallback_v026` axis method. Player proximity is
+still diagnostic/support only, not required, and the output remains candidate evidence only.

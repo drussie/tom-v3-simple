@@ -772,6 +772,36 @@ def main() -> None:
         type=float,
         default=0.08,
     )
+    hit_bounce_parser.add_argument(
+        "--image-space-net-axis-hit-enabled",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+    )
+    hit_bounce_parser.add_argument(
+        "--image-space-net-axis-lookback-ms",
+        type=int,
+        default=700,
+    )
+    hit_bounce_parser.add_argument(
+        "--image-space-net-axis-lookahead-ms",
+        type=int,
+        default=700,
+    )
+    hit_bounce_parser.add_argument(
+        "--image-space-net-axis-min-delta-pixels",
+        type=float,
+        default=4.0,
+    )
+    hit_bounce_parser.add_argument(
+        "--image-space-net-axis-min-pre-post-gap-ms",
+        type=int,
+        default=60,
+    )
+    hit_bounce_parser.add_argument(
+        "--image-space-net-axis-dedupe-distance-pixels",
+        type=float,
+        default=18.0,
+    )
     hit_bounce_parser.add_argument("--candidate-dedupe-ms", type=int, default=500)
     hit_bounce_parser.add_argument(
         "--viewer-base-url",
@@ -1604,6 +1634,36 @@ def _handle_build_hit_bounce_candidates(
             args,
             "net_axis_reversal_dedupe_distance_template",
             0.08,
+        ),
+        image_space_net_axis_hit_enabled=getattr(
+            args,
+            "image_space_net_axis_hit_enabled",
+            True,
+        ),
+        image_space_net_axis_lookback_ms=getattr(
+            args,
+            "image_space_net_axis_lookback_ms",
+            700,
+        ),
+        image_space_net_axis_lookahead_ms=getattr(
+            args,
+            "image_space_net_axis_lookahead_ms",
+            700,
+        ),
+        image_space_net_axis_min_delta_pixels=getattr(
+            args,
+            "image_space_net_axis_min_delta_pixels",
+            4.0,
+        ),
+        image_space_net_axis_min_pre_post_gap_ms=getattr(
+            args,
+            "image_space_net_axis_min_pre_post_gap_ms",
+            60,
+        ),
+        image_space_net_axis_dedupe_distance_pixels=getattr(
+            args,
+            "image_space_net_axis_dedupe_distance_pixels",
+            18.0,
         ),
         candidate_dedupe_ms=args.candidate_dedupe_ms,
         viewer_base_url=args.viewer_base_url,

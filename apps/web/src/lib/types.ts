@@ -1030,6 +1030,7 @@ export interface ReplayEventCandidateOverlay {
   player_anchored_hit_recall?: Record<string, unknown> | null;
   player_anchor_contact_zone?: Record<string, unknown> | null;
   net_axis_reversal_recall?: Record<string, unknown> | null;
+  image_space_net_axis_reversal_recall?: Record<string, unknown> | null;
   overlap_suppression?: Record<string, unknown> | null;
   source_ball_trajectory_run_id: string | null;
   source_ball_trajectory_observation_id: string | null;
@@ -1379,6 +1380,7 @@ export interface ReplayEventCandidateTimelineItem {
   player_anchored_hit_recall?: Record<string, unknown> | null;
   player_anchor_contact_zone?: Record<string, unknown> | null;
   net_axis_reversal_recall?: Record<string, unknown> | null;
+  image_space_net_axis_reversal_recall?: Record<string, unknown> | null;
   overlap_suppression?: Record<string, unknown> | null;
   source_ball_trajectory_observation_id: string | null;
   source_ball_court_projection_observation_id: string | null;

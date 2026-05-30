@@ -148,6 +148,14 @@ anchor, and outgoing frames and whether player proximity was required. For this 
 proximity is not required; it is diagnostic/confidence support only. The marker is still a
 `HIT CANDIDATE`, not hit truth.
 
+Image-Space Net-Axis Hit Recall v0.2.6 can add
+`image_space_net_axis_reversal_hit_candidate_v026` markers when the broadcast image-y trajectory
+reverses across an anchor point. Replay selected evidence exposes
+`image_space_net_axis_reversal_recall`, including the image-axis method, incoming/anchor/outgoing
+frames, image-axis deltas, image points, and `player_proximity_required = false`. This recall path
+is intended for airborne hit-like candidate events where court-plane homography may be unreliable;
+it is still a `HIT CANDIDATE`, not hit truth.
+
 ## What 6A Added
 
 - `GET /media/{media_id}/replay-info`

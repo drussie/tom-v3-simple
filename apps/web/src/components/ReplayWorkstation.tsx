@@ -3161,6 +3161,44 @@ function SelectedEvidencePanel({
                 )} → ${String(item.net_axis_reversal_recall.outgoing_frame ?? "n/a")}`
           }
         />
+        <DetailRow
+          label="image recall player required"
+          value={
+            item.image_space_net_axis_reversal_recall === null ||
+            item.image_space_net_axis_reversal_recall === undefined
+              ? "n/a"
+              : String(
+                  item.image_space_net_axis_reversal_recall.player_proximity_required ??
+                    "n/a"
+                )
+          }
+        />
+        <DetailRow
+          label="image recall axis"
+          value={
+            item.image_space_net_axis_reversal_recall === null ||
+            item.image_space_net_axis_reversal_recall === undefined
+              ? "n/a"
+              : String(
+                  item.image_space_net_axis_reversal_recall.image_axis_method ?? "n/a"
+                )
+          }
+        />
+        <DetailRow
+          label="image recall window"
+          value={
+            item.image_space_net_axis_reversal_recall === null ||
+            item.image_space_net_axis_reversal_recall === undefined
+              ? "n/a"
+              : `${String(
+                  item.image_space_net_axis_reversal_recall.incoming_frame ?? "n/a"
+                )} → ${String(
+                  item.image_space_net_axis_reversal_recall.anchor_frame ?? "n/a"
+                )} → ${String(
+                  item.image_space_net_axis_reversal_recall.outgoing_frame ?? "n/a"
+                )}`
+          }
+        />
         {item.player_proximity_gate !== null ? (
           <>
             <DetailRow

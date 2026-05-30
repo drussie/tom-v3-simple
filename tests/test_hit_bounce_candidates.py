@@ -25,6 +25,7 @@ from apps.worker.services.hit_bounce_candidates import (
     BOUNCE_CANDIDATE_METHOD,
     HIT_CANDIDATE_METHOD,
     HIT_FALLBACK_CANDIDATE_METHOD,
+    IMAGE_SPACE_NET_AXIS_HIT_CANDIDATE_METHOD,
     NET_AXIS_REVERSAL_HIT_CANDIDATE_METHOD,
     PLAYER_ANCHORED_HIT_CANDIDATE_METHOD,
     SIDE_ZONE_SEQUENCE_BOUNCE_METHOD,
@@ -294,6 +295,186 @@ def test_no_net_axis_reversal_does_not_emit_ball_first_hit(
     assert "no_net_axis_reversal" in result["candidate_summary"][
         "net_axis_reversal_rejection_reasons"
     ]
+
+
+def test_image_space_net_axis_reversal_emits_hit_without_player_proximity(
+    db_session: Session,
+) -> None:
+    media = _seed_media(db_session)
+    trajectory_run, projection_ids = _seed_trajectory_run(
+        db_session,
+        media.id,
+        points=[
+            (0, 0, 0.20, 0.20),
+            (6, 200, 0.30, 0.30),
+            (12, 400, 0.40, 0.40),
+        ],
+    )
+    _update_ball_projection_image_points(
+        db_session,
+        projection_ids,
+        image_points=[
+            (100.0, 100.0),
+            (120.0, 150.0),
+            (140.0, 110.0),
+        ],
+    )
+    projection_run = _seed_projection_run(db_session, media.id, players=[])
+
+    result = build_hit_bounce_candidates(
+        session=db_session,
+        media_id=media.id,
+        ball_trajectory_run_id=trajectory_run.id,
+        court_projection_run_id=projection_run.id,
+    )
+
+    assert result["ok"] is True
+    assert result["observations"]["hit_candidate"] == 1
+    assert (
+        result["candidate_summary"]["image_net_axis_reversal_recovered_hit_count"]
+        == 1
+    )
+    hit = db_session.scalar(
+        select(Observation).where(
+            Observation.run_id == result["event_candidate_run_id"],
+            Observation.observation_type == "hit_candidate",
+        )
+    )
+    assert hit is not None
+    assert hit.payload_jsonb["candidate_method"] == (
+        IMAGE_SPACE_NET_AXIS_HIT_CANDIDATE_METHOD
+    )
+    recall = hit.payload_jsonb["image_space_net_axis_reversal_recall"]
+    assert recall["player_proximity_required"] is False
+    assert recall["image_axis_method"] == "broadcast_image_y_axis_fallback_v026"
+    assert recall["image_axis_reversal"] is True
+    assert hit.payload_jsonb["source_player_court_projection_observation_id"] is None
+    assert "airborne_hit_projection_warning" in hit.payload_jsonb["reason_codes"]
+
+
+def test_image_space_reversal_missing_image_points_writes_diagnostics(
+    db_session: Session,
+) -> None:
+    media = _seed_media(db_session)
+    trajectory_run, projection_ids = _seed_trajectory_run(
+        db_session,
+        media.id,
+        points=[
+            (0, 0, 0.20, 0.20),
+            (6, 200, 0.30, 0.30),
+            (12, 400, 0.40, 0.40),
+        ],
+    )
+    _remove_ball_projection_image_points(db_session, projection_ids)
+    projection_run = _seed_projection_run(db_session, media.id, players=[])
+
+    result = build_hit_bounce_candidates(
+        session=db_session,
+        media_id=media.id,
+        ball_trajectory_run_id=trajectory_run.id,
+        court_projection_run_id=projection_run.id,
+    )
+
+    assert result["ok"] is True
+    assert result["observations"]["hit_candidate"] == 0
+    assert "missing_image_point" in result["candidate_summary"][
+        "image_net_axis_reversal_rejection_reasons"
+    ]
+    diagnostic = next(
+        (
+            row
+            for row in db_session.scalars(
+                select(Observation).where(
+                    Observation.run_id == result["event_candidate_run_id"],
+                    Observation.observation_type
+                    == "event_candidate_rejection_diagnostic",
+                )
+            )
+            if row.payload_jsonb.get("diagnostic_source")
+            == "image_space_net_axis_hit_recall"
+        ),
+        None,
+    )
+    assert diagnostic is not None
+    assert diagnostic.payload_jsonb["image_space_net_axis_reversal_recall"][
+        "player_proximity_required"
+    ] is False
+
+
+def test_image_space_recall_uses_projection_points_outside_trajectory_segments(
+    db_session: Session,
+) -> None:
+    media = _seed_media(db_session)
+    trajectory_run, _ = _seed_trajectory_run(
+        db_session,
+        media.id,
+        points=[
+            (0, 0, 0.20, 0.20),
+            (6, 200, 0.30, 0.30),
+            (12, 400, 0.40, 0.40),
+        ],
+    )
+    projection_run = _seed_projection_run(db_session, media.id, players=[])
+    projection_ids = _seed_ball_projection_rows(
+        db_session,
+        media_id=media.id,
+        run_id=projection_run.id,
+        points=[
+            (34, 1133, 0.44, 0.90, 905.0, 324.0),
+            (54, 1800, 0.45, 0.90, 900.0, 324.0),
+            (55, 1833, 0.49, 1.04, 952.0, 244.0),
+            (66, 2200, 0.40, 0.87, 854.0, 338.0),
+        ],
+    )
+
+    result = build_hit_bounce_candidates(
+        session=db_session,
+        media_id=media.id,
+        ball_trajectory_run_id=trajectory_run.id,
+        court_projection_run_id=projection_run.id,
+    )
+
+    assert result["ok"] is True
+    assert result["observations"]["hit_candidate"] == 1
+    assert result["candidate_summary"][
+        "image_net_axis_reversal_source_point_count"
+    ] == 4
+    assert (
+        result["candidate_summary"]["image_net_axis_reversal_recovered_hit_count"]
+        == 1
+    )
+    hit = db_session.scalar(
+        select(Observation).where(
+            Observation.run_id == result["event_candidate_run_id"],
+            Observation.observation_type == "hit_candidate",
+        )
+    )
+    assert hit is not None
+    assert hit.payload_jsonb["candidate_method"] == (
+        IMAGE_SPACE_NET_AXIS_HIT_CANDIDATE_METHOD
+    )
+    assert hit.payload_jsonb["source_ball_trajectory_observation_id"] is None
+    assert hit.payload_jsonb["source_ball_court_projection_observation_id"] == (
+        projection_ids[2]
+    )
+    lineage = db_session.scalars(
+        select(ObservationLineage).where(ObservationLineage.child_observation_id == hit.id)
+    ).all()
+    assert {row.relationship_type for row in lineage} == {
+        "candidate_from_ball_court_projection"
+    }
+    overlays = build_event_candidate_overlay_items(
+        session=db_session,
+        media=media,
+        start_ms=0,
+        end_ms=2400,
+        event_candidate_run_id=result["event_candidate_run_id"],
+        observation_type="hit_candidate",
+    )
+    assert overlays[0]["image_point"] == {"x": 952.0, "y": 244.0}
+    assert overlays[0]["image_space_net_axis_reversal_recall"][
+        "player_proximity_required"
+    ] is False
 
 
 def test_far_side_style_player_time_offset_hit_fallback(
@@ -1430,6 +1611,7 @@ def test_hit_bounce_candidate_plan_only_and_cli_do_not_mutate(
     assert "build-hit-bounce-candidates" in result["plan"]["command"]
     assert "--hit-min-net-axis-delta-template 0.015" in result["plan"]["command"]
     assert "--bounce-min-image-y-delta-pixels 2.0" in result["plan"]["command"]
+    assert "--image-space-net-axis-min-delta-pixels 4.0" in result["plan"]["command"]
     assert db_session.scalars(select(ProcessingRun)).all() == []
 
     class Args:
@@ -1769,3 +1951,52 @@ def _seed_projection_run(
         session.add(observation)
     session.commit()
     return run
+
+
+def _seed_ball_projection_rows(
+    session: Session,
+    *,
+    media_id: str,
+    run_id: str,
+    points: list[tuple[int, int, float, float, float, float]],
+) -> list[str]:
+    observation_ids: list[str] = []
+    for index, (frame, timestamp_ms, court_x, court_y, image_x, image_y) in enumerate(
+        points
+    ):
+        observation = Observation(
+            media_id=media_id,
+            run_id=run_id,
+            observation_family="projection",
+            observation_type="ball_court_projection_candidate",
+            granularity="frame",
+            frame_start=frame,
+            frame_end=frame,
+            timestamp_start_ms=timestamp_ms,
+            timestamp_end_ms=timestamp_ms,
+            confidence=0.8,
+            coordinate_space="court_template_2d",
+            payload_jsonb={
+                "frame_number": frame,
+                "timestamp_ms": timestamp_ms,
+                "court_point": {"x": court_x, "y": court_y},
+                "image_point": {"x": image_x, "y": image_y},
+                "source_homography_observation_id": f"homography-{frame}",
+                "homography_time_delta_ms": 0,
+                "homography_carried_forward": False,
+                "inside_template_bounds": (
+                    0.0 <= court_x <= 1.0 and 0.0 <= court_y <= 1.0
+                ),
+                "projection_candidate_only": True,
+                "not_ball_truth": True,
+                "not_court_truth": True,
+                "observation_only": True,
+                "no_adjudication": True,
+            },
+            idempotency_key=f"ball-projection:{run_id}:{index}",
+        )
+        session.add(observation)
+        session.flush()
+        observation_ids.append(observation.id)
+    session.commit()
+    return observation_ids
