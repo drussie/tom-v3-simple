@@ -112,6 +112,10 @@ This registry makes TOM v3 Simple boundaries explicit.
   candidates using court-side zones and a simple event-sequence prior. This improves operator-review
   labels, but the sequence prior is heuristic candidate evidence only and is not rally, point,
   score, in/out, or adjudication logic.
+- Player-Anchored Hit Recall v0.2.3 can recover additional `hit_candidate` markers by scanning
+  wider ball trajectory windows around near/far main player projection anchors. The recall pass
+  inherits projection and trajectory gaps and does not prove contact, rally order, in/out, point, or
+  score.
 - Event candidate video markers require a source ball court projection image point. If that point
   is unavailable, the candidate remains inspectable in replay but no broadcast-video marker is
   drawn.

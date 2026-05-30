@@ -722,6 +722,12 @@ Event candidate selected evidence shows the v0.2 physics fields when available: 
 net-axis reversal for hit candidates, and image-y descending-to-ascending proxy plus speed
 reduction for bounce candidates.
 
+Player-anchored hit recall v0.2.3 adds `player_anchored_hit_recall` details for candidate hits
+recovered from wider ball windows around near/far main player projection anchors. Selected evidence
+shows the anchor track role candidate, anchor distance, incoming/current/outgoing frames, and
+wide-window `court_y` reversal diagnostics. These fields are review diagnostics only, not contact
+truth or rally/point logic.
+
 For Stream Proxy Mode, open:
 
 ```text

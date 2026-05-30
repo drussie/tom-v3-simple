@@ -2363,3 +2363,31 @@ observations, and 29 rejection diagnostics. It reclassified one raw hit candidat
 
 The side-zone sequence pass is candidate-label repair only. It does not add hit truth, bounce truth,
 in/out, rally/point/score logic, player identity, accepted/rejected lifecycle, or adjudication.
+
+## Player-Anchored Hit Recall v0.2.3
+
+Status: complete
+
+### Goal
+
+Recover obvious hit candidates that local trajectory triples miss when the ball trajectory has a
+sparse gap near a main player contact zone.
+
+### Notes
+
+This repair adds:
+
+- `player_anchored_net_axis_reversal_hit_candidate_v023`
+- player-anchored hit recall diagnostics in event candidate payloads
+- player-anchored rejection diagnostics in `event_candidate_rejection_diagnostic`
+- CLI/Makefile thresholds for bounded player-anchored lookback/lookahead windows
+- selected evidence display for `player_anchored_hit_recall`
+- dedupe behavior that preserves one pre-anchor fallback candidate for side-zone sequence
+  classification
+
+The local bridge smoke run produced 3 `hit_candidate` observations, 2 `bounce_candidate`
+observations, and 433 rejection diagnostics. Two final hit candidates came from the player-anchored
+recall method, including a far-player anchored hit that used a wide-window `court_y` reversal.
+
+This repair improves candidate recall only. It does not add hit truth, bounce truth, in/out,
+rally/point/score logic, player identity, accepted/rejected lifecycle, or adjudication.

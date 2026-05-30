@@ -1411,6 +1411,9 @@ python -m apps.worker.cli completion-audit --no-demo-only
 - Hit/bounce event candidates can be produced for review, but they remain candidate evidence only.
   Persistent replay markers are not hit truth, bounce truth, in/out, rally, point, score, or
   adjudication.
+- Player-anchored hit recall is enabled by default for hit/bounce candidate builds. It uses near/far
+  main player projection anchors plus a bounded wider ball trajectory window to recover additional
+  `hit_candidate` evidence, and it remains candidate-only.
 - Cloud deployment, auth, production streaming, and multi-camera reasoning are out of scope.
 
 ## 15. Completion Checklist

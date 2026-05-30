@@ -3077,6 +3077,44 @@ function SelectedEvidencePanel({
                 )}`
           }
         />
+        <DetailRow
+          label="player anchored recall"
+          value={
+            item.player_anchored_hit_recall === null ||
+            item.player_anchored_hit_recall === undefined
+              ? "n/a"
+              : String(item.player_anchored_hit_recall.enabled ?? "n/a")
+          }
+        />
+        <DetailRow
+          label="anchor track role"
+          value={
+            item.player_anchored_hit_recall === null ||
+            item.player_anchored_hit_recall === undefined
+              ? "n/a"
+              : String(item.player_anchored_hit_recall.anchor_track_role_candidate ?? "n/a")
+          }
+        />
+        <DetailRow
+          label="anchor distance"
+          value={
+            item.player_anchored_hit_recall === null ||
+            item.player_anchored_hit_recall === undefined
+              ? "n/a"
+              : String(item.player_anchored_hit_recall.distance_template_units ?? "n/a")
+          }
+        />
+        <DetailRow
+          label="wide-window reversal"
+          value={
+            item.player_anchored_hit_recall === null ||
+            item.player_anchored_hit_recall === undefined
+              ? "n/a"
+              : `${String(item.player_anchored_hit_recall.vy_before ?? "n/a")} / ${String(
+                  item.player_anchored_hit_recall.vy_after ?? "n/a"
+                )}`
+          }
+        />
         {item.player_proximity_gate !== null ? (
           <>
             <DetailRow

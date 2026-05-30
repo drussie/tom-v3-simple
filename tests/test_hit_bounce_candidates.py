@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Generator
+from dataclasses import replace
 from datetime import UTC, datetime
 
 import pytest
@@ -24,6 +25,7 @@ from apps.worker.services.hit_bounce_candidates import (
     BOUNCE_CANDIDATE_METHOD,
     HIT_CANDIDATE_METHOD,
     HIT_FALLBACK_CANDIDATE_METHOD,
+    PLAYER_ANCHORED_HIT_CANDIDATE_METHOD,
     EventCandidateDraft,
     HitBounceCandidateConfig,
     NearestPlayerContext,
@@ -32,6 +34,7 @@ from apps.worker.services.hit_bounce_candidates import (
     TrajectoryPoint,
     apply_side_zone_sequence_classification,
     build_hit_bounce_candidates,
+    dedupe_event_candidates_with_rejections,
 )
 
 
@@ -186,7 +189,7 @@ def test_far_side_style_player_time_offset_hit_fallback(
         )
     )
     assert hit is not None
-    assert hit.payload_jsonb["candidate_method"].endswith("_fallback_v022")
+    assert hit.payload_jsonb["candidate_method"].endswith("_fallback_v023")
     assert "player_proximate_speed_change_fallback" in hit.payload_jsonb["reason_codes"]
     assert hit.payload_jsonb["net_axis_reversal"]["reversal"] is False
     assert hit.payload_jsonb["nearest_player"]["track_role_candidate"] == (
@@ -482,6 +485,102 @@ def test_candidate_dedupe_keeps_highest_confidence_per_window(
     assert "player_proximate_event_priority" in hit.payload_jsonb["reason_codes"]
 
 
+def test_dedupe_preserves_one_pre_anchor_landing_candidate_for_sequence_prior() -> None:
+    config = HitBounceCandidateConfig()
+    near_hit = replace(
+        _draft_event_candidate(
+            observation_type="hit_candidate",
+            frame=10,
+            timestamp_ms=333,
+            court_x=0.30,
+            court_y=0.20,
+            track_role_candidate="near_player_track_candidate",
+            player_distance=0.16,
+            candidate_method=HIT_CANDIDATE_METHOD,
+            net_axis_reversal=True,
+        ),
+        confidence=0.65,
+    )
+    pre_anchor_landing = replace(
+        _draft_event_candidate(
+            observation_type="hit_candidate",
+            frame=30,
+            timestamp_ms=1000,
+            court_x=0.44,
+            court_y=0.88,
+            track_role_candidate="far_player_track_candidate",
+            player_distance=0.14,
+            candidate_method=HIT_FALLBACK_CANDIDATE_METHOD,
+            net_axis_reversal=False,
+        ),
+        confidence=0.46,
+    )
+    lower_pre_anchor_landing = replace(
+        _draft_event_candidate(
+            observation_type="hit_candidate",
+            frame=29,
+            timestamp_ms=967,
+            court_x=0.44,
+            court_y=0.87,
+            track_role_candidate="far_player_track_candidate",
+            player_distance=0.15,
+            candidate_method=HIT_FALLBACK_CANDIDATE_METHOD,
+            net_axis_reversal=False,
+        ),
+        confidence=0.44,
+    )
+    anchored_hit = replace(
+        _draft_event_candidate(
+            observation_type="hit_candidate",
+            frame=34,
+            timestamp_ms=1133,
+            court_x=0.45,
+            court_y=0.90,
+            track_role_candidate="far_player_track_candidate",
+            player_distance=0.13,
+            candidate_method=PLAYER_ANCHORED_HIT_CANDIDATE_METHOD,
+            net_axis_reversal=True,
+        ),
+        confidence=0.70,
+    )
+
+    deduped, rejections = dedupe_event_candidates_with_rejections(
+        [
+            near_hit,
+            pre_anchor_landing,
+            lower_pre_anchor_landing,
+            anchored_hit,
+        ],
+        candidate_dedupe_ms=500,
+    )
+
+    assert [
+        (candidate.frame_number, candidate.candidate_method) for candidate in deduped
+    ] == [
+        (10, HIT_CANDIDATE_METHOD),
+        (30, HIT_FALLBACK_CANDIDATE_METHOD),
+        (34, PLAYER_ANCHORED_HIT_CANDIDATE_METHOD),
+    ]
+    assert any(
+        "deduped_by_player_anchored_hit" in diagnostic.rejection_reasons
+        for diagnostic in rejections
+    )
+
+    final_candidates, summary = apply_side_zone_sequence_classification(
+        deduped,
+        config=config,
+    )
+
+    assert [
+        candidate.observation_type for candidate in final_candidates
+    ] == [
+        "hit_candidate",
+        "bounce_candidate",
+        "hit_candidate",
+    ]
+    assert summary["reclassified_hit_to_bounce_count"] == 1
+
+
 def test_rejected_contexts_persist_rejection_reason_diagnostics(
     db_session: Session,
 ) -> None:
@@ -573,6 +672,184 @@ def test_dedupe_does_not_suppress_valid_far_side_event_from_near_side_event(
     ]
 
 
+def test_player_anchored_far_side_hit_recall_uses_wide_window(
+    db_session: Session,
+) -> None:
+    media = _seed_media(db_session)
+    trajectory_run, _ = _seed_trajectory_run(
+        db_session,
+        media.id,
+        points=[
+            (80, 2600, 0.45, 0.72),
+            (88, 2933, 0.46, 0.90),
+            (98, 3300, 0.47, 0.70),
+        ],
+    )
+    projection_run = _seed_projection_run(
+        db_session,
+        media.id,
+        players=[(103, 3433, 0.46, 0.91, "far_player_track_candidate")],
+    )
+
+    result = build_hit_bounce_candidates(
+        session=db_session,
+        media_id=media.id,
+        ball_trajectory_run_id=trajectory_run.id,
+        court_projection_run_id=projection_run.id,
+        hit_player_time_window_ms=40,
+    )
+
+    assert result["ok"] is True
+    assert result["observations"]["hit_candidate"] == 1
+    assert result["candidate_summary"]["player_anchor_candidate_count"] == 1
+    assert result["candidate_summary"]["player_anchor_recovered_hit_count"] == 1
+    hit = db_session.scalar(
+        select(Observation).where(
+            Observation.run_id == result["event_candidate_run_id"],
+            Observation.observation_type == "hit_candidate",
+        )
+    )
+    assert hit is not None
+    assert hit.payload_jsonb["candidate_method"] == PLAYER_ANCHORED_HIT_CANDIDATE_METHOD
+    assert "player_anchored_hit_recall" in hit.payload_jsonb["reason_codes"]
+    assert "wide_window_net_axis_reversal" in hit.payload_jsonb["reason_codes"]
+    recall = hit.payload_jsonb["player_anchored_hit_recall"]
+    assert recall["anchor_track_role_candidate"] == "far_player_track_candidate"
+    assert recall["anchor_ball_frame"] == 88
+    assert recall["incoming_frame"] == 80
+    assert recall["outgoing_frame"] == 98
+    assert recall["net_axis_reversal"] is True
+
+
+def test_player_anchored_near_side_hit_recall_uses_wide_window(
+    db_session: Session,
+) -> None:
+    media = _seed_media(db_session)
+    trajectory_run, _ = _seed_trajectory_run(
+        db_session,
+        media.id,
+        points=[
+            (10, 333, 0.30, 0.34),
+            (18, 633, 0.32, 0.16),
+            (28, 1000, 0.34, 0.34),
+        ],
+    )
+    projection_run = _seed_projection_run(
+        db_session,
+        media.id,
+        players=[(33, 1100, 0.32, 0.17, "near_player_track_candidate")],
+    )
+
+    result = build_hit_bounce_candidates(
+        session=db_session,
+        media_id=media.id,
+        ball_trajectory_run_id=trajectory_run.id,
+        court_projection_run_id=projection_run.id,
+        hit_player_time_window_ms=40,
+    )
+
+    assert result["ok"] is True
+    assert result["observations"]["hit_candidate"] == 1
+    hit = db_session.scalar(
+        select(Observation).where(
+            Observation.run_id == result["event_candidate_run_id"],
+            Observation.observation_type == "hit_candidate",
+        )
+    )
+    assert hit is not None
+    assert hit.payload_jsonb["candidate_method"] == PLAYER_ANCHORED_HIT_CANDIDATE_METHOD
+    assert hit.payload_jsonb["nearest_player"]["track_role_candidate"] == (
+        "near_player_track_candidate"
+    )
+
+
+def test_player_anchored_hit_rejects_without_near_player_anchor(
+    db_session: Session,
+) -> None:
+    media = _seed_media(db_session)
+    trajectory_run, _ = _seed_trajectory_run(
+        db_session,
+        media.id,
+        points=[
+            (80, 2600, 0.45, 0.72),
+            (88, 2933, 0.46, 0.90),
+            (98, 3300, 0.47, 0.70),
+        ],
+    )
+    projection_run = _seed_projection_run(
+        db_session,
+        media.id,
+        players=[(88, 2933, 0.10, 0.10, "far_player_track_candidate")],
+    )
+
+    result = build_hit_bounce_candidates(
+        session=db_session,
+        media_id=media.id,
+        ball_trajectory_run_id=trajectory_run.id,
+        court_projection_run_id=projection_run.id,
+        hit_player_time_window_ms=40,
+    )
+
+    assert result["ok"] is True
+    assert result["candidate_summary"]["player_anchor_candidate_count"] == 0
+    assert result["candidate_summary"]["player_anchor_rejected_count"] == 1
+    assert result["candidate_summary"]["player_anchor_rejection_reasons"] == {
+        "player_anchor_distance_too_large": 1
+    }
+
+
+def test_player_anchored_hit_rejects_without_wide_window_reversal(
+    db_session: Session,
+) -> None:
+    media = _seed_media(db_session)
+    trajectory_run, _ = _seed_trajectory_run(
+        db_session,
+        media.id,
+        points=[
+            (80, 2600, 0.45, 0.72),
+            (88, 2933, 0.46, 0.82),
+            (98, 3300, 0.47, 0.92),
+        ],
+    )
+    projection_run = _seed_projection_run(
+        db_session,
+        media.id,
+        players=[(103, 3433, 0.46, 0.83, "far_player_track_candidate")],
+    )
+
+    result = build_hit_bounce_candidates(
+        session=db_session,
+        media_id=media.id,
+        ball_trajectory_run_id=trajectory_run.id,
+        court_projection_run_id=projection_run.id,
+        hit_player_time_window_ms=40,
+    )
+
+    assert result["ok"] is True
+    assert result["candidate_summary"]["player_anchor_candidate_count"] == 0
+    assert result["candidate_summary"]["player_anchor_rejected_count"] == 1
+    assert result["candidate_summary"]["player_anchor_rejection_reasons"] == {
+        "no_wide_window_net_axis_reversal": 1
+    }
+    diagnostics = db_session.scalars(
+        select(Observation).where(
+            Observation.run_id == result["event_candidate_run_id"],
+            Observation.observation_type == "event_candidate_rejection_diagnostic",
+        )
+    ).all()
+    diagnostic = next(
+        (
+            item
+            for item in diagnostics
+            if item.payload_jsonb.get("diagnostic_source")
+            == "player_anchored_hit_recall"
+        ),
+        None,
+    )
+    assert diagnostic is not None
+    assert diagnostic.payload_jsonb["player_anchored_hit_recall"]["enabled"] is True
+
+
 def test_side_zone_sequence_reclassifies_sample_style_sequence() -> None:
     candidates = [
         _draft_event_candidate(
@@ -653,7 +930,7 @@ def test_side_zone_sequence_reclassifies_sample_style_sequence() -> None:
         "reason": "court_landing_zone_over_player_contact_zone",
         "reclassified": True,
     }
-    assert far_bounce.candidate_method == "side_zone_sequence_bounce_candidate_v022"
+    assert far_bounce.candidate_method == "side_zone_sequence_bounce_candidate_v023"
     assert far_bounce.court_side_zone is not None
     assert far_bounce.court_side_zone["side"] == "far_side"
     assert far_bounce.court_landing_zone is not None
@@ -669,7 +946,7 @@ def test_side_zone_sequence_reclassifies_sample_style_sequence() -> None:
     assert near_hit.candidate_reclassification["original_candidate_type"] == (
         "bounce_candidate"
     )
-    assert near_hit.candidate_method == "side_zone_sequence_hit_candidate_v022"
+    assert near_hit.candidate_method == "side_zone_sequence_hit_candidate_v023"
     assert near_hit.player_contact_zone is not None
     assert near_hit.player_contact_zone["in_contact_zone"] is True
     assert near_hit.candidate_sequence is not None
@@ -836,6 +1113,12 @@ def test_hit_bounce_candidate_plan_only_and_cli_do_not_mutate(
         hit_contact_fallback_min_direction_delta_degrees = 5.0
         bounce_fallback_enabled = True
         bounce_fallback_min_speed_reduction_fraction = 0.35
+        player_anchored_hit_enabled = True
+        player_anchored_hit_lookback_ms = 700
+        player_anchored_hit_lookahead_ms = 1300
+        player_anchored_hit_distance_max_template = 0.24
+        player_anchored_hit_min_net_axis_delta_template = 0.015
+        player_anchored_hit_min_pre_post_gap_ms = 60
         candidate_dedupe_ms = 500
         viewer_base_url = "http://127.0.0.1:3000"
         plan_only = True

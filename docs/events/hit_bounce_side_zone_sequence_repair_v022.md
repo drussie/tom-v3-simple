@@ -112,3 +112,10 @@ The sample-point visual target was achieved: the far-side triangle-like raw cand
 
 This repair improves candidate label quality and diagnostics only. It does not add event truth,
 line calls, score, rally/point logic, identity, server/receiver logic, or adjudication.
+
+## Follow-Up Repair
+
+`Player-Anchored Hit Recall v0.2.3` adds a bounded recall pass on top of this side-zone sequence
+repair. It scans wider ball trajectory windows around near/far main player projection anchors to
+recover candidate hits that local trajectory triples miss, while still feeding final labels through
+the side-zone sequence pass.

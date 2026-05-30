@@ -707,6 +707,36 @@ def main() -> None:
         type=float,
         default=0.35,
     )
+    hit_bounce_parser.add_argument(
+        "--player-anchored-hit-enabled",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+    )
+    hit_bounce_parser.add_argument(
+        "--player-anchored-hit-lookback-ms",
+        type=int,
+        default=700,
+    )
+    hit_bounce_parser.add_argument(
+        "--player-anchored-hit-lookahead-ms",
+        type=int,
+        default=1300,
+    )
+    hit_bounce_parser.add_argument(
+        "--player-anchored-hit-distance-max-template",
+        type=float,
+        default=0.24,
+    )
+    hit_bounce_parser.add_argument(
+        "--player-anchored-hit-min-net-axis-delta-template",
+        type=float,
+        default=0.015,
+    )
+    hit_bounce_parser.add_argument(
+        "--player-anchored-hit-min-pre-post-gap-ms",
+        type=int,
+        default=60,
+    )
     hit_bounce_parser.add_argument("--candidate-dedupe-ms", type=int, default=500)
     hit_bounce_parser.add_argument(
         "--viewer-base-url",
@@ -1492,6 +1522,18 @@ def _handle_build_hit_bounce_candidates(
         bounce_fallback_enabled=args.bounce_fallback_enabled,
         bounce_fallback_min_speed_reduction_fraction=(
             args.bounce_fallback_min_speed_reduction_fraction
+        ),
+        player_anchored_hit_enabled=args.player_anchored_hit_enabled,
+        player_anchored_hit_lookback_ms=args.player_anchored_hit_lookback_ms,
+        player_anchored_hit_lookahead_ms=args.player_anchored_hit_lookahead_ms,
+        player_anchored_hit_distance_max_template=(
+            args.player_anchored_hit_distance_max_template
+        ),
+        player_anchored_hit_min_net_axis_delta_template=(
+            args.player_anchored_hit_min_net_axis_delta_template
+        ),
+        player_anchored_hit_min_pre_post_gap_ms=(
+            args.player_anchored_hit_min_pre_post_gap_ms
         ),
         candidate_dedupe_ms=args.candidate_dedupe_ms,
         viewer_base_url=args.viewer_base_url,
