@@ -958,6 +958,47 @@ export interface ReplayEventCandidateDecision {
   classification_priority?: string;
 }
 
+export interface ReplayEventCandidateNetAxisReversal {
+  axis: string;
+  vy_before: number | null;
+  vy_after: number | null;
+  reversal: boolean;
+  min_axis_delta: number;
+  previous_frame?: number | null;
+  current_frame?: number;
+  next_frame?: number | null;
+  previous_timestamp_ms?: number | null;
+  current_timestamp_ms?: number;
+  next_timestamp_ms?: number | null;
+}
+
+export interface ReplayEventCandidateVerticalMotionProxy {
+  proxy_type: string;
+  status?: string;
+  image_y_before: number | null;
+  image_y_current: number | null;
+  image_y_after: number | null;
+  image_vy_before: number | null;
+  image_vy_after: number | null;
+  descending_to_ascending: boolean;
+  min_image_y_delta_pixels: number;
+  previous_frame?: number | null;
+  current_frame?: number;
+  next_frame?: number | null;
+  previous_timestamp_ms?: number | null;
+  current_timestamp_ms?: number;
+  next_timestamp_ms?: number | null;
+  proxy_warning?: string;
+}
+
+export interface ReplayEventCandidateSpeedReduction {
+  speed_before: number;
+  speed_after: number;
+  speed_reduction_fraction: number | null;
+  speed_reduced: boolean;
+  min_speed_reduction_fraction: number;
+}
+
 export interface ReplayEventCandidateOverlay {
   overlay_type: "hit_candidate" | "bounce_candidate";
   candidate_type: "hit_candidate" | "bounce_candidate" | string;
@@ -978,6 +1019,9 @@ export interface ReplayEventCandidateOverlay {
   classification_priority: string | null;
   player_proximity_gate: ReplayEventCandidatePlayerProximityGate | null;
   candidate_decision: ReplayEventCandidateDecision | null;
+  net_axis_reversal: ReplayEventCandidateNetAxisReversal | null;
+  vertical_motion_proxy: ReplayEventCandidateVerticalMotionProxy | null;
+  speed_reduction: ReplayEventCandidateSpeedReduction | null;
   source_ball_trajectory_run_id: string | null;
   source_ball_trajectory_observation_id: string | null;
   source_court_projection_run_id: string | null;
@@ -1315,6 +1359,9 @@ export interface ReplayEventCandidateTimelineItem {
   classification_priority: string | null;
   player_proximity_gate: ReplayEventCandidatePlayerProximityGate | null;
   candidate_decision: ReplayEventCandidateDecision | null;
+  net_axis_reversal: ReplayEventCandidateNetAxisReversal | null;
+  vertical_motion_proxy: ReplayEventCandidateVerticalMotionProxy | null;
+  speed_reduction: ReplayEventCandidateSpeedReduction | null;
   source_ball_trajectory_observation_id: string | null;
   source_ball_court_projection_observation_id: string | null;
   source_player_court_projection_observation_id: string | null;

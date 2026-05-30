@@ -853,13 +853,18 @@ TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_tom_v1_bridge.db \
   --bounce-player-distance-min-template 0.18 \
   --hit-min-direction-delta-degrees 25 \
   --bounce-min-direction-delta-degrees 20 \
+  --hit-min-net-axis-delta-template 0.015 \
+  --bounce-min-image-y-delta-pixels 2.0 \
+  --bounce-min-speed-reduction-fraction 0.05 \
   --candidate-dedupe-ms 500 \
   --viewer-base-url http://127.0.0.1:3000
 ```
 
 This creates derived `hit_candidate` and `bounce_candidate` rows from court-space trajectory
-diagnostics and main-player projection proximity. These are candidate markers only. They are not
-hit truth, bounce truth, in/out truth, rally/point/score logic, or adjudication.
+diagnostics and main-player projection proximity. The v0.2 repair prefers player-proximate
+`court_y` net-axis reversal for hit candidates and image-y descending-to-ascending proxy plus speed
+reduction for bounce candidates. These are candidate markers only. They are not hit truth, bounce
+truth, in/out truth, rally/point/score logic, or adjudication.
 
 Replay can show those candidates in two places:
 
@@ -936,6 +941,11 @@ When `eventCandidateRunId` is present, replay can show `HIT CANDIDATE` and `BOUN
 markers on the normalized court mini-map and, when a source image point is available, on the
 broadcast video. Labels must include `candidate`; they do not confirm hits, bounces, in/out,
 points, or score.
+
+Selected event-candidate evidence also exposes physics diagnostics when present:
+
+- hit candidates: `net_axis_reversal`
+- bounce candidates: `vertical_motion_proxy` and `speed_reduction`
 
 Motion smoothing replay:
 

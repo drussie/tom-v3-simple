@@ -1223,6 +1223,9 @@ def event_candidate_timeline_item_from_observation(
         "classification_priority": overlay_item["classification_priority"],
         "player_proximity_gate": overlay_item["player_proximity_gate"],
         "candidate_decision": overlay_item["candidate_decision"],
+        "net_axis_reversal": overlay_item["net_axis_reversal"],
+        "vertical_motion_proxy": overlay_item["vertical_motion_proxy"],
+        "speed_reduction": overlay_item["speed_reduction"],
         "image_point": overlay_item["image_point"],
         "image_marker_source": overlay_item["image_marker_source"],
         "source_ball_trajectory_observation_id": overlay_item[
@@ -2177,6 +2180,21 @@ def event_candidate_overlay_item_from_observation(
         "candidate_decision": (
             payload.get("candidate_decision")
             if isinstance(payload.get("candidate_decision"), dict)
+            else None
+        ),
+        "net_axis_reversal": (
+            payload.get("net_axis_reversal")
+            if isinstance(payload.get("net_axis_reversal"), dict)
+            else None
+        ),
+        "vertical_motion_proxy": (
+            payload.get("vertical_motion_proxy")
+            if isinstance(payload.get("vertical_motion_proxy"), dict)
+            else None
+        ),
+        "speed_reduction": (
+            payload.get("speed_reduction")
+            if isinstance(payload.get("speed_reduction"), dict)
             else None
         ),
         "source_ball_trajectory_run_id": _string_or_none(

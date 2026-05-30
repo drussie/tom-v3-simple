@@ -126,6 +126,10 @@ lane, the normalized court-template mini-map, selected evidence details, and as 
 markers when the source ball court projection includes an image-space point. Video labels must say
 `HIT CANDIDATE` or `BOUNCE CANDIDATE`; they do not confirm events or line calls.
 
+Hit/Bounce Physics Heuristic Repair v0.2 adds selected-evidence diagnostics for
+`net_axis_reversal`, `vertical_motion_proxy`, and `speed_reduction`. These explain why a candidate
+was proposed; they do not make the candidate true.
+
 ## What 6A Added
 
 - `GET /media/{media_id}/replay-info`
@@ -698,6 +702,10 @@ markers also appear on the broadcast video when replay can resolve the source im
 candidate markers remain visible as persistent review pins, with active and selected states, so
 operators can review the full point without missing sparse markers. Both surfaces are derived
 diagnostics only. They are not hit truth, bounce truth, in/out, point, score, or adjudication.
+
+Event candidate selected evidence shows the v0.2 physics fields when available: player-proximate
+net-axis reversal for hit candidates, and image-y descending-to-ascending proxy plus speed
+reduction for bounce candidates.
 
 For Stream Proxy Mode, open:
 

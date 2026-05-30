@@ -66,6 +66,11 @@ The repaired payload includes review diagnostics:
 Bounce candidates include the same gate shape with `away_from_player = true` when a player
 projection is present but outside the bounce exclusion threshold.
 
+Hit/Bounce Physics Heuristic Repair v0.2 keeps this priority but changes the underlying signals:
+player-proximate hit candidates now prefer `court_y` net-axis reversal, and bounce candidates now
+prefer image-y descending-to-ascending proxy plus speed reduction away from players. These remain
+candidate diagnostics, not truth.
+
 ## Replay Details
 
 The selected evidence panel exposes:
@@ -90,4 +95,3 @@ Event candidate markers and classifications remain candidate evidence. They are 
 - server/receiver logic
 - accepted/rejected truth lifecycle
 - adjudication
-

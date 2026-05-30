@@ -55,6 +55,9 @@ HIT_PLAYER_DISTANCE_MAX_TEMPLATE ?= 0.18
 BOUNCE_PLAYER_DISTANCE_MIN_TEMPLATE ?= 0.18
 HIT_MIN_DIRECTION_DELTA_DEGREES ?= 25
 BOUNCE_MIN_DIRECTION_DELTA_DEGREES ?= 20
+HIT_MIN_NET_AXIS_DELTA_TEMPLATE ?= 0.015
+BOUNCE_MIN_IMAGE_Y_DELTA_PIXELS ?= 2.0
+BOUNCE_MIN_SPEED_REDUCTION_FRACTION ?= 0.05
 CANDIDATE_DEDUPE_MS ?= 500
 AUDIT_DEMO_ONLY ?= true
 AUDIT_STRICT ?= false
@@ -288,7 +291,7 @@ tom-v1-hit-bounce-candidates:
 	@if [ -z "$(MEDIA_ID)" ]; then echo "MEDIA_ID is required: make tom-v1-hit-bounce-candidates MEDIA_ID=<media_id>"; exit 1; fi
 	@if [ -z "$(BALL_TRAJECTORY_RUN_ID)" ]; then echo "BALL_TRAJECTORY_RUN_ID is required: make tom-v1-hit-bounce-candidates BALL_TRAJECTORY_RUN_ID=<ball_trajectory_run_id>"; exit 1; fi
 	@if [ -z "$(COURT_PROJECTION_RUN_ID)" ]; then echo "COURT_PROJECTION_RUN_ID is required: make tom-v1-hit-bounce-candidates COURT_PROJECTION_RUN_ID=<court_projection_run_id>"; exit 1; fi
-	$(PYTHON) -m apps.worker.cli build-hit-bounce-candidates --media-id "$(MEDIA_ID)" --ball-trajectory-run-id "$(BALL_TRAJECTORY_RUN_ID)" --court-projection-run-id "$(COURT_PROJECTION_RUN_ID)" --run-name "$(EVENT_CANDIDATE_RUN_NAME)" --hit-player-distance-max-template "$(HIT_PLAYER_DISTANCE_MAX_TEMPLATE)" --bounce-player-distance-min-template "$(BOUNCE_PLAYER_DISTANCE_MIN_TEMPLATE)" --hit-min-direction-delta-degrees "$(HIT_MIN_DIRECTION_DELTA_DEGREES)" --bounce-min-direction-delta-degrees "$(BOUNCE_MIN_DIRECTION_DELTA_DEGREES)" --candidate-dedupe-ms "$(CANDIDATE_DEDUPE_MS)" --viewer-base-url "$(VIEWER_BASE_URL)" $(if $(filter true,$(PLAN_ONLY)),--plan-only,)
+	$(PYTHON) -m apps.worker.cli build-hit-bounce-candidates --media-id "$(MEDIA_ID)" --ball-trajectory-run-id "$(BALL_TRAJECTORY_RUN_ID)" --court-projection-run-id "$(COURT_PROJECTION_RUN_ID)" --run-name "$(EVENT_CANDIDATE_RUN_NAME)" --hit-player-distance-max-template "$(HIT_PLAYER_DISTANCE_MAX_TEMPLATE)" --bounce-player-distance-min-template "$(BOUNCE_PLAYER_DISTANCE_MIN_TEMPLATE)" --hit-min-direction-delta-degrees "$(HIT_MIN_DIRECTION_DELTA_DEGREES)" --bounce-min-direction-delta-degrees "$(BOUNCE_MIN_DIRECTION_DELTA_DEGREES)" --hit-min-net-axis-delta-template "$(HIT_MIN_NET_AXIS_DELTA_TEMPLATE)" --bounce-min-image-y-delta-pixels "$(BOUNCE_MIN_IMAGE_Y_DELTA_PIXELS)" --bounce-min-speed-reduction-fraction "$(BOUNCE_MIN_SPEED_REDUCTION_FRACTION)" --candidate-dedupe-ms "$(CANDIDATE_DEDUPE_MS)" --viewer-base-url "$(VIEWER_BASE_URL)" $(if $(filter true,$(PLAN_ONLY)),--plan-only,)
 
 tom-v1-court-keypoints-probe:
 	$(PYTHON) -m apps.worker.cli tom-v1-court-keypoints-probe --weights "$(TOM_V1_MODEL_ROOT)/keypoints_model.pth" --allowed-root "$(TOM_V1_MODEL_ROOT)"

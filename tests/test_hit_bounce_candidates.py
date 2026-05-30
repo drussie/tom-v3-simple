@@ -50,9 +50,9 @@ def test_hit_candidate_near_player_direction_change_has_lineage(
         db_session,
         media.id,
         points=[
-            (0, 0, 0.20, 0.20),
+            (0, 0, 0.20, 0.35),
             (1, 33, 0.30, 0.20),
-            (2, 66, 0.30, 0.35),
+            (2, 66, 0.40, 0.35),
         ],
     )
     projection_run = _seed_projection_run(
@@ -87,10 +87,13 @@ def test_hit_candidate_near_player_direction_change_has_lineage(
     assert hit.payload_jsonb["not_bounce_truth"] is True
     assert hit.payload_jsonb["not_in_out_truth"] is True
     assert "near_main_player_projection" in hit.payload_jsonb["reason_codes"]
+    assert "net_axis_reversal" in hit.payload_jsonb["reason_codes"]
     assert "trajectory_direction_change" in hit.payload_jsonb["reason_codes"]
     assert hit.payload_jsonb["source_ball_court_projection_observation_id"] == (
         ball_projection_ids[1]
     )
+    assert hit.payload_jsonb["net_axis_reversal"]["reversal"] is True
+    assert hit.payload_jsonb["net_axis_reversal"]["axis"] == "court_y"
 
     lineage = db_session.scalars(
         select(ObservationLineage).where(ObservationLineage.child_observation_id == hit.id)
@@ -108,9 +111,9 @@ def test_hit_candidate_not_produced_when_player_is_far(db_session: Session) -> N
         db_session,
         media.id,
         points=[
-            (0, 0, 0.20, 0.20),
+            (0, 0, 0.20, 0.35),
             (1, 33, 0.30, 0.20),
-            (2, 66, 0.30, 0.35),
+            (2, 66, 0.40, 0.35),
         ],
     )
     projection_run = _seed_projection_run(
@@ -132,14 +135,19 @@ def test_hit_candidate_not_produced_when_player_is_far(db_session: Session) -> N
 
 def test_bounce_candidate_away_from_players_direction_change(db_session: Session) -> None:
     media = _seed_media(db_session)
-    trajectory_run, _ = _seed_trajectory_run(
+    trajectory_run, ball_projection_ids = _seed_trajectory_run(
         db_session,
         media.id,
         points=[
             (0, 0, 0.20, 0.20),
-            (1, 33, 0.30, 0.20),
-            (2, 66, 0.30, 0.35),
+            (1, 33, 0.30, 0.35),
+            (2, 66, 0.34, 0.30),
         ],
+    )
+    _update_ball_projection_image_points(
+        db_session,
+        ball_projection_ids,
+        image_points=[(200.0, 100.0), (300.0, 190.0), (340.0, 120.0)],
     )
     projection_run = _seed_projection_run(
         db_session,
@@ -164,7 +172,82 @@ def test_bounce_candidate_away_from_players_direction_change(db_session: Session
     )
     assert bounce is not None
     assert "away_from_main_player_projection" in bounce.payload_jsonb["reason_codes"]
+    assert "descending_to_ascending_image_proxy" in bounce.payload_jsonb["reason_codes"]
+    assert "speed_reduction_candidate" in bounce.payload_jsonb["reason_codes"]
     assert bounce.payload_jsonb["not_bounce_truth"] is True
+    assert bounce.payload_jsonb["vertical_motion_proxy"][
+        "descending_to_ascending"
+    ] is True
+    assert bounce.payload_jsonb["vertical_motion_proxy"]["image_y_current"] == 190.0
+    assert bounce.payload_jsonb["speed_reduction"]["speed_reduced"] is True
+
+
+def test_bounce_candidate_requires_speed_reduction(db_session: Session) -> None:
+    media = _seed_media(db_session)
+    trajectory_run, ball_projection_ids = _seed_trajectory_run(
+        db_session,
+        media.id,
+        points=[
+            (0, 0, 0.20, 0.20),
+            (1, 33, 0.21, 0.35),
+            (2, 66, 0.60, 0.30),
+        ],
+    )
+    _update_ball_projection_image_points(
+        db_session,
+        ball_projection_ids,
+        image_points=[(200.0, 100.0), (210.0, 190.0), (600.0, 120.0)],
+    )
+    projection_run = _seed_projection_run(
+        db_session,
+        media.id,
+        players=[(1, 33, 0.90, 0.90, "near_player_track_candidate")],
+    )
+
+    result = build_hit_bounce_candidates(
+        session=db_session,
+        media_id=media.id,
+        ball_trajectory_run_id=trajectory_run.id,
+        court_projection_run_id=projection_run.id,
+    )
+
+    assert result["ok"] is True
+    assert result["observations"]["bounce_candidate"] == 0
+
+
+def test_bounce_candidate_requires_descending_ascending_proxy(
+    db_session: Session,
+) -> None:
+    media = _seed_media(db_session)
+    trajectory_run, ball_projection_ids = _seed_trajectory_run(
+        db_session,
+        media.id,
+        points=[
+            (0, 0, 0.20, 0.20),
+            (1, 33, 0.30, 0.35),
+            (2, 66, 0.34, 0.40),
+        ],
+    )
+    _update_ball_projection_image_points(
+        db_session,
+        ball_projection_ids,
+        image_points=[(200.0, 100.0), (300.0, 190.0), (340.0, 220.0)],
+    )
+    projection_run = _seed_projection_run(
+        db_session,
+        media.id,
+        players=[(1, 33, 0.90, 0.90, "near_player_track_candidate")],
+    )
+
+    result = build_hit_bounce_candidates(
+        session=db_session,
+        media_id=media.id,
+        ball_trajectory_run_id=trajectory_run.id,
+        court_projection_run_id=projection_run.id,
+    )
+
+    assert result["ok"] is True
+    assert result["observations"]["bounce_candidate"] == 0
 
 
 def test_player_proximate_trajectory_change_is_prioritized_as_hit(
@@ -175,9 +258,9 @@ def test_player_proximate_trajectory_change_is_prioritized_as_hit(
         db_session,
         media.id,
         points=[
-            (0, 0, 0.20, 0.20),
+            (0, 0, 0.20, 0.35),
             (1, 33, 0.30, 0.20),
-            (2, 66, 0.30, 0.35),
+            (2, 66, 0.40, 0.35),
         ],
     )
     projection_run = _seed_projection_run(
@@ -219,12 +302,12 @@ def test_conflict_resolution_prefers_hit_over_same_window_bounce(
         db_session,
         media.id,
         points=[
-            (0, 0, 0.20, 0.20),
+            (0, 0, 0.20, 0.35),
             (1, 33, 0.30, 0.20),
-            (2, 66, 0.30, 0.35),
-            (8, 250, 0.60, 0.60),
-            (9, 300, 0.70, 0.60),
-            (10, 350, 0.70, 0.75),
+            (2, 66, 0.40, 0.35),
+            (8, 250, 0.60, 0.30),
+            (9, 300, 0.70, 0.55),
+            (10, 350, 0.75, 0.50),
         ],
     )
     projection_run = _seed_projection_run(
@@ -255,11 +338,11 @@ def test_candidate_dedupe_keeps_highest_confidence_per_window(
         db_session,
         media.id,
         points=[
-            (0, 0, 0.20, 0.20),
+            (0, 0, 0.20, 0.35),
             (1, 33, 0.30, 0.20),
-            (2, 66, 0.30, 0.35),
-            (3, 99, 0.42, 0.35),
-            (4, 132, 0.42, 0.50),
+            (2, 66, 0.40, 0.35),
+            (3, 99, 0.50, 0.20),
+            (4, 132, 0.60, 0.35),
         ],
     )
     projection_run = _seed_projection_run(
@@ -267,7 +350,8 @@ def test_candidate_dedupe_keeps_highest_confidence_per_window(
         media.id,
         players=[
             (1, 33, 0.36, 0.22, "near_player_track_candidate"),
-            (3, 99, 0.42, 0.36, "near_player_track_candidate"),
+            (2, 66, 0.40, 0.36, "near_player_track_candidate"),
+            (3, 99, 0.50, 0.22, "near_player_track_candidate"),
         ],
     )
 
@@ -298,9 +382,9 @@ def test_event_candidate_replay_payloads_are_exposed(db_session: Session) -> Non
         db_session,
         media.id,
         points=[
-            (0, 0, 0.20, 0.20),
+            (0, 0, 0.20, 0.35),
             (1, 33, 0.30, 0.20),
-            (2, 66, 0.30, 0.35),
+            (2, 66, 0.40, 0.35),
         ],
     )
     projection_run = _seed_projection_run(
@@ -337,11 +421,15 @@ def test_event_candidate_replay_payloads_are_exposed(db_session: Session) -> Non
     assert overlays[0]["classification_priority"] == "hit_first_when_player_proximate"
     assert overlays[0]["player_proximity_gate"]["nearest_player_found"] is True
     assert overlays[0]["candidate_decision"]["selected_candidate_type"] == "hit_candidate"
+    assert overlays[0]["net_axis_reversal"]["reversal"] is True
+    assert overlays[0]["vertical_motion_proxy"] is None
+    assert overlays[0]["speed_reduction"] is None
     assert len(timeline_items) == 1
     assert timeline_items[0]["item_type"] == "hit_candidate"
     assert timeline_items[0]["image_point"] == {"x": 300.0, "y": 100.0}
     assert timeline_items[0]["image_marker_source"] == "source_ball_court_projection_image_point"
     assert timeline_items[0]["classification_priority"] == "hit_first_when_player_proximate"
+    assert timeline_items[0]["net_axis_reversal"]["axis"] == "court_y"
     assert timeline_items[0]["candidate_only"] is True
 
     persistent_overlays = build_event_candidate_overlay_items(
@@ -365,9 +453,9 @@ def test_event_candidate_replay_payload_handles_missing_source_image_point(
         db_session,
         media.id,
         points=[
-            (0, 0, 0.20, 0.20),
+            (0, 0, 0.20, 0.35),
             (1, 33, 0.30, 0.20),
-            (2, 66, 0.30, 0.35),
+            (2, 66, 0.40, 0.35),
         ],
     )
     source_projection = db_session.get(Observation, ball_projection_ids[1])
@@ -415,6 +503,8 @@ def test_hit_bounce_candidate_plan_only_and_cli_do_not_mutate(
     assert result["ok"] is True
     assert result["status"] == "planned"
     assert "build-hit-bounce-candidates" in result["plan"]["command"]
+    assert "--hit-min-net-axis-delta-template 0.015" in result["plan"]["command"]
+    assert "--bounce-min-image-y-delta-pixels 2.0" in result["plan"]["command"]
     assert db_session.scalars(select(ProcessingRun)).all() == []
 
     class Args:
@@ -426,6 +516,9 @@ def test_hit_bounce_candidate_plan_only_and_cli_do_not_mutate(
         bounce_player_distance_min_template = 0.18
         hit_min_direction_delta_degrees = 25.0
         bounce_min_direction_delta_degrees = 20.0
+        hit_min_net_axis_delta_template = 0.015
+        bounce_min_image_y_delta_pixels = 2.0
+        bounce_min_speed_reduction_fraction = 0.05
         candidate_dedupe_ms = 500
         viewer_base_url = "http://127.0.0.1:3000"
         plan_only = True
@@ -564,6 +657,25 @@ def _seed_ball_projection(
     session.add(observation)
     session.flush()
     return observation
+
+
+def _update_ball_projection_image_points(
+    session: Session,
+    projection_ids: list[str],
+    *,
+    image_points: list[tuple[float, float]],
+) -> None:
+    for projection_id, (image_x, image_y) in zip(
+        projection_ids,
+        image_points,
+        strict=True,
+    ):
+        observation = session.get(Observation, projection_id)
+        assert observation is not None
+        payload = dict(observation.payload_jsonb or {})
+        payload["image_point"] = {"x": image_x, "y": image_y}
+        observation.payload_jsonb = payload
+    session.commit()
 
 
 def _seed_projection_run(

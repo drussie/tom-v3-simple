@@ -41,15 +41,20 @@ Each payload includes:
 
 ## Hit Candidate Method
 
-`trajectory_player_proximity_hit_candidate_v0` proposes a hit candidate when:
+The original v0 method proposed a hit candidate from generic trajectory direction change near a
+main-player projection candidate. Hit/Bounce Physics Heuristic Repair v0.2 updates this to
+`net_axis_reversal_player_proximity_hit_candidate_v02`, which proposes a hit candidate when:
 
-- the ball trajectory changes direction near a main-player court projection candidate
+- the ball reverses the candidate net-axis direction, currently `court_y`
+- the ball trajectory context remains near a main-player court projection candidate
 - the nearest player projection is within the configured template-distance threshold
 - the player and ball candidate times are within the configured window
+- direction or speed-change diagnostics support the candidate
 
 Reason codes include:
 
 - `near_main_player_projection`
+- `net_axis_reversal`
 - `trajectory_direction_change`
 - `speed_change_candidate`
 - `within_time_window`
@@ -65,21 +70,27 @@ Event Candidate Display + Classification Repair v0.1 adds an explicit
 
 ## Bounce Candidate Method
 
-`trajectory_shape_bounce_candidate_v0` proposes a bounce candidate when:
+The original v0 method proposed a bounce candidate from generic trajectory direction change away
+from players. Hit/Bounce Physics Heuristic Repair v0.2 updates this to
+`image_vertical_proxy_speed_reduction_bounce_candidate_v02`, which proposes a bounce candidate
+when:
 
-- the ball trajectory changes direction
+- source image-y motion descends into the candidate and ascends after it
+- court-template speed decreases after the candidate
 - the candidate is away from main-player court projection candidates
 - the point is inside or near the normalized court template
 
 Reason codes include:
 
-- `trajectory_direction_change`
+- `descending_to_ascending_image_proxy`
+- `speed_reduction_candidate`
 - `away_from_main_player_projection`
 - `inside_or_near_court_template`
+- `trajectory_direction_change`
 - `local_motion_discontinuity`
 
-Because v0 has 2D template trajectory only and no ball height, bounce candidates are intentionally
-conservative derived markers.
+Because v0 has 2D template trajectory only and no true ball height, the image-y vertical signal is
+recorded as a camera-space proxy. Bounce candidates are intentionally conservative derived markers.
 
 ## Deduplication
 

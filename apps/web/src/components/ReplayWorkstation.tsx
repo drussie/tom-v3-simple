@@ -3071,6 +3071,66 @@ function SelectedEvidencePanel({
             <DetailRow label="decision reason" value={item.candidate_decision.reason} />
           </>
         ) : null}
+        {item.net_axis_reversal !== null ? (
+          <>
+            <DetailRow
+              label="net-axis reversal"
+              value={item.net_axis_reversal.reversal ? "true" : "false"}
+            />
+            <DetailRow
+              label="net-axis vy before/after"
+              value={`${item.net_axis_reversal.vy_before ?? "n/a"} / ${
+                item.net_axis_reversal.vy_after ?? "n/a"
+              }`}
+            />
+            <DetailRow
+              label="net-axis frames"
+              value={`${item.net_axis_reversal.previous_frame ?? "n/a"} → ${
+                item.net_axis_reversal.current_frame ?? "n/a"
+              } → ${item.net_axis_reversal.next_frame ?? "n/a"}`}
+            />
+          </>
+        ) : null}
+        {item.vertical_motion_proxy !== null ? (
+          <>
+            <DetailRow
+              label="vertical proxy"
+              value={
+                item.vertical_motion_proxy.descending_to_ascending
+                  ? "descending→ascending"
+                  : item.vertical_motion_proxy.status ?? "n/a"
+              }
+            />
+            <DetailRow
+              label="image-y before/current/after"
+              value={`${item.vertical_motion_proxy.image_y_before ?? "n/a"} / ${
+                item.vertical_motion_proxy.image_y_current ?? "n/a"
+              } / ${item.vertical_motion_proxy.image_y_after ?? "n/a"}`}
+            />
+            <DetailRow
+              label="image-y delta before/after"
+              value={`${item.vertical_motion_proxy.image_vy_before ?? "n/a"} / ${
+                item.vertical_motion_proxy.image_vy_after ?? "n/a"
+              }`}
+            />
+          </>
+        ) : null}
+        {item.speed_reduction !== null ? (
+          <>
+            <DetailRow
+              label="speed reduction"
+              value={item.speed_reduction.speed_reduced ? "true" : "false"}
+            />
+            <DetailRow
+              label="speed reduction fraction"
+              value={
+                item.speed_reduction.speed_reduction_fraction === null
+                  ? "n/a"
+                  : item.speed_reduction.speed_reduction_fraction.toFixed(4)
+              }
+            />
+          </>
+        ) : null}
         <DetailRow
           label="reason codes"
           value={item.reason_codes.length > 0 ? item.reason_codes.join(", ") : "n/a"}

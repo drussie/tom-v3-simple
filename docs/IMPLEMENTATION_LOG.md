@@ -1,5 +1,36 @@
 # TOM v3 Simple - Implementation Log
 
+## Hit/Bounce Physics Heuristic Repair v0.2
+
+Status: complete when accepted
+
+### Goal
+
+Improve first-pass event candidate quality by replacing generic trajectory bend reliance with
+tennis-specific candidate physics diagnostics.
+
+### Outcome
+
+The repair adds:
+
+- player-proximate `court_y` net-axis reversal as the primary hit-candidate feature
+- source image-y descending-to-ascending proxy as the primary bounce vertical-motion feature
+- speed reduction as a required bounce-candidate diagnostic
+- persisted source `ball_court_projection_candidate.image_point` loading for event builder logic
+- CLI and Makefile threshold knobs for net-axis, image-y, and speed-reduction gates
+- replay selected-evidence fields for `net_axis_reversal`, `vertical_motion_proxy`, and
+  `speed_reduction`
+- focused tests for player-proximate hit priority, bounce proxy gates, source image point loading,
+  replay payload exposure, and no-truth boundaries
+
+### Non-goals
+
+- No hit truth or bounce truth.
+- No in/out, rally, point, or score.
+- No player identity, scoreboard OCR, or server/receiver logic.
+- No accepted/rejected lifecycle.
+- No adjudication.
+
 ## TOM v1 Court Keypoints + Homography Adapter
 
 Status: complete when accepted
@@ -2219,6 +2250,7 @@ This milestone adds:
 - deterministic trajectory direction/speed diagnostics
 - main-player proximity context for hit candidates
 - away-from-player and inside/near-template context for bounce candidates
+- v0.2 physics repair diagnostics for net-axis reversal, image-y proxy, and speed reduction
 - candidate deduplication by time window
 - lineage from ball trajectory, ball court projection, and main-player court projection parents
 - replay `eventCandidateRunId` support
