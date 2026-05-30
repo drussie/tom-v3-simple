@@ -737,6 +737,11 @@ def main() -> None:
         type=int,
         default=60,
     )
+    hit_bounce_parser.add_argument(
+        "--event-overlap-distance-template",
+        type=float,
+        default=0.08,
+    )
     hit_bounce_parser.add_argument("--candidate-dedupe-ms", type=int, default=500)
     hit_bounce_parser.add_argument(
         "--viewer-base-url",
@@ -1534,6 +1539,11 @@ def _handle_build_hit_bounce_candidates(
         ),
         player_anchored_hit_min_pre_post_gap_ms=(
             args.player_anchored_hit_min_pre_post_gap_ms
+        ),
+        event_overlap_distance_template=getattr(
+            args,
+            "event_overlap_distance_template",
+            0.08,
         ),
         candidate_dedupe_ms=args.candidate_dedupe_ms,
         viewer_base_url=args.viewer_base_url,

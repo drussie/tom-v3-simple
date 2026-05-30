@@ -111,6 +111,7 @@ Optional player-anchored recall knobs:
 --player-anchored-hit-distance-max-template
 --player-anchored-hit-min-net-axis-delta-template
 --player-anchored-hit-min-pre-post-gap-ms
+--event-overlap-distance-template
 ```
 
 The Makefile helper exposes matching variables:
@@ -146,3 +147,12 @@ classification as a `bounce_candidate`.
 Player-anchored hit recall improves candidate recall and diagnostics only. It does not add hit
 truth, bounce truth, line calls, score, rally/point logic, identity, server/receiver logic,
 accepted/rejected lifecycle, or adjudication.
+
+## v0.2.4 Tightening
+
+The follow-up v0.2.4 repair keeps this recall path but tightens it with player contact-zone
+metadata and bounce-overlap suppression. Player-anchored hit candidates that overlap an open-court
+bounce cluster are now suppressed and written as rejection diagnostics rather than final hit
+candidates.
+
+See `docs/events/player_anchored_hit_contact_zone_tightening_v024.md`.

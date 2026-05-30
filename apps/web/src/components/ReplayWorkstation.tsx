@@ -3115,6 +3115,32 @@ function SelectedEvidencePanel({
                 )}`
           }
         />
+        <DetailRow
+          label="anchor contact zone"
+          value={
+            item.player_anchor_contact_zone === null ||
+            item.player_anchor_contact_zone === undefined
+              ? "n/a"
+              : String(item.player_anchor_contact_zone.in_contact_zone ?? "n/a")
+          }
+        />
+        <DetailRow
+          label="anchor open-court zone"
+          value={
+            item.player_anchor_contact_zone === null ||
+            item.player_anchor_contact_zone === undefined
+              ? "n/a"
+              : String(item.player_anchor_contact_zone.open_court_landing_zone ?? "n/a")
+          }
+        />
+        <DetailRow
+          label="bounce overlap suppression"
+          value={
+            item.overlap_suppression === null || item.overlap_suppression === undefined
+              ? "n/a"
+              : String(item.overlap_suppression.suppressed ?? "n/a")
+          }
+        />
         {item.player_proximity_gate !== null ? (
           <>
             <DetailRow

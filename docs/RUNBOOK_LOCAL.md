@@ -861,6 +861,7 @@ TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_tom_v1_bridge.db \
   --hit-contact-fallback-min-direction-delta-degrees 5.0 \
   --bounce-fallback-enabled \
   --bounce-fallback-min-speed-reduction-fraction 0.35 \
+  --event-overlap-distance-template 0.08 \
   --candidate-dedupe-ms 500 \
   --viewer-base-url http://127.0.0.1:3000
 ```
@@ -879,6 +880,10 @@ The v0.2.2 side-zone sequence repair preserves the 2-hit / 2-bounce sample-point
 counts, reclassification counts, `sequence_prior_applied_count`, and
 `physics_heuristic_version = v0.2.2`. The sequence pass is a candidate label repair only; it does
 not create hit truth, bounce truth, in/out, score, or adjudication.
+
+The v0.2.4 player-anchored contact-zone tightening repair adds `player_anchor_contact_zone` and
+`overlap_suppression` diagnostics. Player-anchored hits that overlap final bounce/open-court
+landing clusters are suppressed as diagnostics rather than emitted as final hit candidates.
 
 Replay can show those candidates in two places:
 
@@ -1414,6 +1419,9 @@ python -m apps.worker.cli completion-audit --no-demo-only
 - Player-anchored hit recall is enabled by default for hit/bounce candidate builds. It uses near/far
   main player projection anchors plus a bounded wider ball trajectory window to recover additional
   `hit_candidate` evidence, and it remains candidate-only.
+- Player-anchored hit contact-zone tightening suppresses anchored hits that overlap final
+  bounce/open-court landing clusters. The diagnostics explain the suppression, but they do not
+  create hit truth, bounce truth, in/out, score, or adjudication.
 - Cloud deployment, auth, production streaming, and multi-camera reasoning are out of scope.
 
 ## 15. Completion Checklist

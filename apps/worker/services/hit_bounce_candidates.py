@@ -39,23 +39,25 @@ EVENT_CANDIDATE_OBSERVATION_TYPES = {
     BOUNCE_CANDIDATE_OBSERVATION_TYPE,
     EVENT_CANDIDATE_REJECTION_DIAGNOSTIC_OBSERVATION_TYPE,
 }
-HIT_CANDIDATE_METHOD = "net_axis_reversal_player_proximity_hit_candidate_v023"
+HIT_CANDIDATE_METHOD = "net_axis_reversal_player_proximity_hit_candidate_v024"
 HIT_FALLBACK_CANDIDATE_METHOD = (
-    "player_proximate_speed_reduction_hit_candidate_fallback_v023"
+    "player_proximate_speed_reduction_hit_candidate_fallback_v024"
 )
-BOUNCE_CANDIDATE_METHOD = "image_vertical_proxy_speed_reduction_bounce_candidate_v023"
+BOUNCE_CANDIDATE_METHOD = "image_vertical_proxy_speed_reduction_bounce_candidate_v024"
 BOUNCE_FALLBACK_CANDIDATE_METHOD = (
-    "image_vertical_proxy_speed_reduction_bounce_candidate_v023_fallback"
+    "image_vertical_proxy_speed_reduction_bounce_candidate_v024_fallback"
 )
 PLAYER_ANCHORED_HIT_CANDIDATE_METHOD = (
-    "player_anchored_net_axis_reversal_hit_candidate_v023"
+    "player_anchored_contact_zone_net_axis_reversal_hit_candidate_v024"
 )
-SIDE_ZONE_SEQUENCE_HIT_METHOD = "side_zone_sequence_hit_candidate_v023"
-SIDE_ZONE_SEQUENCE_BOUNCE_METHOD = "side_zone_sequence_bounce_candidate_v023"
-EVENT_CANDIDATE_METHOD = "player_anchored_hit_recall_candidate_evidence_v023"
+SIDE_ZONE_SEQUENCE_HIT_METHOD = "side_zone_sequence_hit_candidate_v024"
+SIDE_ZONE_SEQUENCE_BOUNCE_METHOD = "side_zone_sequence_bounce_candidate_v024"
+EVENT_CANDIDATE_METHOD = (
+    "player_anchored_hit_contact_zone_tightening_candidate_evidence_v024"
+)
 COURT_SIDE_SPLIT_Y = 0.50
 COURT_MIDCOURT_MARGIN_Y = 0.05
-COURT_Y_CONVENTION = "court_y_low_near_high_far_v023"
+COURT_Y_CONVENTION = "court_y_low_near_high_far_v024"
 DEFAULT_HIT_PLAYER_DISTANCE_MAX_TEMPLATE = 0.18
 DEFAULT_HIT_PLAYER_REVIEW_DISTANCE_MAX_TEMPLATE = 0.33
 DEFAULT_HIT_NEAR_PLAYER_DIRECTION_DELTA_DEGREES = 15.0
@@ -79,6 +81,7 @@ DEFAULT_PLAYER_ANCHORED_HIT_LOOKAHEAD_MS = 1300
 DEFAULT_PLAYER_ANCHORED_HIT_DISTANCE_MAX_TEMPLATE = 0.24
 DEFAULT_PLAYER_ANCHORED_HIT_MIN_NET_AXIS_DELTA_TEMPLATE = 0.015
 DEFAULT_PLAYER_ANCHORED_HIT_MIN_PRE_POST_GAP_MS = 60
+DEFAULT_EVENT_OVERLAP_DISTANCE_TEMPLATE = 0.08
 HIT_CONFIDENCE_CAP = 0.70
 BOUNCE_CONFIDENCE_CAP = 0.60
 EVENT_CANDIDATE_WARNINGS = {
@@ -136,6 +139,7 @@ class HitBounceCandidateConfig:
     player_anchored_hit_min_pre_post_gap_ms: int = (
         DEFAULT_PLAYER_ANCHORED_HIT_MIN_PRE_POST_GAP_MS
     )
+    event_overlap_distance_template: float = DEFAULT_EVENT_OVERLAP_DISTANCE_TEMPLATE
 
     def as_dict(self) -> dict[str, float | int | bool]:
         return {
@@ -180,6 +184,7 @@ class HitBounceCandidateConfig:
             "player_anchored_hit_min_pre_post_gap_ms": (
                 self.player_anchored_hit_min_pre_post_gap_ms
             ),
+            "event_overlap_distance_template": self.event_overlap_distance_template,
         }
 
 
@@ -221,6 +226,8 @@ class PlayerProjection:
     court_y: float
     track_candidate_id: str | None
     track_role_candidate: str | None
+    image_x: float | None = None
+    image_y: float | None = None
 
 
 @dataclass(frozen=True)
@@ -251,6 +258,8 @@ class EventCandidateDraft:
     candidate_reclassification: dict[str, Any] | None = None
     candidate_sequence: dict[str, Any] | None = None
     player_anchored_hit_recall: dict[str, Any] | None = None
+    player_anchor_contact_zone: dict[str, Any] | None = None
+    overlap_suppression: dict[str, Any] | None = None
 
     @property
     def timestamp_ms(self) -> int:
@@ -274,6 +283,8 @@ class EventCandidateRejectionDiagnostic:
     inside_or_near_court_template: bool
     diagnostic_source: str = "local_trajectory_context"
     player_anchored_hit_recall: dict[str, Any] | None = None
+    player_anchor_contact_zone: dict[str, Any] | None = None
+    overlap_suppression: dict[str, Any] | None = None
 
     @property
     def timestamp_ms(self) -> int:
@@ -323,6 +334,7 @@ def build_hit_bounce_candidates_plan(
     player_anchored_hit_min_pre_post_gap_ms: int = (
         DEFAULT_PLAYER_ANCHORED_HIT_MIN_PRE_POST_GAP_MS
     ),
+    event_overlap_distance_template: float = DEFAULT_EVENT_OVERLAP_DISTANCE_TEMPLATE,
     viewer_base_url: str = "http://127.0.0.1:3000",
 ) -> dict[str, Any]:
     bounce_fallback_cli_flag = (
@@ -380,6 +392,8 @@ def build_hit_bounce_candidates_plan(
             f"{player_anchored_hit_min_net_axis_delta_template} "
             "--player-anchored-hit-min-pre-post-gap-ms "
             f"{player_anchored_hit_min_pre_post_gap_ms} "
+            "--event-overlap-distance-template "
+            f"{event_overlap_distance_template} "
             f"--candidate-dedupe-ms {candidate_dedupe_ms}"
         ),
         "run_name": run_name,
@@ -435,6 +449,7 @@ def build_hit_bounce_candidates_plan(
             "player_anchored_hit_min_pre_post_gap_ms": (
                 player_anchored_hit_min_pre_post_gap_ms
             ),
+            "event_overlap_distance_template": event_overlap_distance_template,
         },
         "replay_url_template": (
             f"{viewer_base_url.rstrip('/')}/replay/{media_id}"
@@ -486,6 +501,7 @@ def build_hit_bounce_candidates(
     player_anchored_hit_min_pre_post_gap_ms: int = (
         DEFAULT_PLAYER_ANCHORED_HIT_MIN_PRE_POST_GAP_MS
     ),
+    event_overlap_distance_template: float = DEFAULT_EVENT_OVERLAP_DISTANCE_TEMPLATE,
     viewer_base_url: str = "http://127.0.0.1:3000",
     plan_only: bool = False,
 ) -> dict[str, Any]:
@@ -521,6 +537,7 @@ def build_hit_bounce_candidates(
         player_anchored_hit_min_pre_post_gap_ms=(
             player_anchored_hit_min_pre_post_gap_ms
         ),
+        event_overlap_distance_template=event_overlap_distance_template,
     )
     invalid = _validate_config(config)
     if invalid is not None:
@@ -561,6 +578,7 @@ def build_hit_bounce_candidates(
         player_anchored_hit_min_pre_post_gap_ms=(
             player_anchored_hit_min_pre_post_gap_ms
         ),
+        event_overlap_distance_template=event_overlap_distance_template,
         viewer_base_url=viewer_base_url,
     )
     if plan_only:
@@ -665,6 +683,15 @@ def build_hit_bounce_candidates(
             [*deduped_hits, *deduped_bounces],
             config=config,
         )
+        (
+            final_candidates,
+            player_anchor_suppressed_overlap_count,
+            player_anchor_overlap_rejections,
+        ) = suppress_player_anchored_hits_overlapping_bounces(
+            final_candidates,
+            config=config,
+        )
+        rejection_diagnostics.extend(player_anchor_overlap_rejections)
         writer = ObservationWriter(session)
         observations = _persist_event_candidates_and_diagnostics(
             writer=writer,
@@ -712,7 +739,8 @@ def build_hit_bounce_candidates(
             0,
         ),
         "classification_priority": "side_zone_sequence_candidate_prior",
-        "physics_heuristic_version": "v0.2.3",
+        "physics_heuristic_version": "v0.2.4",
+        "contact_zone_tightening_version": "v0.2.4",
         "player_anchor_context_count": player_anchor_context_count,
         "player_anchor_candidate_count": len(player_anchored_hit_drafts),
         "player_anchor_recovered_hit_count": sum(
@@ -725,9 +753,15 @@ def build_hit_bounce_candidates(
             == PLAYER_ANCHORED_HIT_CANDIDATE_METHOD
             and candidate.observation_type == HIT_CANDIDATE_OBSERVATION_TYPE
         ),
-        "player_anchor_rejected_count": len(player_anchored_rejection_diagnostics),
+        "player_anchor_suppressed_overlap_count": (
+            player_anchor_suppressed_overlap_count
+        ),
+        "player_anchor_rejected_count": (
+            len(player_anchored_rejection_diagnostics)
+            + len(player_anchor_overlap_rejections)
+        ),
         "player_anchor_rejection_reasons": _rejection_reason_counts(
-            player_anchored_rejection_diagnostics
+            [*player_anchored_rejection_diagnostics, *player_anchor_overlap_rejections]
         ),
         "player_anchored_hit_recall": {
             "enabled": config.player_anchored_hit_enabled,
@@ -743,9 +777,15 @@ def build_hit_bounce_candidates(
                 == PLAYER_ANCHORED_HIT_CANDIDATE_METHOD
                 and candidate.observation_type == HIT_CANDIDATE_OBSERVATION_TYPE
             ),
-            "player_anchor_rejected_count": len(player_anchored_rejection_diagnostics),
+            "player_anchor_suppressed_overlap_count": (
+                player_anchor_suppressed_overlap_count
+            ),
+            "player_anchor_rejected_count": (
+                len(player_anchored_rejection_diagnostics)
+                + len(player_anchor_overlap_rejections)
+            ),
             "rejection_reasons": _rejection_reason_counts(
-                player_anchored_rejection_diagnostics
+                [*player_anchored_rejection_diagnostics, *player_anchor_overlap_rejections]
             ),
         },
     }
@@ -1004,12 +1044,12 @@ def evaluate_player_anchored_hit_recall(
         }:
             continue
         evaluated_contexts += 1
-        anchor = _closest_player_anchor_ball_point(
+        anchor_candidates = player_anchor_ball_candidates(
             player,
             all_ball_points,
             config=config,
         )
-        if anchor is None:
+        if not anchor_candidates:
             rejection_diagnostics.append(
                 _player_anchor_rejection_diagnostic(
                     player=player,
@@ -1021,116 +1061,290 @@ def evaluate_player_anchored_hit_recall(
                 )
             )
             continue
-        distance = _player_anchor_distance(player, anchor)
-        if distance > config.player_anchored_hit_distance_max_template:
-            rejection_diagnostics.append(
-                _player_anchor_rejection_diagnostic(
-                    player=player,
-                    anchor=anchor,
-                    incoming=None,
-                    outgoing=None,
-                    config=config,
-                    rejection_reasons=["player_anchor_distance_too_large"],
-                    distance_template_units=distance,
-                )
+        accepted = False
+        for anchor in anchor_candidates:
+            distance = _player_anchor_distance(player, anchor)
+            player_anchor_contact_zone = _player_anchor_contact_zone_payload(
+                player=player,
+                anchor=anchor,
+                config=config,
+                distance_template_units=distance,
             )
-            continue
-        court_side_zone = _court_side_zone_payload(anchor)
-        side_matches = _court_side_matches_player_role(
-            court_side_zone.get("side"),
-            player.track_role_candidate,
-        )
-        if not side_matches:
-            rejection_diagnostics.append(
-                _player_anchor_rejection_diagnostic(
-                    player=player,
-                    anchor=anchor,
-                    incoming=None,
-                    outgoing=None,
-                    config=config,
-                    rejection_reasons=["side_mismatch_player_track"],
-                    distance_template_units=distance,
+            if (
+                player_anchor_contact_zone.get("side_matches_player_track")
+                is not True
+            ):
+                rejection_diagnostics.append(
+                    _player_anchor_rejection_diagnostic(
+                        player=player,
+                        anchor=anchor,
+                        incoming=None,
+                        outgoing=None,
+                        config=config,
+                        rejection_reasons=["side_mismatch_player_track"],
+                        distance_template_units=distance,
+                        player_anchor_contact_zone=player_anchor_contact_zone,
+                    )
                 )
-            )
-            continue
-        incoming = _player_anchor_incoming_point(
-            anchor,
-            all_ball_points,
-            config=config,
-        )
-        outgoing = _player_anchor_outgoing_point(
-            anchor,
-            all_ball_points,
-            config=config,
-        )
-        rejection_reasons: list[str] = []
-        if incoming is None:
-            rejection_reasons.append("no_incoming_point_in_lookback_window")
-        if outgoing is None:
-            rejection_reasons.append("no_outgoing_point_in_lookahead_window")
-        if rejection_reasons:
-            rejection_diagnostics.append(
-                _player_anchor_rejection_diagnostic(
-                    player=player,
-                    anchor=anchor,
-                    incoming=incoming,
-                    outgoing=outgoing,
-                    config=config,
-                    rejection_reasons=rejection_reasons,
-                    distance_template_units=distance,
+                continue
+            if player_anchor_contact_zone.get("in_contact_zone") is not True:
+                rejection_diagnostics.append(
+                    _player_anchor_rejection_diagnostic(
+                        player=player,
+                        anchor=anchor,
+                        incoming=None,
+                        outgoing=None,
+                        config=config,
+                        rejection_reasons=["not_player_contact_zone"],
+                        distance_template_units=distance,
+                        player_anchor_contact_zone=player_anchor_contact_zone,
+                    )
                 )
-            )
-            continue
-        assert incoming is not None
-        assert outgoing is not None
-        context = trajectory_context(incoming, anchor, outgoing)
-        if context is None:
-            rejection_diagnostics.append(
-                _player_anchor_rejection_diagnostic(
-                    player=player,
-                    anchor=anchor,
-                    incoming=incoming,
-                    outgoing=outgoing,
-                    config=config,
-                    rejection_reasons=["invalid_wide_window_context"],
-                    distance_template_units=distance,
+                continue
+            if player_anchor_contact_zone.get("open_court_landing_zone") is True:
+                rejection_diagnostics.append(
+                    _player_anchor_rejection_diagnostic(
+                        player=player,
+                        anchor=anchor,
+                        incoming=None,
+                        outgoing=None,
+                        config=config,
+                        rejection_reasons=["open_court_landing_zone_anchor"],
+                        distance_template_units=distance,
+                        player_anchor_contact_zone=player_anchor_contact_zone,
+                    )
                 )
+                continue
+            incoming = _player_anchor_incoming_point(
+                anchor,
+                all_ball_points,
+                config=config,
             )
-            continue
-        net_axis_reversal = _wide_window_net_axis_reversal_payload(
-            incoming=incoming,
-            anchor=anchor,
-            outgoing=outgoing,
-            config=config,
-        )
-        if net_axis_reversal.get("reversal") is not True:
-            rejection_diagnostics.append(
-                _player_anchor_rejection_diagnostic(
-                    player=player,
-                    anchor=anchor,
-                    incoming=incoming,
-                    outgoing=outgoing,
-                    config=config,
-                    rejection_reasons=["no_wide_window_net_axis_reversal"],
-                    distance_template_units=distance,
+            outgoing = _player_anchor_outgoing_point(
+                anchor,
+                all_ball_points,
+                config=config,
+            )
+            rejection_reasons: list[str] = []
+            if incoming is None:
+                rejection_reasons.append("no_incoming_point_in_lookback_window")
+            if outgoing is None:
+                rejection_reasons.append("no_outgoing_point_in_lookahead_window")
+            if rejection_reasons:
+                rejection_diagnostics.append(
+                    _player_anchor_rejection_diagnostic(
+                        player=player,
+                        anchor=anchor,
+                        incoming=incoming,
+                        outgoing=outgoing,
+                        config=config,
+                        rejection_reasons=rejection_reasons,
+                        distance_template_units=distance,
+                        player_anchor_contact_zone=player_anchor_contact_zone,
+                    )
+                )
+                continue
+            assert incoming is not None
+            assert outgoing is not None
+            context = trajectory_context(incoming, anchor, outgoing)
+            if context is None:
+                rejection_diagnostics.append(
+                    _player_anchor_rejection_diagnostic(
+                        player=player,
+                        anchor=anchor,
+                        incoming=incoming,
+                        outgoing=outgoing,
+                        config=config,
+                        rejection_reasons=["invalid_wide_window_context"],
+                        distance_template_units=distance,
+                        player_anchor_contact_zone=player_anchor_contact_zone,
+                    )
+                )
+                continue
+            net_axis_reversal = _wide_window_net_axis_reversal_payload(
+                incoming=incoming,
+                anchor=anchor,
+                outgoing=outgoing,
+                config=config,
+            )
+            if net_axis_reversal.get("reversal") is not True:
+                rejection_diagnostics.append(
+                    _player_anchor_rejection_diagnostic(
+                        player=player,
+                        anchor=anchor,
+                        incoming=incoming,
+                        outgoing=outgoing,
+                        config=config,
+                        rejection_reasons=["no_wide_window_net_axis_reversal"],
+                        distance_template_units=distance,
+                        net_axis_reversal=net_axis_reversal,
+                        player_anchor_contact_zone=player_anchor_contact_zone,
+                    )
+                )
+                continue
+            nearest_player = NearestPlayerContext(
+                player=player,
+                distance_template_units=distance,
+                time_delta_ms=abs(player.timestamp_ms - anchor.timestamp_ms),
+            )
+            hit_candidates.append(
+                _player_anchored_hit_candidate_from_context(
+                    context,
+                    nearest_player,
+                    config,
                     net_axis_reversal=net_axis_reversal,
+                    player_anchor_contact_zone=player_anchor_contact_zone,
                 )
             )
+            accepted = True
+            break
+        if not accepted:
             continue
-        nearest_player = NearestPlayerContext(
-            player=player,
-            distance_template_units=distance,
-            time_delta_ms=abs(player.timestamp_ms - anchor.timestamp_ms),
-        )
-        hit_candidates.append(
-            _player_anchored_hit_candidate_from_context(
-                context,
-                nearest_player,
-                config,
-                net_axis_reversal=net_axis_reversal,
-            )
-        )
     return evaluated_contexts, hit_candidates, rejection_diagnostics
+
+
+def player_anchor_ball_candidates(
+    player: PlayerProjection,
+    ball_points: list[TrajectoryPoint],
+    *,
+    config: HitBounceCandidateConfig,
+) -> list[TrajectoryPoint]:
+    window_ms = max(
+        config.player_time_window_ms,
+        config.player_anchored_hit_lookback_ms,
+        config.player_anchored_hit_lookahead_ms,
+    )
+    candidates = [
+        point
+        for point in ball_points
+        if abs(point.timestamp_ms - player.timestamp_ms) <= window_ms
+    ]
+    if not candidates:
+        return []
+    contact_window_candidates = [
+        point
+        for point in candidates
+        if _player_anchor_distance(player, point)
+        <= config.player_anchored_hit_distance_max_template
+    ]
+    if not contact_window_candidates:
+        contact_window_candidates = [
+            min(
+                candidates,
+                key=lambda point: (
+                    _player_anchor_distance(player, point),
+                    abs(point.timestamp_ms - player.timestamp_ms),
+                    point.frame_number,
+                ),
+            )
+        ]
+    return sorted(
+        contact_window_candidates,
+        key=lambda point: (
+            _player_anchor_candidate_priority(player, point, config=config),
+            _player_anchor_distance(player, point),
+            abs(point.timestamp_ms - player.timestamp_ms),
+            point.frame_number,
+            point.source_ball_court_projection_observation_id or "",
+        ),
+    )
+
+
+def _player_anchor_candidate_priority(
+    player: PlayerProjection,
+    point: TrajectoryPoint,
+    *,
+    config: HitBounceCandidateConfig,
+) -> tuple[int, int, int]:
+    distance = _player_anchor_distance(player, point)
+    contact_zone = _player_anchor_contact_zone_payload(
+        player=player,
+        anchor=point,
+        config=config,
+        distance_template_units=distance,
+    )
+    return (
+        0 if contact_zone.get("side_matches_player_track") is True else 1,
+        0 if contact_zone.get("in_contact_zone") is True else 1,
+        1 if contact_zone.get("open_court_landing_zone") is True else 0,
+    )
+
+
+def _player_anchor_contact_zone_payload(
+    *,
+    player: PlayerProjection,
+    anchor: TrajectoryPoint,
+    config: HitBounceCandidateConfig,
+    distance_template_units: float,
+) -> dict[str, Any]:
+    court_side_zone = _court_side_zone_payload(anchor)
+    side_matches = _court_side_matches_player_role(
+        court_side_zone.get("side"),
+        player.track_role_candidate,
+    )
+    image_distance_pixels = _image_distance_pixels(
+        player_x=player.image_x,
+        player_y=player.image_y,
+        point_x=anchor.image_x,
+        point_y=anchor.image_y,
+    )
+    in_contact_zone = (
+        side_matches
+        and distance_template_units
+        <= config.player_anchored_hit_distance_max_template
+    )
+    strong_contact_zone = (
+        side_matches
+        and distance_template_units <= config.hit_player_distance_max_template
+    )
+    open_court_landing_zone = (
+        _inside_or_near_template(anchor, config.bounce_inside_template_margin)
+        and side_matches
+        and not strong_contact_zone
+    )
+    return {
+        "nearest_player_found": True,
+        "track_role_candidate": player.track_role_candidate,
+        "track_candidate_id": player.track_candidate_id,
+        "side": court_side_zone.get("side"),
+        "side_matches_player_track": side_matches,
+        "distance_template_units": distance_template_units,
+        "distance_threshold": config.player_anchored_hit_distance_max_template,
+        "strong_distance_threshold": config.hit_player_distance_max_template,
+        "time_delta_ms": abs(player.timestamp_ms - anchor.timestamp_ms),
+        "in_contact_zone": in_contact_zone,
+        "strong_contact_zone": strong_contact_zone,
+        "open_court_landing_zone": open_court_landing_zone,
+        "image_distance_pixels": (
+            _round(image_distance_pixels) if image_distance_pixels is not None else None
+        ),
+        "image_distance_diagnostic_only": True,
+        "not_hit_truth": True,
+        "observation_only": True,
+        "no_adjudication": True,
+    }
+
+
+def _image_distance_pixels(
+    *,
+    player_x: float | None,
+    player_y: float | None,
+    point_x: float | None,
+    point_y: float | None,
+) -> float | None:
+    if player_x is None or player_y is None or point_x is None or point_y is None:
+        return None
+    return math.hypot(player_x - point_x, player_y - point_y)
+
+
+def _closest_player_anchor_ball_point(
+    player: PlayerProjection,
+    ball_points: list[TrajectoryPoint],
+    *,
+    config: HitBounceCandidateConfig,
+) -> TrajectoryPoint | None:
+    candidates = player_anchor_ball_candidates(player, ball_points, config=config)
+    return candidates[0] if candidates else None
 
 
 def _flatten_trajectory_points(
@@ -1146,29 +1360,6 @@ def _flatten_trajectory_points(
             )
             by_key[key] = point
     return sorted(by_key.values(), key=lambda point: (point.timestamp_ms, point.frame_number))
-
-
-def _closest_player_anchor_ball_point(
-    player: PlayerProjection,
-    ball_points: list[TrajectoryPoint],
-    *,
-    config: HitBounceCandidateConfig,
-) -> TrajectoryPoint | None:
-    candidates = [
-        point
-        for point in ball_points
-        if abs(point.timestamp_ms - player.timestamp_ms)
-        <= max(config.player_time_window_ms, config.player_anchored_hit_lookback_ms)
-    ]
-    return min(
-        candidates,
-        key=lambda point: (
-            _player_anchor_distance(player, point),
-            abs(point.timestamp_ms - player.timestamp_ms),
-            point.frame_number,
-        ),
-        default=None,
-    )
 
 
 def _player_anchor_incoming_point(
@@ -1238,7 +1429,7 @@ def _wide_window_net_axis_reversal_payload(
         "incoming_timestamp_ms": incoming.timestamp_ms,
         "current_timestamp_ms": anchor.timestamp_ms,
         "outgoing_timestamp_ms": outgoing.timestamp_ms,
-        "window_method": "player_anchored_wide_window_v023",
+        "window_method": "player_anchored_wide_window_v024",
     }
 
 
@@ -1595,6 +1786,155 @@ def suppress_bounces_near_hits(
             continue
         filtered_bounces.append(bounce)
     return filtered_bounces, suppressed_count, rejections
+
+
+def suppress_player_anchored_hits_overlapping_bounces(
+    candidates: list[EventCandidateDraft],
+    *,
+    config: HitBounceCandidateConfig,
+) -> tuple[
+    list[EventCandidateDraft],
+    int,
+    list[EventCandidateRejectionDiagnostic],
+]:
+    bounces = [
+        candidate
+        for candidate in candidates
+        if candidate.observation_type == BOUNCE_CANDIDATE_OBSERVATION_TYPE
+    ]
+    filtered: list[EventCandidateDraft] = []
+    rejections: list[EventCandidateRejectionDiagnostic] = []
+    suppressed_count = 0
+    for candidate in candidates:
+        if not _is_player_anchored_hit_candidate(candidate):
+            filtered.append(candidate)
+            continue
+        overlapping_bounce = _overlapping_bounce_candidate(
+            candidate,
+            bounces,
+            config=config,
+        )
+        if overlapping_bounce is None:
+            filtered.append(
+                replace(
+                    candidate,
+                    overlap_suppression=_overlap_suppression_payload(
+                        hit=candidate,
+                        bounce=None,
+                        config=config,
+                        suppressed=False,
+                    ),
+                )
+            )
+            continue
+        overlap_payload = _overlap_suppression_payload(
+            hit=candidate,
+            bounce=overlapping_bounce,
+            config=config,
+            suppressed=True,
+        )
+        suppressed_count += 1
+        rejections.append(
+            _rejection_diagnostic_from_candidate(
+                replace(candidate, overlap_suppression=overlap_payload),
+                rejection_reasons=[
+                    "suppressed_by_bounce_candidate_overlap",
+                    "open_court_landing_zone_anchor",
+                ],
+                decision_reason="suppressed_by_bounce_candidate_overlap",
+                suppressed_by_observation_type=overlapping_bounce.observation_type,
+                suppressed_by_frame=overlapping_bounce.frame_number,
+                suppressed_by_timestamp_ms=overlapping_bounce.timestamp_ms,
+                overlap_suppression=overlap_payload,
+            )
+        )
+    return (
+        sorted(filtered, key=lambda item: (item.timestamp_ms, item.frame_number)),
+        suppressed_count,
+        rejections,
+    )
+
+
+def _is_player_anchored_hit_candidate(candidate: EventCandidateDraft) -> bool:
+    return (
+        candidate.observation_type == HIT_CANDIDATE_OBSERVATION_TYPE
+        and (
+            candidate.candidate_method == PLAYER_ANCHORED_HIT_CANDIDATE_METHOD
+            or candidate.original_candidate_method == PLAYER_ANCHORED_HIT_CANDIDATE_METHOD
+        )
+    )
+
+
+def _overlapping_bounce_candidate(
+    hit: EventCandidateDraft,
+    bounces: list[EventCandidateDraft],
+    *,
+    config: HitBounceCandidateConfig,
+) -> EventCandidateDraft | None:
+    overlaps = [
+        bounce
+        for bounce in bounces
+        if abs(hit.timestamp_ms - bounce.timestamp_ms) <= config.candidate_dedupe_ms
+        and _candidate_court_distance(hit, bounce)
+        <= config.event_overlap_distance_template
+    ]
+    return min(
+        overlaps,
+        key=lambda bounce: (
+            _candidate_court_distance(hit, bounce),
+            abs(hit.timestamp_ms - bounce.timestamp_ms),
+            bounce.frame_number,
+        ),
+        default=None,
+    )
+
+
+def _candidate_court_distance(
+    a: EventCandidateDraft,
+    b: EventCandidateDraft,
+) -> float:
+    a_point = a.trajectory_context.current
+    b_point = b.trajectory_context.current
+    return _round(math.hypot(a_point.court_x - b_point.court_x, a_point.court_y - b_point.court_y))
+
+
+def _overlap_suppression_payload(
+    *,
+    hit: EventCandidateDraft,
+    bounce: EventCandidateDraft | None,
+    config: HitBounceCandidateConfig,
+    suppressed: bool,
+) -> dict[str, Any]:
+    if bounce is None:
+        return {
+            "overlaps_bounce_candidate": False,
+            "overlap_distance_template": None,
+            "overlap_time_delta_ms": None,
+            "threshold": config.event_overlap_distance_template,
+            "suppressed": False,
+            "reason": None,
+        }
+    return {
+        "overlaps_bounce_candidate": True,
+        "overlap_distance_template": _candidate_court_distance(hit, bounce),
+        "overlap_time_delta_ms": abs(hit.timestamp_ms - bounce.timestamp_ms),
+        "threshold": config.event_overlap_distance_template,
+        "suppressed": suppressed,
+        "reason": (
+            "bounce_candidate_overlap_without_strong_contact_zone"
+            if suppressed
+            else None
+        ),
+        "source_bounce_frame": bounce.frame_number,
+        "source_bounce_timestamp_ms": bounce.timestamp_ms,
+        "source_bounce_candidate_method": bounce.candidate_method,
+        "candidate_only": True,
+        "not_hit_truth": True,
+        "not_bounce_truth": True,
+        "not_in_out_truth": True,
+        "observation_only": True,
+        "no_adjudication": True,
+    }
 
 
 def apply_side_zone_sequence_classification(
@@ -2025,12 +2365,14 @@ def _player_anchored_hit_candidate_from_context(
     config: HitBounceCandidateConfig,
     *,
     net_axis_reversal: dict[str, Any],
+    player_anchor_contact_zone: dict[str, Any],
 ) -> EventCandidateDraft:
     recall_payload = _player_anchored_hit_recall_payload(
         context=context,
         nearest_player=nearest_player,
         config=config,
         net_axis_reversal=net_axis_reversal,
+        player_anchor_contact_zone=player_anchor_contact_zone,
     )
     proximity_score = 1.0 - min(
         nearest_player.distance_template_units
@@ -2092,6 +2434,7 @@ def _player_anchored_hit_candidate_from_context(
         },
         net_axis_reversal=net_axis_reversal,
         player_anchored_hit_recall=recall_payload,
+        player_anchor_contact_zone=player_anchor_contact_zone,
     )
 
 
@@ -2101,6 +2444,7 @@ def _player_anchored_hit_recall_payload(
     nearest_player: NearestPlayerContext,
     config: HitBounceCandidateConfig,
     net_axis_reversal: dict[str, Any],
+    player_anchor_contact_zone: dict[str, Any],
 ) -> dict[str, Any]:
     player = nearest_player.player
     return {
@@ -2122,6 +2466,7 @@ def _player_anchored_hit_recall_payload(
         "min_pre_post_gap_ms": config.player_anchored_hit_min_pre_post_gap_ms,
         "distance_template_units": nearest_player.distance_template_units,
         "distance_threshold": config.player_anchored_hit_distance_max_template,
+        "contact_zone": player_anchor_contact_zone,
         "vy_before": net_axis_reversal.get("vy_before"),
         "vy_after": net_axis_reversal.get("vy_after"),
         "net_axis_reversal": net_axis_reversal.get("reversal") is True,
@@ -2316,6 +2661,7 @@ def _player_anchor_rejection_diagnostic(
     rejection_reasons: list[str],
     distance_template_units: float | None = None,
     net_axis_reversal: dict[str, Any] | None = None,
+    player_anchor_contact_zone: dict[str, Any] | None = None,
 ) -> EventCandidateRejectionDiagnostic:
     current = anchor or _synthetic_player_anchor_point(player)
     previous = incoming or _synthetic_neighbor_point(
@@ -2367,6 +2713,7 @@ def _player_anchor_rejection_diagnostic(
         "min_pre_post_gap_ms": config.player_anchored_hit_min_pre_post_gap_ms,
         "distance_template_units": distance_template_units,
         "distance_threshold": config.player_anchored_hit_distance_max_template,
+        "contact_zone": player_anchor_contact_zone,
         "net_axis_reversal": (
             net_axis_reversal.get("reversal") is True
             if net_axis_reversal is not None
@@ -2402,6 +2749,7 @@ def _player_anchor_rejection_diagnostic(
         rejection_reasons=rejection_reasons,
         diagnostic_source="player_anchored_hit_recall",
         player_anchored_hit_recall=recall_payload,
+        player_anchor_contact_zone=player_anchor_contact_zone,
     )
 
 
@@ -2453,6 +2801,7 @@ def _rejection_diagnostic_from_candidate(
     suppressed_by_observation_type: str | None = None,
     suppressed_by_frame: int | None = None,
     suppressed_by_timestamp_ms: int | None = None,
+    overlap_suppression: dict[str, Any] | None = None,
 ) -> EventCandidateRejectionDiagnostic:
     candidate_decision = {
         "selected_candidate_type": None,
@@ -2486,6 +2835,8 @@ def _rejection_diagnostic_from_candidate(
             else "local_trajectory_context"
         ),
         player_anchored_hit_recall=candidate.player_anchored_hit_recall,
+        player_anchor_contact_zone=candidate.player_anchor_contact_zone,
+        overlap_suppression=overlap_suppression or candidate.overlap_suppression,
     )
 
 
@@ -2670,6 +3021,10 @@ def _event_candidate_observation_create(
         payload["candidate_sequence"] = candidate.candidate_sequence
     if candidate.player_anchored_hit_recall is not None:
         payload["player_anchored_hit_recall"] = candidate.player_anchored_hit_recall
+    if candidate.player_anchor_contact_zone is not None:
+        payload["player_anchor_contact_zone"] = candidate.player_anchor_contact_zone
+    if candidate.overlap_suppression is not None:
+        payload["overlap_suppression"] = candidate.overlap_suppression
     if candidate.original_observation_type is not None:
         payload["original_candidate_type"] = candidate.original_observation_type
     if candidate.original_candidate_method is not None:
@@ -2800,6 +3155,10 @@ def _event_candidate_diagnostic_observation_create(
         payload["source_player_court_projection_observation_id"] = None
     if diagnostic.player_anchored_hit_recall is not None:
         payload["player_anchored_hit_recall"] = diagnostic.player_anchored_hit_recall
+    if diagnostic.player_anchor_contact_zone is not None:
+        payload["player_anchor_contact_zone"] = diagnostic.player_anchor_contact_zone
+    if diagnostic.overlap_suppression is not None:
+        payload["overlap_suppression"] = diagnostic.overlap_suppression
     lineage = [
         ObservationLineageCreate(
             parent_observation_id=current.trajectory_observation.id,
@@ -2939,6 +3298,7 @@ def _trajectory_points_from_observation(
 def _player_projection_from_observation(row: Observation) -> PlayerProjection | None:
     payload = row.payload_jsonb or {}
     court_point = payload.get("court_point")
+    image_anchor = payload.get("image_anchor")
     frame_number = _optional_int(row.frame_start)
     if frame_number is None:
         frame_number = _optional_int(payload.get("frame_number"))
@@ -2959,6 +3319,12 @@ def _player_projection_from_observation(row: Observation) -> PlayerProjection | 
         court_y=court_y,
         track_candidate_id=_string_or_none(payload.get("track_candidate_id")),
         track_role_candidate=_string_or_none(payload.get("track_role_candidate")),
+        image_x=(
+            _number(image_anchor.get("x")) if isinstance(image_anchor, dict) else None
+        ),
+        image_y=(
+            _number(image_anchor.get("y")) if isinstance(image_anchor, dict) else None
+        ),
     )
 
 
@@ -3046,7 +3412,7 @@ def _register_model(session: Session) -> ModelRegistry:
         select(ModelRegistry)
         .where(
             ModelRegistry.name == "hit-bounce-candidate-evidence",
-            ModelRegistry.version == "v0.2.3",
+            ModelRegistry.version == "v0.2.4",
             ModelRegistry.model_family == "event_candidate",
             ModelRegistry.source == "apps.worker.services.hit_bounce_candidates",
         )
@@ -3056,7 +3422,7 @@ def _register_model(session: Session) -> ModelRegistry:
         return existing
     model = ModelRegistry(
         name="hit-bounce-candidate-evidence",
-        version="v0.2.3",
+        version="v0.2.4",
         model_family="event_candidate",
         source="apps.worker.services.hit_bounce_candidates",
         metadata_jsonb={
@@ -3082,7 +3448,7 @@ def _create_runtime_config(
 ) -> RuntimeConfig:
     runtime_config = RuntimeConfig(
         config_name="hit-bounce-candidate-evidence-config",
-        config_version="v0.2.3",
+        config_version="v0.2.4",
         payload_jsonb={
             "candidate_method": EVENT_CANDIDATE_METHOD,
             "source_ball_trajectory_run_id": ball_trajectory_run_id,
@@ -3142,7 +3508,7 @@ def _create_step(
     now = datetime.now(UTC)
     step = ProcessingStep(
         run_id=run.id,
-        step_name="player_anchored_hit_recall_v023",
+        step_name="player_anchored_hit_contact_zone_tightening_v024",
         step_status="running",
         started_at=now,
         runtime_config_id=runtime_config.id,
@@ -3312,6 +3678,11 @@ def _validate_config(config: HitBounceCandidateConfig) -> dict[str, Any] | None:
         return _failed(
             "invalid_player_anchored_hit_min_pre_post_gap_ms",
             "player_anchored_hit_min_pre_post_gap_ms must be greater than or equal to zero",
+        )
+    if config.event_overlap_distance_template <= 0:
+        return _failed(
+            "invalid_event_overlap_distance_template",
+            "event_overlap_distance_template must be greater than zero",
         )
     return None
 

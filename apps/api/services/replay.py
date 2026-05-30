@@ -1232,6 +1232,8 @@ def event_candidate_timeline_item_from_observation(
         "candidate_reclassification": overlay_item["candidate_reclassification"],
         "candidate_sequence": overlay_item["candidate_sequence"],
         "player_anchored_hit_recall": overlay_item["player_anchored_hit_recall"],
+        "player_anchor_contact_zone": overlay_item["player_anchor_contact_zone"],
+        "overlap_suppression": overlay_item["overlap_suppression"],
         "image_point": overlay_item["image_point"],
         "image_marker_source": overlay_item["image_marker_source"],
         "source_ball_trajectory_observation_id": overlay_item[
@@ -2231,6 +2233,16 @@ def event_candidate_overlay_item_from_observation(
         "player_anchored_hit_recall": (
             payload.get("player_anchored_hit_recall")
             if isinstance(payload.get("player_anchored_hit_recall"), dict)
+            else None
+        ),
+        "player_anchor_contact_zone": (
+            payload.get("player_anchor_contact_zone")
+            if isinstance(payload.get("player_anchor_contact_zone"), dict)
+            else None
+        ),
+        "overlap_suppression": (
+            payload.get("overlap_suppression")
+            if isinstance(payload.get("overlap_suppression"), dict)
             else None
         ),
         "source_ball_trajectory_run_id": _string_or_none(

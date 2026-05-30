@@ -2391,3 +2391,32 @@ recall method, including a far-player anchored hit that used a wide-window `cour
 
 This repair improves candidate recall only. It does not add hit truth, bounce truth, in/out,
 rally/point/score logic, player identity, accepted/rejected lifecycle, or adjudication.
+
+## Player-Anchored Hit Contact-Zone Tightening v0.2.4
+
+Status: complete
+
+### Goal
+
+Tighten the v0.2.3 player-anchored hit recall path so it remains anchored to candidate player
+contact zones and does not create a hit candidate on top of an open-court bounce/landing marker.
+
+### Notes
+
+This repair adds:
+
+- `player_anchored_contact_zone_net_axis_reversal_hit_candidate_v024`
+- `player_anchor_contact_zone` payload and diagnostic metadata
+- post-sequence bounce-overlap suppression for player-anchored hit candidates
+- `overlap_suppression` payload and diagnostic metadata
+- `event_overlap_distance_template`
+- `player_anchor_suppressed_overlap_count` candidate summary fields
+- selected evidence display for contact-zone and overlap-suppression diagnostics
+
+The local bridge smoke run produced 2 `hit_candidate` observations, 2 `bounce_candidate`
+observations, and 655 rejection diagnostics. The frame-34 far-side player-anchored hit that
+overlapped the frame-30 far-side bounce was suppressed with
+`suppressed_by_bounce_candidate_overlap` and `open_court_landing_zone_anchor` diagnostics.
+
+This repair improves candidate quality only. It does not add hit truth, bounce truth, in/out,
+rally/point/score logic, player identity, accepted/rejected lifecycle, or adjudication.

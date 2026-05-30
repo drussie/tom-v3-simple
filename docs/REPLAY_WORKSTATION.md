@@ -728,6 +728,11 @@ shows the anchor track role candidate, anchor distance, incoming/current/outgoin
 wide-window `court_y` reversal diagnostics. These fields are review diagnostics only, not contact
 truth or rally/point logic.
 
+Player-anchored hit contact-zone tightening v0.2.4 adds `player_anchor_contact_zone` and
+`overlap_suppression` details. Selected evidence can show whether an anchored hit was inside the
+candidate player contact zone and whether a nearby bounce/open-court landing cluster suppressed a
+player-anchored hit. These details are diagnostics only and do not make a candidate true.
+
 For Stream Proxy Mode, open:
 
 ```text

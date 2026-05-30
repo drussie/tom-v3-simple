@@ -116,6 +116,9 @@ This registry makes TOM v3 Simple boundaries explicit.
   wider ball trajectory windows around near/far main player projection anchors. The recall pass
   inherits projection and trajectory gaps and does not prove contact, rally order, in/out, point, or
   score.
+- Player-Anchored Hit Contact-Zone Tightening v0.2.4 suppresses player-anchored hit candidates
+  that overlap bounce/open-court landing clusters, but the contact-zone gate is still candidate
+  geometry and does not prove racket contact.
 - Event candidate video markers require a source ball court projection image point. If that point
   is unavailable, the candidate remains inspectable in replay but no broadcast-video marker is
   drawn.
