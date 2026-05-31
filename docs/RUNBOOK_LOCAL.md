@@ -1456,6 +1456,10 @@ python -m apps.worker.cli completion-audit --no-demo-only
 - Image-space net-axis hit recall uses a broadcast image-y fallback to improve airborne hit
   candidate recall. This is not true camera geometry, true ball height, hit truth, in/out, score,
   or adjudication.
+- Local-evidence event type classification v0.2.8 is enabled by default for image-space
+  direction-change event candidates. It can keep a direction change as `hit_candidate` or reclassify
+  it to `bounce_candidate` based on local landing/contact evidence. A hit candidate does not
+  require a prior bounce.
 - Cloud deployment, auth, production streaming, and multi-camera reasoning are out of scope.
 
 ## 15. Completion Checklist

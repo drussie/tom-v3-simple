@@ -27,6 +27,7 @@ from apps.worker.services.hit_bounce_candidates import (
     HIT_FALLBACK_CANDIDATE_METHOD,
     IMAGE_SPACE_DIRECTION_CHANGE_HIT_CANDIDATE_METHOD,
     IMAGE_SPACE_NET_AXIS_HIT_CANDIDATE_METHOD,
+    LOCAL_EVIDENCE_DIRECTION_CHANGE_BOUNCE_CANDIDATE_METHOD,
     NET_AXIS_REVERSAL_HIT_CANDIDATE_METHOD,
     PLAYER_ANCHORED_HIT_CANDIDATE_METHOD,
     SIDE_ZONE_SEQUENCE_BOUNCE_METHOD,
@@ -310,9 +311,9 @@ def test_image_space_net_axis_reversal_emits_hit_without_player_proximity(
         db_session,
         media.id,
         points=[
-            (0, 0, 0.20, 0.20),
-            (6, 200, 0.30, 0.30),
-            (12, 400, 0.40, 0.40),
+            (0, 0, 0.20, 0.48),
+            (6, 200, 0.30, 0.50),
+            (12, 400, 0.40, 0.52),
         ],
     )
     _update_ball_projection_image_points(
@@ -366,9 +367,9 @@ def test_image_space_reversal_missing_image_points_writes_diagnostics(
         db_session,
         media.id,
         points=[
-            (0, 0, 0.20, 0.20),
-            (6, 200, 0.30, 0.30),
-            (12, 400, 0.40, 0.40),
+            (0, 0, 0.20, 0.48),
+            (6, 200, 0.30, 0.50),
+            (12, 400, 0.40, 0.52),
         ],
     )
     _remove_ball_projection_image_points(db_session, projection_ids)
@@ -493,9 +494,9 @@ def test_image_space_direction_change_emits_hit_without_player_proximity(
         db_session,
         media.id,
         points=[
-            (0, 0, 0.20, 0.20),
-            (6, 200, 0.30, 0.30),
-            (12, 400, 0.40, 0.40),
+            (0, 0, 0.20, 0.48),
+            (6, 200, 0.30, 0.50),
+            (12, 400, 0.40, 0.52),
         ],
     )
     _update_ball_projection_image_points(
@@ -545,6 +546,13 @@ def test_image_space_direction_change_emits_hit_without_player_proximity(
     assert recall["pre_vector_length_pixels"] >= 8.0
     assert recall["post_vector_length_pixels"] >= 8.0
     assert "image_space_direction_change" in hit.payload_jsonb["reason_codes"]
+    assert "no_bounce_required_for_hit" in hit.payload_jsonb["reason_codes"]
+    assert hit.payload_jsonb["local_evidence_event_type"][
+        "hit_requires_prior_bounce"
+    ] is False
+    assert hit.payload_jsonb["local_evidence_event_type"][
+        "selected_candidate_type"
+    ] == "hit_candidate"
 
     overlays = build_event_candidate_overlay_items(
         session=db_session,
@@ -557,6 +565,67 @@ def test_image_space_direction_change_emits_hit_without_player_proximity(
     assert overlays[0]["image_space_direction_change_recall"][
         "player_proximity_required"
     ] is False
+    assert overlays[0]["local_evidence_event_type"][
+        "hit_like_airborne_direction_change"
+    ] is True
+
+
+def test_image_space_direction_change_in_landing_zone_reclassifies_to_bounce(
+    db_session: Session,
+) -> None:
+    media = _seed_media(db_session)
+    trajectory_run, projection_ids = _seed_trajectory_run(
+        db_session,
+        media.id,
+        points=[
+            (0, 0, 0.20, 0.20),
+            (6, 200, 0.30, 0.30),
+            (12, 400, 0.40, 0.40),
+        ],
+    )
+    _update_ball_projection_image_points(
+        db_session,
+        projection_ids,
+        image_points=[
+            (100.0, 100.0),
+            (140.0, 140.0),
+            (120.0, 190.0),
+        ],
+    )
+    projection_run = _seed_projection_run(db_session, media.id, players=[])
+
+    result = build_hit_bounce_candidates(
+        session=db_session,
+        media_id=media.id,
+        ball_trajectory_run_id=trajectory_run.id,
+        court_projection_run_id=projection_run.id,
+    )
+
+    assert result["ok"] is True
+    assert result["observations"]["hit_candidate"] == 0
+    assert result["observations"]["bounce_candidate"] == 1
+    assert (
+        result["candidate_summary"]["direction_change_reclassified_to_bounce_count"]
+        == 1
+    )
+    bounce = db_session.scalar(
+        select(Observation).where(
+            Observation.run_id == result["event_candidate_run_id"],
+            Observation.observation_type == "bounce_candidate",
+        )
+    )
+    assert bounce is not None
+    assert bounce.payload_jsonb["candidate_method"] == (
+        LOCAL_EVIDENCE_DIRECTION_CHANGE_BOUNCE_CANDIDATE_METHOD
+    )
+    assert "direction_change_reclassified_to_bounce_candidate" in bounce.payload_jsonb[
+        "reason_codes"
+    ]
+    local_evidence = bounce.payload_jsonb["local_evidence_event_type"]
+    assert local_evidence["selected_candidate_type"] == "bounce_candidate"
+    assert local_evidence["bounce_like_court_landing_zone"] is True
+    assert local_evidence["sequence_is_hard_gate"] is False
+    assert local_evidence["hit_requires_prior_bounce"] is False
 
 
 def test_image_space_direction_change_missing_image_points_writes_diagnostics(
@@ -930,7 +999,7 @@ def test_player_proximate_trajectory_change_is_prioritized_as_hit(
     assert hit is not None
     assert "player_proximate_event_priority" in hit.payload_jsonb["reason_codes"]
     assert hit.payload_jsonb["classification_priority"] == (
-        "side_zone_sequence_candidate_prior"
+        "local_evidence_event_type_classification"
     )
     assert hit.payload_jsonb["player_proximity_gate"]["threshold"] == 0.33
     assert hit.payload_jsonb["candidate_decision"]["suppressed_candidate_types"] == [
@@ -1112,10 +1181,11 @@ def test_dedupe_preserves_one_pre_anchor_landing_candidate_for_sequence_prior() 
         candidate.observation_type for candidate in final_candidates
     ] == [
         "hit_candidate",
-        "bounce_candidate",
+        "hit_candidate",
         "hit_candidate",
     ]
-    assert summary["reclassified_hit_to_bounce_count"] == 1
+    assert summary["reclassified_hit_to_bounce_count"] == 0
+    assert summary["sequence_prior_applied_count"] == 0
 
 
 def test_rejected_contexts_persist_rejection_reason_diagnostics(
@@ -1686,17 +1756,17 @@ def test_side_zone_sequence_reclassifies_sample_style_sequence() -> None:
 
     assert [candidate.observation_type for candidate in final_candidates] == [
         "hit_candidate",
-        "bounce_candidate",
+        "hit_candidate",
         "bounce_candidate",
         "hit_candidate",
     ]
-    assert summary == {
-        "reclassified_hit_to_bounce_count": 1,
-        "reclassified_bounce_to_hit_count": 1,
-        "sequence_prior_applied_count": 2,
-    }
+    assert summary["reclassified_hit_to_bounce_count"] == 0
+    assert summary["reclassified_bounce_to_hit_count"] == 1
+    assert summary["sequence_prior_applied_count"] == 0
+    assert summary["sequence_is_hard_gate"] is False
+    assert summary["hit_requires_prior_bounce"] is False
 
-    first_hit, far_bounce, near_bounce, near_hit = final_candidates
+    first_hit, far_hit, near_bounce, near_hit = final_candidates
     assert first_hit.candidate_reclassification == {
         "original_candidate_type": "hit_candidate",
         "final_candidate_type": "hit_candidate",
@@ -1705,21 +1775,24 @@ def test_side_zone_sequence_reclassifies_sample_style_sequence() -> None:
     }
     assert first_hit.court_side_zone is not None
     assert first_hit.court_side_zone["side"] == "near_side"
-    assert far_bounce.candidate_reclassification == {
+    assert far_hit.candidate_reclassification == {
         "original_candidate_type": "hit_candidate",
-        "final_candidate_type": "bounce_candidate",
-        "reason": "court_landing_zone_over_player_contact_zone",
-        "reclassified": True,
+        "final_candidate_type": "hit_candidate",
+        "reason": None,
+        "reclassified": False,
     }
-    assert far_bounce.candidate_method == SIDE_ZONE_SEQUENCE_BOUNCE_METHOD
-    assert far_bounce.court_side_zone is not None
-    assert far_bounce.court_side_zone["side"] == "far_side"
-    assert far_bounce.court_landing_zone is not None
-    assert far_bounce.court_landing_zone["landing_zone_candidate"] is True
-    assert far_bounce.candidate_sequence is not None
-    assert far_bounce.candidate_sequence["expected_candidate_type"] == "bounce_candidate"
-    assert "reclassified_from_hit_candidate" in far_bounce.reason_codes
-    assert "sequence_bounce_prior" in far_bounce.reason_codes
+    assert far_hit.candidate_method == HIT_FALLBACK_CANDIDATE_METHOD
+    assert far_hit.court_side_zone is not None
+    assert far_hit.court_side_zone["side"] == "far_side"
+    assert far_hit.court_landing_zone is not None
+    assert far_hit.court_landing_zone["landing_zone_candidate"] is True
+    assert far_hit.candidate_sequence is not None
+    assert far_hit.candidate_sequence["expected_candidate_type"] is None
+    assert far_hit.candidate_sequence["sequence_context_hint"] == "bounce_candidate"
+    assert far_hit.candidate_sequence["sequence_is_hard_gate"] is False
+    assert far_hit.candidate_sequence["hit_requires_prior_bounce"] is False
+    assert "reclassified_from_hit_candidate" not in far_hit.reason_codes
+    assert "sequence_bounce_prior" not in far_hit.reason_codes
 
     assert near_bounce.candidate_reclassification is not None
     assert near_bounce.candidate_reclassification["reclassified"] is False
@@ -1731,9 +1804,55 @@ def test_side_zone_sequence_reclassifies_sample_style_sequence() -> None:
     assert near_hit.player_contact_zone is not None
     assert near_hit.player_contact_zone["in_contact_zone"] is True
     assert near_hit.candidate_sequence is not None
-    assert near_hit.candidate_sequence["expected_candidate_type"] == "hit_candidate"
+    assert near_hit.candidate_sequence["expected_candidate_type"] is None
+    assert near_hit.candidate_sequence["sequence_context_hint"] == "hit_candidate"
+    assert near_hit.candidate_sequence["sequence_prior_applied"] is False
     assert "reclassified_from_bounce_candidate" in near_hit.reason_codes
-    assert "sequence_hit_prior" in near_hit.reason_codes
+    assert "sequence_hit_prior" not in near_hit.reason_codes
+
+
+def test_hit_can_follow_hit_without_required_intervening_bounce() -> None:
+    candidates = [
+        _draft_event_candidate(
+            observation_type="hit_candidate",
+            frame=10,
+            timestamp_ms=333,
+            court_x=0.30,
+            court_y=0.16,
+            track_role_candidate="near_player_track_candidate",
+            player_distance=0.10,
+            candidate_method=HIT_CANDIDATE_METHOD,
+            net_axis_reversal=True,
+        ),
+        _draft_event_candidate(
+            observation_type="hit_candidate",
+            frame=20,
+            timestamp_ms=667,
+            court_x=0.42,
+            court_y=0.88,
+            track_role_candidate="far_player_track_candidate",
+            player_distance=0.12,
+            candidate_method=HIT_CANDIDATE_METHOD,
+            net_axis_reversal=True,
+        ),
+    ]
+
+    final_candidates, summary = apply_side_zone_sequence_classification(
+        candidates,
+        config=HitBounceCandidateConfig(),
+    )
+
+    assert [candidate.observation_type for candidate in final_candidates] == [
+        "hit_candidate",
+        "hit_candidate",
+    ]
+    assert summary["sequence_prior_applied_count"] == 0
+    assert summary["sequence_is_hard_gate"] is False
+    assert final_candidates[1].candidate_sequence is not None
+    assert final_candidates[1].candidate_sequence["sequence_context_hint"] == (
+        "bounce_candidate"
+    )
+    assert final_candidates[1].candidate_sequence["hit_requires_prior_bounce"] is False
 
 
 def test_event_candidate_replay_payloads_are_exposed(db_session: Session) -> None:
@@ -1778,7 +1897,7 @@ def test_event_candidate_replay_payloads_are_exposed(db_session: Session) -> Non
     assert overlays[0]["court_point"] == {"x": 0.3, "y": 0.2}
     assert overlays[0]["image_point"] == {"x": 300.0, "y": 100.0}
     assert overlays[0]["image_marker_source"] == "source_ball_court_projection_image_point"
-    assert overlays[0]["classification_priority"] == "side_zone_sequence_candidate_prior"
+    assert overlays[0]["classification_priority"] == "local_evidence_event_type_classification"
     assert overlays[0]["player_proximity_gate"]["nearest_player_found"] is True
     assert overlays[0]["candidate_decision"]["selected_candidate_type"] == "hit_candidate"
     assert overlays[0]["net_axis_reversal"]["reversal"] is True
@@ -1788,17 +1907,19 @@ def test_event_candidate_replay_payloads_are_exposed(db_session: Session) -> Non
     assert overlays[0]["player_contact_zone"]["in_contact_zone"] is True
     assert overlays[0]["candidate_reclassification"]["reclassified"] is False
     assert overlays[0]["candidate_sequence"]["sequence_index"] == 0
+    assert overlays[0]["candidate_sequence"]["sequence_is_hard_gate"] is False
+    assert overlays[0]["candidate_sequence"]["hit_requires_prior_bounce"] is False
     assert len(timeline_items) == 1
     assert timeline_items[0]["item_type"] == "hit_candidate"
     assert timeline_items[0]["image_point"] == {"x": 300.0, "y": 100.0}
     assert timeline_items[0]["image_marker_source"] == "source_ball_court_projection_image_point"
     assert timeline_items[0]["classification_priority"] == (
-        "side_zone_sequence_candidate_prior"
+        "local_evidence_event_type_classification"
     )
     assert timeline_items[0]["net_axis_reversal"]["axis"] == "court_y"
     assert timeline_items[0]["court_side_zone"]["side"] == "near_side"
-    assert timeline_items[0]["candidate_sequence"]["sequence_pattern"] == (
-        "hit_bounce_alternation_v0"
+    assert timeline_items[0]["candidate_sequence"]["sequence_context_model"] == (
+        "optional_bounce_between_hits_v0"
     )
     assert timeline_items[0]["candidate_only"] is True
 

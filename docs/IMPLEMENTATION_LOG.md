@@ -2480,6 +2480,33 @@ This repair improves candidate recall only. Full 2D broadcast image direction is
 evidence, not calibrated contact truth. It does not add hit truth, bounce truth, in/out,
 rally/point/score logic, player identity, accepted/rejected lifecycle, or adjudication.
 
+## Local-Evidence Event-Type Classification v0.2.8
+
+Status: complete
+
+### Goal
+
+Classify image-space direction-change candidates with local evidence instead of a hard
+hit/bounce alternation assumption.
+
+### Notes
+
+This repair adds:
+
+- `local_evidence_event_type` event candidate payload metadata
+- `local_evidence_direction_change_bounce_candidate_v028`
+- explicit `sequence_is_hard_gate = false` and `hit_requires_prior_bounce = false` sequence metadata
+- selected-evidence replay details for local event-type classification
+
+The local bridge smoke run produced 7 `hit_candidate` observations, 2 `bounce_candidate`
+observations, and 868 rejection diagnostics. Two image-space direction-change candidates were
+classified locally: one stayed a `hit_candidate`, and one was reclassified to `bounce_candidate`
+because it was a court landing-zone direction change without player-contact support.
+
+This repair improves candidate labeling only. A hit candidate does not require a prior bounce, and
+sequence is weak diagnostic context only. The repair does not add hit truth, bounce truth, in/out,
+rally/point/score logic, player identity, accepted/rejected lifecycle, or adjudication.
+
 ## Player-Anchored Hit Contact-Zone Tightening v0.2.4
 
 Status: complete

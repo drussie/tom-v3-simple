@@ -1240,6 +1240,7 @@ def event_candidate_timeline_item_from_observation(
         "image_space_direction_change_recall": overlay_item[
             "image_space_direction_change_recall"
         ],
+        "local_evidence_event_type": overlay_item["local_evidence_event_type"],
         "overlap_suppression": overlay_item["overlap_suppression"],
         "image_point": overlay_item["image_point"],
         "image_marker_source": overlay_item["image_marker_source"],
@@ -2260,6 +2261,11 @@ def event_candidate_overlay_item_from_observation(
         "image_space_direction_change_recall": (
             payload.get("image_space_direction_change_recall")
             if isinstance(payload.get("image_space_direction_change_recall"), dict)
+            else None
+        ),
+        "local_evidence_event_type": (
+            payload.get("local_evidence_event_type")
+            if isinstance(payload.get("local_evidence_event_type"), dict)
             else None
         ),
         "overlap_suppression": (

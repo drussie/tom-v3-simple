@@ -50,6 +50,9 @@ IMAGE_SPACE_NET_AXIS_HIT_CANDIDATE_METHOD = (
 IMAGE_SPACE_DIRECTION_CHANGE_HIT_CANDIDATE_METHOD = (
     "image_space_direction_change_hit_candidate_v027"
 )
+LOCAL_EVIDENCE_DIRECTION_CHANGE_BOUNCE_CANDIDATE_METHOD = (
+    "local_evidence_direction_change_bounce_candidate_v028"
+)
 BOUNCE_CANDIDATE_METHOD = "image_vertical_proxy_speed_reduction_bounce_candidate_v024"
 BOUNCE_FALLBACK_CANDIDATE_METHOD = (
     "image_vertical_proxy_speed_reduction_bounce_candidate_v024_fallback"
@@ -60,8 +63,10 @@ PLAYER_ANCHORED_HIT_CANDIDATE_METHOD = (
 SIDE_ZONE_SEQUENCE_HIT_METHOD = "side_zone_sequence_hit_candidate_v024"
 SIDE_ZONE_SEQUENCE_BOUNCE_METHOD = "side_zone_sequence_bounce_candidate_v024"
 EVENT_CANDIDATE_METHOD = (
-    "image_space_direction_change_hit_recall_candidate_evidence_v027"
+    "local_evidence_event_type_classification_candidate_evidence_v028"
 )
+LOCAL_EVIDENCE_CLASSIFICATION_PRIORITY = "local_evidence_event_type_classification"
+LOCAL_EVIDENCE_EVENT_TYPE_CLASSIFIER_VERSION = "v0.2.8"
 COURT_SIDE_SPLIT_Y = 0.50
 COURT_MIDCOURT_MARGIN_Y = 0.05
 COURT_Y_CONVENTION = "court_y_low_near_high_far_v024"
@@ -384,6 +389,7 @@ class EventCandidateDraft:
     net_axis_reversal_recall: dict[str, Any] | None = None
     image_space_net_axis_reversal_recall: dict[str, Any] | None = None
     image_space_direction_change_recall: dict[str, Any] | None = None
+    local_evidence_event_type: dict[str, Any] | None = None
     overlap_suppression: dict[str, Any] | None = None
 
     @property
@@ -553,7 +559,7 @@ def build_hit_bounce_candidates_plan(
             "evaluate_image_space_direction_change_hit_recall",
             "evaluate_player_anchored_hit_recall",
             "dedupe_candidate_clusters",
-            "apply_side_zone_sequence_classification_prior",
+            "apply_local_evidence_event_type_classification",
             "persist_hit_and_bounce_candidate_observations",
             "write_candidate_source_lineage",
         ],
@@ -646,7 +652,7 @@ def build_hit_bounce_candidates_plan(
         ),
         "player_anchored_hit_candidate_method": PLAYER_ANCHORED_HIT_CANDIDATE_METHOD,
         "bounce_candidate_method": BOUNCE_CANDIDATE_METHOD,
-        "classification_priority": "side_zone_sequence_candidate_prior",
+        "classification_priority": LOCAL_EVIDENCE_CLASSIFICATION_PRIORITY,
         "court_y_convention": COURT_Y_CONVENTION,
         "coordinate_space": CoordinateSpace.court_template_2d,
         "court_template_name": COURT_TEMPLATE_NAME,
@@ -1227,12 +1233,15 @@ def build_hit_bounce_candidates(
             EVENT_CANDIDATE_REJECTION_DIAGNOSTIC_OBSERVATION_TYPE,
             0,
         ),
-        "classification_priority": "side_zone_sequence_candidate_prior",
-        "physics_heuristic_version": "v0.2.7",
+        "classification_priority": LOCAL_EVIDENCE_CLASSIFICATION_PRIORITY,
+        "physics_heuristic_version": LOCAL_EVIDENCE_EVENT_TYPE_CLASSIFIER_VERSION,
         "contact_zone_tightening_version": "v0.2.4",
         "net_axis_reversal_hit_recall_version": "v0.2.5",
         "image_space_net_axis_hit_recall_version": "v0.2.6",
         "image_space_direction_change_hit_recall_version": "v0.2.7",
+        "local_evidence_event_type_classification_version": (
+            LOCAL_EVIDENCE_EVENT_TYPE_CLASSIFIER_VERSION
+        ),
         "net_axis_reversal_context_count": net_axis_reversal_context_count,
         "net_axis_reversal_candidate_count": len(net_axis_reversal_hit_drafts),
         "net_axis_reversal_recovered_hit_count": sum(
@@ -3783,16 +3792,19 @@ def apply_side_zone_sequence_classification(
     candidates: list[EventCandidateDraft],
     *,
     config: HitBounceCandidateConfig,
-) -> tuple[list[EventCandidateDraft], dict[str, int]]:
+) -> tuple[list[EventCandidateDraft], dict[str, Any]]:
     ordered = sorted(candidates, key=lambda item: (item.timestamp_ms, item.frame_number))
     final_candidates: list[EventCandidateDraft] = []
     previous_final_type: str | None = None
     reclassified_hit_to_bounce_count = 0
     reclassified_bounce_to_hit_count = 0
     sequence_prior_applied_count = 0
+    direction_change_candidates_classified = 0
+    direction_change_reclassified_to_bounce_count = 0
+    direction_change_kept_as_hit_count = 0
     for sequence_index, candidate in enumerate(ordered):
         original_type = candidate.original_observation_type or candidate.observation_type
-        expected_type = _expected_next_candidate_type(previous_final_type)
+        sequence_context_hint = _expected_next_candidate_type(previous_final_type)
         court_side_zone = _court_side_zone_payload(candidate.trajectory_context.current)
         player_contact_zone = _player_contact_zone_payload(
             candidate,
@@ -3809,9 +3821,30 @@ def apply_side_zone_sequence_classification(
         final_method = candidate.candidate_method
         reclassification_reason: str | None = None
         sequence_prior_applied = False
+        local_evidence_event_type: dict[str, Any] | None = None
+        if _is_image_space_direction_change_hit_candidate(candidate):
+            (
+                final_type,
+                final_method,
+                reclassification_reason,
+                local_evidence_event_type,
+            ) = classify_direction_change_candidate_local_evidence(
+                candidate,
+                config=config,
+                court_side_zone=court_side_zone,
+                player_contact_zone=player_contact_zone,
+                court_landing_zone=court_landing_zone,
+            )
+            direction_change_candidates_classified += 1
+            if final_type == BOUNCE_CANDIDATE_OBSERVATION_TYPE:
+                direction_change_reclassified_to_bounce_count += 1
+                reclassified_hit_to_bounce_count += 1
+            else:
+                direction_change_kept_as_hit_count += 1
         if (
             candidate.observation_type == HIT_CANDIDATE_OBSERVATION_TYPE
-            and expected_type == BOUNCE_CANDIDATE_OBSERVATION_TYPE
+            and local_evidence_event_type is None
+            and player_contact_zone.get("in_contact_zone") is not True
             and _hit_candidate_can_be_landing_zone_bounce(
                 candidate,
                 court_landing_zone=court_landing_zone,
@@ -3820,29 +3853,29 @@ def apply_side_zone_sequence_classification(
             final_type = BOUNCE_CANDIDATE_OBSERVATION_TYPE
             final_method = SIDE_ZONE_SEQUENCE_BOUNCE_METHOD
             reclassification_reason = "court_landing_zone_over_player_contact_zone"
-            sequence_prior_applied = True
             reclassified_hit_to_bounce_count += 1
         elif (
             candidate.observation_type == BOUNCE_CANDIDATE_OBSERVATION_TYPE
             and player_contact_zone.get("in_contact_zone") is True
-            and (
-                expected_type == HIT_CANDIDATE_OBSERVATION_TYPE
-                or player_contact_zone.get("side_matches_player_track") is True
-            )
+            and player_contact_zone.get("side_matches_player_track") is True
         ):
             final_type = HIT_CANDIDATE_OBSERVATION_TYPE
             final_method = SIDE_ZONE_SEQUENCE_HIT_METHOD
             reclassification_reason = "player_contact_zone_over_court_landing_zone"
-            sequence_prior_applied = expected_type == HIT_CANDIDATE_OBSERVATION_TYPE
             reclassified_bounce_to_hit_count += 1
         if sequence_prior_applied:
             sequence_prior_applied_count += 1
         candidate_sequence = {
             "sequence_index": sequence_index,
             "previous_candidate_type": previous_final_type,
-            "expected_candidate_type": expected_type,
+            "expected_candidate_type": None,
+            "sequence_context_hint": sequence_context_hint,
             "sequence_prior_applied": sequence_prior_applied,
-            "sequence_pattern": "hit_bounce_alternation_v0",
+            "sequence_prior_strength": "weak",
+            "sequence_is_hard_gate": False,
+            "hit_requires_prior_bounce": False,
+            "sequence_context_model": "optional_bounce_between_hits_v0",
+            "tennis_note": "hit candidates do not require a prior bounce",
         }
         candidate_reclassification = {
             "original_candidate_type": original_type,
@@ -3856,6 +3889,7 @@ def apply_side_zone_sequence_classification(
             reclassification_reason=reclassification_reason,
             sequence_prior_applied=sequence_prior_applied,
             player_contact_zone=player_contact_zone,
+            local_evidence_event_type=local_evidence_event_type,
         )
         final_candidate = replace(
             candidate,
@@ -3871,17 +3905,24 @@ def apply_side_zone_sequence_classification(
             court_landing_zone=court_landing_zone,
             candidate_reclassification=candidate_reclassification,
             candidate_sequence=candidate_sequence,
+            local_evidence_event_type=local_evidence_event_type,
             candidate_decision={
                 "selected_candidate_type": final_type,
                 "original_candidate_type": original_type,
                 "suppressed_candidate_types": (
                     [BOUNCE_CANDIDATE_OBSERVATION_TYPE]
                     if final_type == HIT_CANDIDATE_OBSERVATION_TYPE
-                    else []
+                    else (
+                        [HIT_CANDIDATE_OBSERVATION_TYPE]
+                        if reclassification_reason is not None
+                        else []
+                    )
                 ),
                 "reason": reclassification_reason
                 or candidate.candidate_decision.get("reason"),
-                "classification_priority": "side_zone_sequence_candidate_prior",
+                "classification_priority": LOCAL_EVIDENCE_CLASSIFICATION_PRIORITY,
+                "sequence_is_hard_gate": False,
+                "hit_requires_prior_bounce": False,
             },
         )
         final_candidates.append(final_candidate)
@@ -3890,7 +3931,114 @@ def apply_side_zone_sequence_classification(
         "reclassified_hit_to_bounce_count": reclassified_hit_to_bounce_count,
         "reclassified_bounce_to_hit_count": reclassified_bounce_to_hit_count,
         "sequence_prior_applied_count": sequence_prior_applied_count,
+        "local_evidence_classification_enabled": True,
+        "local_evidence_classification_version": LOCAL_EVIDENCE_EVENT_TYPE_CLASSIFIER_VERSION,
+        "direction_change_candidates_classified": (
+            direction_change_candidates_classified
+        ),
+        "direction_change_reclassified_to_bounce_count": (
+            direction_change_reclassified_to_bounce_count
+        ),
+        "direction_change_kept_as_hit_count": direction_change_kept_as_hit_count,
+        "sequence_is_hard_gate": False,
+        "hit_requires_prior_bounce": False,
+        "local_evidence_event_type_classification": {
+            "enabled": True,
+            "version": LOCAL_EVIDENCE_EVENT_TYPE_CLASSIFIER_VERSION,
+            "direction_change_candidates_classified": (
+                direction_change_candidates_classified
+            ),
+            "direction_change_reclassified_to_bounce_count": (
+                direction_change_reclassified_to_bounce_count
+            ),
+            "direction_change_kept_as_hit_count": direction_change_kept_as_hit_count,
+            "sequence_is_hard_gate": False,
+            "hit_requires_prior_bounce": False,
+        },
     }
+
+
+def classify_direction_change_candidate_local_evidence(
+    candidate: EventCandidateDraft,
+    *,
+    config: HitBounceCandidateConfig,
+    court_side_zone: dict[str, Any],
+    player_contact_zone: dict[str, Any],
+    court_landing_zone: dict[str, Any],
+) -> tuple[str, str, str | None, dict[str, Any]]:
+    """Classify image-space direction-change candidates by local evidence only."""
+
+    recall = candidate.image_space_direction_change_recall or {}
+    direction_delta = _number(recall.get("image_direction_delta_degrees")) or 0.0
+    pre_vector_length = _number(recall.get("pre_vector_length_pixels")) or 0.0
+    post_vector_length = _number(recall.get("post_vector_length_pixels")) or 0.0
+    strong_image_direction_change = (
+        direction_delta >= config.image_space_direction_change_min_delta_degrees
+    )
+    strong_image_vectors = (
+        pre_vector_length >= config.image_space_direction_change_min_vector_pixels
+        and post_vector_length >= config.image_space_direction_change_min_vector_pixels
+    )
+    player_contact_support = (
+        player_contact_zone.get("in_contact_zone") is True
+        or player_contact_zone.get("strong_contact_zone") is True
+    )
+    side = court_side_zone.get("side")
+    inside_or_near_court = court_landing_zone.get("inside_or_near_court") is True
+    obvious_court_landing_zone = (
+        inside_or_near_court
+        and court_landing_zone.get("landing_zone_candidate") is True
+        and side != "midcourt_net_zone"
+    )
+    bounce_like_court_landing_zone = (
+        obvious_court_landing_zone and not player_contact_support
+    )
+    hit_like_airborne_direction_change = (
+        strong_image_direction_change
+        and strong_image_vectors
+        and not bounce_like_court_landing_zone
+    )
+    nearest_player_distance = player_contact_zone.get("distance_template_units")
+    final_type = HIT_CANDIDATE_OBSERVATION_TYPE
+    final_method = candidate.candidate_method
+    reclassification_reason: str | None = None
+    classification_reason = "strong_image_direction_change_not_landing_zone"
+    if bounce_like_court_landing_zone:
+        final_type = BOUNCE_CANDIDATE_OBSERVATION_TYPE
+        final_method = LOCAL_EVIDENCE_DIRECTION_CHANGE_BOUNCE_CANDIDATE_METHOD
+        reclassification_reason = "direction_change_in_court_landing_zone_without_contact_support"
+        classification_reason = reclassification_reason
+    return (
+        final_type,
+        final_method,
+        reclassification_reason,
+        {
+            "classifier_version": LOCAL_EVIDENCE_EVENT_TYPE_CLASSIFIER_VERSION,
+            "source_candidate_method": candidate.candidate_method,
+            "selected_candidate_type": final_type,
+            "original_candidate_type": candidate.observation_type,
+            "sequence_is_hard_gate": False,
+            "hit_requires_prior_bounce": False,
+            "bounce_like_court_landing_zone": bounce_like_court_landing_zone,
+            "hit_like_airborne_direction_change": hit_like_airborne_direction_change,
+            "inside_or_near_court": inside_or_near_court,
+            "court_landing_zone_candidate": (
+                court_landing_zone.get("landing_zone_candidate") is True
+            ),
+            "court_side": side,
+            "nearest_player_found": (
+                player_contact_zone.get("nearest_player_found") is True
+            ),
+            "nearest_player_distance_template_units": nearest_player_distance,
+            "player_contact_support": player_contact_support,
+            "strong_image_direction_change": strong_image_direction_change,
+            "strong_image_vectors": strong_image_vectors,
+            "image_direction_delta_degrees": _round(direction_delta),
+            "pre_vector_length_pixels": _round(pre_vector_length),
+            "post_vector_length_pixels": _round(post_vector_length),
+            "classification_reason": classification_reason,
+        },
+    )
 
 
 def _expected_next_candidate_type(previous_final_type: str | None) -> str | None:
@@ -4027,6 +4175,7 @@ def _final_reason_codes(
     reclassification_reason: str | None,
     sequence_prior_applied: bool,
     player_contact_zone: dict[str, Any],
+    local_evidence_event_type: dict[str, Any] | None,
 ) -> list[str]:
     reason_codes = list(dict.fromkeys(candidate.reason_codes))
     if final_type == HIT_CANDIDATE_OBSERVATION_TYPE:
@@ -4048,7 +4197,9 @@ def _final_reason_codes(
             reason_codes.extend(
                 [
                     "image_space_direction_change",
+                    "hit_like_direction_change",
                     "player_proximity_not_required",
+                    "no_bounce_required_for_hit",
                     "airborne_hit_projection_warning",
                 ]
             )
@@ -4056,10 +4207,27 @@ def _final_reason_codes(
             reason_codes.append("sequence_hit_prior")
     else:
         reason_codes.append("court_landing_zone")
+        if (
+            local_evidence_event_type is not None
+            and local_evidence_event_type.get("selected_candidate_type")
+            == BOUNCE_CANDIDATE_OBSERVATION_TYPE
+        ):
+            reason_codes.extend(
+                [
+                    "image_space_direction_change",
+                    "bounce_like_court_landing_zone",
+                    "court_plane_landing_candidate",
+                    "away_from_player_contact_zone",
+                    "direction_change_reclassified_to_bounce_candidate",
+                ]
+            )
         if sequence_prior_applied:
             reason_codes.append("sequence_bounce_prior")
     if reclassification_reason is not None:
-        if reclassification_reason == "court_landing_zone_over_player_contact_zone":
+        if reclassification_reason in {
+            "court_landing_zone_over_player_contact_zone",
+            "direction_change_in_court_landing_zone_without_contact_support",
+        }:
             reason_codes.append("reclassified_from_hit_candidate")
         elif reclassification_reason == "player_contact_zone_over_court_landing_zone":
             reason_codes.append("reclassified_from_bounce_candidate")
@@ -5334,7 +5502,7 @@ def _rejection_diagnostic_from_candidate(
         "attempted_candidate_type": candidate.observation_type,
         "reason": decision_reason,
         "rejection_reasons": rejection_reasons,
-        "classification_priority": "side_zone_sequence_candidate_prior",
+        "classification_priority": LOCAL_EVIDENCE_CLASSIFICATION_PRIORITY,
     }
     if suppressed_by_observation_type is not None:
         candidate_decision["suppressed_by_observation_type"] = (
@@ -5519,7 +5687,10 @@ def _event_candidate_observation_create(
         "reason_codes": candidate.reason_codes,
         "confidence": candidate.confidence,
         "candidate_method": candidate.candidate_method,
-        "classification_priority": "side_zone_sequence_candidate_prior",
+        "classification_priority": candidate.candidate_decision.get(
+            "classification_priority",
+            LOCAL_EVIDENCE_CLASSIFICATION_PRIORITY,
+        ),
         "player_proximity_gate": candidate.player_proximity_gate,
         "candidate_decision": candidate.candidate_decision,
         "coordinate_space": CoordinateSpace.court_template_2d,
@@ -5570,6 +5741,8 @@ def _event_candidate_observation_create(
         payload["image_space_direction_change_recall"] = (
             candidate.image_space_direction_change_recall
         )
+    if candidate.local_evidence_event_type is not None:
+        payload["local_evidence_event_type"] = candidate.local_evidence_event_type
     if candidate.overlap_suppression is not None:
         payload["overlap_suppression"] = candidate.overlap_suppression
     if candidate.original_observation_type is not None:
@@ -6032,7 +6205,7 @@ def _register_model(session: Session) -> ModelRegistry:
         select(ModelRegistry)
         .where(
             ModelRegistry.name == "hit-bounce-candidate-evidence",
-            ModelRegistry.version == "v0.2.7",
+            ModelRegistry.version == LOCAL_EVIDENCE_EVENT_TYPE_CLASSIFIER_VERSION,
             ModelRegistry.model_family == "event_candidate",
             ModelRegistry.source == "apps.worker.services.hit_bounce_candidates",
         )
@@ -6042,7 +6215,7 @@ def _register_model(session: Session) -> ModelRegistry:
         return existing
     model = ModelRegistry(
         name="hit-bounce-candidate-evidence",
-        version="v0.2.7",
+        version=LOCAL_EVIDENCE_EVENT_TYPE_CLASSIFIER_VERSION,
         model_family="event_candidate",
         source="apps.worker.services.hit_bounce_candidates",
         metadata_jsonb={
@@ -6053,6 +6226,9 @@ def _register_model(session: Session) -> ModelRegistry:
             ),
             "image_space_direction_change_hit_candidate_method": (
                 IMAGE_SPACE_DIRECTION_CHANGE_HIT_CANDIDATE_METHOD
+            ),
+            "local_evidence_direction_change_bounce_candidate_method": (
+                LOCAL_EVIDENCE_DIRECTION_CHANGE_BOUNCE_CANDIDATE_METHOD
             ),
             "player_anchored_hit_candidate_method": PLAYER_ANCHORED_HIT_CANDIDATE_METHOD,
             "bounce_candidate_method": BOUNCE_CANDIDATE_METHOD,
@@ -6074,9 +6250,12 @@ def _create_runtime_config(
 ) -> RuntimeConfig:
     runtime_config = RuntimeConfig(
         config_name="hit-bounce-candidate-evidence-config",
-        config_version="v0.2.7",
+        config_version=LOCAL_EVIDENCE_EVENT_TYPE_CLASSIFIER_VERSION,
         payload_jsonb={
             "candidate_method": EVENT_CANDIDATE_METHOD,
+            "local_evidence_classification_version": (
+                LOCAL_EVIDENCE_EVENT_TYPE_CLASSIFIER_VERSION
+            ),
             "source_ball_trajectory_run_id": ball_trajectory_run_id,
             "source_court_projection_run_id": court_projection_run_id,
             "court_template_name": COURT_TEMPLATE_NAME,
@@ -6111,6 +6290,9 @@ def _create_run(
         runtime_config_id=runtime_config.id,
         metadata_jsonb={
             "candidate_method": EVENT_CANDIDATE_METHOD,
+            "local_evidence_classification_version": (
+                LOCAL_EVIDENCE_EVENT_TYPE_CLASSIFIER_VERSION
+            ),
             "source_ball_trajectory_run_id": ball_trajectory_run_id,
             "source_court_projection_run_id": court_projection_run_id,
             "evidence_source": "event_candidate",
@@ -6134,7 +6316,7 @@ def _create_step(
     now = datetime.now(UTC)
     step = ProcessingStep(
         run_id=run.id,
-        step_name="image_space_direction_change_hit_recall_v027",
+        step_name="local_evidence_event_type_classification_v028",
         step_status="running",
         started_at=now,
         runtime_config_id=runtime_config.id,

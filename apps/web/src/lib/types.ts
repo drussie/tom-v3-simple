@@ -1032,6 +1032,7 @@ export interface ReplayEventCandidateOverlay {
   net_axis_reversal_recall?: Record<string, unknown> | null;
   image_space_net_axis_reversal_recall?: Record<string, unknown> | null;
   image_space_direction_change_recall?: Record<string, unknown> | null;
+  local_evidence_event_type?: Record<string, unknown> | null;
   overlap_suppression?: Record<string, unknown> | null;
   source_ball_trajectory_run_id: string | null;
   source_ball_trajectory_observation_id: string | null;
@@ -1383,6 +1384,7 @@ export interface ReplayEventCandidateTimelineItem {
   net_axis_reversal_recall?: Record<string, unknown> | null;
   image_space_net_axis_reversal_recall?: Record<string, unknown> | null;
   image_space_direction_change_recall?: Record<string, unknown> | null;
+  local_evidence_event_type?: Record<string, unknown> | null;
   overlap_suppression?: Record<string, unknown> | null;
   source_ball_trajectory_observation_id: string | null;
   source_ball_court_projection_observation_id: string | null;

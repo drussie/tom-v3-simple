@@ -116,6 +116,10 @@ This registry makes TOM v3 Simple boundaries explicit.
   for additional airborne hit-like candidate recall. Player proximity is diagnostic only, and the
   signal can still be affected by camera perspective, occlusion, detection gaps, and projection
   artifacts. It does not prove racket contact.
+- Local-Evidence Event-Type Classification v0.2.8 classifies image-space direction-change
+  candidates as hit-like or bounce-like using local landing/contact evidence. It explicitly does
+  not require a prior bounce before a hit candidate, and sequence remains weak diagnostic context
+  only.
 - Hit/Bounce Side-Zone + Sequence Classification Repair v0.2.2 can reclassify raw hit/bounce
   candidates using court-side zones and a simple event-sequence prior. This improves operator-review
   labels, but the sequence prior is heuristic candidate evidence only and is not rally, point,

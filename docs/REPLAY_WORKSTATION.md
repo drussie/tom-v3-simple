@@ -745,6 +745,11 @@ Event candidate selected evidence shows the v0.2 physics fields when available: 
 net-axis reversal for hit candidates, and image-y descending-to-ascending proxy plus speed
 reduction for bounce candidates.
 
+Local-Evidence Event-Type Classification v0.2.8 adds selected evidence fields for image-space
+direction-change candidates. The panel shows `local_evidence_event_type`, whether sequence is a hard
+gate, and whether a hit requires a prior bounce. For v0.2.8, sequence is weak diagnostic context
+only and `hit_requires_prior_bounce` is always false.
+
 Player-anchored hit recall v0.2.3 adds `player_anchored_hit_recall` details for candidate hits
 recovered from wider ball windows around near/far main player projection anchors. Selected evidence
 shows the anchor track role candidate, anchor distance, incoming/current/outgoing frames, and

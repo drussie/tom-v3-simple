@@ -3072,9 +3072,47 @@ function SelectedEvidencePanel({
           value={
             item.candidate_sequence === null || item.candidate_sequence === undefined
               ? "n/a"
-              : `${String(item.candidate_sequence.previous_candidate_type ?? "start")} → expected ${String(
-                  item.candidate_sequence.expected_candidate_type ?? "n/a"
+              : `${String(item.candidate_sequence.previous_candidate_type ?? "start")} → hint ${String(
+                  item.candidate_sequence.sequence_context_hint ?? "n/a"
+                )} (${String(item.candidate_sequence.sequence_prior_strength ?? "weak")})`
+          }
+        />
+        <DetailRow
+          label="sequence hard gate"
+          value={
+            item.candidate_sequence === null || item.candidate_sequence === undefined
+              ? "n/a"
+              : String(item.candidate_sequence.sequence_is_hard_gate ?? "false")
+          }
+        />
+        <DetailRow
+          label="hit requires prior bounce"
+          value={
+            item.candidate_sequence === null || item.candidate_sequence === undefined
+              ? "n/a"
+              : String(item.candidate_sequence.hit_requires_prior_bounce ?? "false")
+          }
+        />
+        <DetailRow
+          label="local evidence type"
+          value={
+            item.local_evidence_event_type === null ||
+            item.local_evidence_event_type === undefined
+              ? "n/a"
+              : `${String(
+                  item.local_evidence_event_type.original_candidate_type ?? "n/a"
+                )} → ${String(
+                  item.local_evidence_event_type.selected_candidate_type ?? "n/a"
                 )}`
+          }
+        />
+        <DetailRow
+          label="local evidence reason"
+          value={
+            item.local_evidence_event_type === null ||
+            item.local_evidence_event_type === undefined
+              ? "n/a"
+              : String(item.local_evidence_event_type.classification_reason ?? "n/a")
           }
         />
         <DetailRow

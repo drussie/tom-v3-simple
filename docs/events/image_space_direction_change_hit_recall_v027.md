@@ -97,3 +97,12 @@ This is a recall heuristic for operator review. A 2D image direction change can 
 perspective, detection gaps, occlusion, projection artifacts, or a real hit-like event. It does not
 prove racket contact and does not establish bounce truth, in/out, scoring, rally/point state,
 player identity, accepted/rejected lifecycle, or adjudication.
+
+## v0.2.8 Follow-Up
+
+Local-Evidence Event-Type Classification v0.2.8 keeps this recall path but no longer treats every
+image-space direction-change candidate as hit-like by default. The local classifier can keep a
+direction change as `hit_candidate` when it looks airborne/contact-like, or reclassify it to
+`bounce_candidate` when it occurs in an obvious court landing zone without player-contact support.
+
+Sequence is weak diagnostic context only. A hit candidate does not require a prior bounce.
