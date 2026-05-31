@@ -770,6 +770,13 @@ operator workflow: a short JSON response with run ids, replay URL, counts, activ
 `marker_summary` row per visible hit/bounce marker. Full diagnostic dumps remain available through
 explicit verbose/debug flags and still do not change replay evidence or truth status.
 
+Replay Marker Inspector v0 exposes that compact marker summary in the workstation. Clicking a
+visible `HIT CANDIDATE` or `BOUNCE CANDIDATE` marker in the video overlay, mini-map, or timeline
+opens a compact evidence card with frame/time, source method, confidence, marker-level arbitration
+decision/reason, image coordinates, court coordinates, and candidate-only warnings. The full
+selected evidence panel remains available for deeper diagnostics. The inspector is display-only; it
+does not create hit truth, bounce truth, in/out, score, or adjudication.
+
 Player-anchored hit recall v0.2.3 adds `player_anchored_hit_recall` details for candidate hits
 recovered from wider ball windows around near/far main player projection anchors. Selected evidence
 shows the anchor track role candidate, anchor distance, incoming/current/outgoing frames, and

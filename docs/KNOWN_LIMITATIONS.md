@@ -48,6 +48,9 @@ This registry makes TOM v3 Simple boundaries explicit.
 - Hit/bounce rejection diagnostics explain why evaluated contexts were not emitted, deduped, or
   suppressed. They are diagnostic evidence only and do not create an accepted/rejected truth
   lifecycle.
+- Replay Marker Inspector shows compact source method, timing, confidence, coordinate, and
+  marker-level arbitration details for selected visible hit/bounce markers. It is an operator
+  evidence display only and does not create hit truth, bounce truth, in/out, score, or adjudication.
 - Replay current-only, short-trail, and full-trail controls are display policy only; they do not change persisted evidence or prove tracking correctness.
 - Motion smoothing creates derived replay candidate evidence only. Smoothed ball, player-box, and pose candidates can reduce jitter, but they are not true ball positions, confirmed player boxes, actual pose, trajectory physics, bounce/hit/in-out, point, or score.
 - TOM v1 model binaries may exist locally, but they are intentionally not tracked or uploaded.

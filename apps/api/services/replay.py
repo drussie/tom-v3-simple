@@ -348,6 +348,15 @@ def build_replay_overlay_chunk(
         if "bounce_candidates" in layers
         else []
     )
+    marker_summary = (
+        build_event_candidate_marker_summary(
+            session=session,
+            media=media,
+            event_candidate_run_id=event_candidate_run_id,
+        )
+        if "hit_candidates" in layers or "bounce_candidates" in layers
+        else []
+    )
     return {
         "media_id": media.id,
         "start_ms": start_ms,
@@ -372,6 +381,7 @@ def build_replay_overlay_chunk(
         "ball_court_trajectory": ball_court_trajectory,
         "hit_candidates": hit_candidates,
         "bounce_candidates": bounce_candidates,
+        "marker_summary": marker_summary,
         "court_temporal_persistence": court_temporal_persistence,
         "court_persistence_max_gap_ms": court_persistence_max_gap_ms,
         "observation_only": True,
@@ -433,6 +443,11 @@ def build_replay_timeline(
         "observation_only": True,
         "no_adjudication": True,
         "annotations_without_time_count": annotations_without_time_count,
+        "marker_summary": build_event_candidate_marker_summary(
+            session=session,
+            media=media,
+            event_candidate_run_id=event_candidate_run_id,
+        ),
         "lanes": [
             {
                 "lane_type": "detections",
@@ -1195,6 +1210,81 @@ def build_event_candidate_timeline_items(
     return items
 
 
+def build_event_candidate_marker_summary(
+    session: Session,
+    *,
+    media: MediaAsset,
+    event_candidate_run_id: str | None = None,
+) -> list[dict[str, Any]]:
+    rows = _event_candidate_rows(
+        session=session,
+        media=media,
+        start_ms=0,
+        end_ms=0,
+        event_candidate_run_id=event_candidate_run_id,
+        observation_type=None,
+        persistent_run_markers=True,
+    )
+    items: list[dict[str, Any]] = []
+    for row in rows:
+        overlay_item = event_candidate_overlay_item_from_observation(
+            row,
+            session=session,
+            media_id=media.id,
+        )
+        if overlay_item is None:
+            continue
+        items.append(_event_candidate_marker_summary_item(overlay_item))
+
+    items.sort(
+        key=lambda item: (
+            item["timestamp_ms"],
+            item["frame"],
+            str(item["candidate_type"]),
+            str(item["observation_id"]),
+        )
+    )
+    for index, item in enumerate(items, start=1):
+        item["index"] = index
+    return items
+
+
+def _event_candidate_marker_summary_item(
+    item: dict[str, Any],
+) -> dict[str, Any]:
+    court_point = item["court_point"]
+    image_point = item.get("image_point")
+    marker_arbitration = (
+        item.get("marker_level_arbitration")
+        if isinstance(item.get("marker_level_arbitration"), dict)
+        else {}
+    )
+    return {
+        "index": 0,
+        "observation_id": item["observation_id"],
+        "candidate_type": item["candidate_type"],
+        "frame": item["frame_number"],
+        "timestamp_ms": item["timestamp_ms"],
+        "source_method": item.get("original_candidate_method") or item.get("candidate_method"),
+        "candidate_method": item.get("candidate_method"),
+        "original_candidate_type": item.get("original_candidate_type"),
+        "original_candidate_method": item.get("original_candidate_method"),
+        "arbitration_decision": _string_or_none(marker_arbitration.get("decision")),
+        "arbitration_reason": _string_or_none(marker_arbitration.get("reason")),
+        "court_x": _numeric(court_point.get("x")),
+        "court_y": _numeric(court_point.get("y")),
+        "image_x": _numeric(image_point.get("x")) if isinstance(image_point, dict) else None,
+        "image_y": _numeric(image_point.get("y")) if isinstance(image_point, dict) else None,
+        "confidence": item.get("confidence"),
+        "candidate_only": True,
+        "not_hit_truth": True,
+        "not_bounce_truth": True,
+        "not_in_out_truth": True,
+        "observation_only": True,
+        "no_adjudication": True,
+    }
+
+
 def event_candidate_timeline_item_from_observation(
     observation: Observation,
     *,
@@ -1220,6 +1310,8 @@ def event_candidate_timeline_item_from_observation(
         "confidence": overlay_item["confidence"],
         "reason_codes": overlay_item["reason_codes"],
         "candidate_method": overlay_item["candidate_method"],
+        "original_candidate_type": overlay_item["original_candidate_type"],
+        "original_candidate_method": overlay_item["original_candidate_method"],
         "classification_priority": overlay_item["classification_priority"],
         "player_proximity_gate": overlay_item["player_proximity_gate"],
         "candidate_decision": overlay_item["candidate_decision"],
@@ -2189,6 +2281,12 @@ def event_candidate_overlay_item_from_observation(
         "confidence": observation.confidence,
         "reason_codes": payload.get("reason_codes") or [],
         "candidate_method": _string_or_none(payload.get("candidate_method")),
+        "original_candidate_type": _string_or_none(
+            payload.get("original_candidate_type")
+        ),
+        "original_candidate_method": _string_or_none(
+            payload.get("original_candidate_method")
+        ),
         "classification_priority": _string_or_none(
             payload.get("classification_priority")
         ),

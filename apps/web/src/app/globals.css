@@ -1413,6 +1413,119 @@ pre {
   padding: 14px;
 }
 
+.replay-marker-inspector {
+  border-color: rgba(148, 163, 184, 0.32);
+}
+
+.replay-marker-inspector.hit {
+  border-color: rgba(255, 45, 85, 0.42);
+}
+
+.replay-marker-inspector.bounce {
+  border-color: rgba(34, 211, 238, 0.42);
+}
+
+.marker-inspector-body {
+  display: grid;
+  gap: 12px;
+}
+
+.marker-inspector-hero {
+  align-items: center;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 34px minmax(0, 1fr);
+  min-width: 0;
+}
+
+.marker-inspector-hero strong,
+.marker-inspector-hero span {
+  display: block;
+  min-width: 0;
+}
+
+.marker-inspector-hero strong {
+  font-size: 13px;
+}
+
+.marker-inspector-hero span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.marker-inspector-icon {
+  display: block;
+  height: 26px;
+  width: 26px;
+}
+
+.marker-inspector-icon.hit {
+  background: #ff2d55;
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+  filter: drop-shadow(0 0 8px rgba(255, 45, 85, 0.75));
+}
+
+.marker-inspector-icon.bounce {
+  border: 4px solid #22d3ee;
+  border-radius: 999px;
+  box-shadow: 0 0 10px rgba(34, 211, 238, 0.72);
+}
+
+.marker-inspector-grid {
+  display: grid;
+  gap: 8px;
+}
+
+.marker-inspector-row {
+  border-left: 3px solid var(--line);
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+  padding-left: 10px;
+}
+
+.marker-inspector-row strong {
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.marker-inspector-row span {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 12px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.marker-type-pill.hit {
+  border-color: rgba(255, 45, 85, 0.5);
+  color: #ff8aa0;
+}
+
+.marker-type-pill.bounce {
+  border-color: rgba(34, 211, 238, 0.5);
+  color: #67e8f9;
+}
+
+.marker-inspector-note,
+.marker-inspector-warning {
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1.35;
+  margin: 0;
+  padding: 9px;
+}
+
+.marker-inspector-note {
+  background: rgba(148, 163, 184, 0.1);
+  color: var(--muted);
+}
+
+.marker-inspector-warning {
+  background: rgba(250, 204, 21, 0.1);
+  border: 1px solid rgba(250, 204, 21, 0.25);
+  color: #facc15;
+}
+
 .media-grid {
   display: grid;
   grid-template-columns: minmax(0, 1.2fr) repeat(4, minmax(90px, 1fr));

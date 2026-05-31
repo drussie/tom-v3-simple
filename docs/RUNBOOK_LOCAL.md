@@ -885,6 +885,12 @@ active versions, candidate-only warnings, and a deterministic `marker_summary` w
 final visible hit/bounce marker. It omits the full `observation_ids` list and nested
 `candidate_summary` diagnostics unless requested.
 
+Replay Marker Inspector v0 exposes the same compact marker information in the replay UI. Open a
+replay with `eventCandidateRunId=<event_candidate_run_id>`, then click a `HIT CANDIDATE` or
+`BOUNCE CANDIDATE` marker in the video overlay, mini-map, or event timeline. The side panel shows a
+compact selected-marker card with source method, frame/time, confidence, marker-level arbitration
+decision/reason, image/court coordinates, and candidate-only warnings.
+
 Deep diagnostic output remains available:
 
 ```bash

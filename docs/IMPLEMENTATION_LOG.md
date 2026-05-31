@@ -1,5 +1,36 @@
 # TOM v3 Simple - Implementation Log
 
+## Replay Marker Inspector v0
+
+Status: complete when accepted
+
+### Goal
+
+Let replay operators click visible hit/bounce candidate markers and inspect compact candidate
+evidence without opening terminal/debug JSON.
+
+### Outcome
+
+The milestone adds:
+
+- replay API `marker_summary` rows on timeline and event overlay responses
+- deterministic marker ordering by timestamp, frame, candidate type, and observation id
+- compact marker rows with source method, confidence, marker-level arbitration decision/reason,
+  image coordinates, court coordinates, and candidate-only warning flags
+- `ReplayMarkerInspector` in the replay side panel
+- empty-state guidance when no marker is selected
+- selected marker display for video, mini-map, or timeline selections
+
+### Non-goals
+
+- No hit/bounce candidate logic changes.
+- No marker-level arbitration changes.
+- No persisted source evidence mutation.
+- No hit truth or bounce truth.
+- No in/out, rally, point, or score.
+- No accepted/rejected lifecycle.
+- No adjudication.
+
 ## Compact CLI + Marker Summary v0
 
 Status: complete when accepted

@@ -43,6 +43,7 @@ import type {
   ReplayMainPlayerCourtProjectionOverlay,
   ReplayInfo,
   ReplayLayerPreset,
+  ReplayMarkerSummary,
   ReplayMainPlayerTrackOverlay,
   ReplayMode,
   ReplayOverlayDisplayMode,
@@ -69,6 +70,7 @@ import { ReplayDetectionOverlay as ReplayDetectionOverlayLayer } from "./ReplayD
 import { ReplayEventCandidateVideoOverlay } from "./ReplayEventCandidateVideoOverlay";
 import { ReplayEvidenceTimeline } from "./ReplayEvidenceTimeline";
 import { ReplayMainPlayerTrackOverlay as ReplayMainPlayerTrackOverlayLayer } from "./ReplayMainPlayerTrackOverlay";
+import { ReplayMarkerInspector } from "./ReplayMarkerInspector";
 import { ReplayPoseOverlay as ReplayPoseOverlayLayer } from "./ReplayPoseOverlay";
 import { ReplaySmoothedMotionOverlay as ReplaySmoothedMotionOverlayLayer } from "./ReplaySmoothedMotionOverlay";
 import { ReplayTrackletOverlay as ReplayTrackletOverlayLayer } from "./ReplayTrackletOverlay";
@@ -1108,6 +1110,12 @@ export function ReplayWorkstation({
     selectedEvidence?.kind === "event_candidate_timeline"
       ? selectedEvidence.item.observation_id
       : null;
+  const markerSummaries =
+    timelineState.timeline?.marker_summary ?? overlayState.chunk?.marker_summary ?? [];
+  const selectedMarkerSummary = useMemo(
+    () => selectedMarkerSummaryFromEvidence(selectedEvidence, markerSummaries),
+    [markerSummaries, selectedEvidence]
+  );
   const selectedTimelineKey = selectedTimelineItemKey(selectedEvidence);
 
   return (
@@ -1503,6 +1511,10 @@ export function ReplayWorkstation({
         </div>
         <aside className="side-column">
           <ReplayMediaPanel replayInfo={replayInfo} />
+          <ReplayMarkerInspector
+            markerCount={markerSummaries.length}
+            selectedMarker={selectedMarkerSummary}
+          />
           <SelectedEvidencePanel selectedEvidence={selectedEvidence} />
           <AvailableRunsPanel replayInfo={replayInfo} />
         </aside>
@@ -2271,6 +2283,64 @@ function SelectedRunContext({
       </div>
     </section>
   );
+}
+
+function selectedMarkerSummaryFromEvidence(
+  selectedEvidence: SelectedReplayEvidence | null,
+  markerSummaries: ReplayMarkerSummary[]
+): ReplayMarkerSummary | null {
+  if (
+    selectedEvidence === null ||
+    (selectedEvidence.kind !== "event_candidate" &&
+      selectedEvidence.kind !== "event_candidate_timeline")
+  ) {
+    return null;
+  }
+  const item = selectedEvidence.item;
+  return (
+    markerSummaries.find((marker) => marker.observation_id === item.observation_id) ??
+    markerSummaryFromEventCandidate(item)
+  );
+}
+
+function markerSummaryFromEventCandidate(
+  item:
+    | ReplayEventCandidateOverlay
+    | Extract<ReplayTimelineItem, { item_type: "hit_candidate" | "bounce_candidate" }>
+): ReplayMarkerSummary {
+  const arbitration =
+    item.marker_level_arbitration !== null && item.marker_level_arbitration !== undefined
+      ? item.marker_level_arbitration
+      : {};
+  return {
+    index: 0,
+    observation_id: item.observation_id,
+    candidate_type: item.candidate_type,
+    frame: item.frame_number,
+    timestamp_ms: item.timestamp_ms,
+    source_method: item.original_candidate_method ?? item.candidate_method,
+    candidate_method: item.candidate_method,
+    original_candidate_type: item.original_candidate_type ?? null,
+    original_candidate_method: item.original_candidate_method ?? null,
+    arbitration_decision: stringFromRecord(arbitration, "decision"),
+    arbitration_reason: stringFromRecord(arbitration, "reason"),
+    confidence: item.confidence,
+    court_x: item.court_point.x,
+    court_y: item.court_point.y,
+    image_x: item.image_point?.x ?? null,
+    image_y: item.image_point?.y ?? null,
+    candidate_only: item.candidate_only,
+    not_hit_truth: item.not_hit_truth,
+    not_bounce_truth: item.not_bounce_truth,
+    not_in_out_truth: item.not_in_out_truth,
+    observation_only: item.observation_only,
+    no_adjudication: item.no_adjudication
+  };
+}
+
+function stringFromRecord(record: Record<string, unknown>, key: string): string | null {
+  const value = record[key];
+  return typeof value === "string" ? value : null;
 }
 
 function SelectedEvidencePanel({

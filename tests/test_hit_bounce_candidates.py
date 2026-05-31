@@ -17,8 +17,11 @@ from tom_v3_storage.db_models import (
 )
 
 from apps.api.services.replay import (
+    build_event_candidate_marker_summary,
     build_event_candidate_overlay_items,
     build_event_candidate_timeline_items,
+    build_replay_overlay_chunk,
+    build_replay_timeline,
 )
 from apps.worker.cli import (
     _format_hit_bounce_cli_result,
@@ -2195,6 +2198,74 @@ def test_event_candidate_replay_payloads_are_exposed(db_session: Session) -> Non
     assert [item["observation_id"] for item in persistent_overlays] == [
         overlays[0]["observation_id"]
     ]
+
+
+def test_replay_marker_summary_exposes_compact_final_markers(
+    db_session: Session,
+) -> None:
+    media = _seed_media(db_session)
+    trajectory_run, _ = _seed_trajectory_run(
+        db_session,
+        media.id,
+        points=[
+            (0, 0, 0.20, 0.35),
+            (1, 33, 0.30, 0.20),
+            (2, 66, 0.40, 0.35),
+        ],
+    )
+    projection_run = _seed_projection_run(
+        db_session,
+        media.id,
+        players=[(1, 33, 0.31, 0.22, "near_player_track_candidate")],
+    )
+    result = build_hit_bounce_candidates(
+        session=db_session,
+        media_id=media.id,
+        ball_trajectory_run_id=trajectory_run.id,
+        court_projection_run_id=projection_run.id,
+    )
+
+    marker_summary = build_event_candidate_marker_summary(
+        session=db_session,
+        media=media,
+        event_candidate_run_id=result["event_candidate_run_id"],
+    )
+    timeline = build_replay_timeline(
+        db_session,
+        media_id=media.id,
+        event_candidate_run_id=result["event_candidate_run_id"],
+    )
+    overlay_chunk = build_replay_overlay_chunk(
+        db_session,
+        media_id=media.id,
+        start_ms=0,
+        end_ms=200,
+        layers={"hit_candidates", "bounce_candidates"},
+        event_candidate_run_id=result["event_candidate_run_id"],
+    )
+
+    assert len(marker_summary) == 1
+    marker = marker_summary[0]
+    assert marker["index"] == 1
+    assert marker["candidate_type"] == "hit_candidate"
+    assert marker["frame"] == 1
+    assert marker["timestamp_ms"] == 33
+    assert marker["source_method"] == HIT_CANDIDATE_METHOD
+    assert marker["arbitration_decision"] == "keep_hit"
+    assert marker["arbitration_reason"] == "local_event_evidence_supported_hit"
+    assert marker["court_x"] == 0.3
+    assert marker["court_y"] == 0.2
+    assert marker["image_x"] == 300.0
+    assert marker["image_y"] == 100.0
+    assert marker["candidate_only"] is True
+    assert marker["not_hit_truth"] is True
+    assert marker["not_bounce_truth"] is True
+    assert marker["not_in_out_truth"] is True
+    assert marker["no_adjudication"] is True
+    assert timeline is not None
+    assert timeline["marker_summary"] == marker_summary
+    assert overlay_chunk is not None
+    assert overlay_chunk["marker_summary"] == marker_summary
 
 
 def test_event_candidate_replay_payload_handles_missing_source_image_point(

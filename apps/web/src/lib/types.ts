@@ -1016,6 +1016,8 @@ export interface ReplayEventCandidateOverlay {
   confidence: number | null;
   reason_codes: string[];
   candidate_method: string | null;
+  original_candidate_type?: string | null;
+  original_candidate_method?: string | null;
   classification_priority: string | null;
   player_proximity_gate: ReplayEventCandidatePlayerProximityGate | null;
   candidate_decision: ReplayEventCandidateDecision | null;
@@ -1085,6 +1087,7 @@ export interface ReplayOverlayChunk {
   ball_court_trajectory: ReplayBallCourtTrajectoryOverlay[];
   hit_candidates: ReplayEventCandidateOverlay[];
   bounce_candidates: ReplayEventCandidateOverlay[];
+  marker_summary: ReplayMarkerSummary[];
   court_temporal_persistence?: ReplayCourtTemporalPersistence | string;
   court_persistence_max_gap_ms?: number;
   observation_only: boolean;
@@ -1370,6 +1373,8 @@ export interface ReplayEventCandidateTimelineItem {
   confidence: number | null;
   reason_codes: string[];
   candidate_method: string | null;
+  original_candidate_type?: string | null;
+  original_candidate_method?: string | null;
   classification_priority: string | null;
   player_proximity_gate: ReplayEventCandidatePlayerProximityGate | null;
   candidate_decision: ReplayEventCandidateDecision | null;
@@ -1393,6 +1398,31 @@ export interface ReplayEventCandidateTimelineItem {
   source_ball_trajectory_observation_id: string | null;
   source_ball_court_projection_observation_id: string | null;
   source_player_court_projection_observation_id: string | null;
+  candidate_only: boolean;
+  not_hit_truth: boolean;
+  not_bounce_truth: boolean;
+  not_in_out_truth: boolean;
+  observation_only: boolean;
+  no_adjudication: boolean;
+}
+
+export interface ReplayMarkerSummary {
+  index: number;
+  observation_id: string;
+  candidate_type: "hit_candidate" | "bounce_candidate" | string;
+  frame: number;
+  timestamp_ms: number;
+  source_method?: string | null;
+  candidate_method?: string | null;
+  original_candidate_type?: string | null;
+  original_candidate_method?: string | null;
+  arbitration_decision?: string | null;
+  arbitration_reason?: string | null;
+  confidence?: number | null;
+  court_x?: number | null;
+  court_y?: number | null;
+  image_x?: number | null;
+  image_y?: number | null;
   candidate_only: boolean;
   not_hit_truth: boolean;
   not_bounce_truth: boolean;
@@ -1464,6 +1494,7 @@ export interface ReplayTimeline {
   observation_only: boolean;
   no_adjudication: boolean;
   annotations_without_time_count: number;
+  marker_summary: ReplayMarkerSummary[];
   lanes: ReplayTimelineLane[];
 }
 
