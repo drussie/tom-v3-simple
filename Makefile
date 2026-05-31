@@ -51,6 +51,8 @@ VERBOSE ?= false
 HIT_BOUNCE_VERBOSE ?= false
 INCLUDE_OBSERVATION_IDS ?= false
 DIAGNOSTIC_SUMMARY ?= compact
+POINT_SNAPSHOT_FORMAT ?= json
+POINT_SNAPSHOT_OUTPUT ?=
 HOMOGRAPHY_MAX_GAP_MS ?= 1500
 BALL_TRAJECTORY_MAX_GAP_FRAMES ?= 6
 BALL_TRAJECTORY_MAX_GAP_MS ?= 250
@@ -119,7 +121,7 @@ DERIVE_LINES ?= true
 
 export TOM_V3_DATABASE_URL
 
-.PHONY: install web-install test lint migrate api seed verify index-media run-gameplay index-and-run-gameplay run-detection index-and-run-detection extract-frame-artifacts build-tracklets run-pose export-tracklet-review-dataset court-review-export demo demo-fixture demo-plan demo-reset demo-export demo-open replay-open completion-audit completion-check yolo-probe yolo-smoke yolo-runtime-probe register-yolo-model smoke-real-yolo-local real-detection real-pose tom-v1-yolo-probe tom-v1-ball-detection tom-v1-player-detection tom-v1-tracklets tom-v1-main-subjects tom-v1-main-player-tracks tom-v1-pose tom-v1-pose-main-subjects tom-v1-pose-main-tracks tom-v1-motion-smoothing tom-v1-court-keypoints-probe tom-v1-court-keypoints tom-v1-court-keypoint-audit tom-v1-object-court-projection tom-v1-ball-court-trajectory tom-v1-hit-bounce-candidates tom-v1-hit-bounce-candidates-verbose court-fixture homography-candidates projection-diagnostics web web-build web-lint smoke all-checks
+.PHONY: install web-install test lint migrate api seed verify index-media run-gameplay index-and-run-gameplay run-detection index-and-run-detection extract-frame-artifacts build-tracklets run-pose export-tracklet-review-dataset court-review-export demo demo-fixture demo-plan demo-reset demo-export demo-open replay-open completion-audit completion-check yolo-probe yolo-smoke yolo-runtime-probe register-yolo-model smoke-real-yolo-local real-detection real-pose tom-v1-yolo-probe tom-v1-ball-detection tom-v1-player-detection tom-v1-tracklets tom-v1-main-subjects tom-v1-main-player-tracks tom-v1-pose tom-v1-pose-main-subjects tom-v1-pose-main-tracks tom-v1-motion-smoothing tom-v1-court-keypoints-probe tom-v1-court-keypoints tom-v1-court-keypoint-audit tom-v1-object-court-projection tom-v1-ball-court-trajectory tom-v1-hit-bounce-candidates tom-v1-hit-bounce-candidates-verbose tom-v1-point-evidence-snapshot court-fixture homography-candidates projection-diagnostics web web-build web-lint smoke all-checks
 
 install:
 	$(PYTHON) -m pip install -e ".[dev]"
@@ -330,6 +332,11 @@ tom-v1-hit-bounce-candidates:
 
 tom-v1-hit-bounce-candidates-verbose:
 	$(MAKE) tom-v1-hit-bounce-candidates HIT_BOUNCE_VERBOSE=true INCLUDE_OBSERVATION_IDS=true DIAGNOSTIC_SUMMARY=full
+
+tom-v1-point-evidence-snapshot:
+	@if [ -z "$(MEDIA_ID)" ]; then echo "MEDIA_ID is required: make tom-v1-point-evidence-snapshot MEDIA_ID=<media_id>"; exit 1; fi
+	@if [ -z "$(EVENT_CANDIDATE_RUN_ID)" ]; then echo "EVENT_CANDIDATE_RUN_ID is required: make tom-v1-point-evidence-snapshot EVENT_CANDIDATE_RUN_ID=<event_candidate_run_id>"; exit 1; fi
+	$(PYTHON) -m apps.worker.cli build-point-evidence-snapshot --media-id "$(MEDIA_ID)" --event-candidate-run-id "$(EVENT_CANDIDATE_RUN_ID)" --viewer-base-url "$(VIEWER_BASE_URL)" --format "$(POINT_SNAPSHOT_FORMAT)" $(if $(POINT_SNAPSHOT_OUTPUT),--output "$(POINT_SNAPSHOT_OUTPUT)",)
 
 tom-v1-court-keypoints-probe:
 	$(PYTHON) -m apps.worker.cli tom-v1-court-keypoints-probe --weights "$(TOM_V1_MODEL_ROOT)/keypoints_model.pth" --allowed-root "$(TOM_V1_MODEL_ROOT)"

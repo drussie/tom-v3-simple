@@ -139,6 +139,9 @@ This registry makes TOM v3 Simple boundaries explicit.
 - Event Candidate Review Panel v0 is a replay navigation surface for final visible hit/bounce
   markers. It does not change candidate generation, arbitration, truth status, in/out, score, or
   adjudication.
+- Point Evidence Snapshot v0 creates compact run reports for operator review and regression
+  comparison. Snapshots preserve candidate-only warnings and do not make markers true, in/out,
+  scoring, or adjudicated outcomes.
 - Hit/Bounce Side-Zone + Sequence Classification Repair v0.2.2 can reclassify raw hit/bounce
   candidates using court-side zones and a simple event-sequence prior. This improves operator-review
   labels, but the sequence prior is heuristic candidate evidence only and is not rally, point,

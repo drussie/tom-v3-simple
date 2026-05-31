@@ -56,6 +56,7 @@ from apps.worker.services.hit_bounce_candidates import (
     suppress_weak_image_space_direction_change_hits_overlapping_bounces,
     suppress_weak_net_axis_reversal_hits_overlapping_bounces,
 )
+from apps.worker.services.point_evidence_snapshot import build_point_evidence_snapshot
 
 
 @pytest.fixture()
@@ -2266,6 +2267,109 @@ def test_replay_marker_summary_exposes_compact_final_markers(
     assert timeline["marker_summary"] == marker_summary
     assert overlay_chunk is not None
     assert overlay_chunk["marker_summary"] == marker_summary
+
+
+def test_point_evidence_snapshot_summarizes_final_markers(
+    db_session: Session,
+) -> None:
+    media = _seed_media(db_session)
+    trajectory_run, _ = _seed_trajectory_run(
+        db_session,
+        media.id,
+        points=[
+            (0, 0, 0.20, 0.35),
+            (1, 33, 0.30, 0.20),
+            (2, 66, 0.40, 0.35),
+        ],
+    )
+    projection_run = _seed_projection_run(
+        db_session,
+        media.id,
+        players=[(1, 33, 0.31, 0.22, "near_player_track_candidate")],
+    )
+    result = build_hit_bounce_candidates(
+        session=db_session,
+        media_id=media.id,
+        ball_trajectory_run_id=trajectory_run.id,
+        court_projection_run_id=projection_run.id,
+    )
+
+    snapshot = build_point_evidence_snapshot(
+        session=db_session,
+        media_id=media.id,
+        event_candidate_run_id=result["event_candidate_run_id"],
+        viewer_base_url="http://127.0.0.1:3000",
+    )
+
+    assert snapshot["ok"] is True
+    assert snapshot["snapshot_type"] == "point_evidence_snapshot"
+    assert snapshot["snapshot_version"] == "v0"
+    assert snapshot["media_id"] == media.id
+    assert snapshot["event_candidate_run_id"] == result["event_candidate_run_id"]
+    assert snapshot["replay_url"].endswith(
+        f"eventCandidateRunId={result['event_candidate_run_id']}"
+    )
+    assert snapshot["source_run_ids"] == {
+        "ball_trajectory_run_id": trajectory_run.id,
+        "court_projection_run_id": projection_run.id,
+    }
+    assert snapshot["observations"]["hit_candidate"] == 1
+    assert snapshot["observations"]["bounce_candidate"] == 0
+    assert snapshot["observations"]["total"] >= 1
+    assert snapshot["active_versions"]["physics_heuristic"] == "v0.3.1"
+    assert snapshot["active_versions"]["marker_level_arbitration"] == "v0.3.1"
+    assert len(snapshot["marker_summary"]) == 1
+    assert snapshot["marker_summary"][0]["index"] == 1
+    assert snapshot["marker_summary"][0]["candidate_type"] == "hit_candidate"
+    assert "observation_id" not in snapshot["marker_summary"][0]
+    assert snapshot["warnings"]["candidate_only"] is True
+    assert snapshot["warnings"]["not_in_out_truth"] is True
+    assert snapshot["warnings"]["no_score_or_point_truth"] is True
+    assert "No in/out decision." in snapshot["known_limitations"]
+
+
+def test_point_evidence_snapshot_markdown_format(
+    db_session: Session,
+    tmp_path,
+) -> None:
+    media = _seed_media(db_session)
+    trajectory_run, _ = _seed_trajectory_run(
+        db_session,
+        media.id,
+        points=[
+            (0, 0, 0.20, 0.35),
+            (1, 33, 0.30, 0.20),
+            (2, 66, 0.40, 0.35),
+        ],
+    )
+    projection_run = _seed_projection_run(
+        db_session,
+        media.id,
+        players=[(1, 33, 0.31, 0.22, "near_player_track_candidate")],
+    )
+    result = build_hit_bounce_candidates(
+        session=db_session,
+        media_id=media.id,
+        ball_trajectory_run_id=trajectory_run.id,
+        court_projection_run_id=projection_run.id,
+    )
+    output_path = tmp_path / "point_snapshot.md"
+
+    snapshot = build_point_evidence_snapshot(
+        session=db_session,
+        media_id=media.id,
+        event_candidate_run_id=result["event_candidate_run_id"],
+        output_format="markdown",
+        output_path=str(output_path),
+    )
+
+    assert snapshot["ok"] is True
+    assert "markdown" in snapshot
+    assert "# Point Evidence Snapshot v0" in snapshot["markdown"]
+    assert "| # | Type | Frame | Time ms | Confidence | Source | Decision |" in snapshot["markdown"]
+    assert "| 1 | HIT | 1 | 33 |" in snapshot["markdown"]
+    assert "- Not hit truth." in snapshot["markdown"]
+    assert output_path.read_text(encoding="utf-8") == snapshot["markdown"]
 
 
 def test_event_candidate_replay_payload_handles_missing_source_image_point(

@@ -782,6 +782,12 @@ from `marker_summary`. Clicking a row seeks replay to that marker timestamp, sel
 updates the Replay Marker Inspector. The panel is an operator navigation surface only; it does not
 change event candidate generation, arbitration, truth status, in/out, score, or adjudication.
 
+Point Evidence Snapshot v0 adds a worker command and Make helper for freezing the current point/run
+state into a compact report. The snapshot records replay URL, source run ids, counts, active
+versions, final marker summary, warnings, and known limitations. It is a reporting artifact for
+operator review/regression comparison only; it does not create truth, in/out, score, or
+adjudication.
+
 Player-anchored hit recall v0.2.3 adds `player_anchored_hit_recall` details for candidate hits
 recovered from wider ball windows around near/far main player projection anchors. Selected evidence
 shows the anchor track role candidate, anchor distance, incoming/current/outgoing frames, and

@@ -2712,3 +2712,26 @@ detail surfaces.
 This is an operator navigation surface only. It does not change hit/bounce generation,
 marker-level arbitration, truth status, in/out, score, player identity, accepted/rejected lifecycle,
 or adjudication.
+
+## Point Evidence Snapshot v0
+
+Status: complete
+
+### Goal
+
+Create a compact, durable point/run snapshot for operator review and regression comparison.
+
+### Notes
+
+This milestone adds:
+
+- `build-point-evidence-snapshot` worker CLI command
+- `tom-v1-point-evidence-snapshot` Make helper
+- JSON snapshot output by default
+- optional markdown report body/file output
+- replay URL, source run ids, counts, active versions, final marker summary, warnings, and known
+  limitations
+
+The snapshot reads existing event candidate runs and final marker summaries. It does not change
+hit/bounce generation, marker-level arbitration, replay marker behavior, persisted source evidence,
+truth status, in/out, score, player identity, accepted/rejected lifecycle, or adjudication.

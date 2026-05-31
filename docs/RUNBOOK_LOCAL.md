@@ -1501,6 +1501,10 @@ python -m apps.worker.cli completion-audit --no-demo-only
   operators can review final visible hit/bounce markers, click rows to seek/select markers, and
   inspect compact candidate evidence without terminal JSON. This is display-only and does not
   create truth, in/out, score, or adjudication.
+- Point Evidence Snapshot v0 can freeze a specific media/event-candidate run into a compact JSON or
+  markdown report with replay URL, source run ids, counts, active versions, final markers, warnings,
+  and known limitations. It is report-only and does not create truth, in/out, score, or
+  adjudication.
 - Cloud deployment, auth, production streaming, and multi-camera reasoning are out of scope.
 
 ## 15. Completion Checklist

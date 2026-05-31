@@ -40,6 +40,7 @@ from apps.worker.services.main_subject_filter import select_main_player_subjects
 from apps.worker.services.media_indexer import index_media
 from apps.worker.services.motion_smoothing import smooth_motion_candidates
 from apps.worker.services.object_court_projection import project_objects_to_court
+from apps.worker.services.point_evidence_snapshot import build_point_evidence_snapshot
 from apps.worker.services.pose_adapter import run_pose_adapter
 from apps.worker.services.projection_diagnostic_builder import build_projection_diagnostics
 from apps.worker.services.real_court_keypoint_replay import run_real_court_keypoint_replay
@@ -866,6 +867,29 @@ def main() -> None:
     )
     hit_bounce_parser.add_argument("--skip-create-db", action="store_true")
     hit_bounce_parser.set_defaults(handler=_handle_build_hit_bounce_candidates)
+
+    point_snapshot_parser = subcommands.add_parser(
+        "build-point-evidence-snapshot",
+        help="Build a compact point evidence snapshot for a final event candidate run.",
+    )
+    point_snapshot_parser.add_argument("--media-id", required=True)
+    point_snapshot_parser.add_argument("--event-candidate-run-id", required=True)
+    point_snapshot_parser.add_argument(
+        "--viewer-base-url",
+        default="http://127.0.0.1:3000",
+    )
+    point_snapshot_parser.add_argument(
+        "--format",
+        choices=["json", "markdown"],
+        default="json",
+        help="Snapshot payload format. JSON is always returned; markdown adds a report body.",
+    )
+    point_snapshot_parser.add_argument(
+        "--output",
+        help="Optional file path for the JSON or markdown snapshot artifact.",
+    )
+    point_snapshot_parser.add_argument("--skip-create-db", action="store_true")
+    point_snapshot_parser.set_defaults(handler=_handle_build_point_evidence_snapshot)
 
     fixture_court_parser = subcommands.add_parser(
         "run-fixture-court",
@@ -1761,6 +1785,20 @@ def _handle_build_hit_bounce_candidates(
         verbose=getattr(args, "verbose", False),
         include_observation_ids=getattr(args, "include_observation_ids", False),
         diagnostic_summary=getattr(args, "diagnostic_summary", "compact"),
+    )
+
+
+def _handle_build_point_evidence_snapshot(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    return build_point_evidence_snapshot(
+        session=session,
+        media_id=args.media_id,
+        event_candidate_run_id=args.event_candidate_run_id,
+        viewer_base_url=args.viewer_base_url,
+        output_format=args.format,
+        output_path=args.output,
     )
 
 
