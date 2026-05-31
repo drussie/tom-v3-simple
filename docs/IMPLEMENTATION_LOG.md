@@ -2507,6 +2507,33 @@ This repair improves candidate labeling only. A hit candidate does not require a
 sequence is weak diagnostic context only. The repair does not add hit truth, bounce truth, in/out,
 rally/point/score logic, player identity, accepted/rejected lifecycle, or adjudication.
 
+## Universal Hit Candidate Validity Guard v0.2.9
+
+Status: complete
+
+### Goal
+
+Apply a final validity guard to every `hit_candidate` source after the local event-type classifier
+and overlap suppressors.
+
+### Notes
+
+This repair adds:
+
+- `universal_hit_validity_guard` event candidate payload metadata
+- `universal_hit_guard_bounce_candidate_v029`
+- candidate-summary guard counts for evaluated, kept, reclassified, and suppressed hits
+- selected-evidence replay details for the final guard decision
+
+The local bridge smoke run produced 7 `hit_candidate` observations, 2 `bounce_candidate`
+observations, and 868 rejection diagnostics. The guard evaluated 7 final hit candidates and kept
+all 7 in that real sample run. Synthetic tests cover unsupported landing-like hit reclassification
+to `bounce_candidate` and fly-through suppression into diagnostics.
+
+The guard is still candidate evidence only. A hit candidate still does not require a prior bounce,
+and sequence remains weak diagnostic context. The repair does not add hit truth, bounce truth,
+in/out, rally/point/score logic, player identity, accepted/rejected lifecycle, or adjudication.
+
 ## Player-Anchored Hit Contact-Zone Tightening v0.2.4
 
 Status: complete

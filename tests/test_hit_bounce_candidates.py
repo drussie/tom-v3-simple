@@ -32,6 +32,8 @@ from apps.worker.services.hit_bounce_candidates import (
     PLAYER_ANCHORED_HIT_CANDIDATE_METHOD,
     SIDE_ZONE_SEQUENCE_BOUNCE_METHOD,
     SIDE_ZONE_SEQUENCE_HIT_METHOD,
+    UNIVERSAL_HIT_GUARD_BOUNCE_CANDIDATE_METHOD,
+    UNIVERSAL_HIT_VALIDITY_GUARD_PRIORITY,
     EventCandidateDraft,
     HitBounceCandidateConfig,
     NearestPlayerContext,
@@ -39,6 +41,7 @@ from apps.worker.services.hit_bounce_candidates import (
     TrajectoryContext,
     TrajectoryPoint,
     apply_side_zone_sequence_classification,
+    apply_universal_hit_candidate_validity_guard,
     build_hit_bounce_candidates,
     dedupe_event_candidates_with_rejections,
     suppress_player_anchored_hits_overlapping_bounces,
@@ -999,7 +1002,7 @@ def test_player_proximate_trajectory_change_is_prioritized_as_hit(
     assert hit is not None
     assert "player_proximate_event_priority" in hit.payload_jsonb["reason_codes"]
     assert hit.payload_jsonb["classification_priority"] == (
-        "local_evidence_event_type_classification"
+        UNIVERSAL_HIT_VALIDITY_GUARD_PRIORITY
     )
     assert hit.payload_jsonb["player_proximity_gate"]["threshold"] == 0.33
     assert hit.payload_jsonb["candidate_decision"]["suppressed_candidate_types"] == [
@@ -1854,6 +1857,131 @@ def test_hit_can_follow_hit_without_required_intervening_bounce() -> None:
     )
     assert final_candidates[1].candidate_sequence["hit_requires_prior_bounce"] is False
 
+    guarded_candidates, rejections, guard_summary = (
+        apply_universal_hit_candidate_validity_guard(
+            final_candidates,
+            config=HitBounceCandidateConfig(),
+        )
+    )
+
+    assert [candidate.observation_type for candidate in guarded_candidates] == [
+        "hit_candidate",
+        "hit_candidate",
+    ]
+    assert rejections == []
+    assert guard_summary["hit_candidates_kept_by_guard"] == 2
+    assert guard_summary["hit_requires_prior_bounce"] is False
+    assert guarded_candidates[1].universal_hit_validity_guard is not None
+    assert (
+        guarded_candidates[1].universal_hit_validity_guard["final_decision"]
+        == "keep_as_hit"
+    )
+
+
+def test_universal_hit_guard_reclassifies_bounce_like_fallback_hit() -> None:
+    candidates = [
+        _draft_event_candidate(
+            observation_type="hit_candidate",
+            frame=30,
+            timestamp_ms=1000,
+            court_x=0.44,
+            court_y=0.89,
+            track_role_candidate="far_player_track_candidate",
+            player_distance=0.50,
+            candidate_method=HIT_FALLBACK_CANDIDATE_METHOD,
+            net_axis_reversal=False,
+        )
+    ]
+
+    final_candidates, rejections, summary = apply_universal_hit_candidate_validity_guard(
+        candidates,
+        config=HitBounceCandidateConfig(),
+    )
+
+    assert rejections == []
+    assert summary["hit_candidates_reclassified_to_bounce_by_guard"] == 1
+    assert [candidate.observation_type for candidate in final_candidates] == [
+        "bounce_candidate"
+    ]
+    candidate = final_candidates[0]
+    assert candidate.candidate_method == UNIVERSAL_HIT_GUARD_BOUNCE_CANDIDATE_METHOD
+    assert candidate.universal_hit_validity_guard is not None
+    assert (
+        candidate.universal_hit_validity_guard["assessment"]["bounce_like_landing_zone"]
+        is True
+    )
+    assert candidate.candidate_reclassification is not None
+    assert candidate.candidate_reclassification["reclassified"] is True
+    assert candidate.candidate_decision["classification_priority"] == (
+        UNIVERSAL_HIT_VALIDITY_GUARD_PRIORITY
+    )
+
+
+def test_universal_hit_guard_suppresses_fly_through_hit_candidate() -> None:
+    candidates, _ = apply_side_zone_sequence_classification(
+        [
+            _draft_event_candidate(
+                observation_type="hit_candidate",
+                frame=44,
+                timestamp_ms=1467,
+                court_x=1.30,
+                court_y=0.52,
+                track_role_candidate="far_player_track_candidate",
+                player_distance=0.70,
+                candidate_method=HIT_FALLBACK_CANDIDATE_METHOD,
+                net_axis_reversal=False,
+            )
+        ],
+        config=HitBounceCandidateConfig(),
+    )
+
+    final_candidates, rejections, summary = apply_universal_hit_candidate_validity_guard(
+        candidates,
+        config=HitBounceCandidateConfig(),
+    )
+
+    assert final_candidates == []
+    assert len(rejections) == 1
+    assert summary["hit_candidates_suppressed_by_guard"] == 1
+    assert "suppressed_by_universal_hit_validity_guard" in rejections[0].rejection_reasons
+    assert rejections[0].universal_hit_validity_guard is not None
+    assert (
+        rejections[0].universal_hit_validity_guard["assessment"]["fly_through_candidate"]
+        is True
+    )
+
+
+def test_universal_hit_guard_keeps_strong_contact_reversal_hit() -> None:
+    candidates, _ = apply_side_zone_sequence_classification(
+        [
+            _draft_event_candidate(
+                observation_type="hit_candidate",
+                frame=10,
+                timestamp_ms=333,
+                court_x=0.30,
+                court_y=0.16,
+                track_role_candidate="near_player_track_candidate",
+                player_distance=0.10,
+                candidate_method=HIT_CANDIDATE_METHOD,
+                net_axis_reversal=True,
+            )
+        ],
+        config=HitBounceCandidateConfig(),
+    )
+
+    final_candidates, rejections, summary = apply_universal_hit_candidate_validity_guard(
+        candidates,
+        config=HitBounceCandidateConfig(),
+    )
+
+    assert rejections == []
+    assert summary["hit_candidates_kept_by_guard"] == 1
+    assert final_candidates[0].observation_type == "hit_candidate"
+    assert final_candidates[0].universal_hit_validity_guard is not None
+    assert final_candidates[0].universal_hit_validity_guard["assessment"][
+        "strong_contact_support"
+    ] is True
+
 
 def test_event_candidate_replay_payloads_are_exposed(db_session: Session) -> None:
     media = _seed_media(db_session)
@@ -1897,7 +2025,7 @@ def test_event_candidate_replay_payloads_are_exposed(db_session: Session) -> Non
     assert overlays[0]["court_point"] == {"x": 0.3, "y": 0.2}
     assert overlays[0]["image_point"] == {"x": 300.0, "y": 100.0}
     assert overlays[0]["image_marker_source"] == "source_ball_court_projection_image_point"
-    assert overlays[0]["classification_priority"] == "local_evidence_event_type_classification"
+    assert overlays[0]["classification_priority"] == UNIVERSAL_HIT_VALIDITY_GUARD_PRIORITY
     assert overlays[0]["player_proximity_gate"]["nearest_player_found"] is True
     assert overlays[0]["candidate_decision"]["selected_candidate_type"] == "hit_candidate"
     assert overlays[0]["net_axis_reversal"]["reversal"] is True
@@ -1909,12 +2037,18 @@ def test_event_candidate_replay_payloads_are_exposed(db_session: Session) -> Non
     assert overlays[0]["candidate_sequence"]["sequence_index"] == 0
     assert overlays[0]["candidate_sequence"]["sequence_is_hard_gate"] is False
     assert overlays[0]["candidate_sequence"]["hit_requires_prior_bounce"] is False
+    assert overlays[0]["universal_hit_validity_guard"]["final_decision"] == (
+        "keep_as_hit"
+    )
     assert len(timeline_items) == 1
     assert timeline_items[0]["item_type"] == "hit_candidate"
     assert timeline_items[0]["image_point"] == {"x": 300.0, "y": 100.0}
     assert timeline_items[0]["image_marker_source"] == "source_ball_court_projection_image_point"
     assert timeline_items[0]["classification_priority"] == (
-        "local_evidence_event_type_classification"
+        UNIVERSAL_HIT_VALIDITY_GUARD_PRIORITY
+    )
+    assert timeline_items[0]["universal_hit_validity_guard"]["final_decision"] == (
+        "keep_as_hit"
     )
     assert timeline_items[0]["net_axis_reversal"]["axis"] == "court_y"
     assert timeline_items[0]["court_side_zone"]["side"] == "near_side"

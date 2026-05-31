@@ -750,6 +750,12 @@ direction-change candidates. The panel shows `local_evidence_event_type`, whethe
 gate, and whether a hit requires a prior bounce. For v0.2.8, sequence is weak diagnostic context
 only and `hit_requires_prior_bounce` is always false.
 
+Universal Hit Candidate Validity Guard v0.2.9 adds selected evidence fields for
+`universal_hit_validity_guard`. The panel shows whether the guard kept the marker as a
+`hit_candidate`, reclassified unsupported landing-like evidence to `bounce_candidate`, or suppressed
+fly-through/transit evidence into diagnostics. The guard applies to every final hit-candidate source
+and remains candidate-only; it is not hit truth, bounce truth, in/out, score, or adjudication.
+
 Player-anchored hit recall v0.2.3 adds `player_anchored_hit_recall` details for candidate hits
 recovered from wider ball windows around near/far main player projection anchors. Selected evidence
 shows the anchor track role candidate, anchor distance, incoming/current/outgoing frames, and

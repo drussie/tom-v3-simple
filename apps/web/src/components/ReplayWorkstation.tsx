@@ -3116,6 +3116,51 @@ function SelectedEvidencePanel({
           }
         />
         <DetailRow
+          label="universal hit guard"
+          value={
+            item.universal_hit_validity_guard === null ||
+            item.universal_hit_validity_guard === undefined
+              ? "n/a"
+              : String(item.universal_hit_validity_guard.final_decision ?? "n/a")
+          }
+        />
+        <DetailRow
+          label="guard assessment"
+          value={
+            item.universal_hit_validity_guard === null ||
+            item.universal_hit_validity_guard === undefined ||
+            typeof item.universal_hit_validity_guard.assessment !== "object" ||
+            item.universal_hit_validity_guard.assessment === null
+              ? "n/a"
+              : `reversal ${String(
+                  (item.universal_hit_validity_guard.assessment as Record<string, unknown>)
+                    .reversal_support ?? "n/a"
+                )}, contact ${String(
+                  (item.universal_hit_validity_guard.assessment as Record<string, unknown>)
+                    .contact_support ?? "n/a"
+                )}, landing ${String(
+                  (item.universal_hit_validity_guard.assessment as Record<string, unknown>)
+                    .landing_zone_support ?? "n/a"
+                )}, fly-through ${String(
+                  (item.universal_hit_validity_guard.assessment as Record<string, unknown>)
+                    .fly_through_candidate ?? "n/a"
+                )}`
+          }
+        />
+        <DetailRow
+          label="guard no-bounce rule"
+          value={
+            item.universal_hit_validity_guard === null ||
+            item.universal_hit_validity_guard === undefined
+              ? "n/a"
+              : `hit requires prior bounce: ${String(
+                  item.universal_hit_validity_guard.hit_requires_prior_bounce ?? "false"
+                )}; sequence hard gate: ${String(
+                  item.universal_hit_validity_guard.sequence_is_hard_gate ?? "false"
+                )}`
+          }
+        />
+        <DetailRow
           label="player anchored recall"
           value={
             item.player_anchored_hit_recall === null ||

@@ -53,6 +53,9 @@ IMAGE_SPACE_DIRECTION_CHANGE_HIT_CANDIDATE_METHOD = (
 LOCAL_EVIDENCE_DIRECTION_CHANGE_BOUNCE_CANDIDATE_METHOD = (
     "local_evidence_direction_change_bounce_candidate_v028"
 )
+UNIVERSAL_HIT_GUARD_BOUNCE_CANDIDATE_METHOD = (
+    "universal_hit_guard_bounce_candidate_v029"
+)
 BOUNCE_CANDIDATE_METHOD = "image_vertical_proxy_speed_reduction_bounce_candidate_v024"
 BOUNCE_FALLBACK_CANDIDATE_METHOD = (
     "image_vertical_proxy_speed_reduction_bounce_candidate_v024_fallback"
@@ -63,10 +66,13 @@ PLAYER_ANCHORED_HIT_CANDIDATE_METHOD = (
 SIDE_ZONE_SEQUENCE_HIT_METHOD = "side_zone_sequence_hit_candidate_v024"
 SIDE_ZONE_SEQUENCE_BOUNCE_METHOD = "side_zone_sequence_bounce_candidate_v024"
 EVENT_CANDIDATE_METHOD = (
-    "local_evidence_event_type_classification_candidate_evidence_v028"
+    "universal_hit_candidate_validity_guard_candidate_evidence_v029"
 )
 LOCAL_EVIDENCE_CLASSIFICATION_PRIORITY = "local_evidence_event_type_classification"
 LOCAL_EVIDENCE_EVENT_TYPE_CLASSIFIER_VERSION = "v0.2.8"
+EVENT_CANDIDATE_VERSION = "v0.2.9"
+UNIVERSAL_HIT_VALIDITY_GUARD_PRIORITY = "universal_hit_candidate_validity_guard"
+UNIVERSAL_HIT_VALIDITY_GUARD_VERSION = "v0.2.9"
 COURT_SIDE_SPLIT_Y = 0.50
 COURT_MIDCOURT_MARGIN_Y = 0.05
 COURT_Y_CONVENTION = "court_y_low_near_high_far_v024"
@@ -391,6 +397,7 @@ class EventCandidateDraft:
     image_space_direction_change_recall: dict[str, Any] | None = None
     local_evidence_event_type: dict[str, Any] | None = None
     overlap_suppression: dict[str, Any] | None = None
+    universal_hit_validity_guard: dict[str, Any] | None = None
 
     @property
     def timestamp_ms(self) -> int:
@@ -419,6 +426,8 @@ class EventCandidateRejectionDiagnostic:
     image_space_net_axis_reversal_recall: dict[str, Any] | None = None
     image_space_direction_change_recall: dict[str, Any] | None = None
     overlap_suppression: dict[str, Any] | None = None
+    local_evidence_event_type: dict[str, Any] | None = None
+    universal_hit_validity_guard: dict[str, Any] | None = None
 
     @property
     def timestamp_ms(self) -> int:
@@ -560,6 +569,7 @@ def build_hit_bounce_candidates_plan(
             "evaluate_player_anchored_hit_recall",
             "dedupe_candidate_clusters",
             "apply_local_evidence_event_type_classification",
+            "apply_universal_hit_candidate_validity_guard",
             "persist_hit_and_bounce_candidate_observations",
             "write_candidate_source_lineage",
         ],
@@ -652,7 +662,9 @@ def build_hit_bounce_candidates_plan(
         ),
         "player_anchored_hit_candidate_method": PLAYER_ANCHORED_HIT_CANDIDATE_METHOD,
         "bounce_candidate_method": BOUNCE_CANDIDATE_METHOD,
-        "classification_priority": LOCAL_EVIDENCE_CLASSIFICATION_PRIORITY,
+        "classification_priority": UNIVERSAL_HIT_VALIDITY_GUARD_PRIORITY,
+        "local_evidence_classification_priority": LOCAL_EVIDENCE_CLASSIFICATION_PRIORITY,
+        "universal_hit_validity_guard_version": UNIVERSAL_HIT_VALIDITY_GUARD_VERSION,
         "court_y_convention": COURT_Y_CONVENTION,
         "coordinate_space": CoordinateSpace.court_template_2d,
         "court_template_name": COURT_TEMPLATE_NAME,
@@ -1187,6 +1199,15 @@ def build_hit_bounce_candidates(
             config=config,
         )
         rejection_diagnostics.extend(player_anchor_overlap_rejections)
+        (
+            final_candidates,
+            universal_guard_rejections,
+            universal_guard_summary,
+        ) = apply_universal_hit_candidate_validity_guard(
+            final_candidates,
+            config=config,
+        )
+        rejection_diagnostics.extend(universal_guard_rejections)
         writer = ObservationWriter(session)
         observations = _persist_event_candidates_and_diagnostics(
             writer=writer,
@@ -1226,6 +1247,7 @@ def build_hit_bounce_candidates(
             if candidate.observation_type == BOUNCE_CANDIDATE_OBSERVATION_TYPE
         ),
         **sequence_reclassification_summary,
+        **universal_guard_summary,
         "suppressed_bounce_conflict_count": suppressed_bounce_conflict_count,
         "rejected_context_count": len(rejection_diagnostics),
         "rejection_reasons": _rejection_reason_counts(rejection_diagnostics),
@@ -1233,8 +1255,8 @@ def build_hit_bounce_candidates(
             EVENT_CANDIDATE_REJECTION_DIAGNOSTIC_OBSERVATION_TYPE,
             0,
         ),
-        "classification_priority": LOCAL_EVIDENCE_CLASSIFICATION_PRIORITY,
-        "physics_heuristic_version": LOCAL_EVIDENCE_EVENT_TYPE_CLASSIFIER_VERSION,
+        "classification_priority": UNIVERSAL_HIT_VALIDITY_GUARD_PRIORITY,
+        "physics_heuristic_version": EVENT_CANDIDATE_VERSION,
         "contact_zone_tightening_version": "v0.2.4",
         "net_axis_reversal_hit_recall_version": "v0.2.5",
         "image_space_net_axis_hit_recall_version": "v0.2.6",
@@ -1242,6 +1264,7 @@ def build_hit_bounce_candidates(
         "local_evidence_event_type_classification_version": (
             LOCAL_EVIDENCE_EVENT_TYPE_CLASSIFIER_VERSION
         ),
+        "universal_hit_validity_guard_version": UNIVERSAL_HIT_VALIDITY_GUARD_VERSION,
         "net_axis_reversal_context_count": net_axis_reversal_context_count,
         "net_axis_reversal_candidate_count": len(net_axis_reversal_hit_drafts),
         "net_axis_reversal_recovered_hit_count": sum(
@@ -3958,6 +3981,372 @@ def apply_side_zone_sequence_classification(
     }
 
 
+def apply_universal_hit_candidate_validity_guard(
+    candidates: list[EventCandidateDraft],
+    *,
+    config: HitBounceCandidateConfig,
+) -> tuple[
+    list[EventCandidateDraft],
+    list[EventCandidateRejectionDiagnostic],
+    dict[str, Any],
+]:
+    """Apply the final candidate-only validity guard to every hit draft source."""
+
+    final_candidates: list[EventCandidateDraft] = []
+    rejections: list[EventCandidateRejectionDiagnostic] = []
+    evaluated_count = 0
+    kept_count = 0
+    reclassified_count = 0
+    suppressed_count = 0
+    decision_counts: Counter[str] = Counter()
+    source_method_counts: Counter[str] = Counter()
+
+    for candidate in sorted(candidates, key=lambda item: (item.timestamp_ms, item.frame_number)):
+        if candidate.observation_type != HIT_CANDIDATE_OBSERVATION_TYPE:
+            final_candidates.append(candidate)
+            continue
+
+        evaluated_count += 1
+        source_method = candidate.original_candidate_method or candidate.candidate_method
+        source_method_counts[source_method] += 1
+        court_side_zone = candidate.court_side_zone or _court_side_zone_payload(
+            candidate.trajectory_context.current
+        )
+        player_contact_zone = candidate.player_contact_zone or _player_contact_zone_payload(
+            candidate,
+            config=config,
+            court_side_zone=court_side_zone,
+        )
+        court_landing_zone = candidate.court_landing_zone or _court_landing_zone_payload(
+            candidate,
+            config=config,
+            court_side_zone=court_side_zone,
+            player_contact_zone=player_contact_zone,
+        )
+        assessment = _universal_hit_validity_assessment(
+            candidate,
+            config=config,
+            player_contact_zone=player_contact_zone,
+            court_landing_zone=court_landing_zone,
+        )
+        decision = _universal_hit_validity_decision(assessment)
+        decision_counts[decision] += 1
+        guard_payload = _universal_hit_validity_guard_payload(
+            candidate,
+            assessment=assessment,
+            decision=decision,
+            source_method=source_method,
+        )
+
+        if decision == "reclassify_to_bounce":
+            reclassified_count += 1
+            reclassification = {
+                "original_candidate_type": (
+                    candidate.original_observation_type or candidate.observation_type
+                ),
+                "final_candidate_type": BOUNCE_CANDIDATE_OBSERVATION_TYPE,
+                "reason": "universal_hit_guard_bounce_like_landing_zone",
+                "reclassified": True,
+                "previous_reclassification": candidate.candidate_reclassification,
+            }
+            final_candidates.append(
+                replace(
+                    candidate,
+                    observation_type=BOUNCE_CANDIDATE_OBSERVATION_TYPE,
+                    candidate_method=UNIVERSAL_HIT_GUARD_BOUNCE_CANDIDATE_METHOD,
+                    confidence=min(candidate.confidence, BOUNCE_CONFIDENCE_CAP),
+                    reason_codes=_guard_reason_codes(
+                        candidate,
+                        [
+                            "hit_reclassified_to_bounce_by_universal_guard",
+                            "bounce_like_landing_zone",
+                            "landing_zone_without_strong_contact_support",
+                        ],
+                    ),
+                    original_observation_type=(
+                        candidate.original_observation_type or candidate.observation_type
+                    ),
+                    original_candidate_method=source_method,
+                    court_side_zone=court_side_zone,
+                    player_contact_zone=player_contact_zone,
+                    court_landing_zone=court_landing_zone,
+                    candidate_reclassification=reclassification,
+                    universal_hit_validity_guard=guard_payload,
+                    candidate_decision={
+                        "selected_candidate_type": BOUNCE_CANDIDATE_OBSERVATION_TYPE,
+                        "original_candidate_type": (
+                            candidate.original_observation_type
+                            or candidate.observation_type
+                        ),
+                        "suppressed_candidate_types": [HIT_CANDIDATE_OBSERVATION_TYPE],
+                        "reason": "universal_hit_guard_bounce_like_landing_zone",
+                        "classification_priority": UNIVERSAL_HIT_VALIDITY_GUARD_PRIORITY,
+                        "sequence_is_hard_gate": False,
+                        "hit_requires_prior_bounce": False,
+                    },
+                )
+            )
+            continue
+
+        if decision == "suppress_as_diagnostic":
+            suppressed_count += 1
+            rejections.append(
+                _rejection_diagnostic_from_candidate(
+                    replace(
+                        candidate,
+                        court_side_zone=court_side_zone,
+                        player_contact_zone=player_contact_zone,
+                        court_landing_zone=court_landing_zone,
+                        universal_hit_validity_guard=guard_payload,
+                    ),
+                    rejection_reasons=[
+                        "suppressed_by_universal_hit_validity_guard",
+                        "fly_through_no_local_reversal",
+                        "transit_candidate_without_event_evidence",
+                    ],
+                    decision_reason="suppressed_by_universal_hit_validity_guard",
+                    universal_hit_validity_guard=guard_payload,
+                )
+            )
+            continue
+
+        kept_count += 1
+        final_candidates.append(
+            replace(
+                candidate,
+                court_side_zone=court_side_zone,
+                player_contact_zone=player_contact_zone,
+                court_landing_zone=court_landing_zone,
+                universal_hit_validity_guard=guard_payload,
+                reason_codes=_guard_reason_codes(
+                    candidate,
+                    ["kept_by_universal_hit_validity_guard"],
+                ),
+                candidate_decision={
+                    **candidate.candidate_decision,
+                    "selected_candidate_type": HIT_CANDIDATE_OBSERVATION_TYPE,
+                    "classification_priority": UNIVERSAL_HIT_VALIDITY_GUARD_PRIORITY,
+                    "universal_hit_validity_guard_decision": "keep_as_hit",
+                    "sequence_is_hard_gate": False,
+                    "hit_requires_prior_bounce": False,
+                },
+            )
+        )
+
+    return (
+        sorted(final_candidates, key=lambda item: (item.timestamp_ms, item.frame_number)),
+        rejections,
+        {
+            "universal_hit_validity_guard_enabled": True,
+            "universal_hit_validity_guard_version": UNIVERSAL_HIT_VALIDITY_GUARD_VERSION,
+            "hit_candidates_evaluated_by_guard": evaluated_count,
+            "hit_candidates_kept_by_guard": kept_count,
+            "hit_candidates_reclassified_to_bounce_by_guard": reclassified_count,
+            "hit_candidates_suppressed_by_guard": suppressed_count,
+            "hit_requires_prior_bounce": False,
+            "sequence_is_hard_gate": False,
+            "universal_hit_validity_guard_decision_counts": dict(
+                sorted(decision_counts.items())
+            ),
+            "universal_hit_validity_guard_source_method_counts": dict(
+                sorted(source_method_counts.items())
+            ),
+            "universal_hit_validity_guard": {
+                "enabled": True,
+                "version": UNIVERSAL_HIT_VALIDITY_GUARD_VERSION,
+                "applies_to_all_hit_candidate_sources": True,
+                "hit_requires_prior_bounce": False,
+                "sequence_is_hard_gate": False,
+                "candidate_only": True,
+                "not_hit_truth": True,
+                "not_bounce_truth": True,
+                "not_in_out_truth": True,
+                "no_adjudication": True,
+            },
+        },
+    )
+
+
+def _universal_hit_validity_assessment(
+    candidate: EventCandidateDraft,
+    *,
+    config: HitBounceCandidateConfig,
+    player_contact_zone: dict[str, Any],
+    court_landing_zone: dict[str, Any],
+) -> dict[str, Any]:
+    reversal_support = _candidate_has_reversal_support(candidate, config=config)
+    contact_support = _candidate_has_contact_support(
+        candidate,
+        player_contact_zone=player_contact_zone,
+    )
+    strong_contact_support = _candidate_has_strong_contact_support(
+        candidate,
+        player_contact_zone=player_contact_zone,
+    )
+    landing_zone_support = _candidate_has_landing_zone_support(
+        candidate,
+        court_landing_zone=court_landing_zone,
+    )
+    local_image_direction_support = _candidate_has_image_direction_support(
+        candidate,
+        config=config,
+    )
+    bounce_like_landing_zone = (
+        landing_zone_support and not reversal_support and not contact_support
+    )
+    fly_through_candidate = (
+        not reversal_support
+        and not contact_support
+        and not landing_zone_support
+        and not local_image_direction_support
+    )
+    return {
+        "reversal_support": reversal_support,
+        "contact_support": contact_support,
+        "strong_contact_support": strong_contact_support,
+        "landing_zone_support": landing_zone_support,
+        "local_image_direction_support": local_image_direction_support,
+        "bounce_like_landing_zone": bounce_like_landing_zone,
+        "fly_through_candidate": fly_through_candidate,
+        "court_landing_zone_candidate": court_landing_zone.get(
+            "landing_zone_candidate"
+        )
+        is True,
+        "inside_or_near_court": court_landing_zone.get("inside_or_near_court") is True,
+        "in_contact_zone": player_contact_zone.get("in_contact_zone") is True,
+        "strong_contact_zone": player_contact_zone.get("strong_contact_zone") is True,
+        "hit_requires_prior_bounce": False,
+        "sequence_is_hard_gate": False,
+    }
+
+
+def _universal_hit_validity_decision(assessment: dict[str, Any]) -> str:
+    if assessment.get("bounce_like_landing_zone") is True:
+        return "reclassify_to_bounce"
+    if assessment.get("fly_through_candidate") is True:
+        return "suppress_as_diagnostic"
+    return "keep_as_hit"
+
+
+def _universal_hit_validity_guard_payload(
+    candidate: EventCandidateDraft,
+    *,
+    assessment: dict[str, Any],
+    decision: str,
+    source_method: str,
+) -> dict[str, Any]:
+    return {
+        "guard_version": UNIVERSAL_HIT_VALIDITY_GUARD_VERSION,
+        "classification_priority": UNIVERSAL_HIT_VALIDITY_GUARD_PRIORITY,
+        "applied": True,
+        "source_candidate_type": candidate.observation_type,
+        "source_candidate_method": source_method,
+        "final_decision": decision,
+        "assessment": assessment,
+        "previous_candidate_decision": candidate.candidate_decision,
+        "hit_requires_prior_bounce": False,
+        "sequence_is_hard_gate": False,
+        "candidate_only": True,
+        "not_hit_truth": True,
+        "not_bounce_truth": True,
+        "not_in_out_truth": True,
+        "observation_only": True,
+        "no_adjudication": True,
+    }
+
+
+def _guard_reason_codes(
+    candidate: EventCandidateDraft,
+    additions: list[str],
+) -> list[str]:
+    return list(dict.fromkeys([*candidate.reason_codes, *additions]))
+
+
+def _candidate_has_reversal_support(
+    candidate: EventCandidateDraft,
+    *,
+    config: HitBounceCandidateConfig,
+) -> bool:
+    if candidate.net_axis_reversal is not None and candidate.net_axis_reversal.get(
+        "reversal"
+    ) is True:
+        return True
+    recall = candidate.net_axis_reversal_recall or {}
+    if (
+        recall.get("net_axis_reversal") is True
+        or recall.get("reversal") is True
+        or recall.get("reversal_candidate") is True
+    ):
+        return True
+    image_axis_recall = candidate.image_space_net_axis_reversal_recall or {}
+    if (
+        image_axis_recall.get("image_axis_reversal") is True
+        or image_axis_recall.get("reversal") is True
+    ):
+        return True
+    image_direction_recall = candidate.image_space_direction_change_recall or {}
+    direction_delta = _number(image_direction_recall.get("image_direction_delta_degrees"))
+    pre_length = _number(image_direction_recall.get("pre_vector_length_pixels"))
+    post_length = _number(image_direction_recall.get("post_vector_length_pixels"))
+    return bool(
+        direction_delta is not None
+        and direction_delta >= config.image_space_direction_change_min_delta_degrees
+        and pre_length is not None
+        and post_length is not None
+        and pre_length >= config.image_space_direction_change_min_vector_pixels
+        and post_length >= config.image_space_direction_change_min_vector_pixels
+    )
+
+
+def _candidate_has_contact_support(
+    candidate: EventCandidateDraft,
+    *,
+    player_contact_zone: dict[str, Any],
+) -> bool:
+    player_anchor_contact_zone = candidate.player_anchor_contact_zone or {}
+    return bool(
+        player_contact_zone.get("in_contact_zone") is True
+        or player_contact_zone.get("strong_contact_zone") is True
+        or player_anchor_contact_zone.get("in_contact_zone") is True
+        or player_anchor_contact_zone.get("strong_contact_zone") is True
+    )
+
+
+def _candidate_has_strong_contact_support(
+    candidate: EventCandidateDraft,
+    *,
+    player_contact_zone: dict[str, Any],
+) -> bool:
+    player_anchor_contact_zone = candidate.player_anchor_contact_zone or {}
+    return bool(
+        player_contact_zone.get("strong_contact_zone") is True
+        or player_anchor_contact_zone.get("strong_contact_zone") is True
+    )
+
+
+def _candidate_has_landing_zone_support(
+    candidate: EventCandidateDraft,
+    *,
+    court_landing_zone: dict[str, Any],
+) -> bool:
+    vertical_motion_proxy = candidate.vertical_motion_proxy or {}
+    return bool(
+        court_landing_zone.get("landing_zone_candidate") is True
+        or vertical_motion_proxy.get("descending_to_ascending") is True
+    )
+
+
+def _candidate_has_image_direction_support(
+    candidate: EventCandidateDraft,
+    *,
+    config: HitBounceCandidateConfig,
+) -> bool:
+    local_evidence = candidate.local_evidence_event_type or {}
+    if local_evidence.get("hit_like_airborne_direction_change") is True:
+        return True
+    return _candidate_has_reversal_support(candidate, config=config)
+
+
 def classify_direction_change_candidate_local_evidence(
     candidate: EventCandidateDraft,
     *,
@@ -5496,13 +5885,18 @@ def _rejection_diagnostic_from_candidate(
     suppressed_by_frame: int | None = None,
     suppressed_by_timestamp_ms: int | None = None,
     overlap_suppression: dict[str, Any] | None = None,
+    universal_hit_validity_guard: dict[str, Any] | None = None,
 ) -> EventCandidateRejectionDiagnostic:
     candidate_decision = {
         "selected_candidate_type": None,
         "attempted_candidate_type": candidate.observation_type,
         "reason": decision_reason,
         "rejection_reasons": rejection_reasons,
-        "classification_priority": LOCAL_EVIDENCE_CLASSIFICATION_PRIORITY,
+        "classification_priority": (
+            UNIVERSAL_HIT_VALIDITY_GUARD_PRIORITY
+            if universal_hit_validity_guard is not None
+            else LOCAL_EVIDENCE_CLASSIFICATION_PRIORITY
+        ),
     }
     if suppressed_by_observation_type is not None:
         candidate_decision["suppressed_by_observation_type"] = (
@@ -5541,7 +5935,11 @@ def _rejection_diagnostic_from_candidate(
             candidate.image_space_net_axis_reversal_recall
         ),
         image_space_direction_change_recall=candidate.image_space_direction_change_recall,
+        local_evidence_event_type=candidate.local_evidence_event_type,
         overlap_suppression=overlap_suppression or candidate.overlap_suppression,
+        universal_hit_validity_guard=(
+            universal_hit_validity_guard or candidate.universal_hit_validity_guard
+        ),
     )
 
 
@@ -5745,6 +6143,10 @@ def _event_candidate_observation_create(
         payload["local_evidence_event_type"] = candidate.local_evidence_event_type
     if candidate.overlap_suppression is not None:
         payload["overlap_suppression"] = candidate.overlap_suppression
+    if candidate.universal_hit_validity_guard is not None:
+        payload["universal_hit_validity_guard"] = (
+            candidate.universal_hit_validity_guard
+        )
     if candidate.original_observation_type is not None:
         payload["original_candidate_type"] = candidate.original_observation_type
     if candidate.original_candidate_method is not None:
@@ -5860,7 +6262,7 @@ def _event_candidate_diagnostic_observation_create(
         "diagnostic_source": diagnostic.diagnostic_source,
         "diagnostic_only": True,
         "candidate_method": EVENT_CANDIDATE_METHOD,
-        "classification_priority": "player_anchored_hit_recall_then_sequence_prior",
+        "classification_priority": UNIVERSAL_HIT_VALIDITY_GUARD_PRIORITY,
         "coordinate_space": CoordinateSpace.court_template_2d,
         "template_name": COURT_TEMPLATE_NAME,
         "template_version": COURT_TEMPLATE_VERSION,
@@ -5891,8 +6293,14 @@ def _event_candidate_diagnostic_observation_create(
         payload["image_space_direction_change_recall"] = (
             diagnostic.image_space_direction_change_recall
         )
+    if diagnostic.local_evidence_event_type is not None:
+        payload["local_evidence_event_type"] = diagnostic.local_evidence_event_type
     if diagnostic.overlap_suppression is not None:
         payload["overlap_suppression"] = diagnostic.overlap_suppression
+    if diagnostic.universal_hit_validity_guard is not None:
+        payload["universal_hit_validity_guard"] = (
+            diagnostic.universal_hit_validity_guard
+        )
     lineage = []
     trajectory_observation_id = _trajectory_observation_id(current)
     if trajectory_observation_id is not None:
@@ -6205,7 +6613,7 @@ def _register_model(session: Session) -> ModelRegistry:
         select(ModelRegistry)
         .where(
             ModelRegistry.name == "hit-bounce-candidate-evidence",
-            ModelRegistry.version == LOCAL_EVIDENCE_EVENT_TYPE_CLASSIFIER_VERSION,
+            ModelRegistry.version == EVENT_CANDIDATE_VERSION,
             ModelRegistry.model_family == "event_candidate",
             ModelRegistry.source == "apps.worker.services.hit_bounce_candidates",
         )
@@ -6215,7 +6623,7 @@ def _register_model(session: Session) -> ModelRegistry:
         return existing
     model = ModelRegistry(
         name="hit-bounce-candidate-evidence",
-        version=LOCAL_EVIDENCE_EVENT_TYPE_CLASSIFIER_VERSION,
+        version=EVENT_CANDIDATE_VERSION,
         model_family="event_candidate",
         source="apps.worker.services.hit_bounce_candidates",
         metadata_jsonb={
@@ -6229,6 +6637,12 @@ def _register_model(session: Session) -> ModelRegistry:
             ),
             "local_evidence_direction_change_bounce_candidate_method": (
                 LOCAL_EVIDENCE_DIRECTION_CHANGE_BOUNCE_CANDIDATE_METHOD
+            ),
+            "universal_hit_guard_bounce_candidate_method": (
+                UNIVERSAL_HIT_GUARD_BOUNCE_CANDIDATE_METHOD
+            ),
+            "universal_hit_validity_guard_version": (
+                UNIVERSAL_HIT_VALIDITY_GUARD_VERSION
             ),
             "player_anchored_hit_candidate_method": PLAYER_ANCHORED_HIT_CANDIDATE_METHOD,
             "bounce_candidate_method": BOUNCE_CANDIDATE_METHOD,
@@ -6250,11 +6664,14 @@ def _create_runtime_config(
 ) -> RuntimeConfig:
     runtime_config = RuntimeConfig(
         config_name="hit-bounce-candidate-evidence-config",
-        config_version=LOCAL_EVIDENCE_EVENT_TYPE_CLASSIFIER_VERSION,
+        config_version=EVENT_CANDIDATE_VERSION,
         payload_jsonb={
             "candidate_method": EVENT_CANDIDATE_METHOD,
             "local_evidence_classification_version": (
                 LOCAL_EVIDENCE_EVENT_TYPE_CLASSIFIER_VERSION
+            ),
+            "universal_hit_validity_guard_version": (
+                UNIVERSAL_HIT_VALIDITY_GUARD_VERSION
             ),
             "source_ball_trajectory_run_id": ball_trajectory_run_id,
             "source_court_projection_run_id": court_projection_run_id,
@@ -6316,7 +6733,7 @@ def _create_step(
     now = datetime.now(UTC)
     step = ProcessingStep(
         run_id=run.id,
-        step_name="local_evidence_event_type_classification_v028",
+        step_name="universal_hit_candidate_validity_guard_v029",
         step_status="running",
         started_at=now,
         runtime_config_id=runtime_config.id,

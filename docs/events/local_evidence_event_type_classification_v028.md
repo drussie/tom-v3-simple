@@ -100,3 +100,7 @@ change, not an obvious court landing-zone marker.
 This repair improves candidate labeling for operator review. It does not prove contact, bounce,
 in/out, point state, score, or player identity. It does not create an accepted/rejected lifecycle
 and does not adjudicate tennis events.
+
+Follow-up v0.2.9 adds a universal final guard across all hit-candidate sources. The v0.2.8 local
+classifier remains the image-space direction-change classifier, while v0.2.9 records
+`universal_hit_validity_guard` metadata after all source-specific classifiers have run.

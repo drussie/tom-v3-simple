@@ -1460,6 +1460,11 @@ python -m apps.worker.cli completion-audit --no-demo-only
   direction-change event candidates. It can keep a direction change as `hit_candidate` or reclassify
   it to `bounce_candidate` based on local landing/contact evidence. A hit candidate does not
   require a prior bounce.
+- Universal hit candidate validity guard v0.2.9 is enabled by default after all hit/bounce
+  candidate classifiers. It evaluates every final hit-candidate source, records
+  `universal_hit_validity_guard` metadata, can reclassify unsupported landing-like hits to
+  `bounce_candidate`, and can suppress fly-through/no-event hits into diagnostics. This is still
+  candidate evidence only.
 - Cloud deployment, auth, production streaming, and multi-camera reasoning are out of scope.
 
 ## 15. Completion Checklist
