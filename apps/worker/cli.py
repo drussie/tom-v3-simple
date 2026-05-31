@@ -1,6 +1,7 @@
 import argparse
 import json
 from collections.abc import Callable
+from typing import Any
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
@@ -847,6 +848,22 @@ def main() -> None:
         action="store_true",
         help="Print the hit/bounce candidate plan without touching observations.",
     )
+    hit_bounce_parser.add_argument(
+        "--verbose",
+        action="store_true",
+        help="Print the full legacy hit/bounce diagnostic response.",
+    )
+    hit_bounce_parser.add_argument(
+        "--include-observation-ids",
+        action="store_true",
+        help="Include persisted observation ids in compact hit/bounce output.",
+    )
+    hit_bounce_parser.add_argument(
+        "--diagnostic-summary",
+        choices=["none", "compact", "full"],
+        default="compact",
+        help="Control diagnostic detail in hit/bounce CLI output.",
+    )
     hit_bounce_parser.add_argument("--skip-create-db", action="store_true")
     hit_bounce_parser.set_defaults(handler=_handle_build_hit_bounce_candidates)
 
@@ -1599,7 +1616,7 @@ def _handle_build_hit_bounce_candidates(
     session: Session,
     args: argparse.Namespace,
 ) -> dict[str, object]:
-    return build_hit_bounce_candidates(
+    result = build_hit_bounce_candidates(
         session=session,
         media_id=args.media_id,
         ball_trajectory_run_id=args.ball_trajectory_run_id,
@@ -1739,6 +1756,161 @@ def _handle_build_hit_bounce_candidates(
         viewer_base_url=args.viewer_base_url,
         plan_only=args.plan_only,
     )
+    return _format_hit_bounce_cli_result(
+        result,
+        verbose=getattr(args, "verbose", False),
+        include_observation_ids=getattr(args, "include_observation_ids", False),
+        diagnostic_summary=getattr(args, "diagnostic_summary", "compact"),
+    )
+
+
+def _format_hit_bounce_cli_result(
+    result: dict[str, Any],
+    *,
+    verbose: bool = False,
+    include_observation_ids: bool = False,
+    diagnostic_summary: str = "compact",
+) -> dict[str, Any]:
+    """Return operator-focused hit/bounce CLI output without changing service data."""
+
+    if verbose or result.get("status") == "planned" or result.get("ok") is False:
+        return result
+
+    if diagnostic_summary not in {"none", "compact", "full"}:
+        raise ValueError(f"unsupported diagnostic_summary: {diagnostic_summary}")
+
+    candidate_summary = result.get("candidate_summary")
+    if not isinstance(candidate_summary, dict):
+        candidate_summary = {}
+    observations = result.get("observations")
+    if not isinstance(observations, dict):
+        observations = {}
+
+    compact: dict[str, Any] = {}
+    for key in (
+        "ok",
+        "status",
+        "message",
+        "media_id",
+        "run_id",
+        "event_candidate_run_id",
+        "processing_step_id",
+        "runtime_config_id",
+        "replay_url",
+    ):
+        if key in result:
+            compact[key] = result[key]
+
+    if "source_run_ids" in result:
+        compact["source_run_ids"] = result["source_run_ids"]
+    compact["observations"] = observations
+
+    active_versions = _compact_hit_bounce_active_versions(candidate_summary)
+    if diagnostic_summary != "none" and active_versions:
+        compact["active_versions"] = active_versions
+
+    marker_summary = _compact_hit_bounce_marker_summary(
+        result.get("marker_summary"),
+        include_observation_ids=include_observation_ids,
+    )
+    compact["summary_counts"] = {
+        "final_hit_candidates": observations.get("hit_candidate", 0),
+        "final_bounce_candidates": observations.get("bounce_candidate", 0),
+        "rejection_diagnostics": observations.get(
+            "event_candidate_rejection_diagnostic",
+            0,
+        ),
+        "marker_count": len(marker_summary),
+    }
+
+    if diagnostic_summary != "none":
+        compact["marker_summary"] = marker_summary
+
+    if diagnostic_summary == "full":
+        compact["candidate_summary"] = candidate_summary
+
+    if include_observation_ids and "observation_ids" in result:
+        compact["observation_ids"] = result["observation_ids"]
+
+    if "warnings" in result:
+        compact["warnings"] = result["warnings"]
+    return compact
+
+
+def _compact_hit_bounce_active_versions(
+    candidate_summary: dict[str, Any],
+) -> dict[str, Any]:
+    version_keys = {
+        "physics_heuristic": "physics_heuristic_version",
+        "marker_level_arbitration": "marker_level_arbitration_version",
+        "universal_hit_validity_guard": "universal_hit_validity_guard_version",
+        "local_evidence_classification": (
+            "local_evidence_event_type_classification_version"
+        ),
+        "image_space_direction_change_hit_recall": (
+            "image_space_direction_change_hit_recall_version"
+        ),
+        "image_space_net_axis_hit_recall": "image_space_net_axis_hit_recall_version",
+        "net_axis_reversal_hit_recall": "net_axis_reversal_hit_recall_version",
+    }
+    return {
+        label: candidate_summary[source_key]
+        for label, source_key in version_keys.items()
+        if candidate_summary.get(source_key) is not None
+    }
+
+
+def _compact_hit_bounce_marker_summary(
+    marker_summary: object,
+    *,
+    include_observation_ids: bool,
+) -> list[dict[str, Any]]:
+    if not isinstance(marker_summary, list):
+        return []
+
+    rows = [
+        marker
+        for marker in marker_summary
+        if isinstance(marker, dict)
+        and marker.get("candidate_type") in {"hit_candidate", "bounce_candidate"}
+    ]
+    rows.sort(
+        key=lambda marker: (
+            marker.get("timestamp_ms") if marker.get("timestamp_ms") is not None else -1,
+            marker.get("frame") if marker.get("frame") is not None else -1,
+            str(marker.get("candidate_type") or ""),
+            str(marker.get("observation_id") or ""),
+        )
+    )
+
+    compact_rows: list[dict[str, Any]] = []
+    for index, marker in enumerate(rows, start=1):
+        compact_marker: dict[str, Any] = {
+            "index": index,
+            "candidate_type": marker.get("candidate_type"),
+            "frame": marker.get("frame"),
+            "timestamp_ms": marker.get("timestamp_ms"),
+        }
+        for source_key, target_key in (
+            ("source_method", "source_method"),
+            ("arbitration_decision", "arbitration_decision"),
+            ("arbitration_reason", "arbitration_reason"),
+            ("reason", "arbitration_reason"),
+            ("court_x", "court_x"),
+            ("court_y", "court_y"),
+            ("image_x", "image_x"),
+            ("image_y", "image_y"),
+            ("confidence", "confidence"),
+        ):
+            if target_key in compact_marker and target_key == "arbitration_reason":
+                continue
+            value = marker.get(source_key)
+            if value is not None:
+                compact_marker[target_key] = value
+        if include_observation_ids and marker.get("observation_id") is not None:
+            compact_marker["observation_id"] = marker["observation_id"]
+        compact_rows.append(compact_marker)
+    return compact_rows
 
 
 def _handle_run_demo(session: Session, args: argparse.Namespace) -> dict[str, object]:

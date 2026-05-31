@@ -130,6 +130,9 @@ This registry makes TOM v3 Simple boundaries explicit.
   strong, and it can suppress transit/fly-through hit markers into diagnostics. It keeps
   `hit_requires_prior_bounce = false` and `sequence_is_hard_gate = false`; this is candidate-marker
   arbitration only, not truth or adjudication.
+- Compact CLI + Marker Summary v0 shortens default operator output for hit/bounce candidate builds.
+  It does not remove stored diagnostics or change candidate generation; verbose/debug flags are
+  still required for the full diagnostic dump.
 - Hit/Bounce Side-Zone + Sequence Classification Repair v0.2.2 can reclassify raw hit/bounce
   candidates using court-side zones and a simple event-sequence prior. This improves operator-review
   labels, but the sequence prior is heuristic candidate evidence only and is not rally, point,

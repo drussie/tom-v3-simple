@@ -1,5 +1,36 @@
 # TOM v3 Simple - Implementation Log
 
+## Compact CLI + Marker Summary v0
+
+Status: complete when accepted
+
+### Goal
+
+Make hit/bounce candidate CLI output compact and operator-focused by default while preserving full
+diagnostics behind explicit flags.
+
+### Outcome
+
+The cleanup adds:
+
+- compact default formatting for `build-hit-bounce-candidates`
+- `marker_summary` as the primary operator-facing list of final visible markers
+- active version compaction into a single `active_versions` block
+- `--verbose`, `--include-observation-ids`, and `--diagnostic-summary` flags
+- Makefile variables for verbose/full diagnostics and a `tom-v1-hit-bounce-candidates-verbose`
+  helper
+- tests for compact defaults, deterministic marker ordering, verbose output, full diagnostics, and
+  observation id opt-in
+
+### Non-goals
+
+- No hit/bounce candidate logic changes.
+- No replay behavior changes.
+- No hit truth or bounce truth.
+- No in/out, rally, point, or score.
+- No accepted/rejected lifecycle.
+- No adjudication.
+
 ## Marker-Level Event Arbitration v0.3.1
 
 Status: complete when accepted

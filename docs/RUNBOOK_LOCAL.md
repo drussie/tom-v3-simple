@@ -880,6 +880,23 @@ reduction for bounce candidates. The v0.2.1 repair also writes
 contexts can be inspected. These are candidate markers and diagnostics only. They are not hit truth,
 bounce truth, in/out truth, rally/point/score logic, or adjudication.
 
+By default, this command prints compact operator JSON: run ids, replay URL, observation counts,
+active versions, candidate-only warnings, and a deterministic `marker_summary` with one row per
+final visible hit/bounce marker. It omits the full `observation_ids` list and nested
+`candidate_summary` diagnostics unless requested.
+
+Deep diagnostic output remains available:
+
+```bash
+make tom-v1-hit-bounce-candidates HIT_BOUNCE_VERBOSE=true
+make tom-v1-hit-bounce-candidates INCLUDE_OBSERVATION_IDS=true
+make tom-v1-hit-bounce-candidates DIAGNOSTIC_SUMMARY=full
+make tom-v1-hit-bounce-candidates-verbose
+```
+
+These flags change CLI presentation only. They do not change persisted observations or candidate
+decisions.
+
 The v0.2.2 side-zone sequence repair preserves the 2-hit / 2-bounce sample-point recall while adding
 `court_side_zone`, `player_contact_zone`, `court_landing_zone`, `candidate_reclassification`, and
 `candidate_sequence` diagnostics. CLI summaries now include raw candidate counts, final candidate
@@ -1472,6 +1489,8 @@ python -m apps.worker.cli completion-audit --no-demo-only
   `marker_level_arbitration`, keeps `hit_requires_prior_bounce = false`, and keeps
   `sequence_is_hard_gate = false`. This is marker-level candidate display arbitration only, not
   hit truth, bounce truth, in/out, score, or adjudication.
+- Compact CLI + Marker Summary v0 changes default hit/bounce command output only. Full diagnostic
+  data is still persisted and can be printed with verbose/debug flags.
 - Cloud deployment, auth, production streaming, and multi-camera reasoning are out of scope.
 
 ## 15. Completion Checklist

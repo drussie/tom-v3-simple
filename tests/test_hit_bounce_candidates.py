@@ -20,7 +20,10 @@ from apps.api.services.replay import (
     build_event_candidate_overlay_items,
     build_event_candidate_timeline_items,
 )
-from apps.worker.cli import _handle_build_hit_bounce_candidates
+from apps.worker.cli import (
+    _format_hit_bounce_cli_result,
+    _handle_build_hit_bounce_candidates,
+)
 from apps.worker.services.hit_bounce_candidates import (
     BOUNCE_CANDIDATE_METHOD,
     HIT_CANDIDATE_METHOD,
@@ -2312,6 +2315,135 @@ def test_hit_bounce_candidate_plan_only_and_cli_do_not_mutate(
 
     assert cli_result["ok"] is True
     assert cli_result["status"] == "planned"
+
+
+def test_compact_hit_bounce_cli_response_defaults_to_marker_summary() -> None:
+    full_result = {
+        "ok": True,
+        "status": "completed",
+        "message": "hit/bounce candidate evidence build complete",
+        "media_id": "media-1",
+        "run_id": "event-run-1",
+        "event_candidate_run_id": "event-run-1",
+        "source_run_ids": {
+            "ball_trajectory_run_id": "trajectory-run",
+            "court_projection_run_id": "projection-run",
+        },
+        "processing_step_id": "step-1",
+        "runtime_config_id": "runtime-1",
+        "observations": {
+            "hit_candidate": 1,
+            "bounce_candidate": 1,
+            "event_candidate_rejection_diagnostic": 2,
+            "total": 4,
+        },
+        "candidate_summary": {
+            "physics_heuristic_version": "v0.3.1",
+            "marker_level_arbitration_version": "v0.3.1",
+            "universal_hit_validity_guard_version": "v0.3.0",
+            "local_evidence_event_type_classification_version": "v0.2.8",
+            "image_space_direction_change_hit_recall_version": "v0.2.7",
+            "image_space_net_axis_hit_recall_version": "v0.2.6",
+            "net_axis_reversal_hit_recall_version": "v0.2.5",
+            "rejection_reasons": {"no_speed_reduction": 2},
+        },
+        "marker_summary": [
+            {
+                "candidate_type": "bounce_candidate",
+                "frame": 30,
+                "timestamp_ms": 1000,
+                "source_method": "bounce_method",
+                "reason": "keep_bounce",
+                "court_x": 0.4,
+                "court_y": 0.2,
+                "image_x": 700.0,
+                "image_y": 300.0,
+                "confidence": 0.45,
+            },
+            {
+                "candidate_type": "hit_candidate",
+                "frame": 10,
+                "timestamp_ms": 333,
+                "source_method": "hit_method",
+                "arbitration_decision": "keep_hit",
+                "reason": "strong_contact",
+                "court_x": 0.3,
+                "court_y": 0.1,
+                "image_x": 650.0,
+                "image_y": 250.0,
+                "confidence": 0.67,
+            },
+            {
+                "candidate_type": "event_candidate_rejection_diagnostic",
+                "frame": 20,
+                "timestamp_ms": 667,
+            },
+        ],
+        "observation_ids": ["hit-obs", "bounce-obs", "diagnostic-obs-1", "diagnostic-obs-2"],
+        "replay_url": "http://127.0.0.1:3000/replay/media-1?eventCandidateRunId=event-run-1",
+        "warnings": {
+            "candidate_only": True,
+            "event_candidate_only": True,
+            "not_hit_truth": True,
+            "not_bounce_truth": True,
+            "not_in_out_truth": True,
+            "no_adjudication": True,
+            "no_score_or_point_truth": True,
+            "observation_only": True,
+        },
+    }
+
+    compact = _format_hit_bounce_cli_result(full_result)
+
+    assert compact["ok"] is True
+    assert compact["run_id"] == "event-run-1"
+    assert compact["replay_url"].endswith("eventCandidateRunId=event-run-1")
+    assert "observation_ids" not in compact
+    assert "candidate_summary" not in compact
+    assert compact["active_versions"] == {
+        "physics_heuristic": "v0.3.1",
+        "marker_level_arbitration": "v0.3.1",
+        "universal_hit_validity_guard": "v0.3.0",
+        "local_evidence_classification": "v0.2.8",
+        "image_space_direction_change_hit_recall": "v0.2.7",
+        "image_space_net_axis_hit_recall": "v0.2.6",
+        "net_axis_reversal_hit_recall": "v0.2.5",
+    }
+    assert compact["summary_counts"] == {
+        "final_hit_candidates": 1,
+        "final_bounce_candidates": 1,
+        "rejection_diagnostics": 2,
+        "marker_count": 2,
+    }
+    assert [row["candidate_type"] for row in compact["marker_summary"]] == [
+        "hit_candidate",
+        "bounce_candidate",
+    ]
+    assert compact["marker_summary"][0]["index"] == 1
+    assert compact["marker_summary"][0]["arbitration_reason"] == "strong_contact"
+    assert compact["warnings"]["no_score_or_point_truth"] is True
+
+    with_ids = _format_hit_bounce_cli_result(
+        full_result,
+        include_observation_ids=True,
+    )
+    assert with_ids["observation_ids"] == full_result["observation_ids"]
+
+    full = _format_hit_bounce_cli_result(
+        full_result,
+        diagnostic_summary="full",
+    )
+    assert full["candidate_summary"] == full_result["candidate_summary"]
+
+    none = _format_hit_bounce_cli_result(
+        full_result,
+        diagnostic_summary="none",
+    )
+    assert "active_versions" not in none
+    assert "marker_summary" not in none
+    assert none["summary_counts"]["marker_count"] == 2
+
+    assert _format_hit_bounce_cli_result(full_result, verbose=True) is full_result
 
 
 def _draft_event_candidate(

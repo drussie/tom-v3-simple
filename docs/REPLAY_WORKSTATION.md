@@ -765,6 +765,11 @@ hit/bounce conflict was resolved to the bounce marker, or whether a transit/fly-
 suppressed into diagnostics. The pass explicitly records `hit_requires_prior_bounce = false` and
 `sequence_is_hard_gate = false`; it is marker-level candidate arbitration, not hit/bounce truth.
 
+Compact CLI + Marker Summary v0 makes the default event-candidate command output match the replay
+operator workflow: a short JSON response with run ids, replay URL, counts, active versions, and one
+`marker_summary` row per visible hit/bounce marker. Full diagnostic dumps remain available through
+explicit verbose/debug flags and still do not change replay evidence or truth status.
+
 Player-anchored hit recall v0.2.3 adds `player_anchored_hit_recall` details for candidate hits
 recovered from wider ball windows around near/far main player projection anchors. Selected evidence
 shows the anchor track role candidate, anchor distance, incoming/current/outgoing frames, and
