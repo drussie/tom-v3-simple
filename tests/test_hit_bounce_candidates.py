@@ -489,7 +489,7 @@ def test_image_space_recall_uses_projection_points_outside_trajectory_segments(
     ] is False
 
 
-def test_image_space_direction_change_emits_hit_without_player_proximity(
+def test_image_space_direction_change_midcourt_transit_is_guarded(
     db_session: Session,
 ) -> None:
     media = _seed_media(db_session)
@@ -521,26 +521,33 @@ def test_image_space_direction_change_emits_hit_without_player_proximity(
     )
 
     assert result["ok"] is True
-    assert result["observations"]["hit_candidate"] == 1
+    assert result["observations"]["hit_candidate"] == 0
+    assert result["candidate_summary"]["hit_candidates_suppressed_by_guard"] == 1
     assert (
         result["candidate_summary"]["image_direction_change_recovered_hit_count"]
+        == 0
+    )
+    assert (
+        result["candidate_summary"]["image_direction_change_candidate_count"]
         == 1
     )
     assert (
         result["candidate_summary"]["image_net_axis_reversal_recovered_hit_count"]
         == 0
     )
-    hit = db_session.scalar(
+    diagnostic = db_session.scalar(
         select(Observation).where(
             Observation.run_id == result["event_candidate_run_id"],
-            Observation.observation_type == "hit_candidate",
+            Observation.observation_type == "event_candidate_rejection_diagnostic",
+            Observation.payload_jsonb["candidate_decision"]["reason"].as_string()
+            == "suppressed_by_universal_hit_validity_guard",
         )
     )
-    assert hit is not None
-    assert hit.payload_jsonb["candidate_method"] == (
-        IMAGE_SPACE_DIRECTION_CHANGE_HIT_CANDIDATE_METHOD
-    )
-    recall = hit.payload_jsonb["image_space_direction_change_recall"]
+    assert diagnostic is not None
+    assert "fly_through_no_local_reversal" in diagnostic.payload_jsonb[
+        "rejection_reasons"
+    ]
+    recall = diagnostic.payload_jsonb["image_space_direction_change_recall"]
     assert recall["player_proximity_required"] is False
     assert recall["image_direction_change_method"] == (
         "broadcast_image_2d_vector_direction_change_v027"
@@ -548,29 +555,12 @@ def test_image_space_direction_change_emits_hit_without_player_proximity(
     assert recall["image_direction_delta_degrees"] >= 45.0
     assert recall["pre_vector_length_pixels"] >= 8.0
     assert recall["post_vector_length_pixels"] >= 8.0
-    assert "image_space_direction_change" in hit.payload_jsonb["reason_codes"]
-    assert "no_bounce_required_for_hit" in hit.payload_jsonb["reason_codes"]
-    assert hit.payload_jsonb["local_evidence_event_type"][
+    assert diagnostic.payload_jsonb["local_evidence_event_type"][
         "hit_requires_prior_bounce"
     ] is False
-    assert hit.payload_jsonb["local_evidence_event_type"][
+    assert diagnostic.payload_jsonb["local_evidence_event_type"][
         "selected_candidate_type"
     ] == "hit_candidate"
-
-    overlays = build_event_candidate_overlay_items(
-        session=db_session,
-        media=media,
-        start_ms=0,
-        end_ms=500,
-        event_candidate_run_id=result["event_candidate_run_id"],
-        observation_type="hit_candidate",
-    )
-    assert overlays[0]["image_space_direction_change_recall"][
-        "player_proximity_required"
-    ] is False
-    assert overlays[0]["local_evidence_event_type"][
-        "hit_like_airborne_direction_change"
-    ] is True
 
 
 def test_image_space_direction_change_in_landing_zone_reclassifies_to_bounce(
@@ -790,18 +780,26 @@ def test_far_side_style_player_time_offset_hit_fallback(
     )
 
     assert result["ok"] is True
-    assert result["observations"]["hit_candidate"] == 1
-    hit = db_session.scalar(
+    assert result["observations"]["hit_candidate"] == 0
+    assert result["observations"]["bounce_candidate"] == 1
+    assert result["candidate_summary"][
+        "hit_candidates_reclassified_to_bounce_by_guard"
+    ] == 1
+    bounce = db_session.scalar(
         select(Observation).where(
             Observation.run_id == result["event_candidate_run_id"],
-            Observation.observation_type == "hit_candidate",
+            Observation.observation_type == "bounce_candidate",
         )
     )
-    assert hit is not None
-    assert hit.payload_jsonb["candidate_method"] == HIT_FALLBACK_CANDIDATE_METHOD
-    assert "player_proximate_speed_change_fallback" in hit.payload_jsonb["reason_codes"]
-    assert hit.payload_jsonb["net_axis_reversal"]["reversal"] is False
-    assert hit.payload_jsonb["nearest_player"]["track_role_candidate"] == (
+    assert bounce is not None
+    assert bounce.payload_jsonb["candidate_method"] == (
+        UNIVERSAL_HIT_GUARD_BOUNCE_CANDIDATE_METHOD
+    )
+    assert "player_proximate_speed_change_fallback" in bounce.payload_jsonb[
+        "reason_codes"
+    ]
+    assert bounce.payload_jsonb["net_axis_reversal"]["reversal"] is False
+    assert bounce.payload_jsonb["nearest_player"]["track_role_candidate"] == (
         "far_player_track_candidate"
     )
 

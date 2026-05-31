@@ -2,6 +2,9 @@
 
 Status: implemented
 
+Follow-up: v0.3.0 tightens this guard so real sample output no longer keeps every hit candidate.
+See [Universal Hit Validity Guard Tightening v0.3.0](universal_hit_validity_guard_tightening_v030.md).
+
 This repair adds a final candidate-only validity guard after the existing hit/bounce candidate
 classifiers and overlap suppressors. The guard applies to every remaining `hit_candidate` source:
 local/player-proximate hits, player-anchored hits, court-y net-axis reversal hits, image-y

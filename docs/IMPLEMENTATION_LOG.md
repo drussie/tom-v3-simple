@@ -2534,6 +2534,34 @@ The guard is still candidate evidence only. A hit candidate still does not requi
 and sequence remains weak diagnostic context. The repair does not add hit truth, bounce truth,
 in/out, rally/point/score logic, player identity, accepted/rejected lifecycle, or adjudication.
 
+## Universal Hit Validity Guard Tightening v0.3.0
+
+Status: complete
+
+### Goal
+
+Tighten the v0.2.9 universal hit-candidate guard so it actively corrects the real sample output
+instead of keeping every hit marker.
+
+### Notes
+
+This repair adds:
+
+- `physics_heuristic_version` / guard version `v0.3.0`
+- `universal_hit_guard_bounce_candidate_v030`
+- hard reversal assessment split into court-y net-axis support, image-y axis support, and weaker
+  image-direction support
+- reclassification of bounce-like fallback landing hits
+- suppression of midcourt image-direction-only fly-through/transit hits
+
+The local bridge smoke run produced 5 `hit_candidate` observations, 3 `bounce_candidate`
+observations, and 869 rejection diagnostics. The guard evaluated 7 final hit candidates and
+reported `{"keep_as_hit": 5, "reclassify_to_bounce": 1, "suppress_as_diagnostic": 1}`.
+
+The guard is still candidate evidence only. A hit candidate still does not require a prior bounce,
+and sequence remains weak diagnostic context. The repair does not add hit truth, bounce truth,
+in/out, rally/point/score logic, player identity, accepted/rejected lifecycle, or adjudication.
+
 ## Player-Anchored Hit Contact-Zone Tightening v0.2.4
 
 Status: complete

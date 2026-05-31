@@ -54,7 +54,7 @@ LOCAL_EVIDENCE_DIRECTION_CHANGE_BOUNCE_CANDIDATE_METHOD = (
     "local_evidence_direction_change_bounce_candidate_v028"
 )
 UNIVERSAL_HIT_GUARD_BOUNCE_CANDIDATE_METHOD = (
-    "universal_hit_guard_bounce_candidate_v029"
+    "universal_hit_guard_bounce_candidate_v030"
 )
 BOUNCE_CANDIDATE_METHOD = "image_vertical_proxy_speed_reduction_bounce_candidate_v024"
 BOUNCE_FALLBACK_CANDIDATE_METHOD = (
@@ -66,13 +66,13 @@ PLAYER_ANCHORED_HIT_CANDIDATE_METHOD = (
 SIDE_ZONE_SEQUENCE_HIT_METHOD = "side_zone_sequence_hit_candidate_v024"
 SIDE_ZONE_SEQUENCE_BOUNCE_METHOD = "side_zone_sequence_bounce_candidate_v024"
 EVENT_CANDIDATE_METHOD = (
-    "universal_hit_candidate_validity_guard_candidate_evidence_v029"
+    "universal_hit_candidate_validity_guard_candidate_evidence_v030"
 )
 LOCAL_EVIDENCE_CLASSIFICATION_PRIORITY = "local_evidence_event_type_classification"
 LOCAL_EVIDENCE_EVENT_TYPE_CLASSIFIER_VERSION = "v0.2.8"
-EVENT_CANDIDATE_VERSION = "v0.2.9"
+EVENT_CANDIDATE_VERSION = "v0.3.0"
 UNIVERSAL_HIT_VALIDITY_GUARD_PRIORITY = "universal_hit_candidate_validity_guard"
-UNIVERSAL_HIT_VALIDITY_GUARD_VERSION = "v0.2.9"
+UNIVERSAL_HIT_VALIDITY_GUARD_VERSION = "v0.3.0"
 COURT_SIDE_SPLIT_Y = 0.50
 COURT_MIDCOURT_MARGIN_Y = 0.05
 COURT_Y_CONVENTION = "court_y_low_near_high_far_v024"
@@ -4026,6 +4026,7 @@ def apply_universal_hit_candidate_validity_guard(
         assessment = _universal_hit_validity_assessment(
             candidate,
             config=config,
+            court_side_zone=court_side_zone,
             player_contact_zone=player_contact_zone,
             court_landing_zone=court_landing_zone,
         )
@@ -4171,10 +4172,18 @@ def _universal_hit_validity_assessment(
     candidate: EventCandidateDraft,
     *,
     config: HitBounceCandidateConfig,
+    court_side_zone: dict[str, Any],
     player_contact_zone: dict[str, Any],
     court_landing_zone: dict[str, Any],
 ) -> dict[str, Any]:
-    reversal_support = _candidate_has_reversal_support(candidate, config=config)
+    net_axis_reversal_support = _candidate_has_net_axis_reversal_support(candidate)
+    image_axis_reversal_support = _candidate_has_image_axis_reversal_support(candidate)
+    image_direction_support = _candidate_has_image_direction_support(
+        candidate,
+        config=config,
+    )
+    hard_reversal_support = net_axis_reversal_support or image_axis_reversal_support
+    reversal_support = hard_reversal_support or image_direction_support
     contact_support = _candidate_has_contact_support(
         candidate,
         player_contact_zone=player_contact_zone,
@@ -4187,25 +4196,36 @@ def _universal_hit_validity_assessment(
         candidate,
         court_landing_zone=court_landing_zone,
     )
-    local_image_direction_support = _candidate_has_image_direction_support(
-        candidate,
-        config=config,
+    fallback_hit_candidate = (
+        candidate.candidate_method == HIT_FALLBACK_CANDIDATE_METHOD
+        or candidate.original_candidate_method == HIT_FALLBACK_CANDIDATE_METHOD
     )
+    midcourt_transit_zone = court_side_zone.get("side") == "midcourt_net_zone"
     bounce_like_landing_zone = (
-        landing_zone_support and not reversal_support and not contact_support
+        landing_zone_support
+        and not hard_reversal_support
+        and not strong_contact_support
+        and (not contact_support or fallback_hit_candidate)
     )
     fly_through_candidate = (
-        not reversal_support
+        not hard_reversal_support
         and not contact_support
-        and not landing_zone_support
-        and not local_image_direction_support
+        and (
+            not landing_zone_support
+            or (image_direction_support and midcourt_transit_zone)
+        )
     )
     return {
         "reversal_support": reversal_support,
+        "hard_reversal_support": hard_reversal_support,
+        "net_axis_reversal_support": net_axis_reversal_support,
+        "image_axis_reversal_support": image_axis_reversal_support,
+        "image_direction_support": image_direction_support,
         "contact_support": contact_support,
         "strong_contact_support": strong_contact_support,
         "landing_zone_support": landing_zone_support,
-        "local_image_direction_support": local_image_direction_support,
+        "fallback_hit_candidate": fallback_hit_candidate,
+        "midcourt_transit_zone": midcourt_transit_zone,
         "bounce_like_landing_zone": bounce_like_landing_zone,
         "fly_through_candidate": fly_through_candidate,
         "court_landing_zone_candidate": court_landing_zone.get(
@@ -4221,10 +4241,10 @@ def _universal_hit_validity_assessment(
 
 
 def _universal_hit_validity_decision(assessment: dict[str, Any]) -> str:
-    if assessment.get("bounce_like_landing_zone") is True:
-        return "reclassify_to_bounce"
     if assessment.get("fly_through_candidate") is True:
         return "suppress_as_diagnostic"
+    if assessment.get("bounce_like_landing_zone") is True:
+        return "reclassify_to_bounce"
     return "keep_as_hit"
 
 
@@ -4262,11 +4282,7 @@ def _guard_reason_codes(
     return list(dict.fromkeys([*candidate.reason_codes, *additions]))
 
 
-def _candidate_has_reversal_support(
-    candidate: EventCandidateDraft,
-    *,
-    config: HitBounceCandidateConfig,
-) -> bool:
+def _candidate_has_net_axis_reversal_support(candidate: EventCandidateDraft) -> bool:
     if candidate.net_axis_reversal is not None and candidate.net_axis_reversal.get(
         "reversal"
     ) is True:
@@ -4278,11 +4294,24 @@ def _candidate_has_reversal_support(
         or recall.get("reversal_candidate") is True
     ):
         return True
+    return False
+
+
+def _candidate_has_image_axis_reversal_support(candidate: EventCandidateDraft) -> bool:
     image_axis_recall = candidate.image_space_net_axis_reversal_recall or {}
-    if (
+    return bool(
         image_axis_recall.get("image_axis_reversal") is True
         or image_axis_recall.get("reversal") is True
-    ):
+    )
+
+
+def _candidate_has_image_direction_support(
+    candidate: EventCandidateDraft,
+    *,
+    config: HitBounceCandidateConfig,
+) -> bool:
+    local_evidence = candidate.local_evidence_event_type or {}
+    if local_evidence.get("hit_like_airborne_direction_change") is True:
         return True
     image_direction_recall = candidate.image_space_direction_change_recall or {}
     direction_delta = _number(image_direction_recall.get("image_direction_delta_degrees"))
@@ -4334,17 +4363,6 @@ def _candidate_has_landing_zone_support(
         court_landing_zone.get("landing_zone_candidate") is True
         or vertical_motion_proxy.get("descending_to_ascending") is True
     )
-
-
-def _candidate_has_image_direction_support(
-    candidate: EventCandidateDraft,
-    *,
-    config: HitBounceCandidateConfig,
-) -> bool:
-    local_evidence = candidate.local_evidence_event_type or {}
-    if local_evidence.get("hit_like_airborne_direction_change") is True:
-        return True
-    return _candidate_has_reversal_support(candidate, config=config)
 
 
 def classify_direction_change_candidate_local_evidence(

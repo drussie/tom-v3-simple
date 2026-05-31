@@ -120,10 +120,11 @@ This registry makes TOM v3 Simple boundaries explicit.
   candidates as hit-like or bounce-like using local landing/contact evidence. It explicitly does
   not require a prior bounce before a hit candidate, and sequence remains weak diagnostic context
   only.
-- Universal Hit Candidate Validity Guard v0.2.9 adds a final guard across all hit-candidate
-  sources. It can reclassify unsupported landing-like hits or suppress fly-through/no-event hits
-  into diagnostics, but it remains heuristic candidate evidence and does not prove contact, bounce,
-  in/out, score, or point state.
+- Universal Hit Candidate Validity Guard v0.3.0 adds a final guard across all hit-candidate
+  sources and tightens v0.2.9 by separating hard reversal evidence from image-direction-only
+  transit evidence. It can reclassify unsupported landing-like hits or suppress fly-through/no-event
+  hits into diagnostics, but it remains heuristic candidate evidence and does not prove contact,
+  bounce, in/out, score, or point state.
 - Hit/Bounce Side-Zone + Sequence Classification Repair v0.2.2 can reclassify raw hit/bounce
   candidates using court-side zones and a simple event-sequence prior. This improves operator-review
   labels, but the sequence prior is heuristic candidate evidence only and is not rally, point,

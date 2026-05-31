@@ -755,6 +755,9 @@ Universal Hit Candidate Validity Guard v0.2.9 adds selected evidence fields for
 `hit_candidate`, reclassified unsupported landing-like evidence to `bounce_candidate`, or suppressed
 fly-through/transit evidence into diagnostics. The guard applies to every final hit-candidate source
 and remains candidate-only; it is not hit truth, bounce truth, in/out, score, or adjudication.
+The v0.3.0 tightening separates hard net-axis/image-y reversal support from generic image-direction
+changes so transit-like hit markers can be suppressed and bounce-like landing markers can be
+reclassified while remaining candidate evidence only.
 
 Player-anchored hit recall v0.2.3 adds `player_anchored_hit_recall` details for candidate hits
 recovered from wider ball windows around near/far main player projection anchors. Selected evidence
