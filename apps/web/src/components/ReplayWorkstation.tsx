@@ -3161,6 +3161,30 @@ function SelectedEvidencePanel({
           }
         />
         <DetailRow
+          label="marker arbitration"
+          value={
+            item.marker_level_arbitration === null ||
+            item.marker_level_arbitration === undefined
+              ? "n/a"
+              : `${String(item.marker_level_arbitration.decision ?? "n/a")} · ${String(
+                  item.marker_level_arbitration.reason ?? "n/a"
+                )}`
+          }
+        />
+        <DetailRow
+          label="marker no-bounce rule"
+          value={
+            item.marker_level_arbitration === null ||
+            item.marker_level_arbitration === undefined
+              ? "n/a"
+              : `hit requires prior bounce: ${String(
+                  item.marker_level_arbitration.hit_requires_prior_bounce ?? "false"
+                )}; sequence hard gate: ${String(
+                  item.marker_level_arbitration.sequence_is_hard_gate ?? "false"
+                )}`
+          }
+        />
+        <DetailRow
           label="player anchored recall"
           value={
             item.player_anchored_hit_recall === null ||

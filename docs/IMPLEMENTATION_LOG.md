@@ -1,5 +1,38 @@
 # TOM v3 Simple - Implementation Log
 
+## Marker-Level Event Arbitration v0.3.1
+
+Status: complete when accepted
+
+### Goal
+
+Resolve visible hit/bounce marker conflicts after universal hit validity guard v0.3.0 without
+adding event truth or sequence hard gates.
+
+### Outcome
+
+The repair adds:
+
+- marker-level arbitration after the universal guard
+- `marker_level_arbitration` payload metadata on final event candidates and diagnostics
+- co-located hit/bounce conflict handling that prefers the bounce marker unless the hit has strong
+  independent contact evidence
+- fly-through/transit hit suppression into `event_candidate_rejection_diagnostic`
+- CLI summary counts for marker-level decisions, conflicts resolved to bounce, fly-through hits
+  suppressed, and far-side recall preservation
+- replay selected-evidence fields for marker-level arbitration decisions and the
+  `hit_requires_prior_bounce = false` / `sequence_is_hard_gate = false` flags
+- focused regression tests for overlap resolution, independent contact preservation, and
+  fly-through suppression
+
+### Non-goals
+
+- No hit truth or bounce truth.
+- No in/out, rally, point, or score.
+- No player identity, scoreboard OCR, or server/receiver logic.
+- No accepted/rejected lifecycle.
+- No adjudication.
+
 ## Net-Axis Reversal Hit Recall v0.2.5
 
 Status: complete when accepted

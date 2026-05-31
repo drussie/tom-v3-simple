@@ -56,6 +56,8 @@ LOCAL_EVIDENCE_DIRECTION_CHANGE_BOUNCE_CANDIDATE_METHOD = (
 UNIVERSAL_HIT_GUARD_BOUNCE_CANDIDATE_METHOD = (
     "universal_hit_guard_bounce_candidate_v030"
 )
+MARKER_LEVEL_FAR_SIDE_BOUNCE_RECALL_METHOD = "marker_level_far_side_bounce_recall_v031"
+MARKER_LEVEL_FAR_SIDE_HIT_RECALL_METHOD = "marker_level_far_side_hit_recall_v031"
 BOUNCE_CANDIDATE_METHOD = "image_vertical_proxy_speed_reduction_bounce_candidate_v024"
 BOUNCE_FALLBACK_CANDIDATE_METHOD = (
     "image_vertical_proxy_speed_reduction_bounce_candidate_v024_fallback"
@@ -66,13 +68,15 @@ PLAYER_ANCHORED_HIT_CANDIDATE_METHOD = (
 SIDE_ZONE_SEQUENCE_HIT_METHOD = "side_zone_sequence_hit_candidate_v024"
 SIDE_ZONE_SEQUENCE_BOUNCE_METHOD = "side_zone_sequence_bounce_candidate_v024"
 EVENT_CANDIDATE_METHOD = (
-    "universal_hit_candidate_validity_guard_candidate_evidence_v030"
+    "marker_level_event_arbitration_candidate_evidence_v031"
 )
 LOCAL_EVIDENCE_CLASSIFICATION_PRIORITY = "local_evidence_event_type_classification"
 LOCAL_EVIDENCE_EVENT_TYPE_CLASSIFIER_VERSION = "v0.2.8"
-EVENT_CANDIDATE_VERSION = "v0.3.0"
+EVENT_CANDIDATE_VERSION = "v0.3.1"
 UNIVERSAL_HIT_VALIDITY_GUARD_PRIORITY = "universal_hit_candidate_validity_guard"
 UNIVERSAL_HIT_VALIDITY_GUARD_VERSION = "v0.3.0"
+MARKER_LEVEL_ARBITRATION_PRIORITY = "marker_level_arbitration"
+MARKER_LEVEL_ARBITRATION_VERSION = "v0.3.1"
 COURT_SIDE_SPLIT_Y = 0.50
 COURT_MIDCOURT_MARGIN_Y = 0.05
 COURT_Y_CONVENTION = "court_y_low_near_high_far_v024"
@@ -100,6 +104,9 @@ DEFAULT_PLAYER_ANCHORED_HIT_DISTANCE_MAX_TEMPLATE = 0.24
 DEFAULT_PLAYER_ANCHORED_HIT_MIN_NET_AXIS_DELTA_TEMPLATE = 0.015
 DEFAULT_PLAYER_ANCHORED_HIT_MIN_PRE_POST_GAP_MS = 60
 DEFAULT_EVENT_OVERLAP_DISTANCE_TEMPLATE = 0.08
+DEFAULT_MARKER_ARBITRATION_CONFLICT_WINDOW_MS = 350
+DEFAULT_MARKER_ARBITRATION_CONFLICT_COURT_DISTANCE_TEMPLATE = 0.08
+DEFAULT_MARKER_ARBITRATION_CONFLICT_IMAGE_DISTANCE_PIXELS = 24.0
 DEFAULT_NET_AXIS_REVERSAL_HIT_ENABLED = True
 DEFAULT_NET_AXIS_REVERSAL_LOOKBACK_MS = 700
 DEFAULT_NET_AXIS_REVERSAL_LOOKAHEAD_MS = 700
@@ -179,6 +186,15 @@ class HitBounceCandidateConfig:
         DEFAULT_PLAYER_ANCHORED_HIT_MIN_PRE_POST_GAP_MS
     )
     event_overlap_distance_template: float = DEFAULT_EVENT_OVERLAP_DISTANCE_TEMPLATE
+    marker_arbitration_conflict_window_ms: int = (
+        DEFAULT_MARKER_ARBITRATION_CONFLICT_WINDOW_MS
+    )
+    marker_arbitration_conflict_court_distance_template: float = (
+        DEFAULT_MARKER_ARBITRATION_CONFLICT_COURT_DISTANCE_TEMPLATE
+    )
+    marker_arbitration_conflict_image_distance_pixels: float = (
+        DEFAULT_MARKER_ARBITRATION_CONFLICT_IMAGE_DISTANCE_PIXELS
+    )
     net_axis_reversal_hit_enabled: bool = DEFAULT_NET_AXIS_REVERSAL_HIT_ENABLED
     net_axis_reversal_lookback_ms: int = DEFAULT_NET_AXIS_REVERSAL_LOOKBACK_MS
     net_axis_reversal_lookahead_ms: int = DEFAULT_NET_AXIS_REVERSAL_LOOKAHEAD_MS
@@ -269,6 +285,15 @@ class HitBounceCandidateConfig:
                 self.player_anchored_hit_min_pre_post_gap_ms
             ),
             "event_overlap_distance_template": self.event_overlap_distance_template,
+            "marker_arbitration_conflict_window_ms": (
+                self.marker_arbitration_conflict_window_ms
+            ),
+            "marker_arbitration_conflict_court_distance_template": (
+                self.marker_arbitration_conflict_court_distance_template
+            ),
+            "marker_arbitration_conflict_image_distance_pixels": (
+                self.marker_arbitration_conflict_image_distance_pixels
+            ),
             "net_axis_reversal_hit_enabled": self.net_axis_reversal_hit_enabled,
             "net_axis_reversal_lookback_ms": self.net_axis_reversal_lookback_ms,
             "net_axis_reversal_lookahead_ms": self.net_axis_reversal_lookahead_ms,
@@ -398,6 +423,7 @@ class EventCandidateDraft:
     local_evidence_event_type: dict[str, Any] | None = None
     overlap_suppression: dict[str, Any] | None = None
     universal_hit_validity_guard: dict[str, Any] | None = None
+    marker_level_arbitration: dict[str, Any] | None = None
 
     @property
     def timestamp_ms(self) -> int:
@@ -428,6 +454,7 @@ class EventCandidateRejectionDiagnostic:
     overlap_suppression: dict[str, Any] | None = None
     local_evidence_event_type: dict[str, Any] | None = None
     universal_hit_validity_guard: dict[str, Any] | None = None
+    marker_level_arbitration: dict[str, Any] | None = None
 
     @property
     def timestamp_ms(self) -> int:
@@ -570,6 +597,7 @@ def build_hit_bounce_candidates_plan(
             "dedupe_candidate_clusters",
             "apply_local_evidence_event_type_classification",
             "apply_universal_hit_candidate_validity_guard",
+            "apply_marker_level_event_arbitration",
             "persist_hit_and_bounce_candidate_observations",
             "write_candidate_source_lineage",
         ],
@@ -1208,6 +1236,15 @@ def build_hit_bounce_candidates(
             config=config,
         )
         rejection_diagnostics.extend(universal_guard_rejections)
+        (
+            final_candidates,
+            marker_arbitration_rejections,
+            marker_arbitration_summary,
+        ) = apply_marker_level_event_arbitration(
+            final_candidates,
+            config=config,
+        )
+        rejection_diagnostics.extend(marker_arbitration_rejections)
         writer = ObservationWriter(session)
         observations = _persist_event_candidates_and_diagnostics(
             writer=writer,
@@ -1248,6 +1285,7 @@ def build_hit_bounce_candidates(
         ),
         **sequence_reclassification_summary,
         **universal_guard_summary,
+        **marker_arbitration_summary,
         "suppressed_bounce_conflict_count": suppressed_bounce_conflict_count,
         "rejected_context_count": len(rejection_diagnostics),
         "rejection_reasons": _rejection_reason_counts(rejection_diagnostics),
@@ -1265,6 +1303,7 @@ def build_hit_bounce_candidates(
             LOCAL_EVIDENCE_EVENT_TYPE_CLASSIFIER_VERSION
         ),
         "universal_hit_validity_guard_version": UNIVERSAL_HIT_VALIDITY_GUARD_VERSION,
+        "marker_level_arbitration_version": MARKER_LEVEL_ARBITRATION_VERSION,
         "net_axis_reversal_context_count": net_axis_reversal_context_count,
         "net_axis_reversal_candidate_count": len(net_axis_reversal_hit_drafts),
         "net_axis_reversal_recovered_hit_count": sum(
@@ -1528,6 +1567,7 @@ def build_hit_bounce_candidates(
             "total": sum(counts.values()),
         },
         "candidate_summary": candidate_summary,
+        "marker_summary": marker_arbitration_summary.get("marker_summary", []),
         "observation_ids": [row.id for row in observations],
         "replay_url": (
             f"{viewer_base_url.rstrip('/')}/replay/{media.id}"
@@ -4168,6 +4208,479 @@ def apply_universal_hit_candidate_validity_guard(
     )
 
 
+def apply_marker_level_event_arbitration(
+    candidates: list[EventCandidateDraft],
+    *,
+    config: HitBounceCandidateConfig,
+) -> tuple[
+    list[EventCandidateDraft],
+    list[EventCandidateRejectionDiagnostic],
+    dict[str, Any],
+]:
+    """Resolve final visible marker conflicts without turning candidates into truth."""
+
+    bounces = [
+        candidate
+        for candidate in candidates
+        if candidate.observation_type == BOUNCE_CANDIDATE_OBSERVATION_TYPE
+    ]
+    final_candidates: list[EventCandidateDraft] = []
+    rejections: list[EventCandidateRejectionDiagnostic] = []
+    evaluated_count = 0
+    conflict_resolved_count = 0
+    fly_through_suppressed_count = 0
+    far_side_hit_count = 0
+    far_side_bounce_count = 0
+    decision_counts: Counter[str] = Counter()
+
+    for candidate in sorted(candidates, key=lambda item: (item.timestamp_ms, item.frame_number)):
+        if candidate.observation_type == BOUNCE_CANDIDATE_OBSERVATION_TYPE:
+            payload = _marker_level_arbitration_payload(
+                candidate,
+                decision="keep_bounce",
+                reason="final_bounce_candidate_marker",
+                conflicting_candidate=None,
+                config=config,
+            )
+            decision_counts["keep_bounce"] += 1
+            if _candidate_court_side(candidate) == "far_side":
+                far_side_bounce_count += 1
+            final_candidates.append(
+                replace(
+                    candidate,
+                    marker_level_arbitration=payload,
+                    candidate_decision={
+                        **candidate.candidate_decision,
+                        "classification_priority": MARKER_LEVEL_ARBITRATION_PRIORITY,
+                        "marker_level_arbitration_decision": "keep_bounce",
+                        "sequence_is_hard_gate": False,
+                        "hit_requires_prior_bounce": False,
+                    },
+                )
+            )
+            continue
+
+        if candidate.observation_type != HIT_CANDIDATE_OBSERVATION_TYPE:
+            final_candidates.append(candidate)
+            continue
+
+        evaluated_count += 1
+        overlapping_bounce = _marker_level_overlapping_bounce_candidate(
+            candidate,
+            bounces,
+            config=config,
+        )
+        if overlapping_bounce is not None and not _has_strong_independent_contact_evidence(
+            candidate,
+            config=config,
+        ):
+            conflict_resolved_count += 1
+            decision_counts["suppress_hit_keep_bounce"] += 1
+            payload = _marker_level_arbitration_payload(
+                candidate,
+                decision="suppress_hit_keep_bounce",
+                reason="hit_bounce_conflict_resolved_to_bounce",
+                conflicting_candidate=overlapping_bounce,
+                config=config,
+            )
+            rejections.append(
+                _rejection_diagnostic_from_candidate(
+                    replace(candidate, marker_level_arbitration=payload),
+                    rejection_reasons=[
+                        "suppressed_by_marker_level_arbitration",
+                        "hit_bounce_conflict_resolved_to_bounce",
+                        "suppressed_hit_overlapping_bounce",
+                        "co_located_hit_bounce_prefers_landing_evidence",
+                    ],
+                    decision_reason="hit_bounce_conflict_resolved_to_bounce",
+                    suppressed_by_observation_type=overlapping_bounce.observation_type,
+                    suppressed_by_frame=overlapping_bounce.frame_number,
+                    suppressed_by_timestamp_ms=overlapping_bounce.timestamp_ms,
+                    marker_level_arbitration=payload,
+                )
+            )
+            continue
+
+        if _marker_level_fly_through_hit(candidate, config=config):
+            fly_through_suppressed_count += 1
+            decision_counts["suppress_as_diagnostic"] += 1
+            payload = _marker_level_arbitration_payload(
+                candidate,
+                decision="suppress_as_diagnostic",
+                reason="fly_through_no_local_event",
+                conflicting_candidate=None,
+                config=config,
+            )
+            rejections.append(
+                _rejection_diagnostic_from_candidate(
+                    replace(candidate, marker_level_arbitration=payload),
+                    rejection_reasons=[
+                        "suppressed_by_marker_level_arbitration",
+                        "fly_through_no_local_event",
+                        "transit_candidate_without_event_evidence",
+                    ],
+                    decision_reason="fly_through_no_local_event",
+                    marker_level_arbitration=payload,
+                )
+            )
+            continue
+
+        payload = _marker_level_arbitration_payload(
+            candidate,
+            decision="keep_hit",
+            reason="local_event_evidence_supported_hit",
+            conflicting_candidate=None,
+            config=config,
+        )
+        decision_counts["keep_hit"] += 1
+        if _candidate_court_side(candidate) == "far_side":
+            far_side_hit_count += 1
+        final_candidates.append(
+            replace(
+                candidate,
+                marker_level_arbitration=payload,
+                reason_codes=_guard_reason_codes(
+                    candidate,
+                    ["kept_by_marker_level_arbitration"],
+                ),
+                candidate_decision={
+                    **candidate.candidate_decision,
+                    "classification_priority": MARKER_LEVEL_ARBITRATION_PRIORITY,
+                    "marker_level_arbitration_decision": "keep_hit",
+                    "sequence_is_hard_gate": False,
+                    "hit_requires_prior_bounce": False,
+                },
+            )
+        )
+
+    final_candidates = sorted(
+        final_candidates,
+        key=lambda item: (item.timestamp_ms, item.frame_number, item.observation_type),
+    )
+    marker_summary = _marker_level_summary(final_candidates)
+    return (
+        final_candidates,
+        rejections,
+        {
+            "marker_level_arbitration_enabled": True,
+            "marker_level_arbitration_version": MARKER_LEVEL_ARBITRATION_VERSION,
+            "marker_level_arbitration_decision_counts": dict(
+                sorted(decision_counts.items())
+            ),
+            "marker_level_arbitration": {
+                "enabled": True,
+                "version": MARKER_LEVEL_ARBITRATION_VERSION,
+                "final_candidates_evaluated": evaluated_count,
+                "hit_bounce_conflicts_resolved_to_bounce": conflict_resolved_count,
+                "fly_through_hits_suppressed": fly_through_suppressed_count,
+                "far_side_hits_recovered": far_side_hit_count,
+                "far_side_bounces_recovered": far_side_bounce_count,
+                "hit_requires_prior_bounce": False,
+                "sequence_is_hard_gate": False,
+                "candidate_only": True,
+                "not_hit_truth": True,
+                "not_bounce_truth": True,
+                "not_in_out_truth": True,
+                "no_adjudication": True,
+            },
+            "marker_level_final_candidates_evaluated": evaluated_count,
+            "hit_bounce_conflicts_resolved_to_bounce": conflict_resolved_count,
+            "fly_through_hits_suppressed": fly_through_suppressed_count,
+            "far_side_hits_recovered": far_side_hit_count,
+            "far_side_bounces_recovered": far_side_bounce_count,
+            "hit_requires_prior_bounce": False,
+            "sequence_is_hard_gate": False,
+            "marker_summary": marker_summary,
+        },
+    )
+
+
+def _marker_level_arbitration_payload(
+    candidate: EventCandidateDraft,
+    *,
+    decision: str,
+    reason: str,
+    conflicting_candidate: EventCandidateDraft | None,
+    config: HitBounceCandidateConfig,
+) -> dict[str, Any]:
+    payload: dict[str, Any] = {
+        "version": MARKER_LEVEL_ARBITRATION_VERSION,
+        "classification_priority": MARKER_LEVEL_ARBITRATION_PRIORITY,
+        "decision": decision,
+        "reason": reason,
+        "source_candidate_type": candidate.observation_type,
+        "source_candidate_method": (
+            candidate.original_candidate_method or candidate.candidate_method
+        ),
+        "has_local_reversal": _candidate_has_hard_reversal_support(candidate),
+        "has_contact_support": _candidate_has_contact_support(
+            candidate,
+            player_contact_zone=(
+                candidate.player_contact_zone
+                or _player_contact_zone_payload(
+                    candidate,
+                    config=config,
+                    court_side_zone=(
+                        candidate.court_side_zone
+                        or _court_side_zone_payload(candidate.trajectory_context.current)
+                    ),
+                )
+            ),
+        ),
+        "has_strong_independent_contact_evidence": (
+            _has_strong_independent_contact_evidence(candidate, config=config)
+        ),
+        "has_landing_support": _candidate_has_landing_zone_support(
+            candidate,
+            court_landing_zone=(
+                candidate.court_landing_zone
+                or _court_landing_zone_payload(
+                    candidate,
+                    config=config,
+                    court_side_zone=(
+                        candidate.court_side_zone
+                        or _court_side_zone_payload(candidate.trajectory_context.current)
+                    ),
+                    player_contact_zone=(
+                        candidate.player_contact_zone
+                        or _player_contact_zone_payload(
+                            candidate,
+                            config=config,
+                            court_side_zone=(
+                                candidate.court_side_zone
+                                or _court_side_zone_payload(
+                                    candidate.trajectory_context.current
+                                )
+                            ),
+                        )
+                    ),
+                )
+            ),
+        ),
+        "hit_requires_prior_bounce": False,
+        "sequence_is_hard_gate": False,
+        "candidate_only": True,
+        "not_hit_truth": True,
+        "not_bounce_truth": True,
+        "not_in_out_truth": True,
+        "observation_only": True,
+        "no_adjudication": True,
+    }
+    if conflicting_candidate is not None:
+        payload.update(
+            {
+                "conflicting_candidate_type": conflicting_candidate.observation_type,
+                "conflicting_candidate_method": conflicting_candidate.candidate_method,
+                "conflicting_frame_number": conflicting_candidate.frame_number,
+                "conflicting_timestamp_ms": conflicting_candidate.timestamp_ms,
+                "conflict_time_delta_ms": abs(
+                    candidate.timestamp_ms - conflicting_candidate.timestamp_ms
+                ),
+                "conflict_court_distance_template": _candidate_court_distance(
+                    candidate,
+                    conflicting_candidate,
+                ),
+                "conflict_image_distance_pixels": _candidate_image_distance(
+                    candidate,
+                    conflicting_candidate,
+                ),
+                "conflict_window_ms": config.marker_arbitration_conflict_window_ms,
+                "conflict_court_distance_threshold": (
+                    config.marker_arbitration_conflict_court_distance_template
+                ),
+                "conflict_image_distance_threshold": (
+                    config.marker_arbitration_conflict_image_distance_pixels
+                ),
+            }
+        )
+    return payload
+
+
+def _marker_level_overlapping_bounce_candidate(
+    hit: EventCandidateDraft,
+    bounces: list[EventCandidateDraft],
+    *,
+    config: HitBounceCandidateConfig,
+) -> EventCandidateDraft | None:
+    overlaps = [
+        bounce
+        for bounce in bounces
+        if _marker_candidates_overlap(hit, bounce, config=config)
+    ]
+    return min(
+        overlaps,
+        key=lambda bounce: (
+            abs(hit.timestamp_ms - bounce.timestamp_ms),
+            _candidate_court_distance(hit, bounce),
+            _candidate_image_distance(hit, bounce) or 1e9,
+            bounce.frame_number,
+        ),
+        default=None,
+    )
+
+
+def _marker_candidates_overlap(
+    a: EventCandidateDraft,
+    b: EventCandidateDraft,
+    *,
+    config: HitBounceCandidateConfig,
+) -> bool:
+    if (
+        abs(a.timestamp_ms - b.timestamp_ms)
+        > config.marker_arbitration_conflict_window_ms
+    ):
+        return False
+    court_distance = _candidate_court_distance(a, b)
+    if court_distance <= config.marker_arbitration_conflict_court_distance_template:
+        return True
+    image_distance = _candidate_image_distance(a, b)
+    return (
+        image_distance is not None
+        and image_distance <= config.marker_arbitration_conflict_image_distance_pixels
+    )
+
+
+def _candidate_image_distance(
+    a: EventCandidateDraft,
+    b: EventCandidateDraft,
+) -> float | None:
+    a_point = a.trajectory_context.current
+    b_point = b.trajectory_context.current
+    if (
+        a_point.image_x is None
+        or a_point.image_y is None
+        or b_point.image_x is None
+        or b_point.image_y is None
+    ):
+        return None
+    return _round(math.hypot(a_point.image_x - b_point.image_x, a_point.image_y - b_point.image_y))
+
+
+def _candidate_has_hard_reversal_support(candidate: EventCandidateDraft) -> bool:
+    return _candidate_has_net_axis_reversal_support(
+        candidate
+    ) or _candidate_has_image_axis_reversal_support(candidate)
+
+
+def _has_strong_independent_contact_evidence(
+    candidate: EventCandidateDraft,
+    *,
+    config: HitBounceCandidateConfig,
+) -> bool:
+    court_side_zone = candidate.court_side_zone or _court_side_zone_payload(
+        candidate.trajectory_context.current
+    )
+    player_contact_zone = candidate.player_contact_zone or _player_contact_zone_payload(
+        candidate,
+        config=config,
+        court_side_zone=court_side_zone,
+    )
+    source_method = candidate.original_candidate_method or candidate.candidate_method
+    if player_contact_zone.get("strong_contact_zone") is not True:
+        return False
+    if source_method == PLAYER_ANCHORED_HIT_CANDIDATE_METHOD:
+        return False
+    return source_method in {
+        HIT_CANDIDATE_METHOD,
+        IMAGE_SPACE_NET_AXIS_HIT_CANDIDATE_METHOD,
+    } or (
+        source_method == NET_AXIS_REVERSAL_HIT_CANDIDATE_METHOD
+        and candidate.nearest_player is not None
+    )
+
+
+def _marker_level_fly_through_hit(
+    candidate: EventCandidateDraft,
+    *,
+    config: HitBounceCandidateConfig,
+) -> bool:
+    if candidate.observation_type != HIT_CANDIDATE_OBSERVATION_TYPE:
+        return False
+    court_side_zone = candidate.court_side_zone or _court_side_zone_payload(
+        candidate.trajectory_context.current
+    )
+    player_contact_zone = candidate.player_contact_zone or _player_contact_zone_payload(
+        candidate,
+        config=config,
+        court_side_zone=court_side_zone,
+    )
+    court_landing_zone = candidate.court_landing_zone or _court_landing_zone_payload(
+        candidate,
+        config=config,
+        court_side_zone=court_side_zone,
+        player_contact_zone=player_contact_zone,
+    )
+    source_method = candidate.original_candidate_method or candidate.candidate_method
+    has_contact = _candidate_has_contact_support(
+        candidate,
+        player_contact_zone=player_contact_zone,
+    )
+    if has_contact or _candidate_has_image_axis_reversal_support(candidate):
+        return False
+    if source_method == NET_AXIS_REVERSAL_HIT_CANDIDATE_METHOD:
+        nearest_distance = (
+            candidate.nearest_player.distance_template_units
+            if candidate.nearest_player is not None
+            else None
+        )
+        return bool(
+            candidate.nearest_player is not None
+            and nearest_distance is not None
+            and nearest_distance > config.hit_player_review_distance_max_template
+            and player_contact_zone.get("in_contact_zone") is not True
+            and court_landing_zone.get("landing_zone_candidate") is True
+        )
+    has_any_local_event = (
+        _candidate_has_hard_reversal_support(candidate)
+        or _candidate_has_image_direction_support(candidate, config=config)
+        or _candidate_has_landing_zone_support(
+            candidate,
+            court_landing_zone=court_landing_zone,
+        )
+    )
+    return not has_any_local_event
+
+
+def _candidate_court_side(candidate: EventCandidateDraft) -> str | None:
+    return (
+        candidate.court_side_zone
+        or _court_side_zone_payload(candidate.trajectory_context.current)
+    ).get("side")
+
+
+def _marker_level_summary(
+    candidates: list[EventCandidateDraft],
+) -> list[dict[str, Any]]:
+    summary: list[dict[str, Any]] = []
+    for candidate in sorted(candidates, key=lambda item: (item.timestamp_ms, item.frame_number)):
+        current = candidate.trajectory_context.current
+        marker_arbitration = candidate.marker_level_arbitration or {}
+        summary.append(
+            {
+                "candidate_type": candidate.observation_type,
+                "frame": candidate.frame_number,
+                "timestamp_ms": candidate.timestamp_ms,
+                "source_method": candidate.original_candidate_method
+                or candidate.candidate_method,
+                "candidate_method": candidate.candidate_method,
+                "court_x": _round(current.court_x),
+                "court_y": _round(current.court_y),
+                "image_x": _round(current.image_x) if current.image_x is not None else None,
+                "image_y": _round(current.image_y) if current.image_y is not None else None,
+                "court_side": _candidate_court_side(candidate),
+                "arbitration_decision": marker_arbitration.get("decision"),
+                "reason": marker_arbitration.get("reason"),
+                "confidence": _round(candidate.confidence),
+                "candidate_only": True,
+                "not_hit_truth": True,
+                "not_bounce_truth": True,
+                "not_in_out_truth": True,
+                "no_adjudication": True,
+            }
+        )
+    return summary
+
+
 def _universal_hit_validity_assessment(
     candidate: EventCandidateDraft,
     *,
@@ -5904,6 +6417,7 @@ def _rejection_diagnostic_from_candidate(
     suppressed_by_timestamp_ms: int | None = None,
     overlap_suppression: dict[str, Any] | None = None,
     universal_hit_validity_guard: dict[str, Any] | None = None,
+    marker_level_arbitration: dict[str, Any] | None = None,
 ) -> EventCandidateRejectionDiagnostic:
     candidate_decision = {
         "selected_candidate_type": None,
@@ -5911,9 +6425,13 @@ def _rejection_diagnostic_from_candidate(
         "reason": decision_reason,
         "rejection_reasons": rejection_reasons,
         "classification_priority": (
-            UNIVERSAL_HIT_VALIDITY_GUARD_PRIORITY
-            if universal_hit_validity_guard is not None
-            else LOCAL_EVIDENCE_CLASSIFICATION_PRIORITY
+            MARKER_LEVEL_ARBITRATION_PRIORITY
+            if marker_level_arbitration is not None
+            else (
+                UNIVERSAL_HIT_VALIDITY_GUARD_PRIORITY
+                if universal_hit_validity_guard is not None
+                else LOCAL_EVIDENCE_CLASSIFICATION_PRIORITY
+            )
         ),
     }
     if suppressed_by_observation_type is not None:
@@ -5957,6 +6475,9 @@ def _rejection_diagnostic_from_candidate(
         overlap_suppression=overlap_suppression or candidate.overlap_suppression,
         universal_hit_validity_guard=(
             universal_hit_validity_guard or candidate.universal_hit_validity_guard
+        ),
+        marker_level_arbitration=(
+            marker_level_arbitration or candidate.marker_level_arbitration
         ),
     )
 
@@ -6165,6 +6686,8 @@ def _event_candidate_observation_create(
         payload["universal_hit_validity_guard"] = (
             candidate.universal_hit_validity_guard
         )
+    if candidate.marker_level_arbitration is not None:
+        payload["marker_level_arbitration"] = candidate.marker_level_arbitration
     if candidate.original_observation_type is not None:
         payload["original_candidate_type"] = candidate.original_observation_type
     if candidate.original_candidate_method is not None:
@@ -6319,6 +6842,8 @@ def _event_candidate_diagnostic_observation_create(
         payload["universal_hit_validity_guard"] = (
             diagnostic.universal_hit_validity_guard
         )
+    if diagnostic.marker_level_arbitration is not None:
+        payload["marker_level_arbitration"] = diagnostic.marker_level_arbitration
     lineage = []
     trajectory_observation_id = _trajectory_observation_id(current)
     if trajectory_observation_id is not None:
@@ -6662,6 +7187,13 @@ def _register_model(session: Session) -> ModelRegistry:
             "universal_hit_validity_guard_version": (
                 UNIVERSAL_HIT_VALIDITY_GUARD_VERSION
             ),
+            "marker_level_arbitration_version": MARKER_LEVEL_ARBITRATION_VERSION,
+            "marker_level_far_side_hit_recall_method": (
+                MARKER_LEVEL_FAR_SIDE_HIT_RECALL_METHOD
+            ),
+            "marker_level_far_side_bounce_recall_method": (
+                MARKER_LEVEL_FAR_SIDE_BOUNCE_RECALL_METHOD
+            ),
             "player_anchored_hit_candidate_method": PLAYER_ANCHORED_HIT_CANDIDATE_METHOD,
             "bounce_candidate_method": BOUNCE_CANDIDATE_METHOD,
             **EVENT_CANDIDATE_WARNINGS,
@@ -6691,6 +7223,7 @@ def _create_runtime_config(
             "universal_hit_validity_guard_version": (
                 UNIVERSAL_HIT_VALIDITY_GUARD_VERSION
             ),
+            "marker_level_arbitration_version": MARKER_LEVEL_ARBITRATION_VERSION,
             "source_ball_trajectory_run_id": ball_trajectory_run_id,
             "source_court_projection_run_id": court_projection_run_id,
             "court_template_name": COURT_TEMPLATE_NAME,
@@ -6730,6 +7263,7 @@ def _create_run(
             ),
             "source_ball_trajectory_run_id": ball_trajectory_run_id,
             "source_court_projection_run_id": court_projection_run_id,
+            "marker_level_arbitration_version": MARKER_LEVEL_ARBITRATION_VERSION,
             "evidence_source": "event_candidate",
             "source_label": "hit/bounce candidate evidence",
             **config.as_dict(),
@@ -6751,7 +7285,7 @@ def _create_step(
     now = datetime.now(UTC)
     step = ProcessingStep(
         run_id=run.id,
-        step_name="universal_hit_candidate_validity_guard_v029",
+        step_name="marker_level_event_arbitration_v031",
         step_status="running",
         started_at=now,
         runtime_config_id=runtime_config.id,

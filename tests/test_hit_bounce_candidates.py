@@ -28,6 +28,7 @@ from apps.worker.services.hit_bounce_candidates import (
     IMAGE_SPACE_DIRECTION_CHANGE_HIT_CANDIDATE_METHOD,
     IMAGE_SPACE_NET_AXIS_HIT_CANDIDATE_METHOD,
     LOCAL_EVIDENCE_DIRECTION_CHANGE_BOUNCE_CANDIDATE_METHOD,
+    MARKER_LEVEL_ARBITRATION_PRIORITY,
     NET_AXIS_REVERSAL_HIT_CANDIDATE_METHOD,
     PLAYER_ANCHORED_HIT_CANDIDATE_METHOD,
     SIDE_ZONE_SEQUENCE_BOUNCE_METHOD,
@@ -40,6 +41,7 @@ from apps.worker.services.hit_bounce_candidates import (
     PlayerProjection,
     TrajectoryContext,
     TrajectoryPoint,
+    apply_marker_level_event_arbitration,
     apply_side_zone_sequence_classification,
     apply_universal_hit_candidate_validity_guard,
     build_hit_bounce_candidates,
@@ -999,9 +1001,8 @@ def test_player_proximate_trajectory_change_is_prioritized_as_hit(
     )
     assert hit is not None
     assert "player_proximate_event_priority" in hit.payload_jsonb["reason_codes"]
-    assert hit.payload_jsonb["classification_priority"] == (
-        UNIVERSAL_HIT_VALIDITY_GUARD_PRIORITY
-    )
+    assert hit.payload_jsonb["classification_priority"] == MARKER_LEVEL_ARBITRATION_PRIORITY
+    assert hit.payload_jsonb["marker_level_arbitration"]["decision"] == "keep_hit"
     assert hit.payload_jsonb["player_proximity_gate"]["threshold"] == 0.33
     assert hit.payload_jsonb["candidate_decision"]["suppressed_candidate_types"] == [
         "bounce_candidate"
@@ -1598,6 +1599,133 @@ def test_player_anchored_hit_overlap_with_bounce_is_suppressed() -> None:
     assert diagnostics[0].overlap_suppression["suppressed"] is True
 
 
+def test_marker_level_arbitration_resolves_colocated_hit_bounce_to_bounce() -> None:
+    bounce = _draft_event_candidate(
+        observation_type="bounce_candidate",
+        frame=30,
+        timestamp_ms=1000,
+        court_x=0.44,
+        court_y=0.89,
+        track_role_candidate="far_player_track_candidate",
+        player_distance=0.30,
+        candidate_method=BOUNCE_CANDIDATE_METHOD,
+        net_axis_reversal=False,
+    )
+    hit = replace(
+        _draft_event_candidate(
+            observation_type="hit_candidate",
+            frame=34,
+            timestamp_ms=1133,
+            court_x=0.445,
+            court_y=0.90,
+            track_role_candidate="far_player_track_candidate",
+            player_distance=0.12,
+            candidate_method=PLAYER_ANCHORED_HIT_CANDIDATE_METHOD,
+            net_axis_reversal=True,
+        ),
+        player_anchor_contact_zone={
+            "in_contact_zone": True,
+            "strong_contact_zone": True,
+            "open_court_landing_zone": False,
+        },
+    )
+
+    final_candidates, diagnostics, summary = apply_marker_level_event_arbitration(
+        [bounce, hit],
+        config=HitBounceCandidateConfig(),
+    )
+
+    assert [candidate.observation_type for candidate in final_candidates] == [
+        "bounce_candidate"
+    ]
+    assert summary["hit_bounce_conflicts_resolved_to_bounce"] == 1
+    assert summary["marker_level_arbitration"]["sequence_is_hard_gate"] is False
+    assert summary["marker_level_arbitration"]["hit_requires_prior_bounce"] is False
+    assert diagnostics[0].candidate_decision["reason"] == (
+        "hit_bounce_conflict_resolved_to_bounce"
+    )
+    assert "suppressed_hit_overlapping_bounce" in diagnostics[0].rejection_reasons
+    assert diagnostics[0].marker_level_arbitration is not None
+    assert diagnostics[0].marker_level_arbitration["decision"] == (
+        "suppress_hit_keep_bounce"
+    )
+
+
+def test_marker_level_arbitration_keeps_independent_contact_hit() -> None:
+    bounce = _draft_event_candidate(
+        observation_type="bounce_candidate",
+        frame=10,
+        timestamp_ms=333,
+        court_x=0.30,
+        court_y=0.20,
+        track_role_candidate="near_player_track_candidate",
+        player_distance=0.40,
+        candidate_method=BOUNCE_CANDIDATE_METHOD,
+        net_axis_reversal=False,
+    )
+    hit = _draft_event_candidate(
+        observation_type="hit_candidate",
+        frame=10,
+        timestamp_ms=333,
+        court_x=0.301,
+        court_y=0.201,
+        track_role_candidate="near_player_track_candidate",
+        player_distance=0.10,
+        candidate_method=HIT_CANDIDATE_METHOD,
+        net_axis_reversal=True,
+    )
+
+    final_candidates, diagnostics, summary = apply_marker_level_event_arbitration(
+        [bounce, hit],
+        config=HitBounceCandidateConfig(),
+    )
+
+    assert diagnostics == []
+    assert [candidate.observation_type for candidate in final_candidates] == [
+        "bounce_candidate",
+        "hit_candidate",
+    ]
+    assert summary["hit_bounce_conflicts_resolved_to_bounce"] == 0
+    kept_hit = next(
+        candidate
+        for candidate in final_candidates
+        if candidate.observation_type == "hit_candidate"
+    )
+    assert kept_hit.marker_level_arbitration is not None
+    assert kept_hit.marker_level_arbitration["decision"] == "keep_hit"
+    assert kept_hit.marker_level_arbitration[
+        "has_strong_independent_contact_evidence"
+    ] is True
+
+
+def test_marker_level_arbitration_suppresses_fly_through_hit() -> None:
+    fly_through = _draft_event_candidate(
+        observation_type="hit_candidate",
+        frame=93,
+        timestamp_ms=3100,
+        court_x=0.20,
+        court_y=0.12,
+        track_role_candidate="near_player_track_candidate",
+        player_distance=0.50,
+        candidate_method=NET_AXIS_REVERSAL_HIT_CANDIDATE_METHOD,
+        net_axis_reversal=True,
+    )
+
+    final_candidates, diagnostics, summary = apply_marker_level_event_arbitration(
+        [fly_through],
+        config=HitBounceCandidateConfig(),
+    )
+
+    assert final_candidates == []
+    assert summary["fly_through_hits_suppressed"] == 1
+    assert diagnostics[0].candidate_decision["reason"] == "fly_through_no_local_event"
+    assert "fly_through_no_local_event" in diagnostics[0].rejection_reasons
+    assert diagnostics[0].marker_level_arbitration is not None
+    assert diagnostics[0].marker_level_arbitration["decision"] == (
+        "suppress_as_diagnostic"
+    )
+
+
 def test_weak_net_axis_reversal_hit_overlap_with_bounce_is_suppressed() -> None:
     bounce = _draft_event_candidate(
         observation_type="bounce_candidate",
@@ -2023,7 +2151,7 @@ def test_event_candidate_replay_payloads_are_exposed(db_session: Session) -> Non
     assert overlays[0]["court_point"] == {"x": 0.3, "y": 0.2}
     assert overlays[0]["image_point"] == {"x": 300.0, "y": 100.0}
     assert overlays[0]["image_marker_source"] == "source_ball_court_projection_image_point"
-    assert overlays[0]["classification_priority"] == UNIVERSAL_HIT_VALIDITY_GUARD_PRIORITY
+    assert overlays[0]["classification_priority"] == MARKER_LEVEL_ARBITRATION_PRIORITY
     assert overlays[0]["player_proximity_gate"]["nearest_player_found"] is True
     assert overlays[0]["candidate_decision"]["selected_candidate_type"] == "hit_candidate"
     assert overlays[0]["net_axis_reversal"]["reversal"] is True
@@ -2042,9 +2170,7 @@ def test_event_candidate_replay_payloads_are_exposed(db_session: Session) -> Non
     assert timeline_items[0]["item_type"] == "hit_candidate"
     assert timeline_items[0]["image_point"] == {"x": 300.0, "y": 100.0}
     assert timeline_items[0]["image_marker_source"] == "source_ball_court_projection_image_point"
-    assert timeline_items[0]["classification_priority"] == (
-        UNIVERSAL_HIT_VALIDITY_GUARD_PRIORITY
-    )
+    assert timeline_items[0]["classification_priority"] == MARKER_LEVEL_ARBITRATION_PRIORITY
     assert timeline_items[0]["universal_hit_validity_guard"]["final_decision"] == (
         "keep_as_hit"
     )

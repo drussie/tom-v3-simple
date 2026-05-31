@@ -1466,6 +1466,12 @@ python -m apps.worker.cli completion-audit --no-demo-only
   `bounce_candidate`, and can suppress fly-through/no-event hits into diagnostics. v0.3.0 treats
   court-y/image-y reversal as hard support and generic image-direction changes as diagnostic support
   only. This is still candidate evidence only.
+- Marker-level event arbitration v0.3.1 runs after the universal guard. It resolves visible
+  co-located hit/bounce marker conflicts to the bounce marker unless the hit has strong independent
+  contact evidence, and it suppresses transit/fly-through hit markers into diagnostics. It records
+  `marker_level_arbitration`, keeps `hit_requires_prior_bounce = false`, and keeps
+  `sequence_is_hard_gate = false`. This is marker-level candidate display arbitration only, not
+  hit truth, bounce truth, in/out, score, or adjudication.
 - Cloud deployment, auth, production streaming, and multi-camera reasoning are out of scope.
 
 ## 15. Completion Checklist

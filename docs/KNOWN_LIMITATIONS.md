@@ -125,6 +125,11 @@ This registry makes TOM v3 Simple boundaries explicit.
   transit evidence. It can reclassify unsupported landing-like hits or suppress fly-through/no-event
   hits into diagnostics, but it remains heuristic candidate evidence and does not prove contact,
   bounce, in/out, score, or point state.
+- Marker-Level Event Arbitration v0.3.1 resolves visible marker conflicts after the universal guard.
+  It can prefer a co-located bounce marker over a hit marker unless independent contact evidence is
+  strong, and it can suppress transit/fly-through hit markers into diagnostics. It keeps
+  `hit_requires_prior_bounce = false` and `sequence_is_hard_gate = false`; this is candidate-marker
+  arbitration only, not truth or adjudication.
 - Hit/Bounce Side-Zone + Sequence Classification Repair v0.2.2 can reclassify raw hit/bounce
   candidates using court-side zones and a simple event-sequence prior. This improves operator-review
   labels, but the sequence prior is heuristic candidate evidence only and is not rally, point,

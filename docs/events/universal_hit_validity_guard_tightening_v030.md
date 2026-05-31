@@ -65,3 +65,13 @@ suppressed into diagnostics.
 
 This is candidate-quality repair only. It improves review markers and diagnostics, but it does not
 prove hit, bounce, in/out, point state, score, or adjudication.
+
+## Follow-Up v0.3.1
+
+Marker-Level Event Arbitration v0.3.1 runs after this universal guard and resolves visible marker
+conflicts that require local marker context rather than only source-specific hit validation. It can
+suppress co-located hit markers when a bounce marker is the better candidate explanation and can
+suppress transit/fly-through hits into diagnostics. It still does not require a prior bounce before
+a hit candidate, and sequence remains weak diagnostic context only.
+
+See `docs/events/marker_level_event_arbitration_v031.md`.

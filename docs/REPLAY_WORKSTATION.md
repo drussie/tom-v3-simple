@@ -759,6 +759,12 @@ The v0.3.0 tightening separates hard net-axis/image-y reversal support from gene
 changes so transit-like hit markers can be suppressed and bounce-like landing markers can be
 reclassified while remaining candidate evidence only.
 
+Marker-Level Event Arbitration v0.3.1 adds selected-evidence fields for
+`marker_level_arbitration`. The panel shows whether a visible marker was kept, whether a co-located
+hit/bounce conflict was resolved to the bounce marker, or whether a transit/fly-through hit was
+suppressed into diagnostics. The pass explicitly records `hit_requires_prior_bounce = false` and
+`sequence_is_hard_gate = false`; it is marker-level candidate arbitration, not hit/bounce truth.
+
 Player-anchored hit recall v0.2.3 adds `player_anchored_hit_recall` details for candidate hits
 recovered from wider ball windows around near/far main player projection anchors. Selected evidence
 shows the anchor track role candidate, anchor distance, incoming/current/outgoing frames, and
