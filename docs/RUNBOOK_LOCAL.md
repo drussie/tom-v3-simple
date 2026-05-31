@@ -1497,6 +1497,10 @@ python -m apps.worker.cli completion-audit --no-demo-only
   hit truth, bounce truth, in/out, score, or adjudication.
 - Compact CLI + Marker Summary v0 changes default hit/bounce command output only. Full diagnostic
   data is still persisted and can be printed with verbose/debug flags.
+- Replay Marker Inspector v0 and Event Candidate Review Panel v0 use `marker_summary` in replay so
+  operators can review final visible hit/bounce markers, click rows to seek/select markers, and
+  inspect compact candidate evidence without terminal JSON. This is display-only and does not
+  create truth, in/out, score, or adjudication.
 - Cloud deployment, auth, production streaming, and multi-camera reasoning are out of scope.
 
 ## 15. Completion Checklist

@@ -1413,6 +1413,123 @@ pre {
   padding: 14px;
 }
 
+.event-candidate-review-panel {
+  border-color: rgba(148, 163, 184, 0.32);
+}
+
+.event-candidate-review-body {
+  display: grid;
+  gap: 10px;
+}
+
+.event-candidate-review-list {
+  display: grid;
+  gap: 8px;
+}
+
+.event-candidate-review-row {
+  background: rgba(15, 23, 42, 0.45);
+  border: 1px solid var(--line);
+  border-left-width: 4px;
+  border-radius: 8px;
+  color: var(--text);
+  cursor: pointer;
+  display: grid;
+  gap: 7px;
+  grid-template-columns: auto auto minmax(0, 1fr) auto;
+  min-width: 0;
+  padding: 9px;
+  text-align: left;
+}
+
+.event-candidate-review-row.hit {
+  border-left-color: #ff2d55;
+}
+
+.event-candidate-review-row.bounce {
+  border-left-color: #22d3ee;
+}
+
+.event-candidate-review-row:hover {
+  border-color: rgba(226, 232, 240, 0.36);
+}
+
+.event-candidate-review-row.selected {
+  background: rgba(96, 165, 250, 0.12);
+  border-color: var(--blue);
+  box-shadow: 0 0 0 1px rgba(96, 165, 250, 0.18);
+}
+
+.event-candidate-review-index,
+.event-candidate-review-time,
+.event-candidate-review-confidence {
+  align-self: center;
+  font-size: 12px;
+}
+
+.event-candidate-review-index {
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.event-candidate-review-time {
+  color: var(--muted);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.event-candidate-review-confidence {
+  color: var(--green);
+  font-weight: 800;
+  justify-self: end;
+}
+
+.event-candidate-review-meta {
+  display: grid;
+  gap: 2px;
+  grid-column: 1 / -1;
+  min-width: 0;
+}
+
+.event-candidate-review-meta.compact {
+  grid-column: 1 / 4;
+}
+
+.event-candidate-review-meta strong {
+  color: var(--muted);
+  font-size: 10px;
+  text-transform: uppercase;
+}
+
+.event-candidate-review-meta span {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 11px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.review-type {
+  border-radius: 6px;
+  font-size: 11px;
+  min-height: 22px;
+  padding: 0 8px;
+}
+
+.event-candidate-review-warning {
+  background: rgba(250, 204, 21, 0.1);
+  border: 1px solid rgba(250, 204, 21, 0.25);
+  border-radius: 6px;
+  color: #facc15;
+  font-size: 12px;
+  line-height: 1.35;
+  margin: 0;
+  padding: 9px;
+}
+
 .replay-marker-inspector {
   border-color: rgba(148, 163, 184, 0.32);
 }

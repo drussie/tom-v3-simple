@@ -68,6 +68,7 @@ import { ReplayCourtOverlay as ReplayCourtOverlayLayer } from "./ReplayCourtOver
 import { ReplayCourtProjectionMiniMap } from "./ReplayCourtProjectionMiniMap";
 import { ReplayDetectionOverlay as ReplayDetectionOverlayLayer } from "./ReplayDetectionOverlay";
 import { ReplayEventCandidateVideoOverlay } from "./ReplayEventCandidateVideoOverlay";
+import { ReplayEventCandidateReviewPanel } from "./ReplayEventCandidateReviewPanel";
 import { ReplayEvidenceTimeline } from "./ReplayEvidenceTimeline";
 import { ReplayMainPlayerTrackOverlay as ReplayMainPlayerTrackOverlayLayer } from "./ReplayMainPlayerTrackOverlay";
 import { ReplayMarkerInspector } from "./ReplayMarkerInspector";
@@ -1116,6 +1117,32 @@ export function ReplayWorkstation({
     () => selectedMarkerSummaryFromEvidence(selectedEvidence, markerSummaries),
     [markerSummaries, selectedEvidence]
   );
+  const handleMarkerReviewSelect = useCallback(
+    (marker: ReplayMarkerSummary) => {
+      const timelineItem = eventCandidateTimelineItemForMarker(
+        timelineState.timeline,
+        marker.observation_id
+      );
+      if (timelineItem !== null) {
+        handleTimelineItemSelect(timelineItem);
+        return;
+      }
+      if (replayMode === "stream_proxy" && marker.timestamp_ms > streamLiveEdgeMs) {
+        setStreamProxyNotice(
+          "Future evidence is hidden until Stream Proxy Mode reaches that media time."
+        );
+        setSeekRequest({ timestampMs: streamLiveEdgeMs, nonce: Date.now() });
+        return;
+      }
+      setSeekRequest({ timestampMs: marker.timestamp_ms, nonce: Date.now() });
+      const overlayItem =
+        eventCandidates.find((item) => item.observation_id === marker.observation_id) ?? null;
+      if (overlayItem !== null) {
+        setSelectedEvidence({ kind: "event_candidate", item: overlayItem });
+      }
+    },
+    [eventCandidates, handleTimelineItemSelect, replayMode, streamLiveEdgeMs, timelineState.timeline]
+  );
   const selectedTimelineKey = selectedTimelineItemKey(selectedEvidence);
 
   return (
@@ -1511,6 +1538,11 @@ export function ReplayWorkstation({
         </div>
         <aside className="side-column">
           <ReplayMediaPanel replayInfo={replayInfo} />
+          <ReplayEventCandidateReviewPanel
+            markers={markerSummaries}
+            onSelectMarker={handleMarkerReviewSelect}
+            selectedMarkerId={selectedMarkerSummary?.observation_id ?? null}
+          />
           <ReplayMarkerInspector
             markerCount={markerSummaries.length}
             selectedMarker={selectedMarkerSummary}
@@ -2341,6 +2373,26 @@ function markerSummaryFromEventCandidate(
 function stringFromRecord(record: Record<string, unknown>, key: string): string | null {
   const value = record[key];
   return typeof value === "string" ? value : null;
+}
+
+function eventCandidateTimelineItemForMarker(
+  timeline: ReplayTimeline | null,
+  observationId: string
+): Extract<ReplayTimelineItem, { item_type: "hit_candidate" | "bounce_candidate" }> | null {
+  if (timeline === null) {
+    return null;
+  }
+  for (const lane of timeline.lanes) {
+    for (const item of lane.items) {
+      if (
+        (item.item_type === "hit_candidate" || item.item_type === "bounce_candidate") &&
+        item.observation_id === observationId
+      ) {
+        return item;
+      }
+    }
+  }
+  return null;
 }
 
 function SelectedEvidencePanel({

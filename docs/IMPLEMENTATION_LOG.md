@@ -2685,3 +2685,30 @@ overlapped the frame-30 far-side bounce was suppressed with
 
 This repair improves candidate quality only. It does not add hit truth, bounce truth, in/out,
 rally/point/score logic, player identity, accepted/rejected lifecycle, or adjudication.
+
+## Event Candidate Review Panel v0
+
+Status: complete
+
+### Goal
+
+Add a compact ordered replay side panel for final visible event markers so operators can review
+hit/bounce candidates in sequence.
+
+### Notes
+
+This milestone adds:
+
+- `ReplayEventCandidateReviewPanel`
+- chronological marker rows sourced from replay `marker_summary`
+- row click-to-seek and click-to-select behavior wired to the existing event-candidate timeline
+  selection path
+- selected-row highlighting
+
+The panel lists final `hit_candidate` and `bounce_candidate` markers only. It excludes rejection
+diagnostics by default and leaves the Replay Marker Inspector plus selected evidence panel as the
+detail surfaces.
+
+This is an operator navigation surface only. It does not change hit/bounce generation,
+marker-level arbitration, truth status, in/out, score, player identity, accepted/rejected lifecycle,
+or adjudication.

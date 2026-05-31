@@ -777,6 +777,11 @@ decision/reason, image coordinates, court coordinates, and candidate-only warnin
 selected evidence panel remains available for deeper diagnostics. The inspector is display-only; it
 does not create hit truth, bounce truth, in/out, score, or adjudication.
 
+Event Candidate Review Panel v0 adds an ordered side-panel list of final visible hit/bounce markers
+from `marker_summary`. Clicking a row seeks replay to that marker timestamp, selects the marker, and
+updates the Replay Marker Inspector. The panel is an operator navigation surface only; it does not
+change event candidate generation, arbitration, truth status, in/out, score, or adjudication.
+
 Player-anchored hit recall v0.2.3 adds `player_anchored_hit_recall` details for candidate hits
 recovered from wider ball windows around near/far main player projection anchors. Selected evidence
 shows the anchor track role candidate, anchor distance, incoming/current/outgoing frames, and

@@ -136,6 +136,9 @@ This registry makes TOM v3 Simple boundaries explicit.
 - Compact CLI + Marker Summary v0 shortens default operator output for hit/bounce candidate builds.
   It does not remove stored diagnostics or change candidate generation; verbose/debug flags are
   still required for the full diagnostic dump.
+- Event Candidate Review Panel v0 is a replay navigation surface for final visible hit/bounce
+  markers. It does not change candidate generation, arbitration, truth status, in/out, score, or
+  adjudication.
 - Hit/Bounce Side-Zone + Sequence Classification Repair v0.2.2 can reclassify raw hit/bounce
   candidates using court-side zones and a simple event-sequence prior. This improves operator-review
   labels, but the sequence prior is heuristic candidate evidence only and is not rally, point,
