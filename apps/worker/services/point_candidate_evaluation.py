@@ -126,6 +126,7 @@ def evaluate_point_candidates(
         "review_summary": _review_summary(review_rows),
         "review_coverage": review_coverage,
         "reviewed_only_rates": reviewed_only_rates,
+        "geometry_readiness": _geometry_readiness(point_snapshot),
         "candidate_type_breakdown": _candidate_type_breakdown(
             marker_summary,
             latest_marker_reviews,
@@ -256,6 +257,25 @@ def render_point_candidate_evaluation_markdown(evaluation: dict[str, Any]) -> st
                 )
     else:
         rows.append("- none")
+
+    rows.extend(["", "## Geometry Readiness"])
+    geometry_readiness = _dict_or_empty(evaluation.get("geometry_readiness"))
+    rows.append(
+        f"- camera_geometry_available: "
+        f"{geometry_readiness.get('camera_geometry_available', False)}"
+    )
+    rows.append(
+        f"- court_plane_geometry_declared: "
+        f"{geometry_readiness.get('court_plane_geometry_declared', False)}"
+    )
+    rows.append(
+        "- true_3d_reconstruction_available: "
+        f"{geometry_readiness.get('true_3d_reconstruction_available', False)}"
+    )
+    rows.append(
+        "- 3d_ball_trajectory_available: "
+        f"{geometry_readiness.get('3d_ball_trajectory_available', False)}"
+    )
 
     rows.extend(
         [
@@ -463,6 +483,32 @@ def _missing_candidate_notes(
             }
         )
     return notes
+
+
+def _geometry_readiness(point_snapshot: dict[str, Any]) -> dict[str, Any]:
+    summary = point_snapshot.get("camera_geometry_summary")
+    if not isinstance(summary, dict) or summary.get("available") is not True:
+        return {
+            "camera_geometry_available": False,
+            "court_plane_geometry_declared": False,
+            "true_3d_reconstruction_available": False,
+            "3d_ball_trajectory_available": False,
+            "geometry_evidence_only": True,
+            "no_adjudication": True,
+        }
+    return {
+        "camera_geometry_available": True,
+        "camera_geometry_id": summary.get("camera_geometry_id"),
+        "court_plane_geometry_declared": bool(
+            summary.get("court_plane_geometry_declared") is True
+        ),
+        "camera_intrinsics_known": bool(summary.get("camera_intrinsics_known") is True),
+        "camera_extrinsics_known": bool(summary.get("camera_extrinsics_known") is True),
+        "true_3d_reconstruction_available": False,
+        "3d_ball_trajectory_available": False,
+        "geometry_evidence_only": True,
+        "no_adjudication": True,
+    }
 
 
 def _warnings(reviewed_final_markers: int) -> dict[str, bool]:

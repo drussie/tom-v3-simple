@@ -2,7 +2,7 @@
 
 ## Current Progress Gauge
 
-Current: Blueprints 1, 2, 3, 4, 5, 6, 7, and 8 complete/frozen; Blueprint 9 manual candidate review annotations are complete; Blueprint 10 benchmark/evaluation harness has started; TOM v3 Simple is complete as an observation-only evidence platform.
+Current: Blueprints 1, 2, 3, 4, 5, 6, 7, and 8 complete/frozen; Blueprint 9 manual candidate review annotations are complete; Blueprint 10 benchmark/evaluation harness is complete; Blueprint 11 3D readiness / camera geometry evidence has started; TOM v3 Simple is complete as an observation-only evidence platform.
 
 ## Current
 
@@ -400,7 +400,7 @@ marker counts, create accepted/rejected truth, or add in/out, score, point state
 
 ## Blueprint 10 Status
 
-Status: started.
+Status: complete.
 
 Blueprint 10 Benchmark / Evaluation Harness v0 adds read-only summaries over generated point
 candidate markers and Blueprint 9 operator review metadata:
@@ -415,6 +415,24 @@ The v0 evaluator reports candidate counts, rejection diagnostic counts, reviewed
 coverage, reviewed-only label fractions, candidate-type breakdowns, reviewed marker details, and
 missing-candidate notes. It does not compute precision/recall in v0 and does not create truth,
 automatic correction, in/out, score, point state, accepted/rejected lifecycle, or adjudication.
+
+## Blueprint 11 Status
+
+Status: started.
+
+Blueprint 11 3D Readiness / Camera Geometry Evidence Layer v0 adds declared camera/court geometry
+evidence:
+
+```text
+court and projection context
+-> declared camera geometry evidence
+-> 3D-readiness summary
+```
+
+The v0 layer records court dimensions, geometry status, camera model, unknown
+intrinsics/extrinsics placeholders, source run linkage, world-coordinate conventions, and
+capability warnings. It prepares future 3D evidence layers without creating 3D trajectories, event
+truth, in/out, score, point state, accepted/rejected lifecycle, or adjudication.
 
 ## Blueprint 5 Status
 

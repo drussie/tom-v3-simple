@@ -810,6 +810,12 @@ markers, review coverage, reviewed-only label fractions, and missing-candidate n
 read-only and does not compute precision/recall in v0, change replay markers, create truth, decide
 in/out, score, or adjudicate evidence.
 
+Blueprint 11 3D Readiness / Camera Geometry Evidence Layer v0 adds a compact Camera Geometry panel
+when a geometry declaration exists for the media. The panel shows declaration status, camera model,
+court model, court-plane readiness, unknown intrinsics/extrinsics, and that 3D trajectory/truth are
+not available. This is a readiness/debug surface only; it does not render 3D, alter markers, decide
+in/out, score, or adjudicate evidence.
+
 Blueprint 8 Completion Review / Freeze v0 documents the current workstation as a stable
 candidate-evidence milestone. The frozen operator workflow is: build or obtain source runs, build
 ball trajectory candidates, build hit/bounce candidates, open replay in operator view, review

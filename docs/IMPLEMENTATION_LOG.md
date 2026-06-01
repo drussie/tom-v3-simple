@@ -2815,3 +2815,29 @@ The evaluation harness is read-only. It does not change event candidate generati
 arbitration, review annotations, source evidence, truth status, in/out, score, player identity,
 accepted/rejected lifecycle, automatic correction, or adjudication. It does not compute
 precision/recall in v0.
+
+## Blueprint 11 3D Readiness / Camera Geometry Evidence Layer v0
+
+Status: complete
+
+### Goal
+
+Persist explicit camera/court geometry declarations so future 3D evidence work has inspectable
+assumptions and no hidden truth upgrades.
+
+### Notes
+
+This milestone adds:
+
+- `camera_geometry_evidence` persistence and migration
+- `tom_v3_schema.camera_geometry`
+- `declare-camera-geometry` worker CLI command
+- `tom-v1-declare-camera-geometry` Make helper
+- replay info `camera_geometry_summary`
+- replay Camera Geometry readiness panel
+- point evidence snapshot `camera_geometry_summary`
+- point candidate evaluation `geometry_readiness`
+
+The geometry layer is metadata/readiness only. It does not create true camera calibration, 3D ball
+trajectories, hit/bounce truth, in/out, score, player identity, accepted/rejected lifecycle,
+automatic correction, or adjudication.

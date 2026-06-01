@@ -150,6 +150,9 @@ This registry makes TOM v3 Simple boundaries explicit.
   metadata only. They do not compute precision/recall in v0, do not establish an adjudicated
   reference set, and do not promote review labels into truth, corrections, in/out, score, point
   state, or adjudication.
+- Blueprint 11 camera geometry evidence is declared/estimated readiness metadata only. It does not
+  provide true camera calibration, true 3D reconstruction, 3D ball trajectory, 3D event truth,
+  in/out, score, point state, accepted/rejected lifecycle, automatic correction, or adjudication.
 - Blueprint 8 Completion Review / Freeze v0 freezes the current replay evidence workstation as a
   reproducible candidate-evidence milestone only. It does not add or imply hit truth, bounce truth,
   in/out, score, point winner, player identity, manual accept/reject correction, accepted/rejected

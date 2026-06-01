@@ -256,6 +256,16 @@ export interface ReplayRunSummary {
   source_subject_run_id?: string | null;
   source_court_run_id?: string | null;
   source_homography_run_id?: string | null;
+  source_court_projection_run_id?: string | null;
+  camera_geometry_id?: string | null;
+  camera_model?: string | null;
+  geometry_status?: string | null;
+  court_model?: string | null;
+  court_plane_geometry_declared?: boolean;
+  camera_intrinsics_known?: boolean;
+  camera_extrinsics_known?: boolean;
+  true_3d_reconstruction_available?: boolean;
+  "3d_ball_trajectory_available"?: boolean;
   track_candidate_count?: number;
   track_assignment_count?: number;
   court_keypoint_count?: number;
@@ -306,8 +316,29 @@ export interface ReplayAvailableRuns {
   court_projection: ReplayRunSummary[];
   ball_trajectory: ReplayRunSummary[];
   event_candidate: ReplayRunSummary[];
+  camera_geometry: ReplayRunSummary[];
   main_player_track: ReplayRunSummary[];
   motion_smoothing: ReplayRunSummary[];
+}
+
+export interface ReplayCameraGeometrySummary {
+  available: boolean;
+  camera_geometry_id?: string | null;
+  media_id?: string | null;
+  court_run_id?: string | null;
+  court_projection_run_id?: string | null;
+  homography_run_id?: string | null;
+  geometry_run_id?: string | null;
+  camera_model?: string | null;
+  geometry_status?: string | null;
+  court_model?: string | null;
+  court_plane_geometry_declared?: boolean;
+  camera_intrinsics_known?: boolean;
+  camera_extrinsics_known?: boolean;
+  true_3d_reconstruction_available?: boolean;
+  "3d_ball_trajectory_available"?: boolean;
+  geometry_evidence_only?: boolean;
+  no_adjudication?: boolean;
 }
 
 export interface ReplayInfo {
@@ -322,6 +353,7 @@ export interface ReplayInfo {
   frame_time_mode: string;
   frame_time_index: JsonRecord | null;
   available_runs: ReplayAvailableRuns;
+  camera_geometry_summary: ReplayCameraGeometrySummary;
   observation_only: boolean;
   no_adjudication: boolean;
 }

@@ -26,6 +26,7 @@ from apps.api.services.tracklet_review_export import export_tracklet_review_data
 from apps.worker.config import settings
 from apps.worker.pipelines.synthetic_seed import seed_synthetic_run
 from apps.worker.services.ball_court_trajectory import build_ball_court_trajectory
+from apps.worker.services.camera_geometry import declare_camera_geometry
 from apps.worker.services.completion_audit import run_completion_audit
 from apps.worker.services.court_adapter import run_fixture_court_adapter
 from apps.worker.services.court_review_export import export_court_review_dataset
@@ -914,6 +915,40 @@ def main() -> None:
     )
     point_evaluation_parser.add_argument("--skip-create-db", action="store_true")
     point_evaluation_parser.set_defaults(handler=_handle_evaluate_point_candidates)
+
+    camera_geometry_parser = subcommands.add_parser(
+        "declare-camera-geometry",
+        help="Declare camera/court geometry evidence for future 3D readiness.",
+    )
+    camera_geometry_parser.add_argument("--media-id", required=True)
+    camera_geometry_parser.add_argument("--court-run-id")
+    camera_geometry_parser.add_argument("--court-projection-run-id")
+    camera_geometry_parser.add_argument("--homography-run-id")
+    camera_geometry_parser.add_argument(
+        "--court-model",
+        default="itf_standard_tennis_court",
+    )
+    camera_geometry_parser.add_argument(
+        "--camera-model",
+        default="homography_backed_court_plane",
+    )
+    camera_geometry_parser.add_argument("--geometry-status", default="declared")
+    camera_geometry_parser.add_argument(
+        "--viewer-base-url",
+        default="http://127.0.0.1:3000",
+    )
+    camera_geometry_parser.add_argument(
+        "--format",
+        choices=["json", "markdown"],
+        default="json",
+        help="Geometry payload format. JSON is always returned; markdown adds a report body.",
+    )
+    camera_geometry_parser.add_argument(
+        "--output",
+        help="Optional file path for the JSON or markdown geometry artifact.",
+    )
+    camera_geometry_parser.add_argument("--skip-create-db", action="store_true")
+    camera_geometry_parser.set_defaults(handler=_handle_declare_camera_geometry)
 
     fixture_court_parser = subcommands.add_parser(
         "run-fixture-court",
@@ -1834,6 +1869,25 @@ def _handle_evaluate_point_candidates(
         session=session,
         media_id=args.media_id,
         event_candidate_run_id=args.event_candidate_run_id,
+        viewer_base_url=args.viewer_base_url,
+        output_format=args.format,
+        output_path=args.output,
+    )
+
+
+def _handle_declare_camera_geometry(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    return declare_camera_geometry(
+        session=session,
+        media_id=args.media_id,
+        court_run_id=args.court_run_id,
+        court_projection_run_id=args.court_projection_run_id,
+        homography_run_id=args.homography_run_id,
+        court_model=args.court_model,
+        camera_model=args.camera_model,
+        geometry_status=args.geometry_status,
         viewer_base_url=args.viewer_base_url,
         output_format=args.format,
         output_path=args.output,

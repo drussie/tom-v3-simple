@@ -1738,6 +1738,7 @@ export function ReplayWorkstation({
         </div>
         <aside className="side-column">
           <ReplayMediaPanel replayInfo={replayInfo} />
+          <CameraGeometryPanel replayInfo={replayInfo} />
           <ReplayEventCandidateReviewPanel
             markers={markerSummaries}
             onSelectMarker={handleMarkerReviewSelect}
@@ -2483,6 +2484,49 @@ function ReplayMediaPanel({ replayInfo }: { replayInfo: ReplayInfo }) {
   );
 }
 
+function CameraGeometryPanel({ replayInfo }: { replayInfo: ReplayInfo }) {
+  const summary = replayInfo.camera_geometry_summary;
+  return (
+    <section className="panel">
+      <div className="panel-header">
+        <h2>Camera Geometry</h2>
+        <span className="mini-pill">3D readiness</span>
+      </div>
+      <div className="panel-body replay-media-detail">
+        {summary.available ? (
+          <>
+            <DetailRow label="status" value={summary.geometry_status ?? "n/a"} />
+            <DetailRow label="camera model" value={formatCameraGeometryModel(summary.camera_model)} />
+            <DetailRow label="court model" value={formatCameraGeometryModel(summary.court_model)} />
+            <DetailRow
+              label="court plane"
+              value={summary.court_plane_geometry_declared ? "declared" : "not declared"}
+            />
+            <DetailRow
+              label="intrinsics"
+              value={summary.camera_intrinsics_known ? "known" : "unknown"}
+            />
+            <DetailRow
+              label="extrinsics"
+              value={summary.camera_extrinsics_known ? "known" : "unknown"}
+            />
+            <DetailRow label="3D trajectory" value="not available" />
+            <DetailRow label="3D truth" value="not available" />
+          </>
+        ) : (
+          <p className="empty-state compact">
+            No camera geometry evidence has been declared for this media yet.
+          </p>
+        )}
+        <p className="empty-state compact">
+          Camera geometry is declared evidence for future 3D readiness only. It does not change
+          hit/bounce candidates, in/out, score, or adjudication.
+        </p>
+      </div>
+    </section>
+  );
+}
+
 function AvailableRunsPanel({ replayInfo }: { replayInfo: ReplayInfo }) {
   return (
     <section className="panel">
@@ -2521,12 +2565,23 @@ function AvailableRunsPanel({ replayInfo }: { replayInfo: ReplayInfo }) {
           runs={replayInfo.available_runs.event_candidate}
         />
         <RunGroup
+          title="Camera geometry evidence"
+          runs={replayInfo.available_runs.camera_geometry}
+        />
+        <RunGroup
           title="Gameplay/view-state observations"
           runs={replayInfo.available_runs.gameplay}
         />
       </div>
     </section>
   );
+}
+
+function formatCameraGeometryModel(value: string | null | undefined): string {
+  if (value === null || value === undefined || value.length === 0) {
+    return "n/a";
+  }
+  return value.replaceAll("_", " ");
 }
 
 function SelectedRunContext({
@@ -4253,6 +4308,9 @@ function formatReplayRunSourceLabel(run: ReplayRunSummary): string {
   }
   if (run.evidence_source === "event_candidate" || run.event_candidate_only || run.candidate_only) {
     return "hit/bounce event candidates";
+  }
+  if (run.evidence_source === "camera_geometry_evidence") {
+    return "camera geometry evidence";
   }
   if (run.geometry_evidence_only) {
     return run.source_label ?? "court geometry evidence";

@@ -945,6 +945,24 @@ The evaluation summarizes generated candidate markers and operator review metada
 compute precision/recall in v0, does not promote review labels into truth, and does not change
 generated candidates, in/out, score, point state, or adjudication.
 
+Declare Blueprint 11 camera/court geometry readiness for a point:
+
+```bash
+TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_tom_v1_bridge.db \
+make tom-v1-declare-camera-geometry \
+  PYTHON=.venv/bin/python \
+  MEDIA_ID=<media_id> \
+  COURT_RUN_ID=<court_run_id> \
+  COURT_PROJECTION_RUN_ID=<court_projection_run_id> \
+  HOMOGRAPHY_RUN_ID=<homography_run_id>
+```
+
+The output records `camera_geometry_evidence` with declared court dimensions, camera model,
+geometry status, coordinate-system metadata, capabilities, and no-truth warnings. It does not
+create 3D ball trajectories, change event candidates, decide in/out, score a point, or adjudicate
+evidence. Subsequent point evidence snapshots include `camera_geometry_summary`, and point
+candidate evaluations include `geometry_readiness`.
+
 Blueprint 8 freeze operator workflow:
 
 1. Build or obtain the source perception, court, smoothing, projection, and trajectory runs.
@@ -956,6 +974,7 @@ Blueprint 8 freeze operator workflow:
    Inspector.
 7. Generate a point evidence snapshot for the reviewed run.
 8. Generate a point candidate review evaluation when review annotations should be summarized.
+9. Declare camera geometry evidence when future 3D readiness assumptions should be recorded.
 
 The v0.2.2 side-zone sequence repair preserves the 2-hit / 2-bounce sample-point recall while adding
 `court_side_zone`, `player_contact_zone`, `court_landing_zone`, `candidate_reclassification`, and
@@ -1570,6 +1589,10 @@ python -m apps.worker.cli completion-audit --no-demo-only
   `tom-v1-evaluate-point-candidates`. It is a read-only review report; it does not compute
   precision/recall in v0, promote labels into truth, correct candidates, decide in/out, score a
   point, or adjudicate evidence.
+- Blueprint 11 3D Readiness / Camera Geometry Evidence Layer v0 records declared camera/court
+  geometry metadata and unknown intrinsics/extrinsics placeholders. It prepares TOM for future 3D
+  evidence layers without creating 3D ball trajectories, 3D truth, event truth, in/out, score,
+  accepted/rejected lifecycle, automatic correction, or adjudication.
 - Blueprint 8 Completion Review / Freeze v0 freezes the current evidence workstation as a
   documented, reproducible candidate-evidence milestone. It does not add tennis logic, truth,
   score, in/out, manual correction, accepted/rejected lifecycle, or adjudication.

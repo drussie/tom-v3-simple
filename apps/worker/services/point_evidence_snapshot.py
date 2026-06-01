@@ -19,6 +19,7 @@ from apps.api.services.event_candidate_reviews import (
     serialize_event_candidate_review,
 )
 from apps.api.services.replay import build_event_candidate_marker_summary
+from apps.worker.services.camera_geometry import camera_geometry_summary
 
 SNAPSHOT_TYPE = "point_evidence_snapshot"
 SNAPSHOT_VERSION = "v0"
@@ -101,6 +102,12 @@ def build_point_evidence_snapshot(
         event_candidate_run_id=event_candidate_run_id,
     )
     source_run_ids = _source_run_ids(session=session, event_run=event_run)
+    geometry_summary = camera_geometry_summary(
+        session=session,
+        media_id=media.id,
+        court_projection_run_id=source_run_ids.get("court_projection_run_id"),
+        homography_run_id=source_run_ids.get("homography_run_id"),
+    )
     candidate_summary = _candidate_summary(event_run)
     review_rows = _event_candidate_review_rows(
         session=session,
@@ -124,6 +131,7 @@ def build_point_evidence_snapshot(
         ),
         "observations": observations,
         "active_versions": _active_versions(candidate_summary),
+        "camera_geometry_summary": geometry_summary,
         "marker_summary": marker_summary,
         "review_summary": build_event_candidate_review_summary(review_rows),
         "review_annotations": _compact_review_annotations(review_rows),
@@ -203,6 +211,23 @@ def render_point_evidence_snapshot_markdown(snapshot: dict[str, Any]) -> str:
             rows.append(f"- {key}: {value}")
     else:
         rows.append("- n/a")
+
+    rows.extend(["", "## Camera Geometry"])
+    geometry = snapshot.get("camera_geometry_summary")
+    if isinstance(geometry, dict) and geometry.get("available") is True:
+        rows.append(f"- status: {geometry.get('geometry_status', 'n/a')}")
+        rows.append(f"- camera_model: {geometry.get('camera_model', 'n/a')}")
+        rows.append(f"- court_model: {geometry.get('court_model', 'n/a')}")
+        rows.append(
+            "- true_3d_reconstruction_available: "
+            f"{geometry.get('true_3d_reconstruction_available', False)}"
+        )
+        rows.append(
+            "- 3d_ball_trajectory_available: "
+            f"{geometry.get('3d_ball_trajectory_available', False)}"
+        )
+    else:
+        rows.append("- available: false")
 
     rows.extend(["", "## Warnings"])
     for warning in KNOWN_LIMITATIONS:

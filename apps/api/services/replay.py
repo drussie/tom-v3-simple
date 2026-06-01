@@ -10,6 +10,7 @@ from tom_v3_schema.court import get_court_template
 from tom_v3_schema.skeletons import get_skeleton_definition
 from tom_v3_storage.db_models import (
     AtomicObservation,
+    CameraGeometryEvidence,
     CameraViewObservation,
     CourtKeypointObservation,
     CourtLineObservation,
@@ -113,6 +114,7 @@ def build_replay_info(session: Session, media_id: str) -> dict[str, Any] | None:
         "frame_time_mode": "indexed" if media.fps and media.frame_count else "unavailable",
         "frame_time_index": frame_time_index,
         "available_runs": available_runs_for_media(session, media.id),
+        "camera_geometry_summary": _camera_geometry_summary(session, media.id),
         "observation_only": True,
         "no_adjudication": True,
     }
@@ -3030,6 +3032,7 @@ def available_runs_for_media(session: Session, media_id: str) -> dict[str, list[
         "court_projection": _court_projection_run_summaries(session, media_id),
         "ball_trajectory": _ball_trajectory_run_summaries(session, media_id),
         "event_candidate": _event_candidate_run_summaries(session, media_id),
+        "camera_geometry": _camera_geometry_run_summaries(session, media_id),
         "main_player_track": _main_player_track_run_summaries(session, media_id),
         "motion_smoothing": _motion_smoothing_run_summaries(session, media_id),
     }
@@ -3426,6 +3429,85 @@ def _event_candidate_run_summaries(
             }
         )
     return summaries
+
+
+def _camera_geometry_run_summaries(
+    session: Session,
+    media_id: str,
+) -> list[dict[str, Any]]:
+    rows = session.scalars(
+        select(CameraGeometryEvidence)
+        .where(CameraGeometryEvidence.media_id == media_id)
+        .order_by(CameraGeometryEvidence.created_at.desc(), CameraGeometryEvidence.id.desc())
+    ).all()
+    summaries: list[dict[str, Any]] = []
+    for row in rows:
+        run = session.get(ProcessingRun, row.geometry_run_id) if row.geometry_run_id else None
+        summaries.append(
+            {
+                "run_id": row.geometry_run_id or row.id,
+                "run_name": run.run_name if run is not None else "camera-geometry-evidence",
+                "run_status": run.run_status if run is not None else "completed",
+                "created_at": row.created_at.isoformat() if row.created_at else None,
+                "completed_at": (
+                    run.completed_at.isoformat()
+                    if run is not None and run.completed_at is not None
+                    else None
+                ),
+                "observation_count": 0,
+                "evidence_source": "camera_geometry_evidence",
+                "source_label": "camera geometry evidence",
+                "camera_geometry_id": row.id,
+                "source_court_run_id": row.court_run_id,
+                "source_homography_run_id": row.homography_run_id,
+                "source_court_projection_run_id": row.court_projection_run_id,
+                "camera_model": row.camera_model,
+                "geometry_status": row.geometry_status,
+                "court_model": row.court_model,
+                "court_plane_geometry_declared": row.geometry_status
+                in {"declared", "partial", "estimated"},
+                "true_3d_reconstruction_available": False,
+                "3d_ball_trajectory_available": False,
+                "geometry_evidence_only": True,
+                "not_truth": True,
+                "no_adjudication": True,
+            }
+        )
+    return summaries
+
+
+def _camera_geometry_summary(session: Session, media_id: str) -> dict[str, Any]:
+    row = session.scalars(
+        select(CameraGeometryEvidence)
+        .where(CameraGeometryEvidence.media_id == media_id)
+        .order_by(CameraGeometryEvidence.created_at.desc(), CameraGeometryEvidence.id.desc())
+    ).first()
+    if row is None:
+        return {"available": False}
+    return {
+        "available": True,
+        "camera_geometry_id": row.id,
+        "media_id": row.media_id,
+        "court_run_id": row.court_run_id,
+        "court_projection_run_id": row.court_projection_run_id,
+        "homography_run_id": row.homography_run_id,
+        "geometry_run_id": row.geometry_run_id,
+        "camera_model": row.camera_model,
+        "geometry_status": row.geometry_status,
+        "court_model": row.court_model,
+        "court_plane_geometry_declared": row.geometry_status
+        in {"declared", "partial", "estimated"},
+        "camera_intrinsics_known": bool(
+            (row.camera_intrinsics_jsonb or {}).get("known") is True
+        ),
+        "camera_extrinsics_known": bool(
+            (row.camera_extrinsics_jsonb or {}).get("known") is True
+        ),
+        "true_3d_reconstruction_available": False,
+        "3d_ball_trajectory_available": False,
+        "geometry_evidence_only": True,
+        "no_adjudication": True,
+    }
 
 
 def _main_player_track_run_summaries(session: Session, media_id: str) -> list[dict[str, Any]]:

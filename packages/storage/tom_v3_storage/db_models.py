@@ -564,6 +564,74 @@ class ProjectionDiagnosticObservation(CreatedAtMixin, Base):
     runtime_config: Mapped[RuntimeConfig | None] = relationship()
 
 
+class CameraGeometryEvidence(CreatedAtMixin, Base):
+    __tablename__ = "camera_geometry_evidence"
+    __table_args__ = (
+        Index("ix_camera_geometry_media", "media_id"),
+        Index("ix_camera_geometry_court_run", "court_run_id"),
+        Index("ix_camera_geometry_court_projection_run", "court_projection_run_id"),
+        Index("ix_camera_geometry_homography_run", "homography_run_id"),
+        Index("ix_camera_geometry_geometry_run", "geometry_run_id"),
+        Index("ix_camera_geometry_status", "geometry_status"),
+    )
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_uuid)
+    media_id: Mapped[str] = mapped_column(ForeignKey("media_asset.id"), nullable=False)
+    court_run_id: Mapped[str | None] = mapped_column(ForeignKey("processing_run.id"))
+    court_projection_run_id: Mapped[str | None] = mapped_column(ForeignKey("processing_run.id"))
+    homography_run_id: Mapped[str | None] = mapped_column(ForeignKey("processing_run.id"))
+    geometry_run_id: Mapped[str | None] = mapped_column(ForeignKey("processing_run.id"))
+    camera_model: Mapped[str] = mapped_column(String(120), nullable=False)
+    geometry_status: Mapped[str] = mapped_column(String(80), nullable=False)
+    court_model: Mapped[str] = mapped_column(String(120), nullable=False)
+    court_units: Mapped[str] = mapped_column(String(40), nullable=False)
+    court_length: Mapped[float | None] = mapped_column(Float)
+    court_width: Mapped[float | None] = mapped_column(Float)
+    net_height_center: Mapped[float | None] = mapped_column(Float)
+    net_height_posts: Mapped[float | None] = mapped_column(Float)
+    singles_sideline_width: Mapped[float | None] = mapped_column(Float)
+    doubles_sideline_width: Mapped[float | None] = mapped_column(Float)
+    near_baseline_y: Mapped[float | None] = mapped_column(Float)
+    far_baseline_y: Mapped[float | None] = mapped_column(Float)
+    camera_intrinsics_jsonb: Mapped[dict[str, Any]] = mapped_column(
+        JsonType, default=dict, nullable=False
+    )
+    camera_extrinsics_jsonb: Mapped[dict[str, Any]] = mapped_column(
+        JsonType, default=dict, nullable=False
+    )
+    distortion_jsonb: Mapped[dict[str, Any]] = mapped_column(
+        JsonType, default=dict, nullable=False
+    )
+    image_size_jsonb: Mapped[dict[str, Any]] = mapped_column(
+        JsonType, default=dict, nullable=False
+    )
+    homography_matrix_jsonb: Mapped[list[list[float]] | None] = mapped_column(JsonType)
+    world_coordinate_system_jsonb: Mapped[dict[str, Any]] = mapped_column(
+        JsonType, default=dict, nullable=False
+    )
+    assumptions_jsonb: Mapped[dict[str, Any]] = mapped_column(
+        JsonType, default=dict, nullable=False
+    )
+    warnings_jsonb: Mapped[dict[str, Any]] = mapped_column(
+        JsonType, default=dict, nullable=False
+    )
+    metadata_jsonb: Mapped[dict[str, Any]] = mapped_column(JsonType, default=dict, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+        nullable=False,
+    )
+
+    media: Mapped[MediaAsset] = relationship(foreign_keys=[media_id])
+    court_run: Mapped[ProcessingRun | None] = relationship(foreign_keys=[court_run_id])
+    court_projection_run: Mapped[ProcessingRun | None] = relationship(
+        foreign_keys=[court_projection_run_id]
+    )
+    homography_run: Mapped[ProcessingRun | None] = relationship(foreign_keys=[homography_run_id])
+    geometry_run: Mapped[ProcessingRun | None] = relationship(foreign_keys=[geometry_run_id])
+
+
 class Tracklet(Base):
     __tablename__ = "tracklet"
     __table_args__ = (
