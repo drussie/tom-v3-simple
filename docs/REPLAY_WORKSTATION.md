@@ -794,6 +794,15 @@ versions, final marker summary, warnings, and known limitations. It is a reporti
 operator review/regression comparison only; it does not create truth, in/out, score, or
 adjudication.
 
+Blueprint 9 Manual Candidate Review Annotation v0 adds review metadata controls to the replay side
+panel. When `eventCandidateRunId` is selected, the Event Candidate Review panel loads marker review
+annotations, shows summary counts, and displays per-marker review badges. The Replay Marker
+Inspector can save or clear `useful`, `wrong`, `unclear`, and `needs_review` labels for selected
+hit/bounce candidate markers. The Missing Candidate Note panel can add `missing_hit_candidate`,
+`missing_bounce_candidate`, or `missing_event_candidate` notes at the current replay frame/time.
+These annotations are metadata only; they do not change generated markers, marker counts, in/out,
+score, point state, or adjudication.
+
 Blueprint 8 Completion Review / Freeze v0 documents the current workstation as a stable
 candidate-evidence milestone. The frozen operator workflow is: build or obtain source runs, build
 ball trajectory candidates, build hit/bounce candidates, open replay in operator view, review

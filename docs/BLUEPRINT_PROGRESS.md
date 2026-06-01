@@ -2,7 +2,7 @@
 
 ## Current Progress Gauge
 
-Current: Blueprints 1, 2, 3, 4, 5, 6, 7, and 8 complete/frozen; TOM v3 Simple is complete as an observation-only evidence platform.
+Current: Blueprints 1, 2, 3, 4, 5, 6, 7, and 8 complete/frozen; Blueprint 9 manual candidate review annotations have started; TOM v3 Simple is complete as an observation-only evidence platform.
 
 ## Current
 
@@ -380,6 +380,23 @@ real detections
 Blueprint 8 is now frozen as candidate evidence only. It does not add truth promotion, in/out,
 score, point winners, player identity, accepted/rejected lifecycle, manual correction, or
 adjudication.
+
+## Blueprint 9 Status
+
+Status: started.
+
+Blueprint 9 Manual Candidate Review Annotation v0 adds operator review metadata for event candidate
+markers and missing-candidate notes:
+
+```text
+hit/bounce candidate markers
+-> operator review labels
+-> missing-candidate notes
+-> point evidence snapshot review summary
+```
+
+Review annotations are metadata only. They do not mutate generated candidate observations, change
+marker counts, create accepted/rejected truth, or add in/out, score, point state, or adjudication.
 
 ## Blueprint 5 Status
 

@@ -1431,6 +1431,48 @@ export interface ReplayMarkerSummary {
   no_adjudication: boolean;
 }
 
+export type EventCandidateReviewKind =
+  | "candidate_marker_review"
+  | "point_moment_review"
+  | "missing_candidate_note";
+
+export type EventCandidateReviewLabel =
+  | "useful"
+  | "wrong"
+  | "unclear"
+  | "needs_review"
+  | "missing_hit_candidate"
+  | "missing_bounce_candidate"
+  | "missing_event_candidate";
+
+export interface EventCandidateReviewAnnotation {
+  id: string;
+  media_id: string;
+  event_candidate_run_id: string;
+  observation_id: string | null;
+  annotation_kind: EventCandidateReviewKind | string;
+  review_label: EventCandidateReviewLabel | string;
+  candidate_type: string | null;
+  frame: number | null;
+  timestamp_ms: number | null;
+  image_x: number | null;
+  image_y: number | null;
+  court_x: number | null;
+  court_y: number | null;
+  note: string | null;
+  reviewer: string | null;
+  created_at: string;
+  updated_at: string;
+  payload_jsonb: JsonRecord;
+}
+
+export interface EventCandidateReviewList {
+  reviews: EventCandidateReviewAnnotation[];
+  reviews_by_observation_id: Record<string, EventCandidateReviewAnnotation[]>;
+  review_summary: Record<string, number>;
+  warnings: Record<string, boolean>;
+}
+
 export interface ReplaySmoothedMotionTimelineItem {
   item_type:
     | "smoothed_ball_position_candidate"

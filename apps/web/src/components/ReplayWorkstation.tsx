@@ -3,7 +3,14 @@
 import type { ReactNode } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { fetchReplayOverlayChunk, fetchReplayTimeline } from "../lib/api";
+import {
+  createEventCandidateReview,
+  deleteEventCandidateReview,
+  fetchEventCandidateReviews,
+  fetchReplayOverlayChunk,
+  fetchReplayTimeline,
+  updateEventCandidateReview
+} from "../lib/api";
 import {
   filterCameraViewsAvailableAt,
   filterCourtKeypointsAvailableAt,
@@ -38,6 +45,9 @@ import type {
   ReplayCourtTemporalPersistence,
   ReplayCourtKeypointOverlay,
   ReplayCourtLineOverlay,
+  EventCandidateReviewAnnotation,
+  EventCandidateReviewLabel,
+  EventCandidateReviewList,
   ReplayEventCandidateOverlay,
   ReplayHomographyCandidateOverlay,
   ReplayMainPlayerCourtProjectionOverlay,
@@ -78,6 +88,17 @@ import { ReplayTrackletOverlay as ReplayTrackletOverlayLayer } from "./ReplayTra
 import { ReplayVideoPlayer } from "./ReplayVideoPlayer";
 
 const overlayChunkMs = 2000;
+const emptyEventCandidateReviewSummary: Record<string, number> = {
+  total_reviews: 0,
+  useful: 0,
+  wrong: 0,
+  unclear: 0,
+  needs_review: 0,
+  missing_candidate_note: 0,
+  missing_hit_candidate: 0,
+  missing_bounce_candidate: 0,
+  missing_event_candidate: 0
+};
 
 interface ReplayWorkstationProps {
   initialMode?: ReplayMode;
@@ -109,6 +130,13 @@ interface OverlayState {
 interface TimelineState {
   timeline: ReplayTimeline | null;
   loading: boolean;
+  error: string | null;
+}
+
+interface EventCandidateReviewState {
+  payload: EventCandidateReviewList | null;
+  loading: boolean;
+  saving: boolean;
   error: string | null;
 }
 
@@ -520,6 +548,12 @@ export function ReplayWorkstation({
     loading: false,
     error: null
   });
+  const [eventReviewState, setEventReviewState] = useState<EventCandidateReviewState>({
+    payload: null,
+    loading: false,
+    saving: false,
+    error: null
+  });
   const [seekRequest, setSeekRequest] = useState<ReplaySeekRequest | null>(null);
   const chunkCache = useRef<Map<string, ReplayOverlayChunk>>(new Map());
 
@@ -652,6 +686,42 @@ export function ReplayWorkstation({
     },
     [applyReplayLayerPresetState, currentLayerPresetContext]
   );
+
+  const refreshEventCandidateReviews = useCallback(async () => {
+    if (selectedEventCandidateRunId === null) {
+      setEventReviewState({
+        payload: null,
+        loading: false,
+        saving: false,
+        error: null
+      });
+      return;
+    }
+    setEventReviewState((current) => ({ ...current, loading: true, error: null }));
+    try {
+      const payload = await fetchEventCandidateReviews(
+        replayInfo.media_id,
+        selectedEventCandidateRunId
+      );
+      setEventReviewState((current) => ({
+        ...current,
+        payload,
+        loading: false,
+        error: null
+      }));
+    } catch (error: unknown) {
+      setEventReviewState((current) => ({
+        ...current,
+        payload: null,
+        loading: false,
+        error: error instanceof Error ? error.message : "Unable to load event candidate reviews"
+      }));
+    }
+  }, [replayInfo.media_id, selectedEventCandidateRunId]);
+
+  useEffect(() => {
+    void refreshEventCandidateReviews();
+  }, [refreshEventCandidateReviews]);
 
   useEffect(() => {
     if (replayMode === "stream_proxy") {
@@ -1117,6 +1187,136 @@ export function ReplayWorkstation({
     () => selectedMarkerSummaryFromEvidence(selectedEvidence, markerSummaries),
     [markerSummaries, selectedEvidence]
   );
+  const eventReviewsByObservationId =
+    eventReviewState.payload?.reviews_by_observation_id ?? {};
+  const eventReviewSummary =
+    eventReviewState.payload?.review_summary ?? emptyEventCandidateReviewSummary;
+  const selectedMarkerReviews =
+    selectedMarkerSummary !== null
+      ? eventReviewsByObservationId[selectedMarkerSummary.observation_id] ?? []
+      : [];
+
+  const handleSaveCandidateMarkerReview = useCallback(
+    async (reviewLabel: EventCandidateReviewLabel, note: string, reviewId: string | null) => {
+      if (selectedEventCandidateRunId === null || selectedMarkerSummary === null) {
+        setEventReviewState((current) => ({
+          ...current,
+          error: "Select an event candidate run and marker before saving a review."
+        }));
+        return;
+      }
+      setEventReviewState((current) => ({ ...current, saving: true, error: null }));
+      try {
+        if (reviewId !== null) {
+          await updateEventCandidateReview(replayInfo.media_id, reviewId, {
+            review_label: reviewLabel,
+            note,
+            payload_jsonb: {
+              review_source: "replay_marker_inspector_v0",
+              review_metadata_only: true,
+              candidate_evidence_preserved: true
+            }
+          });
+        } else {
+          await createEventCandidateReview(replayInfo.media_id, {
+            event_candidate_run_id: selectedEventCandidateRunId,
+            observation_id: selectedMarkerSummary.observation_id,
+            annotation_kind: "candidate_marker_review",
+            review_label: reviewLabel,
+            candidate_type: selectedMarkerSummary.candidate_type,
+            frame: selectedMarkerSummary.frame,
+            timestamp_ms: selectedMarkerSummary.timestamp_ms,
+            image_x: selectedMarkerSummary.image_x ?? null,
+            image_y: selectedMarkerSummary.image_y ?? null,
+            court_x: selectedMarkerSummary.court_x ?? null,
+            court_y: selectedMarkerSummary.court_y ?? null,
+            note: note.trim() === "" ? null : note,
+            payload_jsonb: {
+              review_source: "replay_marker_inspector_v0",
+              review_metadata_only: true,
+              candidate_evidence_preserved: true
+            }
+          });
+        }
+        setEventReviewState((current) => ({ ...current, saving: false }));
+        await refreshEventCandidateReviews();
+      } catch (error: unknown) {
+        setEventReviewState((current) => ({
+          ...current,
+          saving: false,
+          error: error instanceof Error ? error.message : "Unable to save event candidate review"
+        }));
+      }
+    },
+    [
+      refreshEventCandidateReviews,
+      replayInfo.media_id,
+      selectedEventCandidateRunId,
+      selectedMarkerSummary
+    ]
+  );
+
+  const handleDeleteCandidateMarkerReview = useCallback(
+    async (reviewId: string) => {
+      setEventReviewState((current) => ({ ...current, saving: true, error: null }));
+      try {
+        await deleteEventCandidateReview(replayInfo.media_id, reviewId);
+        setEventReviewState((current) => ({ ...current, saving: false }));
+        await refreshEventCandidateReviews();
+      } catch (error: unknown) {
+        setEventReviewState((current) => ({
+          ...current,
+          saving: false,
+          error: error instanceof Error ? error.message : "Unable to clear event candidate review"
+        }));
+      }
+    },
+    [refreshEventCandidateReviews, replayInfo.media_id]
+  );
+
+  const handleCreateMissingCandidateNote = useCallback(
+    async (reviewLabel: EventCandidateReviewLabel, note: string) => {
+      if (selectedEventCandidateRunId === null) {
+        setEventReviewState((current) => ({
+          ...current,
+          error: "Select an event candidate run before adding a missing-candidate note."
+        }));
+        return;
+      }
+      setEventReviewState((current) => ({ ...current, saving: true, error: null }));
+      try {
+        await createEventCandidateReview(replayInfo.media_id, {
+          event_candidate_run_id: selectedEventCandidateRunId,
+          annotation_kind: "missing_candidate_note",
+          review_label: reviewLabel,
+          frame: playback.frameNumber,
+          timestamp_ms: playback.timestampMs,
+          note: note.trim() === "" ? null : note,
+          payload_jsonb: {
+            review_source: "replay_missing_candidate_note_v0",
+            current_replay_timestamp_ms: playback.timestampMs,
+            review_metadata_only: true,
+            candidate_evidence_preserved: true
+          }
+        });
+        setEventReviewState((current) => ({ ...current, saving: false }));
+        await refreshEventCandidateReviews();
+      } catch (error: unknown) {
+        setEventReviewState((current) => ({
+          ...current,
+          saving: false,
+          error: error instanceof Error ? error.message : "Unable to save missing-candidate note"
+        }));
+      }
+    },
+    [
+      playback.frameNumber,
+      playback.timestampMs,
+      refreshEventCandidateReviews,
+      replayInfo.media_id,
+      selectedEventCandidateRunId
+    ]
+  );
   const handleMarkerReviewSelect = useCallback(
     (marker: ReplayMarkerSummary) => {
       const timelineItem = eventCandidateTimelineItemForMarker(
@@ -1541,17 +1741,114 @@ export function ReplayWorkstation({
           <ReplayEventCandidateReviewPanel
             markers={markerSummaries}
             onSelectMarker={handleMarkerReviewSelect}
+            reviewError={eventReviewState.error}
+            reviewLoading={eventReviewState.loading}
+            reviewSummary={eventReviewSummary}
+            reviewsByObservationId={eventReviewsByObservationId}
             selectedMarkerId={selectedMarkerSummary?.observation_id ?? null}
           />
           <ReplayMarkerInspector
+            eventCandidateRunId={selectedEventCandidateRunId}
             markerCount={markerSummaries.length}
+            onDeleteReview={handleDeleteCandidateMarkerReview}
+            onSaveReview={handleSaveCandidateMarkerReview}
+            reviewError={eventReviewState.error}
+            reviewSaving={eventReviewState.saving}
+            reviews={selectedMarkerReviews}
             selectedMarker={selectedMarkerSummary}
+          />
+          <MissingCandidateNotePanel
+            disabled={selectedEventCandidateRunId === null || eventReviewState.saving}
+            frameNumber={playback.frameNumber}
+            onCreate={handleCreateMissingCandidateNote}
+            reviewError={eventReviewState.error}
+            timestampMs={playback.timestampMs}
           />
           <SelectedEvidencePanel selectedEvidence={selectedEvidence} />
           <AvailableRunsPanel replayInfo={replayInfo} />
         </aside>
       </div>
     </main>
+  );
+}
+
+const missingCandidateLabels: Array<{
+  label: EventCandidateReviewLabel;
+  text: string;
+}> = [
+  { label: "missing_hit_candidate", text: "Missing hit" },
+  { label: "missing_bounce_candidate", text: "Missing bounce" },
+  { label: "missing_event_candidate", text: "Missing event" }
+];
+
+function MissingCandidateNotePanel({
+  disabled,
+  frameNumber,
+  onCreate,
+  reviewError,
+  timestampMs
+}: {
+  disabled: boolean;
+  frameNumber: number;
+  onCreate: (reviewLabel: EventCandidateReviewLabel, note: string) => Promise<void>;
+  reviewError: string | null;
+  timestampMs: number;
+}) {
+  const [reviewLabel, setReviewLabel] =
+    useState<EventCandidateReviewLabel>("missing_event_candidate");
+  const [note, setNote] = useState("");
+
+  return (
+    <section className="panel missing-candidate-note-panel">
+      <div className="panel-header">
+        <h2>Missing Candidate Note</h2>
+        <span className="mini-pill">metadata only</span>
+      </div>
+      <div className="panel-body missing-candidate-note-body">
+        <p className="subtle">
+          Add a review note at frame {frameNumber} / {timestampMs} ms. This does not change
+          generated candidates.
+        </p>
+        <div className="marker-review-labels" role="group" aria-label="Missing candidate kind">
+          {missingCandidateLabels.map((option) => (
+            <button
+              aria-pressed={reviewLabel === option.label}
+              className={reviewLabel === option.label ? "selected" : ""}
+              disabled={disabled}
+              key={option.label}
+              onClick={() => setReviewLabel(option.label)}
+              type="button"
+            >
+              {option.text}
+            </button>
+          ))}
+        </div>
+        <label className="marker-review-note">
+          <span>Missing-candidate note</span>
+          <textarea
+            disabled={disabled}
+            onChange={(event) => setNote(event.target.value)}
+            placeholder="Optional context for later evaluation."
+            value={note}
+          />
+        </label>
+        {reviewError !== null ? <p className="marker-review-error">{reviewError}</p> : null}
+        <button
+          className="primary-button"
+          disabled={disabled}
+          onClick={async () => {
+            await onCreate(reviewLabel, note);
+            setNote("");
+          }}
+          type="button"
+        >
+          Add missing-candidate note at current time
+        </button>
+        <p className="marker-review-warning">
+          Review annotation only - not hit truth, not bounce truth, not in/out.
+        </p>
+      </div>
+    </section>
   );
 }
 

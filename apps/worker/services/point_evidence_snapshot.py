@@ -6,8 +6,18 @@ from urllib.parse import urlencode
 
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
-from tom_v3_storage.db_models import MediaAsset, Observation, ProcessingRun, RuntimeConfig
+from tom_v3_storage.db_models import (
+    EventCandidateReviewAnnotation,
+    MediaAsset,
+    Observation,
+    ProcessingRun,
+    RuntimeConfig,
+)
 
+from apps.api.services.event_candidate_reviews import (
+    build_event_candidate_review_summary,
+    serialize_event_candidate_review,
+)
 from apps.api.services.replay import build_event_candidate_marker_summary
 
 SNAPSHOT_TYPE = "point_evidence_snapshot"
@@ -92,6 +102,11 @@ def build_point_evidence_snapshot(
     )
     source_run_ids = _source_run_ids(session=session, event_run=event_run)
     candidate_summary = _candidate_summary(event_run)
+    review_rows = _event_candidate_review_rows(
+        session=session,
+        media_id=media.id,
+        event_candidate_run_id=event_candidate_run_id,
+    )
 
     snapshot: dict[str, Any] = {
         "ok": True,
@@ -110,6 +125,8 @@ def build_point_evidence_snapshot(
         "observations": observations,
         "active_versions": _active_versions(candidate_summary),
         "marker_summary": marker_summary,
+        "review_summary": build_event_candidate_review_summary(review_rows),
+        "review_annotations": _compact_review_annotations(review_rows),
         "warnings": dict(SNAPSHOT_WARNINGS),
         "known_limitations": list(KNOWN_LIMITATIONS),
     }
@@ -165,6 +182,20 @@ def render_point_evidence_snapshot_markdown(snapshot: dict[str, Any]) -> str:
     else:
         rows.append("| n/a | n/a | n/a | n/a | n/a | n/a | n/a |")
 
+    rows.extend(["", "## Operator Reviews"])
+    review_summary = snapshot.get("review_summary")
+    if isinstance(review_summary, dict):
+        rows.append(f"- total_reviews: {review_summary.get('total_reviews', 0)}")
+        rows.append(f"- useful: {review_summary.get('useful', 0)}")
+        rows.append(f"- wrong: {review_summary.get('wrong', 0)}")
+        rows.append(f"- unclear: {review_summary.get('unclear', 0)}")
+        rows.append(f"- needs_review: {review_summary.get('needs_review', 0)}")
+        rows.append(
+            f"- missing_candidate_note: {review_summary.get('missing_candidate_note', 0)}"
+        )
+    else:
+        rows.append("- total_reviews: 0")
+
     rows.extend(["", "## Active Versions"])
     active_versions = snapshot.get("active_versions")
     if isinstance(active_versions, dict) and active_versions:
@@ -212,6 +243,64 @@ def _event_candidate_observation_counts(
         ),
         "total": sum(counts.values()),
     }
+
+
+def _event_candidate_review_rows(
+    *,
+    session: Session,
+    media_id: str,
+    event_candidate_run_id: str,
+) -> list[EventCandidateReviewAnnotation]:
+    return list(
+        session.scalars(
+            select(EventCandidateReviewAnnotation)
+            .where(
+                EventCandidateReviewAnnotation.media_id == media_id,
+                EventCandidateReviewAnnotation.event_candidate_run_id
+                == event_candidate_run_id,
+            )
+            .order_by(
+                EventCandidateReviewAnnotation.created_at,
+                EventCandidateReviewAnnotation.id,
+            )
+        ).all()
+    )
+
+
+def _compact_review_annotations(
+    rows: list[EventCandidateReviewAnnotation],
+) -> list[dict[str, Any]]:
+    compact: list[dict[str, Any]] = []
+    for row in rows:
+        payload = serialize_event_candidate_review(row)
+        created_at = payload.get("created_at")
+        compact.append(
+            {
+                key: (
+                    created_at.isoformat()
+                    if key == "created_at" and hasattr(created_at, "isoformat")
+                    else payload.get(key)
+                )
+                for key in (
+                    "id",
+                    "observation_id",
+                    "annotation_kind",
+                    "review_label",
+                    "candidate_type",
+                    "frame",
+                    "timestamp_ms",
+                    "image_x",
+                    "image_y",
+                    "court_x",
+                    "court_y",
+                    "note",
+                    "reviewer",
+                    "created_at",
+                )
+                if payload.get(key) is not None
+            }
+        )
+    return compact
 
 
 def _compact_marker_summary(marker_summary: list[dict[str, Any]]) -> list[dict[str, Any]]:

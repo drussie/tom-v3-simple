@@ -2764,3 +2764,27 @@ limitations.
 This freeze changes documentation only. It does not change hit/bounce candidate generation,
 marker-level arbitration, replay behavior, point snapshots, persisted source evidence, truth status,
 in/out, score, player identity, accepted/rejected lifecycle, or adjudication.
+
+## Blueprint 9 Manual Candidate Review Annotation v0
+
+Status: complete
+
+### Goal
+
+Allow an operator to attach review metadata to visible event candidate markers and missing-candidate
+moments without mutating generated evidence or creating truth.
+
+### Notes
+
+This milestone adds:
+
+- `event_candidate_review_annotation` persistence and migration
+- replay API endpoints for list/create/update/delete review annotations
+- Replay Marker Inspector controls for `useful`, `wrong`, `unclear`, and `needs_review`
+- Event Candidate Review panel badges and summary counts
+- Missing Candidate Note panel at the current replay frame/time
+- point evidence snapshot `review_summary` and `review_annotations`
+
+The review layer is metadata only. It does not change event candidate generation, candidate counts,
+marker-level arbitration, truth status, in/out, score, player identity, accepted/rejected lifecycle,
+or adjudication.

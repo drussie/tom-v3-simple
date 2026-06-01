@@ -2,8 +2,22 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
+from tom_v3_schema.event_candidate_reviews import (
+    EventCandidateReviewCreate,
+    EventCandidateReviewList,
+    EventCandidateReviewRead,
+    EventCandidateReviewUpdate,
+)
 
 from apps.api.db import get_session
+from apps.api.services.event_candidate_reviews import (
+    EventCandidateReviewError,
+    create_event_candidate_review,
+    delete_event_candidate_review,
+    list_event_candidate_reviews,
+    serialize_event_candidate_review,
+    update_event_candidate_review,
+)
 from apps.api.services.replay import (
     COURT_TEMPORAL_PERSISTENCE_MODES,
     DEFAULT_COURT_PERSISTENCE_MAX_GAP_MS,
@@ -122,3 +136,73 @@ def get_replay_timeline(
     if timeline is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="media asset not found")
     return timeline
+
+
+@router.get(
+    "/replay/{media_id}/event-candidate-reviews",
+    response_model=EventCandidateReviewList,
+)
+def get_event_candidate_reviews(
+    media_id: str,
+    session: SessionDep,
+    event_candidate_run_id: str = Query(...),
+) -> dict[str, object]:
+    try:
+        return list_event_candidate_reviews(
+            session,
+            media_id=media_id,
+            event_candidate_run_id=event_candidate_run_id,
+        )
+    except EventCandidateReviewError as error:
+        raise HTTPException(status_code=error.status_code, detail=error.message) from error
+
+
+@router.post(
+    "/replay/{media_id}/event-candidate-reviews",
+    response_model=EventCandidateReviewRead,
+    status_code=status.HTTP_201_CREATED,
+)
+def post_event_candidate_review(
+    media_id: str,
+    request: EventCandidateReviewCreate,
+    session: SessionDep,
+) -> dict[str, object]:
+    try:
+        row = create_event_candidate_review(session, media_id=media_id, request=request)
+        return serialize_event_candidate_review(row)
+    except EventCandidateReviewError as error:
+        raise HTTPException(status_code=error.status_code, detail=error.message) from error
+
+
+@router.patch(
+    "/replay/{media_id}/event-candidate-reviews/{review_id}",
+    response_model=EventCandidateReviewRead,
+)
+def patch_event_candidate_review(
+    media_id: str,
+    review_id: str,
+    request: EventCandidateReviewUpdate,
+    session: SessionDep,
+) -> dict[str, object]:
+    try:
+        row = update_event_candidate_review(
+            session,
+            media_id=media_id,
+            review_id=review_id,
+            request=request,
+        )
+        return serialize_event_candidate_review(row)
+    except EventCandidateReviewError as error:
+        raise HTTPException(status_code=error.status_code, detail=error.message) from error
+
+
+@router.delete("/replay/{media_id}/event-candidate-reviews/{review_id}")
+def delete_event_candidate_review_endpoint(
+    media_id: str,
+    review_id: str,
+    session: SessionDep,
+) -> dict[str, object]:
+    try:
+        return delete_event_candidate_review(session, media_id=media_id, review_id=review_id)
+    except EventCandidateReviewError as error:
+        raise HTTPException(status_code=error.status_code, detail=error.message) from error

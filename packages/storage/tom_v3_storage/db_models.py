@@ -677,6 +677,48 @@ class HumanAnnotation(CreatedAtMixin, Base):
     evidence_artifact: Mapped[EvidenceArtifact | None] = relationship()
 
 
+class EventCandidateReviewAnnotation(CreatedAtMixin, Base):
+    __tablename__ = "event_candidate_review_annotation"
+    __table_args__ = (
+        Index(
+            "ix_event_candidate_review_media_run",
+            "media_id",
+            "event_candidate_run_id",
+        ),
+        Index("ix_event_candidate_review_observation", "observation_id"),
+        Index("ix_event_candidate_review_kind_label", "annotation_kind", "review_label"),
+    )
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_uuid)
+    media_id: Mapped[str] = mapped_column(ForeignKey("media_asset.id"), nullable=False)
+    event_candidate_run_id: Mapped[str] = mapped_column(
+        ForeignKey("processing_run.id"), nullable=False
+    )
+    observation_id: Mapped[str | None] = mapped_column(ForeignKey("observation.id"))
+    annotation_kind: Mapped[str] = mapped_column(String(80), nullable=False)
+    review_label: Mapped[str] = mapped_column(String(80), nullable=False)
+    candidate_type: Mapped[str | None] = mapped_column(String(120))
+    frame: Mapped[int | None] = mapped_column(Integer)
+    timestamp_ms: Mapped[int | None] = mapped_column(Integer)
+    image_x: Mapped[float | None] = mapped_column(Float)
+    image_y: Mapped[float | None] = mapped_column(Float)
+    court_x: Mapped[float | None] = mapped_column(Float)
+    court_y: Mapped[float | None] = mapped_column(Float)
+    note: Mapped[str | None] = mapped_column(Text)
+    reviewer: Mapped[str | None] = mapped_column(String(200))
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+        nullable=False,
+    )
+    payload_jsonb: Mapped[dict[str, Any]] = mapped_column(JsonType, default=dict, nullable=False)
+
+    media: Mapped[MediaAsset] = relationship()
+    event_candidate_run: Mapped[ProcessingRun] = relationship()
+    observation: Mapped[Observation | None] = relationship()
+
+
 class QueryResult(CreatedAtMixin, Base):
     __tablename__ = "query_result"
 

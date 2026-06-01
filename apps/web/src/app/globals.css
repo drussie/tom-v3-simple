@@ -1530,6 +1530,63 @@ pre {
   padding: 9px;
 }
 
+.event-review-summary-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-width: 0;
+}
+
+.review-label-badge,
+.review-error-pill {
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  display: inline-flex;
+  font-size: 10px;
+  font-weight: 800;
+  min-height: 22px;
+  padding: 0 8px;
+  text-transform: uppercase;
+}
+
+.review-label-badge.useful {
+  background: rgba(34, 197, 94, 0.13);
+  border-color: rgba(34, 197, 94, 0.42);
+  color: #86efac;
+}
+
+.review-label-badge.wrong {
+  background: rgba(248, 113, 113, 0.13);
+  border-color: rgba(248, 113, 113, 0.42);
+  color: #fca5a5;
+}
+
+.review-label-badge.unclear,
+.review-label-badge.needs_review,
+.review-label-badge.missing_event_candidate,
+.review-label-badge.missing_hit_candidate,
+.review-label-badge.missing_bounce_candidate {
+  background: rgba(250, 204, 21, 0.12);
+  border-color: rgba(250, 204, 21, 0.35);
+  color: #fde68a;
+}
+
+.review-label-badge.row-badge {
+  grid-column: 4 / 5;
+  justify-self: end;
+}
+
+.review-error-pill {
+  background: rgba(248, 113, 113, 0.12);
+  border-color: rgba(248, 113, 113, 0.38);
+  color: #fca5a5;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .replay-marker-inspector {
   border-color: rgba(148, 163, 184, 0.32);
 }
@@ -1641,6 +1698,106 @@ pre {
   background: rgba(250, 204, 21, 0.1);
   border: 1px solid rgba(250, 204, 21, 0.25);
   color: #facc15;
+}
+
+.marker-review-controls,
+.missing-candidate-note-body {
+  display: grid;
+  gap: 10px;
+}
+
+.marker-review-header {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  justify-content: space-between;
+  min-width: 0;
+}
+
+.marker-review-header strong {
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.marker-review-labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.marker-review-labels button {
+  background: rgba(15, 23, 42, 0.62);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 800;
+  min-height: 30px;
+  padding: 0 9px;
+}
+
+.marker-review-labels button:hover:not(:disabled),
+.marker-review-labels button.selected {
+  border-color: var(--blue);
+  color: var(--text);
+}
+
+.marker-review-labels button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.marker-review-note {
+  display: grid;
+  gap: 5px;
+}
+
+.marker-review-note span {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.marker-review-note textarea {
+  background: rgba(2, 6, 23, 0.58);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--text);
+  min-height: 72px;
+  padding: 9px;
+  resize: vertical;
+}
+
+.marker-review-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.marker-review-error,
+.marker-review-warning {
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1.35;
+  margin: 0;
+  padding: 9px;
+}
+
+.marker-review-error {
+  background: rgba(248, 113, 113, 0.12);
+  border: 1px solid rgba(248, 113, 113, 0.35);
+  color: #fca5a5;
+}
+
+.marker-review-warning {
+  background: rgba(148, 163, 184, 0.1);
+  color: var(--muted);
+}
+
+.missing-candidate-note-panel {
+  border-color: rgba(250, 204, 21, 0.24);
 }
 
 .media-grid {

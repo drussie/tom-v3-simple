@@ -1532,6 +1532,11 @@ python -m apps.worker.cli completion-audit --no-demo-only
   markdown report with replay URL, source run ids, counts, active versions, final markers, warnings,
   and known limitations. It is report-only and does not create truth, in/out, score, or
   adjudication.
+- Blueprint 9 Manual Candidate Review Annotation v0 lets an operator mark selected event candidate
+  markers as `useful`, `wrong`, `unclear`, or `needs_review`, and add missing-candidate notes at the
+  current replay time. The annotations are review metadata only and do not change event candidate
+  generation, marker counts, point evidence, in/out, score, accepted/rejected lifecycle, or
+  adjudication.
 - Blueprint 8 Completion Review / Freeze v0 freezes the current evidence workstation as a
   documented, reproducible candidate-evidence milestone. It does not add tennis logic, truth,
   score, in/out, manual correction, accepted/rejected lifecycle, or adjudication.

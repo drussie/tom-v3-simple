@@ -142,6 +142,10 @@ This registry makes TOM v3 Simple boundaries explicit.
 - Point Evidence Snapshot v0 creates compact run reports for operator review and regression
   comparison. Snapshots preserve candidate-only warnings and do not make markers true, in/out,
   scoring, or adjudicated outcomes.
+- Blueprint 9 review annotations let operators attach labels and notes to candidate markers or
+  missing-candidate moments, but those labels are metadata only. They do not mutate generated
+  observations, create accepted/rejected truth, decide in/out, score a point, or adjudicate
+  evidence.
 - Blueprint 8 Completion Review / Freeze v0 freezes the current replay evidence workstation as a
   reproducible candidate-evidence milestone only. It does not add or imply hit truth, bounce truth,
   in/out, score, point winner, player identity, manual accept/reject correction, accepted/rejected

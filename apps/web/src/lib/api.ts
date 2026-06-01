@@ -1,4 +1,8 @@
 import type {
+  EventCandidateReviewAnnotation,
+  EventCandidateReviewList,
+  EventCandidateReviewLabel,
+  EventCandidateReviewKind,
   HumanAnnotation,
   JsonRecord,
   ReplayInfo,
@@ -236,6 +240,90 @@ export async function fetchTrackletEvidenceBundle(
   }
 
   return (await response.json()) as TrackletEvidenceBundle;
+}
+
+export async function fetchEventCandidateReviews(
+  mediaId: string,
+  eventCandidateRunId: string
+): Promise<EventCandidateReviewList> {
+  const params = new URLSearchParams({ event_candidate_run_id: eventCandidateRunId });
+  const response = await fetch(
+    `/api/replay/${mediaId}/event-candidate-reviews?${params.toString()}`,
+    { cache: "no-store" }
+  );
+
+  if (!response.ok) {
+    throw new Error(`Unable to load event candidate reviews: ${response.status}`);
+  }
+
+  return (await response.json()) as EventCandidateReviewList;
+}
+
+export interface CreateEventCandidateReviewInput {
+  event_candidate_run_id: string;
+  observation_id?: string | null;
+  annotation_kind: EventCandidateReviewKind;
+  review_label: EventCandidateReviewLabel;
+  candidate_type?: string | null;
+  frame?: number | null;
+  timestamp_ms?: number | null;
+  image_x?: number | null;
+  image_y?: number | null;
+  court_x?: number | null;
+  court_y?: number | null;
+  note?: string | null;
+  reviewer?: string | null;
+  payload_jsonb?: JsonRecord;
+}
+
+export async function createEventCandidateReview(
+  mediaId: string,
+  input: CreateEventCandidateReviewInput
+): Promise<EventCandidateReviewAnnotation> {
+  const response = await fetch(`/api/replay/${mediaId}/event-candidate-reviews`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input)
+  });
+
+  if (!response.ok) {
+    throw new Error(`Unable to create event candidate review: ${response.status}`);
+  }
+
+  return (await response.json()) as EventCandidateReviewAnnotation;
+}
+
+export async function updateEventCandidateReview(
+  mediaId: string,
+  reviewId: string,
+  input: {
+    review_label?: EventCandidateReviewLabel;
+    note?: string | null;
+    reviewer?: string | null;
+    payload_jsonb?: JsonRecord;
+  }
+): Promise<EventCandidateReviewAnnotation> {
+  const response = await fetch(`/api/replay/${mediaId}/event-candidate-reviews/${reviewId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input)
+  });
+
+  if (!response.ok) {
+    throw new Error(`Unable to update event candidate review: ${response.status}`);
+  }
+
+  return (await response.json()) as EventCandidateReviewAnnotation;
+}
+
+export async function deleteEventCandidateReview(mediaId: string, reviewId: string): Promise<void> {
+  const response = await fetch(`/api/replay/${mediaId}/event-candidate-reviews/${reviewId}`, {
+    method: "DELETE"
+  });
+
+  if (!response.ok) {
+    throw new Error(`Unable to delete event candidate review: ${response.status}`);
+  }
 }
 
 export interface CreateAnnotationInput {
