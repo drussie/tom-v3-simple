@@ -903,6 +903,32 @@ make tom-v1-hit-bounce-candidates-verbose
 These flags change CLI presentation only. They do not change persisted observations or candidate
 decisions.
 
+Generate a compact point evidence snapshot after a candidate run:
+
+```bash
+TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_tom_v1_bridge.db \
+make tom-v1-point-evidence-snapshot \
+  PYTHON=.venv/bin/python \
+  MEDIA_ID=<media_id> \
+  EVENT_CANDIDATE_RUN_ID=<event_candidate_run_id>
+```
+
+The snapshot returns replay URL, source run ids, observation counts, active candidate versions,
+final visible marker summary, candidate-only warnings, and known limitations. It is a report for
+operator review and reproducibility only; it does not create hit truth, bounce truth, in/out, score,
+or adjudication.
+
+Blueprint 8 freeze operator workflow:
+
+1. Build or obtain the source perception, court, smoothing, projection, and trajectory runs.
+2. Run `make tom-v1-hit-bounce-candidates`.
+3. Open the replay URL in operator view.
+4. Review final visible markers in the Event Candidate Review panel.
+5. Click rows or markers to seek/select evidence.
+6. Inspect source method, confidence, coordinates, and marker-level arbitration in Replay Marker
+   Inspector.
+7. Generate a point evidence snapshot for the reviewed run.
+
 The v0.2.2 side-zone sequence repair preserves the 2-hit / 2-bounce sample-point recall while adding
 `court_side_zone`, `player_contact_zone`, `court_landing_zone`, `candidate_reclassification`, and
 `candidate_sequence` diagnostics. CLI summaries now include raw candidate counts, final candidate
@@ -964,6 +990,7 @@ make tom-v1-motion-smoothing MEDIA_ID=<media_id> DETECTION_RUN_ID=<detection_run
 make tom-v1-object-court-projection MEDIA_ID=<media_id> MOTION_SMOOTHING_RUN_ID=<motion_smoothing_run_id> HOMOGRAPHY_RUN_ID=<homography_run_id> PYTHON=.venv/bin/python
 make tom-v1-ball-court-trajectory MEDIA_ID=<media_id> COURT_PROJECTION_RUN_ID=<court_projection_run_id> PYTHON=.venv/bin/python
 make tom-v1-hit-bounce-candidates MEDIA_ID=<media_id> BALL_TRAJECTORY_RUN_ID=<ball_trajectory_run_id> COURT_PROJECTION_RUN_ID=<court_projection_run_id> PYTHON=.venv/bin/python
+make tom-v1-point-evidence-snapshot MEDIA_ID=<media_id> EVENT_CANDIDATE_RUN_ID=<event_candidate_run_id> PYTHON=.venv/bin/python
 ```
 
 The TOM v1 Makefile helpers pass `--allowed-root "$(TOM_V1_MODEL_ROOT)"` and default image sizes that match the local smoke path: 1280 for `best_ball_v2_1280.pt`, 640 for `yolo26x.pt`, 640 for `yolo26x-pose.pt`, and 224 fixed preprocessing for the recognized court keypoint state dict. Override with `IMG_SIZE=<value>` only when testing a deliberate alternate model input size. The court keypoint adapter records requested image size but uses the recognized 224x224 model input convention.
@@ -1139,7 +1166,7 @@ Default validation does not require local weights. If local YOLO or pose weights
 
 ## 11D. Court Evidence Schema Contract
 
-Blueprint 8 has started. Milestone 8A is schema/contract only.
+Blueprint 8 began with Milestone 8A schema/contract work.
 
 Read:
 
@@ -1505,6 +1532,9 @@ python -m apps.worker.cli completion-audit --no-demo-only
   markdown report with replay URL, source run ids, counts, active versions, final markers, warnings,
   and known limitations. It is report-only and does not create truth, in/out, score, or
   adjudication.
+- Blueprint 8 Completion Review / Freeze v0 freezes the current evidence workstation as a
+  documented, reproducible candidate-evidence milestone. It does not add tennis logic, truth,
+  score, in/out, manual correction, accepted/rejected lifecycle, or adjudication.
 - Cloud deployment, auth, production streaming, and multi-camera reasoning are out of scope.
 
 ## 15. Completion Checklist

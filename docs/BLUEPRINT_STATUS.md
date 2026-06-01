@@ -9,10 +9,10 @@
 - Blueprint 5: COMPLETE
 - Blueprint 6: COMPLETE
 - Blueprint 7: COMPLETE
-- Blueprint 8: IN PROGRESS
+- Blueprint 8: COMPLETE / FROZEN
 - TOM v3 Simple: COMPLETE
 
-TOM v3 Simple is complete as a lightweight local observation/evidence platform. Blueprint 6 is complete as the visual replay/operator workstation layer. Blueprint 7 is complete as the real perception runtime layer for optional real detection, real-detection-derived candidate tracklets, and optional real pose keypoint evidence. Blueprint 8 is in progress with court/camera/homography schema contracts, fixture court evidence persistence, camera/view evidence query/bundle read models, homography candidate persistence, replay court overlays, projection diagnostics, and court review export.
+TOM v3 Simple is complete as a lightweight local observation/evidence platform. Blueprint 6 is complete as the visual replay/operator workstation layer. Blueprint 7 is complete as the real perception runtime layer for optional real detection, real-detection-derived candidate tracklets, and optional real pose keypoint evidence. Blueprint 8 is frozen as the visual evidence workstation milestone: real/fixture court evidence, smoothed motion candidates, court projection candidates, ball trajectory candidates, hit/bounce event candidates, marker-level arbitration, replay marker inspection, event candidate review, and point evidence snapshots remain candidate evidence only.
 
 ## Blueprint 1 - Media, Observation Store, Viewer Foundation
 
@@ -404,7 +404,7 @@ Remaining Blueprint 7 milestones: none.
 
 ## Blueprint 8 - Court / Camera / Homography Evidence Layer
 
-Status: IN PROGRESS
+Status: COMPLETE / FROZEN
 
 Blueprint 8 mission:
 
@@ -414,6 +414,12 @@ indexed video
 -> homography candidates
 -> projection diagnostics
 -> replayable geometry evidence
+-> object-to-court projection candidates
+-> ball trajectory candidates
+-> hit/bounce event candidates
+-> marker-level arbitration
+-> replay review panels
+-> point evidence snapshots
 ```
 
 Milestone 8A proves:

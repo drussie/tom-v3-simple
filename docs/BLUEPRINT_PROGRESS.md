@@ -2,7 +2,7 @@
 
 ## Current Progress Gauge
 
-Current: Blueprints 1, 2, 3, 4, 5, 6, and 7 complete; TOM v3 Simple is complete; Blueprint 8 is in progress at Milestone 8F
+Current: Blueprints 1, 2, 3, 4, 5, 6, 7, and 8 complete/frozen; TOM v3 Simple is complete as an observation-only evidence platform.
 
 ## Current
 
@@ -195,7 +195,7 @@ Current: Blueprints 1, 2, 3, 4, 5, 6, and 7 complete; TOM v3 Simple is complete;
 - Blueprint 7 completion review exists.
 - Blueprint 7 is marked complete in canonical docs.
 - Final real perception orchestration is documented for fixture-safe demo, optional real detection, optional real-detection-derived tracklets, and optional real pose replay.
-- Blueprint 8 has started.
+- Blueprint 8 is complete/frozen as the current visual evidence platform milestone.
 - Court keypoint, court line, camera/view, homography candidate, and projection diagnostic schema contracts exist.
 - Court evidence typed storage tables and migration exist.
 - Court template registry v0 exists.
@@ -285,7 +285,7 @@ Remaining Blueprint 7 work: none. Future evaluation workflows, movement/stroke e
 
 ## Blueprint 8 Status
 
-Status: in progress.
+Status: complete / frozen.
 
 Milestone 8A starts Blueprint 8 with court evidence schema and persistence:
 
@@ -362,7 +362,24 @@ homography_candidate_observation
 
 Blueprint 8 progress after 8F: about 80-85%.
 
-Remaining Blueprint 8 work should stay deliberate: completion review and future boundary setting. 8F does not add real camera/court inference, ball/player court-space projection, bounce/hit/in-out/rally/point/scoring, accepted/rejected court lifecycle, or tennis-event interpretation.
+Blueprint 8 Completion Review / Freeze v0 closes the blueprint as the current Visual Evidence
+Platform milestone:
+
+```text
+real detections
+-> smoothed motion candidates
+-> court projection candidates
+-> ball trajectory candidates
+-> hit/bounce event candidates
+-> marker-level arbitration
+-> replay marker inspector
+-> event candidate review panel
+-> point evidence snapshot
+```
+
+Blueprint 8 is now frozen as candidate evidence only. It does not add truth promotion, in/out,
+score, point winners, player identity, accepted/rejected lifecycle, manual correction, or
+adjudication.
 
 ## Blueprint 5 Status
 

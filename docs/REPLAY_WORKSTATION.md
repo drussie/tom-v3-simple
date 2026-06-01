@@ -56,7 +56,13 @@ indexed media
 
 Blueprint 7 completes TOM v3's real perception runtime for the replay workstation. The workstation can render fixture evidence or optional real model-output evidence through the same detection, tracklet, pose, timeline, and selected-detail surfaces. Court/camera/homography evidence now proceeds in Blueprint 8.
 
-Blueprint 8 has started with geometry evidence work. Milestone 8A adds court keypoint, court line, camera/view, homography candidate, and projection diagnostic storage contracts. Milestone 8B writes fixture court keypoint, line, and camera/view rows. Milestone 8C exposes camera/view rows through read-model APIs. Milestone 8D persists homography candidate rows with lineage from source court evidence. Milestone 8E renders those persisted court rows in the replay workstation through `courtRunId` and `homographyRunId`. Milestone 8F adds projection diagnostic rows and replay support through `projectionDiagnosticRunId`.
+Blueprint 8 is frozen as the current visual evidence platform milestone. It began with geometry
+evidence work: Milestone 8A adds court keypoint, court line, camera/view, homography candidate, and
+projection diagnostic storage contracts. Milestone 8B writes fixture court keypoint, line, and
+camera/view rows. Milestone 8C exposes camera/view rows through read-model APIs. Milestone 8D
+persists homography candidate rows with lineage from source court evidence. Milestone 8E renders
+those persisted court rows in the replay workstation through `courtRunId` and `homographyRunId`.
+Milestone 8F adds projection diagnostic rows and replay support through `projectionDiagnosticRunId`.
 
 The TOM v1 court keypoint adapter can now write real model-output `court_keypoint_observation` rows through `courtRunId`. Replay labels distinguish fixture court evidence from real court keypoint model output and derived court line candidates. The court calibration audit adds separate raw TOM v1 keypoint and mapped TOM v3 keypoint toggles so `raw_0..raw_13` can be visually checked before trusting mapping or homography. Homography and projection diagnostic overlays built from those rows remain candidate geometry evidence and review diagnostics, not court truth.
 
@@ -787,6 +793,13 @@ state into a compact report. The snapshot records replay URL, source run ids, co
 versions, final marker summary, warnings, and known limitations. It is a reporting artifact for
 operator review/regression comparison only; it does not create truth, in/out, score, or
 adjudication.
+
+Blueprint 8 Completion Review / Freeze v0 documents the current workstation as a stable
+candidate-evidence milestone. The frozen operator workflow is: build or obtain source runs, build
+ball trajectory candidates, build hit/bounce candidates, open replay in operator view, review
+markers in the Event Candidate Review panel, inspect selected evidence in Replay Marker Inspector,
+and generate a point evidence snapshot. The freeze changes documentation only; it does not change
+candidate logic, marker arbitration, replay defaults, truth status, in/out, score, or adjudication.
 
 Player-anchored hit recall v0.2.3 adds `player_anchored_hit_recall` details for candidate hits
 recovered from wider ball windows around near/far main player projection anchors. Selected evidence

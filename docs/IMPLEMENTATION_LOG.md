@@ -422,7 +422,7 @@ Start Blueprint 8 by implementing the schema and persistence foundation for cour
 
 ### Outcome
 
-Blueprint 8 is in progress.
+At 8A, Blueprint 8 entered progress.
 
 Milestone 8A created:
 
@@ -2735,3 +2735,32 @@ This milestone adds:
 The snapshot reads existing event candidate runs and final marker summaries. It does not change
 hit/bounce generation, marker-level arbitration, replay marker behavior, persisted source evidence,
 truth status, in/out, score, player identity, accepted/rejected lifecycle, or adjudication.
+
+## Blueprint 8 Completion Review / Freeze v0
+
+Status: complete
+
+### Goal
+
+Freeze the current replay evidence workstation as a coherent, documented, reproducible
+candidate-evidence milestone.
+
+### Notes
+
+This milestone adds:
+
+- Blueprint 8 completion review / freeze documentation
+- final sample-point reproducibility commands and expected counts
+- runbook workflow cleanup for event candidate review and point snapshots
+- known limitation freeze language
+- control-room/status/progress pointers for the frozen milestone
+
+The sample bridge smoke produced 3 `hit_candidate` observations, 3 `bounce_candidate` observations,
+6 final marker-summary rows, and 871 rejection diagnostics for event candidate run
+`9cfe4e3a-fad9-4434-b542-37555f9c03b2`. The point evidence snapshot for that run returned the
+same marker profile, source run ids, active versions, replay URL, candidate-only warnings, and known
+limitations.
+
+This freeze changes documentation only. It does not change hit/bounce candidate generation,
+marker-level arbitration, replay behavior, point snapshots, persisted source evidence, truth status,
+in/out, score, player identity, accepted/rejected lifecycle, or adjudication.

@@ -142,6 +142,12 @@ This registry makes TOM v3 Simple boundaries explicit.
 - Point Evidence Snapshot v0 creates compact run reports for operator review and regression
   comparison. Snapshots preserve candidate-only warnings and do not make markers true, in/out,
   scoring, or adjudicated outcomes.
+- Blueprint 8 Completion Review / Freeze v0 freezes the current replay evidence workstation as a
+  reproducible candidate-evidence milestone only. It does not add or imply hit truth, bounce truth,
+  in/out, score, point winner, player identity, manual accept/reject correction, accepted/rejected
+  lifecycle, or adjudication.
+- Marker correctness remains operator-reviewed. The current sample-point counts are reproducible,
+  but there is not yet a benchmark set or dataset-level recall/precision report.
 - Hit/Bounce Side-Zone + Sequence Classification Repair v0.2.2 can reclassify raw hit/bounce
   candidates using court-side zones and a simple event-sequence prior. This improves operator-review
   labels, but the sequence prior is heuristic candidate evidence only and is not rally, point,
@@ -191,6 +197,10 @@ TOM v3 Simple does not include:
 - point reconstruction
 - scoring
 - official tennis results
+- manual correction workflow
+- accepted/rejected candidate lifecycle
+- multi-point or match-level event timeline
+- dataset-level benchmark metrics
 
 ## Data / Export Limitations
 
