@@ -157,6 +157,9 @@ This registry makes TOM v3 Simple boundaries explicit.
   and metric x/y conversion uses declared court dimensions as an assumption. It is not true 3D
   reconstruction, verified ball height, hit/bounce truth, in/out, score, point state,
   accepted/rejected lifecycle, automatic correction, or adjudication.
+- Blueprint 13 3D-assisted event candidate diagnostics are per-marker context only. They can report
+  nearby 3D samples, unknown height, and neutral/insufficient diagnostic labels, but they do not
+  confirm or reject a hit/bounce marker, change marker counts, decide in/out, score, or adjudicate.
 - Blueprint 8 Completion Review / Freeze v0 freezes the current replay evidence workstation as a
   reproducible candidate-evidence milestone only. It does not add or imply hit truth, bounce truth,
   in/out, score, point winner, player identity, manual accept/reject correction, accepted/rejected

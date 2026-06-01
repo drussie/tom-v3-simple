@@ -822,6 +822,12 @@ candidate count, known/unknown height counts, and that 3D truth is not available
 render fake 3D arcs or use Three.js in this blueprint. The summary is candidate evidence only and
 does not alter hit/bounce markers, in/out, score, or adjudication.
 
+Blueprint 13 3D-Assisted Event Candidate Diagnostics v0 adds compact diagnostic context to the
+Replay Marker Inspector when diagnostics have been built for the selected event candidate run. The
+inspector can show diagnostic status/label, nearest 3D sample frame/time, nearest metric
+court-plane x/y, height status, local sample counts, and speed. This context is diagnostic-only; it
+does not change marker classification, candidate counts, in/out, score, or adjudication.
+
 Blueprint 8 Completion Review / Freeze v0 documents the current workstation as a stable
 candidate-evidence milestone. The frozen operator workflow is: build or obtain source runs, build
 ball trajectory candidates, build hit/bounce candidates, open replay in operator view, review

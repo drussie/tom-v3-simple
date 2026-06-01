@@ -2868,3 +2868,27 @@ The v0 builder derives metric court-plane x/y candidates from declared court dim
 height unknown by default. It does not create true 3D reconstruction, verified ball height,
 hit/bounce truth, in/out, score, accepted/rejected lifecycle, automatic correction, or
 adjudication.
+
+## Blueprint 13 3D-Assisted Event Candidate Diagnostics v0
+
+Status: complete
+
+### Goal
+
+Attach diagnostic-only 3D context to final visible hit/bounce event candidate markers.
+
+### Notes
+
+This milestone adds:
+
+- `event_candidate_3d_diagnostic` persistence and migration
+- `tom_v3_schema.event_candidate_3d_diagnostic`
+- `build-event-candidate-3d-diagnostics` worker CLI command
+- `tom-v1-build-event-candidate-3d-diagnostics` Make helper
+- replay compact diagnostics attached to marker summaries
+- point evidence snapshot `event_candidate_3d_diagnostic_summary`
+- point candidate evaluation `event_candidate_3d_diagnostics`
+
+The diagnostics link each final marker to nearby 3D trajectory samples when available. They do not
+change hit/bounce classification, marker arbitration, candidate counts, review annotations, 3D
+trajectory rows, in/out, score, accepted/rejected lifecycle, or adjudication.

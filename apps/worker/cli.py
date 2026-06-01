@@ -32,6 +32,9 @@ from apps.worker.services.completion_audit import run_completion_audit
 from apps.worker.services.court_adapter import run_fixture_court_adapter
 from apps.worker.services.court_review_export import export_court_review_dataset
 from apps.worker.services.detection_adapter import run_detection_adapter
+from apps.worker.services.event_candidate_3d_diagnostics import (
+    build_event_candidate_3d_diagnostics,
+)
 from apps.worker.services.frame_artifacts import extract_frame_artifacts_for_run
 from apps.worker.services.gameplay_adapter import run_gameplay_adapter
 from apps.worker.services.hit_bounce_candidates import build_hit_bounce_candidates
@@ -949,6 +952,34 @@ def main() -> None:
     )
     point_evaluation_parser.add_argument("--skip-create-db", action="store_true")
     point_evaluation_parser.set_defaults(handler=_handle_evaluate_point_candidates)
+
+    event_candidate_3d_parser = subcommands.add_parser(
+        "build-event-candidate-3d-diagnostics",
+        help="Build diagnostic-only 3D context for final hit/bounce event markers.",
+    )
+    event_candidate_3d_parser.add_argument("--media-id", required=True)
+    event_candidate_3d_parser.add_argument("--event-candidate-run-id", required=True)
+    event_candidate_3d_parser.add_argument("--trajectory-3d-run-id", required=True)
+    event_candidate_3d_parser.add_argument("--camera-geometry-id")
+    event_candidate_3d_parser.add_argument("--time-window-ms", type=int, default=250)
+    event_candidate_3d_parser.add_argument(
+        "--viewer-base-url",
+        default="http://127.0.0.1:3000",
+    )
+    event_candidate_3d_parser.add_argument(
+        "--format",
+        choices=["json", "markdown"],
+        default="json",
+        help="Diagnostic payload format. JSON is always returned; markdown adds a report body.",
+    )
+    event_candidate_3d_parser.add_argument(
+        "--output",
+        help="Optional file path for the JSON or markdown diagnostic artifact.",
+    )
+    event_candidate_3d_parser.add_argument("--skip-create-db", action="store_true")
+    event_candidate_3d_parser.set_defaults(
+        handler=_handle_build_event_candidate_3d_diagnostics
+    )
 
     camera_geometry_parser = subcommands.add_parser(
         "declare-camera-geometry",
@@ -1921,6 +1952,23 @@ def _handle_evaluate_point_candidates(
         session=session,
         media_id=args.media_id,
         event_candidate_run_id=args.event_candidate_run_id,
+        viewer_base_url=args.viewer_base_url,
+        output_format=args.format,
+        output_path=args.output,
+    )
+
+
+def _handle_build_event_candidate_3d_diagnostics(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    return build_event_candidate_3d_diagnostics(
+        session=session,
+        media_id=args.media_id,
+        event_candidate_run_id=args.event_candidate_run_id,
+        trajectory_3d_run_id=args.trajectory_3d_run_id,
+        camera_geometry_id=args.camera_geometry_id,
+        time_window_ms=args.time_window_ms,
         viewer_base_url=args.viewer_base_url,
         output_format=args.format,
         output_path=args.output,

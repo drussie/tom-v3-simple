@@ -2611,6 +2611,10 @@ function AvailableRunsPanel({ replayInfo }: { replayInfo: ReplayInfo }) {
           runs={replayInfo.available_runs.trajectory_3d}
         />
         <RunGroup
+          title="3D event candidate diagnostics"
+          runs={replayInfo.available_runs.event_candidate_3d_diagnostic ?? []}
+        />
+        <RunGroup
           title="Gameplay/view-state observations"
           runs={replayInfo.available_runs.gameplay}
         />
@@ -2760,7 +2764,10 @@ function markerSummaryFromEventCandidate(
     not_bounce_truth: item.not_bounce_truth,
     not_in_out_truth: item.not_in_out_truth,
     observation_only: item.observation_only,
-    no_adjudication: item.no_adjudication
+    no_adjudication: item.no_adjudication,
+    event_candidate_3d_diagnostic: (
+      item as Pick<ReplayMarkerSummary, "event_candidate_3d_diagnostic">
+    ).event_candidate_3d_diagnostic
   };
 }
 

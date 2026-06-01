@@ -1700,6 +1700,28 @@ pre {
   color: #facc15;
 }
 
+.marker-3d-diagnostic {
+  background: rgba(14, 165, 233, 0.08);
+  border: 1px solid rgba(14, 165, 233, 0.22);
+  border-radius: 8px;
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  padding: 10px;
+}
+
+.marker-3d-diagnostic-header {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  justify-content: space-between;
+  min-width: 0;
+}
+
+.marker-3d-diagnostic-header strong {
+  font-size: 12px;
+}
+
 .marker-review-controls,
 .missing-candidate-note-body {
   display: grid;

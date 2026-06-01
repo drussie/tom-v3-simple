@@ -15,6 +15,9 @@ from tom_v3_storage.db_models import (
 from apps.api.services.event_candidate_reviews import serialize_event_candidate_review
 from apps.api.services.replay import build_event_candidate_marker_summary
 from apps.worker.services.ball_trajectory_3d import trajectory_3d_readiness_summary
+from apps.worker.services.event_candidate_3d_diagnostics import (
+    event_candidate_3d_diagnostic_readiness_summary,
+)
 from apps.worker.services.point_evidence_snapshot import build_point_evidence_snapshot
 
 EVALUATION_TYPE = "point_candidate_review_evaluation"
@@ -130,6 +133,9 @@ def evaluate_point_candidates(
         "geometry_readiness": _geometry_readiness(point_snapshot),
         "trajectory_3d_readiness": trajectory_3d_readiness_summary(
             _dict_or_empty(point_snapshot.get("trajectory_3d_summary"))
+        ),
+        "event_candidate_3d_diagnostics": event_candidate_3d_diagnostic_readiness_summary(
+            _dict_or_empty(point_snapshot.get("event_candidate_3d_diagnostic_summary"))
         ),
         "candidate_type_breakdown": _candidate_type_breakdown(
             marker_summary,
@@ -299,6 +305,22 @@ def render_point_candidate_evaluation_markdown(evaluation: dict[str, Any]) -> st
         "- 3d_ball_trajectory_truth_available: "
         f"{trajectory_3d_readiness.get('3d_ball_trajectory_truth_available', False)}"
     )
+
+    rows.extend(["", "## 3D Event Candidate Diagnostics"])
+    event_3d = _dict_or_empty(evaluation.get("event_candidate_3d_diagnostics"))
+    rows.append(f"- available: {event_3d.get('available', False)}")
+    rows.append(f"- diagnostic_count: {event_3d.get('diagnostic_count', 0)}")
+    rows.append(f"- height_unknown_count: {event_3d.get('height_unknown_count', 0)}")
+    rows.append(
+        "- supports_candidate_context_count: "
+        f"{event_3d.get('supports_candidate_context_count', 0)}"
+    )
+    rows.append(
+        "- weakens_candidate_context_count: "
+        f"{event_3d.get('weakens_candidate_context_count', 0)}"
+    )
+    rows.append("- diagnostic_only: true")
+    rows.append("- not_truth: true")
 
     rows.extend(
         [

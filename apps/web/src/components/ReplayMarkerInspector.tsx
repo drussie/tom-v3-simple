@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import type {
   EventCandidateReviewAnnotation,
   EventCandidateReviewLabel,
+  ReplayEventCandidate3DDiagnostic,
   ReplayMarkerSummary
 } from "../lib/types";
 import { formatConfidence } from "../lib/timeline";
@@ -110,6 +111,7 @@ export function ReplayMarkerInspector({
             {selectedMarker.candidate_type}.
           </p>
         ) : null}
+        <EventCandidate3DDiagnosticBlock diagnostic={selectedMarker.event_candidate_3d_diagnostic} />
         <p className="marker-inspector-warning">
           Candidate evidence only - not truth, not score, not in/out.
         </p>
@@ -127,6 +129,63 @@ export function ReplayMarkerInspector({
   );
 }
 
+function EventCandidate3DDiagnosticBlock({
+  diagnostic
+}: {
+  diagnostic: ReplayEventCandidate3DDiagnostic | undefined;
+}) {
+  if (diagnostic === undefined) {
+    return (
+      <div className="marker-3d-diagnostic">
+        <div className="marker-3d-diagnostic-header">
+          <strong>3D Diagnostic</strong>
+          <span className="mini-pill">not available</span>
+        </div>
+        <p className="empty-state compact">
+          No 3D-assisted event diagnostic has been built for this marker yet.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="marker-3d-diagnostic">
+      <div className="marker-3d-diagnostic-header">
+        <strong>3D Diagnostic</strong>
+        <span className="mini-pill">diagnostic only</span>
+      </div>
+      <div className="marker-inspector-grid">
+        <MarkerInspectorRow label="status" value={formatDiagnosticValue(diagnostic.diagnostic_status)} />
+        <MarkerInspectorRow label="label" value={formatDiagnosticValue(diagnostic.diagnostic_label)} />
+        <MarkerInspectorRow
+          label="nearest sample"
+          value={formatNearest3DSample(diagnostic)}
+        />
+        <MarkerInspectorRow
+          label="court-plane xy"
+          value={formatCoordinates(diagnostic.nearest_court_x_m, diagnostic.nearest_court_y_m)}
+        />
+        <MarkerInspectorRow label="height" value={formatDiagnosticValue(diagnostic.height_status)} />
+        <MarkerInspectorRow
+          label="local samples"
+          value={diagnostic.local_window_sample_count.toString()}
+        />
+        <MarkerInspectorRow
+          label="speed"
+          value={
+            diagnostic.local_speed_mps === null || diagnostic.local_speed_mps === undefined
+              ? "n/a"
+              : `${diagnostic.local_speed_mps.toFixed(3)} m/s`
+          }
+        />
+      </div>
+      <p className="marker-inspector-note">
+        3D diagnostic context only. It does not change this marker and is not 3D truth.
+      </p>
+    </div>
+  );
+}
+
 function MarkerInspectorRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="marker-inspector-row">
@@ -141,6 +200,29 @@ function formatCoordinates(x: number | null | undefined, y: number | null | unde
     return "n/a";
   }
   return `x=${x.toFixed(3)}, y=${y.toFixed(3)}`;
+}
+
+function formatNearest3DSample(diagnostic: ReplayEventCandidate3DDiagnostic): string {
+  if (
+    diagnostic.nearest_3d_frame === null ||
+    diagnostic.nearest_3d_frame === undefined ||
+    diagnostic.nearest_3d_timestamp_ms === null ||
+    diagnostic.nearest_3d_timestamp_ms === undefined
+  ) {
+    return "n/a";
+  }
+  const delta =
+    diagnostic.nearest_time_delta_ms === null || diagnostic.nearest_time_delta_ms === undefined
+      ? "delta n/a"
+      : `delta ${diagnostic.nearest_time_delta_ms} ms`;
+  return `frame ${diagnostic.nearest_3d_frame} / ${diagnostic.nearest_3d_timestamp_ms} ms (${delta})`;
+}
+
+function formatDiagnosticValue(value: string | null | undefined): string {
+  if (value === null || value === undefined || value.length === 0) {
+    return "n/a";
+  }
+  return value.replaceAll("_", " ");
 }
 
 const markerReviewLabels: Array<{

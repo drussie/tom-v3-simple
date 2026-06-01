@@ -1615,6 +1615,10 @@ python -m apps.worker.cli completion-audit --no-demo-only
   x/y samples from existing ball trajectory candidates and declared camera geometry. Default height
   is unknown. It does not create true 3D reconstruction, verified ball height, event truth, in/out,
   score, accepted/rejected lifecycle, automatic correction, or adjudication.
+- Blueprint 13 3D-Assisted Event Candidate Diagnostics v0 links final hit/bounce marker rows to
+  nearby 3D trajectory candidate samples. It reports nearby sample counts, nearest metric x/y,
+  height status, and conservative diagnostic labels. It does not change hit/bounce classification,
+  marker counts, review annotations, in/out, score, or adjudication.
 - Blueprint 8 Completion Review / Freeze v0 freezes the current evidence workstation as a
   documented, reproducible candidate-evidence milestone. It does not add tennis logic, truth,
   score, in/out, manual correction, accepted/rejected lifecycle, or adjudication.
@@ -1664,3 +1668,19 @@ Expected result:
 - review exports are written
 - observations remain evidence only
 - no tennis-event interpretation appears
+
+Build 3D-assisted event candidate diagnostics:
+
+```bash
+TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_tom_v1_bridge.db \
+make tom-v1-build-event-candidate-3d-diagnostics \
+  PYTHON=.venv/bin/python \
+  MEDIA_ID=<media_id> \
+  EVENT_CANDIDATE_RUN_ID=<event_candidate_run_id> \
+  TRAJECTORY_3D_RUN_ID=<trajectory_3d_run_id> \
+  CAMERA_GEOMETRY_ID=<camera_geometry_id>
+```
+
+Expected output includes `diagnostic_type=event_candidate_3d_diagnostic_evidence`,
+`diagnostic_version=v0`, one diagnostic per final marker when markers exist, and warnings that the
+diagnostics are not truth, not 3D truth, not in/out, not score, and not adjudication.

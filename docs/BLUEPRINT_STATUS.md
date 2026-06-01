@@ -623,3 +623,21 @@ The v0 layer persists metric court-plane x/y candidates from declared court dime
 height unknown by default. It does not create true 3D reconstruction, verified ball height,
 hit/bounce truth, in/out, score, point state, accepted/rejected lifecycle, automatic correction, or
 adjudication.
+
+## Blueprint 13 - 3D-Assisted Event Candidate Diagnostics
+
+Status: COMPLETE
+
+Blueprint 13 proves:
+
+```text
+final hit/bounce event markers
++ provisional 3D ball trajectory candidates
+-> diagnostic-only per-marker 3D context
+-> replay, snapshot, and evaluation summaries
+```
+
+The v0 layer records nearby 3D sample counts, nearest metric court-plane x/y, height status, and
+conservative diagnostic labels. It does not change event classification, marker arbitration,
+candidate counts, review annotations, in/out, score, point state, accepted/rejected lifecycle,
+automatic correction, or adjudication.

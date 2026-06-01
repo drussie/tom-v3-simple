@@ -21,6 +21,9 @@ from apps.api.services.event_candidate_reviews import (
 from apps.api.services.replay import build_event_candidate_marker_summary
 from apps.worker.services.ball_trajectory_3d import latest_ball_trajectory_3d_summary
 from apps.worker.services.camera_geometry import camera_geometry_summary
+from apps.worker.services.event_candidate_3d_diagnostics import (
+    latest_event_candidate_3d_diagnostic_summary,
+)
 
 SNAPSHOT_TYPE = "point_evidence_snapshot"
 SNAPSHOT_VERSION = "v0"
@@ -115,6 +118,11 @@ def build_point_evidence_snapshot(
         ball_trajectory_run_id=source_run_ids.get("ball_trajectory_run_id"),
         court_projection_run_id=source_run_ids.get("court_projection_run_id"),
     )
+    event_candidate_3d_diagnostic_summary = latest_event_candidate_3d_diagnostic_summary(
+        session=session,
+        media_id=media.id,
+        event_candidate_run_id=event_candidate_run_id,
+    )
     candidate_summary = _candidate_summary(event_run)
     review_rows = _event_candidate_review_rows(
         session=session,
@@ -140,6 +148,7 @@ def build_point_evidence_snapshot(
         "active_versions": _active_versions(candidate_summary),
         "camera_geometry_summary": geometry_summary,
         "trajectory_3d_summary": trajectory_3d_summary,
+        "event_candidate_3d_diagnostic_summary": event_candidate_3d_diagnostic_summary,
         "marker_summary": marker_summary,
         "review_summary": build_event_candidate_review_summary(review_rows),
         "review_annotations": _compact_review_annotations(review_rows),
@@ -249,6 +258,24 @@ def render_point_evidence_snapshot_markdown(snapshot: dict[str, Any]) -> str:
             "- true_3d_reconstruction_available: "
             f"{trajectory_3d.get('true_3d_reconstruction_available', False)}"
         )
+    else:
+        rows.append("- available: false")
+
+    rows.extend(["", "## 3D Event Candidate Diagnostics"])
+    event_3d = snapshot.get("event_candidate_3d_diagnostic_summary")
+    if isinstance(event_3d, dict) and event_3d.get("available") is True:
+        rows.append(f"- diagnostic_count: {event_3d.get('diagnostic_count', 0)}")
+        rows.append(f"- height_unknown_count: {event_3d.get('height_unknown_count', 0)}")
+        rows.append(
+            "- supports_candidate_context_count: "
+            f"{event_3d.get('supports_candidate_context_count', 0)}"
+        )
+        rows.append(
+            "- weakens_candidate_context_count: "
+            f"{event_3d.get('weakens_candidate_context_count', 0)}"
+        )
+        rows.append("- diagnostic_only: true")
+        rows.append("- not_truth: true")
     else:
         rows.append("- available: false")
 

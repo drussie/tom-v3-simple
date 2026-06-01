@@ -3,6 +3,7 @@ from typing import Any
 
 from sqlalchemy import (
     JSON,
+    Boolean,
     DateTime,
     Float,
     ForeignKey,
@@ -706,6 +707,87 @@ class BallTrajectory3DCandidate(CreatedAtMixin, Base):
     )
     source_observation: Mapped[Observation | None] = relationship(
         foreign_keys=[source_observation_id]
+    )
+
+
+class EventCandidate3DDiagnostic(CreatedAtMixin, Base):
+    __tablename__ = "event_candidate_3d_diagnostic"
+    __table_args__ = (
+        Index(
+            "ix_event_candidate_3d_diag_media_run",
+            "media_id",
+            "event_candidate_run_id",
+        ),
+        Index("ix_event_candidate_3d_diag_event", "event_observation_id"),
+        Index("ix_event_candidate_3d_diag_traj_run", "trajectory_3d_run_id"),
+        Index("ix_event_candidate_3d_diag_nearest", "nearest_3d_candidate_id"),
+        Index("ix_event_candidate_3d_diag_frame", "media_id", "frame"),
+        Index("ix_event_candidate_3d_diag_timestamp", "media_id", "timestamp_ms"),
+        Index("ix_event_candidate_3d_diag_label", "diagnostic_label"),
+        Index("ix_event_candidate_3d_diag_status", "diagnostic_status"),
+    )
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_uuid)
+    media_id: Mapped[str] = mapped_column(ForeignKey("media_asset.id"), nullable=False)
+    event_candidate_run_id: Mapped[str] = mapped_column(
+        ForeignKey("processing_run.id"), nullable=False
+    )
+    event_observation_id: Mapped[str] = mapped_column(ForeignKey("observation.id"), nullable=False)
+    candidate_type: Mapped[str] = mapped_column(String(120), nullable=False)
+    trajectory_3d_run_id: Mapped[str | None] = mapped_column(ForeignKey("processing_run.id"))
+    camera_geometry_id: Mapped[str | None] = mapped_column(
+        ForeignKey("camera_geometry_evidence.id")
+    )
+    frame: Mapped[int] = mapped_column(Integer, nullable=False)
+    timestamp_ms: Mapped[int] = mapped_column(Integer, nullable=False)
+    nearest_3d_candidate_id: Mapped[str | None] = mapped_column(
+        ForeignKey("ball_trajectory_3d_candidate.id")
+    )
+    nearest_3d_frame: Mapped[int | None] = mapped_column(Integer)
+    nearest_3d_timestamp_ms: Mapped[int | None] = mapped_column(Integer)
+    nearest_time_delta_ms: Mapped[int | None] = mapped_column(Integer)
+    nearest_court_x_m: Mapped[float | None] = mapped_column(Float)
+    nearest_court_y_m: Mapped[float | None] = mapped_column(Float)
+    nearest_court_z_m: Mapped[float | None] = mapped_column(Float)
+    height_status: Mapped[str] = mapped_column(String(80), nullable=False)
+    diagnostic_status: Mapped[str] = mapped_column(String(80), nullable=False)
+    diagnostic_label: Mapped[str] = mapped_column(String(120), nullable=False)
+    diagnostic_confidence: Mapped[float | None] = mapped_column(Float)
+    pre_window_sample_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    post_window_sample_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    local_window_sample_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    local_velocity_available: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False
+    )
+    local_speed_mps: Mapped[float | None] = mapped_column(Float)
+    local_direction_delta_degrees: Mapped[float | None] = mapped_column(Float)
+    diagnostics_jsonb: Mapped[dict[str, Any]] = mapped_column(
+        JsonType, default=dict, nullable=False
+    )
+    warnings_jsonb: Mapped[dict[str, Any]] = mapped_column(
+        JsonType, default=dict, nullable=False
+    )
+    metadata_jsonb: Mapped[dict[str, Any]] = mapped_column(JsonType, default=dict, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+        nullable=False,
+    )
+
+    media: Mapped[MediaAsset] = relationship(foreign_keys=[media_id])
+    event_candidate_run: Mapped[ProcessingRun] = relationship(
+        foreign_keys=[event_candidate_run_id]
+    )
+    event_observation: Mapped[Observation] = relationship(foreign_keys=[event_observation_id])
+    trajectory_3d_run: Mapped[ProcessingRun | None] = relationship(
+        foreign_keys=[trajectory_3d_run_id]
+    )
+    camera_geometry: Mapped[CameraGeometryEvidence | None] = relationship(
+        foreign_keys=[camera_geometry_id]
+    )
+    nearest_3d_candidate: Mapped[BallTrajectory3DCandidate | None] = relationship(
+        foreign_keys=[nearest_3d_candidate_id]
     )
 
 

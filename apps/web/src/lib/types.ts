@@ -324,6 +324,7 @@ export interface ReplayAvailableRuns {
   event_candidate: ReplayRunSummary[];
   camera_geometry: ReplayRunSummary[];
   trajectory_3d: ReplayRunSummary[];
+  event_candidate_3d_diagnostic?: ReplayRunSummary[];
   main_player_track: ReplayRunSummary[];
   motion_smoothing: ReplayRunSummary[];
 }
@@ -362,6 +363,54 @@ export interface ReplayTrajectory3DSummary {
   true_3d_reconstruction_available?: boolean;
   "3d_ball_trajectory_truth_available"?: boolean;
   geometry_evidence_only?: boolean;
+  no_adjudication?: boolean;
+}
+
+export interface ReplayEventCandidate3DDiagnostic {
+  id: string;
+  event_observation_id: string;
+  candidate_type: string;
+  frame: number;
+  timestamp_ms: number;
+  trajectory_3d_run_id?: string | null;
+  camera_geometry_id?: string | null;
+  nearest_3d_candidate_id?: string | null;
+  nearest_3d_frame?: number | null;
+  nearest_3d_timestamp_ms?: number | null;
+  nearest_time_delta_ms?: number | null;
+  nearest_court_x_m?: number | null;
+  nearest_court_y_m?: number | null;
+  nearest_court_z_m?: number | null;
+  height_status: string;
+  diagnostic_status: string;
+  diagnostic_label: string;
+  diagnostic_confidence?: number | null;
+  pre_window_sample_count: number;
+  post_window_sample_count: number;
+  local_window_sample_count: number;
+  local_velocity_available: boolean;
+  local_speed_mps?: number | null;
+  local_direction_delta_degrees?: number | null;
+  diagnostic_only: boolean;
+  not_truth: boolean;
+  not_3d_truth: boolean;
+  height_not_verified: boolean;
+  no_adjudication: boolean;
+}
+
+export interface ReplayEventCandidate3DDiagnosticSummary {
+  available: boolean;
+  event_candidate_run_id?: string | null;
+  trajectory_3d_run_id?: string | null;
+  camera_geometry_id?: string | null;
+  diagnostic_count?: number;
+  height_unknown_count?: number;
+  supports_candidate_context_count?: number;
+  weakens_candidate_context_count?: number;
+  neutral_context_count?: number;
+  diagnostic_only?: boolean;
+  not_truth?: boolean;
+  not_3d_truth?: boolean;
   no_adjudication?: boolean;
 }
 
@@ -1145,6 +1194,8 @@ export interface ReplayOverlayChunk {
   hit_candidates: ReplayEventCandidateOverlay[];
   bounce_candidates: ReplayEventCandidateOverlay[];
   marker_summary: ReplayMarkerSummary[];
+  event_candidate_3d_diagnostics?: ReplayEventCandidate3DDiagnostic[];
+  event_candidate_3d_diagnostic_summary?: ReplayEventCandidate3DDiagnosticSummary;
   court_temporal_persistence?: ReplayCourtTemporalPersistence | string;
   court_persistence_max_gap_ms?: number;
   observation_only: boolean;
@@ -1480,6 +1531,7 @@ export interface ReplayMarkerSummary {
   court_y?: number | null;
   image_x?: number | null;
   image_y?: number | null;
+  event_candidate_3d_diagnostic?: ReplayEventCandidate3DDiagnostic;
   candidate_only: boolean;
   not_hit_truth: boolean;
   not_bounce_truth: boolean;
@@ -1594,6 +1646,8 @@ export interface ReplayTimeline {
   no_adjudication: boolean;
   annotations_without_time_count: number;
   marker_summary: ReplayMarkerSummary[];
+  event_candidate_3d_diagnostics?: ReplayEventCandidate3DDiagnostic[];
+  event_candidate_3d_diagnostic_summary?: ReplayEventCandidate3DDiagnosticSummary;
   lanes: ReplayTimelineLane[];
 }
 

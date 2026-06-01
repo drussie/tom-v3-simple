@@ -1094,3 +1094,13 @@ Expected: 100% through Blueprint 4
 Status: complete.
 
 Blueprint 4 is complete. TOM v3 can persist pose model output as observation evidence with a first-class pose schema, COCO17 skeleton registry, keypoint validation, normalization, processing-run persistence, source candidate lineage, viewer overlay, pose-specific query filters, review annotation support, evidence bundles, and TOM-native review dataset export without adding real pose inference, movement interpretation, homography, bounce, hit, rally, point, scoring, or adjudication.
+
+## Blueprint 13 Status
+
+Status: complete.
+
+TOM v3 now has a diagnostic-only bridge from final hit/bounce event candidate markers to nearby
+3D ball trajectory candidate samples. The bridge persists `event_candidate_3d_diagnostic` rows,
+adds a CLI/Make workflow, and surfaces compact diagnostics in replay marker inspection, point
+snapshots, and point candidate evaluations. It does not change event candidate counts or create
+truth, in/out, score, or adjudication.

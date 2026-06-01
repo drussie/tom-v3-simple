@@ -15,6 +15,7 @@ from tom_v3_storage.db_models import (
     CameraViewObservation,
     CourtKeypointObservation,
     CourtLineObservation,
+    EventCandidate3DDiagnostic,
     HomographyCandidateObservation,
     HumanAnnotation,
     MediaAsset,
@@ -27,6 +28,12 @@ from tom_v3_storage.db_models import (
     TrackPoint,
 )
 from tom_v3_video.paths import local_path_from_uri_or_path
+
+from apps.worker.services.event_candidate_3d_diagnostics import (
+    compact_event_candidate_3d_diagnostics,
+    event_candidate_3d_diagnostic_summary,
+    event_candidate_3d_diagnostics_by_event_observation_id,
+)
 
 DETECTION_TYPES = {"ball_detection", "player_detection"}
 TRACKLET_TYPES = {
@@ -361,6 +368,33 @@ def build_replay_overlay_chunk(
         if "hit_candidates" in layers or "bounce_candidates" in layers
         else []
     )
+    event_candidate_3d_diagnostics = (
+        compact_event_candidate_3d_diagnostics(
+            session=session,
+            media_id=media.id,
+            event_candidate_run_id=event_candidate_run_id,
+        )
+        if event_candidate_run_id is not None
+        and ("hit_candidates" in layers or "bounce_candidates" in layers)
+        else []
+    )
+    event_candidate_3d_summary = (
+        event_candidate_3d_diagnostic_summary(
+            session=session,
+            media_id=media.id,
+            event_candidate_run_id=event_candidate_run_id,
+        )
+        if event_candidate_run_id is not None
+        and ("hit_candidates" in layers or "bounce_candidates" in layers)
+        and event_candidate_3d_diagnostics
+        else {
+            "available": False,
+            "diagnostic_only": True,
+            "not_truth": True,
+            "not_3d_truth": True,
+            "no_adjudication": True,
+        }
+    )
     return {
         "media_id": media.id,
         "start_ms": start_ms,
@@ -386,6 +420,8 @@ def build_replay_overlay_chunk(
         "hit_candidates": hit_candidates,
         "bounce_candidates": bounce_candidates,
         "marker_summary": marker_summary,
+        "event_candidate_3d_diagnostics": event_candidate_3d_diagnostics,
+        "event_candidate_3d_diagnostic_summary": event_candidate_3d_summary,
         "court_temporal_persistence": court_temporal_persistence,
         "court_persistence_max_gap_ms": court_persistence_max_gap_ms,
         "observation_only": True,
@@ -451,6 +487,30 @@ def build_replay_timeline(
             session=session,
             media=media,
             event_candidate_run_id=event_candidate_run_id,
+        ),
+        "event_candidate_3d_diagnostics": (
+            compact_event_candidate_3d_diagnostics(
+                session=session,
+                media_id=media.id,
+                event_candidate_run_id=event_candidate_run_id,
+            )
+            if event_candidate_run_id is not None
+            else []
+        ),
+        "event_candidate_3d_diagnostic_summary": (
+            event_candidate_3d_diagnostic_summary(
+                session=session,
+                media_id=media.id,
+                event_candidate_run_id=event_candidate_run_id,
+            )
+            if event_candidate_run_id is not None
+            else {
+                "available": False,
+                "diagnostic_only": True,
+                "not_truth": True,
+                "not_3d_truth": True,
+                "no_adjudication": True,
+            }
         ),
         "lanes": [
             {
@@ -1250,6 +1310,16 @@ def build_event_candidate_marker_summary(
     )
     for index, item in enumerate(items, start=1):
         item["index"] = index
+    if event_candidate_run_id is not None:
+        diagnostics_by_event_id = event_candidate_3d_diagnostics_by_event_observation_id(
+            session=session,
+            media_id=media.id,
+            event_candidate_run_id=event_candidate_run_id,
+        )
+        for item in items:
+            diagnostic = diagnostics_by_event_id.get(str(item.get("observation_id") or ""))
+            if diagnostic is not None:
+                item["event_candidate_3d_diagnostic"] = diagnostic
     return items
 
 
@@ -1287,6 +1357,50 @@ def _event_candidate_marker_summary_item(
         "observation_only": True,
         "no_adjudication": True,
     }
+
+
+def _event_candidate_3d_diagnostic_run_summaries(
+    session: Session,
+    media_id: str,
+) -> list[dict[str, Any]]:
+    run_rows = session.execute(
+        select(
+            EventCandidate3DDiagnostic.event_candidate_run_id,
+            EventCandidate3DDiagnostic.trajectory_3d_run_id,
+            func.count(EventCandidate3DDiagnostic.id),
+        )
+        .where(EventCandidate3DDiagnostic.media_id == media_id)
+        .group_by(
+            EventCandidate3DDiagnostic.event_candidate_run_id,
+            EventCandidate3DDiagnostic.trajectory_3d_run_id,
+        )
+    ).all()
+    summaries: list[dict[str, Any]] = []
+    for event_candidate_run_id, trajectory_3d_run_id, diagnostic_count in run_rows:
+        event_run = session.get(ProcessingRun, event_candidate_run_id)
+        summaries.append(
+            {
+                "run_id": event_candidate_run_id,
+                "run_name": (
+                    event_run.run_name
+                    if event_run is not None
+                    else "event-candidate-3d-diagnostics"
+                ),
+                "run_status": event_run.run_status if event_run is not None else "completed",
+                "observation_count": int(diagnostic_count or 0),
+                "evidence_source": "event_candidate_3d_diagnostic_evidence",
+                "source_label": "3D-assisted event candidate diagnostics",
+                "event_candidate_run_id": event_candidate_run_id,
+                "trajectory_3d_run_id": trajectory_3d_run_id,
+                "diagnostic_count": int(diagnostic_count or 0),
+                "diagnostic_only": True,
+                "not_truth": True,
+                "not_3d_truth": True,
+                "no_adjudication": True,
+            }
+        )
+    summaries.sort(key=lambda row: str(row.get("run_name") or ""))
+    return summaries
 
 
 def event_candidate_timeline_item_from_observation(
@@ -3036,6 +3150,10 @@ def available_runs_for_media(session: Session, media_id: str) -> dict[str, list[
         "event_candidate": _event_candidate_run_summaries(session, media_id),
         "camera_geometry": _camera_geometry_run_summaries(session, media_id),
         "trajectory_3d": _trajectory_3d_run_summaries(session, media_id),
+        "event_candidate_3d_diagnostic": _event_candidate_3d_diagnostic_run_summaries(
+            session,
+            media_id,
+        ),
         "main_player_track": _main_player_track_run_summaries(session, media_id),
         "motion_smoothing": _motion_smoothing_run_summaries(session, media_id),
     }
