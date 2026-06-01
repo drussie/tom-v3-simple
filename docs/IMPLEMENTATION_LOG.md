@@ -2788,3 +2788,30 @@ This milestone adds:
 The review layer is metadata only. It does not change event candidate generation, candidate counts,
 marker-level arbitration, truth status, in/out, score, player identity, accepted/rejected lifecycle,
 or adjudication.
+
+## Blueprint 10 Benchmark / Evaluation Harness v0
+
+Status: complete
+
+### Goal
+
+Summarize generated point candidate markers and Blueprint 9 operator review metadata in a compact
+CLI/report artifact.
+
+### Notes
+
+This milestone adds:
+
+- `evaluate-point-candidates` worker CLI command
+- `tom-v1-evaluate-point-candidates` Make helper
+- JSON evaluation output by default
+- optional markdown report output
+- reviewed/unreviewed final marker coverage
+- reviewed-only label fractions
+- candidate-type breakdowns
+- missing-candidate note summaries
+
+The evaluation harness is read-only. It does not change event candidate generation, marker-level
+arbitration, review annotations, source evidence, truth status, in/out, score, player identity,
+accepted/rejected lifecycle, automatic correction, or adjudication. It does not compute
+precision/recall in v0.

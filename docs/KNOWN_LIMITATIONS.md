@@ -146,6 +146,10 @@ This registry makes TOM v3 Simple boundaries explicit.
   missing-candidate moments, but those labels are metadata only. They do not mutate generated
   observations, create accepted/rejected truth, decide in/out, score a point, or adjudicate
   evidence.
+- Blueprint 10 evaluation reports summarize generated candidate markers and Blueprint 9 review
+  metadata only. They do not compute precision/recall in v0, do not establish an adjudicated
+  reference set, and do not promote review labels into truth, corrections, in/out, score, point
+  state, or adjudication.
 - Blueprint 8 Completion Review / Freeze v0 freezes the current replay evidence workstation as a
   reproducible candidate-evidence milestone only. It does not add or imply hit truth, bounce truth,
   in/out, score, point winner, player identity, manual accept/reject correction, accepted/rejected

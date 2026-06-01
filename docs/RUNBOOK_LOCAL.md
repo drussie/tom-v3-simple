@@ -918,6 +918,33 @@ final visible marker summary, candidate-only warnings, and known limitations. It
 operator review and reproducibility only; it does not create hit truth, bounce truth, in/out, score,
 or adjudication.
 
+Generate a Blueprint 10 point candidate review evaluation after adding Blueprint 9 review
+annotations:
+
+```bash
+TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_tom_v1_bridge.db \
+make tom-v1-evaluate-point-candidates \
+  PYTHON=.venv/bin/python \
+  MEDIA_ID=<media_id> \
+  EVENT_CANDIDATE_RUN_ID=<event_candidate_run_id>
+```
+
+Optional markdown output:
+
+```bash
+TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_tom_v1_bridge.db \
+make tom-v1-evaluate-point-candidates \
+  PYTHON=.venv/bin/python \
+  MEDIA_ID=<media_id> \
+  EVENT_CANDIDATE_RUN_ID=<event_candidate_run_id> \
+  FORMAT=markdown \
+  OUTPUT=tmp_reports/point_candidate_review_evaluation.md
+```
+
+The evaluation summarizes generated candidate markers and operator review metadata. It does not
+compute precision/recall in v0, does not promote review labels into truth, and does not change
+generated candidates, in/out, score, point state, or adjudication.
+
 Blueprint 8 freeze operator workflow:
 
 1. Build or obtain the source perception, court, smoothing, projection, and trajectory runs.
@@ -928,6 +955,7 @@ Blueprint 8 freeze operator workflow:
 6. Inspect source method, confidence, coordinates, and marker-level arbitration in Replay Marker
    Inspector.
 7. Generate a point evidence snapshot for the reviewed run.
+8. Generate a point candidate review evaluation when review annotations should be summarized.
 
 The v0.2.2 side-zone sequence repair preserves the 2-hit / 2-bounce sample-point recall while adding
 `court_side_zone`, `player_contact_zone`, `court_landing_zone`, `candidate_reclassification`, and
@@ -1537,6 +1565,11 @@ python -m apps.worker.cli completion-audit --no-demo-only
   current replay time. The annotations are review metadata only and do not change event candidate
   generation, marker counts, point evidence, in/out, score, accepted/rejected lifecycle, or
   adjudication.
+- Blueprint 10 Benchmark / Evaluation Harness v0 summarizes generated point candidate markers and
+  Blueprint 9 review annotations with `evaluate-point-candidates` and
+  `tom-v1-evaluate-point-candidates`. It is a read-only review report; it does not compute
+  precision/recall in v0, promote labels into truth, correct candidates, decide in/out, score a
+  point, or adjudicate evidence.
 - Blueprint 8 Completion Review / Freeze v0 freezes the current evidence workstation as a
   documented, reproducible candidate-evidence milestone. It does not add tennis logic, truth,
   score, in/out, manual correction, accepted/rejected lifecycle, or adjudication.

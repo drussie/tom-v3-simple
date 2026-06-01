@@ -803,6 +803,13 @@ hit/bounce candidate markers. The Missing Candidate Note panel can add `missing_
 These annotations are metadata only; they do not change generated markers, marker counts, in/out,
 score, point state, or adjudication.
 
+Blueprint 10 Benchmark / Evaluation Harness v0 is a CLI/reporting companion to the replay review
+workflow. After operators add Blueprint 9 review labels and missing-candidate notes, run
+`evaluate-point-candidates` or `make tom-v1-evaluate-point-candidates` to summarize generated
+markers, review coverage, reviewed-only label fractions, and missing-candidate notes. The report is
+read-only and does not compute precision/recall in v0, change replay markers, create truth, decide
+in/out, score, or adjudicate evidence.
+
 Blueprint 8 Completion Review / Freeze v0 documents the current workstation as a stable
 candidate-evidence milestone. The frozen operator workflow is: build or obtain source runs, build
 ball trajectory candidates, build hit/bounce candidates, open replay in operator view, review

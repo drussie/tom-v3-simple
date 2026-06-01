@@ -10,10 +10,11 @@
 - Blueprint 6: COMPLETE
 - Blueprint 7: COMPLETE
 - Blueprint 8: COMPLETE / FROZEN
-- Blueprint 9: STARTED
+- Blueprint 9: COMPLETE
+- Blueprint 10: STARTED
 - TOM v3 Simple: COMPLETE
 
-TOM v3 Simple is complete as a lightweight local observation/evidence platform. Blueprint 6 is complete as the visual replay/operator workstation layer. Blueprint 7 is complete as the real perception runtime layer for optional real detection, real-detection-derived candidate tracklets, and optional real pose keypoint evidence. Blueprint 8 is frozen as the visual evidence workstation milestone: real/fixture court evidence, smoothed motion candidates, court projection candidates, ball trajectory candidates, hit/bounce event candidates, marker-level arbitration, replay marker inspection, event candidate review, and point evidence snapshots remain candidate evidence only. Blueprint 9 has started with manual candidate review annotations that attach operator metadata to candidate markers and missing-candidate moments without creating truth or adjudication.
+TOM v3 Simple is complete as a lightweight local observation/evidence platform. Blueprint 6 is complete as the visual replay/operator workstation layer. Blueprint 7 is complete as the real perception runtime layer for optional real detection, real-detection-derived candidate tracklets, and optional real pose keypoint evidence. Blueprint 8 is frozen as the visual evidence workstation milestone: real/fixture court evidence, smoothed motion candidates, court projection candidates, ball trajectory candidates, hit/bounce event candidates, marker-level arbitration, replay marker inspection, event candidate review, and point evidence snapshots remain candidate evidence only. Blueprint 9 is complete with manual candidate review annotations that attach operator metadata to candidate markers and missing-candidate moments without creating truth or adjudication. Blueprint 10 has started with a read-only evaluation harness that summarizes generated candidate markers and Blueprint 9 review metadata.
 
 ## Blueprint 1 - Media, Observation Store, Viewer Foundation
 
@@ -553,3 +554,36 @@ homography candidate rows
 - bounce/hit/in-out/rally/point/scoring
 - stream ingestion
 - adjudication
+
+## Blueprint 9 - Manual Candidate Review Annotation
+
+Status: COMPLETE
+
+Blueprint 9 proves:
+
+```text
+final hit/bounce candidate markers
+-> operator review labels
+-> missing-candidate notes
+-> point evidence snapshot review summary
+```
+
+Review annotations are metadata only. They do not change generated candidate observations, final
+marker counts, source evidence, in/out, score, accepted/rejected lifecycle, or adjudication.
+
+## Blueprint 10 - Benchmark / Evaluation Harness
+
+Status: STARTED
+
+Blueprint 10 proves:
+
+```text
+event candidate run
++ Blueprint 9 review metadata
+-> point candidate review evaluation report
+```
+
+The v0 harness summarizes generated hit/bounce candidate markers, rejection diagnostic counts,
+review labels, missing-candidate notes, reviewed-marker coverage, and reviewed-only label fractions.
+It does not compute precision/recall, create hit/bounce truth, decide in/out, score a point, promote
+labels into truth, correct candidates, or adjudicate evidence.

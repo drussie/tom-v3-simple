@@ -83,6 +83,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [TOM v1 Model Assets + Perception Bridge](milestones/tom_v1_model_assets_perception_bridge.md)
 - [Blueprint 8 Completion Review / Freeze v0](blueprints/blueprint_8_completion_review_freeze_v0.md)
 - [Blueprint 9 Manual Candidate Review Annotation v0](blueprints/blueprint_9_manual_candidate_review_annotation_v0.md)
+- [Blueprint 10 Benchmark / Evaluation Harness v0](blueprints/blueprint_10_benchmark_evaluation_harness_v0.md)
 
 ## Handoffs
 
@@ -193,6 +194,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [TOM v1 Model Assets + Perception Bridge Agent Report](agent_reports/tom_v1_model_assets_perception_bridge_report.md)
 - [Blueprint 8 Completion Review / Freeze v0 Agent Report](agent_reports/blueprint_8_completion_review_freeze_v0_report.md)
 - [Blueprint 9 Manual Candidate Review Annotation v0 Agent Report](agent_reports/blueprint_9_manual_candidate_review_annotation_v0_report.md)
+- [Blueprint 10 Benchmark / Evaluation Harness v0 Agent Report](agent_reports/blueprint_10_benchmark_evaluation_harness_v0_report.md)
 
 ## Blueprints
 
@@ -211,6 +213,8 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Blueprint 8 - Court / Camera / Homography Evidence Layer](blueprints/tom_v3_blueprint_8_court_camera_homography_evidence_layer_candidate.md)
 - [Blueprint 8 Completion Review / Freeze v0](blueprints/blueprint_8_completion_review_freeze_v0.md)
 - [Blueprint 9 Manual Candidate Review Annotation v0](blueprints/blueprint_9_manual_candidate_review_annotation_v0.md)
+- [Blueprint 10 Benchmark / Evaluation Harness v0](blueprints/blueprint_10_benchmark_evaluation_harness_v0.md)
+- [Point Candidate Review Evaluation v0](evaluation/point_candidate_review_evaluation_v0.md)
 
 ## API and Schema
 

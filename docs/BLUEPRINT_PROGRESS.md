@@ -2,7 +2,7 @@
 
 ## Current Progress Gauge
 
-Current: Blueprints 1, 2, 3, 4, 5, 6, 7, and 8 complete/frozen; Blueprint 9 manual candidate review annotations have started; TOM v3 Simple is complete as an observation-only evidence platform.
+Current: Blueprints 1, 2, 3, 4, 5, 6, 7, and 8 complete/frozen; Blueprint 9 manual candidate review annotations are complete; Blueprint 10 benchmark/evaluation harness has started; TOM v3 Simple is complete as an observation-only evidence platform.
 
 ## Current
 
@@ -383,7 +383,7 @@ adjudication.
 
 ## Blueprint 9 Status
 
-Status: started.
+Status: complete.
 
 Blueprint 9 Manual Candidate Review Annotation v0 adds operator review metadata for event candidate
 markers and missing-candidate notes:
@@ -397,6 +397,24 @@ hit/bounce candidate markers
 
 Review annotations are metadata only. They do not mutate generated candidate observations, change
 marker counts, create accepted/rejected truth, or add in/out, score, point state, or adjudication.
+
+## Blueprint 10 Status
+
+Status: started.
+
+Blueprint 10 Benchmark / Evaluation Harness v0 adds read-only summaries over generated point
+candidate markers and Blueprint 9 operator review metadata:
+
+```text
+event candidate run
++ operator review annotations
+-> point candidate review evaluation
+```
+
+The v0 evaluator reports candidate counts, rejection diagnostic counts, reviewed/unreviewed marker
+coverage, reviewed-only label fractions, candidate-type breakdowns, reviewed marker details, and
+missing-candidate notes. It does not compute precision/recall in v0 and does not create truth,
+automatic correction, in/out, score, point state, accepted/rejected lifecycle, or adjudication.
 
 ## Blueprint 5 Status
 
