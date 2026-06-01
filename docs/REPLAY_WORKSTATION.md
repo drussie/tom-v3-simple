@@ -816,6 +816,12 @@ court model, court-plane readiness, unknown intrinsics/extrinsics, and that 3D t
 not available. This is a readiness/debug surface only; it does not render 3D, alter markers, decide
 in/out, score, or adjudicate evidence.
 
+Blueprint 12 3D Ball Trajectory Candidate Evidence v0 adds a compact 3D Trajectory Candidates
+panel when provisional 3D candidate rows exist for the media. The panel shows height model,
+candidate count, known/unknown height counts, and that 3D truth is not available. Replay does not
+render fake 3D arcs or use Three.js in this blueprint. The summary is candidate evidence only and
+does not alter hit/bounce markers, in/out, score, or adjudication.
+
 Blueprint 8 Completion Review / Freeze v0 documents the current workstation as a stable
 candidate-evidence milestone. The frozen operator workflow is: build or obtain source runs, build
 ball trajectory candidates, build hit/bounce candidates, open replay in operator view, review

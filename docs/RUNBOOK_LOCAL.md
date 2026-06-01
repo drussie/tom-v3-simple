@@ -963,6 +963,24 @@ create 3D ball trajectories, change event candidates, decide in/out, score a poi
 evidence. Subsequent point evidence snapshots include `camera_geometry_summary`, and point
 candidate evaluations include `geometry_readiness`.
 
+Build Blueprint 12 provisional 3D ball trajectory candidates:
+
+```bash
+TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_tom_v1_bridge.db \
+make tom-v1-build-3d-ball-trajectory-candidates \
+  PYTHON=.venv/bin/python \
+  MEDIA_ID=<media_id> \
+  BALL_TRAJECTORY_RUN_ID=<ball_trajectory_run_id> \
+  COURT_PROJECTION_RUN_ID=<court_projection_run_id> \
+  CAMERA_GEOMETRY_ID=<camera_geometry_id>
+```
+
+The default `HEIGHT_MODEL=none_unknown` derives metric court-plane x/y candidates from declared
+court dimensions and leaves height unknown. It does not create true 3D reconstruction, verified
+ball height, hit/bounce truth, in/out, score, or adjudication. Subsequent point evidence snapshots
+include `trajectory_3d_summary`, and point candidate evaluations include
+`trajectory_3d_readiness`.
+
 Blueprint 8 freeze operator workflow:
 
 1. Build or obtain the source perception, court, smoothing, projection, and trajectory runs.
@@ -1593,6 +1611,10 @@ python -m apps.worker.cli completion-audit --no-demo-only
   geometry metadata and unknown intrinsics/extrinsics placeholders. It prepares TOM for future 3D
   evidence layers without creating 3D ball trajectories, 3D truth, event truth, in/out, score,
   accepted/rejected lifecycle, automatic correction, or adjudication.
+- Blueprint 12 3D Ball Trajectory Candidate Evidence v0 records provisional metric court-plane
+  x/y samples from existing ball trajectory candidates and declared camera geometry. Default height
+  is unknown. It does not create true 3D reconstruction, verified ball height, event truth, in/out,
+  score, accepted/rejected lifecycle, automatic correction, or adjudication.
 - Blueprint 8 Completion Review / Freeze v0 freezes the current evidence workstation as a
   documented, reproducible candidate-evidence milestone. It does not add tennis logic, truth,
   score, in/out, manual correction, accepted/rejected lifecycle, or adjudication.

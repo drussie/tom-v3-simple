@@ -2841,3 +2841,30 @@ This milestone adds:
 The geometry layer is metadata/readiness only. It does not create true camera calibration, 3D ball
 trajectories, hit/bounce truth, in/out, score, player identity, accepted/rejected lifecycle,
 automatic correction, or adjudication.
+
+## Blueprint 12 3D Ball Trajectory Candidate Evidence v0
+
+Status: complete
+
+### Goal
+
+Persist provisional 3D ball trajectory candidate evidence from existing 2D court trajectory points
+and Blueprint 11 camera geometry declarations.
+
+### Notes
+
+This milestone adds:
+
+- `ball_trajectory_3d_candidate` persistence and migration
+- `tom_v3_schema.ball_trajectory_3d`
+- `build-3d-ball-trajectory-candidates` worker CLI command
+- `tom-v1-build-3d-ball-trajectory-candidates` Make helper
+- replay info `trajectory_3d_summary`
+- replay 3D Trajectory Candidates side panel
+- point evidence snapshot `trajectory_3d_summary`
+- point candidate evaluation `trajectory_3d_readiness`
+
+The v0 builder derives metric court-plane x/y candidates from declared court dimensions and keeps
+height unknown by default. It does not create true 3D reconstruction, verified ball height,
+hit/bounce truth, in/out, score, accepted/rejected lifecycle, automatic correction, or
+adjudication.

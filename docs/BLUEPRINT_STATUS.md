@@ -12,10 +12,11 @@
 - Blueprint 8: COMPLETE / FROZEN
 - Blueprint 9: COMPLETE
 - Blueprint 10: COMPLETE
-- Blueprint 11: STARTED
+- Blueprint 11: COMPLETE
+- Blueprint 12: COMPLETE
 - TOM v3 Simple: COMPLETE
 
-TOM v3 Simple is complete as a lightweight local observation/evidence platform. Blueprint 6 is complete as the visual replay/operator workstation layer. Blueprint 7 is complete as the real perception runtime layer for optional real detection, real-detection-derived candidate tracklets, and optional real pose keypoint evidence. Blueprint 8 is frozen as the visual evidence workstation milestone: real/fixture court evidence, smoothed motion candidates, court projection candidates, ball trajectory candidates, hit/bounce event candidates, marker-level arbitration, replay marker inspection, event candidate review, and point evidence snapshots remain candidate evidence only. Blueprint 9 is complete with manual candidate review annotations that attach operator metadata to candidate markers and missing-candidate moments without creating truth or adjudication. Blueprint 10 is complete with a read-only evaluation harness that summarizes generated candidate markers and Blueprint 9 review metadata. Blueprint 11 has started with declared camera/court geometry evidence for future 3D readiness.
+TOM v3 Simple is complete as a lightweight local observation/evidence platform. Blueprint 6 is complete as the visual replay/operator workstation layer. Blueprint 7 is complete as the real perception runtime layer for optional real detection, real-detection-derived candidate tracklets, and optional real pose keypoint evidence. Blueprint 8 is frozen as the visual evidence workstation milestone: real/fixture court evidence, smoothed motion candidates, court projection candidates, ball trajectory candidates, hit/bounce event candidates, marker-level arbitration, replay marker inspection, event candidate review, and point evidence snapshots remain candidate evidence only. Blueprint 9 is complete with manual candidate review annotations that attach operator metadata to candidate markers and missing-candidate moments without creating truth or adjudication. Blueprint 10 is complete with a read-only evaluation harness that summarizes generated candidate markers and Blueprint 9 review metadata. Blueprint 11 is complete with declared camera/court geometry evidence for future 3D readiness. Blueprint 12 is complete with provisional 3D ball trajectory candidate evidence that keeps height unknown by default and does not create 3D truth.
 
 ## Blueprint 1 - Media, Observation Store, Viewer Foundation
 
@@ -591,7 +592,7 @@ labels into truth, correct candidates, or adjudicate evidence.
 
 ## Blueprint 11 - 3D Readiness / Camera Geometry Evidence Layer
 
-Status: STARTED
+Status: COMPLETE
 
 Blueprint 11 proves:
 
@@ -604,3 +605,21 @@ media / court / homography / projection context
 The v0 layer declares camera/court geometry metadata and unknown intrinsics/extrinsics placeholders
 for future 3D evidence work. It does not create 3D ball trajectories, 3D truth, hit/bounce truth,
 in/out, score, point state, accepted/rejected lifecycle, automatic correction, or adjudication.
+
+## Blueprint 12 - 3D Ball Trajectory Candidate Evidence
+
+Status: COMPLETE
+
+Blueprint 12 proves:
+
+```text
+ball trajectory court candidates
++ camera geometry evidence
+-> provisional 3D ball trajectory candidate evidence
+-> replay, snapshot, and evaluation 3D-readiness summaries
+```
+
+The v0 layer persists metric court-plane x/y candidates from declared court dimensions and keeps
+height unknown by default. It does not create true 3D reconstruction, verified ball height,
+hit/bounce truth, in/out, score, point state, accepted/rejected lifecycle, automatic correction, or
+adjudication.

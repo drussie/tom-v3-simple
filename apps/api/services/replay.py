@@ -4,12 +4,13 @@ import math
 from pathlib import Path
 from typing import Any
 
-from sqlalchemy import func, select
+from sqlalchemy import Integer, func, select
 from sqlalchemy.orm import Session
 from tom_v3_schema.court import get_court_template
 from tom_v3_schema.skeletons import get_skeleton_definition
 from tom_v3_storage.db_models import (
     AtomicObservation,
+    BallTrajectory3DCandidate,
     CameraGeometryEvidence,
     CameraViewObservation,
     CourtKeypointObservation,
@@ -115,6 +116,7 @@ def build_replay_info(session: Session, media_id: str) -> dict[str, Any] | None:
         "frame_time_index": frame_time_index,
         "available_runs": available_runs_for_media(session, media.id),
         "camera_geometry_summary": _camera_geometry_summary(session, media.id),
+        "trajectory_3d_summary": _trajectory_3d_summary(session, media.id),
         "observation_only": True,
         "no_adjudication": True,
     }
@@ -3033,6 +3035,7 @@ def available_runs_for_media(session: Session, media_id: str) -> dict[str, list[
         "ball_trajectory": _ball_trajectory_run_summaries(session, media_id),
         "event_candidate": _event_candidate_run_summaries(session, media_id),
         "camera_geometry": _camera_geometry_run_summaries(session, media_id),
+        "trajectory_3d": _trajectory_3d_run_summaries(session, media_id),
         "main_player_track": _main_player_track_run_summaries(session, media_id),
         "motion_smoothing": _motion_smoothing_run_summaries(session, media_id),
     }
@@ -3505,6 +3508,125 @@ def _camera_geometry_summary(session: Session, media_id: str) -> dict[str, Any]:
         ),
         "true_3d_reconstruction_available": False,
         "3d_ball_trajectory_available": False,
+        "geometry_evidence_only": True,
+        "no_adjudication": True,
+    }
+
+
+def _trajectory_3d_run_summaries(
+    session: Session,
+    media_id: str,
+) -> list[dict[str, Any]]:
+    run_rows = session.execute(
+        select(
+            BallTrajectory3DCandidate.trajectory_3d_run_id,
+            func.count(BallTrajectory3DCandidate.id),
+            func.sum(
+                func.coalesce(
+                    (BallTrajectory3DCandidate.court_z_m.is_not(None)).cast(Integer),
+                    0,
+                )
+            ),
+        )
+        .where(
+            BallTrajectory3DCandidate.media_id == media_id,
+            BallTrajectory3DCandidate.trajectory_3d_run_id.is_not(None),
+        )
+        .group_by(BallTrajectory3DCandidate.trajectory_3d_run_id)
+    ).all()
+    summaries: list[dict[str, Any]] = []
+    for trajectory_3d_run_id, candidate_count, known_height_count in run_rows:
+        if trajectory_3d_run_id is None:
+            continue
+        first = session.scalars(
+            select(BallTrajectory3DCandidate)
+            .where(
+                BallTrajectory3DCandidate.media_id == media_id,
+                BallTrajectory3DCandidate.trajectory_3d_run_id == trajectory_3d_run_id,
+            )
+            .order_by(BallTrajectory3DCandidate.timestamp_ms, BallTrajectory3DCandidate.id)
+            .limit(1)
+        ).first()
+        run = session.get(ProcessingRun, trajectory_3d_run_id)
+        summaries.append(
+            {
+                "run_id": trajectory_3d_run_id,
+                "run_name": (
+                    run.run_name if run is not None else "3d-ball-trajectory-candidates"
+                ),
+                "run_status": run.run_status if run is not None else "completed",
+                "created_at": first.created_at.isoformat() if first is not None else None,
+                "completed_at": (
+                    run.completed_at.isoformat()
+                    if run is not None and run.completed_at is not None
+                    else None
+                ),
+                "observation_count": int(candidate_count or 0),
+                "evidence_source": "ball_trajectory_3d_candidate_evidence",
+                "source_label": "3D ball trajectory candidate evidence",
+                "trajectory_3d_run_id": trajectory_3d_run_id,
+                "source_ball_trajectory_run_id": (
+                    first.ball_trajectory_run_id if first is not None else None
+                ),
+                "source_court_projection_run_id": (
+                    first.court_projection_run_id if first is not None else None
+                ),
+                "camera_geometry_id": first.camera_geometry_id if first is not None else None,
+                "trajectory_3d_candidate_count": int(candidate_count or 0),
+                "height_model": first.height_model if first is not None else None,
+                "known_height_count": int(known_height_count or 0),
+                "unknown_height_count": int(candidate_count or 0) - int(known_height_count or 0),
+                "true_3d_reconstruction_available": False,
+                "3d_ball_trajectory_truth_available": False,
+                "trajectory_3d_candidate_only": True,
+                "geometry_evidence_only": True,
+                "not_3d_truth": True,
+                "no_adjudication": True,
+            }
+        )
+    summaries.sort(key=lambda row: str(row.get("created_at") or ""), reverse=True)
+    return summaries
+
+
+def _trajectory_3d_summary(session: Session, media_id: str) -> dict[str, Any]:
+    row = session.scalars(
+        select(BallTrajectory3DCandidate)
+        .where(BallTrajectory3DCandidate.media_id == media_id)
+        .order_by(
+            BallTrajectory3DCandidate.created_at.desc(),
+            BallTrajectory3DCandidate.id.desc(),
+        )
+    ).first()
+    if row is None or row.trajectory_3d_run_id is None:
+        return {"available": False}
+    candidate_count = session.scalar(
+        select(func.count(BallTrajectory3DCandidate.id)).where(
+            BallTrajectory3DCandidate.media_id == media_id,
+            BallTrajectory3DCandidate.trajectory_3d_run_id == row.trajectory_3d_run_id,
+        )
+    )
+    known_height_count = session.scalar(
+        select(func.count(BallTrajectory3DCandidate.id)).where(
+            BallTrajectory3DCandidate.media_id == media_id,
+            BallTrajectory3DCandidate.trajectory_3d_run_id == row.trajectory_3d_run_id,
+            BallTrajectory3DCandidate.court_z_m.is_not(None),
+        )
+    )
+    candidate_total = int(candidate_count or 0)
+    known_total = int(known_height_count or 0)
+    return {
+        "available": True,
+        "trajectory_3d_run_id": row.trajectory_3d_run_id,
+        "media_id": row.media_id,
+        "ball_trajectory_run_id": row.ball_trajectory_run_id,
+        "court_projection_run_id": row.court_projection_run_id,
+        "camera_geometry_id": row.camera_geometry_id,
+        "candidate_count": candidate_total,
+        "height_model": row.height_model,
+        "known_height_count": known_total,
+        "unknown_height_count": candidate_total - known_total,
+        "true_3d_reconstruction_available": False,
+        "3d_ball_trajectory_truth_available": False,
         "geometry_evidence_only": True,
         "no_adjudication": True,
     }

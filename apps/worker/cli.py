@@ -26,6 +26,7 @@ from apps.api.services.tracklet_review_export import export_tracklet_review_data
 from apps.worker.config import settings
 from apps.worker.pipelines.synthetic_seed import seed_synthetic_run
 from apps.worker.services.ball_court_trajectory import build_ball_court_trajectory
+from apps.worker.services.ball_trajectory_3d import build_3d_ball_trajectory_candidates
 from apps.worker.services.camera_geometry import declare_camera_geometry
 from apps.worker.services.completion_audit import run_completion_audit
 from apps.worker.services.court_adapter import run_fixture_court_adapter
@@ -639,6 +640,39 @@ def main() -> None:
     )
     ball_court_trajectory_parser.add_argument("--skip-create-db", action="store_true")
     ball_court_trajectory_parser.set_defaults(handler=_handle_build_ball_court_trajectory)
+
+    ball_trajectory_3d_parser = subcommands.add_parser(
+        "build-3d-ball-trajectory-candidates",
+        help="Build provisional 3D ball trajectory candidate evidence from declared geometry.",
+    )
+    ball_trajectory_3d_parser.add_argument("--media-id", required=True)
+    ball_trajectory_3d_parser.add_argument("--ball-trajectory-run-id", required=True)
+    ball_trajectory_3d_parser.add_argument("--court-projection-run-id")
+    ball_trajectory_3d_parser.add_argument("--camera-geometry-id")
+    ball_trajectory_3d_parser.add_argument(
+        "--height-model",
+        default="none_unknown",
+    )
+    ball_trajectory_3d_parser.add_argument(
+        "--run-name",
+        default="3d-ball-trajectory-candidate-evidence-v0",
+    )
+    ball_trajectory_3d_parser.add_argument(
+        "--viewer-base-url",
+        default="http://127.0.0.1:3000",
+    )
+    ball_trajectory_3d_parser.add_argument(
+        "--format",
+        choices=["json", "markdown"],
+        default="json",
+        help="3D candidate payload format. JSON is always returned; markdown adds a report body.",
+    )
+    ball_trajectory_3d_parser.add_argument(
+        "--output",
+        help="Optional file path for the JSON or markdown 3D candidate artifact.",
+    )
+    ball_trajectory_3d_parser.add_argument("--skip-create-db", action="store_true")
+    ball_trajectory_3d_parser.set_defaults(handler=_handle_build_3d_ball_trajectory_candidates)
 
     hit_bounce_parser = subcommands.add_parser(
         "build-hit-bounce-candidates",
@@ -1692,6 +1726,24 @@ def _handle_build_ball_court_trajectory(
         min_points_per_segment=args.min_points_per_segment,
         viewer_base_url=args.viewer_base_url,
         plan_only=args.plan_only,
+    )
+
+
+def _handle_build_3d_ball_trajectory_candidates(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    return build_3d_ball_trajectory_candidates(
+        session=session,
+        media_id=args.media_id,
+        ball_trajectory_run_id=args.ball_trajectory_run_id,
+        court_projection_run_id=args.court_projection_run_id,
+        camera_geometry_id=args.camera_geometry_id,
+        height_model=args.height_model,
+        run_name=args.run_name,
+        viewer_base_url=args.viewer_base_url,
+        output_format=args.format,
+        output_path=args.output,
     )
 
 

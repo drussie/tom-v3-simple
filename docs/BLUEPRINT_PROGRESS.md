@@ -2,7 +2,7 @@
 
 ## Current Progress Gauge
 
-Current: Blueprints 1, 2, 3, 4, 5, 6, 7, and 8 complete/frozen; Blueprint 9 manual candidate review annotations are complete; Blueprint 10 benchmark/evaluation harness is complete; Blueprint 11 3D readiness / camera geometry evidence has started; TOM v3 Simple is complete as an observation-only evidence platform.
+Current: Blueprints 1, 2, 3, 4, 5, 6, 7, and 8 complete/frozen; Blueprint 9 manual candidate review annotations are complete; Blueprint 10 benchmark/evaluation harness is complete; Blueprint 11 3D readiness / camera geometry evidence is complete; Blueprint 12 3D ball trajectory candidate evidence is complete; TOM v3 Simple is complete as an observation-only evidence platform.
 
 ## Current
 
@@ -418,7 +418,7 @@ automatic correction, in/out, score, point state, accepted/rejected lifecycle, o
 
 ## Blueprint 11 Status
 
-Status: started.
+Status: complete.
 
 Blueprint 11 3D Readiness / Camera Geometry Evidence Layer v0 adds declared camera/court geometry
 evidence:
@@ -433,6 +433,25 @@ The v0 layer records court dimensions, geometry status, camera model, unknown
 intrinsics/extrinsics placeholders, source run linkage, world-coordinate conventions, and
 capability warnings. It prepares future 3D evidence layers without creating 3D trajectories, event
 truth, in/out, score, point state, accepted/rejected lifecycle, or adjudication.
+
+## Blueprint 12 Status
+
+Status: complete.
+
+Blueprint 12 3D Ball Trajectory Candidate Evidence v0 adds provisional 3D candidate evidence:
+
+```text
+ball trajectory court candidates
++ declared camera geometry
+-> metric court-plane x/y candidates
+-> unknown/default height diagnostics
+-> 3D trajectory readiness summary
+```
+
+The v0 layer keeps `height_model = none_unknown` by default. It can record explicit court-plane
+placeholder z only when requested, and the output remains candidate evidence only. It does not
+change hit/bounce generation, marker arbitration, review labels, in/out, score, point state,
+accepted/rejected lifecycle, automatic correction, or adjudication.
 
 ## Blueprint 5 Status
 

@@ -45,6 +45,10 @@ COURT_PROJECTION_RUN_NAME ?= object-to-court-projection-candidates-v0
 COURT_PROJECTION_RUN_ID ?=
 BALL_TRAJECTORY_RUN_NAME ?= ball-trajectory-court-candidate-v0
 BALL_TRAJECTORY_RUN_ID ?=
+BALL_TRAJECTORY_3D_RUN_NAME ?= 3d-ball-trajectory-candidate-evidence-v0
+TRAJECTORY_3D_RUN_ID ?=
+CAMERA_GEOMETRY_ID ?=
+HEIGHT_MODEL ?= none_unknown
 EVENT_CANDIDATE_RUN_NAME ?= hit-bounce-candidate-evidence-v0
 EVENT_CANDIDATE_RUN_ID ?=
 VERBOSE ?= false
@@ -126,7 +130,7 @@ DERIVE_LINES ?= true
 
 export TOM_V3_DATABASE_URL
 
-.PHONY: install web-install test lint migrate api seed verify index-media run-gameplay index-and-run-gameplay run-detection index-and-run-detection extract-frame-artifacts build-tracklets run-pose export-tracklet-review-dataset court-review-export demo demo-fixture demo-plan demo-reset demo-export demo-open replay-open completion-audit completion-check yolo-probe yolo-smoke yolo-runtime-probe register-yolo-model smoke-real-yolo-local real-detection real-pose tom-v1-yolo-probe tom-v1-ball-detection tom-v1-player-detection tom-v1-tracklets tom-v1-main-subjects tom-v1-main-player-tracks tom-v1-pose tom-v1-pose-main-subjects tom-v1-pose-main-tracks tom-v1-motion-smoothing tom-v1-court-keypoints-probe tom-v1-court-keypoints tom-v1-court-keypoint-audit tom-v1-object-court-projection tom-v1-ball-court-trajectory tom-v1-hit-bounce-candidates tom-v1-hit-bounce-candidates-verbose tom-v1-point-evidence-snapshot tom-v1-evaluate-point-candidates tom-v1-declare-camera-geometry court-fixture homography-candidates projection-diagnostics web web-build web-lint smoke all-checks
+.PHONY: install web-install test lint migrate api seed verify index-media run-gameplay index-and-run-gameplay run-detection index-and-run-detection extract-frame-artifacts build-tracklets run-pose export-tracklet-review-dataset court-review-export demo demo-fixture demo-plan demo-reset demo-export demo-open replay-open completion-audit completion-check yolo-probe yolo-smoke yolo-runtime-probe register-yolo-model smoke-real-yolo-local real-detection real-pose tom-v1-yolo-probe tom-v1-ball-detection tom-v1-player-detection tom-v1-tracklets tom-v1-main-subjects tom-v1-main-player-tracks tom-v1-pose tom-v1-pose-main-subjects tom-v1-pose-main-tracks tom-v1-motion-smoothing tom-v1-court-keypoints-probe tom-v1-court-keypoints tom-v1-court-keypoint-audit tom-v1-object-court-projection tom-v1-ball-court-trajectory tom-v1-build-3d-ball-trajectory-candidates tom-v1-hit-bounce-candidates tom-v1-hit-bounce-candidates-verbose tom-v1-point-evidence-snapshot tom-v1-evaluate-point-candidates tom-v1-declare-camera-geometry court-fixture homography-candidates projection-diagnostics web web-build web-lint smoke all-checks
 
 install:
 	$(PYTHON) -m pip install -e ".[dev]"
@@ -328,6 +332,12 @@ tom-v1-ball-court-trajectory:
 	@if [ -z "$(MEDIA_ID)" ]; then echo "MEDIA_ID is required: make tom-v1-ball-court-trajectory MEDIA_ID=<media_id>"; exit 1; fi
 	@if [ -z "$(COURT_PROJECTION_RUN_ID)" ]; then echo "COURT_PROJECTION_RUN_ID is required: make tom-v1-ball-court-trajectory COURT_PROJECTION_RUN_ID=<court_projection_run_id>"; exit 1; fi
 	$(PYTHON) -m apps.worker.cli build-ball-court-trajectory --media-id "$(MEDIA_ID)" --court-projection-run-id "$(COURT_PROJECTION_RUN_ID)" --run-name "$(BALL_TRAJECTORY_RUN_NAME)" --max-gap-frames "$(BALL_TRAJECTORY_MAX_GAP_FRAMES)" --max-gap-ms "$(BALL_TRAJECTORY_MAX_GAP_MS)" --min-points-per-segment "$(BALL_TRAJECTORY_MIN_POINTS_PER_SEGMENT)" --viewer-base-url "$(VIEWER_BASE_URL)" $(if $(filter true,$(PLAN_ONLY)),--plan-only,)
+
+tom-v1-build-3d-ball-trajectory-candidates:
+	@if [ -z "$(MEDIA_ID)" ]; then echo "MEDIA_ID is required: make tom-v1-build-3d-ball-trajectory-candidates MEDIA_ID=<media_id>"; exit 1; fi
+	@if [ -z "$(BALL_TRAJECTORY_RUN_ID)" ]; then echo "BALL_TRAJECTORY_RUN_ID is required: make tom-v1-build-3d-ball-trajectory-candidates BALL_TRAJECTORY_RUN_ID=<ball_trajectory_run_id>"; exit 1; fi
+	@if [ -z "$(CAMERA_GEOMETRY_ID)" ]; then echo "CAMERA_GEOMETRY_ID is required: make tom-v1-build-3d-ball-trajectory-candidates CAMERA_GEOMETRY_ID=<camera_geometry_id>"; exit 1; fi
+	$(PYTHON) -m apps.worker.cli build-3d-ball-trajectory-candidates --media-id "$(MEDIA_ID)" --ball-trajectory-run-id "$(BALL_TRAJECTORY_RUN_ID)" $(if $(COURT_PROJECTION_RUN_ID),--court-projection-run-id "$(COURT_PROJECTION_RUN_ID)",) --camera-geometry-id "$(CAMERA_GEOMETRY_ID)" --height-model "$(HEIGHT_MODEL)" --run-name "$(BALL_TRAJECTORY_3D_RUN_NAME)" --viewer-base-url "$(VIEWER_BASE_URL)" --format "$(FORMAT)" $(if $(OUTPUT),--output "$(OUTPUT)",)
 
 tom-v1-hit-bounce-candidates:
 	@if [ -z "$(MEDIA_ID)" ]; then echo "MEDIA_ID is required: make tom-v1-hit-bounce-candidates MEDIA_ID=<media_id>"; exit 1; fi

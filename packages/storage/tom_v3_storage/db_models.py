@@ -632,6 +632,83 @@ class CameraGeometryEvidence(CreatedAtMixin, Base):
     geometry_run: Mapped[ProcessingRun | None] = relationship(foreign_keys=[geometry_run_id])
 
 
+class BallTrajectory3DCandidate(CreatedAtMixin, Base):
+    __tablename__ = "ball_trajectory_3d_candidate"
+    __table_args__ = (
+        Index("ix_ball_trajectory_3d_media", "media_id"),
+        Index("ix_ball_trajectory_3d_source_run", "ball_trajectory_run_id"),
+        Index("ix_ball_trajectory_3d_projection_run", "court_projection_run_id"),
+        Index("ix_ball_trajectory_3d_camera_geometry", "camera_geometry_id"),
+        Index("ix_ball_trajectory_3d_run", "trajectory_3d_run_id"),
+        Index("ix_ball_trajectory_3d_source_observation", "source_observation_id"),
+        Index("ix_ball_trajectory_3d_frame", "media_id", "frame"),
+        Index("ix_ball_trajectory_3d_timestamp", "media_id", "timestamp_ms"),
+        Index("ix_ball_trajectory_3d_z_status", "court_z_status"),
+        Index("ix_ball_trajectory_3d_height_model", "height_model"),
+    )
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_uuid)
+    media_id: Mapped[str] = mapped_column(ForeignKey("media_asset.id"), nullable=False)
+    ball_trajectory_run_id: Mapped[str] = mapped_column(
+        ForeignKey("processing_run.id"), nullable=False
+    )
+    court_projection_run_id: Mapped[str | None] = mapped_column(ForeignKey("processing_run.id"))
+    camera_geometry_id: Mapped[str | None] = mapped_column(
+        ForeignKey("camera_geometry_evidence.id")
+    )
+    geometry_run_id: Mapped[str | None] = mapped_column(ForeignKey("processing_run.id"))
+    trajectory_3d_run_id: Mapped[str | None] = mapped_column(ForeignKey("processing_run.id"))
+    source_observation_id: Mapped[str | None] = mapped_column(ForeignKey("observation.id"))
+    frame: Mapped[int] = mapped_column(Integer, nullable=False)
+    timestamp_ms: Mapped[int] = mapped_column(Integer, nullable=False)
+    image_x: Mapped[float | None] = mapped_column(Float)
+    image_y: Mapped[float | None] = mapped_column(Float)
+    court_x: Mapped[float | None] = mapped_column(Float)
+    court_y: Mapped[float | None] = mapped_column(Float)
+    court_x_m: Mapped[float | None] = mapped_column(Float)
+    court_y_m: Mapped[float | None] = mapped_column(Float)
+    court_z_m: Mapped[float | None] = mapped_column(Float)
+    court_z_status: Mapped[str] = mapped_column(String(80), nullable=False)
+    height_model: Mapped[str] = mapped_column(String(120), nullable=False)
+    projection_method: Mapped[str] = mapped_column(String(200), nullable=False)
+    confidence: Mapped[float | None] = mapped_column(Float)
+    velocity_x_mps: Mapped[float | None] = mapped_column(Float)
+    velocity_y_mps: Mapped[float | None] = mapped_column(Float)
+    velocity_z_mps: Mapped[float | None] = mapped_column(Float)
+    speed_mps: Mapped[float | None] = mapped_column(Float)
+    diagnostics_jsonb: Mapped[dict[str, Any]] = mapped_column(
+        JsonType, default=dict, nullable=False
+    )
+    warnings_jsonb: Mapped[dict[str, Any]] = mapped_column(
+        JsonType, default=dict, nullable=False
+    )
+    metadata_jsonb: Mapped[dict[str, Any]] = mapped_column(JsonType, default=dict, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+        nullable=False,
+    )
+
+    media: Mapped[MediaAsset] = relationship(foreign_keys=[media_id])
+    ball_trajectory_run: Mapped[ProcessingRun] = relationship(
+        foreign_keys=[ball_trajectory_run_id]
+    )
+    court_projection_run: Mapped[ProcessingRun | None] = relationship(
+        foreign_keys=[court_projection_run_id]
+    )
+    camera_geometry: Mapped[CameraGeometryEvidence | None] = relationship(
+        foreign_keys=[camera_geometry_id]
+    )
+    geometry_run: Mapped[ProcessingRun | None] = relationship(foreign_keys=[geometry_run_id])
+    trajectory_3d_run: Mapped[ProcessingRun | None] = relationship(
+        foreign_keys=[trajectory_3d_run_id]
+    )
+    source_observation: Mapped[Observation | None] = relationship(
+        foreign_keys=[source_observation_id]
+    )
+
+
 class Tracklet(Base):
     __tablename__ = "tracklet"
     __table_args__ = (

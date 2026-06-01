@@ -258,6 +258,7 @@ export interface ReplayRunSummary {
   source_homography_run_id?: string | null;
   source_court_projection_run_id?: string | null;
   camera_geometry_id?: string | null;
+  trajectory_3d_run_id?: string | null;
   camera_model?: string | null;
   geometry_status?: string | null;
   court_model?: string | null;
@@ -266,6 +267,11 @@ export interface ReplayRunSummary {
   camera_extrinsics_known?: boolean;
   true_3d_reconstruction_available?: boolean;
   "3d_ball_trajectory_available"?: boolean;
+  "3d_ball_trajectory_truth_available"?: boolean;
+  trajectory_3d_candidate_count?: number;
+  known_height_count?: number;
+  unknown_height_count?: number;
+  height_model?: string | null;
   track_candidate_count?: number;
   track_assignment_count?: number;
   court_keypoint_count?: number;
@@ -317,6 +323,7 @@ export interface ReplayAvailableRuns {
   ball_trajectory: ReplayRunSummary[];
   event_candidate: ReplayRunSummary[];
   camera_geometry: ReplayRunSummary[];
+  trajectory_3d: ReplayRunSummary[];
   main_player_track: ReplayRunSummary[];
   motion_smoothing: ReplayRunSummary[];
 }
@@ -341,6 +348,23 @@ export interface ReplayCameraGeometrySummary {
   no_adjudication?: boolean;
 }
 
+export interface ReplayTrajectory3DSummary {
+  available: boolean;
+  trajectory_3d_run_id?: string | null;
+  media_id?: string | null;
+  ball_trajectory_run_id?: string | null;
+  court_projection_run_id?: string | null;
+  camera_geometry_id?: string | null;
+  candidate_count?: number;
+  height_model?: string | null;
+  known_height_count?: number;
+  unknown_height_count?: number;
+  true_3d_reconstruction_available?: boolean;
+  "3d_ball_trajectory_truth_available"?: boolean;
+  geometry_evidence_only?: boolean;
+  no_adjudication?: boolean;
+}
+
 export interface ReplayInfo {
   media_id: string;
   video_url: string;
@@ -354,6 +378,7 @@ export interface ReplayInfo {
   frame_time_index: JsonRecord | null;
   available_runs: ReplayAvailableRuns;
   camera_geometry_summary: ReplayCameraGeometrySummary;
+  trajectory_3d_summary: ReplayTrajectory3DSummary;
   observation_only: boolean;
   no_adjudication: boolean;
 }

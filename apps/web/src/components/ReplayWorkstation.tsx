@@ -1739,6 +1739,7 @@ export function ReplayWorkstation({
         <aside className="side-column">
           <ReplayMediaPanel replayInfo={replayInfo} />
           <CameraGeometryPanel replayInfo={replayInfo} />
+          <Trajectory3DPanel replayInfo={replayInfo} />
           <ReplayEventCandidateReviewPanel
             markers={markerSummaries}
             onSelectMarker={handleMarkerReviewSelect}
@@ -2527,6 +2528,43 @@ function CameraGeometryPanel({ replayInfo }: { replayInfo: ReplayInfo }) {
   );
 }
 
+function Trajectory3DPanel({ replayInfo }: { replayInfo: ReplayInfo }) {
+  const summary = replayInfo.trajectory_3d_summary;
+  return (
+    <section className="panel">
+      <div className="panel-header">
+        <h2>3D Trajectory Candidates</h2>
+        <span className="mini-pill">candidate evidence</span>
+      </div>
+      <div className="panel-body replay-media-detail">
+        {summary.available ? (
+          <>
+            <DetailRow label="height model" value={formatCameraGeometryModel(summary.height_model)} />
+            <DetailRow label="candidates" value={(summary.candidate_count ?? 0).toString()} />
+            <DetailRow
+              label="known heights"
+              value={(summary.known_height_count ?? 0).toString()}
+            />
+            <DetailRow
+              label="unknown heights"
+              value={(summary.unknown_height_count ?? 0).toString()}
+            />
+            <DetailRow label="3D truth" value="not available" />
+          </>
+        ) : (
+          <p className="empty-state compact">
+            No 3D ball trajectory candidate evidence has been built for this media yet.
+          </p>
+        )}
+        <p className="empty-state compact">
+          This panel is readiness metadata only. It does not render 3D arcs and does not change
+          hit/bounce candidates, in/out, score, or adjudication.
+        </p>
+      </div>
+    </section>
+  );
+}
+
 function AvailableRunsPanel({ replayInfo }: { replayInfo: ReplayInfo }) {
   return (
     <section className="panel">
@@ -2567,6 +2605,10 @@ function AvailableRunsPanel({ replayInfo }: { replayInfo: ReplayInfo }) {
         <RunGroup
           title="Camera geometry evidence"
           runs={replayInfo.available_runs.camera_geometry}
+        />
+        <RunGroup
+          title="3D trajectory candidates"
+          runs={replayInfo.available_runs.trajectory_3d}
         />
         <RunGroup
           title="Gameplay/view-state observations"
@@ -4311,6 +4353,9 @@ function formatReplayRunSourceLabel(run: ReplayRunSummary): string {
   }
   if (run.evidence_source === "camera_geometry_evidence") {
     return "camera geometry evidence";
+  }
+  if (run.evidence_source === "ball_trajectory_3d_candidate_evidence") {
+    return "3D ball trajectory candidate evidence";
   }
   if (run.geometry_evidence_only) {
     return run.source_label ?? "court geometry evidence";

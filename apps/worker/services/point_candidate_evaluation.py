@@ -14,6 +14,7 @@ from tom_v3_storage.db_models import (
 
 from apps.api.services.event_candidate_reviews import serialize_event_candidate_review
 from apps.api.services.replay import build_event_candidate_marker_summary
+from apps.worker.services.ball_trajectory_3d import trajectory_3d_readiness_summary
 from apps.worker.services.point_evidence_snapshot import build_point_evidence_snapshot
 
 EVALUATION_TYPE = "point_candidate_review_evaluation"
@@ -127,6 +128,9 @@ def evaluate_point_candidates(
         "review_coverage": review_coverage,
         "reviewed_only_rates": reviewed_only_rates,
         "geometry_readiness": _geometry_readiness(point_snapshot),
+        "trajectory_3d_readiness": trajectory_3d_readiness_summary(
+            _dict_or_empty(point_snapshot.get("trajectory_3d_summary"))
+        ),
         "candidate_type_breakdown": _candidate_type_breakdown(
             marker_summary,
             latest_marker_reviews,
@@ -275,6 +279,25 @@ def render_point_candidate_evaluation_markdown(evaluation: dict[str, Any]) -> st
     rows.append(
         "- 3d_ball_trajectory_available: "
         f"{geometry_readiness.get('3d_ball_trajectory_available', False)}"
+    )
+
+    rows.extend(["", "## 3D Trajectory Readiness"])
+    trajectory_3d_readiness = _dict_or_empty(evaluation.get("trajectory_3d_readiness"))
+    rows.append(
+        "- trajectory_3d_candidates_available: "
+        f"{trajectory_3d_readiness.get('trajectory_3d_candidates_available', False)}"
+    )
+    rows.append(
+        "- height_candidate_available: "
+        f"{trajectory_3d_readiness.get('height_candidate_available', False)}"
+    )
+    rows.append(
+        "- true_3d_reconstruction_available: "
+        f"{trajectory_3d_readiness.get('true_3d_reconstruction_available', False)}"
+    )
+    rows.append(
+        "- 3d_ball_trajectory_truth_available: "
+        f"{trajectory_3d_readiness.get('3d_ball_trajectory_truth_available', False)}"
     )
 
     rows.extend(

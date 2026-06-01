@@ -19,6 +19,7 @@ from apps.api.services.event_candidate_reviews import (
     serialize_event_candidate_review,
 )
 from apps.api.services.replay import build_event_candidate_marker_summary
+from apps.worker.services.ball_trajectory_3d import latest_ball_trajectory_3d_summary
 from apps.worker.services.camera_geometry import camera_geometry_summary
 
 SNAPSHOT_TYPE = "point_evidence_snapshot"
@@ -108,6 +109,12 @@ def build_point_evidence_snapshot(
         court_projection_run_id=source_run_ids.get("court_projection_run_id"),
         homography_run_id=source_run_ids.get("homography_run_id"),
     )
+    trajectory_3d_summary = latest_ball_trajectory_3d_summary(
+        session=session,
+        media_id=media.id,
+        ball_trajectory_run_id=source_run_ids.get("ball_trajectory_run_id"),
+        court_projection_run_id=source_run_ids.get("court_projection_run_id"),
+    )
     candidate_summary = _candidate_summary(event_run)
     review_rows = _event_candidate_review_rows(
         session=session,
@@ -132,6 +139,7 @@ def build_point_evidence_snapshot(
         "observations": observations,
         "active_versions": _active_versions(candidate_summary),
         "camera_geometry_summary": geometry_summary,
+        "trajectory_3d_summary": trajectory_3d_summary,
         "marker_summary": marker_summary,
         "review_summary": build_event_candidate_review_summary(review_rows),
         "review_annotations": _compact_review_annotations(review_rows),
@@ -225,6 +233,21 @@ def render_point_evidence_snapshot_markdown(snapshot: dict[str, Any]) -> str:
         rows.append(
             "- 3d_ball_trajectory_available: "
             f"{geometry.get('3d_ball_trajectory_available', False)}"
+        )
+    else:
+        rows.append("- available: false")
+
+    rows.extend(["", "## 3D Trajectory Candidates"])
+    trajectory_3d = snapshot.get("trajectory_3d_summary")
+    if isinstance(trajectory_3d, dict) and trajectory_3d.get("available") is True:
+        rows.append(f"- trajectory_3d_run_id: {trajectory_3d.get('trajectory_3d_run_id')}")
+        rows.append(f"- candidate_count: {trajectory_3d.get('candidate_count', 0)}")
+        rows.append(f"- height_model: {trajectory_3d.get('height_model', 'n/a')}")
+        rows.append(f"- known_height_count: {trajectory_3d.get('known_height_count', 0)}")
+        rows.append(f"- unknown_height_count: {trajectory_3d.get('unknown_height_count', 0)}")
+        rows.append(
+            "- true_3d_reconstruction_available: "
+            f"{trajectory_3d.get('true_3d_reconstruction_available', False)}"
         )
     else:
         rows.append("- available: false")
