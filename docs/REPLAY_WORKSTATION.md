@@ -840,6 +840,12 @@ emphasized, clicked samples request video seek through existing replay controls,
 sample metadata is shown in the panel. The 3D panel does not own playback time and remains
 display-only.
 
+Blueprint 16 3D Debug Review Annotations v0 adds review controls to that same 3D Debug View.
+Selected 3D samples can receive sample reviews, selected marker-linked diagnostics can receive
+diagnostic-link reviews, and operators can add missing 3D sample notes at current replay time.
+These reviews are metadata only; they do not change event candidates, 3D samples, 3D diagnostics,
+in/out, score, or adjudication.
+
 Blueprint 8 Completion Review / Freeze v0 documents the current workstation as a stable
 candidate-evidence milestone. The frozen operator workflow is: build or obtain source runs, build
 ball trajectory candidates, build hit/bounce candidates, open replay in operator view, review

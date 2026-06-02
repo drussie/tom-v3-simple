@@ -8,6 +8,10 @@ import type {
   ReplayInfo,
   ReplayOverlayChunk,
   ReplayTimeline,
+  Trajectory3DDebugReviewAnnotation,
+  Trajectory3DDebugReviewKind,
+  Trajectory3DDebugReviewLabel,
+  Trajectory3DDebugReviewList,
   TrackletEvidenceBundle,
   ViewerRun
 } from "./types";
@@ -329,6 +333,96 @@ export async function deleteEventCandidateReview(mediaId: string, reviewId: stri
   if (!response.ok) {
     throw new Error(`Unable to delete event candidate review: ${response.status}`);
   }
+}
+
+export async function fetchTrajectory3DDebugReviews(
+  mediaId: string,
+  input: {
+    trajectory3dRunId?: string | null;
+    eventCandidateRunId?: string | null;
+  }
+): Promise<Trajectory3DDebugReviewList> {
+  const params = new URLSearchParams();
+  if (input.trajectory3dRunId !== undefined && input.trajectory3dRunId !== null) {
+    params.set("trajectory3dRunId", input.trajectory3dRunId);
+  }
+  if (input.eventCandidateRunId !== undefined && input.eventCandidateRunId !== null) {
+    params.set("eventCandidateRunId", input.eventCandidateRunId);
+  }
+  const response = await fetch(
+    `/api/replay/${mediaId}/trajectory-3d-debug-reviews?${params.toString()}`,
+    { cache: "no-store" }
+  );
+
+  if (!response.ok) {
+    throw new Error(`Unable to load 3D debug reviews: ${response.status}`);
+  }
+
+  return (await response.json()) as Trajectory3DDebugReviewList;
+}
+
+export interface CreateTrajectory3DDebugReviewInput {
+  trajectory_3d_run_id?: string | null;
+  camera_geometry_id?: string | null;
+  event_candidate_run_id?: string | null;
+  event_observation_id?: string | null;
+  trajectory_3d_candidate_id?: string | null;
+  event_candidate_3d_diagnostic_id?: string | null;
+  annotation_kind: Trajectory3DDebugReviewKind;
+  review_label: Trajectory3DDebugReviewLabel;
+  frame?: number | null;
+  timestamp_ms?: number | null;
+  image_x?: number | null;
+  image_y?: number | null;
+  court_x_m?: number | null;
+  court_y_m?: number | null;
+  court_z_m?: number | null;
+  note?: string | null;
+  reviewer?: string | null;
+  payload_jsonb?: JsonRecord;
+}
+
+export async function createTrajectory3DDebugReview(
+  mediaId: string,
+  input: CreateTrajectory3DDebugReviewInput
+): Promise<Trajectory3DDebugReviewAnnotation> {
+  const response = await fetch(`/api/replay/${mediaId}/trajectory-3d-debug-reviews`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input)
+  });
+
+  if (!response.ok) {
+    throw new Error(`Unable to create 3D debug review: ${response.status}`);
+  }
+
+  return (await response.json()) as Trajectory3DDebugReviewAnnotation;
+}
+
+export async function updateTrajectory3DDebugReview(
+  mediaId: string,
+  reviewId: string,
+  input: {
+    review_label?: Trajectory3DDebugReviewLabel;
+    note?: string | null;
+    reviewer?: string | null;
+    payload_jsonb?: JsonRecord;
+  }
+): Promise<Trajectory3DDebugReviewAnnotation> {
+  const response = await fetch(
+    `/api/replay/${mediaId}/trajectory-3d-debug-reviews/${reviewId}`,
+    {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input)
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error(`Unable to update 3D debug review: ${response.status}`);
+  }
+
+  return (await response.json()) as Trajectory3DDebugReviewAnnotation;
 }
 
 export interface CreateAnnotationInput {

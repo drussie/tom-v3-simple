@@ -404,6 +404,7 @@ export interface ReplayTrajectory3DDebugPayload {
   true_3d_reconstruction_available?: boolean;
   court_dimensions?: ReplayTrajectory3DDebugCourtDimensions;
   points?: ReplayTrajectory3DDebugPoint[];
+  trajectory_3d_debug_review_summary?: ReplayTrajectory3DDebugReviewSummary;
   warnings?: {
     display_only?: boolean;
     trajectory_3d_candidate_only?: boolean;
@@ -416,6 +417,81 @@ export interface ReplayTrajectory3DDebugPayload {
   not_3d_truth?: boolean;
   height_not_verified?: boolean;
   no_adjudication?: boolean;
+}
+
+export type Trajectory3DDebugReviewKind =
+  | "trajectory_3d_sample_review"
+  | "event_candidate_3d_diagnostic_review"
+  | "missing_3d_sample_note"
+  | "debug_view_note";
+
+export type Trajectory3DDebugReviewLabel =
+  | "useful"
+  | "wrong"
+  | "unclear"
+  | "needs_review"
+  | "missing_3d_sample"
+  | "bad_3d_position"
+  | "bad_diagnostic_link";
+
+export interface Trajectory3DDebugReviewAnnotation {
+  id: string;
+  media_id: string;
+  trajectory_3d_run_id: string | null;
+  camera_geometry_id: string | null;
+  event_candidate_run_id: string | null;
+  event_observation_id: string | null;
+  trajectory_3d_candidate_id: string | null;
+  event_candidate_3d_diagnostic_id: string | null;
+  annotation_kind: Trajectory3DDebugReviewKind | string;
+  review_label: Trajectory3DDebugReviewLabel | string;
+  frame: number | null;
+  timestamp_ms: number | null;
+  image_x: number | null;
+  image_y: number | null;
+  court_x_m: number | null;
+  court_y_m: number | null;
+  court_z_m: number | null;
+  note: string | null;
+  reviewer: string | null;
+  created_at: string;
+  updated_at: string;
+  payload_jsonb: JsonRecord;
+}
+
+export interface ReplayTrajectory3DDebugReviewSummary {
+  available: boolean;
+  total_reviews: number;
+  sample_reviews?: number;
+  diagnostic_reviews?: number;
+  missing_3d_sample_notes?: number;
+  debug_view_notes?: number;
+  useful?: number;
+  wrong?: number;
+  unclear?: number;
+  needs_review?: number;
+  missing_3d_sample?: number;
+  bad_3d_position?: number;
+  bad_diagnostic_link?: number;
+  review_metadata_only?: boolean;
+  not_truth?: boolean;
+  not_3d_truth?: boolean;
+  does_not_change_event_candidates?: boolean;
+  does_not_change_3d_candidates?: boolean;
+  does_not_create_in_out?: boolean;
+  does_not_create_score?: boolean;
+  no_adjudication?: boolean;
+}
+
+export interface Trajectory3DDebugReviewList {
+  reviews: Trajectory3DDebugReviewAnnotation[];
+  reviews_by_trajectory_3d_candidate_id: Record<string, Trajectory3DDebugReviewAnnotation[]>;
+  reviews_by_event_candidate_3d_diagnostic_id: Record<
+    string,
+    Trajectory3DDebugReviewAnnotation[]
+  >;
+  review_summary: ReplayTrajectory3DDebugReviewSummary;
+  warnings: Record<string, boolean>;
 }
 
 export interface ReplayEventCandidate3DDiagnostic {
@@ -1249,6 +1325,7 @@ export interface ReplayOverlayChunk {
   event_candidate_3d_diagnostics?: ReplayEventCandidate3DDiagnostic[];
   event_candidate_3d_diagnostic_summary?: ReplayEventCandidate3DDiagnosticSummary;
   trajectory_3d_debug?: ReplayTrajectory3DDebugPayload;
+  trajectory_3d_debug_review_summary?: ReplayTrajectory3DDebugReviewSummary;
   court_temporal_persistence?: ReplayCourtTemporalPersistence | string;
   court_persistence_max_gap_ms?: number;
   observation_only: boolean;

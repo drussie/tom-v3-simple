@@ -791,6 +791,88 @@ class EventCandidate3DDiagnostic(CreatedAtMixin, Base):
     )
 
 
+class Trajectory3DDebugReviewAnnotation(CreatedAtMixin, Base):
+    __tablename__ = "trajectory_3d_debug_review_annotation"
+    __table_args__ = (
+        Index(
+            "ix_trajectory_3d_debug_review_media_traj_run",
+            "media_id",
+            "trajectory_3d_run_id",
+        ),
+        Index(
+            "ix_trajectory_3d_debug_review_media_event_run",
+            "media_id",
+            "event_candidate_run_id",
+        ),
+        Index(
+            "ix_trajectory_3d_debug_review_sample",
+            "trajectory_3d_candidate_id",
+        ),
+        Index(
+            "ix_trajectory_3d_debug_review_diagnostic",
+            "event_candidate_3d_diagnostic_id",
+        ),
+        Index(
+            "ix_trajectory_3d_debug_review_kind_label",
+            "annotation_kind",
+            "review_label",
+        ),
+    )
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_uuid)
+    media_id: Mapped[str] = mapped_column(ForeignKey("media_asset.id"), nullable=False)
+    trajectory_3d_run_id: Mapped[str | None] = mapped_column(ForeignKey("processing_run.id"))
+    camera_geometry_id: Mapped[str | None] = mapped_column(
+        ForeignKey("camera_geometry_evidence.id")
+    )
+    event_candidate_run_id: Mapped[str | None] = mapped_column(ForeignKey("processing_run.id"))
+    event_observation_id: Mapped[str | None] = mapped_column(ForeignKey("observation.id"))
+    trajectory_3d_candidate_id: Mapped[str | None] = mapped_column(
+        ForeignKey("ball_trajectory_3d_candidate.id")
+    )
+    event_candidate_3d_diagnostic_id: Mapped[str | None] = mapped_column(
+        ForeignKey("event_candidate_3d_diagnostic.id")
+    )
+    annotation_kind: Mapped[str] = mapped_column(String(80), nullable=False)
+    review_label: Mapped[str] = mapped_column(String(80), nullable=False)
+    frame: Mapped[int | None] = mapped_column(Integer)
+    timestamp_ms: Mapped[int | None] = mapped_column(Integer)
+    image_x: Mapped[float | None] = mapped_column(Float)
+    image_y: Mapped[float | None] = mapped_column(Float)
+    court_x_m: Mapped[float | None] = mapped_column(Float)
+    court_y_m: Mapped[float | None] = mapped_column(Float)
+    court_z_m: Mapped[float | None] = mapped_column(Float)
+    note: Mapped[str | None] = mapped_column(Text)
+    reviewer: Mapped[str | None] = mapped_column(String(200))
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+        nullable=False,
+    )
+    payload_jsonb: Mapped[dict[str, Any]] = mapped_column(JsonType, default=dict, nullable=False)
+
+    media: Mapped[MediaAsset] = relationship(foreign_keys=[media_id])
+    trajectory_3d_run: Mapped[ProcessingRun | None] = relationship(
+        foreign_keys=[trajectory_3d_run_id]
+    )
+    camera_geometry: Mapped[CameraGeometryEvidence | None] = relationship(
+        foreign_keys=[camera_geometry_id]
+    )
+    event_candidate_run: Mapped[ProcessingRun | None] = relationship(
+        foreign_keys=[event_candidate_run_id]
+    )
+    event_observation: Mapped[Observation | None] = relationship(
+        foreign_keys=[event_observation_id]
+    )
+    trajectory_3d_candidate: Mapped[BallTrajectory3DCandidate | None] = relationship(
+        foreign_keys=[trajectory_3d_candidate_id]
+    )
+    event_candidate_3d_diagnostic: Mapped[EventCandidate3DDiagnostic | None] = relationship(
+        foreign_keys=[event_candidate_3d_diagnostic_id]
+    )
+
+
 class Tracklet(Base):
     __tablename__ = "tracklet"
     __table_args__ = (

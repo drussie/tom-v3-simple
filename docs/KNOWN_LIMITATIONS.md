@@ -191,6 +191,9 @@ This registry makes TOM v3 Simple boundaries explicit.
 - Event candidate video markers require a source ball court projection image point. If that point
   is unavailable, the candidate remains inspectable in replay but no broadcast-video marker is
   drawn.
+- 3D debug review annotations are operator metadata only. They can mark samples or diagnostic
+  links as useful, wrong, unclear, needs review, missing, bad position, or bad link, but they do
+  not create 3D truth or change hit/bounce candidates.
 - Replay view presets are display defaults only. Operator view hides raw/debug layers by default,
   and debug/audit view enables them, but neither preset changes persisted observations or proves
   evidence correctness.

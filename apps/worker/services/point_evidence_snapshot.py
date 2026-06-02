@@ -19,6 +19,11 @@ from apps.api.services.event_candidate_reviews import (
     serialize_event_candidate_review,
 )
 from apps.api.services.replay import build_event_candidate_marker_summary
+from apps.api.services.trajectory_3d_debug_reviews import (
+    serialize_trajectory_3d_debug_review,
+    trajectory_3d_debug_review_rows,
+    trajectory_3d_debug_review_summary,
+)
 from apps.worker.services.ball_trajectory_3d import latest_ball_trajectory_3d_summary
 from apps.worker.services.camera_geometry import camera_geometry_summary
 from apps.worker.services.event_candidate_3d_diagnostics import (
@@ -118,6 +123,8 @@ def build_point_evidence_snapshot(
         ball_trajectory_run_id=source_run_ids.get("ball_trajectory_run_id"),
         court_projection_run_id=source_run_ids.get("court_projection_run_id"),
     )
+    if isinstance(trajectory_3d_summary.get("trajectory_3d_run_id"), str):
+        source_run_ids["trajectory_3d_run_id"] = trajectory_3d_summary["trajectory_3d_run_id"]
     event_candidate_3d_diagnostic_summary = latest_event_candidate_3d_diagnostic_summary(
         session=session,
         media_id=media.id,
@@ -128,6 +135,12 @@ def build_point_evidence_snapshot(
         session=session,
         media_id=media.id,
         event_candidate_run_id=event_candidate_run_id,
+    )
+    trajectory_3d_debug_review_rows = _trajectory_3d_debug_review_rows(
+        session=session,
+        media_id=media.id,
+        event_candidate_run_id=event_candidate_run_id,
+        trajectory_3d_run_id=source_run_ids.get("trajectory_3d_run_id"),
     )
 
     snapshot: dict[str, Any] = {
@@ -152,6 +165,12 @@ def build_point_evidence_snapshot(
         "marker_summary": marker_summary,
         "review_summary": build_event_candidate_review_summary(review_rows),
         "review_annotations": _compact_review_annotations(review_rows),
+        "trajectory_3d_debug_review_summary": trajectory_3d_debug_review_summary(
+            trajectory_3d_debug_review_rows
+        ),
+        "trajectory_3d_debug_review_annotations": _compact_trajectory_3d_debug_reviews(
+            trajectory_3d_debug_review_rows
+        ),
         "warnings": dict(SNAPSHOT_WARNINGS),
         "known_limitations": list(KNOWN_LIMITATIONS),
     }
@@ -279,6 +298,23 @@ def render_point_evidence_snapshot_markdown(snapshot: dict[str, Any]) -> str:
     else:
         rows.append("- available: false")
 
+    rows.extend(["", "## 3D Debug Reviews"])
+    debug_reviews = snapshot.get("trajectory_3d_debug_review_summary")
+    if isinstance(debug_reviews, dict) and debug_reviews.get("available") is True:
+        rows.append(f"- total_reviews: {debug_reviews.get('total_reviews', 0)}")
+        rows.append(f"- sample_reviews: {debug_reviews.get('sample_reviews', 0)}")
+        rows.append(f"- diagnostic_reviews: {debug_reviews.get('diagnostic_reviews', 0)}")
+        rows.append(
+            "- missing_3d_sample_notes: "
+            f"{debug_reviews.get('missing_3d_sample_notes', 0)}"
+        )
+        rows.append(f"- wrong: {debug_reviews.get('wrong', 0)}")
+        rows.append(f"- useful: {debug_reviews.get('useful', 0)}")
+        rows.append("- review_metadata_only: true")
+        rows.append("- not_truth: true")
+    else:
+        rows.append("- available: false")
+
     rows.extend(["", "## Warnings"])
     for warning in KNOWN_LIMITATIONS:
         rows.append(f"- {warning}")
@@ -342,6 +378,31 @@ def _event_candidate_review_rows(
     )
 
 
+def _trajectory_3d_debug_review_rows(
+    *,
+    session: Session,
+    media_id: str,
+    event_candidate_run_id: str,
+    trajectory_3d_run_id: str | None,
+) -> list[Any]:
+    event_rows = trajectory_3d_debug_review_rows(
+        session=session,
+        media_id=media_id,
+        event_candidate_run_id=event_candidate_run_id,
+    )
+    if trajectory_3d_run_id is None:
+        return event_rows
+    trajectory_rows = trajectory_3d_debug_review_rows(
+        session=session,
+        media_id=media_id,
+        trajectory_3d_run_id=trajectory_3d_run_id,
+    )
+    rows_by_id = {row.id: row for row in event_rows}
+    for row in trajectory_rows:
+        rows_by_id.setdefault(row.id, row)
+    return sorted(rows_by_id.values(), key=lambda row: (row.created_at, row.id))
+
+
 def _compact_review_annotations(
     rows: list[EventCandidateReviewAnnotation],
 ) -> list[dict[str, Any]]:
@@ -368,6 +429,41 @@ def _compact_review_annotations(
                     "image_y",
                     "court_x",
                     "court_y",
+                    "note",
+                    "reviewer",
+                    "created_at",
+                )
+                if payload.get(key) is not None
+            }
+        )
+    return compact
+
+
+def _compact_trajectory_3d_debug_reviews(
+    rows: list[Any],
+) -> list[dict[str, Any]]:
+    compact: list[dict[str, Any]] = []
+    for row in rows:
+        payload = serialize_trajectory_3d_debug_review(row)
+        created_at = payload.get("created_at")
+        compact.append(
+            {
+                key: (
+                    created_at.isoformat()
+                    if key == "created_at" and hasattr(created_at, "isoformat")
+                    else payload.get(key)
+                )
+                for key in (
+                    "id",
+                    "trajectory_3d_candidate_id",
+                    "event_candidate_3d_diagnostic_id",
+                    "annotation_kind",
+                    "review_label",
+                    "frame",
+                    "timestamp_ms",
+                    "court_x_m",
+                    "court_y_m",
+                    "court_z_m",
                     "note",
                     "reviewer",
                     "created_at",
@@ -507,6 +603,8 @@ def _replay_url(
     if source_run_ids.get("ball_trajectory_run_id") is not None:
         params["ballTrajectoryRunId"] = source_run_ids["ball_trajectory_run_id"]
     params["eventCandidateRunId"] = event_candidate_run_id
+    if source_run_ids.get("trajectory_3d_run_id") is not None:
+        params["trajectory3dRunId"] = source_run_ids["trajectory_3d_run_id"]
     if source_run_ids.get("court_run_id") is not None:
         params["courtTemporalPersistence"] = "carry_forward"
         params["courtPersistenceMaxGapMs"] = "1500"

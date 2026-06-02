@@ -2938,3 +2938,28 @@ This milestone adds:
 The 3D Debug View may request seek/select behavior through existing replay controls, but it does
 not own playback time. It does not change event candidates, marker arbitration, review annotations,
 in/out, score, accepted/rejected lifecycle, or adjudication.
+
+## Blueprint 16 3D Debug Review Annotations v0
+
+Status: complete
+
+### Goal
+
+Let operators attach review metadata to 3D Debug View evidence without changing generated
+evidence.
+
+### Notes
+
+This milestone adds:
+
+- `trajectory_3d_debug_review_annotation` persistence and migration
+- `tom_v3_schema.trajectory_3d_debug_review`
+- replay API GET/POST/PATCH endpoints for 3D debug reviews
+- 3D sample review controls in Replay Workstation
+- marker-linked 3D diagnostic review controls
+- missing 3D sample notes at current replay time
+- point evidence snapshot `trajectory_3d_debug_review_summary`
+- point candidate evaluation `trajectory_3d_debug_reviews`
+
+The reviews are operator metadata only. They do not mutate 3D samples, 3D diagnostics, event
+candidates, marker arbitration, in/out, score, accepted/rejected lifecycle, or adjudication.

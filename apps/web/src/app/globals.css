@@ -2875,6 +2875,27 @@ pre {
   border-color: #ff4d6d;
 }
 
+.trajectory-3d-debug-review-block,
+.trajectory-3d-debug-review-form {
+  border-top: 1px solid var(--line);
+  display: grid;
+  gap: 9px;
+  padding-top: 10px;
+}
+
+.review-summary-row {
+  align-items: center;
+  color: var(--muted);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 12px;
+  gap: 6px 10px;
+}
+
+.trajectory-3d-debug-review-form textarea {
+  min-height: 68px;
+}
+
 .subhead {
   font-size: 12px;
   line-height: 1.2;

@@ -1706,3 +1706,13 @@ Blueprint 15 adds selection and timeline coupling to that same panel:
 
 The 3D panel requests seek through existing replay controls. It does not own playback time or
 change generated evidence.
+
+Blueprint 16 adds 3D debug review annotations to the same panel:
+
+- click a 3D sample and save a useful/wrong/unclear/needs-review/bad-position review
+- select a marker with a 3D diagnostic and save a useful/wrong/unclear/needs-review/bad-link review
+- add a missing 3D sample note at current replay time
+
+These reviews persist as `trajectory_3d_debug_review_annotation` metadata. They do not change
+candidate counts, event marker review counts, 3D samples, 3D diagnostics, in/out, score, or
+adjudication.

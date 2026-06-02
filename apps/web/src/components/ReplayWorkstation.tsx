@@ -5,11 +5,14 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import {
   createEventCandidateReview,
+  createTrajectory3DDebugReview,
   deleteEventCandidateReview,
   fetchEventCandidateReviews,
   fetchReplayOverlayChunk,
   fetchReplayTimeline,
-  updateEventCandidateReview
+  fetchTrajectory3DDebugReviews,
+  updateEventCandidateReview,
+  updateTrajectory3DDebugReview
 } from "../lib/api";
 import {
   filterCameraViewsAvailableAt,
@@ -49,6 +52,7 @@ import type {
   EventCandidateReviewLabel,
   EventCandidateReviewList,
   ReplayEventCandidateOverlay,
+  ReplayEventCandidate3DDiagnostic,
   ReplayHomographyCandidateOverlay,
   ReplayMainPlayerCourtProjectionOverlay,
   ReplayInfo,
@@ -72,6 +76,10 @@ import type {
   ReplayTimelineItem,
   ReplayTrackletOverlay,
   ReplayTrackPointOverlay,
+  Trajectory3DDebugReviewAnnotation,
+  Trajectory3DDebugReviewLabel,
+  Trajectory3DDebugReviewList,
+  ReplayTrajectory3DDebugReviewSummary,
   ReplayTrajectory3DDebugPoint,
   ReplayTrajectory3DDebugPayload
 } from "../lib/types";
@@ -101,6 +109,30 @@ const emptyEventCandidateReviewSummary: Record<string, number> = {
   missing_hit_candidate: 0,
   missing_bounce_candidate: 0,
   missing_event_candidate: 0
+};
+
+const emptyTrajectory3DDebugReviewSummary: ReplayTrajectory3DDebugReviewSummary = {
+  available: false,
+  total_reviews: 0,
+  sample_reviews: 0,
+  diagnostic_reviews: 0,
+  missing_3d_sample_notes: 0,
+  debug_view_notes: 0,
+  useful: 0,
+  wrong: 0,
+  unclear: 0,
+  needs_review: 0,
+  missing_3d_sample: 0,
+  bad_3d_position: 0,
+  bad_diagnostic_link: 0,
+  review_metadata_only: true,
+  not_truth: true,
+  not_3d_truth: true,
+  does_not_change_event_candidates: true,
+  does_not_change_3d_candidates: true,
+  does_not_create_in_out: true,
+  does_not_create_score: true,
+  no_adjudication: true
 };
 
 interface ReplayWorkstationProps {
@@ -139,6 +171,13 @@ interface TimelineState {
 
 interface EventCandidateReviewState {
   payload: EventCandidateReviewList | null;
+  loading: boolean;
+  saving: boolean;
+  error: string | null;
+}
+
+interface Trajectory3DDebugReviewState {
+  payload: Trajectory3DDebugReviewList | null;
   loading: boolean;
   saving: boolean;
   error: string | null;
@@ -569,6 +608,13 @@ export function ReplayWorkstation({
     saving: false,
     error: null
   });
+  const [trajectory3DReviewState, setTrajectory3DReviewState] =
+    useState<Trajectory3DDebugReviewState>({
+      payload: null,
+      loading: false,
+      saving: false,
+      error: null
+    });
   const [seekRequest, setSeekRequest] = useState<ReplaySeekRequest | null>(null);
   const chunkCache = useRef<Map<string, ReplayOverlayChunk>>(new Map());
 
@@ -745,6 +791,42 @@ export function ReplayWorkstation({
   useEffect(() => {
     void refreshEventCandidateReviews();
   }, [refreshEventCandidateReviews]);
+
+  const refreshTrajectory3DDebugReviews = useCallback(async () => {
+    if (selectedTrajectory3DRunId === null && selectedEventCandidateRunId === null) {
+      setTrajectory3DReviewState({
+        payload: null,
+        loading: false,
+        saving: false,
+        error: null
+      });
+      return;
+    }
+    setTrajectory3DReviewState((current) => ({ ...current, loading: true, error: null }));
+    try {
+      const payload = await fetchTrajectory3DDebugReviews(replayInfo.media_id, {
+        trajectory3dRunId: selectedTrajectory3DRunId,
+        eventCandidateRunId: selectedEventCandidateRunId
+      });
+      setTrajectory3DReviewState((current) => ({
+        ...current,
+        payload,
+        loading: false,
+        error: null
+      }));
+    } catch (error: unknown) {
+      setTrajectory3DReviewState((current) => ({
+        ...current,
+        payload: null,
+        loading: false,
+        error: error instanceof Error ? error.message : "Unable to load 3D debug reviews"
+      }));
+    }
+  }, [replayInfo.media_id, selectedEventCandidateRunId, selectedTrajectory3DRunId]);
+
+  useEffect(() => {
+    void refreshTrajectory3DDebugReviews();
+  }, [refreshTrajectory3DDebugReviews]);
 
   useEffect(() => {
     if (replayMode === "stream_proxy") {
@@ -1223,6 +1305,25 @@ export function ReplayWorkstation({
     selectedMarkerSummary !== null
       ? eventReviewsByObservationId[selectedMarkerSummary.observation_id] ?? []
       : [];
+  const trajectory3DReviewsBySampleId =
+    trajectory3DReviewState.payload?.reviews_by_trajectory_3d_candidate_id ?? {};
+  const trajectory3DReviewsByDiagnosticId =
+    trajectory3DReviewState.payload?.reviews_by_event_candidate_3d_diagnostic_id ?? {};
+  const trajectory3DReviewSummary =
+    trajectory3DReviewState.payload?.review_summary ??
+    overlayState.chunk?.trajectory_3d_debug_review_summary ??
+    overlayState.chunk?.trajectory_3d_debug?.trajectory_3d_debug_review_summary ??
+    emptyTrajectory3DDebugReviewSummary;
+  const selectedTrajectory3DPointReviews =
+    selectedTrajectory3DPointId !== null
+      ? trajectory3DReviewsBySampleId[selectedTrajectory3DPointId] ?? []
+      : [];
+  const selectedTrajectory3DDiagnosticId =
+    selectedMarkerSummary?.event_candidate_3d_diagnostic?.id ?? null;
+  const selectedTrajectory3DDiagnosticReviews =
+    selectedTrajectory3DDiagnosticId !== null
+      ? trajectory3DReviewsByDiagnosticId[selectedTrajectory3DDiagnosticId] ?? []
+      : [];
 
   const handleSaveCandidateMarkerReview = useCallback(
     async (reviewLabel: EventCandidateReviewLabel, note: string, reviewId: string | null) => {
@@ -1345,6 +1446,172 @@ export function ReplayWorkstation({
       selectedEventCandidateRunId
     ]
   );
+
+  const handleSaveTrajectory3DSampleReview = useCallback(
+    async (
+      point: ReplayTrajectory3DDebugPoint,
+      reviewLabel: Trajectory3DDebugReviewLabel,
+      note: string,
+      reviewId: string | null
+    ) => {
+      if (selectedTrajectory3DRunId === null) {
+        setTrajectory3DReviewState((current) => ({
+          ...current,
+          error: "Select a 3D trajectory candidate run before saving a 3D sample review."
+        }));
+        return;
+      }
+      setTrajectory3DReviewState((current) => ({ ...current, saving: true, error: null }));
+      try {
+        if (reviewId !== null) {
+          await updateTrajectory3DDebugReview(replayInfo.media_id, reviewId, {
+            review_label: reviewLabel,
+            note,
+            payload_jsonb: {
+              review_source: "trajectory_3d_debug_sample_review_v0"
+            }
+          });
+        } else {
+          await createTrajectory3DDebugReview(replayInfo.media_id, {
+            trajectory_3d_run_id: selectedTrajectory3DRunId,
+            event_candidate_run_id: selectedEventCandidateRunId,
+            trajectory_3d_candidate_id: point.id,
+            annotation_kind: "trajectory_3d_sample_review",
+            review_label: reviewLabel,
+            frame: point.frame,
+            timestamp_ms: point.timestamp_ms,
+            court_x_m: point.court_x_m,
+            court_y_m: point.court_y_m,
+            court_z_m: point.court_z_m,
+            note: note.trim() === "" ? null : note,
+            payload_jsonb: {
+              review_source: "trajectory_3d_debug_sample_review_v0",
+              selected_replay_timestamp_ms: playback.timestampMs
+            }
+          });
+        }
+        chunkCache.current.clear();
+        setTrajectory3DReviewState((current) => ({ ...current, saving: false }));
+        await refreshTrajectory3DDebugReviews();
+      } catch (error: unknown) {
+        setTrajectory3DReviewState((current) => ({
+          ...current,
+          saving: false,
+          error: error instanceof Error ? error.message : "Unable to save 3D sample review"
+        }));
+      }
+    },
+    [
+      playback.timestampMs,
+      refreshTrajectory3DDebugReviews,
+      replayInfo.media_id,
+      selectedEventCandidateRunId,
+      selectedTrajectory3DRunId
+    ]
+  );
+
+  const handleSaveTrajectory3DDiagnosticReview = useCallback(
+    async (
+      diagnostic: ReplayEventCandidate3DDiagnostic,
+      reviewLabel: Trajectory3DDebugReviewLabel,
+      note: string,
+      reviewId: string | null
+    ) => {
+      setTrajectory3DReviewState((current) => ({ ...current, saving: true, error: null }));
+      try {
+        if (reviewId !== null) {
+          await updateTrajectory3DDebugReview(replayInfo.media_id, reviewId, {
+            review_label: reviewLabel,
+            note,
+            payload_jsonb: {
+              review_source: "trajectory_3d_debug_diagnostic_review_v0"
+            }
+          });
+        } else {
+          await createTrajectory3DDebugReview(replayInfo.media_id, {
+            trajectory_3d_run_id:
+              selectedTrajectory3DRunId ?? diagnostic.trajectory_3d_run_id ?? null,
+            event_candidate_run_id: selectedEventCandidateRunId,
+            event_candidate_3d_diagnostic_id: diagnostic.id,
+            annotation_kind: "event_candidate_3d_diagnostic_review",
+            review_label: reviewLabel,
+            frame: diagnostic.frame,
+            timestamp_ms: diagnostic.timestamp_ms,
+            court_x_m: diagnostic.nearest_court_x_m ?? null,
+            court_y_m: diagnostic.nearest_court_y_m ?? null,
+            court_z_m: diagnostic.nearest_court_z_m ?? null,
+            note: note.trim() === "" ? null : note,
+            payload_jsonb: {
+              review_source: "trajectory_3d_debug_diagnostic_review_v0",
+              selected_replay_timestamp_ms: playback.timestampMs
+            }
+          });
+        }
+        chunkCache.current.clear();
+        setTrajectory3DReviewState((current) => ({ ...current, saving: false }));
+        await refreshTrajectory3DDebugReviews();
+      } catch (error: unknown) {
+        setTrajectory3DReviewState((current) => ({
+          ...current,
+          saving: false,
+          error: error instanceof Error ? error.message : "Unable to save 3D diagnostic review"
+        }));
+      }
+    },
+    [
+      playback.timestampMs,
+      refreshTrajectory3DDebugReviews,
+      replayInfo.media_id,
+      selectedEventCandidateRunId,
+      selectedTrajectory3DRunId
+    ]
+  );
+
+  const handleCreateMissing3DSampleNote = useCallback(
+    async (note: string) => {
+      if (selectedTrajectory3DRunId === null && selectedEventCandidateRunId === null) {
+        setTrajectory3DReviewState((current) => ({
+          ...current,
+          error: "Select a 3D or event candidate run before adding a missing 3D sample note."
+        }));
+        return;
+      }
+      setTrajectory3DReviewState((current) => ({ ...current, saving: true, error: null }));
+      try {
+        await createTrajectory3DDebugReview(replayInfo.media_id, {
+          trajectory_3d_run_id: selectedTrajectory3DRunId,
+          event_candidate_run_id: selectedEventCandidateRunId,
+          annotation_kind: "missing_3d_sample_note",
+          review_label: "missing_3d_sample",
+          frame: playback.frameNumber,
+          timestamp_ms: playback.timestampMs,
+          note: note.trim() === "" ? null : note,
+          payload_jsonb: {
+            review_source: "trajectory_3d_debug_missing_sample_note_v0",
+            current_replay_timestamp_ms: playback.timestampMs
+          }
+        });
+        chunkCache.current.clear();
+        setTrajectory3DReviewState((current) => ({ ...current, saving: false }));
+        await refreshTrajectory3DDebugReviews();
+      } catch (error: unknown) {
+        setTrajectory3DReviewState((current) => ({
+          ...current,
+          saving: false,
+          error: error instanceof Error ? error.message : "Unable to save missing 3D sample note"
+        }));
+      }
+    },
+    [
+      playback.frameNumber,
+      playback.timestampMs,
+      refreshTrajectory3DDebugReviews,
+      replayInfo.media_id,
+      selectedEventCandidateRunId,
+      selectedTrajectory3DRunId
+    ]
+  );
+
   const handleMarkerReviewSelect = useCallback(
     (marker: ReplayMarkerSummary) => {
       const timelineItem = eventCandidateTimelineItemForMarker(
@@ -1777,13 +2044,23 @@ export function ReplayWorkstation({
           <Trajectory3DPanel replayInfo={replayInfo} />
           <Trajectory3DDebugViewPanel
             currentTimestampMs={playback.timestampMs}
+            frameNumber={playback.frameNumber}
+            onCreateMissing3DSampleNote={handleCreateMissing3DSampleNote}
             onSelectPoint={(point) => {
               setSelectedTrajectory3DPointId(point.id);
               setSeekRequest({ timestampMs: point.timestamp_ms, nonce: Date.now() });
             }}
+            onSaveDiagnosticReview={handleSaveTrajectory3DDiagnosticReview}
+            onSaveSampleReview={handleSaveTrajectory3DSampleReview}
             payload={overlayState.chunk?.trajectory_3d_debug ?? null}
+            reviewError={trajectory3DReviewState.error}
+            reviewLoading={trajectory3DReviewState.loading}
+            reviewSaving={trajectory3DReviewState.saving}
+            reviewSummary={trajectory3DReviewSummary}
+            selectedDiagnosticReviews={selectedTrajectory3DDiagnosticReviews}
             selectedMarker={selectedMarkerSummary}
             selectedPointId={selectedTrajectory3DPointId}
+            selectedPointReviews={selectedTrajectory3DPointReviews}
             selectedTrajectory3DRunId={selectedTrajectory3DRunId}
           />
           <ReplayEventCandidateReviewPanel
@@ -1827,6 +2104,28 @@ const missingCandidateLabels: Array<{
   { label: "missing_hit_candidate", text: "Missing hit" },
   { label: "missing_bounce_candidate", text: "Missing bounce" },
   { label: "missing_event_candidate", text: "Missing event" }
+];
+
+const trajectory3DSampleReviewLabels: Array<{
+  label: Trajectory3DDebugReviewLabel;
+  text: string;
+}> = [
+  { label: "useful", text: "Useful" },
+  { label: "wrong", text: "Wrong" },
+  { label: "unclear", text: "Unclear" },
+  { label: "needs_review", text: "Needs review" },
+  { label: "bad_3d_position", text: "Bad 3D position" }
+];
+
+const trajectory3DDiagnosticReviewLabels: Array<{
+  label: Trajectory3DDebugReviewLabel;
+  text: string;
+}> = [
+  { label: "useful", text: "Useful" },
+  { label: "wrong", text: "Wrong" },
+  { label: "unclear", text: "Unclear" },
+  { label: "needs_review", text: "Needs review" },
+  { label: "bad_diagnostic_link", text: "Bad diagnostic link" }
 ];
 
 function MissingCandidateNotePanel({
@@ -2625,16 +2924,46 @@ function Trajectory3DPanel({ replayInfo }: { replayInfo: ReplayInfo }) {
 
 function Trajectory3DDebugViewPanel({
   currentTimestampMs,
+  frameNumber,
+  onCreateMissing3DSampleNote,
   onSelectPoint,
+  onSaveDiagnosticReview,
+  onSaveSampleReview,
   payload,
+  reviewError,
+  reviewLoading,
+  reviewSaving,
+  reviewSummary,
+  selectedDiagnosticReviews,
   selectedPointId,
+  selectedPointReviews,
   selectedMarker,
   selectedTrajectory3DRunId
 }: {
   currentTimestampMs: number;
+  frameNumber: number;
+  onCreateMissing3DSampleNote: (note: string) => Promise<void>;
   onSelectPoint: (point: ReplayTrajectory3DDebugPoint) => void;
+  onSaveDiagnosticReview: (
+    diagnostic: ReplayEventCandidate3DDiagnostic,
+    reviewLabel: Trajectory3DDebugReviewLabel,
+    note: string,
+    reviewId: string | null
+  ) => Promise<void>;
+  onSaveSampleReview: (
+    point: ReplayTrajectory3DDebugPoint,
+    reviewLabel: Trajectory3DDebugReviewLabel,
+    note: string,
+    reviewId: string | null
+  ) => Promise<void>;
   payload: ReplayTrajectory3DDebugPayload | null;
+  reviewError: string | null;
+  reviewLoading: boolean;
+  reviewSaving: boolean;
+  reviewSummary: ReplayTrajectory3DDebugReviewSummary;
+  selectedDiagnosticReviews: Trajectory3DDebugReviewAnnotation[];
   selectedPointId: string | null;
+  selectedPointReviews: Trajectory3DDebugReviewAnnotation[];
   selectedMarker: ReplayMarkerSummary | null;
   selectedTrajectory3DRunId: string | null;
 }) {
@@ -2850,6 +3179,21 @@ function Trajectory3DDebugViewPanel({
                 Select a hit/bounce candidate marker to inspect its nearest 3D diagnostic sample.
               </p>
             )}
+            <Trajectory3DDebugReviewControls
+              currentTimestampMs={currentTimestampMs}
+              frameNumber={frameNumber}
+              onCreateMissing3DSampleNote={onCreateMissing3DSampleNote}
+              onSaveDiagnosticReview={onSaveDiagnosticReview}
+              onSaveSampleReview={onSaveSampleReview}
+              reviewError={reviewError}
+              reviewLoading={reviewLoading}
+              reviewSaving={reviewSaving}
+              reviewSummary={reviewSummary}
+              selectedDiagnostic={selectedDiagnostic}
+              selectedDiagnosticReviews={selectedDiagnosticReviews}
+              selectedPoint={selectedPoint}
+              selectedPointReviews={selectedPointReviews}
+            />
           </>
         )}
         <p className="empty-state compact">
@@ -2859,6 +3203,255 @@ function Trajectory3DDebugViewPanel({
       </div>
     </section>
   );
+}
+
+function Trajectory3DDebugReviewControls({
+  currentTimestampMs,
+  frameNumber,
+  onCreateMissing3DSampleNote,
+  onSaveDiagnosticReview,
+  onSaveSampleReview,
+  reviewError,
+  reviewLoading,
+  reviewSaving,
+  reviewSummary,
+  selectedDiagnostic,
+  selectedDiagnosticReviews,
+  selectedPoint,
+  selectedPointReviews
+}: {
+  currentTimestampMs: number;
+  frameNumber: number;
+  onCreateMissing3DSampleNote: (note: string) => Promise<void>;
+  onSaveDiagnosticReview: (
+    diagnostic: ReplayEventCandidate3DDiagnostic,
+    reviewLabel: Trajectory3DDebugReviewLabel,
+    note: string,
+    reviewId: string | null
+  ) => Promise<void>;
+  onSaveSampleReview: (
+    point: ReplayTrajectory3DDebugPoint,
+    reviewLabel: Trajectory3DDebugReviewLabel,
+    note: string,
+    reviewId: string | null
+  ) => Promise<void>;
+  reviewError: string | null;
+  reviewLoading: boolean;
+  reviewSaving: boolean;
+  reviewSummary: typeof emptyTrajectory3DDebugReviewSummary;
+  selectedDiagnostic: ReplayEventCandidate3DDiagnostic | null;
+  selectedDiagnosticReviews: Trajectory3DDebugReviewAnnotation[];
+  selectedPoint: ReplayTrajectory3DDebugPoint | null;
+  selectedPointReviews: Trajectory3DDebugReviewAnnotation[];
+}) {
+  const latestPointReview = latestTrajectory3DDebugReview(selectedPointReviews);
+  const latestDiagnosticReview = latestTrajectory3DDebugReview(selectedDiagnosticReviews);
+
+  return (
+    <div className="trajectory-3d-debug-review-block">
+      <div className="review-summary-row">
+        <span className="mini-pill">3D debug reviews</span>
+        <span>{reviewSummary.total_reviews} total</span>
+        <span>{reviewSummary.sample_reviews ?? 0} sample</span>
+        <span>{reviewSummary.diagnostic_reviews ?? 0} diagnostic</span>
+        <span>{reviewSummary.missing_3d_sample_notes ?? 0} missing notes</span>
+      </div>
+      {reviewLoading ? <p className="empty-state compact">Loading 3D debug reviews...</p> : null}
+      {reviewError !== null ? <p className="marker-review-error">{reviewError}</p> : null}
+      {selectedPoint !== null ? (
+        <Trajectory3DReviewForm
+          defaultLabel="useful"
+          disabled={reviewSaving}
+          labelOptions={trajectory3DSampleReviewLabels}
+          latestReview={latestPointReview}
+          onSave={(label, note, reviewId) =>
+            onSaveSampleReview(selectedPoint, label, note, reviewId)
+          }
+          title="3D Sample Review"
+        />
+      ) : (
+        <p className="empty-state compact">Select a 3D sample to add a sample review.</p>
+      )}
+      {selectedDiagnostic !== null ? (
+        <Trajectory3DReviewForm
+          defaultLabel="useful"
+          disabled={reviewSaving}
+          labelOptions={trajectory3DDiagnosticReviewLabels}
+          latestReview={latestDiagnosticReview}
+          onSave={(label, note, reviewId) =>
+            onSaveDiagnosticReview(selectedDiagnostic, label, note, reviewId)
+          }
+          title="3D Diagnostic Review"
+        />
+      ) : (
+        <p className="empty-state compact">
+          Select a marker with a 3D diagnostic to review the diagnostic link.
+        </p>
+      )}
+      <Missing3DSampleNoteForm
+        disabled={reviewSaving}
+        frameNumber={frameNumber}
+        onCreate={onCreateMissing3DSampleNote}
+        timestampMs={currentTimestampMs}
+      />
+      <p className="marker-review-warning">
+        3D debug reviews are metadata only. They do not change event candidates, 3D samples,
+        in/out, score, or adjudication.
+      </p>
+    </div>
+  );
+}
+
+function Trajectory3DReviewForm({
+  defaultLabel,
+  disabled,
+  labelOptions,
+  latestReview,
+  onSave,
+  title
+}: {
+  defaultLabel: Trajectory3DDebugReviewLabel;
+  disabled: boolean;
+  labelOptions: Array<{ label: Trajectory3DDebugReviewLabel; text: string }>;
+  latestReview: Trajectory3DDebugReviewAnnotation | null;
+  onSave: (
+    reviewLabel: Trajectory3DDebugReviewLabel,
+    note: string,
+    reviewId: string | null
+  ) => Promise<void>;
+  title: string;
+}) {
+  const latestLabel = isTrajectory3DDebugReviewLabel(latestReview?.review_label)
+    ? latestReview.review_label
+    : defaultLabel;
+  const [reviewLabel, setReviewLabel] = useState<Trajectory3DDebugReviewLabel>(latestLabel);
+  const [note, setNote] = useState(latestReview?.note ?? "");
+
+  useEffect(() => {
+    setReviewLabel(latestLabel);
+    setNote(latestReview?.note ?? "");
+  }, [latestLabel, latestReview?.id, latestReview?.note]);
+
+  return (
+    <div className="trajectory-3d-debug-review-form">
+      <h3 className="subhead">{title}</h3>
+      {latestReview !== null ? (
+        <p className="subtle">
+          Latest saved review: {formatTrajectory3DReviewLabel(latestReview.review_label)}
+        </p>
+      ) : null}
+      <div className="marker-review-labels" role="group" aria-label={title}>
+        {labelOptions.map((option) => (
+          <button
+            aria-pressed={reviewLabel === option.label}
+            className={reviewLabel === option.label ? "selected" : ""}
+            disabled={disabled}
+            key={option.label}
+            onClick={() => setReviewLabel(option.label)}
+            type="button"
+          >
+            {option.text}
+          </button>
+        ))}
+      </div>
+      <label className="marker-review-note">
+        <span>Review note</span>
+        <textarea
+          disabled={disabled}
+          onChange={(event) => setNote(event.target.value)}
+          placeholder="Optional operator context. Metadata only."
+          value={note}
+        />
+      </label>
+      <button
+        className="primary-button"
+        disabled={disabled}
+        onClick={async () => {
+          await onSave(reviewLabel, note, latestReview?.id ?? null);
+        }}
+        type="button"
+      >
+        {latestReview !== null ? "Update 3D debug review" : "Save 3D debug review"}
+      </button>
+    </div>
+  );
+}
+
+function Missing3DSampleNoteForm({
+  disabled,
+  frameNumber,
+  onCreate,
+  timestampMs
+}: {
+  disabled: boolean;
+  frameNumber: number;
+  onCreate: (note: string) => Promise<void>;
+  timestampMs: number;
+}) {
+  const [note, setNote] = useState("");
+
+  return (
+    <div className="trajectory-3d-debug-review-form">
+      <h3 className="subhead">Missing 3D Sample Note</h3>
+      <p className="subtle">
+        Add a missing 3D sample note at frame {frameNumber} / {timestampMs} ms.
+      </p>
+      <label className="marker-review-note">
+        <span>Missing sample note</span>
+        <textarea
+          disabled={disabled}
+          onChange={(event) => setNote(event.target.value)}
+          placeholder="Optional context for the missing 3D sample."
+          value={note}
+        />
+      </label>
+      <button
+        className="quiet-button"
+        disabled={disabled}
+        onClick={async () => {
+          await onCreate(note);
+          setNote("");
+        }}
+        type="button"
+      >
+        Add missing 3D sample note at current time
+      </button>
+    </div>
+  );
+}
+
+function latestTrajectory3DDebugReview(
+  reviews: Trajectory3DDebugReviewAnnotation[]
+): Trajectory3DDebugReviewAnnotation | null {
+  if (reviews.length === 0) {
+    return null;
+  }
+  return [...reviews].sort((left, right) => {
+    const leftTime = Date.parse(left.created_at);
+    const rightTime = Date.parse(right.created_at);
+    if (leftTime !== rightTime) {
+      return rightTime - leftTime;
+    }
+    return right.id.localeCompare(left.id);
+  })[0];
+}
+
+function isTrajectory3DDebugReviewLabel(
+  value: unknown
+): value is Trajectory3DDebugReviewLabel {
+  return (
+    value === "useful" ||
+    value === "wrong" ||
+    value === "unclear" ||
+    value === "needs_review" ||
+    value === "missing_3d_sample" ||
+    value === "bad_3d_position" ||
+    value === "bad_diagnostic_link"
+  );
+}
+
+function formatTrajectory3DReviewLabel(value: string): string {
+  return value.replaceAll("_", " ");
 }
 
 function nearestTrajectory3DPoint(

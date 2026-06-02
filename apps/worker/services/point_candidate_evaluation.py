@@ -137,6 +137,9 @@ def evaluate_point_candidates(
         "event_candidate_3d_diagnostics": event_candidate_3d_diagnostic_readiness_summary(
             _dict_or_empty(point_snapshot.get("event_candidate_3d_diagnostic_summary"))
         ),
+        "trajectory_3d_debug_reviews": _dict_or_empty(
+            point_snapshot.get("trajectory_3d_debug_review_summary")
+        ),
         "candidate_type_breakdown": _candidate_type_breakdown(
             marker_summary,
             latest_marker_reviews,
@@ -320,6 +323,21 @@ def render_point_candidate_evaluation_markdown(evaluation: dict[str, Any]) -> st
         f"{event_3d.get('weakens_candidate_context_count', 0)}"
     )
     rows.append("- diagnostic_only: true")
+    rows.append("- not_truth: true")
+
+    rows.extend(["", "## 3D Debug Reviews"])
+    debug_reviews = _dict_or_empty(evaluation.get("trajectory_3d_debug_reviews"))
+    rows.append(f"- available: {debug_reviews.get('available', False)}")
+    rows.append(f"- total_reviews: {debug_reviews.get('total_reviews', 0)}")
+    rows.append(f"- sample_reviews: {debug_reviews.get('sample_reviews', 0)}")
+    rows.append(f"- diagnostic_reviews: {debug_reviews.get('diagnostic_reviews', 0)}")
+    rows.append(
+        "- missing_3d_sample_notes: "
+        f"{debug_reviews.get('missing_3d_sample_notes', 0)}"
+    )
+    rows.append(f"- wrong: {debug_reviews.get('wrong', 0)}")
+    rows.append(f"- useful: {debug_reviews.get('useful', 0)}")
+    rows.append("- review_metadata_only: true")
     rows.append("- not_truth: true")
 
     rows.extend(

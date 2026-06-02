@@ -2,7 +2,7 @@
 
 ## Current Progress Gauge
 
-Current: Blueprints 1, 2, 3, 4, 5, 6, 7, and 8 complete/frozen; Blueprint 9 manual candidate review annotations are complete; Blueprint 10 benchmark/evaluation harness is complete; Blueprint 11 3D readiness / camera geometry evidence is complete; Blueprint 12 3D ball trajectory candidate evidence is complete; TOM v3 Simple is complete as an observation-only evidence platform.
+Current: Blueprints 1, 2, 3, 4, 5, 6, 7, and 8 complete/frozen; Blueprint 9 manual candidate review annotations are complete; Blueprint 10 benchmark/evaluation harness is complete; Blueprint 11 3D readiness / camera geometry evidence is complete; Blueprint 12 3D ball trajectory candidate evidence is complete; Blueprints 13 through 16 add diagnostic-only 3D marker context, the 3D Debug View, selection/timeline coupling, and 3D debug review annotations; TOM v3 Simple remains an observation-only evidence platform.
 
 ## Current
 
@@ -1126,3 +1126,13 @@ operator click or keyboard-select a sample to request video seek, displays selec
 metadata, and continues to highlight the selected-marker nearest diagnostic sample when available.
 The panel remains display-only and does not own playback time, mutate evidence, change
 hit/bounce markers, decide in/out, score, or adjudicate.
+
+## Blueprint 16 Status
+
+Status: complete.
+
+TOM v3 now supports operator review annotations for 3D Debug View evidence. Selected 3D candidate
+samples, marker-linked 3D diagnostics, and missing 3D sample moments can receive review metadata
+without changing source candidates or event markers. Point evidence snapshots and point candidate
+evaluations include compact 3D debug review summaries. These reviews do not create 3D truth,
+hit/bounce truth, in/out, score, or adjudication.

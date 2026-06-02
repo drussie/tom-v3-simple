@@ -8,6 +8,12 @@ from tom_v3_schema.event_candidate_reviews import (
     EventCandidateReviewRead,
     EventCandidateReviewUpdate,
 )
+from tom_v3_schema.trajectory_3d_debug_review import (
+    Trajectory3DDebugReviewAnnotationCreate,
+    Trajectory3DDebugReviewAnnotationRead,
+    Trajectory3DDebugReviewAnnotationUpdate,
+    Trajectory3DDebugReviewList,
+)
 
 from apps.api.db import get_session
 from apps.api.services.event_candidate_reviews import (
@@ -25,6 +31,13 @@ from apps.api.services.replay import (
     build_replay_timeline,
     normalize_court_temporal_persistence,
     normalize_replay_layers,
+)
+from apps.api.services.trajectory_3d_debug_reviews import (
+    Trajectory3DDebugReviewError,
+    create_trajectory_3d_debug_review,
+    list_trajectory_3d_debug_reviews,
+    serialize_trajectory_3d_debug_review,
+    update_trajectory_3d_debug_review,
 )
 
 router = APIRouter(tags=["replay"])
@@ -207,4 +220,68 @@ def delete_event_candidate_review_endpoint(
     try:
         return delete_event_candidate_review(session, media_id=media_id, review_id=review_id)
     except EventCandidateReviewError as error:
+        raise HTTPException(status_code=error.status_code, detail=error.message) from error
+
+
+@router.get(
+    "/replay/{media_id}/trajectory-3d-debug-reviews",
+    response_model=Trajectory3DDebugReviewList,
+)
+def get_trajectory_3d_debug_reviews(
+    media_id: str,
+    session: SessionDep,
+    trajectory_3d_run_id_camel: str | None = Query(default=None, alias="trajectory3dRunId"),
+    event_candidate_run_id_camel: str | None = Query(default=None, alias="eventCandidateRunId"),
+    trajectory_3d_run_id: str | None = Query(default=None),
+    event_candidate_run_id: str | None = Query(default=None),
+) -> dict[str, object]:
+    resolved_trajectory_3d_run_id = trajectory_3d_run_id_camel or trajectory_3d_run_id
+    resolved_event_candidate_run_id = event_candidate_run_id_camel or event_candidate_run_id
+    try:
+        return list_trajectory_3d_debug_reviews(
+            session,
+            media_id=media_id,
+            trajectory_3d_run_id=resolved_trajectory_3d_run_id,
+            event_candidate_run_id=resolved_event_candidate_run_id,
+        )
+    except Trajectory3DDebugReviewError as error:
+        raise HTTPException(status_code=error.status_code, detail=error.message) from error
+
+
+@router.post(
+    "/replay/{media_id}/trajectory-3d-debug-reviews",
+    response_model=Trajectory3DDebugReviewAnnotationRead,
+    status_code=status.HTTP_201_CREATED,
+)
+def post_trajectory_3d_debug_review(
+    media_id: str,
+    request: Trajectory3DDebugReviewAnnotationCreate,
+    session: SessionDep,
+) -> dict[str, object]:
+    try:
+        row = create_trajectory_3d_debug_review(session, media_id=media_id, request=request)
+        return serialize_trajectory_3d_debug_review(row)
+    except Trajectory3DDebugReviewError as error:
+        raise HTTPException(status_code=error.status_code, detail=error.message) from error
+
+
+@router.patch(
+    "/replay/{media_id}/trajectory-3d-debug-reviews/{review_id}",
+    response_model=Trajectory3DDebugReviewAnnotationRead,
+)
+def patch_trajectory_3d_debug_review(
+    media_id: str,
+    review_id: str,
+    request: Trajectory3DDebugReviewAnnotationUpdate,
+    session: SessionDep,
+) -> dict[str, object]:
+    try:
+        row = update_trajectory_3d_debug_review(
+            session,
+            media_id=media_id,
+            review_id=review_id,
+            request=request,
+        )
+        return serialize_trajectory_3d_debug_review(row)
+    except Trajectory3DDebugReviewError as error:
         raise HTTPException(status_code=error.status_code, detail=error.message) from error

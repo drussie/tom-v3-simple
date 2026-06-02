@@ -29,6 +29,9 @@ from tom_v3_storage.db_models import (
 )
 from tom_v3_video.paths import local_path_from_uri_or_path
 
+from apps.api.services.trajectory_3d_debug_reviews import (
+    trajectory_3d_debug_review_summary_for_media,
+)
 from apps.worker.services.event_candidate_3d_diagnostics import (
     compact_event_candidate_3d_diagnostics,
     event_candidate_3d_diagnostic_summary,
@@ -401,6 +404,12 @@ def build_replay_overlay_chunk(
         media_id=media.id,
         trajectory_3d_run_id=trajectory_3d_run_id,
     )
+    trajectory_3d_debug_review_summary = trajectory_3d_debug_review_summary_for_media(
+        session=session,
+        media_id=media.id,
+        trajectory_3d_run_id=trajectory_3d_run_id,
+        event_candidate_run_id=event_candidate_run_id,
+    )
     return {
         "media_id": media.id,
         "start_ms": start_ms,
@@ -429,6 +438,7 @@ def build_replay_overlay_chunk(
         "event_candidate_3d_diagnostics": event_candidate_3d_diagnostics,
         "event_candidate_3d_diagnostic_summary": event_candidate_3d_summary,
         "trajectory_3d_debug": trajectory_3d_debug,
+        "trajectory_3d_debug_review_summary": trajectory_3d_debug_review_summary,
         "court_temporal_persistence": court_temporal_persistence,
         "court_persistence_max_gap_ms": court_persistence_max_gap_ms,
         "observation_only": True,
@@ -3805,6 +3815,11 @@ def build_trajectory_3d_debug_payload(
         else None
     )
     known_height_count = sum(1 for row in rows if row.court_z_m is not None)
+    review_summary = trajectory_3d_debug_review_summary_for_media(
+        session=session,
+        media_id=media_id,
+        trajectory_3d_run_id=trajectory_3d_run_id,
+    )
     return {
         "available": True,
         "trajectory_3d_run_id": trajectory_3d_run_id,
@@ -3816,6 +3831,7 @@ def build_trajectory_3d_debug_payload(
         "true_3d_reconstruction_available": False,
         "court_dimensions": _trajectory_3d_debug_court_dimensions(camera_geometry),
         "points": [_trajectory_3d_debug_point(row) for row in rows],
+        "trajectory_3d_debug_review_summary": review_summary,
         "warnings": {
             "display_only": True,
             "trajectory_3d_candidate_only": True,
