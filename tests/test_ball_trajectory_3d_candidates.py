@@ -259,9 +259,17 @@ def test_replay_overlay_exposes_trajectory_3d_debug_payload(
     assert debug["true_3d_reconstruction_available"] is False
     assert debug["warnings"]["display_only"] is True
     assert len(debug["points"]) == 3
+    assert debug["points"][0]["id"]
+    assert debug["points"][0]["frame"] == 0
+    assert debug["points"][0]["frame_number"] == 0
+    assert debug["points"][0]["timestamp_ms"] == 0
     assert debug["points"][0]["court_x_m"] == pytest.approx(1.097)
     assert debug["points"][0]["court_z_m"] is None
     assert debug["points"][0]["court_z_status"] == "unknown"
+    rendered = str(debug)
+    assert "in_out_decision" not in rendered
+    assert "score_decision" not in rendered
+    assert "adjudicated" not in rendered
 
 
 def test_replay_overlay_exposes_trajectory_3d_debug_unavailable_state(

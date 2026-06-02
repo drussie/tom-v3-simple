@@ -1695,3 +1695,14 @@ The Replay Workstation side panel shows a display-only court-plane debug view of
 candidate samples. It can highlight the nearest 3D diagnostic sample for a selected marker when
 Blueprint 13 diagnostics exist. Height remains unknown in v0, and the view does not change
 hit/bounce candidates, in/out, score, or adjudication.
+
+Blueprint 15 adds selection and timeline coupling to that same panel:
+
+- current replay time highlights the nearest 3D candidate sample
+- samples within the local ±250ms window are emphasized
+- clicking a 3D sample requests replay seek to that sample timestamp
+- clicked sample metadata is shown in the panel
+- selected hit/bounce markers still highlight linked 3D diagnostic samples when available
+
+The 3D panel requests seek through existing replay controls. It does not own playback time or
+change generated evidence.

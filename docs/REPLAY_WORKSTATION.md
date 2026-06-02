@@ -834,6 +834,12 @@ x/y samples, an ordered candidate path, unknown height status, and a highlighted
 the selected marker when 3D diagnostics exist. It is display-only and does not render true 3D ball
 flight, claim ball height, change hit/bounce candidates, decide in/out, score, or adjudicate.
 
+Blueprint 15 3D Debug Selection / Timeline Coupling v0 makes that panel interactive without
+changing evidence. Current replay time highlights the nearest 3D sample, the local ±250ms window is
+emphasized, clicked samples request video seek through existing replay controls, and selected
+sample metadata is shown in the panel. The 3D panel does not own playback time and remains
+display-only.
+
 Blueprint 8 Completion Review / Freeze v0 documents the current workstation as a stable
 candidate-evidence milestone. The frozen operator workflow is: build or obtain source runs, build
 ball trajectory candidates, build hit/bounce candidates, open replay in operator view, review

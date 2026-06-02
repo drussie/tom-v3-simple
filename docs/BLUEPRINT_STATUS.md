@@ -657,3 +657,20 @@ provisional 3D ball trajectory candidates
 The v0 view renders a top-down court-plane display of existing 3D candidate samples, unknown height
 status, and selected-marker nearest 3D diagnostic context. It does not render a true 3D ball flight,
 create height truth, change hit/bounce markers, decide in/out, score, or adjudicate evidence.
+
+## Blueprint 15 - 3D Debug Selection / Timeline Coupling
+
+Status: COMPLETE
+
+Blueprint 15 proves:
+
+```text
+replay time / selected marker / clicked 3D sample
++ provisional 3D trajectory debug points
+-> coupled display-only 3D inspection surface
+```
+
+The v0 panel highlights current-time nearest samples, local time-window samples, selected samples,
+and selected-marker diagnostic samples. It can request replay seek through existing replay controls,
+but it does not own playback time, mutate evidence, change hit/bounce markers, decide in/out,
+score, or adjudicate.

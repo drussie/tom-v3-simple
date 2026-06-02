@@ -72,6 +72,7 @@ import type {
   ReplayTimelineItem,
   ReplayTrackletOverlay,
   ReplayTrackPointOverlay,
+  ReplayTrajectory3DDebugPoint,
   ReplayTrajectory3DDebugPayload
 } from "../lib/types";
 import { formatConfidence } from "../lib/timeline";
@@ -89,6 +90,7 @@ import { ReplayTrackletOverlay as ReplayTrackletOverlayLayer } from "./ReplayTra
 import { ReplayVideoPlayer } from "./ReplayVideoPlayer";
 
 const overlayChunkMs = 2000;
+const trajectory3DLocalWindowMs = 250;
 const emptyEventCandidateReviewSummary: Record<string, number> = {
   total_reviews: 0,
   useful: 0,
@@ -480,6 +482,9 @@ export function ReplayWorkstation({
   const [selectedTrajectory3DRunId, setSelectedTrajectory3DRunId] = useState<string | null>(
     initialTrajectory3DRunId
   );
+  const [selectedTrajectory3DPointId, setSelectedTrajectory3DPointId] = useState<string | null>(
+    null
+  );
   const [replayLayerPreset, setReplayLayerPreset] =
     useState<ReplayLayerPreset>(initialReplayLayerPreset);
   const [showDetections, setShowDetections] = useState(initialLayerPresetState.showDetections);
@@ -647,6 +652,10 @@ export function ReplayWorkstation({
   useEffect(() => {
     setSelectedTrajectory3DRunId(initialTrajectory3DRunId);
   }, [initialTrajectory3DRunId]);
+
+  useEffect(() => {
+    setSelectedTrajectory3DPointId(null);
+  }, [selectedTrajectory3DRunId]);
 
   useEffect(() => {
     applyReplayLayerPresetState(initialReplayLayerPreset, initialLayerPresetContext);
@@ -1767,8 +1776,14 @@ export function ReplayWorkstation({
           <CameraGeometryPanel replayInfo={replayInfo} />
           <Trajectory3DPanel replayInfo={replayInfo} />
           <Trajectory3DDebugViewPanel
+            currentTimestampMs={playback.timestampMs}
+            onSelectPoint={(point) => {
+              setSelectedTrajectory3DPointId(point.id);
+              setSeekRequest({ timestampMs: point.timestamp_ms, nonce: Date.now() });
+            }}
             payload={overlayState.chunk?.trajectory_3d_debug ?? null}
             selectedMarker={selectedMarkerSummary}
+            selectedPointId={selectedTrajectory3DPointId}
             selectedTrajectory3DRunId={selectedTrajectory3DRunId}
           />
           <ReplayEventCandidateReviewPanel
@@ -2609,19 +2624,35 @@ function Trajectory3DPanel({ replayInfo }: { replayInfo: ReplayInfo }) {
 }
 
 function Trajectory3DDebugViewPanel({
+  currentTimestampMs,
+  onSelectPoint,
   payload,
+  selectedPointId,
   selectedMarker,
   selectedTrajectory3DRunId
 }: {
+  currentTimestampMs: number;
+  onSelectPoint: (point: ReplayTrajectory3DDebugPoint) => void;
   payload: ReplayTrajectory3DDebugPayload | null;
+  selectedPointId: string | null;
   selectedMarker: ReplayMarkerSummary | null;
   selectedTrajectory3DRunId: string | null;
 }) {
   const selectedDiagnostic = selectedMarker?.event_candidate_3d_diagnostic ?? null;
-  const highlightedPointId = selectedDiagnostic?.nearest_3d_candidate_id ?? null;
+  const markerLinkedPointId = selectedDiagnostic?.nearest_3d_candidate_id ?? null;
   const points = (payload?.points ?? []).filter(
     (point) => point.court_x_m !== null && point.court_y_m !== null
   );
+  const currentNearestPoint = nearestTrajectory3DPoint(points, currentTimestampMs);
+  const currentNearestDeltaMs =
+    currentNearestPoint !== null
+      ? Math.abs(currentNearestPoint.timestamp_ms - currentTimestampMs)
+      : null;
+  const selectedPoint = points.find((point) => point.id === selectedPointId) ?? null;
+  const markerLinkedPoint =
+    markerLinkedPointId !== null
+      ? points.find((point) => point.id === markerLinkedPointId) ?? null
+      : null;
   const dimensions = payload?.court_dimensions;
   const courtWidth = dimensions?.court_width ?? 10.97;
   const courtLength = dimensions?.court_length ?? 23.77;
@@ -2689,22 +2720,48 @@ function Trajectory3DDebugViewPanel({
                 ) : null}
                 {points.map((point) => {
                   const svgPoint = toSvgPoint(point.court_x_m ?? 0, point.court_y_m ?? 0);
-                  const highlighted = point.id === highlightedPointId;
+                  const currentNearest = point.id === currentNearestPoint?.id;
+                  const selected = point.id === selectedPoint?.id;
+                  const markerLinked = point.id === markerLinkedPoint?.id;
+                  const localWindow =
+                    Math.abs(point.timestamp_ms - currentTimestampMs) <= trajectory3DLocalWindowMs;
+                  const emphasized = currentNearest || selected || markerLinked;
+                  const className = [
+                    "trajectory-3d-debug-point",
+                    localWindow ? "local-window" : null,
+                    currentNearest ? "current" : null,
+                    markerLinked ? "marker-linked" : null,
+                    selected ? "selected" : null
+                  ]
+                    .filter(Boolean)
+                    .join(" ");
                   return (
                     <circle
-                      className={
-                        highlighted
-                          ? "trajectory-3d-debug-point highlighted"
-                          : "trajectory-3d-debug-point"
-                      }
+                      aria-label={`3D candidate sample frame ${point.frame}`}
+                      className={className}
                       cx={svgPoint.x}
                       cy={svgPoint.y}
                       key={point.id}
-                      r={highlighted ? 5.5 : 3}
+                      onClick={() => onSelectPoint(point)}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          event.preventDefault();
+                          onSelectPoint(point);
+                        }
+                      }}
+                      r={emphasized ? 5.5 : localWindow ? 4 : 3}
+                      role="button"
+                      tabIndex={0}
                     />
                   );
                 })}
               </svg>
+            </div>
+            <div className="trajectory-3d-debug-legend" aria-label="3D debug legend">
+              <span><i className="legend-dot all" />All candidate samples</span>
+              <span><i className="legend-dot local" />Local time window</span>
+              <span><i className="legend-dot current" />Current-time nearest sample</span>
+              <span><i className="legend-dot marker" />Selected-marker nearest sample</span>
             </div>
             <DetailRow label="candidate points" value={points.length.toString()} />
             <DetailRow label="height model" value={payload.height_model ?? "none_unknown"} />
@@ -2717,11 +2774,55 @@ function Trajectory3DDebugViewPanel({
               }
             />
             <DetailRow label="true 3D reconstruction" value="unavailable" />
+            {currentNearestPoint !== null ? (
+              <>
+                <h3 className="subhead">Current nearest 3D sample</h3>
+                <DetailRow label="frame" value={currentNearestPoint.frame.toString()} />
+                <DetailRow
+                  label="time"
+                  value={`${currentNearestPoint.timestamp_ms}ms`}
+                />
+                <DetailRow
+                  label="delta"
+                  value={
+                    currentNearestDeltaMs !== null
+                      ? `${currentNearestDeltaMs}ms${
+                          currentNearestDeltaMs <= trajectory3DLocalWindowMs
+                            ? " nearby"
+                            : " outside local window"
+                        }`
+                      : "n/a"
+                  }
+                />
+                <DetailRow label="height" value={formatTrajectory3DHeight(currentNearestPoint)} />
+              </>
+            ) : (
+              <p className="empty-state compact">No nearby 3D candidate sample at current time.</p>
+            )}
+            {selectedPoint !== null ? (
+              <>
+                <h3 className="subhead">Selected 3D candidate sample</h3>
+                <DetailRow label="frame" value={selectedPoint.frame.toString()} />
+                <DetailRow label="time" value={`${selectedPoint.timestamp_ms}ms`} />
+                <DetailRow
+                  label="court x/y"
+                  value={`${formatMeters(selectedPoint.court_x_m)} / ${formatMeters(
+                    selectedPoint.court_y_m
+                  )}`}
+                />
+                <DetailRow label="height" value={formatTrajectory3DHeight(selectedPoint)} />
+              </>
+            ) : null}
             {selectedDiagnostic !== null ? (
               <>
+                <h3 className="subhead">Selected marker 3D diagnostic</h3>
                 <DetailRow
-                  label="selected marker diagnostic"
+                  label="label"
                   value={selectedDiagnostic.diagnostic_label}
+                />
+                <DetailRow
+                  label="status"
+                  value={selectedDiagnostic.diagnostic_status}
                 />
                 <DetailRow
                   label="nearest 3D frame"
@@ -2736,7 +2837,14 @@ function Trajectory3DDebugViewPanel({
                       : "n/a"
                   }
                 />
+                <DetailRow
+                  label="height"
+                  value={selectedDiagnostic.height_status === "unknown" ? "unknown" : "n/a"}
+                />
+                <p className="empty-state compact">Diagnostic only. Not truth.</p>
               </>
+            ) : selectedMarker !== null ? (
+              <p className="empty-state compact">No 3D diagnostic linked to selected marker.</p>
             ) : (
               <p className="empty-state compact">
                 Select a hit/bounce candidate marker to inspect its nearest 3D diagnostic sample.
@@ -2751,6 +2859,33 @@ function Trajectory3DDebugViewPanel({
       </div>
     </section>
   );
+}
+
+function nearestTrajectory3DPoint(
+  points: ReplayTrajectory3DDebugPoint[],
+  timestampMs: number
+): ReplayTrajectory3DDebugPoint | null {
+  let nearest: ReplayTrajectory3DDebugPoint | null = null;
+  let nearestDelta = Number.POSITIVE_INFINITY;
+  for (const point of points) {
+    const delta = Math.abs(point.timestamp_ms - timestampMs);
+    if (delta < nearestDelta || (delta === nearestDelta && point.id < (nearest?.id ?? ""))) {
+      nearest = point;
+      nearestDelta = delta;
+    }
+  }
+  return nearest;
+}
+
+function formatMeters(value: number | null): string {
+  return value === null ? "n/a" : `${value.toFixed(2)}m`;
+}
+
+function formatTrajectory3DHeight(point: ReplayTrajectory3DDebugPoint): string {
+  if (point.court_z_m === null || point.court_z_status === "unknown") {
+    return "unknown";
+  }
+  return `${point.court_z_m.toFixed(2)}m candidate`;
 }
 
 function AvailableRunsPanel({ replayInfo }: { replayInfo: ReplayInfo }) {

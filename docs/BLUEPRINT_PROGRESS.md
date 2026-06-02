@@ -1115,3 +1115,14 @@ candidate samples in a compact SVG court view, and highlights the nearest 3D dia
 the selected hit/bounce marker when Blueprint 13 diagnostics are available. Height remains unknown
 in v0, and the view does not create true 3D reconstruction, change event candidates, decide in/out,
 score, or adjudicate evidence.
+
+## Blueprint 15 Status
+
+Status: complete.
+
+The 3D Debug View is now coupled to replay time and selection. It highlights the 3D candidate
+sample nearest to current replay time, emphasizes samples in the local ±250ms window, lets an
+operator click or keyboard-select a sample to request video seek, displays selected sample
+metadata, and continues to highlight the selected-marker nearest diagnostic sample when available.
+The panel remains display-only and does not own playback time, mutate evidence, change
+hit/bounce markers, decide in/out, score, or adjudicate.

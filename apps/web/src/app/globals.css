@@ -2796,17 +2796,83 @@ pre {
 }
 
 .trajectory-3d-debug-point {
+  cursor: pointer;
   fill: #ffd166;
-  opacity: 0.72;
+  opacity: 0.55;
   stroke: #11191c;
   stroke-width: 1.2;
 }
 
-.trajectory-3d-debug-point.highlighted {
+.trajectory-3d-debug-point.local-window {
+  fill: #8ce99a;
+  opacity: 0.78;
+}
+
+.trajectory-3d-debug-point.current {
+  fill: #73d2de;
+  opacity: 1;
+  stroke: #ffffff;
+  stroke-width: 2.5;
+}
+
+.trajectory-3d-debug-point.marker-linked {
   fill: #ffffff;
   opacity: 1;
   stroke: #ff4d6d;
   stroke-width: 3;
+}
+
+.trajectory-3d-debug-point.selected {
+  fill: #ffffff;
+  opacity: 1;
+  stroke: #ffd166;
+  stroke-width: 3;
+}
+
+.trajectory-3d-debug-point:focus-visible {
+  outline: none;
+  stroke: #ffffff;
+  stroke-width: 4;
+}
+
+.trajectory-3d-debug-legend {
+  display: grid;
+  gap: 5px;
+}
+
+.trajectory-3d-debug-legend span {
+  align-items: center;
+  color: var(--muted);
+  display: flex;
+  font-size: 12px;
+  gap: 6px;
+}
+
+.legend-dot {
+  border: 1px solid #11191c;
+  border-radius: 50%;
+  display: inline-block;
+  height: 9px;
+  width: 9px;
+}
+
+.legend-dot.all {
+  background: #ffd166;
+  opacity: 0.55;
+}
+
+.legend-dot.local {
+  background: #8ce99a;
+}
+
+.legend-dot.current {
+  background: #73d2de;
+  border-color: #ffffff;
+}
+
+.legend-dot.marker {
+  background: #ffffff;
+  border-color: #ff4d6d;
 }
 
 .subhead {

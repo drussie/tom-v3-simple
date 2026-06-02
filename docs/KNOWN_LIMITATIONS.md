@@ -164,6 +164,9 @@ This registry makes TOM v3 Simple boundaries explicit.
   court-plane x/y candidate samples and selected-marker diagnostic context, but it does not render
   true 3D ball flight, estimate ball height, change hit/bounce markers, decide in/out, score, or
   adjudicate.
+- Blueprint 15 3D debug selection/timeline coupling is UI navigation only. The panel can highlight
+  current-time samples and request replay seek from clicked samples, but it does not own playback
+  time, mutate evidence, change hit/bounce markers, decide in/out, score, or adjudicate.
 - Blueprint 8 Completion Review / Freeze v0 freezes the current replay evidence workstation as a
   reproducible candidate-evidence milestone only. It does not add or imply hit truth, bounce truth,
   in/out, score, point winner, player identity, manual accept/reject correction, accepted/rejected

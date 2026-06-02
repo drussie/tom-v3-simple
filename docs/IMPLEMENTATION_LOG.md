@@ -2914,3 +2914,27 @@ This milestone adds:
 The debug view renders court-plane candidate x/y samples only. It does not draw fake 3D arcs,
 claim ball height, change hit/bounce candidates, create in/out, score, accepted/rejected lifecycle,
 or adjudication.
+
+## Blueprint 15 3D Debug Selection / Timeline Coupling v0
+
+Status: complete
+
+### Goal
+
+Couple the display-only 3D Debug View to replay time, selected markers, and point selection.
+
+### Notes
+
+This milestone adds:
+
+- current-time nearest 3D sample highlighting
+- local ±250ms time-window emphasis
+- click/keyboard selection for 3D candidate samples
+- replay seek requests from clicked 3D samples
+- selected 3D sample metadata
+- selected-marker nearest 3D diagnostic highlighting
+- legend entries for all/local/current/marker-linked samples
+
+The 3D Debug View may request seek/select behavior through existing replay controls, but it does
+not own playback time. It does not change event candidates, marker arbitration, review annotations,
+in/out, score, accepted/rejected lifecycle, or adjudication.
