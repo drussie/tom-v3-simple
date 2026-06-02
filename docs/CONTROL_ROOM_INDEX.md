@@ -308,6 +308,8 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Reviewed 3D Debug Dataset Export v0](exports/reviewed_3d_debug_dataset_export_v0.md)
 - [Reviewed 3D Debug Dataset Regression v0](exports/reviewed_3d_debug_dataset_regression_v0.md)
 - [Sample Point Reviewed 3D Debug Baseline v0](baselines/sample_point_reviewed_3d_debug_baseline_v0.md)
+- [sample_point Completion Review v0](reviews/sample_point_completion_review_v0.md)
+- [sample_point Expansion Readiness v0](reviews/sample_point_expansion_readiness_v0.md)
 
 ## Development
 

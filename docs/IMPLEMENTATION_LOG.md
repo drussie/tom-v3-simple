@@ -3035,3 +3035,27 @@ This milestone adds:
 The baseline and gate are regression metadata only. The baseline is not truth or training truth.
 The gate does not mutate live observations, event candidates, marker arbitration, 3D candidates,
 3D diagnostics, review annotations, in/out, score, or adjudication.
+
+## Blueprint 20 sample_point Completion Review / Expansion Readiness v0
+
+Status: complete
+
+### Goal
+
+Document the current `sample_point` completion state and freeze the expansion readiness gate before
+introducing a second point.
+
+### Notes
+
+This milestone adds:
+
+- `docs/reviews/sample_point_completion_review_v0.md`
+- `docs/reviews/sample_point_expansion_readiness_v0.md`
+- `docs/agent_reports/blueprint_20_sample_point_completion_review_expansion_readiness_v0_report.md`
+- a runbook section for the sample-point expansion readiness gate
+
+The review confirms six event markers, three hit candidates, three bounce candidates, 68 provisional
+3D trajectory candidates with unknown height, six event candidate 3D diagnostics, one event-marker
+review, zero 3D debug reviews, and a no-drift reviewed 3D debug baseline gate. It changes no
+candidate generation, marker arbitration, 3D candidate generation, 3D diagnostics, review
+annotations, replay UI, in/out, score, or adjudication.

@@ -202,6 +202,9 @@ This registry makes TOM v3 Simple boundaries explicit.
 - The sample-point reviewed 3D debug baseline gate is a local regression checkpoint only. It can
   detect drift from the frozen export profile, but it does not prove correctness or change live TOM
   behavior.
+- The sample-point completion/readiness review permits controlled second-point expansion only. It
+  does not prove event marker correctness, marker completeness, 3D reconstruction, in/out, score,
+  training labels, or adjudication.
 - Replay view presets are display defaults only. Operator view hides raw/debug layers by default,
   and debug/audit view enables them, but neither preset changes persisted observations or proves
   evidence correctness.

@@ -1784,3 +1784,104 @@ make tom-v1-verify-reviewed-3d-debug-baseline \
 
 The gate writes local `.data/baselines` and `.data/exports` files. These are generated regression
 artifacts. The baseline is not truth, and drift requires human review before any follow-up work.
+
+## sample_point Expansion Readiness Gate
+
+Use this gate before introducing a controlled second point. It verifies the current `sample_point`
+profile, then records the point snapshot, point candidate evaluation, and reviewed 3D debug export.
+The gate is evidence-only: it does not create truth, training truth, in/out, score, or adjudication.
+
+Verify the reviewed 3D debug baseline:
+
+```bash
+TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_tom_v1_bridge.db \
+make tom-v1-verify-reviewed-3d-debug-baseline \
+  PYTHON=.venv/bin/python \
+  MEDIA_ID=9518fb01-0da1-4344-9a84-ff88ec8e9b1e \
+  EVENT_CANDIDATE_RUN_ID=1b946366-7ec1-426f-8b40-494535a9b3fb \
+  TRAJECTORY_3D_RUN_ID=ea76ccab-c51d-4a63-9682-9fd0bbb83f14 \
+  CAMERA_GEOMETRY_ID=5afa67fb-7f6e-41eb-b4aa-b1100a97ee97
+```
+
+Expected:
+
+- `ok`: true
+- `status`: `completed`
+- `drift_detected`: false
+- `breaking_drift_detected`: false
+- `baseline_is_not_truth`: true
+
+Build the point evidence snapshot:
+
+```bash
+TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_tom_v1_bridge.db \
+make tom-v1-point-evidence-snapshot \
+  PYTHON=.venv/bin/python \
+  MEDIA_ID=9518fb01-0da1-4344-9a84-ff88ec8e9b1e \
+  EVENT_CANDIDATE_RUN_ID=1b946366-7ec1-426f-8b40-494535a9b3fb
+```
+
+Expected:
+
+- `marker_summary`: 6
+- `trajectory_3d_summary`: available
+- `event_candidate_3d_diagnostic_summary`: available
+- `trajectory_3d_debug_review_summary`: present
+- warnings preserve candidate-only, not-truth, and no-adjudication boundaries
+
+Evaluate point candidates:
+
+```bash
+TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_tom_v1_bridge.db \
+make tom-v1-evaluate-point-candidates \
+  PYTHON=.venv/bin/python \
+  MEDIA_ID=9518fb01-0da1-4344-9a84-ff88ec8e9b1e \
+  EVENT_CANDIDATE_RUN_ID=1b946366-7ec1-426f-8b40-494535a9b3fb
+```
+
+Expected:
+
+- `final_marker_count`: 6
+- `hit_candidate`: 3
+- `bounce_candidate`: 3
+- `trajectory_3d_readiness`: available
+- `event_candidate_3d_diagnostics`: available
+- reviewed event-marker count remains 1
+
+Export the reviewed 3D debug dataset:
+
+```bash
+TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_tom_v1_bridge.db \
+make tom-v1-export-reviewed-3d-debug-dataset \
+  PYTHON=.venv/bin/python \
+  MEDIA_ID=9518fb01-0da1-4344-9a84-ff88ec8e9b1e \
+  EVENT_CANDIDATE_RUN_ID=1b946366-7ec1-426f-8b40-494535a9b3fb \
+  TRAJECTORY_3D_RUN_ID=ea76ccab-c51d-4a63-9682-9fd0bbb83f14 \
+  CAMERA_GEOMETRY_ID=5afa67fb-7f6e-41eb-b4aa-b1100a97ee97 \
+  FORMAT=json \
+  OUTPUT=.data/exports/reviewed_3d_debug_dataset_sample_point.current.json
+```
+
+Expected:
+
+- `event_marker_count`: 6
+- `trajectory_3d_candidate_count`: 68
+- `event_candidate_3d_diagnostic_count`: 6
+- `event_marker_review_count`: 1
+- `not_truth`: true
+- `not_training_truth`: true
+
+Then run the normal validation suite:
+
+```bash
+.venv/bin/python -m pytest -q
+ruff check .
+git diff --check
+cd apps/web
+npm run lint
+npm run build
+npm audit --omit=dev
+cd ../..
+```
+
+Only proceed to a second point if the baseline gate passes and the validation suite is clean.
