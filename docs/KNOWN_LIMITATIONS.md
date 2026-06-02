@@ -205,6 +205,9 @@ This registry makes TOM v3 Simple boundaries explicit.
 - The sample-point completion/readiness review permits controlled second-point expansion only. It
   does not prove event marker correctness, marker completeness, 3D reconstruction, in/out, score,
   training labels, or adjudication.
+- Second-point ingestion smoke only proves that one additional local video can be indexed and
+  opened in replay. It is not a multi-point benchmark, generalization claim, truth source, or event
+  generation result.
 - Replay view presets are display defaults only. Operator view hides raw/debug layers by default,
   and debug/audit view enables them, but neither preset changes persisted observations or proves
   evidence correctness.

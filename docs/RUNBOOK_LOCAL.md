@@ -1885,3 +1885,54 @@ cd ../..
 ```
 
 Only proceed to a second point if the baseline gate passes and the validation suite is clean.
+
+## Second Point Ingestion / Replay Smoke
+
+Use this smoke after the `sample_point` expansion readiness gate passes. The second point is a
+single additional evidence sample only. It is not a generalization claim, benchmark, truth source,
+or event-generation milestone.
+
+Ingest one local second-point video:
+
+```bash
+TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_second_point_smoke.db \
+make tom-v1-ingest-second-point-smoke \
+  PYTHON=.venv/bin/python \
+  SECOND_POINT_MEDIA_PATH=/absolute/path/to/second_point.mp4
+```
+
+Optional generated manifest:
+
+```bash
+SECOND_POINT_MANIFEST_OUTPUT=.data/second_point/second_point_smoke_manifest.json
+```
+
+Expected:
+
+- `ok`: true
+- `status`: `completed`
+- `smoke_type`: `second_point_ingestion_evidence_replay_smoke`
+- `media_id`: present
+- `replay_url`: present
+- `not_truth`: true
+- `not_generalization_claim`: true
+- `does_not_change_sample_point`: true
+
+Missing media path returns `missing_second_point_media_path`. A nonexistent file returns
+`second_point_media_path_not_found`.
+
+Open the returned `replay_url`. For Blueprint 21 it is valid if the replay shows only indexed video
+playback and no event/3D candidate layers. Missing event candidates, missing 3D candidates, and no
+review annotations should not crash replay.
+
+After the smoke, verify `sample_point` remains protected:
+
+```bash
+TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_tom_v1_bridge.db \
+make tom-v1-verify-reviewed-3d-debug-baseline \
+  PYTHON=.venv/bin/python \
+  MEDIA_ID=9518fb01-0da1-4344-9a84-ff88ec8e9b1e \
+  EVENT_CANDIDATE_RUN_ID=1b946366-7ec1-426f-8b40-494535a9b3fb \
+  TRAJECTORY_3D_RUN_ID=ea76ccab-c51d-4a63-9682-9fd0bbb83f14 \
+  CAMERA_GEOMETRY_ID=5afa67fb-7f6e-41eb-b4aa-b1100a97ee97
+```

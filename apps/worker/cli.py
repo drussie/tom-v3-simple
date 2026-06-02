@@ -65,6 +65,7 @@ from apps.worker.services.reviewed_3d_debug_dataset_export import (
 from apps.worker.services.reviewed_3d_debug_dataset_regression import (
     compare_reviewed_3d_debug_dataset_exports,
 )
+from apps.worker.services.second_point_smoke import run_second_point_ingestion_smoke
 from apps.worker.services.tracklet_builder import build_tracklets_from_detection_run
 from apps.worker.services.yolo_model_registry import register_yolo_model
 
@@ -118,6 +119,26 @@ def main() -> None:
     index_parser.add_argument("--storage-root", default=".data/media")
     index_parser.add_argument("--skip-create-db", action="store_true")
     index_parser.set_defaults(handler=_handle_index_media)
+
+    second_point_smoke_parser = subcommands.add_parser(
+        "ingest-second-point-smoke",
+        help="Index one additional local point/video for replay smoke only.",
+    )
+    second_point_smoke_parser.add_argument("--media-path")
+    second_point_smoke_parser.add_argument(
+        "--run-name",
+        default="second-point-ingestion-smoke-v0",
+    )
+    second_point_smoke_parser.add_argument("--viewer-base-url", default="http://127.0.0.1:3000")
+    second_point_smoke_parser.add_argument("--storage-root", default=".data/media")
+    second_point_smoke_parser.add_argument(
+        "--copy-to-storage",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+    )
+    second_point_smoke_parser.add_argument("--manifest-output")
+    second_point_smoke_parser.add_argument("--skip-create-db", action="store_true")
+    second_point_smoke_parser.set_defaults(handler=_handle_ingest_second_point_smoke)
 
     gameplay_parser = subcommands.add_parser(
         "run-gameplay-adapter",
@@ -1385,6 +1406,21 @@ def _handle_index_media(session: Session, args: argparse.Namespace) -> dict[str,
         "height": media.height,
         "frame_time_summary": media.metadata_jsonb.get("frame_time_index"),
     }
+
+
+def _handle_ingest_second_point_smoke(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    return run_second_point_ingestion_smoke(
+        session=session,
+        media_path=args.media_path,
+        run_name=args.run_name,
+        viewer_base_url=args.viewer_base_url,
+        storage_root=args.storage_root,
+        copy_to_storage=args.copy_to_storage,
+        manifest_output=args.manifest_output,
+    )
 
 
 def _handle_run_gameplay_adapter(session: Session, args: argparse.Namespace) -> dict[str, object]:

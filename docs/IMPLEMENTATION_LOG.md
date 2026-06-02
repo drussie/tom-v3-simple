@@ -3059,3 +3059,29 @@ The review confirms six event markers, three hit candidates, three bounce candid
 review, zero 3D debug reviews, and a no-drift reviewed 3D debug baseline gate. It changes no
 candidate generation, marker arbitration, 3D candidate generation, 3D diagnostics, review
 annotations, replay UI, in/out, score, or adjudication.
+
+## Blueprint 21 Second Point Ingestion / Evidence Replay Smoke v0
+
+Status: complete
+
+### Goal
+
+Introduce one additional local point/video as an isolated evidence sample and prove it can open in
+Replay Workstation without changing the protected `sample_point` baseline.
+
+### Notes
+
+This milestone adds:
+
+- `apps.worker.services.second_point_smoke`
+- `ingest-second-point-smoke` worker CLI command
+- `tom-v1-ingest-second-point-smoke` Make helper
+- `docs/blueprints/blueprint_21_second_point_ingestion_evidence_replay_smoke_v0.md`
+- `docs/reviews/second_point_ingestion_smoke_v0.md`
+- `docs/agent_reports/blueprint_21_second_point_ingestion_evidence_replay_smoke_v0_report.md`
+
+The smoke path validates an operator-provided local video path, indexes it with existing media
+ingestion/probe/storage code, and returns a replay URL. A second point with no event candidates and
+no 3D candidates is valid. This milestone changes no hit/bounce logic, marker arbitration, 3D
+candidate generation, 3D diagnostics, review annotations, replay semantics, in/out, score, or
+adjudication.

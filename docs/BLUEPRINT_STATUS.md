@@ -22,9 +22,10 @@
 - Blueprint 18: COMPLETE
 - Blueprint 19: COMPLETE
 - Blueprint 20: COMPLETE
+- Blueprint 21: COMPLETE
 - TOM v3 Simple: COMPLETE
 
-TOM v3 Simple is complete as a lightweight local observation/evidence platform. Blueprint 6 is complete as the visual replay/operator workstation layer. Blueprint 7 is complete as the real perception runtime layer for optional real detection, real-detection-derived candidate tracklets, and optional real pose keypoint evidence. Blueprint 8 is frozen as the visual evidence workstation milestone: real/fixture court evidence, smoothed motion candidates, court projection candidates, ball trajectory candidates, hit/bounce event candidates, marker-level arbitration, replay marker inspection, event candidate review, and point evidence snapshots remain candidate evidence only. Blueprint 9 is complete with manual candidate review annotations that attach operator metadata to candidate markers and missing-candidate moments without creating truth or adjudication. Blueprint 10 is complete with a read-only evaluation harness that summarizes generated candidate markers and Blueprint 9 review metadata. Blueprint 11 is complete with declared camera/court geometry evidence for future 3D readiness. Blueprint 12 is complete with provisional 3D ball trajectory candidate evidence that keeps height unknown by default and does not create 3D truth. Blueprints 13 through 16 add diagnostic-only 3D marker context, a display-only 3D Debug View, replay-time/selection coupling, and 3D debug review annotations without creating 3D truth, hit/bounce truth, in/out, score, or adjudication. Blueprints 17 through 19 add reviewed 3D debug dataset export, export-to-export regression reporting, and a local sample-point baseline gate without treating exported labels or baselines as truth. Blueprint 20 freezes the sample-point completion/readiness review and permits only controlled second-point expansion under the same candidate-only contract.
+TOM v3 Simple is complete as a lightweight local observation/evidence platform. Blueprint 6 is complete as the visual replay/operator workstation layer. Blueprint 7 is complete as the real perception runtime layer for optional real detection, real-detection-derived candidate tracklets, and optional real pose keypoint evidence. Blueprint 8 is frozen as the visual evidence workstation milestone: real/fixture court evidence, smoothed motion candidates, court projection candidates, ball trajectory candidates, hit/bounce event candidates, marker-level arbitration, replay marker inspection, event candidate review, and point evidence snapshots remain candidate evidence only. Blueprint 9 is complete with manual candidate review annotations that attach operator metadata to candidate markers and missing-candidate moments without creating truth or adjudication. Blueprint 10 is complete with a read-only evaluation harness that summarizes generated candidate markers and Blueprint 9 review metadata. Blueprint 11 is complete with declared camera/court geometry evidence for future 3D readiness. Blueprint 12 is complete with provisional 3D ball trajectory candidate evidence that keeps height unknown by default and does not create 3D truth. Blueprints 13 through 16 add diagnostic-only 3D marker context, a display-only 3D Debug View, replay-time/selection coupling, and 3D debug review annotations without creating 3D truth, hit/bounce truth, in/out, score, or adjudication. Blueprints 17 through 19 add reviewed 3D debug dataset export, export-to-export regression reporting, and a local sample-point baseline gate without treating exported labels or baselines as truth. Blueprint 20 freezes the sample-point completion/readiness review and permits only controlled second-point expansion under the same candidate-only contract. Blueprint 21 adds that controlled second-point ingestion/replay smoke path without claiming generalization.
 
 ## Blueprint 1 - Media, Observation Store, Viewer Foundation
 
@@ -770,3 +771,22 @@ diagnostics, one event-marker review, zero 3D debug reviews, and a no-drift revi
 baseline gate. The readiness verdict allows one controlled second-point smoke only. It does not
 create truth, training truth, in/out, score, point state, accepted/rejected lifecycle, or
 adjudication.
+
+## Blueprint 21 - Second Point Ingestion / Evidence Replay Smoke
+
+Status: COMPLETE
+
+Blueprint 21 proves:
+
+```text
+operator-provided local second point video
+-> existing media indexing path
+-> new media_id
+-> Replay Workstation URL
+```
+
+The smoke command validates a local media path, indexes it through the existing media ingestion
+path, and returns a replay URL. A second media asset with no event candidates and no 3D candidates
+is valid for this milestone. This is a single additional evidence sample only; it is not a
+generalization claim and does not create event logic, marker arbitration, 3D reconstruction, truth,
+in/out, score, or adjudication.

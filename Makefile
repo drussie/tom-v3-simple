@@ -52,6 +52,9 @@ HEIGHT_MODEL ?= none_unknown
 TIME_WINDOW_MS ?= 250
 EVENT_CANDIDATE_RUN_NAME ?= hit-bounce-candidate-evidence-v0
 EVENT_CANDIDATE_RUN_ID ?=
+SECOND_POINT_MEDIA_PATH ?=
+SECOND_POINT_RUN_NAME ?= second-point-ingestion-smoke-v0
+SECOND_POINT_MANIFEST_OUTPUT ?=
 VERBOSE ?= false
 HIT_BOUNCE_VERBOSE ?= false
 INCLUDE_OBSERVATION_IDS ?= false
@@ -143,7 +146,7 @@ DERIVE_LINES ?= true
 
 export TOM_V3_DATABASE_URL
 
-.PHONY: install web-install test lint migrate api seed verify index-media run-gameplay index-and-run-gameplay run-detection index-and-run-detection extract-frame-artifacts build-tracklets run-pose export-tracklet-review-dataset court-review-export demo demo-fixture demo-plan demo-reset demo-export demo-open replay-open completion-audit completion-check yolo-probe yolo-smoke yolo-runtime-probe register-yolo-model smoke-real-yolo-local real-detection real-pose tom-v1-yolo-probe tom-v1-ball-detection tom-v1-player-detection tom-v1-tracklets tom-v1-main-subjects tom-v1-main-player-tracks tom-v1-pose tom-v1-pose-main-subjects tom-v1-pose-main-tracks tom-v1-motion-smoothing tom-v1-court-keypoints-probe tom-v1-court-keypoints tom-v1-court-keypoint-audit tom-v1-object-court-projection tom-v1-ball-court-trajectory tom-v1-build-3d-ball-trajectory-candidates tom-v1-build-event-candidate-3d-diagnostics tom-v1-export-reviewed-3d-debug-dataset tom-v1-compare-reviewed-3d-debug-dataset tom-v1-freeze-reviewed-3d-debug-baseline tom-v1-verify-reviewed-3d-debug-baseline tom-v1-hit-bounce-candidates tom-v1-hit-bounce-candidates-verbose tom-v1-point-evidence-snapshot tom-v1-evaluate-point-candidates tom-v1-declare-camera-geometry court-fixture homography-candidates projection-diagnostics web web-build web-lint smoke all-checks
+.PHONY: install web-install test lint migrate api seed verify index-media run-gameplay index-and-run-gameplay run-detection index-and-run-detection extract-frame-artifacts build-tracklets run-pose export-tracklet-review-dataset court-review-export demo demo-fixture demo-plan demo-reset demo-export demo-open replay-open completion-audit completion-check yolo-probe yolo-smoke yolo-runtime-probe register-yolo-model smoke-real-yolo-local real-detection real-pose tom-v1-yolo-probe tom-v1-ball-detection tom-v1-player-detection tom-v1-tracklets tom-v1-main-subjects tom-v1-main-player-tracks tom-v1-pose tom-v1-pose-main-subjects tom-v1-pose-main-tracks tom-v1-motion-smoothing tom-v1-court-keypoints-probe tom-v1-court-keypoints tom-v1-court-keypoint-audit tom-v1-object-court-projection tom-v1-ball-court-trajectory tom-v1-build-3d-ball-trajectory-candidates tom-v1-build-event-candidate-3d-diagnostics tom-v1-export-reviewed-3d-debug-dataset tom-v1-compare-reviewed-3d-debug-dataset tom-v1-freeze-reviewed-3d-debug-baseline tom-v1-verify-reviewed-3d-debug-baseline tom-v1-hit-bounce-candidates tom-v1-hit-bounce-candidates-verbose tom-v1-point-evidence-snapshot tom-v1-evaluate-point-candidates tom-v1-declare-camera-geometry tom-v1-ingest-second-point-smoke court-fixture homography-candidates projection-diagnostics web web-build web-lint smoke all-checks
 
 install:
 	$(PYTHON) -m pip install -e ".[dev]"
@@ -173,6 +176,10 @@ verify:
 index-media:
 	@if [ -z "$(SOURCE_PATH)" ]; then echo "SOURCE_PATH is required: make index-media SOURCE_PATH=/path/to/video.mp4"; exit 1; fi
 	$(PYTHON) -m apps.worker.cli index-media --source-path "$(SOURCE_PATH)" --storage-root "$(STORAGE_ROOT)"
+
+tom-v1-ingest-second-point-smoke:
+	@if [ -z "$(SECOND_POINT_MEDIA_PATH)" ]; then echo "missing_second_point_media_path: SECOND_POINT_MEDIA_PATH is required"; exit 1; fi
+	$(PYTHON) -m apps.worker.cli ingest-second-point-smoke --media-path "$(SECOND_POINT_MEDIA_PATH)" --run-name "$(SECOND_POINT_RUN_NAME)" --viewer-base-url "$(VIEWER_BASE_URL)" --storage-root "$(STORAGE_ROOT)" $(if $(SECOND_POINT_MANIFEST_OUTPUT),--manifest-output "$(SECOND_POINT_MANIFEST_OUTPUT)",)
 
 run-gameplay:
 	@if [ -z "$(MEDIA_ID)" ]; then echo "MEDIA_ID is required: make run-gameplay MEDIA_ID=<media_id>"; exit 1; fi

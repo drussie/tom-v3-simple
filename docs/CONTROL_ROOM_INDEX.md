@@ -310,6 +310,8 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Sample Point Reviewed 3D Debug Baseline v0](baselines/sample_point_reviewed_3d_debug_baseline_v0.md)
 - [sample_point Completion Review v0](reviews/sample_point_completion_review_v0.md)
 - [sample_point Expansion Readiness v0](reviews/sample_point_expansion_readiness_v0.md)
+- [Blueprint 21 Second Point Ingestion / Evidence Replay Smoke v0](blueprints/blueprint_21_second_point_ingestion_evidence_replay_smoke_v0.md)
+- [second_point Ingestion Smoke v0](reviews/second_point_ingestion_smoke_v0.md)
 
 ## Development
 

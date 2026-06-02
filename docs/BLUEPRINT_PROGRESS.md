@@ -2,7 +2,7 @@
 
 ## Current Progress Gauge
 
-Current: Blueprints 1, 2, 3, 4, 5, 6, 7, and 8 complete/frozen; Blueprint 9 manual candidate review annotations are complete; Blueprint 10 benchmark/evaluation harness is complete; Blueprint 11 3D readiness / camera geometry evidence is complete; Blueprint 12 3D ball trajectory candidate evidence is complete; Blueprints 13 through 16 add diagnostic-only 3D marker context, the 3D Debug View, selection/timeline coupling, and 3D debug review annotations; Blueprint 17 exports reviewed 3D debug datasets; Blueprint 18 compares those exports for deterministic drift; Blueprint 19 freezes and verifies a local sample-point reviewed 3D debug baseline; Blueprint 20 completes the sample-point review and controlled expansion readiness freeze; TOM v3 Simple remains an observation-only evidence platform.
+Current: Blueprints 1, 2, 3, 4, 5, 6, 7, and 8 complete/frozen; Blueprint 9 manual candidate review annotations are complete; Blueprint 10 benchmark/evaluation harness is complete; Blueprint 11 3D readiness / camera geometry evidence is complete; Blueprint 12 3D ball trajectory candidate evidence is complete; Blueprints 13 through 16 add diagnostic-only 3D marker context, the 3D Debug View, selection/timeline coupling, and 3D debug review annotations; Blueprint 17 exports reviewed 3D debug datasets; Blueprint 18 compares those exports for deterministic drift; Blueprint 19 freezes and verifies a local sample-point reviewed 3D debug baseline; Blueprint 20 completes the sample-point review and controlled expansion readiness freeze; Blueprint 21 adds a controlled second-point ingestion/replay smoke; TOM v3 Simple remains an observation-only evidence platform.
 
 ## Current
 
@@ -1177,3 +1177,12 @@ The frozen profile is six event markers, 68 provisional 3D trajectory candidates
 candidate 3D diagnostics, one event-marker review, zero 3D debug reviews, and a no-drift baseline
 gate. The next recommended milestone is a controlled second-point ingestion/replay smoke, not
 multi-point generalization or truth/adjudication.
+
+## Blueprint 21 Status
+
+Status: complete.
+
+TOM v3 can now index a single operator-provided second-point video through the existing media path
+and return a Replay Workstation URL. The smoke explicitly allows an empty candidate state for the
+second media asset, preserves `sample_point` as the protected baseline, and does not claim
+multi-point generalization.
