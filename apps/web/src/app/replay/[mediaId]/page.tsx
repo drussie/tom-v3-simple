@@ -21,6 +21,7 @@ interface ReplayPageProps {
     courtProjectionRunId?: string;
     ballTrajectoryRunId?: string;
     eventCandidateRunId?: string;
+    trajectory3dRunId?: string;
     viewPreset?: string;
   }>;
 }

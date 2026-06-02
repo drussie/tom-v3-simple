@@ -58,6 +58,7 @@ export interface FetchReplayOverlayChunkInput {
   courtProjectionRunId?: string | null;
   ballTrajectoryRunId?: string | null;
   eventCandidateRunId?: string | null;
+  trajectory3dRunId?: string | null;
   courtTemporalPersistence?: string | null;
   courtPersistenceMaxGapMs?: number | null;
   minConfidence?: number | null;
@@ -80,6 +81,7 @@ export async function fetchReplayOverlayChunk({
   courtProjectionRunId = null,
   ballTrajectoryRunId = null,
   eventCandidateRunId = null,
+  trajectory3dRunId = null,
   courtTemporalPersistence = null,
   courtPersistenceMaxGapMs = null,
   minConfidence = null,
@@ -123,6 +125,9 @@ export async function fetchReplayOverlayChunk({
   }
   if (eventCandidateRunId !== null) {
     params.set("event_candidate_run_id", eventCandidateRunId);
+  }
+  if (trajectory3dRunId !== null) {
+    params.set("trajectory_3d_run_id", trajectory3dRunId);
   }
   if (courtTemporalPersistence !== null) {
     params.set("court_temporal_persistence", courtTemporalPersistence);

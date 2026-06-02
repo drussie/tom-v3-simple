@@ -2892,3 +2892,25 @@ This milestone adds:
 The diagnostics link each final marker to nearby 3D trajectory samples when available. They do not
 change hit/bounce classification, marker arbitration, candidate counts, review annotations, 3D
 trajectory rows, in/out, score, accepted/rejected lifecycle, or adjudication.
+
+## Blueprint 14 3D Trajectory Debug View v0
+
+Status: complete
+
+### Goal
+
+Add a display-only Replay Workstation debug view for existing 3D trajectory candidate evidence.
+
+### Notes
+
+This milestone adds:
+
+- replay `trajectory_3d_debug` payloads for selected `trajectory3dRunId`
+- TypeScript types for 3D debug court dimensions and candidate points
+- Replay Workstation 3D Debug View SVG panel
+- selected-marker nearest 3D sample highlighting from Blueprint 13 diagnostics
+- replay API tests for available and unavailable debug payload states
+
+The debug view renders court-plane candidate x/y samples only. It does not draw fake 3D arcs,
+claim ball height, change hit/bounce candidates, create in/out, score, accepted/rejected lifecycle,
+or adjudication.

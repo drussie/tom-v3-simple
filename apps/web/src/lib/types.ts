@@ -366,6 +366,58 @@ export interface ReplayTrajectory3DSummary {
   no_adjudication?: boolean;
 }
 
+export interface ReplayTrajectory3DDebugCourtDimensions {
+  units: string;
+  court_length: number;
+  court_width: number;
+  net_height_center: number;
+  net_height_posts: number;
+}
+
+export interface ReplayTrajectory3DDebugPoint {
+  id: string;
+  frame: number;
+  frame_number: number;
+  timestamp_ms: number;
+  court_x_m: number | null;
+  court_y_m: number | null;
+  court_z_m: number | null;
+  court_z_status: string;
+  height_model: string;
+  velocity_available: boolean;
+  speed_mps?: number | null;
+  trajectory_3d_candidate_only: boolean;
+  not_3d_truth: boolean;
+  height_not_verified: boolean;
+  no_adjudication: boolean;
+}
+
+export interface ReplayTrajectory3DDebugPayload {
+  available: boolean;
+  status?: string;
+  trajectory_3d_run_id?: string | null;
+  camera_geometry_id?: string | null;
+  media_id?: string | null;
+  height_model?: string | null;
+  known_height_count?: number;
+  unknown_height_count?: number;
+  true_3d_reconstruction_available?: boolean;
+  court_dimensions?: ReplayTrajectory3DDebugCourtDimensions;
+  points?: ReplayTrajectory3DDebugPoint[];
+  warnings?: {
+    display_only?: boolean;
+    trajectory_3d_candidate_only?: boolean;
+    not_3d_truth?: boolean;
+    height_not_verified?: boolean;
+    no_adjudication?: boolean;
+  };
+  display_only?: boolean;
+  trajectory_3d_candidate_only?: boolean;
+  not_3d_truth?: boolean;
+  height_not_verified?: boolean;
+  no_adjudication?: boolean;
+}
+
 export interface ReplayEventCandidate3DDiagnostic {
   id: string;
   event_observation_id: string;
@@ -1196,6 +1248,7 @@ export interface ReplayOverlayChunk {
   marker_summary: ReplayMarkerSummary[];
   event_candidate_3d_diagnostics?: ReplayEventCandidate3DDiagnostic[];
   event_candidate_3d_diagnostic_summary?: ReplayEventCandidate3DDiagnosticSummary;
+  trajectory_3d_debug?: ReplayTrajectory3DDebugPayload;
   court_temporal_persistence?: ReplayCourtTemporalPersistence | string;
   court_persistence_max_gap_ms?: number;
   observation_only: boolean;

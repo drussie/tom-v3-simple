@@ -302,6 +302,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Camera / View Evidence Layer v0](court/camera_view_evidence_layer_v0.md)
 - [Homography Candidate Persistence v0](court/homography_candidate_persistence_v0.md)
 - [Event Candidate 3D Diagnostics v0](geometry/event_candidate_3d_diagnostics_v0.md)
+- [Trajectory 3D Debug View v0](replay/trajectory_3d_debug_view_v0.md)
 
 ## Development
 

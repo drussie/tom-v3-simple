@@ -147,6 +147,7 @@ def build_replay_overlay_chunk(
     court_projection_run_id: str | None = None,
     ball_trajectory_run_id: str | None = None,
     event_candidate_run_id: str | None = None,
+    trajectory_3d_run_id: str | None = None,
     court_temporal_persistence: str = COURT_TEMPORAL_PERSISTENCE_CARRY_FORWARD,
     court_persistence_max_gap_ms: int = DEFAULT_COURT_PERSISTENCE_MAX_GAP_MS,
     min_confidence: float | None = None,
@@ -395,6 +396,11 @@ def build_replay_overlay_chunk(
             "no_adjudication": True,
         }
     )
+    trajectory_3d_debug = build_trajectory_3d_debug_payload(
+        session=session,
+        media_id=media.id,
+        trajectory_3d_run_id=trajectory_3d_run_id,
+    )
     return {
         "media_id": media.id,
         "start_ms": start_ms,
@@ -422,6 +428,7 @@ def build_replay_overlay_chunk(
         "marker_summary": marker_summary,
         "event_candidate_3d_diagnostics": event_candidate_3d_diagnostics,
         "event_candidate_3d_diagnostic_summary": event_candidate_3d_summary,
+        "trajectory_3d_debug": trajectory_3d_debug,
         "court_temporal_persistence": court_temporal_persistence,
         "court_persistence_max_gap_ms": court_persistence_max_gap_ms,
         "observation_only": True,
@@ -3746,6 +3753,127 @@ def _trajectory_3d_summary(session: Session, media_id: str) -> dict[str, Any]:
         "true_3d_reconstruction_available": False,
         "3d_ball_trajectory_truth_available": False,
         "geometry_evidence_only": True,
+        "no_adjudication": True,
+    }
+
+
+def build_trajectory_3d_debug_payload(
+    session: Session,
+    *,
+    media_id: str,
+    trajectory_3d_run_id: str | None = None,
+) -> dict[str, Any]:
+    if trajectory_3d_run_id is None:
+        return {
+            "available": False,
+            "status": "no_trajectory_3d_run_selected",
+            "display_only": True,
+            "trajectory_3d_candidate_only": True,
+            "not_3d_truth": True,
+            "height_not_verified": True,
+            "no_adjudication": True,
+        }
+
+    rows = session.scalars(
+        select(BallTrajectory3DCandidate)
+        .where(
+            BallTrajectory3DCandidate.media_id == media_id,
+            BallTrajectory3DCandidate.trajectory_3d_run_id == trajectory_3d_run_id,
+        )
+        .order_by(
+            BallTrajectory3DCandidate.timestamp_ms,
+            BallTrajectory3DCandidate.frame,
+            BallTrajectory3DCandidate.id,
+        )
+    ).all()
+    if not rows:
+        return {
+            "available": False,
+            "status": "no_trajectory_3d_candidates_found",
+            "trajectory_3d_run_id": trajectory_3d_run_id,
+            "display_only": True,
+            "trajectory_3d_candidate_only": True,
+            "not_3d_truth": True,
+            "height_not_verified": True,
+            "no_adjudication": True,
+        }
+
+    first = rows[0]
+    camera_geometry = (
+        session.get(CameraGeometryEvidence, first.camera_geometry_id)
+        if first.camera_geometry_id is not None
+        else None
+    )
+    known_height_count = sum(1 for row in rows if row.court_z_m is not None)
+    return {
+        "available": True,
+        "trajectory_3d_run_id": trajectory_3d_run_id,
+        "camera_geometry_id": first.camera_geometry_id,
+        "media_id": media_id,
+        "height_model": first.height_model,
+        "known_height_count": known_height_count,
+        "unknown_height_count": len(rows) - known_height_count,
+        "true_3d_reconstruction_available": False,
+        "court_dimensions": _trajectory_3d_debug_court_dimensions(camera_geometry),
+        "points": [_trajectory_3d_debug_point(row) for row in rows],
+        "warnings": {
+            "display_only": True,
+            "trajectory_3d_candidate_only": True,
+            "not_3d_truth": True,
+            "height_not_verified": True,
+            "no_adjudication": True,
+        },
+    }
+
+
+def _trajectory_3d_debug_court_dimensions(
+    camera_geometry: CameraGeometryEvidence | None,
+) -> dict[str, Any]:
+    return {
+        "units": camera_geometry.court_units if camera_geometry is not None else "meters",
+        "court_length": (
+            _numeric(camera_geometry.court_length) if camera_geometry is not None else 23.77
+        )
+        or 23.77,
+        "court_width": (
+            _numeric(camera_geometry.court_width) if camera_geometry is not None else 10.97
+        )
+        or 10.97,
+        "net_height_center": (
+            _numeric(camera_geometry.net_height_center) if camera_geometry is not None else 0.914
+        )
+        or 0.914,
+        "net_height_posts": (
+            _numeric(camera_geometry.net_height_posts) if camera_geometry is not None else 1.07
+        )
+        or 1.07,
+    }
+
+
+def _trajectory_3d_debug_point(row: BallTrajectory3DCandidate) -> dict[str, Any]:
+    return {
+        "id": row.id,
+        "frame": row.frame,
+        "frame_number": row.frame,
+        "timestamp_ms": row.timestamp_ms,
+        "court_x_m": _numeric(row.court_x_m),
+        "court_y_m": _numeric(row.court_y_m),
+        "court_z_m": _numeric(row.court_z_m),
+        "court_z_status": row.court_z_status,
+        "height_model": row.height_model,
+        "velocity_available": any(
+            value is not None
+            for value in (
+                row.velocity_x_mps,
+                row.velocity_y_mps,
+                row.velocity_z_mps,
+                row.speed_mps,
+            )
+        ),
+        "speed_mps": _numeric(row.speed_mps),
+        "trajectory_3d_candidate_only": True,
+        "not_3d_truth": True,
+        "height_not_verified": True,
         "no_adjudication": True,
     }
 

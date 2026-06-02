@@ -1684,3 +1684,14 @@ make tom-v1-build-event-candidate-3d-diagnostics \
 Expected output includes `diagnostic_type=event_candidate_3d_diagnostic_evidence`,
 `diagnostic_version=v0`, one diagnostic per final marker when markers exist, and warnings that the
 diagnostics are not truth, not 3D truth, not in/out, not score, and not adjudication.
+
+Open the Blueprint 14 3D Debug View by adding the selected 3D trajectory candidate run:
+
+```text
+http://127.0.0.1:3000/replay/<media_id>?eventCandidateRunId=<event_candidate_run_id>&trajectory3dRunId=<trajectory_3d_run_id>
+```
+
+The Replay Workstation side panel shows a display-only court-plane debug view of existing 3D
+candidate samples. It can highlight the nearest 3D diagnostic sample for a selected marker when
+Blueprint 13 diagnostics exist. Height remains unknown in v0, and the view does not change
+hit/bounce candidates, in/out, score, or adjudication.

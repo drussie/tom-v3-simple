@@ -49,6 +49,7 @@ def get_replay_overlays(
     court_projection_run_id: str | None = None,
     ball_trajectory_run_id: str | None = None,
     event_candidate_run_id: str | None = None,
+    trajectory_3d_run_id: str | None = None,
     court_temporal_persistence: str = Query(default="carry_forward"),
     court_persistence_max_gap_ms: int = Query(
         default=DEFAULT_COURT_PERSISTENCE_MAX_GAP_MS,
@@ -90,6 +91,7 @@ def get_replay_overlays(
         court_projection_run_id=court_projection_run_id,
         ball_trajectory_run_id=ball_trajectory_run_id,
         event_candidate_run_id=event_candidate_run_id,
+        trajectory_3d_run_id=trajectory_3d_run_id,
         court_temporal_persistence=normalized_court_temporal_persistence,
         court_persistence_max_gap_ms=court_persistence_max_gap_ms,
         min_confidence=min_confidence,

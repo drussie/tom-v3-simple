@@ -227,6 +227,69 @@ def test_replay_info_exposes_3d_trajectory_summary(
     )
 
 
+def test_replay_overlay_exposes_trajectory_3d_debug_payload(
+    client: TestClient,
+    db_session: Session,
+) -> None:
+    context = _seed_trajectory_context(db_session)
+    result = build_3d_ball_trajectory_candidates(
+        session=db_session,
+        media_id=context["media"].id,
+        ball_trajectory_run_id=context["trajectory_run"].id,
+        court_projection_run_id=context["projection_run"].id,
+        camera_geometry_id=context["camera_geometry_id"],
+    )
+
+    response = client.get(
+        "/replay/overlays",
+        params={
+            "media_id": context["media"].id,
+            "start_ms": 0,
+            "end_ms": 1000,
+            "layers": "",
+            "trajectory_3d_run_id": result["trajectory_3d_run_id"],
+        },
+    )
+
+    assert response.status_code == 200
+    debug = response.json()["trajectory_3d_debug"]
+    assert debug["available"] is True
+    assert debug["trajectory_3d_run_id"] == result["trajectory_3d_run_id"]
+    assert debug["height_model"] == "none_unknown"
+    assert debug["true_3d_reconstruction_available"] is False
+    assert debug["warnings"]["display_only"] is True
+    assert len(debug["points"]) == 3
+    assert debug["points"][0]["court_x_m"] == pytest.approx(1.097)
+    assert debug["points"][0]["court_z_m"] is None
+    assert debug["points"][0]["court_z_status"] == "unknown"
+
+
+def test_replay_overlay_exposes_trajectory_3d_debug_unavailable_state(
+    client: TestClient,
+    db_session: Session,
+) -> None:
+    media = _seed_media(db_session)
+    db_session.commit()
+
+    response = client.get(
+        "/replay/overlays",
+        params={
+            "media_id": media.id,
+            "start_ms": 0,
+            "end_ms": 1000,
+            "layers": "",
+        },
+    )
+
+    assert response.status_code == 200
+    debug = response.json()["trajectory_3d_debug"]
+    assert debug["available"] is False
+    assert debug["status"] == "no_trajectory_3d_run_selected"
+    assert debug["display_only"] is True
+    assert debug["not_3d_truth"] is True
+    assert debug["no_adjudication"] is True
+
+
 def test_3d_ball_trajectory_outputs_do_not_introduce_adjudication_fields(
     db_session: Session,
 ) -> None:

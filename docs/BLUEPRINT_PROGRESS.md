@@ -1104,3 +1104,14 @@ TOM v3 now has a diagnostic-only bridge from final hit/bounce event candidate ma
 adds a CLI/Make workflow, and surfaces compact diagnostics in replay marker inspection, point
 snapshots, and point candidate evaluations. It does not change event candidate counts or create
 truth, in/out, score, or adjudication.
+
+## Blueprint 14 Status
+
+Status: complete.
+
+TOM v3 now has a display-only 3D Debug View in Replay Workstation. The view loads existing
+`ball_trajectory_3d_candidate` rows through the replay read model, renders court-plane metric x/y
+candidate samples in a compact SVG court view, and highlights the nearest 3D diagnostic sample for
+the selected hit/bounce marker when Blueprint 13 diagnostics are available. Height remains unknown
+in v0, and the view does not create true 3D reconstruction, change event candidates, decide in/out,
+score, or adjudicate evidence.

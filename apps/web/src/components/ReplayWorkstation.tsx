@@ -71,7 +71,8 @@ import type {
   ReplayTimeline,
   ReplayTimelineItem,
   ReplayTrackletOverlay,
-  ReplayTrackPointOverlay
+  ReplayTrackPointOverlay,
+  ReplayTrajectory3DDebugPayload
 } from "../lib/types";
 import { formatConfidence } from "../lib/timeline";
 import { ReplayCourtOverlay as ReplayCourtOverlayLayer } from "./ReplayCourtOverlay";
@@ -117,6 +118,7 @@ interface ReplayWorkstationProps {
     courtProjectionRunId?: string;
     ballTrajectoryRunId?: string;
     eventCandidateRunId?: string;
+    trajectory3dRunId?: string;
     viewPreset?: string;
   };
 }
@@ -396,6 +398,11 @@ export function ReplayWorkstation({
       ),
     [replayInfo.available_runs.event_candidate, selectedRuns.eventCandidateRunId]
   );
+  const initialTrajectory3DRunId = useMemo(
+    () =>
+      selectInitialReplayRun(replayInfo.available_runs.trajectory_3d, selectedRuns.trajectory3dRunId),
+    [replayInfo.available_runs.trajectory_3d, selectedRuns.trajectory3dRunId]
+  );
   const initialCourtTemporalPersistence = useMemo<ReplayCourtTemporalPersistence>(() => {
     return selectedRuns.courtTemporalPersistence === "off" ? "off" : "carry_forward";
   }, [selectedRuns.courtTemporalPersistence]);
@@ -469,6 +476,9 @@ export function ReplayWorkstation({
   );
   const [selectedEventCandidateRunId, setSelectedEventCandidateRunId] = useState<string | null>(
     initialEventCandidateRunId
+  );
+  const [selectedTrajectory3DRunId, setSelectedTrajectory3DRunId] = useState<string | null>(
+    initialTrajectory3DRunId
   );
   const [replayLayerPreset, setReplayLayerPreset] =
     useState<ReplayLayerPreset>(initialReplayLayerPreset);
@@ -633,6 +643,10 @@ export function ReplayWorkstation({
   useEffect(() => {
     setSelectedEventCandidateRunId(initialEventCandidateRunId);
   }, [initialEventCandidateRunId]);
+
+  useEffect(() => {
+    setSelectedTrajectory3DRunId(initialTrajectory3DRunId);
+  }, [initialTrajectory3DRunId]);
 
   useEffect(() => {
     applyReplayLayerPresetState(initialReplayLayerPreset, initialLayerPresetContext);
@@ -833,15 +847,17 @@ export function ReplayWorkstation({
     selectedCourtProjectionRunId ?? "none",
     selectedBallTrajectoryRunId ?? "none",
     selectedEventCandidateRunId ?? "none",
+    selectedTrajectory3DRunId ?? "none",
     courtTemporalPersistence,
     courtPersistenceMaxGapMs,
     layersParam || "none",
     currentChunkStart,
     currentChunkEnd
   ].join(":");
+  const needsOverlayChunk = enabledLayers.length > 0 || selectedTrajectory3DRunId !== null;
 
   useEffect(() => {
-    if (enabledLayers.length === 0) {
+    if (!needsOverlayChunk) {
       setOverlayState({ chunk: null, loading: false, error: null });
       return;
     }
@@ -869,6 +885,7 @@ export function ReplayWorkstation({
       courtProjectionRunId: selectedCourtProjectionRunId,
       ballTrajectoryRunId: selectedBallTrajectoryRunId,
       eventCandidateRunId: selectedEventCandidateRunId,
+      trajectory3dRunId: selectedTrajectory3DRunId,
       courtTemporalPersistence,
       courtPersistenceMaxGapMs,
       layers: layersParam
@@ -904,6 +921,7 @@ export function ReplayWorkstation({
     selectedCourtRunId,
     selectedCourtProjectionRunId,
     selectedBallTrajectoryRunId,
+    selectedTrajectory3DRunId,
     selectedDetectionRunId,
     selectedHomographyRunId,
     selectedMainPlayerTrackRunId,
@@ -911,7 +929,8 @@ export function ReplayWorkstation({
     selectedPoseRunId,
     selectedProjectionDiagnosticRunId,
     selectedEventCandidateRunId,
-    selectedTrackletRunId
+    selectedTrackletRunId,
+    needsOverlayChunk
   ]);
 
   useEffect(() => {
@@ -1579,6 +1598,7 @@ export function ReplayWorkstation({
             mainPlayerTrackRuns={replayInfo.available_runs.main_player_track}
             motionSmoothingRuns={replayInfo.available_runs.motion_smoothing}
             projectionDiagnosticRuns={replayInfo.available_runs.projection_diagnostic}
+            trajectory3DRuns={replayInfo.available_runs.trajectory_3d}
             replayLayerPreset={replayLayerPreset}
             onReplayLayerPresetChange={handleReplayLayerPresetChange}
             onSelectedCourtRunChange={(runId) => {
@@ -1615,6 +1635,10 @@ export function ReplayWorkstation({
             }}
             onSelectedEventCandidateRunChange={(runId) => {
               setSelectedEventCandidateRunId(runId);
+              setSelectedEvidence(null);
+            }}
+            onSelectedTrajectory3DRunChange={(runId) => {
+              setSelectedTrajectory3DRunId(runId);
               setSelectedEvidence(null);
             }}
             onSelectedPoseRunChange={(runId) => {
@@ -1668,6 +1692,7 @@ export function ReplayWorkstation({
             selectedCourtProjectionRunId={selectedCourtProjectionRunId}
             selectedBallTrajectoryRunId={selectedBallTrajectoryRunId}
             selectedEventCandidateRunId={selectedEventCandidateRunId}
+            selectedTrajectory3DRunId={selectedTrajectory3DRunId}
             selectedTrackletRunId={selectedTrackletRunId}
             showBallCourtProjection={showBallCourtProjection}
             showBallCourtTrajectory={showBallCourtTrajectory}
@@ -1732,6 +1757,7 @@ export function ReplayWorkstation({
             selectedCourtProjectionRunId={selectedCourtProjectionRunId}
             selectedBallTrajectoryRunId={selectedBallTrajectoryRunId}
             selectedEventCandidateRunId={selectedEventCandidateRunId}
+            selectedTrajectory3DRunId={selectedTrajectory3DRunId}
             selectedProjectionDiagnosticRunId={selectedProjectionDiagnosticRunId}
             selectedTrackletRunId={selectedTrackletRunId}
           />
@@ -1740,6 +1766,11 @@ export function ReplayWorkstation({
           <ReplayMediaPanel replayInfo={replayInfo} />
           <CameraGeometryPanel replayInfo={replayInfo} />
           <Trajectory3DPanel replayInfo={replayInfo} />
+          <Trajectory3DDebugViewPanel
+            payload={overlayState.chunk?.trajectory_3d_debug ?? null}
+            selectedMarker={selectedMarkerSummary}
+            selectedTrajectory3DRunId={selectedTrajectory3DRunId}
+          />
           <ReplayEventCandidateReviewPanel
             markers={markerSummaries}
             onSelectMarker={handleMarkerReviewSelect}
@@ -1962,6 +1993,7 @@ function ReplayLayerControls({
   projectionDiagnosticRuns,
   courtProjectionRuns,
   eventCandidateRuns,
+  trajectory3DRuns,
   replayLayerPreset,
   selectedDetectionRunId,
   selectedTrackletRunId,
@@ -1974,6 +2006,7 @@ function ReplayLayerControls({
   selectedCourtProjectionRunId,
   selectedBallTrajectoryRunId,
   selectedEventCandidateRunId,
+  selectedTrajectory3DRunId,
   showDetections,
   detectionDisplayMode,
   showTracklets,
@@ -2010,6 +2043,7 @@ function ReplayLayerControls({
   onSelectedCourtProjectionRunChange,
   onSelectedBallTrajectoryRunChange,
   onSelectedEventCandidateRunChange,
+  onSelectedTrajectory3DRunChange,
   onToggleDetections,
   onDetectionDisplayModeChange,
   onToggleTracklets,
@@ -2046,6 +2080,7 @@ function ReplayLayerControls({
   projectionDiagnosticRuns: ReplayRunSummary[];
   courtProjectionRuns: ReplayRunSummary[];
   eventCandidateRuns: ReplayRunSummary[];
+  trajectory3DRuns: ReplayRunSummary[];
   replayLayerPreset: ReplayLayerPreset;
   selectedDetectionRunId: string | null;
   selectedTrackletRunId: string | null;
@@ -2058,6 +2093,7 @@ function ReplayLayerControls({
   selectedCourtProjectionRunId: string | null;
   selectedBallTrajectoryRunId: string | null;
   selectedEventCandidateRunId: string | null;
+  selectedTrajectory3DRunId: string | null;
   showDetections: boolean;
   detectionDisplayMode: ReplayOverlayDisplayMode;
   showTracklets: boolean;
@@ -2094,6 +2130,7 @@ function ReplayLayerControls({
   onSelectedCourtProjectionRunChange: (runId: string | null) => void;
   onSelectedBallTrajectoryRunChange: (runId: string | null) => void;
   onSelectedEventCandidateRunChange: (runId: string | null) => void;
+  onSelectedTrajectory3DRunChange: (runId: string | null) => void;
   onToggleDetections: (enabled: boolean) => void;
   onDetectionDisplayModeChange: (mode: ReplayOverlayDisplayMode) => void;
   onToggleTracklets: (enabled: boolean) => void;
@@ -2318,6 +2355,12 @@ function ReplayLayerControls({
           onChange={onSelectedEventCandidateRunChange}
           runs={eventCandidateRuns}
           selectedRunId={selectedEventCandidateRunId}
+        />
+        <RunSelect
+          label="3D trajectory candidate run"
+          onChange={onSelectedTrajectory3DRunChange}
+          runs={trajectory3DRuns}
+          selectedRunId={selectedTrajectory3DRunId}
         />
         <p className="evidence-note">
           Overlays are synchronized persisted evidence. Court geometry layers are candidates for
@@ -2565,6 +2608,151 @@ function Trajectory3DPanel({ replayInfo }: { replayInfo: ReplayInfo }) {
   );
 }
 
+function Trajectory3DDebugViewPanel({
+  payload,
+  selectedMarker,
+  selectedTrajectory3DRunId
+}: {
+  payload: ReplayTrajectory3DDebugPayload | null;
+  selectedMarker: ReplayMarkerSummary | null;
+  selectedTrajectory3DRunId: string | null;
+}) {
+  const selectedDiagnostic = selectedMarker?.event_candidate_3d_diagnostic ?? null;
+  const highlightedPointId = selectedDiagnostic?.nearest_3d_candidate_id ?? null;
+  const points = (payload?.points ?? []).filter(
+    (point) => point.court_x_m !== null && point.court_y_m !== null
+  );
+  const dimensions = payload?.court_dimensions;
+  const courtWidth = dimensions?.court_width ?? 10.97;
+  const courtLength = dimensions?.court_length ?? 23.77;
+  const canvasWidth = 260;
+  const canvasHeight = 360;
+  const padding = 18;
+  const drawableWidth = canvasWidth - padding * 2;
+  const drawableHeight = canvasHeight - padding * 2;
+  const toSvgPoint = (courtX: number, courtY: number) => {
+    const x = padding + (courtX / courtWidth) * drawableWidth;
+    const y = padding + (courtY / courtLength) * drawableHeight;
+    return {
+      x: Number.isFinite(x) ? x : padding,
+      y: Number.isFinite(y) ? y : padding
+    };
+  };
+  const pathPoints = points
+    .map((point) => toSvgPoint(point.court_x_m ?? 0, point.court_y_m ?? 0))
+    .map((point) => `${point.x.toFixed(1)},${point.y.toFixed(1)}`)
+    .join(" ");
+
+  return (
+    <section className="panel trajectory-3d-debug-panel">
+      <div className="panel-header">
+        <h2>3D Debug View</h2>
+        <span className="mini-pill">display only</span>
+      </div>
+      <div className="panel-body replay-media-detail">
+        {payload === null ? (
+          <p className="empty-state compact">
+            {selectedTrajectory3DRunId === null
+              ? "No 3D trajectory candidate run is selected."
+              : "3D debug payload has not loaded yet."}
+          </p>
+        ) : payload.available !== true ? (
+          <p className="empty-state compact">
+            {payload.status === "no_trajectory_3d_candidates_found"
+              ? "No 3D trajectory candidate points were found for the selected run."
+              : "No 3D trajectory candidate run is selected."}
+          </p>
+        ) : (
+          <>
+            <div className="trajectory-3d-debug-canvas" aria-label="3D trajectory debug court-plane view">
+              <svg
+                role="img"
+                viewBox={`0 0 ${canvasWidth} ${canvasHeight}`}
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <rect
+                  className="trajectory-3d-debug-court"
+                  height={drawableHeight}
+                  width={drawableWidth}
+                  x={padding}
+                  y={padding}
+                />
+                <line
+                  className="trajectory-3d-debug-net"
+                  x1={padding}
+                  x2={canvasWidth - padding}
+                  y1={padding + drawableHeight / 2}
+                  y2={padding + drawableHeight / 2}
+                />
+                {pathPoints.length > 0 ? (
+                  <polyline className="trajectory-3d-debug-path" points={pathPoints} />
+                ) : null}
+                {points.map((point) => {
+                  const svgPoint = toSvgPoint(point.court_x_m ?? 0, point.court_y_m ?? 0);
+                  const highlighted = point.id === highlightedPointId;
+                  return (
+                    <circle
+                      className={
+                        highlighted
+                          ? "trajectory-3d-debug-point highlighted"
+                          : "trajectory-3d-debug-point"
+                      }
+                      cx={svgPoint.x}
+                      cy={svgPoint.y}
+                      key={point.id}
+                      r={highlighted ? 5.5 : 3}
+                    />
+                  );
+                })}
+              </svg>
+            </div>
+            <DetailRow label="candidate points" value={points.length.toString()} />
+            <DetailRow label="height model" value={payload.height_model ?? "none_unknown"} />
+            <DetailRow
+              label="height"
+              value={
+                (payload.known_height_count ?? 0) > 0
+                  ? `${payload.known_height_count ?? 0} candidate heights`
+                  : "unknown"
+              }
+            />
+            <DetailRow label="true 3D reconstruction" value="unavailable" />
+            {selectedDiagnostic !== null ? (
+              <>
+                <DetailRow
+                  label="selected marker diagnostic"
+                  value={selectedDiagnostic.diagnostic_label}
+                />
+                <DetailRow
+                  label="nearest 3D frame"
+                  value={selectedDiagnostic.nearest_3d_frame?.toString() ?? "n/a"}
+                />
+                <DetailRow
+                  label="nearest time delta"
+                  value={
+                    selectedDiagnostic.nearest_time_delta_ms !== null &&
+                    selectedDiagnostic.nearest_time_delta_ms !== undefined
+                      ? `${selectedDiagnostic.nearest_time_delta_ms}ms`
+                      : "n/a"
+                  }
+                />
+              </>
+            ) : (
+              <p className="empty-state compact">
+                Select a hit/bounce candidate marker to inspect its nearest 3D diagnostic sample.
+              </p>
+            )}
+          </>
+        )}
+        <p className="empty-state compact">
+          This view renders court-plane candidate samples only. It does not draw a 3D arc, claim
+          ball height, change hit/bounce candidates, or adjudicate in/out or score.
+        </p>
+      </div>
+    </section>
+  );
+}
+
 function AvailableRunsPanel({ replayInfo }: { replayInfo: ReplayInfo }) {
   return (
     <section className="panel">
@@ -2642,7 +2830,8 @@ function SelectedRunContext({
   selectedProjectionDiagnosticRunId,
   selectedCourtProjectionRunId,
   selectedBallTrajectoryRunId,
-  selectedEventCandidateRunId
+  selectedEventCandidateRunId,
+  selectedTrajectory3DRunId
 }: {
   replayInfo: ReplayInfo;
   selectedDetectionRunId: string | null;
@@ -2656,6 +2845,7 @@ function SelectedRunContext({
   selectedCourtProjectionRunId: string | null;
   selectedBallTrajectoryRunId: string | null;
   selectedEventCandidateRunId: string | null;
+  selectedTrajectory3DRunId: string | null;
 }) {
   const selected = [
     ["detection", selectedDetectionRunId, replayInfo.available_runs.detection],
@@ -2692,6 +2882,11 @@ function SelectedRunContext({
       "hit/bounce event candidate",
       selectedEventCandidateRunId,
       replayInfo.available_runs.event_candidate
+    ],
+    [
+      "3D trajectory candidate",
+      selectedTrajectory3DRunId,
+      replayInfo.available_runs.trajectory_3d
     ]
   ] as const;
 

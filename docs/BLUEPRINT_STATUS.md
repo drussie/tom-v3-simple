@@ -641,3 +641,19 @@ The v0 layer records nearby 3D sample counts, nearest metric court-plane x/y, he
 conservative diagnostic labels. It does not change event classification, marker arbitration,
 candidate counts, review annotations, in/out, score, point state, accepted/rejected lifecycle,
 automatic correction, or adjudication.
+
+## Blueprint 14 - 3D Trajectory Debug View
+
+Status: COMPLETE
+
+Blueprint 14 proves:
+
+```text
+provisional 3D ball trajectory candidates
++ selected hit/bounce marker diagnostics
+-> replay 3D Debug View
+```
+
+The v0 view renders a top-down court-plane display of existing 3D candidate samples, unknown height
+status, and selected-marker nearest 3D diagnostic context. It does not render a true 3D ball flight,
+create height truth, change hit/bounce markers, decide in/out, score, or adjudicate evidence.

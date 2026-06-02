@@ -2758,6 +2758,57 @@ pre {
   padding: 12px;
 }
 
+.trajectory-3d-debug-canvas {
+  background: #172024;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  display: grid;
+  justify-items: center;
+  overflow: hidden;
+  padding: 8px;
+}
+
+.trajectory-3d-debug-canvas svg {
+  display: block;
+  height: auto;
+  max-width: 100%;
+}
+
+.trajectory-3d-debug-court {
+  fill: #213338;
+  stroke: #9fb4ba;
+  stroke-width: 1.4;
+}
+
+.trajectory-3d-debug-net {
+  stroke: #f2f6f7;
+  stroke-dasharray: 5 4;
+  stroke-width: 1.5;
+}
+
+.trajectory-3d-debug-path {
+  fill: none;
+  opacity: 0.55;
+  stroke: #73d2de;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.6;
+}
+
+.trajectory-3d-debug-point {
+  fill: #ffd166;
+  opacity: 0.72;
+  stroke: #11191c;
+  stroke-width: 1.2;
+}
+
+.trajectory-3d-debug-point.highlighted {
+  fill: #ffffff;
+  opacity: 1;
+  stroke: #ff4d6d;
+  stroke-width: 3;
+}
+
 .subhead {
   font-size: 12px;
   line-height: 1.2;

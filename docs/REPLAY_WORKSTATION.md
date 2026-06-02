@@ -828,6 +828,12 @@ inspector can show diagnostic status/label, nearest 3D sample frame/time, neares
 court-plane x/y, height status, local sample counts, and speed. This context is diagnostic-only; it
 does not change marker classification, candidate counts, in/out, score, or adjudication.
 
+Blueprint 14 3D Trajectory Debug View v0 adds a side-panel court-plane debug view when
+`trajectory3dRunId` is selected. The panel renders existing `ball_trajectory_3d_candidate` metric
+x/y samples, an ordered candidate path, unknown height status, and a highlighted nearest sample for
+the selected marker when 3D diagnostics exist. It is display-only and does not render true 3D ball
+flight, claim ball height, change hit/bounce candidates, decide in/out, score, or adjudicate.
+
 Blueprint 8 Completion Review / Freeze v0 documents the current workstation as a stable
 candidate-evidence milestone. The frozen operator workflow is: build or obtain source runs, build
 ball trajectory candidates, build hit/bounce candidates, open replay in operator view, review
