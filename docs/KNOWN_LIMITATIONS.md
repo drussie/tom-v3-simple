@@ -199,6 +199,9 @@ This registry makes TOM v3 Simple boundaries explicit.
   labels are not truth or training truth and do not change live TOM behavior.
 - Reviewed 3D debug dataset regression reports compare exports only. A saved baseline export is not
   truth, and drift is not proof that either export is correct or incorrect.
+- The sample-point reviewed 3D debug baseline gate is a local regression checkpoint only. It can
+  detect drift from the frozen export profile, but it does not prove correctness or change live TOM
+  behavior.
 - Replay view presets are display defaults only. Operator view hides raw/debug layers by default,
   and debug/audit view enables them, but neither preset changes persisted observations or proves
   evidence correctness.

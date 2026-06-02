@@ -1757,3 +1757,30 @@ make tom-v1-compare-reviewed-3d-debug-dataset \
 Use `STRICT=true` to return `failed_regression` when drift is detected. Baseline exports are
 comparison references only; they are not truth or training truth, and drift does not change live TOM
 behavior.
+
+Freeze the current sample-point reviewed 3D debug export as a local baseline:
+
+```bash
+TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_tom_v1_bridge.db \
+make tom-v1-freeze-reviewed-3d-debug-baseline \
+  PYTHON=.venv/bin/python \
+  MEDIA_ID=9518fb01-0da1-4344-9a84-ff88ec8e9b1e \
+  EVENT_CANDIDATE_RUN_ID=1b946366-7ec1-426f-8b40-494535a9b3fb \
+  TRAJECTORY_3D_RUN_ID=ea76ccab-c51d-4a63-9682-9fd0bbb83f14 \
+  CAMERA_GEOMETRY_ID=5afa67fb-7f6e-41eb-b4aa-b1100a97ee97
+```
+
+Verify the current sample-point export against the local baseline:
+
+```bash
+TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_tom_v1_bridge.db \
+make tom-v1-verify-reviewed-3d-debug-baseline \
+  PYTHON=.venv/bin/python \
+  MEDIA_ID=9518fb01-0da1-4344-9a84-ff88ec8e9b1e \
+  EVENT_CANDIDATE_RUN_ID=1b946366-7ec1-426f-8b40-494535a9b3fb \
+  TRAJECTORY_3D_RUN_ID=ea76ccab-c51d-4a63-9682-9fd0bbb83f14 \
+  CAMERA_GEOMETRY_ID=5afa67fb-7f6e-41eb-b4aa-b1100a97ee97
+```
+
+The gate writes local `.data/baselines` and `.data/exports` files. These are generated regression
+artifacts. The baseline is not truth, and drift requires human review before any follow-up work.

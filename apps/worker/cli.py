@@ -53,6 +53,12 @@ from apps.worker.services.real_court_keypoint_replay import run_real_court_keypo
 from apps.worker.services.real_detection_replay import run_real_detection_replay
 from apps.worker.services.real_pose_replay import run_real_pose_replay
 from apps.worker.services.real_yolo_smoke import run_real_yolo_local_smoke
+from apps.worker.services.reviewed_3d_debug_baseline import (
+    DEFAULT_BASELINE_FILE_STEM,
+    DEFAULT_BASELINE_NAME,
+    freeze_reviewed_3d_debug_baseline,
+    verify_reviewed_3d_debug_baseline,
+)
 from apps.worker.services.reviewed_3d_debug_dataset_export import (
     export_reviewed_3d_debug_dataset,
 )
@@ -1052,6 +1058,71 @@ def main() -> None:
     reviewed_3d_regression_parser.set_defaults(
         handler=_handle_compare_reviewed_3d_debug_dataset,
         skip_create_db=True,
+    )
+
+    freeze_reviewed_3d_baseline_parser = subcommands.add_parser(
+        "freeze-reviewed-3d-debug-baseline",
+        help="Freeze a local reviewed 3D debug baseline export and manifest.",
+    )
+    freeze_reviewed_3d_baseline_parser.add_argument("--media-id", required=True)
+    freeze_reviewed_3d_baseline_parser.add_argument("--event-candidate-run-id", required=True)
+    freeze_reviewed_3d_baseline_parser.add_argument("--trajectory-3d-run-id", required=True)
+    freeze_reviewed_3d_baseline_parser.add_argument("--camera-geometry-id", required=True)
+    freeze_reviewed_3d_baseline_parser.add_argument(
+        "--baseline-dir",
+        default=".data/baselines",
+    )
+    freeze_reviewed_3d_baseline_parser.add_argument(
+        "--baseline-name",
+        default=DEFAULT_BASELINE_NAME,
+    )
+    freeze_reviewed_3d_baseline_parser.add_argument(
+        "--file-stem",
+        default=DEFAULT_BASELINE_FILE_STEM,
+    )
+    freeze_reviewed_3d_baseline_parser.add_argument(
+        "--viewer-base-url",
+        default="http://127.0.0.1:3000",
+    )
+    freeze_reviewed_3d_baseline_parser.add_argument("--skip-create-db", action="store_true")
+    freeze_reviewed_3d_baseline_parser.set_defaults(
+        handler=_handle_freeze_reviewed_3d_debug_baseline
+    )
+
+    verify_reviewed_3d_baseline_parser = subcommands.add_parser(
+        "verify-reviewed-3d-debug-baseline",
+        help="Export current reviewed 3D debug data and compare it with a baseline.",
+    )
+    verify_reviewed_3d_baseline_parser.add_argument("--media-id", required=True)
+    verify_reviewed_3d_baseline_parser.add_argument("--event-candidate-run-id", required=True)
+    verify_reviewed_3d_baseline_parser.add_argument("--trajectory-3d-run-id", required=True)
+    verify_reviewed_3d_baseline_parser.add_argument("--camera-geometry-id", required=True)
+    verify_reviewed_3d_baseline_parser.add_argument("--baseline", required=True)
+    verify_reviewed_3d_baseline_parser.add_argument(
+        "--current-output",
+        default=".data/exports/reviewed_3d_debug_dataset_sample_point.current.json",
+    )
+    verify_reviewed_3d_baseline_parser.add_argument(
+        "--regression-output",
+        default=".data/exports/reviewed_3d_debug_dataset_sample_point.regression.json",
+    )
+    verify_reviewed_3d_baseline_parser.add_argument(
+        "--regression-markdown-output",
+        default=None,
+    )
+    verify_reviewed_3d_baseline_parser.add_argument(
+        "--strict",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+        help="Return a failed regression status when drift is detected.",
+    )
+    verify_reviewed_3d_baseline_parser.add_argument(
+        "--viewer-base-url",
+        default="http://127.0.0.1:3000",
+    )
+    verify_reviewed_3d_baseline_parser.add_argument("--skip-create-db", action="store_true")
+    verify_reviewed_3d_baseline_parser.set_defaults(
+        handler=_handle_verify_reviewed_3d_debug_baseline
     )
 
     camera_geometry_parser = subcommands.add_parser(
@@ -2077,6 +2148,42 @@ def _handle_compare_reviewed_3d_debug_dataset(
         output_path=args.output,
         allow_id_drift=args.allow_id_drift,
         allow_float_drift=args.allow_float_drift,
+    )
+
+
+def _handle_freeze_reviewed_3d_debug_baseline(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    return freeze_reviewed_3d_debug_baseline(
+        session=session,
+        media_id=args.media_id,
+        event_candidate_run_id=args.event_candidate_run_id,
+        trajectory_3d_run_id=args.trajectory_3d_run_id,
+        camera_geometry_id=args.camera_geometry_id,
+        baseline_dir=args.baseline_dir,
+        baseline_name=args.baseline_name,
+        file_stem=args.file_stem,
+        viewer_base_url=args.viewer_base_url,
+    )
+
+
+def _handle_verify_reviewed_3d_debug_baseline(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    return verify_reviewed_3d_debug_baseline(
+        session=session,
+        media_id=args.media_id,
+        event_candidate_run_id=args.event_candidate_run_id,
+        trajectory_3d_run_id=args.trajectory_3d_run_id,
+        camera_geometry_id=args.camera_geometry_id,
+        baseline_path=args.baseline,
+        current_output=args.current_output,
+        regression_output=args.regression_output,
+        regression_markdown_output=args.regression_markdown_output,
+        strict=args.strict,
+        viewer_base_url=args.viewer_base_url,
     )
 
 

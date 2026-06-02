@@ -62,6 +62,13 @@ FORMAT ?= json
 OUTPUT ?=
 BASELINE ?=
 CURRENT ?=
+BASELINE_DIR ?= .data/baselines
+BASELINE_NAME ?= sample_point_reviewed_3d_debug_baseline_v0
+BASELINE_FILE_STEM ?= reviewed_3d_debug_dataset_sample_point
+BASELINE_JSON ?= $(BASELINE_DIR)/$(BASELINE_FILE_STEM).baseline.json
+CURRENT_OUTPUT ?= .data/exports/reviewed_3d_debug_dataset_sample_point.current.json
+REGRESSION ?= .data/exports/reviewed_3d_debug_dataset_sample_point.regression.json
+REGRESSION_MARKDOWN ?=
 STRICT ?= false
 ALLOW_ID_DRIFT ?= true
 ALLOW_FLOAT_DRIFT ?= 0.000001
@@ -136,7 +143,7 @@ DERIVE_LINES ?= true
 
 export TOM_V3_DATABASE_URL
 
-.PHONY: install web-install test lint migrate api seed verify index-media run-gameplay index-and-run-gameplay run-detection index-and-run-detection extract-frame-artifacts build-tracklets run-pose export-tracklet-review-dataset court-review-export demo demo-fixture demo-plan demo-reset demo-export demo-open replay-open completion-audit completion-check yolo-probe yolo-smoke yolo-runtime-probe register-yolo-model smoke-real-yolo-local real-detection real-pose tom-v1-yolo-probe tom-v1-ball-detection tom-v1-player-detection tom-v1-tracklets tom-v1-main-subjects tom-v1-main-player-tracks tom-v1-pose tom-v1-pose-main-subjects tom-v1-pose-main-tracks tom-v1-motion-smoothing tom-v1-court-keypoints-probe tom-v1-court-keypoints tom-v1-court-keypoint-audit tom-v1-object-court-projection tom-v1-ball-court-trajectory tom-v1-build-3d-ball-trajectory-candidates tom-v1-build-event-candidate-3d-diagnostics tom-v1-export-reviewed-3d-debug-dataset tom-v1-compare-reviewed-3d-debug-dataset tom-v1-hit-bounce-candidates tom-v1-hit-bounce-candidates-verbose tom-v1-point-evidence-snapshot tom-v1-evaluate-point-candidates tom-v1-declare-camera-geometry court-fixture homography-candidates projection-diagnostics web web-build web-lint smoke all-checks
+.PHONY: install web-install test lint migrate api seed verify index-media run-gameplay index-and-run-gameplay run-detection index-and-run-detection extract-frame-artifacts build-tracklets run-pose export-tracklet-review-dataset court-review-export demo demo-fixture demo-plan demo-reset demo-export demo-open replay-open completion-audit completion-check yolo-probe yolo-smoke yolo-runtime-probe register-yolo-model smoke-real-yolo-local real-detection real-pose tom-v1-yolo-probe tom-v1-ball-detection tom-v1-player-detection tom-v1-tracklets tom-v1-main-subjects tom-v1-main-player-tracks tom-v1-pose tom-v1-pose-main-subjects tom-v1-pose-main-tracks tom-v1-motion-smoothing tom-v1-court-keypoints-probe tom-v1-court-keypoints tom-v1-court-keypoint-audit tom-v1-object-court-projection tom-v1-ball-court-trajectory tom-v1-build-3d-ball-trajectory-candidates tom-v1-build-event-candidate-3d-diagnostics tom-v1-export-reviewed-3d-debug-dataset tom-v1-compare-reviewed-3d-debug-dataset tom-v1-freeze-reviewed-3d-debug-baseline tom-v1-verify-reviewed-3d-debug-baseline tom-v1-hit-bounce-candidates tom-v1-hit-bounce-candidates-verbose tom-v1-point-evidence-snapshot tom-v1-evaluate-point-candidates tom-v1-declare-camera-geometry court-fixture homography-candidates projection-diagnostics web web-build web-lint smoke all-checks
 
 install:
 	$(PYTHON) -m pip install -e ".[dev]"
@@ -362,6 +369,20 @@ tom-v1-compare-reviewed-3d-debug-dataset:
 	@if [ -z "$(BASELINE)" ]; then echo "BASELINE is required: make tom-v1-compare-reviewed-3d-debug-dataset BASELINE=<baseline_export.json>"; exit 1; fi
 	@if [ -z "$(CURRENT)" ]; then echo "CURRENT is required: make tom-v1-compare-reviewed-3d-debug-dataset CURRENT=<current_export.json>"; exit 1; fi
 	$(PYTHON) -m apps.worker.cli compare-reviewed-3d-debug-dataset --baseline "$(BASELINE)" --current "$(CURRENT)" --format "$(FORMAT)" $(if $(OUTPUT),--output "$(OUTPUT)",) $(if $(filter true,$(STRICT)),--strict,--no-strict) $(if $(filter false,$(ALLOW_ID_DRIFT)),--no-allow-id-drift,--allow-id-drift) --allow-float-drift "$(ALLOW_FLOAT_DRIFT)"
+
+tom-v1-freeze-reviewed-3d-debug-baseline:
+	@if [ -z "$(MEDIA_ID)" ]; then echo "MEDIA_ID is required: make tom-v1-freeze-reviewed-3d-debug-baseline MEDIA_ID=<media_id>"; exit 1; fi
+	@if [ -z "$(EVENT_CANDIDATE_RUN_ID)" ]; then echo "EVENT_CANDIDATE_RUN_ID is required: make tom-v1-freeze-reviewed-3d-debug-baseline EVENT_CANDIDATE_RUN_ID=<event_candidate_run_id>"; exit 1; fi
+	@if [ -z "$(TRAJECTORY_3D_RUN_ID)" ]; then echo "TRAJECTORY_3D_RUN_ID is required: make tom-v1-freeze-reviewed-3d-debug-baseline TRAJECTORY_3D_RUN_ID=<trajectory_3d_run_id>"; exit 1; fi
+	@if [ -z "$(CAMERA_GEOMETRY_ID)" ]; then echo "CAMERA_GEOMETRY_ID is required: make tom-v1-freeze-reviewed-3d-debug-baseline CAMERA_GEOMETRY_ID=<camera_geometry_id>"; exit 1; fi
+	$(PYTHON) -m apps.worker.cli freeze-reviewed-3d-debug-baseline --media-id "$(MEDIA_ID)" --event-candidate-run-id "$(EVENT_CANDIDATE_RUN_ID)" --trajectory-3d-run-id "$(TRAJECTORY_3D_RUN_ID)" --camera-geometry-id "$(CAMERA_GEOMETRY_ID)" --baseline-dir "$(BASELINE_DIR)" --baseline-name "$(BASELINE_NAME)" --file-stem "$(BASELINE_FILE_STEM)" --viewer-base-url "$(VIEWER_BASE_URL)"
+
+tom-v1-verify-reviewed-3d-debug-baseline:
+	@if [ -z "$(MEDIA_ID)" ]; then echo "MEDIA_ID is required: make tom-v1-verify-reviewed-3d-debug-baseline MEDIA_ID=<media_id>"; exit 1; fi
+	@if [ -z "$(EVENT_CANDIDATE_RUN_ID)" ]; then echo "EVENT_CANDIDATE_RUN_ID is required: make tom-v1-verify-reviewed-3d-debug-baseline EVENT_CANDIDATE_RUN_ID=<event_candidate_run_id>"; exit 1; fi
+	@if [ -z "$(TRAJECTORY_3D_RUN_ID)" ]; then echo "TRAJECTORY_3D_RUN_ID is required: make tom-v1-verify-reviewed-3d-debug-baseline TRAJECTORY_3D_RUN_ID=<trajectory_3d_run_id>"; exit 1; fi
+	@if [ -z "$(CAMERA_GEOMETRY_ID)" ]; then echo "CAMERA_GEOMETRY_ID is required: make tom-v1-verify-reviewed-3d-debug-baseline CAMERA_GEOMETRY_ID=<camera_geometry_id>"; exit 1; fi
+	$(PYTHON) -m apps.worker.cli verify-reviewed-3d-debug-baseline --media-id "$(MEDIA_ID)" --event-candidate-run-id "$(EVENT_CANDIDATE_RUN_ID)" --trajectory-3d-run-id "$(TRAJECTORY_3D_RUN_ID)" --camera-geometry-id "$(CAMERA_GEOMETRY_ID)" --baseline "$(if $(BASELINE),$(BASELINE),$(BASELINE_JSON))" --current-output "$(CURRENT_OUTPUT)" --regression-output "$(REGRESSION)" $(if $(REGRESSION_MARKDOWN),--regression-markdown-output "$(REGRESSION_MARKDOWN)",) $(if $(filter true,$(STRICT)),--strict,--no-strict) --viewer-base-url "$(VIEWER_BASE_URL)"
 
 tom-v1-hit-bounce-candidates:
 	@if [ -z "$(MEDIA_ID)" ]; then echo "MEDIA_ID is required: make tom-v1-hit-bounce-candidates MEDIA_ID=<media_id>"; exit 1; fi

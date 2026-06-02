@@ -3010,3 +3010,28 @@ This milestone adds:
 The report is export-to-export comparison metadata only. Baseline exports are not truth or training
 truth. Drift does not mutate live observations, event candidates, marker arbitration, 3D candidates,
 3D diagnostics, review annotations, in/out, score, or adjudication.
+
+## Blueprint 19 Reviewed 3D Debug Baseline Freeze v0
+
+Status: complete
+
+### Goal
+
+Freeze the current sample-point reviewed 3D debug export profile and provide a repeatable local
+regression gate against that baseline.
+
+### Notes
+
+This milestone adds:
+
+- `apps.worker.services.reviewed_3d_debug_baseline`
+- `freeze-reviewed-3d-debug-baseline` worker CLI command
+- `verify-reviewed-3d-debug-baseline` worker CLI command
+- `tom-v1-freeze-reviewed-3d-debug-baseline` Make helper
+- `tom-v1-verify-reviewed-3d-debug-baseline` Make helper
+- local baseline JSON/Markdown export and manifest workflow
+- local current export plus regression report gate workflow
+
+The baseline and gate are regression metadata only. The baseline is not truth or training truth.
+The gate does not mutate live observations, event candidates, marker arbitration, 3D candidates,
+3D diagnostics, review annotations, in/out, score, or adjudication.
