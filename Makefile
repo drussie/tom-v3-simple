@@ -131,7 +131,7 @@ DERIVE_LINES ?= true
 
 export TOM_V3_DATABASE_URL
 
-.PHONY: install web-install test lint migrate api seed verify index-media run-gameplay index-and-run-gameplay run-detection index-and-run-detection extract-frame-artifacts build-tracklets run-pose export-tracklet-review-dataset court-review-export demo demo-fixture demo-plan demo-reset demo-export demo-open replay-open completion-audit completion-check yolo-probe yolo-smoke yolo-runtime-probe register-yolo-model smoke-real-yolo-local real-detection real-pose tom-v1-yolo-probe tom-v1-ball-detection tom-v1-player-detection tom-v1-tracklets tom-v1-main-subjects tom-v1-main-player-tracks tom-v1-pose tom-v1-pose-main-subjects tom-v1-pose-main-tracks tom-v1-motion-smoothing tom-v1-court-keypoints-probe tom-v1-court-keypoints tom-v1-court-keypoint-audit tom-v1-object-court-projection tom-v1-ball-court-trajectory tom-v1-build-3d-ball-trajectory-candidates tom-v1-build-event-candidate-3d-diagnostics tom-v1-hit-bounce-candidates tom-v1-hit-bounce-candidates-verbose tom-v1-point-evidence-snapshot tom-v1-evaluate-point-candidates tom-v1-declare-camera-geometry court-fixture homography-candidates projection-diagnostics web web-build web-lint smoke all-checks
+.PHONY: install web-install test lint migrate api seed verify index-media run-gameplay index-and-run-gameplay run-detection index-and-run-detection extract-frame-artifacts build-tracklets run-pose export-tracklet-review-dataset court-review-export demo demo-fixture demo-plan demo-reset demo-export demo-open replay-open completion-audit completion-check yolo-probe yolo-smoke yolo-runtime-probe register-yolo-model smoke-real-yolo-local real-detection real-pose tom-v1-yolo-probe tom-v1-ball-detection tom-v1-player-detection tom-v1-tracklets tom-v1-main-subjects tom-v1-main-player-tracks tom-v1-pose tom-v1-pose-main-subjects tom-v1-pose-main-tracks tom-v1-motion-smoothing tom-v1-court-keypoints-probe tom-v1-court-keypoints tom-v1-court-keypoint-audit tom-v1-object-court-projection tom-v1-ball-court-trajectory tom-v1-build-3d-ball-trajectory-candidates tom-v1-build-event-candidate-3d-diagnostics tom-v1-export-reviewed-3d-debug-dataset tom-v1-hit-bounce-candidates tom-v1-hit-bounce-candidates-verbose tom-v1-point-evidence-snapshot tom-v1-evaluate-point-candidates tom-v1-declare-camera-geometry court-fixture homography-candidates projection-diagnostics web web-build web-lint smoke all-checks
 
 install:
 	$(PYTHON) -m pip install -e ".[dev]"
@@ -345,6 +345,13 @@ tom-v1-build-event-candidate-3d-diagnostics:
 	@if [ -z "$(EVENT_CANDIDATE_RUN_ID)" ]; then echo "EVENT_CANDIDATE_RUN_ID is required: make tom-v1-build-event-candidate-3d-diagnostics EVENT_CANDIDATE_RUN_ID=<event_candidate_run_id>"; exit 1; fi
 	@if [ -z "$(TRAJECTORY_3D_RUN_ID)" ]; then echo "TRAJECTORY_3D_RUN_ID is required: make tom-v1-build-event-candidate-3d-diagnostics TRAJECTORY_3D_RUN_ID=<trajectory_3d_run_id>"; exit 1; fi
 	$(PYTHON) -m apps.worker.cli build-event-candidate-3d-diagnostics --media-id "$(MEDIA_ID)" --event-candidate-run-id "$(EVENT_CANDIDATE_RUN_ID)" --trajectory-3d-run-id "$(TRAJECTORY_3D_RUN_ID)" $(if $(CAMERA_GEOMETRY_ID),--camera-geometry-id "$(CAMERA_GEOMETRY_ID)",) --time-window-ms "$(TIME_WINDOW_MS)" --viewer-base-url "$(VIEWER_BASE_URL)" --format "$(FORMAT)" $(if $(OUTPUT),--output "$(OUTPUT)",)
+
+tom-v1-export-reviewed-3d-debug-dataset:
+	@if [ -z "$(MEDIA_ID)" ]; then echo "MEDIA_ID is required: make tom-v1-export-reviewed-3d-debug-dataset MEDIA_ID=<media_id>"; exit 1; fi
+	@if [ -z "$(EVENT_CANDIDATE_RUN_ID)" ]; then echo "EVENT_CANDIDATE_RUN_ID is required: make tom-v1-export-reviewed-3d-debug-dataset EVENT_CANDIDATE_RUN_ID=<event_candidate_run_id>"; exit 1; fi
+	@if [ -z "$(TRAJECTORY_3D_RUN_ID)" ]; then echo "TRAJECTORY_3D_RUN_ID is required: make tom-v1-export-reviewed-3d-debug-dataset TRAJECTORY_3D_RUN_ID=<trajectory_3d_run_id>"; exit 1; fi
+	@if [ -z "$(CAMERA_GEOMETRY_ID)" ]; then echo "CAMERA_GEOMETRY_ID is required: make tom-v1-export-reviewed-3d-debug-dataset CAMERA_GEOMETRY_ID=<camera_geometry_id>"; exit 1; fi
+	$(PYTHON) -m apps.worker.cli export-reviewed-3d-debug-dataset --media-id "$(MEDIA_ID)" --event-candidate-run-id "$(EVENT_CANDIDATE_RUN_ID)" --trajectory-3d-run-id "$(TRAJECTORY_3D_RUN_ID)" --camera-geometry-id "$(CAMERA_GEOMETRY_ID)" --viewer-base-url "$(VIEWER_BASE_URL)" --format "$(FORMAT)" $(if $(OUTPUT),--output "$(OUTPUT)",)
 
 tom-v1-hit-bounce-candidates:
 	@if [ -z "$(MEDIA_ID)" ]; then echo "MEDIA_ID is required: make tom-v1-hit-bounce-candidates MEDIA_ID=<media_id>"; exit 1; fi

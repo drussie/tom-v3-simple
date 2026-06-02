@@ -2963,3 +2963,27 @@ This milestone adds:
 
 The reviews are operator metadata only. They do not mutate 3D samples, 3D diagnostics, event
 candidates, marker arbitration, in/out, score, accepted/rejected lifecycle, or adjudication.
+
+## Blueprint 17 Reviewed 3D Debug Dataset Export v0
+
+Status: complete
+
+### Goal
+
+Export reviewed 3D debug evidence into deterministic offline JSON/Markdown dataset artifacts.
+
+### Notes
+
+This milestone adds:
+
+- `apps.worker.services.reviewed_3d_debug_dataset_export`
+- `export-reviewed-3d-debug-dataset` worker CLI command
+- `tom-v1-export-reviewed-3d-debug-dataset` Make helper
+- JSON export with media/run IDs, replay URL, camera geometry summary, 3D trajectory summary,
+  event marker summary, 3D candidate rows, 3D diagnostic rows, 3D debug reviews, event marker
+  reviews, warnings, and limitations
+- Markdown export with compact summary tables and examples
+
+The export is dataset/export metadata only. It does not mutate live observations, event candidates,
+marker arbitration, 3D candidates, 3D diagnostics, review annotations, in/out, score, or
+adjudication. Review labels are not training truth.

@@ -1716,3 +1716,20 @@ Blueprint 16 adds 3D debug review annotations to the same panel:
 These reviews persist as `trajectory_3d_debug_review_annotation` metadata. They do not change
 candidate counts, event marker review counts, 3D samples, 3D diagnostics, in/out, score, or
 adjudication.
+
+Export reviewed 3D debug evidence for offline analysis:
+
+```bash
+TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_tom_v1_bridge.db \
+make tom-v1-export-reviewed-3d-debug-dataset \
+  PYTHON=.venv/bin/python \
+  MEDIA_ID=<media_id> \
+  EVENT_CANDIDATE_RUN_ID=<event_candidate_run_id> \
+  TRAJECTORY_3D_RUN_ID=<trajectory_3d_run_id> \
+  CAMERA_GEOMETRY_ID=<camera_geometry_id> \
+  FORMAT=json \
+  OUTPUT=.data/exports/reviewed_3d_debug_dataset.json
+```
+
+Use `FORMAT=markdown` for a compact human-readable report. The export is read-only dataset
+metadata. Review labels are not truth, not 3D truth, and not training truth.

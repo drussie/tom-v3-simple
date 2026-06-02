@@ -694,3 +694,21 @@ selected 3D sample / selected diagnostic link / current replay time
 Operators can mark 3D debug evidence as useful, wrong, unclear, needs review, missing a 3D sample,
 bad 3D position, or bad diagnostic link. These labels are review metadata only. They do not change
 3D candidates, 3D diagnostics, hit/bounce event candidates, in/out, score, or adjudication.
+
+## Blueprint 17 - Reviewed 3D Debug Dataset Export
+
+Status: COMPLETE
+
+Blueprint 17 proves:
+
+```text
+reviewed 3D debug evidence
++ event marker review metadata
+-> deterministic offline JSON/Markdown dataset export
+```
+
+The v0 export includes media/run identity, replay URL, camera geometry summary, 3D trajectory
+summary, event marker context, 3D candidate rows, 3D diagnostic rows, 3D debug reviews, event
+marker reviews, warnings, and limitations. It is for offline analysis, QA review, dataset curation,
+and future training preparation only. Review labels are not truth or training truth, and the export
+does not change live hit/bounce behavior, in/out, score, or adjudication.

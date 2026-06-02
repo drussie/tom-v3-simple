@@ -194,6 +194,9 @@ This registry makes TOM v3 Simple boundaries explicit.
 - 3D debug review annotations are operator metadata only. They can mark samples or diagnostic
   links as useful, wrong, unclear, needs review, missing, bad position, or bad link, but they do
   not create 3D truth or change hit/bounce candidates.
+- Reviewed 3D debug dataset exports are offline curation artifacts only. They preserve operator
+  review metadata and candidate evidence for analysis or training preparation, but the exported
+  labels are not ground truth and do not change live TOM behavior.
 - Replay view presets are display defaults only. Operator view hides raw/debug layers by default,
   and debug/audit view enables them, but neither preset changes persisted observations or proves
   evidence correctness.
@@ -233,6 +236,7 @@ TOM v3 Simple does not include:
 ## Data / Export Limitations
 
 - Exports are TOM-native review exports.
+- Reviewed 3D debug exports are not ground-truth or third-party training formats.
 - Exports are not third-party training formats unless a future blueprint adds one.
 - Large-scale analytics are not included.
 - Artifact storage lifecycle is local/demo-oriented.

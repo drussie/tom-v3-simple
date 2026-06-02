@@ -1136,3 +1136,14 @@ samples, marker-linked 3D diagnostics, and missing 3D sample moments can receive
 without changing source candidates or event markers. Point evidence snapshots and point candidate
 evaluations include compact 3D debug review summaries. These reviews do not create 3D truth,
 hit/bounce truth, in/out, score, or adjudication.
+
+## Blueprint 17 Status
+
+Status: complete.
+
+TOM v3 can now export reviewed 3D debug evidence as deterministic offline JSON/Markdown dataset
+artifacts. The export includes event markers, 3D candidate rows, 3D diagnostics, 3D debug reviews,
+event marker reviews, camera geometry summary, replay URL, warnings, and limitations. The export is
+read-only and does not change event candidates, marker arbitration, 3D candidates, 3D diagnostics,
+review annotations, in/out, score, or adjudication. Review labels remain operator metadata, not
+training truth.

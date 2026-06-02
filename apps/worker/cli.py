@@ -53,6 +53,9 @@ from apps.worker.services.real_court_keypoint_replay import run_real_court_keypo
 from apps.worker.services.real_detection_replay import run_real_detection_replay
 from apps.worker.services.real_pose_replay import run_real_pose_replay
 from apps.worker.services.real_yolo_smoke import run_real_yolo_local_smoke
+from apps.worker.services.reviewed_3d_debug_dataset_export import (
+    export_reviewed_3d_debug_dataset,
+)
 from apps.worker.services.tracklet_builder import build_tracklets_from_detection_run
 from apps.worker.services.yolo_model_registry import register_yolo_model
 
@@ -979,6 +982,33 @@ def main() -> None:
     event_candidate_3d_parser.add_argument("--skip-create-db", action="store_true")
     event_candidate_3d_parser.set_defaults(
         handler=_handle_build_event_candidate_3d_diagnostics
+    )
+
+    reviewed_3d_export_parser = subcommands.add_parser(
+        "export-reviewed-3d-debug-dataset",
+        help="Export reviewed 3D debug evidence as an offline JSON/Markdown dataset package.",
+    )
+    reviewed_3d_export_parser.add_argument("--media-id", required=True)
+    reviewed_3d_export_parser.add_argument("--event-candidate-run-id", required=True)
+    reviewed_3d_export_parser.add_argument("--trajectory-3d-run-id", required=True)
+    reviewed_3d_export_parser.add_argument("--camera-geometry-id", required=True)
+    reviewed_3d_export_parser.add_argument(
+        "--viewer-base-url",
+        default="http://127.0.0.1:3000",
+    )
+    reviewed_3d_export_parser.add_argument(
+        "--format",
+        choices=["json", "markdown"],
+        default="json",
+        help="Reviewed 3D debug dataset format.",
+    )
+    reviewed_3d_export_parser.add_argument(
+        "--output",
+        help="Optional file path for the JSON or markdown export artifact.",
+    )
+    reviewed_3d_export_parser.add_argument("--skip-create-db", action="store_true")
+    reviewed_3d_export_parser.set_defaults(
+        handler=_handle_export_reviewed_3d_debug_dataset
     )
 
     camera_geometry_parser = subcommands.add_parser(
@@ -1969,6 +1999,22 @@ def _handle_build_event_candidate_3d_diagnostics(
         trajectory_3d_run_id=args.trajectory_3d_run_id,
         camera_geometry_id=args.camera_geometry_id,
         time_window_ms=args.time_window_ms,
+        viewer_base_url=args.viewer_base_url,
+        output_format=args.format,
+        output_path=args.output,
+    )
+
+
+def _handle_export_reviewed_3d_debug_dataset(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    return export_reviewed_3d_debug_dataset(
+        session=session,
+        media_id=args.media_id,
+        event_candidate_run_id=args.event_candidate_run_id,
+        trajectory_3d_run_id=args.trajectory_3d_run_id,
+        camera_geometry_id=args.camera_geometry_id,
         viewer_base_url=args.viewer_base_url,
         output_format=args.format,
         output_path=args.output,
