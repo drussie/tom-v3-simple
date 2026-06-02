@@ -2,7 +2,7 @@
 
 ## Current Progress Gauge
 
-Current: Blueprints 1, 2, 3, 4, 5, 6, 7, and 8 complete/frozen; Blueprint 9 manual candidate review annotations are complete; Blueprint 10 benchmark/evaluation harness is complete; Blueprint 11 3D readiness / camera geometry evidence is complete; Blueprint 12 3D ball trajectory candidate evidence is complete; Blueprints 13 through 16 add diagnostic-only 3D marker context, the 3D Debug View, selection/timeline coupling, and 3D debug review annotations; TOM v3 Simple remains an observation-only evidence platform.
+Current: Blueprints 1, 2, 3, 4, 5, 6, 7, and 8 complete/frozen; Blueprint 9 manual candidate review annotations are complete; Blueprint 10 benchmark/evaluation harness is complete; Blueprint 11 3D readiness / camera geometry evidence is complete; Blueprint 12 3D ball trajectory candidate evidence is complete; Blueprints 13 through 16 add diagnostic-only 3D marker context, the 3D Debug View, selection/timeline coupling, and 3D debug review annotations; Blueprint 17 exports reviewed 3D debug datasets; Blueprint 18 compares those exports for deterministic drift; TOM v3 Simple remains an observation-only evidence platform.
 
 ## Current
 
@@ -1147,3 +1147,13 @@ event marker reviews, camera geometry summary, replay URL, warnings, and limitat
 read-only and does not change event candidates, marker arbitration, 3D candidates, 3D diagnostics,
 review annotations, in/out, score, or adjudication. Review labels remain operator metadata, not
 training truth.
+
+## Blueprint 18 Status
+
+Status: complete.
+
+TOM v3 can now compare a current reviewed 3D debug dataset export against a saved baseline export
+and produce deterministic JSON/Markdown drift reports. The regression harness compares summary
+counts, section presence, warnings, event markers, 3D candidates, 3D diagnostics, 3D debug reviews,
+and event marker reviews. Baseline exports are not truth or training truth, and drift does not change
+event candidates, 3D candidates, review annotations, in/out, score, or adjudication.

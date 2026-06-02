@@ -56,6 +56,9 @@ from apps.worker.services.real_yolo_smoke import run_real_yolo_local_smoke
 from apps.worker.services.reviewed_3d_debug_dataset_export import (
     export_reviewed_3d_debug_dataset,
 )
+from apps.worker.services.reviewed_3d_debug_dataset_regression import (
+    compare_reviewed_3d_debug_dataset_exports,
+)
 from apps.worker.services.tracklet_builder import build_tracklets_from_detection_run
 from apps.worker.services.yolo_model_registry import register_yolo_model
 
@@ -1009,6 +1012,46 @@ def main() -> None:
     reviewed_3d_export_parser.add_argument("--skip-create-db", action="store_true")
     reviewed_3d_export_parser.set_defaults(
         handler=_handle_export_reviewed_3d_debug_dataset
+    )
+
+    reviewed_3d_regression_parser = subcommands.add_parser(
+        "compare-reviewed-3d-debug-dataset",
+        help="Compare reviewed 3D debug dataset exports and report deterministic drift.",
+    )
+    reviewed_3d_regression_parser.add_argument("--baseline", required=True)
+    reviewed_3d_regression_parser.add_argument("--current", required=True)
+    reviewed_3d_regression_parser.add_argument(
+        "--format",
+        choices=["json", "markdown"],
+        default="json",
+        help="Reviewed 3D debug regression report format.",
+    )
+    reviewed_3d_regression_parser.add_argument(
+        "--output",
+        help="Optional file path for the JSON or markdown regression report.",
+    )
+    reviewed_3d_regression_parser.add_argument(
+        "--strict",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+        help="Return a failed regression status when drift is detected.",
+    )
+    reviewed_3d_regression_parser.add_argument(
+        "--allow-id-drift",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Ignore UUID-like field drift when comparing exported rows.",
+    )
+    reviewed_3d_regression_parser.add_argument(
+        "--allow-float-drift",
+        type=float,
+        default=0.000001,
+        help="Absolute tolerance for float comparisons.",
+    )
+    reviewed_3d_regression_parser.add_argument("--skip-create-db", action="store_true")
+    reviewed_3d_regression_parser.set_defaults(
+        handler=_handle_compare_reviewed_3d_debug_dataset,
+        skip_create_db=True,
     )
 
     camera_geometry_parser = subcommands.add_parser(
@@ -2018,6 +2061,22 @@ def _handle_export_reviewed_3d_debug_dataset(
         viewer_base_url=args.viewer_base_url,
         output_format=args.format,
         output_path=args.output,
+    )
+
+
+def _handle_compare_reviewed_3d_debug_dataset(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return compare_reviewed_3d_debug_dataset_exports(
+        baseline_path=args.baseline,
+        current_path=args.current,
+        strict=args.strict,
+        output_format=args.format,
+        output_path=args.output,
+        allow_id_drift=args.allow_id_drift,
+        allow_float_drift=args.allow_float_drift,
     )
 
 

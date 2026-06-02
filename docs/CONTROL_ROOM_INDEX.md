@@ -306,6 +306,7 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Trajectory 3D Debug Selection / Timeline Coupling v0](replay/trajectory_3d_debug_selection_timeline_coupling_v0.md)
 - [Trajectory 3D Debug Review Annotations v0](replay/trajectory_3d_debug_review_annotations_v0.md)
 - [Reviewed 3D Debug Dataset Export v0](exports/reviewed_3d_debug_dataset_export_v0.md)
+- [Reviewed 3D Debug Dataset Regression v0](exports/reviewed_3d_debug_dataset_regression_v0.md)
 
 ## Development
 

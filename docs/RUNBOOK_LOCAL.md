@@ -1733,3 +1733,27 @@ make tom-v1-export-reviewed-3d-debug-dataset \
 
 Use `FORMAT=markdown` for a compact human-readable report. The export is read-only dataset
 metadata. Review labels are not truth, not 3D truth, and not training truth.
+
+Compare a current reviewed 3D debug dataset export with a saved baseline export:
+
+```bash
+.venv/bin/python -m apps.worker.cli compare-reviewed-3d-debug-dataset \
+  --baseline .data/exports/reviewed_3d_debug_dataset_sample_point.baseline.json \
+  --current .data/exports/reviewed_3d_debug_dataset_sample_point.current.json \
+  --format json \
+  --output .data/exports/reviewed_3d_debug_dataset_sample_point.regression.json
+```
+
+Or use the Make helper:
+
+```bash
+make tom-v1-compare-reviewed-3d-debug-dataset \
+  BASELINE=.data/exports/reviewed_3d_debug_dataset_sample_point.baseline.json \
+  CURRENT=.data/exports/reviewed_3d_debug_dataset_sample_point.current.json \
+  FORMAT=json \
+  OUTPUT=.data/exports/reviewed_3d_debug_dataset_sample_point.regression.json
+```
+
+Use `STRICT=true` to return `failed_regression` when drift is detected. Baseline exports are
+comparison references only; they are not truth or training truth, and drift does not change live TOM
+behavior.

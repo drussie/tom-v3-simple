@@ -2987,3 +2987,26 @@ This milestone adds:
 The export is dataset/export metadata only. It does not mutate live observations, event candidates,
 marker arbitration, 3D candidates, 3D diagnostics, review annotations, in/out, score, or
 adjudication. Review labels are not training truth.
+
+## Blueprint 18 Reviewed 3D Debug Dataset Regression v0
+
+Status: complete
+
+### Goal
+
+Compare reviewed 3D debug dataset exports and report deterministic drift.
+
+### Notes
+
+This milestone adds:
+
+- `apps.worker.services.reviewed_3d_debug_dataset_regression`
+- `compare-reviewed-3d-debug-dataset` worker CLI command
+- `tom-v1-compare-reviewed-3d-debug-dataset` Make helper
+- JSON regression reports with summary count drift, section drift, row drift, and warning drift
+- Markdown regression reports with compact count and drift tables
+- strict mode that returns `failed_regression` when drift is detected
+
+The report is export-to-export comparison metadata only. Baseline exports are not truth or training
+truth. Drift does not mutate live observations, event candidates, marker arbitration, 3D candidates,
+3D diagnostics, review annotations, in/out, score, or adjudication.

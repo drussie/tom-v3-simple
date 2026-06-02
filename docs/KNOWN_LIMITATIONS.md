@@ -196,7 +196,9 @@ This registry makes TOM v3 Simple boundaries explicit.
   not create 3D truth or change hit/bounce candidates.
 - Reviewed 3D debug dataset exports are offline curation artifacts only. They preserve operator
   review metadata and candidate evidence for analysis or training preparation, but the exported
-  labels are not ground truth and do not change live TOM behavior.
+  labels are not truth or training truth and do not change live TOM behavior.
+- Reviewed 3D debug dataset regression reports compare exports only. A saved baseline export is not
+  truth, and drift is not proof that either export is correct or incorrect.
 - Replay view presets are display defaults only. Operator view hides raw/debug layers by default,
   and debug/audit view enables them, but neither preset changes persisted observations or proves
   evidence correctness.
