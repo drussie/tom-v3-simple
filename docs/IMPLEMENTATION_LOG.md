@@ -3111,3 +3111,29 @@ The parity service orchestrates existing media ingestion/replay read-model behav
 whether event candidates, 3D candidates, and review annotations exist for the second media asset.
 It does not generate candidates, modify marker arbitration, generate 3D evidence, create reviews,
 mutate the protected `sample_point` baseline, decide in/out, score, or adjudicate evidence.
+
+## Blueprint 23 Point Manifest / Evidence Provenance Contract v0
+
+Status: complete
+
+### Goal
+
+Create a durable point-level manifest/provenance contract for describing an evidence point without
+creating truth, adjudication, scoring, player identity, event generation, or 3D generation.
+
+### Notes
+
+This milestone adds:
+
+- `apps.worker.services.point_manifest`
+- `build-point-manifest` worker CLI command
+- `tom-v1-build-point-manifest` Make helper
+- `.data/manifests/<point_manifest_id>.json` generated manifest path
+- `docs/blueprints/blueprint_23_point_manifest_evidence_provenance_contract_v0.md`
+- `docs/reviews/point_manifest_evidence_provenance_contract_v0.md`
+- `docs/agent_reports/blueprint_23_point_manifest_evidence_provenance_contract_v0_report.md`
+
+The manifest service reads existing media and evidence tables, records availability booleans and
+profile counts, and writes one local JSON manifest. It does not generate evidence, change review
+metadata, mutate protected baselines, decide in/out, score, identify players, determine a winner,
+or adjudicate evidence.

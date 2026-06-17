@@ -314,6 +314,8 @@ Use this index as the durable navigation point for project memory, architecture 
 - [second_point Ingestion Smoke v0](reviews/second_point_ingestion_smoke_v0.md)
 - [Blueprint 22 Second Point Evidence Parity / Protected Baseline Gate v0](blueprints/blueprint_22_second_point_evidence_parity_baseline_gate_v0.md)
 - [second_point Evidence Parity v0](reviews/second_point_evidence_parity_v0.md)
+- [Blueprint 23 Point Manifest / Evidence Provenance Contract v0](blueprints/blueprint_23_point_manifest_evidence_provenance_contract_v0.md)
+- [Point Manifest Evidence Provenance Contract v0](reviews/point_manifest_evidence_provenance_contract_v0.md)
 
 ## Development
 

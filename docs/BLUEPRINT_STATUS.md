@@ -811,3 +811,22 @@ writes a local manifest for that profile. It is valid for v0 to have only media/
 event or 3D candidate layers. The second-point manifest is not truth, not a generalization claim,
 and does not create or change event generation, marker arbitration, 3D generation, in/out, score, or
 adjudication.
+
+## Blueprint 23 - Point Manifest / Evidence Provenance Contract
+
+Status: COMPLETE
+
+Blueprint 23 proves:
+
+```text
+indexed media asset
+-> optional event/3D/geometry evidence IDs
+-> deterministic point_manifest_id
+-> local point manifest JSON
+```
+
+The manifest records media source/storage provenance, a replay URL, associated run IDs when
+provided, evidence availability booleans, profile counts, and explicit warning flags. It is a
+provenance contract only. It does not create truth, training truth, 3D truth, player identity,
+in/out, score, point winner, event generation, marker arbitration, 3D generation, generalization,
+or adjudication.

@@ -211,6 +211,9 @@ This registry makes TOM v3 Simple boundaries explicit.
 - Second-point evidence parity records media/replay availability and the current presence or
   absence of candidate layers for one additional local video. It is a protected evidence checkpoint,
   not proof of second-point correctness, broad scaling, truth, in/out, score, or adjudication.
+- Point manifests record media provenance, replay links, optional evidence run IDs, evidence
+  availability, and profile counts only. They are not truth, training truth, 3D truth, player
+  identity, score, point winner, in/out, generalization, or adjudication records.
 - Replay view presets are display defaults only. Operator view hides raw/debug layers by default,
   and debug/audit view enables them, but neither preset changes persisted observations or proves
   evidence correctness.

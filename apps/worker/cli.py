@@ -47,6 +47,7 @@ from apps.worker.services.motion_smoothing import smooth_motion_candidates
 from apps.worker.services.object_court_projection import project_objects_to_court
 from apps.worker.services.point_candidate_evaluation import evaluate_point_candidates
 from apps.worker.services.point_evidence_snapshot import build_point_evidence_snapshot
+from apps.worker.services.point_manifest import build_point_manifest
 from apps.worker.services.pose_adapter import run_pose_adapter
 from apps.worker.services.projection_diagnostic_builder import build_projection_diagnostics
 from apps.worker.services.real_court_keypoint_replay import run_real_court_keypoint_replay
@@ -992,6 +993,25 @@ def main() -> None:
     )
     point_snapshot_parser.add_argument("--skip-create-db", action="store_true")
     point_snapshot_parser.set_defaults(handler=_handle_build_point_evidence_snapshot)
+
+    point_manifest_parser = subcommands.add_parser(
+        "build-point-manifest",
+        help="Build a point-level evidence provenance manifest without changing evidence.",
+    )
+    point_manifest_parser.add_argument("--media-id", required=True)
+    point_manifest_parser.add_argument("--event-candidate-run-id")
+    point_manifest_parser.add_argument("--trajectory-3d-run-id")
+    point_manifest_parser.add_argument("--camera-geometry-id")
+    point_manifest_parser.add_argument(
+        "--viewer-base-url",
+        default="http://127.0.0.1:3000",
+    )
+    point_manifest_parser.add_argument(
+        "--output",
+        help="Optional JSON manifest path. Defaults to .data/manifests/<manifest-id>.json.",
+    )
+    point_manifest_parser.add_argument("--skip-create-db", action="store_true")
+    point_manifest_parser.set_defaults(handler=_handle_build_point_manifest)
 
     point_evaluation_parser = subcommands.add_parser(
         "evaluate-point-candidates",
@@ -2165,6 +2185,21 @@ def _handle_build_point_evidence_snapshot(
         event_candidate_run_id=args.event_candidate_run_id,
         viewer_base_url=args.viewer_base_url,
         output_format=args.format,
+        output_path=args.output,
+    )
+
+
+def _handle_build_point_manifest(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    return build_point_manifest(
+        session=session,
+        media_id=args.media_id,
+        event_candidate_run_id=args.event_candidate_run_id,
+        trajectory_3d_run_id=args.trajectory_3d_run_id,
+        camera_geometry_id=args.camera_geometry_id,
+        viewer_base_url=args.viewer_base_url,
         output_path=args.output,
     )
 

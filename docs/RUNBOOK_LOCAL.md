@@ -1811,6 +1811,62 @@ Expected:
 - `breaking_drift_detected`: false
 - `baseline_is_not_truth`: true
 
+## Point Manifest / Evidence Provenance Contract
+
+Use this when an indexed point needs a durable provenance record for replay/review surfaces,
+dataset exports, or regression gates. The manifest describes existing evidence only. It does not
+generate event candidates, run marker arbitration, create 3D candidates, create reviews, decide
+truth, identify players, determine a winner, score a point, or adjudicate in/out.
+
+Build a point manifest:
+
+```bash
+TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_tom_v1_bridge.db \
+make tom-v1-build-point-manifest \
+  PYTHON=.venv/bin/python \
+  MEDIA_ID=9518fb01-0da1-4344-9a84-ff88ec8e9b1e \
+  EVENT_CANDIDATE_RUN_ID=1b946366-7ec1-426f-8b40-494535a9b3fb \
+  TRAJECTORY_3D_RUN_ID=ea76ccab-c51d-4a63-9682-9fd0bbb83f14 \
+  CAMERA_GEOMETRY_ID=5afa67fb-7f6e-41eb-b4aa-b1100a97ee97
+```
+
+Only `MEDIA_ID` is required. The event candidate, trajectory 3D, and camera geometry IDs narrow
+the manifest to known evidence runs when available.
+
+Default generated manifest:
+
+```text
+.data/manifests/<point_manifest_id>.json
+```
+
+Override the manifest path if needed:
+
+```bash
+POINT_MANIFEST_OUTPUT=.data/manifests/sample_point.point_manifest.json
+```
+
+Expected:
+
+- `ok`: true
+- `status`: `completed`
+- `manifest_type`: `point_evidence_provenance_manifest`
+- `manifest_version`: `v0`
+- `point_manifest_id`: present and deterministic for the supplied IDs
+- `replay_url`: present
+- `evidence_availability.media_indexed`: true
+- `evidence_availability.replay_available`: true
+- `profile_counts`: present
+- `warnings.manifest_is_not_truth`: true
+- `warnings.observation_only`: true
+- `warnings.no_adjudication`: true
+- `warnings.does_not_create_in_out`: true
+- `warnings.does_not_create_score`: true
+- `warnings.does_not_identify_players`: true
+- `warnings.does_not_determine_winner`: true
+- `warnings.not_generalization_claim`: true
+
+Generated `.data` manifests are local outputs and should not be committed.
+
 Build the point evidence snapshot:
 
 ```bash

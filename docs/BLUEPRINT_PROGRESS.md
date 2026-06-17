@@ -2,7 +2,7 @@
 
 ## Current Progress Gauge
 
-Current: Blueprints 1, 2, 3, 4, 5, 6, 7, and 8 complete/frozen; Blueprint 9 manual candidate review annotations are complete; Blueprint 10 benchmark/evaluation harness is complete; Blueprint 11 3D readiness / camera geometry evidence is complete; Blueprint 12 3D ball trajectory candidate evidence is complete; Blueprints 13 through 16 add diagnostic-only 3D marker context, the 3D Debug View, selection/timeline coupling, and 3D debug review annotations; Blueprint 17 exports reviewed 3D debug datasets; Blueprint 18 compares those exports for deterministic drift; Blueprint 19 freezes and verifies a local sample-point reviewed 3D debug baseline; Blueprint 20 completes the sample-point review and controlled expansion readiness freeze; Blueprint 21 adds a controlled second-point ingestion/replay smoke; Blueprint 22 adds second-point evidence parity and a local baseline manifest checkpoint; TOM v3 Simple remains an observation-only evidence platform.
+Current: Blueprints 1, 2, 3, 4, 5, 6, 7, and 8 complete/frozen; Blueprint 9 manual candidate review annotations are complete; Blueprint 10 benchmark/evaluation harness is complete; Blueprint 11 3D readiness / camera geometry evidence is complete; Blueprint 12 3D ball trajectory candidate evidence is complete; Blueprints 13 through 16 add diagnostic-only 3D marker context, the 3D Debug View, selection/timeline coupling, and 3D debug review annotations; Blueprint 17 exports reviewed 3D debug datasets; Blueprint 18 compares those exports for deterministic drift; Blueprint 19 freezes and verifies a local sample-point reviewed 3D debug baseline; Blueprint 20 completes the sample-point review and controlled expansion readiness freeze; Blueprint 21 adds a controlled second-point ingestion/replay smoke; Blueprint 22 adds second-point evidence parity and a local baseline manifest checkpoint; Blueprint 23 adds a point manifest / evidence provenance contract; TOM v3 Simple remains an observation-only evidence platform.
 
 ## Current
 
@@ -1196,3 +1196,14 @@ asset. The command indexes the media, returns a replay URL, records whether even
 candidates, and review annotations exist, and writes a local baseline manifest for the profile.
 The manifest is not truth, not a generalization claim, and does not change event generation,
 marker arbitration, 3D generation, in/out, score, or adjudication.
+
+## Blueprint 23 Status
+
+Status: complete.
+
+TOM v3 can now build a point-level provenance manifest for an indexed media asset and optional
+associated event candidate, 3D trajectory, and camera geometry evidence IDs. The manifest records a
+deterministic `point_manifest_id`, media source/storage provenance, replay URL, TOM/Blueprint
+provenance, evidence availability booleans, profile counts, and explicit warning flags. It is
+observation-only and does not create truth, adjudication, scoring, player identity, event
+generation, marker arbitration, 3D generation, or generalization claims.
