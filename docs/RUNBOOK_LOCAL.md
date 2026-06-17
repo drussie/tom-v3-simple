@@ -1936,3 +1936,88 @@ make tom-v1-verify-reviewed-3d-debug-baseline \
   TRAJECTORY_3D_RUN_ID=ea76ccab-c51d-4a63-9682-9fd0bbb83f14 \
   CAMERA_GEOMETRY_ID=5afa67fb-7f6e-41eb-b4aa-b1100a97ee97
 ```
+
+## Second Point Evidence Parity / Protected Baseline Gate
+
+Use this after the second-point ingestion smoke is available and the protected `sample_point`
+baseline gate passes. The parity command records media/replay availability and the current evidence
+profile for one second-point media asset. It does not generate hit/bounce candidates, marker
+arbitration, 3D candidates, 3D diagnostics, truth, in/out, score, or adjudication.
+
+Build a second-point evidence parity manifest:
+
+```bash
+TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_second_point_parity.db \
+make tom-v1-build-second-point-evidence-parity \
+  PYTHON=.venv/bin/python \
+  SECOND_POINT_MEDIA_PATH=/absolute/path/to/second_point.mp4
+```
+
+Default generated manifest:
+
+```text
+.data/baselines/second_point_evidence_parity.baseline_manifest.json
+```
+
+Override the manifest path if needed:
+
+```bash
+SECOND_POINT_BASELINE_MANIFEST_OUTPUT=.data/baselines/my_second_point.baseline_manifest.json
+```
+
+Expected:
+
+- `ok`: true
+- `status`: `completed`
+- `parity_type`: `second_point_evidence_parity_baseline`
+- `media_id`: present
+- `replay_url`: present
+- `second_point_profile.media_indexed`: true
+- `second_point_profile.replay_available`: true
+- `second_point_profile.baseline_available`: true
+- `not_truth`: true
+- `not_generalization_claim`: true
+- `does_not_change_sample_point`: true
+
+For v0, it is acceptable for `event_candidates_available`,
+`trajectory_3d_candidates_available`, and `review_annotations_available` to be false. That means
+the second point has media/replay parity only; it is not a failure unless a future command claims
+those evidence layers exist.
+
+If no real second-point file is available, validate the negative path:
+
+```bash
+TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_second_point_parity.db \
+make tom-v1-build-second-point-evidence-parity \
+  PYTHON=.venv/bin/python \
+  SECOND_POINT_MEDIA_PATH=/absolute/path/to/missing.mp4
+```
+
+Expected:
+
+- `ok`: false
+- `status`: `second_point_media_path_not_found`
+
+For command validation only, an operator may explicitly pass `demo_assets/sample_point.mp4`. Any
+report using that stand-in must state that it is not a real second-point review and not proof of
+generalization.
+
+After parity, verify `sample_point` remains protected:
+
+```bash
+TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_tom_v1_bridge.db \
+make tom-v1-verify-reviewed-3d-debug-baseline \
+  PYTHON=.venv/bin/python \
+  MEDIA_ID=9518fb01-0da1-4344-9a84-ff88ec8e9b1e \
+  EVENT_CANDIDATE_RUN_ID=1b946366-7ec1-426f-8b40-494535a9b3fb \
+  TRAJECTORY_3D_RUN_ID=ea76ccab-c51d-4a63-9682-9fd0bbb83f14 \
+  CAMERA_GEOMETRY_ID=5afa67fb-7f6e-41eb-b4aa-b1100a97ee97
+```
+
+Expected:
+
+- `ok`: true
+- `status`: `completed`
+- `drift_detected`: false
+- `breaking_drift_detected`: false
+- `baseline_is_not_truth`: true

@@ -65,6 +65,10 @@ from apps.worker.services.reviewed_3d_debug_dataset_export import (
 from apps.worker.services.reviewed_3d_debug_dataset_regression import (
     compare_reviewed_3d_debug_dataset_exports,
 )
+from apps.worker.services.second_point_evidence_parity import (
+    DEFAULT_SECOND_POINT_PARITY_MANIFEST,
+    build_second_point_evidence_parity,
+)
 from apps.worker.services.second_point_smoke import run_second_point_ingestion_smoke
 from apps.worker.services.tracklet_builder import build_tracklets_from_detection_run
 from apps.worker.services.yolo_model_registry import register_yolo_model
@@ -139,6 +143,32 @@ def main() -> None:
     second_point_smoke_parser.add_argument("--manifest-output")
     second_point_smoke_parser.add_argument("--skip-create-db", action="store_true")
     second_point_smoke_parser.set_defaults(handler=_handle_ingest_second_point_smoke)
+
+    second_point_parity_parser = subcommands.add_parser(
+        "build-second-point-evidence-parity",
+        help="Index one additional local point/video and write a parity baseline manifest.",
+    )
+    second_point_parity_parser.add_argument("--media-path")
+    second_point_parity_parser.add_argument(
+        "--run-name",
+        default="second-point-evidence-parity-v0",
+    )
+    second_point_parity_parser.add_argument(
+        "--viewer-base-url",
+        default="http://127.0.0.1:3000",
+    )
+    second_point_parity_parser.add_argument("--storage-root", default=".data/media")
+    second_point_parity_parser.add_argument(
+        "--copy-to-storage",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+    )
+    second_point_parity_parser.add_argument(
+        "--baseline-manifest-output",
+        default=DEFAULT_SECOND_POINT_PARITY_MANIFEST,
+    )
+    second_point_parity_parser.add_argument("--skip-create-db", action="store_true")
+    second_point_parity_parser.set_defaults(handler=_handle_build_second_point_evidence_parity)
 
     gameplay_parser = subcommands.add_parser(
         "run-gameplay-adapter",
@@ -1420,6 +1450,21 @@ def _handle_ingest_second_point_smoke(
         storage_root=args.storage_root,
         copy_to_storage=args.copy_to_storage,
         manifest_output=args.manifest_output,
+    )
+
+
+def _handle_build_second_point_evidence_parity(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    return build_second_point_evidence_parity(
+        session=session,
+        media_path=args.media_path,
+        run_name=args.run_name,
+        viewer_base_url=args.viewer_base_url,
+        storage_root=args.storage_root,
+        copy_to_storage=args.copy_to_storage,
+        baseline_manifest_output=args.baseline_manifest_output,
     )
 
 

@@ -312,6 +312,8 @@ Use this index as the durable navigation point for project memory, architecture 
 - [sample_point Expansion Readiness v0](reviews/sample_point_expansion_readiness_v0.md)
 - [Blueprint 21 Second Point Ingestion / Evidence Replay Smoke v0](blueprints/blueprint_21_second_point_ingestion_evidence_replay_smoke_v0.md)
 - [second_point Ingestion Smoke v0](reviews/second_point_ingestion_smoke_v0.md)
+- [Blueprint 22 Second Point Evidence Parity / Protected Baseline Gate v0](blueprints/blueprint_22_second_point_evidence_parity_baseline_gate_v0.md)
+- [second_point Evidence Parity v0](reviews/second_point_evidence_parity_v0.md)
 
 ## Development
 
