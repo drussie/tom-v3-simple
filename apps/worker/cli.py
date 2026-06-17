@@ -44,6 +44,10 @@ from apps.worker.services.main_player_track_assignment import assign_main_player
 from apps.worker.services.main_subject_filter import select_main_player_subjects
 from apps.worker.services.media_indexer import index_media
 from apps.worker.services.motion_smoothing import smooth_motion_candidates
+from apps.worker.services.multi_point_replay_index import (
+    MULTI_POINT_REPLAY_INDEX_OUTPUT,
+    build_multi_point_replay_index,
+)
 from apps.worker.services.object_court_projection import project_objects_to_court
 from apps.worker.services.point_candidate_evaluation import evaluate_point_candidates
 from apps.worker.services.point_evidence_snapshot import build_point_evidence_snapshot
@@ -1012,6 +1016,27 @@ def main() -> None:
     )
     point_manifest_parser.add_argument("--skip-create-db", action="store_true")
     point_manifest_parser.set_defaults(handler=_handle_build_point_manifest)
+
+    multi_point_index_parser = subcommands.add_parser(
+        "build-multi-point-replay-index",
+        help="Build a read-only replay navigation index from existing point manifests.",
+    )
+    multi_point_index_parser.add_argument(
+        "--manifest-root",
+        default=".data/manifests",
+        help="Directory containing point manifest JSON files.",
+    )
+    multi_point_index_parser.add_argument(
+        "--viewer-base-url",
+        default="http://127.0.0.1:3000",
+    )
+    multi_point_index_parser.add_argument(
+        "--output",
+        default=MULTI_POINT_REPLAY_INDEX_OUTPUT,
+        help="JSON index output path.",
+    )
+    multi_point_index_parser.add_argument("--skip-create-db", action="store_true")
+    multi_point_index_parser.set_defaults(handler=_handle_build_multi_point_replay_index)
 
     point_evaluation_parser = subcommands.add_parser(
         "evaluate-point-candidates",
@@ -2199,6 +2224,18 @@ def _handle_build_point_manifest(
         event_candidate_run_id=args.event_candidate_run_id,
         trajectory_3d_run_id=args.trajectory_3d_run_id,
         camera_geometry_id=args.camera_geometry_id,
+        viewer_base_url=args.viewer_base_url,
+        output_path=args.output,
+    )
+
+
+def _handle_build_multi_point_replay_index(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_multi_point_replay_index(
+        manifest_root=args.manifest_root,
         viewer_base_url=args.viewer_base_url,
         output_path=args.output,
     )

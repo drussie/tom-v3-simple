@@ -1,5 +1,45 @@
 export type JsonRecord = Record<string, unknown>;
 
+export interface PointManifestAssociatedRunIds {
+  event_candidate_run_id?: string;
+  trajectory_3d_run_id?: string;
+  camera_geometry_id?: string;
+  [key: string]: string | undefined;
+}
+
+export type PointManifestEvidenceAvailability = Record<string, boolean>;
+
+export type PointManifestProfileCounts = Record<string, number>;
+
+export interface PointManifestIndexPoint {
+  point_manifest_id: string;
+  media_id: string;
+  manifest_path: string;
+  replay_url: string;
+  source_media_path?: string | null;
+  source_uri?: string | null;
+  stored_path?: string | null;
+  stored_uri?: string | null;
+  associated_run_ids: PointManifestAssociatedRunIds;
+  evidence_availability: PointManifestEvidenceAvailability;
+  profile_counts: PointManifestProfileCounts;
+  warnings: Record<string, boolean>;
+  labels: string[];
+}
+
+export interface PointManifestIndex {
+  index_type: string;
+  index_version: string;
+  generated_at: string;
+  manifest_roots: string[];
+  point_count: number;
+  points: PointManifestIndexPoint[];
+  skipped_manifest_count?: number;
+  skipped_manifests?: Array<Record<string, string>>;
+  tom_provenance?: JsonRecord;
+  warnings: Record<string, boolean>;
+}
+
 export interface MediaAsset {
   id: string;
   source_uri: string;

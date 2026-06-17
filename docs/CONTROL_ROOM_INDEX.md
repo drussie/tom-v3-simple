@@ -316,6 +316,8 @@ Use this index as the durable navigation point for project memory, architecture 
 - [second_point Evidence Parity v0](reviews/second_point_evidence_parity_v0.md)
 - [Blueprint 23 Point Manifest / Evidence Provenance Contract v0](blueprints/blueprint_23_point_manifest_evidence_provenance_contract_v0.md)
 - [Point Manifest Evidence Provenance Contract v0](reviews/point_manifest_evidence_provenance_contract_v0.md)
+- [Blueprint 24 Multi-Point Replay Navigation / Review Surface v0](blueprints/blueprint_24_multi_point_replay_navigation_review_surface_v0.md)
+- [Multi-Point Replay Navigation / Review Surface v0](reviews/multi_point_replay_navigation_review_surface_v0.md)
 
 ## Development
 

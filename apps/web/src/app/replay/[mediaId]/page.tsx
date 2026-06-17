@@ -1,5 +1,5 @@
 import { ReplayWorkstation } from "../../../components/ReplayWorkstation";
-import { fetchReplayInfo } from "../../../lib/api";
+import { fetchPointManifestIndex, fetchReplayInfo } from "../../../lib/api";
 import type { ReplayMode } from "../../../lib/types";
 
 interface ReplayPageProps {
@@ -22,6 +22,7 @@ interface ReplayPageProps {
     ballTrajectoryRunId?: string;
     eventCandidateRunId?: string;
     trajectory3dRunId?: string;
+    cameraGeometryId?: string;
     viewPreset?: string;
   }>;
 }
@@ -31,9 +32,17 @@ export default async function ReplayPage({ params, searchParams }: ReplayPagePro
   const selectedRuns = await searchParams;
   const initialMode: ReplayMode = selectedRuns.mode === "stream_proxy" ? "stream_proxy" : "replay";
   try {
-    const replayInfo = await fetchReplayInfo(mediaId);
+    const [replayInfo, pointManifestIndex] = await Promise.all([
+      fetchReplayInfo(mediaId),
+      fetchPointManifestIndex().catch(() => null)
+    ]);
     return (
-      <ReplayWorkstation initialMode={initialMode} replayInfo={replayInfo} selectedRuns={selectedRuns} />
+      <ReplayWorkstation
+        initialMode={initialMode}
+        pointManifestIndex={pointManifestIndex}
+        replayInfo={replayInfo}
+        selectedRuns={selectedRuns}
+      />
     );
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unable to load replay media";

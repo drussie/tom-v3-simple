@@ -63,6 +63,8 @@ import type {
   ReplayOverlayDisplayMode,
   ReplayOverlayChunk,
   ReplayPlaybackState,
+  PointManifestIndex,
+  PointManifestIndexPoint,
   ReplayPoseOverlay,
   ReplayPoseVisualStyle,
   ReplayProjectionDiagnosticOverlay,
@@ -137,6 +139,7 @@ const emptyTrajectory3DDebugReviewSummary: ReplayTrajectory3DDebugReviewSummary 
 
 interface ReplayWorkstationProps {
   initialMode?: ReplayMode;
+  pointManifestIndex?: PointManifestIndex | null;
   replayInfo: ReplayInfo;
   selectedRuns: {
     detectionRunId?: string;
@@ -153,6 +156,7 @@ interface ReplayWorkstationProps {
     ballTrajectoryRunId?: string;
     eventCandidateRunId?: string;
     trajectory3dRunId?: string;
+    cameraGeometryId?: string;
     viewPreset?: string;
   };
 }
@@ -359,8 +363,159 @@ function presetContextFromRunIds({
   };
 }
 
+const pointNavigatorEvidenceFields: Array<{
+  field: string;
+  label: string;
+}> = [
+  { field: "media_indexed", label: "media" },
+  { field: "replay_available", label: "replay" },
+  { field: "event_candidates_available", label: "events" },
+  { field: "trajectory_3d_candidates_available", label: "3D" },
+  { field: "event_candidate_3d_diagnostics_available", label: "3D diagnostics" },
+  { field: "review_annotations_available", label: "reviews" },
+  { field: "trajectory_3d_debug_reviews_available", label: "debug reviews" }
+];
+
+function MultiPointReplayNavigator({
+  currentMediaId,
+  index,
+  selectedRuns
+}: {
+  currentMediaId: string;
+  index: PointManifestIndex | null;
+  selectedRuns: ReplayWorkstationProps["selectedRuns"];
+}) {
+  const points = index?.points.filter((point) => point.evidence_availability.replay_available) ?? [];
+  if (index === null || points.length === 0) {
+    return null;
+  }
+
+  return (
+    <section className="point-navigator" aria-label="Point manifest replay navigation">
+      <div className="point-navigator-header">
+        <div>
+          <p className="eyebrow">Point manifests</p>
+          <h2>{points.length} replayable evidence points</h2>
+        </div>
+        <div className="meta-line point-navigator-badges">
+          <span className="mini-pill">manifest index {index.index_version}</span>
+          <span className="mini-pill">observation-only</span>
+          <span className="mini-pill">no adjudication</span>
+        </div>
+      </div>
+      <div className="point-navigator-list">
+        {points.map((point) => {
+          const selected = isSelectedPoint(point, currentMediaId, selectedRuns);
+          return (
+            <a
+              className={`point-navigator-item${selected ? " selected" : ""}`}
+              href={pointReplayHref(point)}
+              key={`${point.point_manifest_id}:${point.media_id}`}
+            >
+              <div className="point-navigator-item-top">
+                <span className="status-pill">{pointPrimaryLabel(point)}</span>
+                <span className="mono point-manifest-id" title={point.point_manifest_id}>
+                  {shortIdentifier(point.point_manifest_id)}
+                </span>
+              </div>
+              <span className="mono point-media-id" title={point.media_id}>
+                {point.media_id}
+              </span>
+              <div className="point-navigator-counts">
+                {countChip(point, "event_marker_count", "markers")}
+                {countChip(point, "trajectory_3d_candidate_count", "3D candidates")}
+                {countChip(point, "review_annotation_count", "reviews")}
+              </div>
+              <div className="point-navigator-evidence">
+                {pointNavigatorEvidenceFields.map(({ field, label }) => {
+                  const available = point.evidence_availability[field] === true;
+                  return (
+                    <span
+                      className={`point-evidence-chip${available ? " available" : " missing"}`}
+                      key={field}
+                    >
+                      {label}
+                    </span>
+                  );
+                })}
+              </div>
+            </a>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+function pointReplayHref(point: PointManifestIndexPoint): string {
+  const params = new URLSearchParams();
+  const runIds = point.associated_run_ids;
+  if (runIds.event_candidate_run_id) {
+    params.set("eventCandidateRunId", runIds.event_candidate_run_id);
+  }
+  if (runIds.trajectory_3d_run_id) {
+    params.set("trajectory3dRunId", runIds.trajectory_3d_run_id);
+  }
+  if (runIds.camera_geometry_id) {
+    params.set("cameraGeometryId", runIds.camera_geometry_id);
+  }
+  const query = params.toString();
+  return `/replay/${encodeURIComponent(point.media_id)}${query ? `?${query}` : ""}`;
+}
+
+function isSelectedPoint(
+  point: PointManifestIndexPoint,
+  currentMediaId: string,
+  selectedRuns: ReplayWorkstationProps["selectedRuns"]
+): boolean {
+  if (point.media_id !== currentMediaId) {
+    return false;
+  }
+  const runIds = point.associated_run_ids;
+  return (
+    selectedRunMatches(runIds.event_candidate_run_id, selectedRuns.eventCandidateRunId) &&
+    selectedRunMatches(runIds.trajectory_3d_run_id, selectedRuns.trajectory3dRunId) &&
+    selectedRunMatches(runIds.camera_geometry_id, selectedRuns.cameraGeometryId)
+  );
+}
+
+function selectedRunMatches(manifestRunId?: string, selectedRunId?: string): boolean {
+  return !manifestRunId || !selectedRunId || manifestRunId === selectedRunId;
+}
+
+function pointPrimaryLabel(point: PointManifestIndexPoint): string {
+  if (point.labels.includes("protected_sample_point")) {
+    return "protected sample_point";
+  }
+  if (point.labels.includes("second_point_parity_stand_in")) {
+    return "second-point stand-in";
+  }
+  return "manifest point";
+}
+
+function countChip(
+  point: PointManifestIndexPoint,
+  field: string,
+  label: string
+): ReactNode {
+  const value = point.profile_counts[field] ?? 0;
+  return (
+    <span className="mini-pill" key={field}>
+      {value} {label}
+    </span>
+  );
+}
+
+function shortIdentifier(value: string): string {
+  if (value.length <= 18) {
+    return value;
+  }
+  return `${value.slice(0, 15)}...`;
+}
+
 export function ReplayWorkstation({
   initialMode = "replay",
+  pointManifestIndex = null,
   replayInfo,
   selectedRuns
 }: ReplayWorkstationProps) {
@@ -1680,6 +1835,12 @@ export function ReplayWorkstation({
           <span className="mini-pill">{eventCandidates.length} event candidates</span>
         </div>
       </header>
+
+      <MultiPointReplayNavigator
+        currentMediaId={replayInfo.media_id}
+        index={pointManifestIndex}
+        selectedRuns={selectedRuns}
+      />
 
       <div className="replay-grid">
         <div className="main-column">

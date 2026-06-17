@@ -210,6 +210,108 @@ pre {
   gap: 14px;
 }
 
+.point-navigator {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  display: grid;
+  gap: 12px;
+  margin-bottom: 14px;
+  min-width: 0;
+  padding: 14px;
+}
+
+.point-navigator-header {
+  align-items: start;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.point-navigator-header h2 {
+  font-size: 16px;
+  line-height: 1.2;
+  margin: 3px 0 0;
+}
+
+.point-navigator-badges {
+  justify-content: flex-end;
+}
+
+.point-navigator-list {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.point-navigator-item {
+  background: var(--surface-strong);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: inherit;
+  display: grid;
+  gap: 9px;
+  min-width: 0;
+  padding: 11px;
+  text-decoration: none;
+}
+
+.point-navigator-item.selected {
+  border-color: var(--green);
+  box-shadow: inset 0 0 0 1px var(--green);
+}
+
+.point-navigator-item-top {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  justify-content: space-between;
+  min-width: 0;
+}
+
+.point-manifest-id,
+.point-media-id {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.point-media-id {
+  color: var(--muted);
+  display: block;
+}
+
+.point-navigator-counts,
+.point-navigator-evidence {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-width: 0;
+}
+
+.point-evidence-chip {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  display: inline-flex;
+  font-size: 11px;
+  font-weight: 700;
+  min-height: 22px;
+  padding: 0 8px;
+}
+
+.point-evidence-chip.available {
+  background: var(--mint);
+  border-color: rgba(47, 125, 90, 0.35);
+  color: var(--green);
+}
+
+.point-evidence-chip.missing {
+  background: #fafafa;
+}
+
 .main-column,
 .side-column {
   display: grid;
@@ -2958,10 +3060,15 @@ pre {
 
 @media (max-width: 980px) {
   .viewer-header,
+  .point-navigator-header,
   .viewer-grid,
   .replay-grid,
   .media-grid {
     grid-template-columns: 1fr;
+  }
+
+  .point-navigator-badges {
+    justify-content: flex-start;
   }
 
   .timeline-axis,

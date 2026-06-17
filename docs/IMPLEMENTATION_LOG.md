@@ -3137,3 +3137,32 @@ The manifest service reads existing media and evidence tables, records availabil
 profile counts, and writes one local JSON manifest. It does not generate evidence, change review
 metadata, mutate protected baselines, decide in/out, score, identify players, determine a winner,
 or adjudicate evidence.
+
+## Blueprint 24 Multi-Point Replay Navigation / Review Surface v0
+
+Status: complete
+
+### Goal
+
+Make point manifests usable as replay navigation/review units without creating truth, scoring,
+player identity, event generation, 3D generation, or adjudication.
+
+### Notes
+
+This milestone adds:
+
+- `apps.worker.services.multi_point_replay_index`
+- `build-multi-point-replay-index` worker CLI command
+- `tom-v1-build-multi-point-replay-index` Make helper
+- `.data/manifests/multi_point_replay_index.json` generated index path
+- `GET /replay/point-manifests`
+- Replay Workstation point navigator
+- `docs/blueprints/blueprint_24_multi_point_replay_navigation_review_surface_v0.md`
+- `docs/reviews/multi_point_replay_navigation_review_surface_v0.md`
+- `docs/agent_reports/blueprint_24_multi_point_replay_navigation_review_surface_v0_report.md`
+
+The index service reads existing point manifest JSON, preserves replay run-ID context, reports
+evidence availability/profile counts, and labels protected sample-point or second-point stand-in
+contexts only when inferable from manifest provenance. It does not generate evidence, change review
+metadata, mutate protected baselines, decide in/out, score, identify players, determine a winner,
+or adjudicate evidence.

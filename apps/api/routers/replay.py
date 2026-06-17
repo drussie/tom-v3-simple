@@ -39,9 +39,23 @@ from apps.api.services.trajectory_3d_debug_reviews import (
     serialize_trajectory_3d_debug_review,
     update_trajectory_3d_debug_review,
 )
+from apps.worker.services.multi_point_replay_index import build_multi_point_replay_index
 
 router = APIRouter(tags=["replay"])
 SessionDep = Annotated[Session, Depends(get_session)]
+
+
+@router.get("/replay/point-manifests")
+def get_point_manifest_index(
+    manifest_root: str = Query(default=".data/manifests"),
+    viewer_base_url: str = Query(default="http://127.0.0.1:3000"),
+) -> dict[str, object]:
+    result = build_multi_point_replay_index(
+        manifest_root=manifest_root,
+        viewer_base_url=viewer_base_url,
+        output_path=None,
+    )
+    return result["index"]
 
 
 @router.get("/replay/overlays")

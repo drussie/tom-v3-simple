@@ -1867,6 +1867,56 @@ Expected:
 
 Generated `.data` manifests are local outputs and should not be committed.
 
+## Multi-Point Replay Navigation / Review Surface
+
+Use this after point manifests exist locally. The index discovers valid point manifests and builds a
+replay navigation artifact for manifest-backed points. It describes existing manifests only. It
+does not generate observations, event candidates, 3D candidates, review lifecycle decisions, truth,
+score, player identity, point winner, in/out, or adjudication.
+
+Build the multi-point replay index:
+
+```bash
+make tom-v1-build-multi-point-replay-index \
+  PYTHON=.venv/bin/python
+```
+
+Optional overrides:
+
+```bash
+POINT_MANIFEST_ROOT=.data/manifests
+MULTI_POINT_REPLAY_INDEX_OUTPUT=.data/manifests/multi_point_replay_index.json
+VIEWER_BASE_URL=http://127.0.0.1:3000
+```
+
+Default generated index:
+
+```text
+.data/manifests/multi_point_replay_index.json
+```
+
+Expected:
+
+- `ok`: true
+- `status`: `completed`
+- `index_type`: `multi_point_replay_index`
+- `index_version`: `v0`
+- `point_count`: number of valid point manifests discovered
+- `points[]`: manifest-backed replay points
+- `warnings.navigation_only`: true
+- `warnings.manifest_index_is_not_truth`: true
+- `warnings.observation_only`: true
+- `warnings.no_adjudication`: true
+
+The replay API exposes the same index at:
+
+```text
+GET /replay/point-manifests
+```
+
+The Replay Workstation keeps existing `/replay/<media_id>` semantics. Point links preserve
+`eventCandidateRunId`, `trajectory3dRunId`, and `cameraGeometryId` query parameters when present.
+
 Build the point evidence snapshot:
 
 ```bash

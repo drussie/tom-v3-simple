@@ -5,6 +5,7 @@ import type {
   EventCandidateReviewKind,
   HumanAnnotation,
   JsonRecord,
+  PointManifestIndex,
   ReplayInfo,
   ReplayOverlayChunk,
   ReplayTimeline,
@@ -44,6 +45,18 @@ export async function fetchReplayInfo(mediaId: string): Promise<ReplayInfo> {
   }
 
   return (await response.json()) as ReplayInfo;
+}
+
+export async function fetchPointManifestIndex(): Promise<PointManifestIndex> {
+  const response = await fetch(`${getApiBaseUrl()}/replay/point-manifests`, {
+    cache: "no-store"
+  });
+
+  if (!response.ok) {
+    throw new Error(`Unable to load point manifest index: ${response.status}`);
+  }
+
+  return (await response.json()) as PointManifestIndex;
 }
 
 export interface FetchReplayOverlayChunkInput {

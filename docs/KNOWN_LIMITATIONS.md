@@ -214,6 +214,9 @@ This registry makes TOM v3 Simple boundaries explicit.
 - Point manifests record media provenance, replay links, optional evidence run IDs, evidence
   availability, and profile counts only. They are not truth, training truth, 3D truth, player
   identity, score, point winner, in/out, generalization, or adjudication records.
+- Multi-point replay navigation indexes existing point manifests only. It is not a multi-point
+  benchmark, truth source, review lifecycle, score layer, player identity layer, generalization
+  claim, or adjudication surface.
 - Replay view presets are display defaults only. Operator view hides raw/debug layers by default,
   and debug/audit view enables them, but neither preset changes persisted observations or proves
   evidence correctness.
