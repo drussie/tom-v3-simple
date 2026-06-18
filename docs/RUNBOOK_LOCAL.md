@@ -1970,6 +1970,50 @@ Additional manifest-backed points are additive and non-breaking unless strict mo
 Protected sample-point regressions and matrix contract failures are breaking. Drift is a local
 artifact difference only; it is not proof of correctness or tennis truth.
 
+## Observation Quality Taxonomy / Profile
+
+Use this after a Blueprint 24 multi-point replay index exists. The taxonomy defines neutral
+review-support quality dimensions. The profile reads the replay index and marks what is known,
+unknown, unavailable, or needs human review from existing artifacts only. It does not inspect video,
+generate observations, create event candidates, create 3D candidates, decide in/out, score, identify
+players, determine a winner, or adjudicate evidence.
+
+Export the taxonomy contract:
+
+```bash
+make tom-v1-export-observation-quality-taxonomy \
+  PYTHON=.venv/bin/python
+```
+
+Build a current profile:
+
+```bash
+make tom-v1-build-observation-quality-profile \
+  PYTHON=.venv/bin/python
+```
+
+Default paths:
+
+```text
+.data/contracts/observation_quality_taxonomy_v1.json
+.data/exports/observation_quality_profile.current.json
+```
+
+Expected:
+
+- `ok`: true
+- `taxonomy_type`: `observation_quality_taxonomy`
+- `taxonomy_version`: `v1`
+- `profile_type`: `observation_quality_profile`
+- `profile_version`: `v1`
+- `warnings.taxonomy_is_not_truth`: true
+- `warnings.observation_quality_is_not_adjudication`: true
+- `warnings.no_adjudication`: true
+
+Visual quality dimensions default to `unknown` when media/replay context exists because the profile
+does not inspect video content. Missing evidence is `unavailable`. `requires_human_review` marks
+dimensions that cannot be determined from the existing provenance artifacts.
+
 Build the point evidence snapshot:
 
 ```bash

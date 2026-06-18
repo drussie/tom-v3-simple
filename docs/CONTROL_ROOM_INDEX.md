@@ -320,6 +320,8 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Multi-Point Replay Navigation / Review Surface v0](reviews/multi_point_replay_navigation_review_surface_v0.md)
 - [Blueprint 25 Multi-Point Regression Matrix / Baseline Expansion v0](blueprints/blueprint_25_multi_point_regression_matrix_baseline_expansion_v0.md)
 - [Multi-Point Regression Matrix / Baseline Expansion v0](reviews/multi_point_regression_matrix_baseline_expansion_v0.md)
+- [Blueprint 26 Observation Quality Taxonomy v1](blueprints/blueprint_26_observation_quality_taxonomy_v1.md)
+- [Observation Quality Taxonomy v1](reviews/observation_quality_taxonomy_v1.md)
 
 ## Development
 

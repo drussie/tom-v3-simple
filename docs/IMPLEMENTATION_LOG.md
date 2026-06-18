@@ -3201,3 +3201,34 @@ artifacts. Added manifest-backed points are non-breaking by default. Protected s
 and matrix warning/type/version contract failures are breaking. The service does not generate
 evidence, change review metadata, mutate protected baselines, decide in/out, score, identify
 players, determine a winner, claim generalization, or adjudicate evidence.
+
+## Blueprint 26 Observation Quality Taxonomy v1
+
+Status: complete
+
+### Goal
+
+Create a versioned observation-quality taxonomy and conservative profile builder without creating
+truth, scoring, player identity, event generation, 3D generation, or adjudication.
+
+### Notes
+
+This milestone adds:
+
+- `apps.worker.services.observation_quality_taxonomy`
+- `export-observation-quality-taxonomy` worker CLI command
+- `build-observation-quality-profile` worker CLI command
+- `tom-v1-export-observation-quality-taxonomy` Make helper
+- `tom-v1-build-observation-quality-profile` Make helper
+- `.data/contracts/observation_quality_taxonomy_v1.json` local contract path
+- `.data/exports/observation_quality_profile.current.json` local profile path
+- `docs/blueprints/blueprint_26_observation_quality_taxonomy_v1.md`
+- `docs/reviews/observation_quality_taxonomy_v1.md`
+- `docs/agent_reports/blueprint_26_observation_quality_taxonomy_v1_report.md`
+
+The taxonomy defines neutral quality dimensions and allowed values for review support. The profile
+service reads the Blueprint 24 replay index only, preserves point/replay/run/evidence/profile
+context, marks visual quality as `unknown` when media context exists, marks missing evidence as
+`unavailable`, and flags dimensions that require human review. It does not inspect video, generate
+evidence, change review metadata, mutate protected baselines, decide in/out, score, identify
+players, determine a winner, claim generalization, or adjudicate evidence.

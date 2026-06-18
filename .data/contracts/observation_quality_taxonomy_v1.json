@@ -1,0 +1,541 @@
+{
+  "dimensions": [
+    {
+      "allowed_values": [
+        "unknown",
+        "unavailable",
+        "low",
+        "medium",
+        "high",
+        "mixed",
+        "not_applicable",
+        "clear",
+        "partially_obscured",
+        "heavily_obscured",
+        "sufficient_for_review",
+        "insufficient_for_review",
+        "needs_human_review"
+      ],
+      "applies_to": [
+        "media",
+        "replay",
+        "review"
+      ],
+      "default_value": "unknown",
+      "description": "Review-support description of source media condition when known.",
+      "key": "media_quality",
+      "name": "Media quality",
+      "warnings": {
+        "dimension_is_not_truth": true,
+        "no_adjudication": true,
+        "observation_quality_is_not_adjudication": true,
+        "review_support_only": true
+      }
+    },
+    {
+      "allowed_values": [
+        "unknown",
+        "unavailable",
+        "low",
+        "medium",
+        "high",
+        "mixed",
+        "not_applicable",
+        "clear",
+        "partially_obscured",
+        "heavily_obscured",
+        "sufficient_for_review",
+        "insufficient_for_review",
+        "needs_human_review"
+      ],
+      "applies_to": [
+        "media",
+        "replay",
+        "review"
+      ],
+      "default_value": "unknown",
+      "description": "Review-support description of apparent camera steadiness when known.",
+      "key": "camera_stability",
+      "name": "Camera stability",
+      "warnings": {
+        "dimension_is_not_truth": true,
+        "no_adjudication": true,
+        "observation_quality_is_not_adjudication": true,
+        "review_support_only": true
+      }
+    },
+    {
+      "allowed_values": [
+        "unknown",
+        "unavailable",
+        "low",
+        "medium",
+        "high",
+        "mixed",
+        "not_applicable",
+        "clear",
+        "partially_obscured",
+        "heavily_obscured",
+        "sufficient_for_review",
+        "insufficient_for_review",
+        "needs_human_review"
+      ],
+      "applies_to": [
+        "media",
+        "replay",
+        "review",
+        "camera_geometry"
+      ],
+      "default_value": "unknown",
+      "description": "Review-support description of court visibility when known.",
+      "key": "court_visibility",
+      "name": "Court visibility",
+      "warnings": {
+        "dimension_is_not_truth": true,
+        "no_adjudication": true,
+        "observation_quality_is_not_adjudication": true,
+        "review_support_only": true
+      }
+    },
+    {
+      "allowed_values": [
+        "unknown",
+        "unavailable",
+        "low",
+        "medium",
+        "high",
+        "mixed",
+        "not_applicable",
+        "clear",
+        "partially_obscured",
+        "heavily_obscured",
+        "sufficient_for_review",
+        "insufficient_for_review",
+        "needs_human_review"
+      ],
+      "applies_to": [
+        "media",
+        "replay",
+        "event_candidates",
+        "trajectory_3d"
+      ],
+      "default_value": "unknown",
+      "description": "Review-support description of ball visibility when known.",
+      "key": "ball_visibility",
+      "name": "Ball visibility",
+      "warnings": {
+        "dimension_is_not_truth": true,
+        "no_adjudication": true,
+        "observation_quality_is_not_adjudication": true,
+        "review_support_only": true
+      }
+    },
+    {
+      "allowed_values": [
+        "unknown",
+        "unavailable",
+        "low",
+        "medium",
+        "high",
+        "mixed",
+        "not_applicable",
+        "clear",
+        "partially_obscured",
+        "heavily_obscured",
+        "sufficient_for_review",
+        "insufficient_for_review",
+        "needs_human_review"
+      ],
+      "applies_to": [
+        "media",
+        "replay",
+        "review"
+      ],
+      "default_value": "unknown",
+      "description": "Review-support description of player visibility when known.",
+      "key": "player_visibility",
+      "name": "Player visibility",
+      "warnings": {
+        "dimension_is_not_truth": true,
+        "no_adjudication": true,
+        "observation_quality_is_not_adjudication": true,
+        "review_support_only": true
+      }
+    },
+    {
+      "allowed_values": [
+        "unknown",
+        "unavailable",
+        "low",
+        "medium",
+        "high",
+        "mixed",
+        "not_applicable",
+        "clear",
+        "partially_obscured",
+        "heavily_obscured",
+        "sufficient_for_review",
+        "insufficient_for_review",
+        "needs_human_review"
+      ],
+      "applies_to": [
+        "media",
+        "replay",
+        "review"
+      ],
+      "default_value": "unknown",
+      "description": "Review-support description of visual obstruction when known.",
+      "key": "occlusion",
+      "name": "Occlusion",
+      "warnings": {
+        "dimension_is_not_truth": true,
+        "no_adjudication": true,
+        "observation_quality_is_not_adjudication": true,
+        "review_support_only": true
+      }
+    },
+    {
+      "allowed_values": [
+        "unknown",
+        "unavailable",
+        "low",
+        "medium",
+        "high",
+        "mixed",
+        "not_applicable",
+        "clear",
+        "partially_obscured",
+        "heavily_obscured",
+        "sufficient_for_review",
+        "insufficient_for_review",
+        "needs_human_review"
+      ],
+      "applies_to": [
+        "media",
+        "replay",
+        "review"
+      ],
+      "default_value": "unknown",
+      "description": "Review-support description of motion blur when known.",
+      "key": "motion_blur",
+      "name": "Motion blur",
+      "warnings": {
+        "dimension_is_not_truth": true,
+        "no_adjudication": true,
+        "observation_quality_is_not_adjudication": true,
+        "review_support_only": true
+      }
+    },
+    {
+      "allowed_values": [
+        "unknown",
+        "unavailable",
+        "low",
+        "medium",
+        "high",
+        "mixed",
+        "not_applicable",
+        "clear",
+        "partially_obscured",
+        "heavily_obscured",
+        "sufficient_for_review",
+        "insufficient_for_review",
+        "needs_human_review"
+      ],
+      "applies_to": [
+        "media",
+        "replay",
+        "review"
+      ],
+      "default_value": "unknown",
+      "description": "Review-support description of lighting condition when known.",
+      "key": "lighting",
+      "name": "Lighting",
+      "warnings": {
+        "dimension_is_not_truth": true,
+        "no_adjudication": true,
+        "observation_quality_is_not_adjudication": true,
+        "review_support_only": true
+      }
+    },
+    {
+      "allowed_values": [
+        "unknown",
+        "unavailable",
+        "low",
+        "medium",
+        "high",
+        "mixed",
+        "not_applicable",
+        "clear",
+        "partially_obscured",
+        "heavily_obscured",
+        "sufficient_for_review",
+        "insufficient_for_review",
+        "needs_human_review"
+      ],
+      "applies_to": [
+        "media",
+        "replay",
+        "review"
+      ],
+      "default_value": "unknown",
+      "description": "Review-support description of frame continuity when known.",
+      "key": "frame_continuity",
+      "name": "Frame continuity",
+      "warnings": {
+        "dimension_is_not_truth": true,
+        "no_adjudication": true,
+        "observation_quality_is_not_adjudication": true,
+        "review_support_only": true
+      }
+    },
+    {
+      "allowed_values": [
+        "unknown",
+        "unavailable",
+        "low",
+        "medium",
+        "high",
+        "mixed",
+        "not_applicable",
+        "clear",
+        "partially_obscured",
+        "heavily_obscured",
+        "sufficient_for_review",
+        "insufficient_for_review",
+        "needs_human_review"
+      ],
+      "applies_to": [
+        "point_manifest",
+        "multi_point_replay_index",
+        "review"
+      ],
+      "default_value": "unknown",
+      "description": "Whether existing artifacts provide enough replay context for review.",
+      "key": "replay_context_completeness",
+      "name": "Replay context completeness",
+      "warnings": {
+        "dimension_is_not_truth": true,
+        "no_adjudication": true,
+        "observation_quality_is_not_adjudication": true,
+        "review_support_only": true
+      }
+    },
+    {
+      "allowed_values": [
+        "unknown",
+        "unavailable",
+        "low",
+        "medium",
+        "high",
+        "mixed",
+        "not_applicable",
+        "clear",
+        "partially_obscured",
+        "heavily_obscured",
+        "sufficient_for_review",
+        "insufficient_for_review",
+        "needs_human_review"
+      ],
+      "applies_to": [
+        "point_manifest",
+        "multi_point_replay_index",
+        "review"
+      ],
+      "default_value": "unknown",
+      "description": "Availability summary for existing evidence categories only.",
+      "key": "evidence_completeness",
+      "name": "Evidence completeness",
+      "warnings": {
+        "dimension_is_not_truth": true,
+        "no_adjudication": true,
+        "observation_quality_is_not_adjudication": true,
+        "review_support_only": true
+      }
+    },
+    {
+      "allowed_values": [
+        "unknown",
+        "unavailable",
+        "low",
+        "medium",
+        "high",
+        "mixed",
+        "not_applicable",
+        "clear",
+        "partially_obscured",
+        "heavily_obscured",
+        "sufficient_for_review",
+        "insufficient_for_review",
+        "needs_human_review"
+      ],
+      "applies_to": [
+        "camera_geometry",
+        "trajectory_3d",
+        "review"
+      ],
+      "default_value": "unknown",
+      "description": "Availability summary for existing camera geometry context only.",
+      "key": "calibration_readiness",
+      "name": "Calibration readiness",
+      "warnings": {
+        "dimension_is_not_truth": true,
+        "no_adjudication": true,
+        "observation_quality_is_not_adjudication": true,
+        "review_support_only": true
+      }
+    },
+    {
+      "allowed_values": [
+        "unknown",
+        "unavailable",
+        "low",
+        "medium",
+        "high",
+        "mixed",
+        "not_applicable",
+        "clear",
+        "partially_obscured",
+        "heavily_obscured",
+        "sufficient_for_review",
+        "insufficient_for_review",
+        "needs_human_review"
+      ],
+      "applies_to": [
+        "trajectory_3d",
+        "review"
+      ],
+      "default_value": "unknown",
+      "description": "Availability summary for existing 3D trajectory context only.",
+      "key": "trajectory_3d_readiness",
+      "name": "3D trajectory readiness",
+      "warnings": {
+        "dimension_is_not_truth": true,
+        "no_adjudication": true,
+        "observation_quality_is_not_adjudication": true,
+        "review_support_only": true
+      }
+    },
+    {
+      "allowed_values": [
+        "unknown",
+        "unavailable",
+        "low",
+        "medium",
+        "high",
+        "mixed",
+        "not_applicable",
+        "clear",
+        "partially_obscured",
+        "heavily_obscured",
+        "sufficient_for_review",
+        "insufficient_for_review",
+        "needs_human_review"
+      ],
+      "applies_to": [
+        "replay",
+        "review",
+        "review_annotations"
+      ],
+      "default_value": "unknown",
+      "description": "Whether existing replay and evidence context can support human review.",
+      "key": "review_readiness",
+      "name": "Review readiness",
+      "warnings": {
+        "dimension_is_not_truth": true,
+        "no_adjudication": true,
+        "observation_quality_is_not_adjudication": true,
+        "review_support_only": true
+      }
+    },
+    {
+      "allowed_values": [
+        "unknown",
+        "unavailable",
+        "low",
+        "medium",
+        "high",
+        "mixed",
+        "not_applicable",
+        "clear",
+        "partially_obscured",
+        "heavily_obscured",
+        "sufficient_for_review",
+        "insufficient_for_review",
+        "needs_human_review"
+      ],
+      "applies_to": [
+        "review_annotations",
+        "review"
+      ],
+      "default_value": "unknown",
+      "description": "Availability summary for existing review annotation context only.",
+      "key": "annotation_readiness",
+      "name": "Annotation readiness",
+      "warnings": {
+        "dimension_is_not_truth": true,
+        "no_adjudication": true,
+        "observation_quality_is_not_adjudication": true,
+        "review_support_only": true
+      }
+    },
+    {
+      "allowed_values": [
+        "unknown",
+        "unavailable",
+        "low",
+        "medium",
+        "high",
+        "mixed",
+        "not_applicable",
+        "clear",
+        "partially_obscured",
+        "heavily_obscured",
+        "sufficient_for_review",
+        "insufficient_for_review",
+        "needs_human_review"
+      ],
+      "applies_to": [
+        "point_manifest",
+        "multi_point_replay_index",
+        "exports"
+      ],
+      "default_value": "unknown",
+      "description": "Whether existing artifacts carry point, media, manifest, and run context.",
+      "key": "provenance_completeness",
+      "name": "Provenance completeness",
+      "warnings": {
+        "dimension_is_not_truth": true,
+        "no_adjudication": true,
+        "observation_quality_is_not_adjudication": true,
+        "review_support_only": true
+      }
+    }
+  ],
+  "exported_at": "2026-06-18T17:29:23.087176+00:00",
+  "taxonomy_type": "observation_quality_taxonomy",
+  "taxonomy_version": "v1",
+  "tom_provenance": {
+    "blueprint": "blueprint_26",
+    "blueprint_name": "observation_quality_taxonomy_v1",
+    "project": "tom-v3-simple",
+    "project_version": "0.0.0"
+  },
+  "warnings": {
+    "does_not_create_3d_candidates": true,
+    "does_not_create_event_candidates": true,
+    "does_not_create_in_out": true,
+    "does_not_create_observations": true,
+    "does_not_create_score": true,
+    "does_not_determine_winner": true,
+    "does_not_identify_players": true,
+    "no_adjudication": true,
+    "not_generalization_claim": true,
+    "not_training_truth": true,
+    "observation_only": true,
+    "observation_quality_is_not_adjudication": true,
+    "review_support_only": true,
+    "taxonomy_is_not_truth": true
+  }
+}

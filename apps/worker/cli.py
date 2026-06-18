@@ -58,6 +58,12 @@ from apps.worker.services.multi_point_replay_index import (
     build_multi_point_replay_index,
 )
 from apps.worker.services.object_court_projection import project_objects_to_court
+from apps.worker.services.observation_quality_taxonomy import (
+    DEFAULT_OBSERVATION_QUALITY_PROFILE_OUTPUT,
+    DEFAULT_OBSERVATION_QUALITY_TAXONOMY_OUTPUT,
+    build_observation_quality_profile,
+    export_observation_quality_taxonomy,
+)
 from apps.worker.services.point_candidate_evaluation import evaluate_point_candidates
 from apps.worker.services.point_evidence_snapshot import build_point_evidence_snapshot
 from apps.worker.services.point_manifest import build_point_manifest
@@ -1129,6 +1135,41 @@ def main() -> None:
     multi_point_matrix_verify_parser.add_argument("--skip-create-db", action="store_true")
     multi_point_matrix_verify_parser.set_defaults(
         handler=_handle_verify_multi_point_regression_matrix,
+        skip_create_db=True,
+    )
+
+    observation_quality_taxonomy_parser = subcommands.add_parser(
+        "export-observation-quality-taxonomy",
+        help="Export the read-only observation-quality taxonomy contract.",
+    )
+    observation_quality_taxonomy_parser.add_argument(
+        "--output",
+        default=DEFAULT_OBSERVATION_QUALITY_TAXONOMY_OUTPUT,
+        help="JSON taxonomy contract output path.",
+    )
+    observation_quality_taxonomy_parser.add_argument("--skip-create-db", action="store_true")
+    observation_quality_taxonomy_parser.set_defaults(
+        handler=_handle_export_observation_quality_taxonomy,
+        skip_create_db=True,
+    )
+
+    observation_quality_profile_parser = subcommands.add_parser(
+        "build-observation-quality-profile",
+        help="Build a conservative observation-quality profile from an existing replay index.",
+    )
+    observation_quality_profile_parser.add_argument(
+        "--index",
+        default=MULTI_POINT_REPLAY_INDEX_OUTPUT,
+        help="Blueprint 24 multi-point replay index JSON path.",
+    )
+    observation_quality_profile_parser.add_argument(
+        "--output",
+        default=DEFAULT_OBSERVATION_QUALITY_PROFILE_OUTPUT,
+        help="JSON observation-quality profile output path.",
+    )
+    observation_quality_profile_parser.add_argument("--skip-create-db", action="store_true")
+    observation_quality_profile_parser.set_defaults(
+        handler=_handle_build_observation_quality_profile,
         skip_create_db=True,
     )
 
@@ -2372,6 +2413,25 @@ def _handle_verify_multi_point_regression_matrix(
         regression_output=args.regression_output,
         regression_markdown_output=args.regression_markdown_output,
         strict=args.strict,
+    )
+
+
+def _handle_export_observation_quality_taxonomy(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return export_observation_quality_taxonomy(output_path=args.output)
+
+
+def _handle_build_observation_quality_profile(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_observation_quality_profile(
+        source_index_path=args.index,
+        output_path=args.output,
     )
 
 

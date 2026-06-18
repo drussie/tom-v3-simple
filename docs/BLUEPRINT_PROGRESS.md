@@ -1229,3 +1229,15 @@ availability, profile counts, warnings, and provenance-only labels. Comparison r
 points separately from breaking protected/contract drift. It does not create observations, event
 candidates, 3D candidates, labels, truth, score, player identity, point winner, in/out,
 generalization, or adjudication.
+
+## Blueprint 26 Status
+
+Status: complete.
+
+TOM v3 can now export a versioned observation-quality taxonomy and build a conservative
+observation-quality profile from the Blueprint 24 replay index. The profile preserves point
+manifest/media identity, replay URLs, associated run IDs, evidence availability, profile counts,
+provenance-only labels, quality dimensions, and warning flags. Visual quality remains `unknown`
+unless reviewed by a human; missing evidence is `unavailable`. It does not inspect video, create
+observations, event candidates, 3D candidates, truth, score, player identity, point winner, in/out,
+generalization, or adjudication.

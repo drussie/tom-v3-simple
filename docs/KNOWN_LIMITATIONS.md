@@ -220,6 +220,10 @@ This registry makes TOM v3 Simple boundaries explicit.
 - Multi-point regression matrices compare local manifest-backed evidence profiles only. They do
   not prove correctness, support scoring, establish player identity, create in/out, or claim TOM
   generalizes to multiple real tennis points.
+- Observation-quality taxonomy/profile artifacts describe review-support availability and
+  conservative quality states only. Visual quality remains unknown without human review, and the
+  profile does not inspect video, prove correctness, create training truth, score, identify
+  players, decide in/out, or adjudicate evidence.
 - Replay view presets are display defaults only. Operator view hides raw/debug layers by default,
   and debug/audit view enables them, but neither preset changes persisted observations or proves
   evidence correctness.
