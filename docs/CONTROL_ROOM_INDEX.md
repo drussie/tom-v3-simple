@@ -330,6 +330,8 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Multi-Reviewer / Disagreement Foundation v1](reviews/multi_reviewer_disagreement_foundation_v1.md)
 - [Blueprint 30 INTENNSE Label Alignment Contract v1](blueprints/blueprint_30_intennse_label_alignment_contract_v1.md)
 - [INTENNSE Label Alignment Contract v1](reviews/intennse_label_alignment_contract_v1.md)
+- [Blueprint 31 Versioned Dataset Corpus v1](blueprints/blueprint_31_versioned_dataset_corpus_v1.md)
+- [Versioned Dataset Corpus v1](reviews/versioned_dataset_corpus_v1.md)
 
 ## Development
 

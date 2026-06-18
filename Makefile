@@ -96,6 +96,15 @@ INTENNSE_ALIGNMENT_REPORT_OUTPUT ?= .data/exports/intennse_alignment_report.curr
 TOM_DISAGREEMENT_REPORT_REF ?=
 INTENNSE_LABEL_BUNDLE_REF ?=
 INTENNSE_SCHEMA_VERSION ?=
+DATASET_CORPUS_CONTRACT_OUTPUT ?= .data/contracts/versioned_dataset_corpus_contract_v1.json
+DATASET_CORPUS_SOURCE_INDEX ?= $(MULTI_POINT_REPLAY_INDEX_OUTPUT)
+DATASET_CORPUS_SOURCE_MATRIX ?= $(MULTI_POINT_REGRESSION_MATRIX_CURRENT)
+DATASET_CORPUS_MANIFEST_OUTPUT ?= .data/exports/versioned_dataset_corpus_manifest.current.json
+DATASET_CORPUS_MANIFEST ?=
+DATASET_CORPUS_VALIDATION_OUTPUT ?= .data/exports/versioned_dataset_corpus_manifest.validation.json
+DATASET_CORPUS_REPORT_OUTPUT ?= .data/exports/versioned_dataset_corpus_report.current.json
+DATASET_CORPUS_ID ?=
+DATASET_CORPUS_VERSION ?= v1
 EXPECTED_BRANCH ?=
 EXPECTED_TAG ?=
 FORMAT ?= json
@@ -183,7 +192,7 @@ DERIVE_LINES ?= true
 
 export TOM_V3_DATABASE_URL
 
-.PHONY: install web-install test lint migrate api seed verify index-media run-gameplay index-and-run-gameplay run-detection index-and-run-detection extract-frame-artifacts build-tracklets run-pose export-tracklet-review-dataset court-review-export demo demo-fixture demo-plan demo-reset demo-export demo-open replay-open completion-audit completion-check yolo-probe yolo-smoke yolo-runtime-probe register-yolo-model smoke-real-yolo-local real-detection real-pose tom-v1-yolo-probe tom-v1-ball-detection tom-v1-player-detection tom-v1-tracklets tom-v1-main-subjects tom-v1-main-player-tracks tom-v1-pose tom-v1-pose-main-subjects tom-v1-pose-main-tracks tom-v1-motion-smoothing tom-v1-court-keypoints-probe tom-v1-court-keypoints tom-v1-court-keypoint-audit tom-v1-object-court-projection tom-v1-ball-court-trajectory tom-v1-build-3d-ball-trajectory-candidates tom-v1-build-event-candidate-3d-diagnostics tom-v1-export-reviewed-3d-debug-dataset tom-v1-compare-reviewed-3d-debug-dataset tom-v1-freeze-reviewed-3d-debug-baseline tom-v1-verify-reviewed-3d-debug-baseline tom-v1-hit-bounce-candidates tom-v1-hit-bounce-candidates-verbose tom-v1-point-evidence-snapshot tom-v1-build-point-manifest tom-v1-build-multi-point-replay-index tom-v1-build-multi-point-regression-matrix tom-v1-compare-multi-point-regression-matrix tom-v1-verify-multi-point-regression-matrix tom-v1-export-observation-quality-taxonomy tom-v1-build-observation-quality-profile tom-v1-export-review-label-schema tom-v1-build-review-label-template tom-v1-validate-review-label-bundle tom-v1-export-reviewer-confidence-schema tom-v1-build-reviewer-confidence-template tom-v1-validate-reviewer-confidence-bundle tom-v1-export-multi-reviewer-disagreement-schema tom-v1-build-multi-reviewer-review-set-template tom-v1-validate-multi-reviewer-review-set tom-v1-build-reviewer-disagreement-report tom-v1-export-intennse-label-alignment-contract tom-v1-build-intennse-alignment-template tom-v1-validate-intennse-alignment-bundle tom-v1-build-intennse-alignment-report tom-v1-post-codex-validate tom-v1-evaluate-point-candidates tom-v1-declare-camera-geometry tom-v1-ingest-second-point-smoke tom-v1-build-second-point-evidence-parity court-fixture homography-candidates projection-diagnostics web web-build web-lint smoke all-checks
+.PHONY: install web-install test lint migrate api seed verify index-media run-gameplay index-and-run-gameplay run-detection index-and-run-detection extract-frame-artifacts build-tracklets run-pose export-tracklet-review-dataset court-review-export demo demo-fixture demo-plan demo-reset demo-export demo-open replay-open completion-audit completion-check yolo-probe yolo-smoke yolo-runtime-probe register-yolo-model smoke-real-yolo-local real-detection real-pose tom-v1-yolo-probe tom-v1-ball-detection tom-v1-player-detection tom-v1-tracklets tom-v1-main-subjects tom-v1-main-player-tracks tom-v1-pose tom-v1-pose-main-subjects tom-v1-pose-main-tracks tom-v1-motion-smoothing tom-v1-court-keypoints-probe tom-v1-court-keypoints tom-v1-court-keypoint-audit tom-v1-object-court-projection tom-v1-ball-court-trajectory tom-v1-build-3d-ball-trajectory-candidates tom-v1-build-event-candidate-3d-diagnostics tom-v1-export-reviewed-3d-debug-dataset tom-v1-compare-reviewed-3d-debug-dataset tom-v1-freeze-reviewed-3d-debug-baseline tom-v1-verify-reviewed-3d-debug-baseline tom-v1-hit-bounce-candidates tom-v1-hit-bounce-candidates-verbose tom-v1-point-evidence-snapshot tom-v1-build-point-manifest tom-v1-build-multi-point-replay-index tom-v1-build-multi-point-regression-matrix tom-v1-compare-multi-point-regression-matrix tom-v1-verify-multi-point-regression-matrix tom-v1-export-observation-quality-taxonomy tom-v1-build-observation-quality-profile tom-v1-export-review-label-schema tom-v1-build-review-label-template tom-v1-validate-review-label-bundle tom-v1-export-reviewer-confidence-schema tom-v1-build-reviewer-confidence-template tom-v1-validate-reviewer-confidence-bundle tom-v1-export-multi-reviewer-disagreement-schema tom-v1-build-multi-reviewer-review-set-template tom-v1-validate-multi-reviewer-review-set tom-v1-build-reviewer-disagreement-report tom-v1-export-intennse-label-alignment-contract tom-v1-build-intennse-alignment-template tom-v1-validate-intennse-alignment-bundle tom-v1-build-intennse-alignment-report tom-v1-export-versioned-dataset-corpus-contract tom-v1-build-versioned-dataset-corpus-manifest tom-v1-validate-versioned-dataset-corpus-manifest tom-v1-build-versioned-dataset-corpus-report tom-v1-post-codex-validate tom-v1-evaluate-point-candidates tom-v1-declare-camera-geometry tom-v1-ingest-second-point-smoke tom-v1-build-second-point-evidence-parity court-fixture homography-candidates projection-diagnostics web web-build web-lint smoke all-checks
 
 install:
 	$(PYTHON) -m pip install -e ".[dev]"
@@ -517,6 +526,20 @@ tom-v1-validate-intennse-alignment-bundle:
 tom-v1-build-intennse-alignment-report:
 	@if [ -z "$(INTENNSE_ALIGNMENT_BUNDLE)" ]; then echo "INTENNSE_ALIGNMENT_BUNDLE is required: make tom-v1-build-intennse-alignment-report INTENNSE_ALIGNMENT_BUNDLE=<bundle.json>"; exit 1; fi
 	$(PYTHON) -m apps.worker.cli build-intennse-alignment-report --contract "$(INTENNSE_ALIGNMENT_CONTRACT_OUTPUT)" --bundle "$(INTENNSE_ALIGNMENT_BUNDLE)" --observation-quality-taxonomy "$(OBSERVATION_QUALITY_TAXONOMY_OUTPUT)" --review-label-schema "$(REVIEW_LABEL_SCHEMA_OUTPUT)" --reviewer-confidence-schema "$(REVIEWER_CONFIDENCE_SCHEMA_OUTPUT)" --multi-reviewer-schema "$(MULTI_REVIEWER_SCHEMA_OUTPUT)" --output "$(INTENNSE_ALIGNMENT_REPORT_OUTPUT)" --skip-create-db
+
+tom-v1-export-versioned-dataset-corpus-contract:
+	$(PYTHON) -m apps.worker.cli export-versioned-dataset-corpus-contract --output "$(DATASET_CORPUS_CONTRACT_OUTPUT)" --skip-create-db
+
+tom-v1-build-versioned-dataset-corpus-manifest:
+	$(PYTHON) -m apps.worker.cli build-versioned-dataset-corpus-manifest --index "$(DATASET_CORPUS_SOURCE_INDEX)" --matrix "$(DATASET_CORPUS_SOURCE_MATRIX)" --corpus-version "$(DATASET_CORPUS_VERSION)" --output "$(DATASET_CORPUS_MANIFEST_OUTPUT)" $(if $(DATASET_CORPUS_ID),--corpus-id "$(DATASET_CORPUS_ID)",) --skip-create-db
+
+tom-v1-validate-versioned-dataset-corpus-manifest:
+	@if [ -z "$(DATASET_CORPUS_MANIFEST)" ]; then echo "DATASET_CORPUS_MANIFEST is required: make tom-v1-validate-versioned-dataset-corpus-manifest DATASET_CORPUS_MANIFEST=<manifest.json>"; exit 1; fi
+	$(PYTHON) -m apps.worker.cli validate-versioned-dataset-corpus-manifest --contract "$(DATASET_CORPUS_CONTRACT_OUTPUT)" --manifest "$(DATASET_CORPUS_MANIFEST)" --observation-quality-taxonomy "$(OBSERVATION_QUALITY_TAXONOMY_OUTPUT)" --review-label-schema "$(REVIEW_LABEL_SCHEMA_OUTPUT)" --reviewer-confidence-schema "$(REVIEWER_CONFIDENCE_SCHEMA_OUTPUT)" --multi-reviewer-schema "$(MULTI_REVIEWER_SCHEMA_OUTPUT)" --intennse-alignment-contract "$(INTENNSE_ALIGNMENT_CONTRACT_OUTPUT)" --output "$(DATASET_CORPUS_VALIDATION_OUTPUT)" --skip-create-db
+
+tom-v1-build-versioned-dataset-corpus-report:
+	@if [ -z "$(DATASET_CORPUS_MANIFEST)" ]; then echo "DATASET_CORPUS_MANIFEST is required: make tom-v1-build-versioned-dataset-corpus-report DATASET_CORPUS_MANIFEST=<manifest.json>"; exit 1; fi
+	$(PYTHON) -m apps.worker.cli build-versioned-dataset-corpus-report --contract "$(DATASET_CORPUS_CONTRACT_OUTPUT)" --manifest "$(DATASET_CORPUS_MANIFEST)" --observation-quality-taxonomy "$(OBSERVATION_QUALITY_TAXONOMY_OUTPUT)" --review-label-schema "$(REVIEW_LABEL_SCHEMA_OUTPUT)" --reviewer-confidence-schema "$(REVIEWER_CONFIDENCE_SCHEMA_OUTPUT)" --multi-reviewer-schema "$(MULTI_REVIEWER_SCHEMA_OUTPUT)" --intennse-alignment-contract "$(INTENNSE_ALIGNMENT_CONTRACT_OUTPUT)" --output "$(DATASET_CORPUS_REPORT_OUTPUT)" --skip-create-db
 
 tom-v1-post-codex-validate:
 	scripts/post_codex_validate.sh $(if $(EXPECTED_BRANCH),--branch "$(EXPECTED_BRANCH)",) $(if $(EXPECTED_TAG),--expected-tag "$(EXPECTED_TAG)",) --python "$(PYTHON)"

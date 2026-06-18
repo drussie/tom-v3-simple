@@ -162,4 +162,36 @@ run "$PYTHON_BIN" -m apps.worker.cli build-intennse-alignment-report \
   --output "$TMP_ROOT/intennse_alignment_report.current.json" \
   --skip-create-db
 
+run "$PYTHON_BIN" -m apps.worker.cli export-versioned-dataset-corpus-contract \
+  --output "$TMP_ROOT/versioned_dataset_corpus_contract_v1.smoke.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-versioned-dataset-corpus-manifest \
+  --index "$TMP_ROOT/multi_point_replay_index.json" \
+  --matrix "$TMP_ROOT/multi_point_regression_matrix.current.json" \
+  --output "$TMP_ROOT/versioned_dataset_corpus_manifest.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli validate-versioned-dataset-corpus-manifest \
+  --contract "$TMP_ROOT/versioned_dataset_corpus_contract_v1.smoke.json" \
+  --manifest "$TMP_ROOT/versioned_dataset_corpus_manifest.current.json" \
+  --observation-quality-taxonomy "$TMP_ROOT/observation_quality_taxonomy_v1.smoke.json" \
+  --review-label-schema "$TMP_ROOT/review_label_schema_v1.smoke.json" \
+  --reviewer-confidence-schema "$TMP_ROOT/reviewer_confidence_ambiguity_schema_v1.smoke.json" \
+  --multi-reviewer-schema "$TMP_ROOT/multi_reviewer_disagreement_schema_v1.smoke.json" \
+  --intennse-alignment-contract "$TMP_ROOT/intennse_label_alignment_contract_v1.smoke.json" \
+  --output "$TMP_ROOT/versioned_dataset_corpus_manifest.validation.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-versioned-dataset-corpus-report \
+  --contract "$TMP_ROOT/versioned_dataset_corpus_contract_v1.smoke.json" \
+  --manifest "$TMP_ROOT/versioned_dataset_corpus_manifest.current.json" \
+  --observation-quality-taxonomy "$TMP_ROOT/observation_quality_taxonomy_v1.smoke.json" \
+  --review-label-schema "$TMP_ROOT/review_label_schema_v1.smoke.json" \
+  --reviewer-confidence-schema "$TMP_ROOT/reviewer_confidence_ambiguity_schema_v1.smoke.json" \
+  --multi-reviewer-schema "$TMP_ROOT/multi_reviewer_disagreement_schema_v1.smoke.json" \
+  --intennse-alignment-contract "$TMP_ROOT/intennse_label_alignment_contract_v1.smoke.json" \
+  --output "$TMP_ROOT/versioned_dataset_corpus_report.current.json" \
+  --skip-create-db
+
 run git status --short

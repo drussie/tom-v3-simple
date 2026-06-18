@@ -2259,6 +2259,74 @@ Validation checks contract shape, TOM contract references, allowed alignment ent
 values, forbidden fields, and human-only flags. INTENNSE refs are external placeholders in v1.
 Missing TOM or INTENNSE refs are reported as structural/provenance context only.
 
+## Versioned Dataset Corpus
+
+Use this to export the dataset corpus contract, package existing point manifests/replay-index rows
+and regression-matrix rows into corpus entries, validate corpus structure, and build a structural
+corpus report. This is a dataset-corpus foundation only. It does not create training truth,
+automatic labels, correctness claims, in/out, score, player identity, point winner, reviewer
+ranking, reviewer scoring, disagreement resolution, INTENNSE conclusions, coaching/tactical
+conclusions, or adjudication.
+
+Export the contract:
+
+```bash
+make tom-v1-export-versioned-dataset-corpus-contract \
+  PYTHON=.venv/bin/python
+```
+
+Build the corpus manifest:
+
+```bash
+make tom-v1-build-versioned-dataset-corpus-manifest \
+  PYTHON=.venv/bin/python
+```
+
+Validate a corpus manifest:
+
+```bash
+make tom-v1-validate-versioned-dataset-corpus-manifest \
+  PYTHON=.venv/bin/python \
+  DATASET_CORPUS_MANIFEST=.data/exports/versioned_dataset_corpus_manifest.current.json
+```
+
+Build a structural corpus report:
+
+```bash
+make tom-v1-build-versioned-dataset-corpus-report \
+  PYTHON=.venv/bin/python \
+  DATASET_CORPUS_MANIFEST=.data/exports/versioned_dataset_corpus_manifest.current.json
+```
+
+Default paths:
+
+```text
+.data/contracts/versioned_dataset_corpus_contract_v1.json
+.data/exports/versioned_dataset_corpus_manifest.current.json
+.data/exports/versioned_dataset_corpus_manifest.validation.json
+.data/exports/versioned_dataset_corpus_report.current.json
+```
+
+Expected:
+
+- `ok`: true for contract export and valid corpus manifest validation
+- `contract_type`: `versioned_dataset_corpus_contract`
+- `contract_version`: `v1`
+- `corpus_manifest_type`: `versioned_dataset_corpus_manifest`
+- `corpus_manifest_version`: `v1`
+- `corpus_report_type`: `versioned_dataset_corpus_report`
+- `corpus_report_version`: `v1`
+- `warnings.dataset_corpus_is_not_truth`: true
+- `warnings.dataset_corpus_is_not_training_truth`: true
+- `warnings.does_not_create_labels`: true
+- `warnings.does_not_resolve_disagreement`: true
+- `warnings.no_adjudication`: true
+
+Validation checks contract shape, included contract refs, referenced Blueprint 26 through 30
+contract versions when paths are available, source index/matrix paths, required corpus entry
+fields, allowed split/status values, and forbidden fields. Missing optional review,
+observation-quality, disagreement, INTENNSE, and dataset-export refs are provenance gaps only.
+
 Build the point evidence snapshot:
 
 ```bash

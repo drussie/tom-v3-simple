@@ -239,6 +239,10 @@ This registry makes TOM v3 Simple boundaries explicit.
   future external INTENNSE expert interpretation labels only. They do not import INTENNSE labels,
   create TOM labels, validate correctness, resolve disagreement, create coaching or tactical
   conclusions, score, identify players, decide in/out, or adjudicate evidence.
+- Versioned dataset corpus artifacts package existing TOM evidence/provenance/review-support
+  references only. They do not create training truth, automatic labels, correctness claims,
+  reviewer scores, disagreement resolution, INTENNSE conclusions, score, player identity, point
+  winner, in/out, or adjudication.
 - Replay view presets are display defaults only. Operator view hides raw/debug layers by default,
   and debug/audit view enables them, but neither preset changes persisted observations or proves
   evidence correctness.

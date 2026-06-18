@@ -1,0 +1,851 @@
+{
+  "contract_type": "versioned_dataset_corpus_contract",
+  "contract_version": "v1",
+  "corpus_entities": [
+    {
+      "description": "Versioned dataset corpus manifest metadata.",
+      "key": "corpus_manifest",
+      "provenance_only": true,
+      "structural_only": true,
+      "warnings": {
+        "corpus_entry_is_not_truth": true,
+        "does_not_create_labels": true,
+        "does_not_validate_correctness": true,
+        "no_adjudication": true,
+        "provenance_only": true,
+        "review_support_only": true,
+        "split_is_not_training_truth": true
+      }
+    },
+    {
+      "description": "One manifest-backed point entry in a versioned corpus.",
+      "key": "corpus_point_entry",
+      "provenance_only": true,
+      "structural_only": true,
+      "warnings": {
+        "corpus_entry_is_not_truth": true,
+        "does_not_create_labels": true,
+        "does_not_validate_correctness": true,
+        "no_adjudication": true,
+        "provenance_only": true,
+        "review_support_only": true,
+        "split_is_not_training_truth": true
+      }
+    },
+    {
+      "description": "Reference to existing TOM evidence assets.",
+      "key": "evidence_asset_ref",
+      "provenance_only": true,
+      "structural_only": true,
+      "warnings": {
+        "corpus_entry_is_not_truth": true,
+        "does_not_create_labels": true,
+        "does_not_validate_correctness": true,
+        "no_adjudication": true,
+        "provenance_only": true,
+        "review_support_only": true,
+        "split_is_not_training_truth": true
+      }
+    },
+    {
+      "description": "Reference to a TOM point manifest.",
+      "key": "point_manifest_ref",
+      "provenance_only": true,
+      "structural_only": true,
+      "warnings": {
+        "corpus_entry_is_not_truth": true,
+        "does_not_create_labels": true,
+        "does_not_validate_correctness": true,
+        "no_adjudication": true,
+        "provenance_only": true,
+        "review_support_only": true,
+        "split_is_not_training_truth": true
+      }
+    },
+    {
+      "description": "Replay URL and run-ID context for human review.",
+      "key": "replay_context_ref",
+      "provenance_only": true,
+      "structural_only": true,
+      "warnings": {
+        "corpus_entry_is_not_truth": true,
+        "does_not_create_labels": true,
+        "does_not_validate_correctness": true,
+        "no_adjudication": true,
+        "provenance_only": true,
+        "review_support_only": true,
+        "split_is_not_training_truth": true
+      }
+    },
+    {
+      "description": "Optional reference to a TOM observation-quality profile.",
+      "key": "observation_quality_profile_ref",
+      "provenance_only": true,
+      "structural_only": true,
+      "warnings": {
+        "corpus_entry_is_not_truth": true,
+        "does_not_create_labels": true,
+        "does_not_validate_correctness": true,
+        "no_adjudication": true,
+        "provenance_only": true,
+        "review_support_only": true,
+        "split_is_not_training_truth": true
+      }
+    },
+    {
+      "description": "Optional reference to TOM structured review-label bundles.",
+      "key": "review_label_bundle_ref",
+      "provenance_only": true,
+      "structural_only": true,
+      "warnings": {
+        "corpus_entry_is_not_truth": true,
+        "does_not_create_labels": true,
+        "does_not_validate_correctness": true,
+        "no_adjudication": true,
+        "provenance_only": true,
+        "review_support_only": true,
+        "split_is_not_training_truth": true
+      }
+    },
+    {
+      "description": "Optional reference to TOM reviewer confidence bundles.",
+      "key": "reviewer_confidence_bundle_ref",
+      "provenance_only": true,
+      "structural_only": true,
+      "warnings": {
+        "corpus_entry_is_not_truth": true,
+        "does_not_create_labels": true,
+        "does_not_validate_correctness": true,
+        "no_adjudication": true,
+        "provenance_only": true,
+        "review_support_only": true,
+        "split_is_not_training_truth": true
+      }
+    },
+    {
+      "description": "Optional reference to TOM multi-reviewer review sets.",
+      "key": "multi_reviewer_review_set_ref",
+      "provenance_only": true,
+      "structural_only": true,
+      "warnings": {
+        "corpus_entry_is_not_truth": true,
+        "does_not_create_labels": true,
+        "does_not_validate_correctness": true,
+        "no_adjudication": true,
+        "provenance_only": true,
+        "review_support_only": true,
+        "split_is_not_training_truth": true
+      }
+    },
+    {
+      "description": "Optional reference to TOM structural disagreement reports.",
+      "key": "disagreement_report_ref",
+      "provenance_only": true,
+      "structural_only": true,
+      "warnings": {
+        "corpus_entry_is_not_truth": true,
+        "does_not_create_labels": true,
+        "does_not_validate_correctness": true,
+        "no_adjudication": true,
+        "provenance_only": true,
+        "review_support_only": true,
+        "split_is_not_training_truth": true
+      }
+    },
+    {
+      "description": "Optional reference to INTENNSE alignment bundles.",
+      "key": "intennse_alignment_bundle_ref",
+      "provenance_only": true,
+      "structural_only": true,
+      "warnings": {
+        "corpus_entry_is_not_truth": true,
+        "does_not_create_labels": true,
+        "does_not_validate_correctness": true,
+        "no_adjudication": true,
+        "provenance_only": true,
+        "review_support_only": true,
+        "split_is_not_training_truth": true
+      }
+    },
+    {
+      "description": "Reference to a TOM multi-point regression matrix.",
+      "key": "regression_matrix_ref",
+      "provenance_only": true,
+      "structural_only": true,
+      "warnings": {
+        "corpus_entry_is_not_truth": true,
+        "does_not_create_labels": true,
+        "does_not_validate_correctness": true,
+        "no_adjudication": true,
+        "provenance_only": true,
+        "review_support_only": true,
+        "split_is_not_training_truth": true
+      }
+    },
+    {
+      "description": "Optional reference to existing dataset/export artifacts.",
+      "key": "dataset_export_ref",
+      "provenance_only": true,
+      "structural_only": true,
+      "warnings": {
+        "corpus_entry_is_not_truth": true,
+        "does_not_create_labels": true,
+        "does_not_validate_correctness": true,
+        "no_adjudication": true,
+        "provenance_only": true,
+        "review_support_only": true,
+        "split_is_not_training_truth": true
+      }
+    }
+  ],
+  "corpus_entry_fields": [
+    {
+      "key": "corpus_entry_id",
+      "provenance_only": true,
+      "required": true,
+      "structural_only": true,
+      "value_set": null,
+      "warnings": {
+        "corpus_entry_is_not_truth": true,
+        "does_not_create_labels": true,
+        "does_not_validate_correctness": true,
+        "no_adjudication": true,
+        "provenance_only": true,
+        "review_support_only": true,
+        "split_is_not_training_truth": true
+      }
+    },
+    {
+      "key": "point_manifest_id",
+      "provenance_only": true,
+      "required": true,
+      "structural_only": true,
+      "value_set": null,
+      "warnings": {
+        "corpus_entry_is_not_truth": true,
+        "does_not_create_labels": true,
+        "does_not_validate_correctness": true,
+        "no_adjudication": true,
+        "provenance_only": true,
+        "review_support_only": true,
+        "split_is_not_training_truth": true
+      }
+    },
+    {
+      "key": "media_id",
+      "provenance_only": true,
+      "required": true,
+      "structural_only": true,
+      "value_set": null,
+      "warnings": {
+        "corpus_entry_is_not_truth": true,
+        "does_not_create_labels": true,
+        "does_not_validate_correctness": true,
+        "no_adjudication": true,
+        "provenance_only": true,
+        "review_support_only": true,
+        "split_is_not_training_truth": true
+      }
+    },
+    {
+      "key": "replay_url",
+      "provenance_only": true,
+      "required": false,
+      "structural_only": true,
+      "value_set": null,
+      "warnings": {
+        "corpus_entry_is_not_truth": true,
+        "does_not_create_labels": true,
+        "does_not_validate_correctness": true,
+        "no_adjudication": true,
+        "provenance_only": true,
+        "review_support_only": true,
+        "split_is_not_training_truth": true
+      }
+    },
+    {
+      "key": "associated_run_ids",
+      "provenance_only": true,
+      "required": false,
+      "structural_only": true,
+      "value_set": null,
+      "warnings": {
+        "corpus_entry_is_not_truth": true,
+        "does_not_create_labels": true,
+        "does_not_validate_correctness": true,
+        "no_adjudication": true,
+        "provenance_only": true,
+        "review_support_only": true,
+        "split_is_not_training_truth": true
+      }
+    },
+    {
+      "key": "labels",
+      "provenance_only": true,
+      "required": false,
+      "structural_only": true,
+      "value_set": null,
+      "warnings": {
+        "corpus_entry_is_not_truth": true,
+        "does_not_create_labels": true,
+        "does_not_validate_correctness": true,
+        "no_adjudication": true,
+        "provenance_only": true,
+        "review_support_only": true,
+        "split_is_not_training_truth": true
+      }
+    },
+    {
+      "key": "corpus_split",
+      "provenance_only": true,
+      "required": true,
+      "structural_only": true,
+      "value_set": "corpus_split_values",
+      "warnings": {
+        "corpus_entry_is_not_truth": true,
+        "does_not_create_labels": true,
+        "does_not_validate_correctness": true,
+        "no_adjudication": true,
+        "provenance_only": true,
+        "review_support_only": true,
+        "split_is_not_training_truth": true
+      }
+    },
+    {
+      "key": "source_media_path",
+      "provenance_only": true,
+      "required": false,
+      "structural_only": true,
+      "value_set": null,
+      "warnings": {
+        "corpus_entry_is_not_truth": true,
+        "does_not_create_labels": true,
+        "does_not_validate_correctness": true,
+        "no_adjudication": true,
+        "provenance_only": true,
+        "review_support_only": true,
+        "split_is_not_training_truth": true
+      }
+    },
+    {
+      "key": "source_uri",
+      "provenance_only": true,
+      "required": false,
+      "structural_only": true,
+      "value_set": null,
+      "warnings": {
+        "corpus_entry_is_not_truth": true,
+        "does_not_create_labels": true,
+        "does_not_validate_correctness": true,
+        "no_adjudication": true,
+        "provenance_only": true,
+        "review_support_only": true,
+        "split_is_not_training_truth": true
+      }
+    },
+    {
+      "key": "stored_uri",
+      "provenance_only": true,
+      "required": false,
+      "structural_only": true,
+      "value_set": null,
+      "warnings": {
+        "corpus_entry_is_not_truth": true,
+        "does_not_create_labels": true,
+        "does_not_validate_correctness": true,
+        "no_adjudication": true,
+        "provenance_only": true,
+        "review_support_only": true,
+        "split_is_not_training_truth": true
+      }
+    },
+    {
+      "key": "point_manifest_path",
+      "provenance_only": true,
+      "required": false,
+      "structural_only": true,
+      "value_set": null,
+      "warnings": {
+        "corpus_entry_is_not_truth": true,
+        "does_not_create_labels": true,
+        "does_not_validate_correctness": true,
+        "no_adjudication": true,
+        "provenance_only": true,
+        "review_support_only": true,
+        "split_is_not_training_truth": true
+      }
+    },
+    {
+      "key": "multi_point_replay_index_path",
+      "provenance_only": true,
+      "required": true,
+      "structural_only": true,
+      "value_set": null,
+      "warnings": {
+        "corpus_entry_is_not_truth": true,
+        "does_not_create_labels": true,
+        "does_not_validate_correctness": true,
+        "no_adjudication": true,
+        "provenance_only": true,
+        "review_support_only": true,
+        "split_is_not_training_truth": true
+      }
+    },
+    {
+      "key": "multi_point_regression_matrix_path",
+      "provenance_only": true,
+      "required": true,
+      "structural_only": true,
+      "value_set": null,
+      "warnings": {
+        "corpus_entry_is_not_truth": true,
+        "does_not_create_labels": true,
+        "does_not_validate_correctness": true,
+        "no_adjudication": true,
+        "provenance_only": true,
+        "review_support_only": true,
+        "split_is_not_training_truth": true
+      }
+    },
+    {
+      "key": "observation_quality_profile_path",
+      "provenance_only": true,
+      "required": false,
+      "structural_only": true,
+      "value_set": null,
+      "warnings": {
+        "corpus_entry_is_not_truth": true,
+        "does_not_create_labels": true,
+        "does_not_validate_correctness": true,
+        "no_adjudication": true,
+        "provenance_only": true,
+        "review_support_only": true,
+        "split_is_not_training_truth": true
+      }
+    },
+    {
+      "key": "review_label_bundle_refs",
+      "provenance_only": true,
+      "required": false,
+      "structural_only": true,
+      "value_set": null,
+      "warnings": {
+        "corpus_entry_is_not_truth": true,
+        "does_not_create_labels": true,
+        "does_not_validate_correctness": true,
+        "no_adjudication": true,
+        "provenance_only": true,
+        "review_support_only": true,
+        "split_is_not_training_truth": true
+      }
+    },
+    {
+      "key": "reviewer_confidence_bundle_refs",
+      "provenance_only": true,
+      "required": false,
+      "structural_only": true,
+      "value_set": null,
+      "warnings": {
+        "corpus_entry_is_not_truth": true,
+        "does_not_create_labels": true,
+        "does_not_validate_correctness": true,
+        "no_adjudication": true,
+        "provenance_only": true,
+        "review_support_only": true,
+        "split_is_not_training_truth": true
+      }
+    },
+    {
+      "key": "multi_reviewer_review_set_refs",
+      "provenance_only": true,
+      "required": false,
+      "structural_only": true,
+      "value_set": null,
+      "warnings": {
+        "corpus_entry_is_not_truth": true,
+        "does_not_create_labels": true,
+        "does_not_validate_correctness": true,
+        "no_adjudication": true,
+        "provenance_only": true,
+        "review_support_only": true,
+        "split_is_not_training_truth": true
+      }
+    },
+    {
+      "key": "disagreement_report_refs",
+      "provenance_only": true,
+      "required": false,
+      "structural_only": true,
+      "value_set": null,
+      "warnings": {
+        "corpus_entry_is_not_truth": true,
+        "does_not_create_labels": true,
+        "does_not_validate_correctness": true,
+        "no_adjudication": true,
+        "provenance_only": true,
+        "review_support_only": true,
+        "split_is_not_training_truth": true
+      }
+    },
+    {
+      "key": "intennse_alignment_refs",
+      "provenance_only": true,
+      "required": false,
+      "structural_only": true,
+      "value_set": null,
+      "warnings": {
+        "corpus_entry_is_not_truth": true,
+        "does_not_create_labels": true,
+        "does_not_validate_correctness": true,
+        "no_adjudication": true,
+        "provenance_only": true,
+        "review_support_only": true,
+        "split_is_not_training_truth": true
+      }
+    },
+    {
+      "key": "dataset_export_refs",
+      "provenance_only": true,
+      "required": false,
+      "structural_only": true,
+      "value_set": null,
+      "warnings": {
+        "corpus_entry_is_not_truth": true,
+        "does_not_create_labels": true,
+        "does_not_validate_correctness": true,
+        "no_adjudication": true,
+        "provenance_only": true,
+        "review_support_only": true,
+        "split_is_not_training_truth": true
+      }
+    },
+    {
+      "key": "evidence_availability",
+      "provenance_only": true,
+      "required": false,
+      "structural_only": true,
+      "value_set": null,
+      "warnings": {
+        "corpus_entry_is_not_truth": true,
+        "does_not_create_labels": true,
+        "does_not_validate_correctness": true,
+        "no_adjudication": true,
+        "provenance_only": true,
+        "review_support_only": true,
+        "split_is_not_training_truth": true
+      }
+    },
+    {
+      "key": "profile_counts",
+      "provenance_only": true,
+      "required": false,
+      "structural_only": true,
+      "value_set": null,
+      "warnings": {
+        "corpus_entry_is_not_truth": true,
+        "does_not_create_labels": true,
+        "does_not_validate_correctness": true,
+        "no_adjudication": true,
+        "provenance_only": true,
+        "review_support_only": true,
+        "split_is_not_training_truth": true
+      }
+    },
+    {
+      "key": "provenance_status",
+      "provenance_only": true,
+      "required": true,
+      "structural_only": true,
+      "value_set": "provenance_status_values",
+      "warnings": {
+        "corpus_entry_is_not_truth": true,
+        "does_not_create_labels": true,
+        "does_not_validate_correctness": true,
+        "no_adjudication": true,
+        "provenance_only": true,
+        "review_support_only": true,
+        "split_is_not_training_truth": true
+      }
+    },
+    {
+      "key": "corpus_entry_status",
+      "provenance_only": true,
+      "required": true,
+      "structural_only": true,
+      "value_set": "corpus_entry_status_values",
+      "warnings": {
+        "corpus_entry_is_not_truth": true,
+        "does_not_create_labels": true,
+        "does_not_validate_correctness": true,
+        "no_adjudication": true,
+        "provenance_only": true,
+        "review_support_only": true,
+        "split_is_not_training_truth": true
+      }
+    },
+    {
+      "key": "requires_human_review",
+      "provenance_only": true,
+      "required": true,
+      "structural_only": true,
+      "value_set": "human_review_values",
+      "warnings": {
+        "corpus_entry_is_not_truth": true,
+        "does_not_create_labels": true,
+        "does_not_validate_correctness": true,
+        "no_adjudication": true,
+        "provenance_only": true,
+        "review_support_only": true,
+        "split_is_not_training_truth": true
+      }
+    },
+    {
+      "key": "provenance_gaps",
+      "provenance_only": true,
+      "required": false,
+      "structural_only": true,
+      "value_set": null,
+      "warnings": {
+        "corpus_entry_is_not_truth": true,
+        "does_not_create_labels": true,
+        "does_not_validate_correctness": true,
+        "no_adjudication": true,
+        "provenance_only": true,
+        "review_support_only": true,
+        "split_is_not_training_truth": true
+      }
+    },
+    {
+      "key": "warnings",
+      "provenance_only": true,
+      "required": true,
+      "structural_only": true,
+      "value_set": null,
+      "warnings": {
+        "corpus_entry_is_not_truth": true,
+        "does_not_create_labels": true,
+        "does_not_validate_correctness": true,
+        "no_adjudication": true,
+        "provenance_only": true,
+        "review_support_only": true,
+        "split_is_not_training_truth": true
+      }
+    }
+  ],
+  "corpus_manifest_type": "versioned_dataset_corpus_manifest",
+  "corpus_manifest_version": "v1",
+  "corpus_report_type": "versioned_dataset_corpus_report",
+  "corpus_report_version": "v1",
+  "corpus_scope": {
+    "automatic_correctness_claims_allowed": false,
+    "automatic_label_creation_allowed": false,
+    "dataset_productization_layer": true,
+    "provenance_only": true,
+    "purpose": "Package TOM evidence, provenance, review structures, reviewer confidence, multi-reviewer disagreement, and INTENNSE alignment references into a versioned corpus manifest.",
+    "review_support_only": true,
+    "training_truth_allowed": false
+  },
+  "corpus_split_policy": {
+    "allowed_values": [
+      "unassigned",
+      "holdout_candidate",
+      "review_candidate",
+      "regression_protected",
+      "not_applicable"
+    ],
+    "current_manifest_default": "unassigned",
+    "default_value": "unassigned",
+    "no_training_evaluation_assignment": true,
+    "protected_regression_entries_use": "regression_protected",
+    "split_values_are_not_training_truth": true,
+    "warnings": {
+      "no_adjudication": true,
+      "provenance_only": true,
+      "split_is_not_training_truth": true
+    }
+  },
+  "corpus_value_sets": [
+    {
+      "allowed_values": [
+        "unassigned",
+        "holdout_candidate",
+        "review_candidate",
+        "regression_protected",
+        "not_applicable"
+      ],
+      "default_value": "unassigned",
+      "free_text": false,
+      "key": "corpus_split_values",
+      "warnings": {
+        "no_adjudication": true,
+        "provenance_only": true,
+        "review_support_only": true,
+        "value_set_is_not_truth": true
+      }
+    },
+    {
+      "allowed_values": [
+        "not_assessed",
+        "evidence_present",
+        "evidence_partial",
+        "evidence_missing",
+        "review_ready",
+        "needs_human_review",
+        "provenance_partial",
+        "provenance_missing",
+        "not_applicable"
+      ],
+      "default_value": "not_assessed",
+      "free_text": false,
+      "key": "corpus_entry_status_values",
+      "warnings": {
+        "no_adjudication": true,
+        "provenance_only": true,
+        "review_support_only": true,
+        "value_set_is_not_truth": true
+      }
+    },
+    {
+      "allowed_values": [
+        "not_assessed",
+        "provenance_present",
+        "provenance_partial",
+        "provenance_missing",
+        "conflicting_references",
+        "not_applicable"
+      ],
+      "default_value": "not_assessed",
+      "free_text": false,
+      "key": "provenance_status_values",
+      "warnings": {
+        "no_adjudication": true,
+        "provenance_only": true,
+        "review_support_only": true,
+        "value_set_is_not_truth": true
+      }
+    },
+    {
+      "allowed_values": [
+        "not_assessed",
+        "unknown",
+        "required",
+        "not_required",
+        "not_applicable"
+      ],
+      "default_value": "not_assessed",
+      "free_text": false,
+      "key": "human_review_values",
+      "warnings": {
+        "no_adjudication": true,
+        "provenance_only": true,
+        "review_support_only": true,
+        "value_set_is_not_truth": true
+      }
+    }
+  ],
+  "corpus_versioning_policy": {
+    "corpus_entries_required": true,
+    "corpus_id_required": true,
+    "corpus_manifest_version_required": "v1",
+    "corpus_version_required": true,
+    "generated_at_required": true,
+    "point_count_required": true,
+    "skipped_entries_allowed": true,
+    "source_contract_versions_required": true,
+    "source_index_path_required": true,
+    "source_matrix_path_required": true,
+    "summary_required": true
+  },
+  "exported_at": "2026-06-18T00:00:00+00:00",
+  "included_contract_refs": {
+    "intennse_label_alignment_contract_version": "v1",
+    "multi_point_regression_matrix_version": "v0",
+    "multi_reviewer_disagreement_schema_version": "v1",
+    "observation_quality_taxonomy_version": "v1",
+    "point_manifest_version": "v0",
+    "review_label_schema_version": "v1",
+    "reviewer_confidence_schema_version": "v1"
+  },
+  "provenance_requirements": {
+    "associated_run_ids_allowed": [
+      "event_candidate_run_id",
+      "trajectory_3d_run_id",
+      "camera_geometry_id"
+    ],
+    "media_id_required": true,
+    "missing_intennse_alignment_refs_are_provenance_gaps": true,
+    "missing_optional_review_refs_are_provenance_gaps": true,
+    "point_manifest_id_required": true,
+    "point_manifest_path_recommended": true,
+    "replay_url_recommended": true,
+    "source_index_path_required": true,
+    "source_matrix_path_required": true
+  },
+  "tom_provenance": {
+    "blueprint": "blueprint_31",
+    "blueprint_name": "versioned_dataset_corpus_v1",
+    "project": "tom-v3-simple",
+    "project_version": "0.0.0"
+  },
+  "validation_rules": {
+    "allowed_split_values_only": true,
+    "allowed_status_values_only": true,
+    "corpus_entry_required_fields_checked": true,
+    "does_not_create_labels": true,
+    "does_not_create_training_truth": true,
+    "does_not_create_truth": true,
+    "does_not_infer_missing_labels": true,
+    "does_not_resolve_disagreement": true,
+    "does_not_validate_label_validity": true,
+    "forbidden_fields": [
+      "accepted",
+      "adjudication",
+      "betting_prediction",
+      "coaching_recommendation",
+      "correct",
+      "disagreement_resolution",
+      "in_out",
+      "incorrect",
+      "match_outcome",
+      "model_ready_truth",
+      "player_identity",
+      "point_winner",
+      "receiver",
+      "rejected",
+      "reviewer_rank",
+      "reviewer_score",
+      "score",
+      "server",
+      "tactical_recommendation",
+      "training_truth",
+      "truth",
+      "winner"
+    ],
+    "referenced_contract_versions_validated_when_paths_available": true,
+    "source_matrix_and_index_paths_must_exist_when_supplied": true,
+    "structural_validation_only": true
+  },
+  "warnings": {
+    "dataset_corpus_is_not_training_truth": true,
+    "dataset_corpus_is_not_truth": true,
+    "does_not_create_3d_candidates": true,
+    "does_not_create_event_candidates": true,
+    "does_not_create_in_out": true,
+    "does_not_create_intennse_labels": true,
+    "does_not_create_labels": true,
+    "does_not_create_observations": true,
+    "does_not_create_score": true,
+    "does_not_determine_winner": true,
+    "does_not_identify_players": true,
+    "does_not_infer_truth": true,
+    "does_not_resolve_disagreement": true,
+    "does_not_score_reviewers": true,
+    "does_not_validate_correctness": true,
+    "manifest_is_not_truth": true,
+    "no_adjudication": true,
+    "not_generalization_claim": true,
+    "observation_only": true,
+    "provenance_only": true,
+    "review_support_only": true
+  }
+}

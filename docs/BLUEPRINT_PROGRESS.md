@@ -1290,3 +1290,16 @@ Reports summarize reference presence and provenance issues only. They do not imp
 labels, create TOM labels, infer expert interpretation, validate correctness, resolve
 disagreement, inspect video, decide truth, score, player identity, point winner, in/out,
 generalization, coaching/tactical conclusions, or adjudication.
+
+## Blueprint 31 Status
+
+Status: complete.
+
+TOM v3 can now export a versioned dataset corpus contract, build a corpus manifest from existing
+multi-point replay index and regression matrix artifacts, validate the manifest structurally, and
+build a structural corpus report. The corpus layer preserves point manifest identity, media
+identity, replay URLs, run IDs, evidence availability, profile counts, existing provenance-only
+labels, contract refs, and optional review/INTENNSE/export provenance gaps. It does not create
+training truth, automatic labels, correctness claims, review labels, reviewer scores, disagreement
+resolution, INTENNSE conclusions, inspect video, decide truth, score, player identity, point
+winner, in/out, generalization, coaching/tactical conclusions, or adjudication.

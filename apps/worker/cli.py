@@ -125,6 +125,16 @@ from apps.worker.services.second_point_evidence_parity import (
 )
 from apps.worker.services.second_point_smoke import run_second_point_ingestion_smoke
 from apps.worker.services.tracklet_builder import build_tracklets_from_detection_run
+from apps.worker.services.versioned_dataset_corpus import (
+    DEFAULT_DATASET_CORPUS_CONTRACT_OUTPUT,
+    DEFAULT_DATASET_CORPUS_MANIFEST_OUTPUT,
+    DEFAULT_DATASET_CORPUS_REPORT_OUTPUT,
+    DEFAULT_DATASET_CORPUS_VALIDATION_OUTPUT,
+    build_versioned_dataset_corpus_manifest,
+    build_versioned_dataset_corpus_report,
+    export_versioned_dataset_corpus_contract,
+    validate_versioned_dataset_corpus_manifest,
+)
 from apps.worker.services.yolo_model_registry import register_yolo_model
 
 
@@ -1548,6 +1558,144 @@ def main() -> None:
     intennse_alignment_report_parser.add_argument("--skip-create-db", action="store_true")
     intennse_alignment_report_parser.set_defaults(
         handler=_handle_build_intennse_alignment_report,
+        skip_create_db=True,
+    )
+
+    dataset_corpus_contract_parser = subcommands.add_parser(
+        "export-versioned-dataset-corpus-contract",
+        help="Export the versioned dataset corpus contract.",
+    )
+    dataset_corpus_contract_parser.add_argument(
+        "--output",
+        default=DEFAULT_DATASET_CORPUS_CONTRACT_OUTPUT,
+        help="JSON versioned dataset corpus contract output path.",
+    )
+    dataset_corpus_contract_parser.add_argument("--skip-create-db", action="store_true")
+    dataset_corpus_contract_parser.set_defaults(
+        handler=_handle_export_versioned_dataset_corpus_contract,
+        skip_create_db=True,
+    )
+
+    dataset_corpus_manifest_parser = subcommands.add_parser(
+        "build-versioned-dataset-corpus-manifest",
+        help="Build a versioned dataset corpus manifest from existing TOM artifacts.",
+    )
+    dataset_corpus_manifest_parser.add_argument(
+        "--index",
+        default=MULTI_POINT_REPLAY_INDEX_OUTPUT,
+        help="Multi-point replay index JSON path.",
+    )
+    dataset_corpus_manifest_parser.add_argument(
+        "--matrix",
+        default=DEFAULT_MULTI_POINT_REGRESSION_MATRIX_CURRENT,
+        help="Multi-point regression matrix JSON path.",
+    )
+    dataset_corpus_manifest_parser.add_argument("--corpus-id")
+    dataset_corpus_manifest_parser.add_argument(
+        "--corpus-version",
+        default="v1",
+        help="Version label for the generated corpus manifest.",
+    )
+    dataset_corpus_manifest_parser.add_argument(
+        "--output",
+        default=DEFAULT_DATASET_CORPUS_MANIFEST_OUTPUT,
+        help="JSON versioned dataset corpus manifest output path.",
+    )
+    dataset_corpus_manifest_parser.add_argument("--skip-create-db", action="store_true")
+    dataset_corpus_manifest_parser.set_defaults(
+        handler=_handle_build_versioned_dataset_corpus_manifest,
+        skip_create_db=True,
+    )
+
+    dataset_corpus_validate_parser = subcommands.add_parser(
+        "validate-versioned-dataset-corpus-manifest",
+        help="Validate a versioned dataset corpus manifest structurally.",
+    )
+    dataset_corpus_validate_parser.add_argument(
+        "--contract",
+        default=DEFAULT_DATASET_CORPUS_CONTRACT_OUTPUT,
+        help="Versioned dataset corpus contract JSON path.",
+    )
+    dataset_corpus_validate_parser.add_argument("--manifest", required=True)
+    dataset_corpus_validate_parser.add_argument(
+        "--observation-quality-taxonomy",
+        default=DEFAULT_OBSERVATION_QUALITY_TAXONOMY_OUTPUT,
+        help="Blueprint 26 observation-quality taxonomy JSON path.",
+    )
+    dataset_corpus_validate_parser.add_argument(
+        "--review-label-schema",
+        default=DEFAULT_REVIEW_LABEL_SCHEMA_OUTPUT,
+        help="Blueprint 27 review label schema JSON path.",
+    )
+    dataset_corpus_validate_parser.add_argument(
+        "--reviewer-confidence-schema",
+        default=DEFAULT_REVIEWER_CONFIDENCE_SCHEMA_OUTPUT,
+        help="Blueprint 28 reviewer confidence schema JSON path.",
+    )
+    dataset_corpus_validate_parser.add_argument(
+        "--multi-reviewer-schema",
+        default=DEFAULT_MULTI_REVIEWER_SCHEMA_OUTPUT,
+        help="Blueprint 29 multi-reviewer disagreement schema JSON path.",
+    )
+    dataset_corpus_validate_parser.add_argument(
+        "--intennse-alignment-contract",
+        default=DEFAULT_INTENNSE_ALIGNMENT_CONTRACT_OUTPUT,
+        help="Blueprint 30 INTENNSE alignment contract JSON path.",
+    )
+    dataset_corpus_validate_parser.add_argument(
+        "--output",
+        default=DEFAULT_DATASET_CORPUS_VALIDATION_OUTPUT,
+        help="Optional JSON corpus validation report path.",
+    )
+    dataset_corpus_validate_parser.add_argument("--skip-create-db", action="store_true")
+    dataset_corpus_validate_parser.set_defaults(
+        handler=_handle_validate_versioned_dataset_corpus_manifest,
+        skip_create_db=True,
+    )
+
+    dataset_corpus_report_parser = subcommands.add_parser(
+        "build-versioned-dataset-corpus-report",
+        help="Build a structural versioned dataset corpus report.",
+    )
+    dataset_corpus_report_parser.add_argument(
+        "--contract",
+        default=DEFAULT_DATASET_CORPUS_CONTRACT_OUTPUT,
+        help="Versioned dataset corpus contract JSON path.",
+    )
+    dataset_corpus_report_parser.add_argument("--manifest", required=True)
+    dataset_corpus_report_parser.add_argument(
+        "--observation-quality-taxonomy",
+        default=DEFAULT_OBSERVATION_QUALITY_TAXONOMY_OUTPUT,
+        help="Blueprint 26 observation-quality taxonomy JSON path.",
+    )
+    dataset_corpus_report_parser.add_argument(
+        "--review-label-schema",
+        default=DEFAULT_REVIEW_LABEL_SCHEMA_OUTPUT,
+        help="Blueprint 27 review label schema JSON path.",
+    )
+    dataset_corpus_report_parser.add_argument(
+        "--reviewer-confidence-schema",
+        default=DEFAULT_REVIEWER_CONFIDENCE_SCHEMA_OUTPUT,
+        help="Blueprint 28 reviewer confidence schema JSON path.",
+    )
+    dataset_corpus_report_parser.add_argument(
+        "--multi-reviewer-schema",
+        default=DEFAULT_MULTI_REVIEWER_SCHEMA_OUTPUT,
+        help="Blueprint 29 multi-reviewer disagreement schema JSON path.",
+    )
+    dataset_corpus_report_parser.add_argument(
+        "--intennse-alignment-contract",
+        default=DEFAULT_INTENNSE_ALIGNMENT_CONTRACT_OUTPUT,
+        help="Blueprint 30 INTENNSE alignment contract JSON path.",
+    )
+    dataset_corpus_report_parser.add_argument(
+        "--output",
+        default=DEFAULT_DATASET_CORPUS_REPORT_OUTPUT,
+        help="JSON corpus report output path.",
+    )
+    dataset_corpus_report_parser.add_argument("--skip-create-db", action="store_true")
+    dataset_corpus_report_parser.set_defaults(
+        handler=_handle_build_versioned_dataset_corpus_report,
         skip_create_db=True,
     )
 
@@ -3025,6 +3173,62 @@ def _handle_build_intennse_alignment_report(
         review_label_schema_path=args.review_label_schema,
         reviewer_confidence_schema_path=args.reviewer_confidence_schema,
         multi_reviewer_schema_path=args.multi_reviewer_schema,
+        output_path=args.output,
+    )
+
+
+def _handle_export_versioned_dataset_corpus_contract(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return export_versioned_dataset_corpus_contract(output_path=args.output)
+
+
+def _handle_build_versioned_dataset_corpus_manifest(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_versioned_dataset_corpus_manifest(
+        source_index_path=args.index,
+        source_matrix_path=args.matrix,
+        corpus_id=args.corpus_id,
+        corpus_version=args.corpus_version,
+        output_path=args.output,
+    )
+
+
+def _handle_validate_versioned_dataset_corpus_manifest(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_versioned_dataset_corpus_manifest(
+        contract_path=args.contract,
+        manifest_path=args.manifest,
+        observation_quality_taxonomy_path=args.observation_quality_taxonomy,
+        review_label_schema_path=args.review_label_schema,
+        reviewer_confidence_schema_path=args.reviewer_confidence_schema,
+        multi_reviewer_schema_path=args.multi_reviewer_schema,
+        intennse_alignment_contract_path=args.intennse_alignment_contract,
+        output_path=args.output,
+    )
+
+
+def _handle_build_versioned_dataset_corpus_report(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_versioned_dataset_corpus_report(
+        contract_path=args.contract,
+        manifest_path=args.manifest,
+        observation_quality_taxonomy_path=args.observation_quality_taxonomy,
+        review_label_schema_path=args.review_label_schema,
+        reviewer_confidence_schema_path=args.reviewer_confidence_schema,
+        multi_reviewer_schema_path=args.multi_reviewer_schema,
+        intennse_alignment_contract_path=args.intennse_alignment_contract,
         output_path=args.output,
     )
 

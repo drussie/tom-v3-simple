@@ -3388,3 +3388,47 @@ evidence, create TOM or INTENNSE labels, change review semantics, mutate protect
 decide in/out, score, identify players, determine a winner, claim generalization, validate
 correctness, resolve disagreement, produce INTENNSE coaching/tactical/match-outcome conclusions,
 or adjudicate evidence.
+
+## Blueprint 31 Versioned Dataset Corpus v1
+
+Status: complete
+
+### Goal
+
+Create a versioned dataset corpus contract and manifest/report layer that packages existing TOM
+evidence, provenance, review-support structures, reviewer confidence/ambiguity, multi-reviewer
+disagreement structure, INTENNSE alignment references, and regression context without creating
+truth, training truth, labels, correctness claims, tennis outcomes, reviewer scoring, disagreement
+resolution, or adjudication.
+
+### Notes
+
+This milestone adds:
+
+- `apps.worker.services.versioned_dataset_corpus`
+- `export-versioned-dataset-corpus-contract` worker CLI command
+- `build-versioned-dataset-corpus-manifest` worker CLI command
+- `validate-versioned-dataset-corpus-manifest` worker CLI command
+- `build-versioned-dataset-corpus-report` worker CLI command
+- `tom-v1-export-versioned-dataset-corpus-contract` Make helper
+- `tom-v1-build-versioned-dataset-corpus-manifest` Make helper
+- `tom-v1-validate-versioned-dataset-corpus-manifest` Make helper
+- `tom-v1-build-versioned-dataset-corpus-report` Make helper
+- `.data/contracts/versioned_dataset_corpus_contract_v1.json` local contract path
+- `.data/exports/versioned_dataset_corpus_manifest.current.json` local manifest path
+- `.data/exports/versioned_dataset_corpus_manifest.validation.json` local validation path
+- `.data/exports/versioned_dataset_corpus_report.current.json` local report path
+- `docs/blueprints/blueprint_31_versioned_dataset_corpus_v1.md`
+- `docs/reviews/versioned_dataset_corpus_v1.md`
+- `docs/agent_reports/blueprint_31_versioned_dataset_corpus_v1_report.md`
+
+The contract defines corpus scope, corpus entities, corpus entry fields, neutral split/status value
+sets, versioning policy, provenance requirements, validation rules, and refs for Blueprints 23,
+25, and 26 through 30. The manifest builder reads existing replay-index and regression-matrix
+artifacts, preserves replay/run/evidence/profile context, and records missing optional
+review/INTENNSE/export refs as provenance gaps. The validator checks structure and referenced
+contract versions. The report summarizes corpus entries and provenance coverage structurally. It
+does not generate evidence, create labels, change review semantics, mutate protected baselines,
+decide in/out, score, identify players, determine a winner, claim generalization, validate
+correctness, score reviewers, resolve disagreement, produce INTENNSE coaching/tactical/match
+outcome conclusions, create training truth, or adjudicate evidence.
