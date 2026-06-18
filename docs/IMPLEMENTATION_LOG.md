@@ -3232,3 +3232,38 @@ context, marks visual quality as `unknown` when media context exists, marks miss
 `unavailable`, and flags dimensions that require human review. It does not inspect video, generate
 evidence, change review metadata, mutate protected baselines, decide in/out, score, identify
 players, determine a winner, claim generalization, or adjudicate evidence.
+
+## Blueprint 27 Structured Review Label Schema v1
+
+Status: complete
+
+### Goal
+
+Create a versioned structured review label schema for future human-provided labels without creating
+truth, scoring, player identity, event generation, 3D generation, correctness claims, or
+adjudication.
+
+### Notes
+
+This milestone adds:
+
+- `apps.worker.services.review_label_schema`
+- `export-review-label-schema` worker CLI command
+- `build-review-label-template` worker CLI command
+- `validate-review-label-bundle` worker CLI command
+- `tom-v1-export-review-label-schema` Make helper
+- `tom-v1-build-review-label-template` Make helper
+- `tom-v1-validate-review-label-bundle` Make helper
+- `.data/contracts/review_label_schema_v1.json` local contract path
+- `.data/exports/review_label_template.current.json` local template path
+- `.data/exports/review_label_bundle.validation.json` local validation path
+- `docs/blueprints/blueprint_27_structured_review_label_schema_v1.md`
+- `docs/reviews/structured_review_label_schema_v1.md`
+- `docs/agent_reports/blueprint_27_structured_review_label_schema_v1_report.md`
+
+The schema defines neutral human-review label families, label definitions, value sets, provenance
+requirements, validation rules, and warnings. The template builder emits blank `not_assessed`
+entries and does not infer labels. The validator checks bundle structure, known label keys, allowed
+values, forbidden fields, and human-only flags. It does not generate evidence, create labels,
+change review semantics, mutate protected baselines, decide in/out, score, identify players,
+determine a winner, claim generalization, validate correctness, or adjudicate evidence.

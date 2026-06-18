@@ -224,6 +224,10 @@ This registry makes TOM v3 Simple boundaries explicit.
   conservative quality states only. Visual quality remains unknown without human review, and the
   profile does not inspect video, prove correctness, create training truth, score, identify
   players, decide in/out, or adjudicate evidence.
+- Structured review label schema artifacts define label families, allowed values, templates, and
+  structural validation only. They do not create labels automatically, infer missing labels, judge
+  whether a human label is correct, create truth or training truth, score, identify players,
+  decide in/out, or adjudicate evidence.
 - Replay view presets are display defaults only. Operator view hides raw/debug layers by default,
   and debug/audit view enables them, but neither preset changes persisted observations or proves
   evidence correctness.

@@ -1,0 +1,528 @@
+{
+  "exported_at": "2026-06-18T20:06:15.952075+00:00",
+  "label_definitions": [
+    {
+      "applies_to": [
+        "point_manifest",
+        "replay"
+      ],
+      "description": "Human-provided review label for overall media visibility context.",
+      "family": "evidence_visibility_review",
+      "human_provided_only": true,
+      "key": "media_visibility_review",
+      "machine_inferred": false,
+      "multi_select": false,
+      "name": "Media visibility review",
+      "required": false,
+      "value_set": "visibility_review_values",
+      "warnings": {
+        "does_not_create_in_out": true,
+        "does_not_create_score": true,
+        "does_not_determine_winner": true,
+        "does_not_identify_players": true,
+        "human_review_only": true,
+        "label_is_not_truth": true,
+        "no_adjudication": true,
+        "not_generalization_claim": true,
+        "not_training_truth": true,
+        "observation_only": true,
+        "review_support_only": true
+      }
+    },
+    {
+      "applies_to": [
+        "replay",
+        "observation_quality_profile"
+      ],
+      "description": "Human-provided review label for court visibility context.",
+      "family": "evidence_visibility_review",
+      "human_provided_only": true,
+      "key": "court_visibility_review",
+      "machine_inferred": false,
+      "multi_select": false,
+      "name": "Court visibility review",
+      "required": false,
+      "value_set": "visibility_review_values",
+      "warnings": {
+        "does_not_create_in_out": true,
+        "does_not_create_score": true,
+        "does_not_determine_winner": true,
+        "does_not_identify_players": true,
+        "human_review_only": true,
+        "label_is_not_truth": true,
+        "no_adjudication": true,
+        "not_generalization_claim": true,
+        "not_training_truth": true,
+        "observation_only": true,
+        "review_support_only": true
+      }
+    },
+    {
+      "applies_to": [
+        "replay",
+        "event_candidate",
+        "trajectory_3d_candidate"
+      ],
+      "description": "Human-provided review label for ball visibility context.",
+      "family": "evidence_visibility_review",
+      "human_provided_only": true,
+      "key": "ball_visibility_review",
+      "machine_inferred": false,
+      "multi_select": false,
+      "name": "Ball visibility review",
+      "required": false,
+      "value_set": "visibility_review_values",
+      "warnings": {
+        "does_not_create_in_out": true,
+        "does_not_create_score": true,
+        "does_not_determine_winner": true,
+        "does_not_identify_players": true,
+        "human_review_only": true,
+        "label_is_not_truth": true,
+        "no_adjudication": true,
+        "not_generalization_claim": true,
+        "not_training_truth": true,
+        "observation_only": true,
+        "review_support_only": true
+      }
+    },
+    {
+      "applies_to": [
+        "replay",
+        "review_session"
+      ],
+      "description": "Human-provided review label for whether replay context supports review.",
+      "family": "replay_review_readiness",
+      "human_provided_only": true,
+      "key": "replay_readiness_review",
+      "machine_inferred": false,
+      "multi_select": false,
+      "name": "Replay readiness review",
+      "required": false,
+      "value_set": "review_readiness_values",
+      "warnings": {
+        "does_not_create_in_out": true,
+        "does_not_create_score": true,
+        "does_not_determine_winner": true,
+        "does_not_identify_players": true,
+        "human_review_only": true,
+        "label_is_not_truth": true,
+        "no_adjudication": true,
+        "not_generalization_claim": true,
+        "not_training_truth": true,
+        "observation_only": true,
+        "review_support_only": true
+      }
+    },
+    {
+      "applies_to": [
+        "observation_quality_profile",
+        "review_session"
+      ],
+      "description": "Human-provided review label for observation-quality profile context.",
+      "family": "observation_quality_review",
+      "human_provided_only": true,
+      "key": "observation_quality_profile_review",
+      "machine_inferred": false,
+      "multi_select": false,
+      "name": "Observation quality profile review",
+      "required": false,
+      "value_set": "review_readiness_values",
+      "warnings": {
+        "does_not_create_in_out": true,
+        "does_not_create_score": true,
+        "does_not_determine_winner": true,
+        "does_not_identify_players": true,
+        "human_review_only": true,
+        "label_is_not_truth": true,
+        "no_adjudication": true,
+        "not_generalization_claim": true,
+        "not_training_truth": true,
+        "observation_only": true,
+        "review_support_only": true
+      }
+    },
+    {
+      "applies_to": [
+        "event_candidate",
+        "replay",
+        "review_session"
+      ],
+      "description": "Human-provided review label for event-candidate context availability.",
+      "family": "event_candidate_review_context",
+      "human_provided_only": true,
+      "key": "event_candidate_context_review",
+      "machine_inferred": false,
+      "multi_select": false,
+      "name": "Event candidate context review",
+      "required": false,
+      "value_set": "evidence_presence_values",
+      "warnings": {
+        "does_not_create_in_out": true,
+        "does_not_create_score": true,
+        "does_not_determine_winner": true,
+        "does_not_identify_players": true,
+        "human_review_only": true,
+        "label_is_not_truth": true,
+        "no_adjudication": true,
+        "not_generalization_claim": true,
+        "not_training_truth": true,
+        "observation_only": true,
+        "review_support_only": true
+      }
+    },
+    {
+      "applies_to": [
+        "trajectory_3d_candidate",
+        "replay",
+        "review_session"
+      ],
+      "description": "Human-provided review label for 3D trajectory context availability.",
+      "family": "trajectory_3d_review_context",
+      "human_provided_only": true,
+      "key": "trajectory_3d_context_review",
+      "machine_inferred": false,
+      "multi_select": false,
+      "name": "3D trajectory context review",
+      "required": false,
+      "value_set": "evidence_presence_values",
+      "warnings": {
+        "does_not_create_in_out": true,
+        "does_not_create_score": true,
+        "does_not_determine_winner": true,
+        "does_not_identify_players": true,
+        "human_review_only": true,
+        "label_is_not_truth": true,
+        "no_adjudication": true,
+        "not_generalization_claim": true,
+        "not_training_truth": true,
+        "observation_only": true,
+        "review_support_only": true
+      }
+    },
+    {
+      "applies_to": [
+        "point_manifest",
+        "provenance",
+        "review_session"
+      ],
+      "description": "Human-provided review label for provenance context availability.",
+      "family": "provenance_review",
+      "human_provided_only": true,
+      "key": "provenance_context_review",
+      "machine_inferred": false,
+      "multi_select": false,
+      "name": "Provenance context review",
+      "required": false,
+      "value_set": "provenance_presence_values",
+      "warnings": {
+        "does_not_create_in_out": true,
+        "does_not_create_score": true,
+        "does_not_determine_winner": true,
+        "does_not_identify_players": true,
+        "human_review_only": true,
+        "label_is_not_truth": true,
+        "no_adjudication": true,
+        "not_generalization_claim": true,
+        "not_training_truth": true,
+        "observation_only": true,
+        "review_support_only": true
+      }
+    },
+    {
+      "applies_to": [
+        "review_session"
+      ],
+      "description": "Human-provided review label for reviewer-note context availability.",
+      "family": "reviewer_note_context",
+      "human_provided_only": true,
+      "key": "reviewer_note_context_review",
+      "machine_inferred": false,
+      "multi_select": false,
+      "name": "Reviewer note context review",
+      "required": false,
+      "value_set": "reviewer_note_values",
+      "warnings": {
+        "does_not_create_in_out": true,
+        "does_not_create_score": true,
+        "does_not_determine_winner": true,
+        "does_not_identify_players": true,
+        "human_review_only": true,
+        "label_is_not_truth": true,
+        "no_adjudication": true,
+        "not_generalization_claim": true,
+        "not_training_truth": true,
+        "observation_only": true,
+        "review_support_only": true
+      }
+    }
+  ],
+  "label_families": [
+    {
+      "description": "Human review labels for whether evidence is visible or obscured.",
+      "key": "evidence_visibility_review",
+      "name": "Evidence visibility review",
+      "warnings": {
+        "family_is_not_truth": true,
+        "human_review_only": true,
+        "no_adjudication": true,
+        "review_support_only": true
+      }
+    },
+    {
+      "description": "Human review labels for whether replay context supports review.",
+      "key": "replay_review_readiness",
+      "name": "Replay review readiness",
+      "warnings": {
+        "family_is_not_truth": true,
+        "human_review_only": true,
+        "no_adjudication": true,
+        "review_support_only": true
+      }
+    },
+    {
+      "description": "Human review labels for observation-quality profile context.",
+      "key": "observation_quality_review",
+      "name": "Observation quality review",
+      "warnings": {
+        "family_is_not_truth": true,
+        "human_review_only": true,
+        "no_adjudication": true,
+        "review_support_only": true
+      }
+    },
+    {
+      "description": "Human review labels for event-candidate context availability.",
+      "key": "event_candidate_review_context",
+      "name": "Event candidate review context",
+      "warnings": {
+        "family_is_not_truth": true,
+        "human_review_only": true,
+        "no_adjudication": true,
+        "review_support_only": true
+      }
+    },
+    {
+      "description": "Human review labels for trajectory-candidate context availability.",
+      "key": "trajectory_3d_review_context",
+      "name": "3D trajectory review context",
+      "warnings": {
+        "family_is_not_truth": true,
+        "human_review_only": true,
+        "no_adjudication": true,
+        "review_support_only": true
+      }
+    },
+    {
+      "description": "Human review labels for provenance context availability.",
+      "key": "provenance_review",
+      "name": "Provenance review",
+      "warnings": {
+        "family_is_not_truth": true,
+        "human_review_only": true,
+        "no_adjudication": true,
+        "review_support_only": true
+      }
+    },
+    {
+      "description": "Human review labels for whether reviewer notes are present.",
+      "key": "reviewer_note_context",
+      "name": "Reviewer note context",
+      "warnings": {
+        "family_is_not_truth": true,
+        "human_review_only": true,
+        "no_adjudication": true,
+        "review_support_only": true
+      }
+    }
+  ],
+  "provenance_requirements": {
+    "associated_run_ids_allowed": [
+      "event_candidate_run_id",
+      "trajectory_3d_run_id",
+      "camera_geometry_id"
+    ],
+    "label_bundle_type_required": "structured_review_label_bundle",
+    "label_bundle_version_required": "v1",
+    "media_id_recommended": true,
+    "point_manifest_id_recommended": true,
+    "provenance_only": true,
+    "replay_url_recommended": true,
+    "reviewer_identity_not_required": true,
+    "schema_version_required": "v1"
+  },
+  "schema_type": "structured_review_label_schema",
+  "schema_version": "v1",
+  "tom_provenance": {
+    "blueprint": "blueprint_27",
+    "blueprint_name": "structured_review_label_schema_v1",
+    "project": "tom-v3-simple",
+    "project_version": "0.0.0"
+  },
+  "validation_rules": {
+    "allowed_values_only": true,
+    "does_not_create_labels": true,
+    "does_not_infer_missing_labels": true,
+    "does_not_validate_truth": true,
+    "forbidden_fields": [
+      "accepted",
+      "adjudication",
+      "in_out",
+      "player_identity",
+      "point_winner",
+      "receiver",
+      "rejected",
+      "score",
+      "server",
+      "winner"
+    ],
+    "forbidden_label_values": [
+      "accepted",
+      "correct",
+      "in",
+      "incorrect",
+      "out",
+      "player_a",
+      "player_b",
+      "receiver",
+      "rejected",
+      "score",
+      "server",
+      "winner"
+    ],
+    "human_provided_only_required": true,
+    "known_label_keys_only": true,
+    "machine_inferred_must_be_false": true,
+    "structural_validation_only": true
+  },
+  "value_sets": [
+    {
+      "allowed_values": [
+        "not_assessed",
+        "unknown",
+        "unavailable",
+        "visible",
+        "partially_visible",
+        "obscured",
+        "ambiguous",
+        "needs_human_review",
+        "not_applicable"
+      ],
+      "default_value": "not_assessed",
+      "description": "Neutral values for human visibility review.",
+      "key": "visibility_review_values",
+      "name": "Visibility review values",
+      "warnings": {
+        "human_review_only": true,
+        "no_adjudication": true,
+        "review_support_only": true,
+        "value_set_is_not_truth": true
+      }
+    },
+    {
+      "allowed_values": [
+        "not_assessed",
+        "unknown",
+        "unavailable",
+        "needs_human_review",
+        "sufficient_for_review",
+        "insufficient_for_review",
+        "ambiguous",
+        "not_applicable"
+      ],
+      "default_value": "not_assessed",
+      "description": "Neutral values for human review-readiness labels.",
+      "key": "review_readiness_values",
+      "name": "Review readiness values",
+      "warnings": {
+        "human_review_only": true,
+        "no_adjudication": true,
+        "review_support_only": true,
+        "value_set_is_not_truth": true
+      }
+    },
+    {
+      "allowed_values": [
+        "not_assessed",
+        "unknown",
+        "unavailable",
+        "evidence_present",
+        "evidence_missing",
+        "ambiguous",
+        "needs_human_review",
+        "not_applicable"
+      ],
+      "default_value": "not_assessed",
+      "description": "Neutral values for human evidence-presence labels.",
+      "key": "evidence_presence_values",
+      "name": "Evidence presence values",
+      "warnings": {
+        "human_review_only": true,
+        "no_adjudication": true,
+        "review_support_only": true,
+        "value_set_is_not_truth": true
+      }
+    },
+    {
+      "allowed_values": [
+        "not_assessed",
+        "unknown",
+        "unavailable",
+        "provenance_present",
+        "provenance_missing",
+        "ambiguous",
+        "needs_human_review",
+        "not_applicable"
+      ],
+      "default_value": "not_assessed",
+      "description": "Neutral values for human provenance-presence labels.",
+      "key": "provenance_presence_values",
+      "name": "Provenance presence values",
+      "warnings": {
+        "human_review_only": true,
+        "no_adjudication": true,
+        "review_support_only": true,
+        "value_set_is_not_truth": true
+      }
+    },
+    {
+      "allowed_values": [
+        "not_assessed",
+        "unknown",
+        "reviewer_note_present",
+        "reviewer_note_missing",
+        "not_applicable"
+      ],
+      "default_value": "not_assessed",
+      "description": "Neutral values for human reviewer-note labels.",
+      "key": "reviewer_note_values",
+      "name": "Reviewer note values",
+      "warnings": {
+        "human_review_only": true,
+        "no_adjudication": true,
+        "review_support_only": true,
+        "value_set_is_not_truth": true
+      }
+    }
+  ],
+  "warnings": {
+    "does_not_create_3d_candidates": true,
+    "does_not_create_event_candidates": true,
+    "does_not_create_in_out": true,
+    "does_not_create_labels": true,
+    "does_not_create_observations": true,
+    "does_not_create_score": true,
+    "does_not_determine_winner": true,
+    "does_not_identify_players": true,
+    "does_not_infer_truth": true,
+    "does_not_validate_correctness": true,
+    "human_review_only": true,
+    "label_is_not_truth": true,
+    "no_adjudication": true,
+    "not_generalization_claim": true,
+    "not_training_truth": true,
+    "observation_only": true,
+    "review_support_only": true,
+    "schema_is_not_truth": true
+  }
+}

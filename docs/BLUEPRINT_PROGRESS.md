@@ -1241,3 +1241,14 @@ provenance-only labels, quality dimensions, and warning flags. Visual quality re
 unless reviewed by a human; missing evidence is `unavailable`. It does not inspect video, create
 observations, event candidates, 3D candidates, truth, score, player identity, point winner, in/out,
 generalization, or adjudication.
+
+## Blueprint 27 Status
+
+Status: complete.
+
+TOM v3 can now export a versioned structured review label schema, build a blank human-review label
+bundle template, and validate label bundle structure. The schema defines neutral label families,
+label definitions, value sets, provenance requirements, validation rules, and warning flags.
+Validation rejects forbidden decision fields and invalid label keys/values, but it does not infer
+missing labels, create labels, judge correctness, inspect video, decide truth, score, player
+identity, point winner, in/out, generalization, or adjudication.

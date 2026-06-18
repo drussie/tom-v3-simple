@@ -73,6 +73,13 @@ from apps.worker.services.real_court_keypoint_replay import run_real_court_keypo
 from apps.worker.services.real_detection_replay import run_real_detection_replay
 from apps.worker.services.real_pose_replay import run_real_pose_replay
 from apps.worker.services.real_yolo_smoke import run_real_yolo_local_smoke
+from apps.worker.services.review_label_schema import (
+    DEFAULT_REVIEW_LABEL_SCHEMA_OUTPUT,
+    DEFAULT_REVIEW_LABEL_TEMPLATE_OUTPUT,
+    build_review_label_template,
+    export_review_label_schema,
+    validate_review_label_bundle,
+)
 from apps.worker.services.reviewed_3d_debug_baseline import (
     DEFAULT_BASELINE_FILE_STEM,
     DEFAULT_BASELINE_NAME,
@@ -1170,6 +1177,62 @@ def main() -> None:
     observation_quality_profile_parser.add_argument("--skip-create-db", action="store_true")
     observation_quality_profile_parser.set_defaults(
         handler=_handle_build_observation_quality_profile,
+        skip_create_db=True,
+    )
+
+    review_label_schema_parser = subcommands.add_parser(
+        "export-review-label-schema",
+        help="Export the structured human-review label schema contract.",
+    )
+    review_label_schema_parser.add_argument(
+        "--output",
+        default=DEFAULT_REVIEW_LABEL_SCHEMA_OUTPUT,
+        help="JSON review-label schema output path.",
+    )
+    review_label_schema_parser.add_argument("--skip-create-db", action="store_true")
+    review_label_schema_parser.set_defaults(
+        handler=_handle_export_review_label_schema,
+        skip_create_db=True,
+    )
+
+    review_label_template_parser = subcommands.add_parser(
+        "build-review-label-template",
+        help="Build a blank structured human-review label bundle template.",
+    )
+    review_label_template_parser.add_argument("--point-manifest-id")
+    review_label_template_parser.add_argument("--media-id")
+    review_label_template_parser.add_argument("--replay-url")
+    review_label_template_parser.add_argument("--event-candidate-run-id")
+    review_label_template_parser.add_argument("--trajectory-3d-run-id")
+    review_label_template_parser.add_argument("--camera-geometry-id")
+    review_label_template_parser.add_argument(
+        "--output",
+        default=DEFAULT_REVIEW_LABEL_TEMPLATE_OUTPUT,
+        help="JSON review-label template output path.",
+    )
+    review_label_template_parser.add_argument("--skip-create-db", action="store_true")
+    review_label_template_parser.set_defaults(
+        handler=_handle_build_review_label_template,
+        skip_create_db=True,
+    )
+
+    review_label_validate_parser = subcommands.add_parser(
+        "validate-review-label-bundle",
+        help="Validate a structured review-label bundle against the schema.",
+    )
+    review_label_validate_parser.add_argument(
+        "--schema",
+        default=DEFAULT_REVIEW_LABEL_SCHEMA_OUTPUT,
+        help="Structured review-label schema JSON path.",
+    )
+    review_label_validate_parser.add_argument("--bundle", required=True)
+    review_label_validate_parser.add_argument(
+        "--output",
+        help="Optional JSON validation report path.",
+    )
+    review_label_validate_parser.add_argument("--skip-create-db", action="store_true")
+    review_label_validate_parser.set_defaults(
+        handler=_handle_validate_review_label_bundle,
         skip_create_db=True,
     )
 
@@ -2431,6 +2494,49 @@ def _handle_build_observation_quality_profile(
     del session
     return build_observation_quality_profile(
         source_index_path=args.index,
+        output_path=args.output,
+    )
+
+
+def _handle_export_review_label_schema(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return export_review_label_schema(output_path=args.output)
+
+
+def _handle_build_review_label_template(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    associated_run_ids = {
+        key: value
+        for key, value in {
+            "event_candidate_run_id": args.event_candidate_run_id,
+            "trajectory_3d_run_id": args.trajectory_3d_run_id,
+            "camera_geometry_id": args.camera_geometry_id,
+        }.items()
+        if value
+    }
+    return build_review_label_template(
+        point_manifest_id=args.point_manifest_id,
+        media_id=args.media_id,
+        replay_url=args.replay_url,
+        associated_run_ids=associated_run_ids,
+        output_path=args.output,
+    )
+
+
+def _handle_validate_review_label_bundle(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_review_label_bundle(
+        schema_path=args.schema,
+        bundle_path=args.bundle,
         output_path=args.output,
     )
 

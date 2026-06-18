@@ -322,6 +322,8 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Multi-Point Regression Matrix / Baseline Expansion v0](reviews/multi_point_regression_matrix_baseline_expansion_v0.md)
 - [Blueprint 26 Observation Quality Taxonomy v1](blueprints/blueprint_26_observation_quality_taxonomy_v1.md)
 - [Observation Quality Taxonomy v1](reviews/observation_quality_taxonomy_v1.md)
+- [Blueprint 27 Structured Review Label Schema v1](blueprints/blueprint_27_structured_review_label_schema_v1.md)
+- [Structured Review Label Schema v1](reviews/structured_review_label_schema_v1.md)
 
 ## Development
 

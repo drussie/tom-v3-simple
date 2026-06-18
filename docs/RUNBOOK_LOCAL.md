@@ -2014,6 +2014,57 @@ Visual quality dimensions default to `unknown` when media/replay context exists 
 does not inspect video content. Missing evidence is `unavailable`. `requires_human_review` marks
 dimensions that cannot be determined from the existing provenance artifacts.
 
+## Structured Review Label Schema
+
+Use this to export the human-review label schema, create a blank label bundle template, and validate
+bundle structure. This is label-structure support only. It does not create labels automatically,
+judge correctness, decide in/out, score, identify players, determine a winner, or adjudicate
+evidence.
+
+Export the schema contract:
+
+```bash
+make tom-v1-export-review-label-schema \
+  PYTHON=.venv/bin/python
+```
+
+Build a blank template:
+
+```bash
+make tom-v1-build-review-label-template \
+  PYTHON=.venv/bin/python
+```
+
+Validate a bundle:
+
+```bash
+make tom-v1-validate-review-label-bundle \
+  PYTHON=.venv/bin/python \
+  REVIEW_LABEL_BUNDLE=.data/exports/review_label_template.current.json
+```
+
+Default paths:
+
+```text
+.data/contracts/review_label_schema_v1.json
+.data/exports/review_label_template.current.json
+.data/exports/review_label_bundle.validation.json
+```
+
+Expected:
+
+- `ok`: true for schema export and valid bundle validation
+- `schema_type`: `structured_review_label_schema`
+- `schema_version`: `v1`
+- `label_bundle_type`: `structured_review_label_bundle`
+- `label_bundle_version`: `v1`
+- `warnings.label_is_not_truth`: true
+- `warnings.human_review_only`: true
+- `warnings.no_adjudication`: true
+
+Validation checks shape, label keys, allowed values, forbidden fields, and human-only flags. It does
+not infer missing labels, create labels, validate correctness, or decide truth.
+
 Build the point evidence snapshot:
 
 ```bash
