@@ -44,6 +44,15 @@ from apps.worker.services.main_player_track_assignment import assign_main_player
 from apps.worker.services.main_subject_filter import select_main_player_subjects
 from apps.worker.services.media_indexer import index_media
 from apps.worker.services.motion_smoothing import smooth_motion_candidates
+from apps.worker.services.multi_point_regression_matrix import (
+    DEFAULT_MULTI_POINT_REGRESSION_MATRIX_BASELINE,
+    DEFAULT_MULTI_POINT_REGRESSION_MATRIX_CURRENT,
+    DEFAULT_MULTI_POINT_REGRESSION_MATRIX_REGRESSION,
+    DEFAULT_MULTI_POINT_REGRESSION_MATRIX_REGRESSION_MARKDOWN,
+    build_multi_point_regression_matrix,
+    compare_multi_point_regression_matrices,
+    verify_multi_point_regression_matrix,
+)
 from apps.worker.services.multi_point_replay_index import (
     MULTI_POINT_REPLAY_INDEX_OUTPUT,
     build_multi_point_replay_index,
@@ -1037,6 +1046,91 @@ def main() -> None:
     )
     multi_point_index_parser.add_argument("--skip-create-db", action="store_true")
     multi_point_index_parser.set_defaults(handler=_handle_build_multi_point_replay_index)
+
+    multi_point_matrix_parser = subcommands.add_parser(
+        "build-multi-point-regression-matrix",
+        help="Build a read-only regression matrix from an existing multi-point replay index.",
+    )
+    multi_point_matrix_parser.add_argument(
+        "--index",
+        default=MULTI_POINT_REPLAY_INDEX_OUTPUT,
+        help="Blueprint 24 multi-point replay index JSON path.",
+    )
+    multi_point_matrix_parser.add_argument(
+        "--output",
+        default=DEFAULT_MULTI_POINT_REGRESSION_MATRIX_CURRENT,
+        help="JSON matrix output path.",
+    )
+    multi_point_matrix_parser.add_argument("--skip-create-db", action="store_true")
+    multi_point_matrix_parser.set_defaults(
+        handler=_handle_build_multi_point_regression_matrix,
+        skip_create_db=True,
+    )
+
+    multi_point_matrix_compare_parser = subcommands.add_parser(
+        "compare-multi-point-regression-matrix",
+        help="Compare multi-point regression matrix JSON files and report drift.",
+    )
+    multi_point_matrix_compare_parser.add_argument("--baseline", required=True)
+    multi_point_matrix_compare_parser.add_argument("--current", required=True)
+    multi_point_matrix_compare_parser.add_argument(
+        "--format",
+        choices=["json", "markdown"],
+        default="json",
+        help="Multi-point regression report format.",
+    )
+    multi_point_matrix_compare_parser.add_argument(
+        "--output",
+        help="Optional file path for the JSON or markdown regression report.",
+    )
+    multi_point_matrix_compare_parser.add_argument(
+        "--strict",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+        help="Treat additive or non-protected drift as breaking.",
+    )
+    multi_point_matrix_compare_parser.add_argument("--skip-create-db", action="store_true")
+    multi_point_matrix_compare_parser.set_defaults(
+        handler=_handle_compare_multi_point_regression_matrix,
+        skip_create_db=True,
+    )
+
+    multi_point_matrix_verify_parser = subcommands.add_parser(
+        "verify-multi-point-regression-matrix",
+        help="Build current matrix and compare it against a frozen baseline matrix.",
+    )
+    multi_point_matrix_verify_parser.add_argument(
+        "--index",
+        default=MULTI_POINT_REPLAY_INDEX_OUTPUT,
+        help="Blueprint 24 multi-point replay index JSON path.",
+    )
+    multi_point_matrix_verify_parser.add_argument(
+        "--baseline",
+        default=DEFAULT_MULTI_POINT_REGRESSION_MATRIX_BASELINE,
+    )
+    multi_point_matrix_verify_parser.add_argument(
+        "--current-output",
+        default=DEFAULT_MULTI_POINT_REGRESSION_MATRIX_CURRENT,
+    )
+    multi_point_matrix_verify_parser.add_argument(
+        "--regression-output",
+        default=DEFAULT_MULTI_POINT_REGRESSION_MATRIX_REGRESSION,
+    )
+    multi_point_matrix_verify_parser.add_argument(
+        "--regression-markdown-output",
+        default=DEFAULT_MULTI_POINT_REGRESSION_MATRIX_REGRESSION_MARKDOWN,
+    )
+    multi_point_matrix_verify_parser.add_argument(
+        "--strict",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+        help="Treat additive or non-protected drift as breaking.",
+    )
+    multi_point_matrix_verify_parser.add_argument("--skip-create-db", action="store_true")
+    multi_point_matrix_verify_parser.set_defaults(
+        handler=_handle_verify_multi_point_regression_matrix,
+        skip_create_db=True,
+    )
 
     point_evaluation_parser = subcommands.add_parser(
         "evaluate-point-candidates",
@@ -2238,6 +2332,46 @@ def _handle_build_multi_point_replay_index(
         manifest_root=args.manifest_root,
         viewer_base_url=args.viewer_base_url,
         output_path=args.output,
+    )
+
+
+def _handle_build_multi_point_regression_matrix(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_multi_point_regression_matrix(
+        source_index_path=args.index,
+        output_path=args.output,
+    )
+
+
+def _handle_compare_multi_point_regression_matrix(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return compare_multi_point_regression_matrices(
+        baseline_path=args.baseline,
+        current_path=args.current,
+        strict=args.strict,
+        output_format=args.format,
+        output_path=args.output,
+    )
+
+
+def _handle_verify_multi_point_regression_matrix(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return verify_multi_point_regression_matrix(
+        source_index_path=args.index,
+        baseline_path=args.baseline,
+        current_output=args.current_output,
+        regression_output=args.regression_output,
+        regression_markdown_output=args.regression_markdown_output,
+        strict=args.strict,
     )
 
 

@@ -1917,6 +1917,59 @@ GET /replay/point-manifests
 The Replay Workstation keeps existing `/replay/<media_id>` semantics. Point links preserve
 `eventCandidateRunId`, `trajectory3dRunId`, and `cameraGeometryId` query parameters when present.
 
+## Multi-Point Regression Matrix / Baseline Expansion
+
+Use this after a Blueprint 24 multi-point replay index exists. The matrix compares
+manifest-backed evidence profiles over time. It protects regression contracts only. It does not
+generate observations, event candidates, 3D candidates, labels, truth, score, point winner, player
+identity, in/out, generalization, or adjudication.
+
+Build a current matrix:
+
+```bash
+make tom-v1-build-multi-point-regression-matrix \
+  PYTHON=.venv/bin/python
+```
+
+Optional baseline build:
+
+```bash
+MULTI_POINT_REGRESSION_MATRIX_OUTPUT=.data/baselines/multi_point_regression_matrix.baseline.json \
+make tom-v1-build-multi-point-regression-matrix \
+  PYTHON=.venv/bin/python
+```
+
+Verify current matrix against the frozen baseline:
+
+```bash
+make tom-v1-verify-multi-point-regression-matrix \
+  PYTHON=.venv/bin/python
+```
+
+Default paths:
+
+```text
+.data/baselines/multi_point_regression_matrix.baseline.json
+.data/exports/multi_point_regression_matrix.current.json
+.data/exports/multi_point_regression_matrix.regression.json
+.data/exports/multi_point_regression_matrix.regression.md
+```
+
+Expected:
+
+- `ok`: true when no breaking drift is detected
+- `status`: `completed`, `completed_with_drift`, or `failed_regression`
+- `matrix_type`: `multi_point_evidence_regression_matrix`
+- `matrix_version`: `v0`
+- `warnings.matrix_is_not_truth`: true
+- `warnings.baseline_is_not_truth`: true
+- `warnings.regression_report_only`: true
+- `warnings.no_adjudication`: true
+
+Additional manifest-backed points are additive and non-breaking unless strict mode is enabled.
+Protected sample-point regressions and matrix contract failures are breaking. Drift is a local
+artifact difference only; it is not proof of correctness or tennis truth.
+
 Build the point evidence snapshot:
 
 ```bash

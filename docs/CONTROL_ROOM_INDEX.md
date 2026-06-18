@@ -318,6 +318,8 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Point Manifest Evidence Provenance Contract v0](reviews/point_manifest_evidence_provenance_contract_v0.md)
 - [Blueprint 24 Multi-Point Replay Navigation / Review Surface v0](blueprints/blueprint_24_multi_point_replay_navigation_review_surface_v0.md)
 - [Multi-Point Replay Navigation / Review Surface v0](reviews/multi_point_replay_navigation_review_surface_v0.md)
+- [Blueprint 25 Multi-Point Regression Matrix / Baseline Expansion v0](blueprints/blueprint_25_multi_point_regression_matrix_baseline_expansion_v0.md)
+- [Multi-Point Regression Matrix / Baseline Expansion v0](reviews/multi_point_regression_matrix_baseline_expansion_v0.md)
 
 ## Development
 

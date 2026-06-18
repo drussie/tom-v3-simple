@@ -217,6 +217,9 @@ This registry makes TOM v3 Simple boundaries explicit.
 - Multi-point replay navigation indexes existing point manifests only. It is not a multi-point
   benchmark, truth source, review lifecycle, score layer, player identity layer, generalization
   claim, or adjudication surface.
+- Multi-point regression matrices compare local manifest-backed evidence profiles only. They do
+  not prove correctness, support scoring, establish player identity, create in/out, or claim TOM
+  generalizes to multiple real tennis points.
 - Replay view presets are display defaults only. Operator view hides raw/debug layers by default,
   and debug/audit view enables them, but neither preset changes persisted observations or proves
   evidence correctness.

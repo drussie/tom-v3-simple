@@ -1,0 +1,115 @@
+{
+  "generated_at": "2026-06-18T15:50:35.264008+00:00",
+  "matrix_type": "multi_point_evidence_regression_matrix",
+  "matrix_version": "v0",
+  "point_count": 1,
+  "points": [
+    {
+      "associated_run_ids": {
+        "camera_geometry_id": "5afa67fb-7f6e-41eb-b4aa-b1100a97ee97",
+        "event_candidate_run_id": "1b946366-7ec1-426f-8b40-494535a9b3fb",
+        "trajectory_3d_run_id": "ea76ccab-c51d-4a63-9682-9fd0bbb83f14"
+      },
+      "evidence_availability": {
+        "event_candidate_3d_diagnostics_available": true,
+        "event_candidates_available": true,
+        "media_indexed": true,
+        "replay_available": true,
+        "review_annotations_available": true,
+        "trajectory_3d_candidates_available": true,
+        "trajectory_3d_debug_reviews_available": false
+      },
+      "labels": [
+        "protected_sample_point"
+      ],
+      "manifest_path": ".data/manifests/point_manifest_v0_690dfd41205609e0caca1263.json",
+      "matrix_row_warnings": {
+        "does_not_create_3d_candidates": true,
+        "does_not_create_event_candidates": true,
+        "does_not_create_observations": true,
+        "manifest_file_available": true,
+        "manifest_identity_matches_index": true,
+        "matrix_row_is_not_truth": true,
+        "navigation_only": true,
+        "no_adjudication": true,
+        "observation_only": true
+      },
+      "media_id": "9518fb01-0da1-4344-9a84-ff88ec8e9b1e",
+      "point_manifest_id": "point_manifest_v0_690dfd41205609e0caca1263",
+      "profile_counts": {
+        "bounce_candidate_count": 3,
+        "event_candidate_3d_diagnostic_count": 6,
+        "event_candidate_observation_count": 877,
+        "event_candidate_rejection_diagnostic_count": 871,
+        "event_marker_count": 6,
+        "event_marker_review_count": 1,
+        "hit_candidate_count": 3,
+        "human_annotation_count": 3,
+        "review_annotation_count": 4,
+        "trajectory_3d_candidate_count": 68,
+        "trajectory_3d_debug_review_count": 0
+      },
+      "replay_url": "http://127.0.0.1:3000/replay/9518fb01-0da1-4344-9a84-ff88ec8e9b1e?eventCandidateRunId=1b946366-7ec1-426f-8b40-494535a9b3fb&trajectory3dRunId=ea76ccab-c51d-4a63-9682-9fd0bbb83f14&cameraGeometryId=5afa67fb-7f6e-41eb-b4aa-b1100a97ee97",
+      "warnings": {
+        "baseline_is_not_truth": true,
+        "does_not_create_in_out": true,
+        "does_not_create_score": true,
+        "does_not_determine_winner": true,
+        "does_not_identify_players": true,
+        "manifest_is_not_truth": true,
+        "no_adjudication": true,
+        "not_3d_truth": true,
+        "not_generalization_claim": true,
+        "not_training_truth": true,
+        "observation_only": true
+      }
+    }
+  ],
+  "source_index_generated_at": "2026-06-18T15:47:29.400459+00:00",
+  "source_index_path": ".data/manifests/multi_point_replay_index.json",
+  "source_index_skipped_manifest_count": 2,
+  "source_index_skipped_manifests": [
+    {
+      "path": ".data/manifests/sample_point.blueprint_23.make.point_manifest.json",
+      "reason": "duplicate_point_manifest"
+    },
+    {
+      "path": ".data/manifests/sample_point.blueprint_23.point_manifest.json",
+      "reason": "duplicate_point_manifest"
+    }
+  ],
+  "source_index_type": "multi_point_replay_index",
+  "source_index_version": "v0",
+  "summary": {
+    "event_candidates_available_count": 1,
+    "point_count": 1,
+    "protected_sample_point_count": 1,
+    "replay_available_count": 1,
+    "review_annotations_available_count": 1,
+    "second_point_parity_stand_in_count": 0,
+    "trajectory_3d_candidates_available_count": 1,
+    "trajectory_3d_debug_reviews_available_count": 0
+  },
+  "tom_provenance": {
+    "blueprint": "blueprint_25",
+    "blueprint_name": "multi_point_regression_matrix_baseline_expansion_v0",
+    "project": "tom-v3-simple",
+    "project_version": "0.0.0"
+  },
+  "warnings": {
+    "baseline_is_not_truth": true,
+    "does_not_create_3d_candidates": true,
+    "does_not_create_event_candidates": true,
+    "does_not_create_in_out": true,
+    "does_not_create_observations": true,
+    "does_not_create_score": true,
+    "does_not_determine_winner": true,
+    "does_not_identify_players": true,
+    "matrix_is_not_truth": true,
+    "navigation_only": true,
+    "no_adjudication": true,
+    "not_generalization_claim": true,
+    "observation_only": true,
+    "regression_report_only": true
+  }
+}

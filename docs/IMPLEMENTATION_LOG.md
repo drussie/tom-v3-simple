@@ -3166,3 +3166,38 @@ evidence availability/profile counts, and labels protected sample-point or secon
 contexts only when inferable from manifest provenance. It does not generate evidence, change review
 metadata, mutate protected baselines, decide in/out, score, identify players, determine a winner,
 or adjudicate evidence.
+
+## Blueprint 25 Multi-Point Regression Matrix / Baseline Expansion v0
+
+Status: complete
+
+### Goal
+
+Turn manifest-backed replay points into a regression-protected evidence matrix without creating
+truth, scoring, player identity, event generation, 3D generation, or adjudication.
+
+### Notes
+
+This milestone adds:
+
+- `apps.worker.services.multi_point_regression_matrix`
+- `build-multi-point-regression-matrix` worker CLI command
+- `compare-multi-point-regression-matrix` worker CLI command
+- `verify-multi-point-regression-matrix` worker CLI command
+- `tom-v1-build-multi-point-regression-matrix` Make helper
+- `tom-v1-compare-multi-point-regression-matrix` Make helper
+- `tom-v1-verify-multi-point-regression-matrix` Make helper
+- `.data/baselines/multi_point_regression_matrix.baseline.json` local baseline path
+- `.data/exports/multi_point_regression_matrix.current.json` local current path
+- `.data/exports/multi_point_regression_matrix.regression.json` local regression path
+- `.data/exports/multi_point_regression_matrix.regression.md` local Markdown path
+- `docs/blueprints/blueprint_25_multi_point_regression_matrix_baseline_expansion_v0.md`
+- `docs/reviews/multi_point_regression_matrix_baseline_expansion_v0.md`
+- `docs/agent_reports/blueprint_25_multi_point_regression_matrix_baseline_expansion_v0_report.md`
+
+The matrix service reads the Blueprint 24 replay index and associated Blueprint 23 point manifest
+files, preserves replay/run/evidence/profile/warning context, and compares baseline/current matrix
+artifacts. Added manifest-backed points are non-breaking by default. Protected sample-point drift
+and matrix warning/type/version contract failures are breaking. The service does not generate
+evidence, change review metadata, mutate protected baselines, decide in/out, score, identify
+players, determine a winner, claim generalization, or adjudicate evidence.
