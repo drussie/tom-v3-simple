@@ -232,6 +232,9 @@ This registry makes TOM v3 Simple boundaries explicit.
   templates, and structural validation only. They do not score confidence automatically, infer
   missing ambiguity, judge whether confidence is appropriate, create truth or training truth, score,
   identify players, decide in/out, or adjudicate evidence.
+- Multi-reviewer disagreement artifacts compare human-provided review structures only. They do not
+  decide which reviewer is right, rank reviewers, score reviewer quality, resolve disagreement,
+  create truth or training truth, score, identify players, decide in/out, or adjudicate evidence.
 - Replay view presets are display defaults only. Operator view hides raw/debug layers by default,
   and debug/audit view enables them, but neither preset changes persisted observations or proves
   evidence correctness.

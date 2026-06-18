@@ -82,6 +82,12 @@ REVIEWER_CONFIDENCE_SCHEMA_OUTPUT ?= .data/contracts/reviewer_confidence_ambigui
 REVIEWER_CONFIDENCE_TEMPLATE_OUTPUT ?= .data/exports/reviewer_confidence_ambiguity_template.current.json
 REVIEWER_CONFIDENCE_BUNDLE ?=
 REVIEWER_CONFIDENCE_VALIDATION_OUTPUT ?= .data/exports/reviewer_confidence_ambiguity.validation.json
+MULTI_REVIEWER_SCHEMA_OUTPUT ?= .data/contracts/multi_reviewer_disagreement_schema_v1.json
+MULTI_REVIEWER_REVIEW_SET_OUTPUT ?= .data/exports/multi_reviewer_review_set_template.current.json
+MULTI_REVIEWER_REVIEW_SET ?=
+MULTI_REVIEWER_REVIEW_SET_VALIDATION_OUTPUT ?= .data/exports/multi_reviewer_review_set.validation.json
+REVIEWER_DISAGREEMENT_REPORT_OUTPUT ?= .data/exports/reviewer_disagreement_report.current.json
+REVIEWER_COUNT ?= 2
 EXPECTED_BRANCH ?=
 EXPECTED_TAG ?=
 FORMAT ?= json
@@ -169,7 +175,7 @@ DERIVE_LINES ?= true
 
 export TOM_V3_DATABASE_URL
 
-.PHONY: install web-install test lint migrate api seed verify index-media run-gameplay index-and-run-gameplay run-detection index-and-run-detection extract-frame-artifacts build-tracklets run-pose export-tracklet-review-dataset court-review-export demo demo-fixture demo-plan demo-reset demo-export demo-open replay-open completion-audit completion-check yolo-probe yolo-smoke yolo-runtime-probe register-yolo-model smoke-real-yolo-local real-detection real-pose tom-v1-yolo-probe tom-v1-ball-detection tom-v1-player-detection tom-v1-tracklets tom-v1-main-subjects tom-v1-main-player-tracks tom-v1-pose tom-v1-pose-main-subjects tom-v1-pose-main-tracks tom-v1-motion-smoothing tom-v1-court-keypoints-probe tom-v1-court-keypoints tom-v1-court-keypoint-audit tom-v1-object-court-projection tom-v1-ball-court-trajectory tom-v1-build-3d-ball-trajectory-candidates tom-v1-build-event-candidate-3d-diagnostics tom-v1-export-reviewed-3d-debug-dataset tom-v1-compare-reviewed-3d-debug-dataset tom-v1-freeze-reviewed-3d-debug-baseline tom-v1-verify-reviewed-3d-debug-baseline tom-v1-hit-bounce-candidates tom-v1-hit-bounce-candidates-verbose tom-v1-point-evidence-snapshot tom-v1-build-point-manifest tom-v1-build-multi-point-replay-index tom-v1-build-multi-point-regression-matrix tom-v1-compare-multi-point-regression-matrix tom-v1-verify-multi-point-regression-matrix tom-v1-export-observation-quality-taxonomy tom-v1-build-observation-quality-profile tom-v1-export-review-label-schema tom-v1-build-review-label-template tom-v1-validate-review-label-bundle tom-v1-export-reviewer-confidence-schema tom-v1-build-reviewer-confidence-template tom-v1-validate-reviewer-confidence-bundle tom-v1-post-codex-validate tom-v1-evaluate-point-candidates tom-v1-declare-camera-geometry tom-v1-ingest-second-point-smoke tom-v1-build-second-point-evidence-parity court-fixture homography-candidates projection-diagnostics web web-build web-lint smoke all-checks
+.PHONY: install web-install test lint migrate api seed verify index-media run-gameplay index-and-run-gameplay run-detection index-and-run-detection extract-frame-artifacts build-tracklets run-pose export-tracklet-review-dataset court-review-export demo demo-fixture demo-plan demo-reset demo-export demo-open replay-open completion-audit completion-check yolo-probe yolo-smoke yolo-runtime-probe register-yolo-model smoke-real-yolo-local real-detection real-pose tom-v1-yolo-probe tom-v1-ball-detection tom-v1-player-detection tom-v1-tracklets tom-v1-main-subjects tom-v1-main-player-tracks tom-v1-pose tom-v1-pose-main-subjects tom-v1-pose-main-tracks tom-v1-motion-smoothing tom-v1-court-keypoints-probe tom-v1-court-keypoints tom-v1-court-keypoint-audit tom-v1-object-court-projection tom-v1-ball-court-trajectory tom-v1-build-3d-ball-trajectory-candidates tom-v1-build-event-candidate-3d-diagnostics tom-v1-export-reviewed-3d-debug-dataset tom-v1-compare-reviewed-3d-debug-dataset tom-v1-freeze-reviewed-3d-debug-baseline tom-v1-verify-reviewed-3d-debug-baseline tom-v1-hit-bounce-candidates tom-v1-hit-bounce-candidates-verbose tom-v1-point-evidence-snapshot tom-v1-build-point-manifest tom-v1-build-multi-point-replay-index tom-v1-build-multi-point-regression-matrix tom-v1-compare-multi-point-regression-matrix tom-v1-verify-multi-point-regression-matrix tom-v1-export-observation-quality-taxonomy tom-v1-build-observation-quality-profile tom-v1-export-review-label-schema tom-v1-build-review-label-template tom-v1-validate-review-label-bundle tom-v1-export-reviewer-confidence-schema tom-v1-build-reviewer-confidence-template tom-v1-validate-reviewer-confidence-bundle tom-v1-export-multi-reviewer-disagreement-schema tom-v1-build-multi-reviewer-review-set-template tom-v1-validate-multi-reviewer-review-set tom-v1-build-reviewer-disagreement-report tom-v1-post-codex-validate tom-v1-evaluate-point-candidates tom-v1-declare-camera-geometry tom-v1-ingest-second-point-smoke tom-v1-build-second-point-evidence-parity court-fixture homography-candidates projection-diagnostics web web-build web-lint smoke all-checks
 
 install:
 	$(PYTHON) -m pip install -e ".[dev]"
@@ -475,6 +481,20 @@ tom-v1-build-reviewer-confidence-template:
 tom-v1-validate-reviewer-confidence-bundle:
 	@if [ -z "$(REVIEWER_CONFIDENCE_BUNDLE)" ]; then echo "REVIEWER_CONFIDENCE_BUNDLE is required: make tom-v1-validate-reviewer-confidence-bundle REVIEWER_CONFIDENCE_BUNDLE=<bundle.json>"; exit 1; fi
 	$(PYTHON) -m apps.worker.cli validate-reviewer-confidence-bundle --schema "$(REVIEWER_CONFIDENCE_SCHEMA_OUTPUT)" --bundle "$(REVIEWER_CONFIDENCE_BUNDLE)" --review-label-schema "$(REVIEW_LABEL_SCHEMA_OUTPUT)" --output "$(REVIEWER_CONFIDENCE_VALIDATION_OUTPUT)" --skip-create-db
+
+tom-v1-export-multi-reviewer-disagreement-schema:
+	$(PYTHON) -m apps.worker.cli export-multi-reviewer-disagreement-schema --output "$(MULTI_REVIEWER_SCHEMA_OUTPUT)" --skip-create-db
+
+tom-v1-build-multi-reviewer-review-set-template:
+	$(PYTHON) -m apps.worker.cli build-multi-reviewer-review-set-template $(if $(POINT_MANIFEST_ID),--point-manifest-id "$(POINT_MANIFEST_ID)",) $(if $(MEDIA_ID),--media-id "$(MEDIA_ID)",) $(if $(REPLAY_URL),--replay-url "$(REPLAY_URL)",) $(if $(EVENT_CANDIDATE_RUN_ID),--event-candidate-run-id "$(EVENT_CANDIDATE_RUN_ID)",) $(if $(TRAJECTORY_3D_RUN_ID),--trajectory-3d-run-id "$(TRAJECTORY_3D_RUN_ID)",) $(if $(CAMERA_GEOMETRY_ID),--camera-geometry-id "$(CAMERA_GEOMETRY_ID)",) --reviewer-count "$(REVIEWER_COUNT)" --output "$(MULTI_REVIEWER_REVIEW_SET_OUTPUT)" --skip-create-db
+
+tom-v1-validate-multi-reviewer-review-set:
+	@if [ -z "$(MULTI_REVIEWER_REVIEW_SET)" ]; then echo "MULTI_REVIEWER_REVIEW_SET is required: make tom-v1-validate-multi-reviewer-review-set MULTI_REVIEWER_REVIEW_SET=<review-set.json>"; exit 1; fi
+	$(PYTHON) -m apps.worker.cli validate-multi-reviewer-review-set --schema "$(MULTI_REVIEWER_SCHEMA_OUTPUT)" --review-set "$(MULTI_REVIEWER_REVIEW_SET)" --review-label-schema "$(REVIEW_LABEL_SCHEMA_OUTPUT)" --reviewer-confidence-schema "$(REVIEWER_CONFIDENCE_SCHEMA_OUTPUT)" --output "$(MULTI_REVIEWER_REVIEW_SET_VALIDATION_OUTPUT)" --skip-create-db
+
+tom-v1-build-reviewer-disagreement-report:
+	@if [ -z "$(MULTI_REVIEWER_REVIEW_SET)" ]; then echo "MULTI_REVIEWER_REVIEW_SET is required: make tom-v1-build-reviewer-disagreement-report MULTI_REVIEWER_REVIEW_SET=<review-set.json>"; exit 1; fi
+	$(PYTHON) -m apps.worker.cli build-reviewer-disagreement-report --schema "$(MULTI_REVIEWER_SCHEMA_OUTPUT)" --review-set "$(MULTI_REVIEWER_REVIEW_SET)" --review-label-schema "$(REVIEW_LABEL_SCHEMA_OUTPUT)" --reviewer-confidence-schema "$(REVIEWER_CONFIDENCE_SCHEMA_OUTPUT)" --output "$(REVIEWER_DISAGREEMENT_REPORT_OUTPUT)" --skip-create-db
 
 tom-v1-post-codex-validate:
 	scripts/post_codex_validate.sh $(if $(EXPECTED_BRANCH),--branch "$(EXPECTED_BRANCH)",) $(if $(EXPECTED_TAG),--expected-tag "$(EXPECTED_TAG)",) --python "$(PYTHON)"

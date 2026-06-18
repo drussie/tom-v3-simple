@@ -57,6 +57,16 @@ from apps.worker.services.multi_point_replay_index import (
     MULTI_POINT_REPLAY_INDEX_OUTPUT,
     build_multi_point_replay_index,
 )
+from apps.worker.services.multi_reviewer_disagreement import (
+    DEFAULT_MULTI_REVIEWER_REVIEW_SET_TEMPLATE_OUTPUT,
+    DEFAULT_MULTI_REVIEWER_REVIEW_SET_VALIDATION_OUTPUT,
+    DEFAULT_MULTI_REVIEWER_SCHEMA_OUTPUT,
+    DEFAULT_REVIEWER_DISAGREEMENT_REPORT_OUTPUT,
+    build_multi_reviewer_review_set_template,
+    build_reviewer_disagreement_report,
+    export_multi_reviewer_disagreement_schema,
+    validate_multi_reviewer_review_set,
+)
 from apps.worker.services.object_court_projection import project_objects_to_court
 from apps.worker.services.observation_quality_taxonomy import (
     DEFAULT_OBSERVATION_QUALITY_PROFILE_OUTPUT,
@@ -1300,6 +1310,110 @@ def main() -> None:
     reviewer_confidence_validate_parser.add_argument("--skip-create-db", action="store_true")
     reviewer_confidence_validate_parser.set_defaults(
         handler=_handle_validate_reviewer_confidence_bundle,
+        skip_create_db=True,
+    )
+
+    multi_reviewer_schema_parser = subcommands.add_parser(
+        "export-multi-reviewer-disagreement-schema",
+        help="Export the multi-reviewer disagreement schema contract.",
+    )
+    multi_reviewer_schema_parser.add_argument(
+        "--output",
+        default=DEFAULT_MULTI_REVIEWER_SCHEMA_OUTPUT,
+        help="JSON multi-reviewer disagreement schema output path.",
+    )
+    multi_reviewer_schema_parser.add_argument("--skip-create-db", action="store_true")
+    multi_reviewer_schema_parser.set_defaults(
+        handler=_handle_export_multi_reviewer_disagreement_schema,
+        skip_create_db=True,
+    )
+
+    multi_reviewer_template_parser = subcommands.add_parser(
+        "build-multi-reviewer-review-set-template",
+        help="Build a blank multi-reviewer review-set template.",
+    )
+    multi_reviewer_template_parser.add_argument("--point-manifest-id")
+    multi_reviewer_template_parser.add_argument("--media-id")
+    multi_reviewer_template_parser.add_argument("--replay-url")
+    multi_reviewer_template_parser.add_argument("--event-candidate-run-id")
+    multi_reviewer_template_parser.add_argument("--trajectory-3d-run-id")
+    multi_reviewer_template_parser.add_argument("--camera-geometry-id")
+    multi_reviewer_template_parser.add_argument(
+        "--reviewer-count",
+        type=int,
+        default=2,
+        help="Number of blank reviewer entries to include.",
+    )
+    multi_reviewer_template_parser.add_argument(
+        "--output",
+        default=DEFAULT_MULTI_REVIEWER_REVIEW_SET_TEMPLATE_OUTPUT,
+        help="JSON multi-reviewer review-set template output path.",
+    )
+    multi_reviewer_template_parser.add_argument("--skip-create-db", action="store_true")
+    multi_reviewer_template_parser.set_defaults(
+        handler=_handle_build_multi_reviewer_review_set_template,
+        skip_create_db=True,
+    )
+
+    multi_reviewer_validate_parser = subcommands.add_parser(
+        "validate-multi-reviewer-review-set",
+        help="Validate a multi-reviewer review set against the schema.",
+    )
+    multi_reviewer_validate_parser.add_argument(
+        "--schema",
+        default=DEFAULT_MULTI_REVIEWER_SCHEMA_OUTPUT,
+        help="Multi-reviewer disagreement schema JSON path.",
+    )
+    multi_reviewer_validate_parser.add_argument("--review-set", required=True)
+    multi_reviewer_validate_parser.add_argument(
+        "--review-label-schema",
+        default=DEFAULT_REVIEW_LABEL_SCHEMA_OUTPUT,
+        help="Blueprint 27 review label schema JSON path.",
+    )
+    multi_reviewer_validate_parser.add_argument(
+        "--reviewer-confidence-schema",
+        default=DEFAULT_REVIEWER_CONFIDENCE_SCHEMA_OUTPUT,
+        help="Blueprint 28 reviewer confidence schema JSON path.",
+    )
+    multi_reviewer_validate_parser.add_argument(
+        "--output",
+        default=DEFAULT_MULTI_REVIEWER_REVIEW_SET_VALIDATION_OUTPUT,
+        help="Optional JSON validation report path.",
+    )
+    multi_reviewer_validate_parser.add_argument("--skip-create-db", action="store_true")
+    multi_reviewer_validate_parser.set_defaults(
+        handler=_handle_validate_multi_reviewer_review_set,
+        skip_create_db=True,
+    )
+
+    reviewer_disagreement_report_parser = subcommands.add_parser(
+        "build-reviewer-disagreement-report",
+        help="Build a structural reviewer disagreement report from a review set.",
+    )
+    reviewer_disagreement_report_parser.add_argument(
+        "--schema",
+        default=DEFAULT_MULTI_REVIEWER_SCHEMA_OUTPUT,
+        help="Multi-reviewer disagreement schema JSON path.",
+    )
+    reviewer_disagreement_report_parser.add_argument("--review-set", required=True)
+    reviewer_disagreement_report_parser.add_argument(
+        "--review-label-schema",
+        default=DEFAULT_REVIEW_LABEL_SCHEMA_OUTPUT,
+        help="Blueprint 27 review label schema JSON path.",
+    )
+    reviewer_disagreement_report_parser.add_argument(
+        "--reviewer-confidence-schema",
+        default=DEFAULT_REVIEWER_CONFIDENCE_SCHEMA_OUTPUT,
+        help="Blueprint 28 reviewer confidence schema JSON path.",
+    )
+    reviewer_disagreement_report_parser.add_argument(
+        "--output",
+        default=DEFAULT_REVIEWER_DISAGREEMENT_REPORT_OUTPUT,
+        help="JSON reviewer disagreement report output path.",
+    )
+    reviewer_disagreement_report_parser.add_argument("--skip-create-db", action="store_true")
+    reviewer_disagreement_report_parser.set_defaults(
+        handler=_handle_build_reviewer_disagreement_report,
         skip_create_db=True,
     )
 
@@ -2648,6 +2762,66 @@ def _handle_validate_reviewer_confidence_bundle(
         schema_path=args.schema,
         bundle_path=args.bundle,
         review_label_schema_path=args.review_label_schema,
+        output_path=args.output,
+    )
+
+
+def _handle_export_multi_reviewer_disagreement_schema(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return export_multi_reviewer_disagreement_schema(output_path=args.output)
+
+
+def _handle_build_multi_reviewer_review_set_template(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    associated_run_ids = {
+        key: value
+        for key, value in {
+            "event_candidate_run_id": args.event_candidate_run_id,
+            "trajectory_3d_run_id": args.trajectory_3d_run_id,
+            "camera_geometry_id": args.camera_geometry_id,
+        }.items()
+        if value
+    }
+    return build_multi_reviewer_review_set_template(
+        point_manifest_id=args.point_manifest_id,
+        media_id=args.media_id,
+        replay_url=args.replay_url,
+        associated_run_ids=associated_run_ids,
+        reviewer_count=args.reviewer_count,
+        output_path=args.output,
+    )
+
+
+def _handle_validate_multi_reviewer_review_set(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_multi_reviewer_review_set(
+        schema_path=args.schema,
+        review_set_path=args.review_set,
+        review_label_schema_path=args.review_label_schema,
+        reviewer_confidence_schema_path=args.reviewer_confidence_schema,
+        output_path=args.output,
+    )
+
+
+def _handle_build_reviewer_disagreement_report(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_reviewer_disagreement_report(
+        schema_path=args.schema,
+        review_set_path=args.review_set,
+        review_label_schema_path=args.review_label_schema,
+        reviewer_confidence_schema_path=args.reviewer_confidence_schema,
         output_path=args.output,
     )
 

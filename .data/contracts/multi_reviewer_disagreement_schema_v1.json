@@ -1,0 +1,533 @@
+{
+  "disagreement_dimensions": [
+    {
+      "allowed_values": [
+        "not_assessed",
+        "no_disagreement_observed",
+        "disagreement_observed",
+        "partial_disagreement",
+        "missing_reviewer_input",
+        "insufficient_reviewer_input",
+        "ambiguous",
+        "not_applicable"
+      ],
+      "description": "Structural difference across human-provided label values.",
+      "does_not_resolve_disagreement": true,
+      "key": "label_value_disagreement",
+      "name": "Label value disagreement",
+      "required": false,
+      "structural_only": true,
+      "warnings": {
+        "dimension_is_not_truth": true,
+        "does_not_validate_correctness": true,
+        "no_adjudication": true,
+        "review_support_only": true
+      }
+    },
+    {
+      "allowed_values": [
+        "not_assessed",
+        "no_disagreement_observed",
+        "disagreement_observed",
+        "partial_disagreement",
+        "missing_reviewer_input",
+        "insufficient_reviewer_input",
+        "ambiguous",
+        "not_applicable"
+      ],
+      "description": "Structural difference across human-provided confidence values.",
+      "does_not_resolve_disagreement": true,
+      "key": "confidence_disagreement",
+      "name": "Confidence disagreement",
+      "required": false,
+      "structural_only": true,
+      "warnings": {
+        "dimension_is_not_truth": true,
+        "does_not_validate_correctness": true,
+        "no_adjudication": true,
+        "review_support_only": true
+      }
+    },
+    {
+      "allowed_values": [
+        "not_assessed",
+        "no_disagreement_observed",
+        "disagreement_observed",
+        "partial_disagreement",
+        "missing_reviewer_input",
+        "insufficient_reviewer_input",
+        "ambiguous",
+        "not_applicable"
+      ],
+      "description": "Structural difference across human-provided ambiguity values.",
+      "does_not_resolve_disagreement": true,
+      "key": "ambiguity_disagreement",
+      "name": "Ambiguity disagreement",
+      "required": false,
+      "structural_only": true,
+      "warnings": {
+        "dimension_is_not_truth": true,
+        "does_not_validate_correctness": true,
+        "no_adjudication": true,
+        "review_support_only": true
+      }
+    },
+    {
+      "allowed_values": [
+        "not_assessed",
+        "no_disagreement_observed",
+        "disagreement_observed",
+        "partial_disagreement",
+        "missing_reviewer_input",
+        "insufficient_reviewer_input",
+        "ambiguous",
+        "not_applicable"
+      ],
+      "description": "Structural difference across human-provided evidence sufficiency values.",
+      "does_not_resolve_disagreement": true,
+      "key": "evidence_sufficiency_disagreement",
+      "name": "Evidence sufficiency disagreement",
+      "required": false,
+      "structural_only": true,
+      "warnings": {
+        "dimension_is_not_truth": true,
+        "does_not_validate_correctness": true,
+        "no_adjudication": true,
+        "review_support_only": true
+      }
+    },
+    {
+      "allowed_values": [
+        "not_assessed",
+        "no_disagreement_observed",
+        "disagreement_observed",
+        "partial_disagreement",
+        "missing_reviewer_input",
+        "insufficient_reviewer_input",
+        "ambiguous",
+        "not_applicable"
+      ],
+      "description": "A reviewer entry has no available structured review-label bundle.",
+      "does_not_resolve_disagreement": true,
+      "key": "missing_review_bundle",
+      "name": "Missing review bundle",
+      "required": false,
+      "structural_only": true,
+      "warnings": {
+        "dimension_is_not_truth": true,
+        "does_not_validate_correctness": true,
+        "no_adjudication": true,
+        "review_support_only": true
+      }
+    },
+    {
+      "allowed_values": [
+        "not_assessed",
+        "no_disagreement_observed",
+        "disagreement_observed",
+        "partial_disagreement",
+        "missing_reviewer_input",
+        "insufficient_reviewer_input",
+        "ambiguous",
+        "not_applicable"
+      ],
+      "description": "A reviewer entry has no available reviewer confidence bundle.",
+      "does_not_resolve_disagreement": true,
+      "key": "missing_confidence_bundle",
+      "name": "Missing confidence bundle",
+      "required": false,
+      "structural_only": true,
+      "warnings": {
+        "dimension_is_not_truth": true,
+        "does_not_validate_correctness": true,
+        "no_adjudication": true,
+        "review_support_only": true
+      }
+    },
+    {
+      "allowed_values": [
+        "not_assessed",
+        "no_disagreement_observed",
+        "disagreement_observed",
+        "partial_disagreement",
+        "missing_reviewer_input",
+        "insufficient_reviewer_input",
+        "ambiguous",
+        "not_applicable"
+      ],
+      "description": "Structural difference across human-provided reviewer notes.",
+      "does_not_resolve_disagreement": true,
+      "key": "reviewer_note_difference",
+      "name": "Reviewer note difference",
+      "required": false,
+      "structural_only": true,
+      "warnings": {
+        "dimension_is_not_truth": true,
+        "does_not_validate_correctness": true,
+        "no_adjudication": true,
+        "review_support_only": true
+      }
+    },
+    {
+      "allowed_values": [
+        "not_assessed",
+        "no_disagreement_observed",
+        "disagreement_observed",
+        "partial_disagreement",
+        "missing_reviewer_input",
+        "insufficient_reviewer_input",
+        "ambiguous",
+        "not_applicable"
+      ],
+      "description": "Reviewer bundle context differs from the review-set context.",
+      "does_not_resolve_disagreement": true,
+      "key": "provenance_mismatch",
+      "name": "Provenance mismatch",
+      "required": false,
+      "structural_only": true,
+      "warnings": {
+        "dimension_is_not_truth": true,
+        "does_not_validate_correctness": true,
+        "no_adjudication": true,
+        "review_support_only": true
+      }
+    },
+    {
+      "allowed_values": [
+        "not_assessed",
+        "no_disagreement_observed",
+        "disagreement_observed",
+        "partial_disagreement",
+        "missing_reviewer_input",
+        "insufficient_reviewer_input",
+        "ambiguous",
+        "not_applicable"
+      ],
+      "description": "At least one reviewer left a compared value not assessed.",
+      "does_not_resolve_disagreement": true,
+      "key": "not_assessed_difference",
+      "name": "Not assessed difference",
+      "required": false,
+      "structural_only": true,
+      "warnings": {
+        "dimension_is_not_truth": true,
+        "does_not_validate_correctness": true,
+        "no_adjudication": true,
+        "review_support_only": true
+      }
+    }
+  ],
+  "disagreement_value_sets": [
+    {
+      "allowed_values": [
+        "not_assessed",
+        "no_disagreement_observed",
+        "disagreement_observed",
+        "partial_disagreement",
+        "missing_reviewer_input",
+        "insufficient_reviewer_input",
+        "ambiguous",
+        "not_applicable"
+      ],
+      "default_value": "not_assessed",
+      "description": "Neutral structural disagreement statuses.",
+      "key": "disagreement_status_values",
+      "name": "Disagreement status values",
+      "warnings": {
+        "does_not_resolve_disagreement": true,
+        "no_adjudication": true,
+        "review_support_only": true,
+        "value_set_is_not_truth": true
+      }
+    }
+  ],
+  "exported_at": "2026-06-18T21:03:57.866018+00:00",
+  "provenance_requirements": {
+    "associated_run_ids_allowed": [
+      "event_candidate_run_id",
+      "trajectory_3d_run_id",
+      "camera_geometry_id"
+    ],
+    "media_id_recommended": true,
+    "point_manifest_id_recommended": true,
+    "provenance_only": true,
+    "replay_url_recommended": true,
+    "review_label_bundle_path_or_ref_allowed": true,
+    "review_label_schema_version_supported": "v1",
+    "review_set_type_required": "multi_reviewer_review_set",
+    "review_set_version_required": "v1",
+    "reviewer_confidence_bundle_path_or_ref_allowed": true,
+    "reviewer_confidence_schema_version_supported": "v1"
+  },
+  "review_set_type": "multi_reviewer_review_set",
+  "review_set_version": "v1",
+  "reviewer_entry_definitions": [
+    {
+      "description": "Required neutral or pseudonymous reviewer identifier.",
+      "human_provided_only": true,
+      "key": "reviewer_id",
+      "machine_inferred": false,
+      "required": true,
+      "warnings": {
+        "does_not_rank_reviewers": true,
+        "does_not_resolve_disagreement": true,
+        "does_not_score_reviewers": true,
+        "does_not_validate_correctness": true,
+        "human_review_only": true,
+        "machine_inferred": false,
+        "no_adjudication": true,
+        "review_support_only": true,
+        "reviewer_identity_is_pseudonymous": true
+      }
+    },
+    {
+      "description": "Optional neutral reviewer role.",
+      "human_provided_only": true,
+      "key": "reviewer_role",
+      "machine_inferred": false,
+      "required": false,
+      "warnings": {
+        "does_not_rank_reviewers": true,
+        "does_not_resolve_disagreement": true,
+        "does_not_score_reviewers": true,
+        "does_not_validate_correctness": true,
+        "human_review_only": true,
+        "machine_inferred": false,
+        "no_adjudication": true,
+        "review_support_only": true,
+        "reviewer_identity_is_pseudonymous": true
+      }
+    },
+    {
+      "description": "Optional neutral review session identifier.",
+      "human_provided_only": true,
+      "key": "reviewer_session_id",
+      "machine_inferred": false,
+      "required": false,
+      "warnings": {
+        "does_not_rank_reviewers": true,
+        "does_not_resolve_disagreement": true,
+        "does_not_score_reviewers": true,
+        "does_not_validate_correctness": true,
+        "human_review_only": true,
+        "machine_inferred": false,
+        "no_adjudication": true,
+        "review_support_only": true,
+        "reviewer_identity_is_pseudonymous": true
+      }
+    },
+    {
+      "description": "Optional human-provided reviewer note for this entry.",
+      "human_provided_only": true,
+      "key": "reviewer_notes",
+      "machine_inferred": false,
+      "required": false,
+      "warnings": {
+        "does_not_rank_reviewers": true,
+        "does_not_resolve_disagreement": true,
+        "does_not_score_reviewers": true,
+        "does_not_validate_correctness": true,
+        "human_review_only": true,
+        "machine_inferred": false,
+        "no_adjudication": true,
+        "review_support_only": true,
+        "reviewer_identity_is_pseudonymous": true
+      }
+    },
+    {
+      "description": "Optional local path to a Blueprint 27 review-label bundle.",
+      "human_provided_only": true,
+      "key": "review_label_bundle_path",
+      "machine_inferred": false,
+      "required": false,
+      "warnings": {
+        "does_not_rank_reviewers": true,
+        "does_not_resolve_disagreement": true,
+        "does_not_score_reviewers": true,
+        "does_not_validate_correctness": true,
+        "human_review_only": true,
+        "machine_inferred": false,
+        "no_adjudication": true,
+        "review_support_only": true,
+        "reviewer_identity_is_pseudonymous": true
+      }
+    },
+    {
+      "description": "Optional non-path reference to a Blueprint 27 review-label bundle.",
+      "human_provided_only": true,
+      "key": "review_label_bundle_ref",
+      "machine_inferred": false,
+      "required": false,
+      "warnings": {
+        "does_not_rank_reviewers": true,
+        "does_not_resolve_disagreement": true,
+        "does_not_score_reviewers": true,
+        "does_not_validate_correctness": true,
+        "human_review_only": true,
+        "machine_inferred": false,
+        "no_adjudication": true,
+        "review_support_only": true,
+        "reviewer_identity_is_pseudonymous": true
+      }
+    },
+    {
+      "description": "Optional local path to a Blueprint 28 confidence bundle.",
+      "human_provided_only": true,
+      "key": "reviewer_confidence_bundle_path",
+      "machine_inferred": false,
+      "required": false,
+      "warnings": {
+        "does_not_rank_reviewers": true,
+        "does_not_resolve_disagreement": true,
+        "does_not_score_reviewers": true,
+        "does_not_validate_correctness": true,
+        "human_review_only": true,
+        "machine_inferred": false,
+        "no_adjudication": true,
+        "review_support_only": true,
+        "reviewer_identity_is_pseudonymous": true
+      }
+    },
+    {
+      "description": "Optional non-path reference to a Blueprint 28 confidence bundle.",
+      "human_provided_only": true,
+      "key": "reviewer_confidence_bundle_ref",
+      "machine_inferred": false,
+      "required": false,
+      "warnings": {
+        "does_not_rank_reviewers": true,
+        "does_not_resolve_disagreement": true,
+        "does_not_score_reviewers": true,
+        "does_not_validate_correctness": true,
+        "human_review_only": true,
+        "machine_inferred": false,
+        "no_adjudication": true,
+        "review_support_only": true,
+        "reviewer_identity_is_pseudonymous": true
+      }
+    }
+  ],
+  "reviewer_identity_policy": {
+    "allowed_reviewer_identity_fields": [
+      "reviewer_id",
+      "reviewer_role",
+      "reviewer_session_id",
+      "reviewer_notes"
+    ],
+    "disallowed_reviewer_identity_fields": [
+      "email",
+      "name",
+      "real_name",
+      "reviewer_authority_score",
+      "reviewer_correctness_score",
+      "reviewer_email",
+      "reviewer_name",
+      "reviewer_quality_score",
+      "reviewer_rank",
+      "reviewer_reliability",
+      "reviewer_score"
+    ],
+    "email_required": false,
+    "pseudonymous_identifiers_only": true,
+    "real_name_required": false,
+    "required_reviewer_identity_fields": [
+      "reviewer_id"
+    ],
+    "reviewer_authority_scoring_allowed": false,
+    "reviewer_correctness_scoring_allowed": false,
+    "reviewer_quality_scoring_allowed": false,
+    "reviewer_ranking_allowed": false,
+    "warnings": {
+      "does_not_rank_reviewers": true,
+      "does_not_resolve_disagreement": true,
+      "does_not_score_reviewers": true,
+      "does_not_validate_correctness": true,
+      "human_review_only": true,
+      "machine_inferred": false,
+      "no_adjudication": true,
+      "review_support_only": true,
+      "reviewer_identity_is_pseudonymous": true
+    }
+  },
+  "schema_type": "multi_reviewer_disagreement_schema",
+  "schema_version": "v1",
+  "tom_provenance": {
+    "blueprint": "blueprint_29",
+    "blueprint_name": "multi_reviewer_disagreement_foundation_v1",
+    "project": "tom-v3-simple",
+    "project_version": "0.0.0"
+  },
+  "validation_rules": {
+    "disallowed_reviewer_identity_fields": [
+      "email",
+      "name",
+      "real_name",
+      "reviewer_authority_score",
+      "reviewer_correctness_score",
+      "reviewer_email",
+      "reviewer_name",
+      "reviewer_quality_score",
+      "reviewer_rank",
+      "reviewer_reliability",
+      "reviewer_score"
+    ],
+    "does_not_create_labels": true,
+    "does_not_infer_missing_labels": true,
+    "does_not_rank_reviewers": true,
+    "does_not_resolve_disagreements": true,
+    "does_not_score_reviewers": true,
+    "does_not_validate_correctness": true,
+    "does_not_validate_truth": true,
+    "forbidden_fields": [
+      "accepted",
+      "adjudication",
+      "correct",
+      "in_out",
+      "incorrect",
+      "player_identity",
+      "point_winner",
+      "receiver",
+      "rejected",
+      "reviewer_rank",
+      "reviewer_reliability",
+      "reviewer_score",
+      "score",
+      "server",
+      "truth",
+      "winner"
+    ],
+    "human_provided_only_required": true,
+    "machine_inferred_must_be_false": true,
+    "missing_bundle_refs_are_structural_warnings": true,
+    "referenced_confidence_bundles_validated_when_paths_available": true,
+    "referenced_review_label_bundles_validated_when_paths_available": true,
+    "reviewer_ids_required": true,
+    "reviewer_ids_unique_within_review_set": true,
+    "structural_validation_only": true
+  },
+  "warnings": {
+    "disagreement_is_not_truth": true,
+    "does_not_create_3d_candidates": true,
+    "does_not_create_automatic_confidence_scores": true,
+    "does_not_create_event_candidates": true,
+    "does_not_create_in_out": true,
+    "does_not_create_labels": true,
+    "does_not_create_observations": true,
+    "does_not_create_score": true,
+    "does_not_determine_winner": true,
+    "does_not_identify_players": true,
+    "does_not_infer_truth": true,
+    "does_not_rank_reviewers": true,
+    "does_not_resolve_disagreement": true,
+    "does_not_score_reviewers": true,
+    "does_not_validate_correctness": true,
+    "human_review_only": true,
+    "no_adjudication": true,
+    "not_generalization_claim": true,
+    "not_training_truth": true,
+    "observation_only": true,
+    "review_set_is_not_truth": true,
+    "review_support_only": true,
+    "schema_is_not_truth": true
+  }
+}

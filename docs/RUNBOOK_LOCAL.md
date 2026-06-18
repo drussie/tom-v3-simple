@@ -2127,6 +2127,71 @@ Validation checks shape, allowed metadata values, optional Blueprint 27 label ke
 fields, and human-only flags. It does not infer missing confidence or ambiguity, create labels,
 validate correctness, decide whether confidence is appropriate, or decide truth.
 
+## Multi-Reviewer / Disagreement Foundation
+
+Use this to export the multi-reviewer disagreement schema, create a blank review-set template,
+validate review-set structure, and build a structural disagreement report. This is review structure
+support only. It does not rank reviewers, score reviewer quality, resolve disagreement, infer truth,
+decide in/out, score, identify players, determine a winner, or adjudicate evidence.
+
+Export the schema contract:
+
+```bash
+make tom-v1-export-multi-reviewer-disagreement-schema \
+  PYTHON=.venv/bin/python
+```
+
+Build a blank review-set template:
+
+```bash
+make tom-v1-build-multi-reviewer-review-set-template \
+  PYTHON=.venv/bin/python
+```
+
+Validate a review set:
+
+```bash
+make tom-v1-validate-multi-reviewer-review-set \
+  PYTHON=.venv/bin/python \
+  MULTI_REVIEWER_REVIEW_SET=.data/exports/multi_reviewer_review_set_template.current.json
+```
+
+Build a disagreement report:
+
+```bash
+make tom-v1-build-reviewer-disagreement-report \
+  PYTHON=.venv/bin/python \
+  MULTI_REVIEWER_REVIEW_SET=.data/exports/multi_reviewer_review_set_template.current.json
+```
+
+Default paths:
+
+```text
+.data/contracts/multi_reviewer_disagreement_schema_v1.json
+.data/exports/multi_reviewer_review_set_template.current.json
+.data/exports/multi_reviewer_review_set.validation.json
+.data/exports/reviewer_disagreement_report.current.json
+```
+
+Expected:
+
+- `ok`: true for schema export and valid review-set validation
+- `schema_type`: `multi_reviewer_disagreement_schema`
+- `schema_version`: `v1`
+- `review_set_type`: `multi_reviewer_review_set`
+- `review_set_version`: `v1`
+- `disagreement_report_type`: `reviewer_disagreement_report`
+- `disagreement_report_version`: `v1`
+- `warnings.disagreement_is_not_truth`: true
+- `warnings.does_not_resolve_disagreement`: true
+- `warnings.does_not_score_reviewers`: true
+- `warnings.no_adjudication`: true
+
+Validation checks shape, reviewer IDs, forbidden fields, disallowed reviewer identity fields,
+human-only flags, and referenced Blueprint 27/28 bundle structure when paths are present. It does
+not infer missing labels, create labels, decide whether a reviewer is right, resolve disagreement,
+or score reviewers.
+
 Build the point evidence snapshot:
 
 ```bash

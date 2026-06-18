@@ -3304,3 +3304,45 @@ checks bundle structure, allowed values, optional Blueprint 27 label keys, forbi
 human-only flags. It does not generate evidence, create labels, change review semantics, mutate
 protected baselines, decide in/out, score, identify players, determine a winner, claim
 generalization, validate correctness, score confidence automatically, or adjudicate evidence.
+
+## Blueprint 29 Multi-Reviewer / Disagreement Foundation v1
+
+Status: complete
+
+### Goal
+
+Create a versioned multi-reviewer review-set and disagreement-report foundation for multiple
+human-provided review inputs without creating truth, scoring, player identity, event generation,
+3D generation, reviewer ranking, reviewer scoring, disagreement resolution, correctness claims, or
+adjudication.
+
+### Notes
+
+This milestone adds:
+
+- `apps.worker.services.multi_reviewer_disagreement`
+- `export-multi-reviewer-disagreement-schema` worker CLI command
+- `build-multi-reviewer-review-set-template` worker CLI command
+- `validate-multi-reviewer-review-set` worker CLI command
+- `build-reviewer-disagreement-report` worker CLI command
+- `tom-v1-export-multi-reviewer-disagreement-schema` Make helper
+- `tom-v1-build-multi-reviewer-review-set-template` Make helper
+- `tom-v1-validate-multi-reviewer-review-set` Make helper
+- `tom-v1-build-reviewer-disagreement-report` Make helper
+- `.data/contracts/multi_reviewer_disagreement_schema_v1.json` local contract path
+- `.data/exports/multi_reviewer_review_set_template.current.json` local template path
+- `.data/exports/multi_reviewer_review_set.validation.json` local validation path
+- `.data/exports/reviewer_disagreement_report.current.json` local report path
+- `docs/blueprints/blueprint_29_multi_reviewer_disagreement_foundation_v1.md`
+- `docs/reviews/multi_reviewer_disagreement_foundation_v1.md`
+- `docs/agent_reports/blueprint_29_multi_reviewer_disagreement_foundation_v1_report.md`
+
+The schema defines pseudonymous reviewer identity policy, reviewer entry definitions,
+disagreement dimensions, disagreement values, provenance requirements, validation rules, and
+warnings. The template builder emits blank reviewer entries and does not infer reviewer input. The
+validator checks review-set structure, reviewer IDs, forbidden fields, disallowed reviewer identity
+fields, human-only flags, and referenced Blueprint 27/28 bundles when paths are present. The report
+builder compares human-provided values structurally. It does not generate evidence, create labels,
+change review semantics, mutate protected baselines, decide in/out, score, identify players,
+determine a winner, claim generalization, validate correctness, rank reviewers, score reviewers,
+resolve disagreement, or adjudicate evidence.

@@ -1264,3 +1264,16 @@ reason, evidence-sufficiency, additional-review, time-spent, and review-context 
 rejects forbidden decision fields and invalid metadata values, but it does not infer missing
 confidence, create labels, judge correctness, inspect video, decide truth, score, player identity,
 point winner, in/out, generalization, or adjudication.
+
+## Blueprint 29 Status
+
+Status: complete.
+
+TOM v3 can now export a versioned multi-reviewer disagreement schema, build a blank
+multi-reviewer review-set template, validate review-set structure, and build a structural
+disagreement report. The schema uses pseudonymous reviewer IDs only, validates referenced Blueprint
+27/28 bundles when paths are present, and treats missing bundle refs as structural warnings. Reports
+capture disagreement dimensions such as label-value, confidence, ambiguity, evidence-sufficiency,
+missing input, note differences, and provenance mismatch. They do not infer missing labels, create
+labels, decide which reviewer is right, resolve disagreement, score reviewers, inspect video,
+decide truth, score, player identity, point winner, in/out, generalization, or adjudication.

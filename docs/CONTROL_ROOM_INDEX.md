@@ -326,6 +326,8 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Structured Review Label Schema v1](reviews/structured_review_label_schema_v1.md)
 - [Blueprint 28 Reviewer Confidence / Ambiguity Capture v1](blueprints/blueprint_28_reviewer_confidence_ambiguity_capture_v1.md)
 - [Reviewer Confidence / Ambiguity Capture v1](reviews/reviewer_confidence_ambiguity_capture_v1.md)
+- [Blueprint 29 Multi-Reviewer / Disagreement Foundation v1](blueprints/blueprint_29_multi_reviewer_disagreement_foundation_v1.md)
+- [Multi-Reviewer / Disagreement Foundation v1](reviews/multi_reviewer_disagreement_foundation_v1.md)
 
 ## Development
 
