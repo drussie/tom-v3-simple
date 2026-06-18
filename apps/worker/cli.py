@@ -31,6 +31,16 @@ from apps.worker.services.camera_geometry import declare_camera_geometry
 from apps.worker.services.completion_audit import run_completion_audit
 from apps.worker.services.court_adapter import run_fixture_court_adapter
 from apps.worker.services.court_review_export import export_court_review_dataset
+from apps.worker.services.coverage_driven_sampling_strategy import (
+    DEFAULT_COVERAGE_SAMPLING_CONTRACT_OUTPUT,
+    DEFAULT_COVERAGE_SAMPLING_PROFILE_OUTPUT,
+    DEFAULT_COVERAGE_SAMPLING_REPORT_OUTPUT,
+    DEFAULT_COVERAGE_SAMPLING_VALIDATION_OUTPUT,
+    build_coverage_sampling_profile,
+    build_coverage_sampling_report,
+    export_coverage_sampling_strategy_contract,
+    validate_coverage_sampling_profile,
+)
 from apps.worker.services.detection_adapter import run_detection_adapter
 from apps.worker.services.event_candidate_3d_diagnostics import (
     build_event_candidate_3d_diagnostics,
@@ -1699,6 +1709,153 @@ def main() -> None:
         skip_create_db=True,
     )
 
+    coverage_sampling_contract_parser = subcommands.add_parser(
+        "export-coverage-sampling-strategy-contract",
+        help="Export the coverage-driven sampling strategy contract.",
+    )
+    coverage_sampling_contract_parser.add_argument(
+        "--output",
+        default=DEFAULT_COVERAGE_SAMPLING_CONTRACT_OUTPUT,
+        help="JSON coverage sampling strategy contract output path.",
+    )
+    coverage_sampling_contract_parser.add_argument("--skip-create-db", action="store_true")
+    coverage_sampling_contract_parser.set_defaults(
+        handler=_handle_export_coverage_sampling_strategy_contract,
+        skip_create_db=True,
+    )
+
+    coverage_sampling_profile_parser = subcommands.add_parser(
+        "build-coverage-sampling-profile",
+        help="Build a coverage sampling profile from existing TOM corpus artifacts.",
+    )
+    coverage_sampling_profile_parser.add_argument(
+        "--corpus-manifest",
+        default=DEFAULT_DATASET_CORPUS_MANIFEST_OUTPUT,
+        help="Versioned dataset corpus manifest JSON path.",
+    )
+    coverage_sampling_profile_parser.add_argument(
+        "--index",
+        default=MULTI_POINT_REPLAY_INDEX_OUTPUT,
+        help="Optional multi-point replay index JSON path.",
+    )
+    coverage_sampling_profile_parser.add_argument(
+        "--matrix",
+        default=DEFAULT_MULTI_POINT_REGRESSION_MATRIX_CURRENT,
+        help="Optional multi-point regression matrix JSON path.",
+    )
+    coverage_sampling_profile_parser.add_argument(
+        "--output",
+        default=DEFAULT_COVERAGE_SAMPLING_PROFILE_OUTPUT,
+        help="JSON coverage sampling profile output path.",
+    )
+    coverage_sampling_profile_parser.add_argument("--skip-create-db", action="store_true")
+    coverage_sampling_profile_parser.set_defaults(
+        handler=_handle_build_coverage_sampling_profile,
+        skip_create_db=True,
+    )
+
+    coverage_sampling_validate_parser = subcommands.add_parser(
+        "validate-coverage-sampling-profile",
+        help="Validate a coverage sampling profile structurally.",
+    )
+    coverage_sampling_validate_parser.add_argument(
+        "--contract",
+        default=DEFAULT_COVERAGE_SAMPLING_CONTRACT_OUTPUT,
+        help="Coverage sampling strategy contract JSON path.",
+    )
+    coverage_sampling_validate_parser.add_argument("--profile", required=True)
+    coverage_sampling_validate_parser.add_argument(
+        "--observation-quality-taxonomy",
+        default=DEFAULT_OBSERVATION_QUALITY_TAXONOMY_OUTPUT,
+        help="Blueprint 26 observation-quality taxonomy JSON path.",
+    )
+    coverage_sampling_validate_parser.add_argument(
+        "--review-label-schema",
+        default=DEFAULT_REVIEW_LABEL_SCHEMA_OUTPUT,
+        help="Blueprint 27 review label schema JSON path.",
+    )
+    coverage_sampling_validate_parser.add_argument(
+        "--reviewer-confidence-schema",
+        default=DEFAULT_REVIEWER_CONFIDENCE_SCHEMA_OUTPUT,
+        help="Blueprint 28 reviewer confidence schema JSON path.",
+    )
+    coverage_sampling_validate_parser.add_argument(
+        "--multi-reviewer-schema",
+        default=DEFAULT_MULTI_REVIEWER_SCHEMA_OUTPUT,
+        help="Blueprint 29 multi-reviewer disagreement schema JSON path.",
+    )
+    coverage_sampling_validate_parser.add_argument(
+        "--intennse-alignment-contract",
+        default=DEFAULT_INTENNSE_ALIGNMENT_CONTRACT_OUTPUT,
+        help="Blueprint 30 INTENNSE alignment contract JSON path.",
+    )
+    coverage_sampling_validate_parser.add_argument(
+        "--dataset-corpus-contract",
+        default=DEFAULT_DATASET_CORPUS_CONTRACT_OUTPUT,
+        help="Blueprint 31 versioned dataset corpus contract JSON path.",
+    )
+    coverage_sampling_validate_parser.add_argument(
+        "--output",
+        default=DEFAULT_COVERAGE_SAMPLING_VALIDATION_OUTPUT,
+        help="Optional JSON coverage sampling validation report path.",
+    )
+    coverage_sampling_validate_parser.add_argument("--skip-create-db", action="store_true")
+    coverage_sampling_validate_parser.set_defaults(
+        handler=_handle_validate_coverage_sampling_profile,
+        skip_create_db=True,
+    )
+
+    coverage_sampling_report_parser = subcommands.add_parser(
+        "build-coverage-sampling-report",
+        help="Build a structural coverage sampling report.",
+    )
+    coverage_sampling_report_parser.add_argument(
+        "--contract",
+        default=DEFAULT_COVERAGE_SAMPLING_CONTRACT_OUTPUT,
+        help="Coverage sampling strategy contract JSON path.",
+    )
+    coverage_sampling_report_parser.add_argument("--profile", required=True)
+    coverage_sampling_report_parser.add_argument(
+        "--observation-quality-taxonomy",
+        default=DEFAULT_OBSERVATION_QUALITY_TAXONOMY_OUTPUT,
+        help="Blueprint 26 observation-quality taxonomy JSON path.",
+    )
+    coverage_sampling_report_parser.add_argument(
+        "--review-label-schema",
+        default=DEFAULT_REVIEW_LABEL_SCHEMA_OUTPUT,
+        help="Blueprint 27 review label schema JSON path.",
+    )
+    coverage_sampling_report_parser.add_argument(
+        "--reviewer-confidence-schema",
+        default=DEFAULT_REVIEWER_CONFIDENCE_SCHEMA_OUTPUT,
+        help="Blueprint 28 reviewer confidence schema JSON path.",
+    )
+    coverage_sampling_report_parser.add_argument(
+        "--multi-reviewer-schema",
+        default=DEFAULT_MULTI_REVIEWER_SCHEMA_OUTPUT,
+        help="Blueprint 29 multi-reviewer disagreement schema JSON path.",
+    )
+    coverage_sampling_report_parser.add_argument(
+        "--intennse-alignment-contract",
+        default=DEFAULT_INTENNSE_ALIGNMENT_CONTRACT_OUTPUT,
+        help="Blueprint 30 INTENNSE alignment contract JSON path.",
+    )
+    coverage_sampling_report_parser.add_argument(
+        "--dataset-corpus-contract",
+        default=DEFAULT_DATASET_CORPUS_CONTRACT_OUTPUT,
+        help="Blueprint 31 versioned dataset corpus contract JSON path.",
+    )
+    coverage_sampling_report_parser.add_argument(
+        "--output",
+        default=DEFAULT_COVERAGE_SAMPLING_REPORT_OUTPUT,
+        help="JSON coverage sampling report output path.",
+    )
+    coverage_sampling_report_parser.add_argument("--skip-create-db", action="store_true")
+    coverage_sampling_report_parser.set_defaults(
+        handler=_handle_build_coverage_sampling_report,
+        skip_create_db=True,
+    )
+
     point_evaluation_parser = subcommands.add_parser(
         "evaluate-point-candidates",
         help="Evaluate generated point candidate markers using operator review metadata.",
@@ -3229,6 +3386,63 @@ def _handle_build_versioned_dataset_corpus_report(
         reviewer_confidence_schema_path=args.reviewer_confidence_schema,
         multi_reviewer_schema_path=args.multi_reviewer_schema,
         intennse_alignment_contract_path=args.intennse_alignment_contract,
+        output_path=args.output,
+    )
+
+
+def _handle_export_coverage_sampling_strategy_contract(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return export_coverage_sampling_strategy_contract(output_path=args.output)
+
+
+def _handle_build_coverage_sampling_profile(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_coverage_sampling_profile(
+        source_corpus_manifest_path=args.corpus_manifest,
+        source_index_path=args.index,
+        source_matrix_path=args.matrix,
+        output_path=args.output,
+    )
+
+
+def _handle_validate_coverage_sampling_profile(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_coverage_sampling_profile(
+        contract_path=args.contract,
+        profile_path=args.profile,
+        observation_quality_taxonomy_path=args.observation_quality_taxonomy,
+        review_label_schema_path=args.review_label_schema,
+        reviewer_confidence_schema_path=args.reviewer_confidence_schema,
+        multi_reviewer_schema_path=args.multi_reviewer_schema,
+        intennse_alignment_contract_path=args.intennse_alignment_contract,
+        dataset_corpus_contract_path=args.dataset_corpus_contract,
+        output_path=args.output,
+    )
+
+
+def _handle_build_coverage_sampling_report(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_coverage_sampling_report(
+        contract_path=args.contract,
+        profile_path=args.profile,
+        observation_quality_taxonomy_path=args.observation_quality_taxonomy,
+        review_label_schema_path=args.review_label_schema,
+        reviewer_confidence_schema_path=args.reviewer_confidence_schema,
+        multi_reviewer_schema_path=args.multi_reviewer_schema,
+        intennse_alignment_contract_path=args.intennse_alignment_contract,
+        dataset_corpus_contract_path=args.dataset_corpus_contract,
         output_path=args.output,
     )
 

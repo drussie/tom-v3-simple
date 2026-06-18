@@ -3432,3 +3432,48 @@ does not generate evidence, create labels, change review semantics, mutate prote
 decide in/out, score, identify players, determine a winner, claim generalization, validate
 correctness, score reviewers, resolve disagreement, produce INTENNSE coaching/tactical/match
 outcome conclusions, create training truth, or adjudicate evidence.
+
+## Blueprint 32 Coverage-Driven Sampling Strategy v1
+
+Status: complete
+
+### Goal
+
+Create a versioned coverage-driven sampling strategy contract and report layer that identifies
+structural evidence, provenance, review, and alignment coverage gaps for future dataset expansion
+without executing sampling, ingesting media, creating observations, creating labels, deciding
+truth, scoring correctness, claiming generalization, resolving disagreement, or adjudicating
+evidence.
+
+### Notes
+
+This milestone adds:
+
+- `apps.worker.services.coverage_driven_sampling_strategy`
+- `export-coverage-sampling-strategy-contract` worker CLI command
+- `build-coverage-sampling-profile` worker CLI command
+- `validate-coverage-sampling-profile` worker CLI command
+- `build-coverage-sampling-report` worker CLI command
+- `tom-v1-export-coverage-sampling-strategy-contract` Make helper
+- `tom-v1-build-coverage-sampling-profile` Make helper
+- `tom-v1-validate-coverage-sampling-profile` Make helper
+- `tom-v1-build-coverage-sampling-report` Make helper
+- `.data/contracts/coverage_sampling_strategy_contract_v1.json` local contract path
+- `.data/exports/coverage_sampling_profile.current.json` local profile path
+- `.data/exports/coverage_sampling_profile.validation.json` local validation path
+- `.data/exports/coverage_sampling_report.current.json` local report path
+- `docs/blueprints/blueprint_32_coverage_driven_sampling_strategy_v1.md`
+- `docs/reviews/coverage_driven_sampling_strategy_v1.md`
+- `docs/agent_reports/blueprint_32_coverage_driven_sampling_strategy_v1_report.md`
+
+The contract defines coverage scope, source contract refs, coverage axes, coverage gap types,
+sampling priority values, candidate fields, allowed next-action values, provenance requirements,
+validation rules, and warnings. The profile builder reads the existing dataset corpus manifest,
+preserves replay/run/evidence/profile context, and records missing optional review/INTENNSE refs as
+coverage gaps. The validator checks structure and referenced contract versions. The report
+summarizes coverage axes, gaps, priorities, missing optional refs, and candidate counts
+structurally. It does not generate evidence, create labels, change review semantics, mutate
+protected baselines, decide in/out, score, identify players, determine a winner, claim
+generalization, validate correctness, score reviewers, resolve disagreement, produce INTENNSE
+coaching/tactical/match outcome conclusions, create training truth, ingest media, execute
+sampling, or adjudicate evidence.

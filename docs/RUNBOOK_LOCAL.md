@@ -2327,6 +2327,75 @@ contract versions when paths are available, source index/matrix paths, required 
 fields, allowed split/status values, and forbidden fields. Missing optional review,
 observation-quality, disagreement, INTENNSE, and dataset-export refs are provenance gaps only.
 
+## Coverage-Driven Sampling Strategy
+
+Use this to export the coverage sampling strategy contract, build a structural coverage profile
+from the versioned dataset corpus, validate profile structure, and build a structural coverage
+report. This is planning/provenance infrastructure only. It does not execute sampling, ingest
+media, create observations, create labels, create training truth, score correctness, claim
+generalization, resolve disagreement, produce tennis conclusions, or adjudicate evidence.
+
+Export the contract:
+
+```bash
+make tom-v1-export-coverage-sampling-strategy-contract \
+  PYTHON=.venv/bin/python
+```
+
+Build the coverage sampling profile:
+
+```bash
+make tom-v1-build-coverage-sampling-profile \
+  PYTHON=.venv/bin/python
+```
+
+Validate a coverage sampling profile:
+
+```bash
+make tom-v1-validate-coverage-sampling-profile \
+  PYTHON=.venv/bin/python \
+  COVERAGE_SAMPLING_PROFILE=.data/exports/coverage_sampling_profile.current.json
+```
+
+Build a structural coverage sampling report:
+
+```bash
+make tom-v1-build-coverage-sampling-report \
+  PYTHON=.venv/bin/python \
+  COVERAGE_SAMPLING_PROFILE=.data/exports/coverage_sampling_profile.current.json
+```
+
+Default paths:
+
+```text
+.data/contracts/coverage_sampling_strategy_contract_v1.json
+.data/exports/coverage_sampling_profile.current.json
+.data/exports/coverage_sampling_profile.validation.json
+.data/exports/coverage_sampling_report.current.json
+```
+
+Expected:
+
+- `ok`: true for contract export and valid coverage sampling profile validation
+- `contract_type`: `coverage_sampling_strategy_contract`
+- `contract_version`: `v1`
+- `profile_type`: `coverage_sampling_profile`
+- `profile_version`: `v1`
+- `report_type`: `coverage_sampling_report`
+- `report_version`: `v1`
+- `warnings.coverage_sampling_is_not_truth`: true
+- `warnings.coverage_sampling_is_not_training_truth`: true
+- `warnings.does_not_execute_sampling`: true
+- `warnings.does_not_ingest_media`: true
+- `warnings.does_not_create_labels`: true
+- `warnings.no_adjudication`: true
+
+Validation checks contract shape, profile type/version, referenced Blueprint 26 through 31
+contract versions when paths are available, source corpus/index/matrix paths, required candidate
+fields, allowed coverage axes, allowed gap types, allowed priority values, allowed next-action
+values, and forbidden fields. Missing optional review, observation-quality, disagreement,
+INTENNSE, and export refs are coverage gaps only.
+
 Build the point evidence snapshot:
 
 ```bash

@@ -332,6 +332,8 @@ Use this index as the durable navigation point for project memory, architecture 
 - [INTENNSE Label Alignment Contract v1](reviews/intennse_label_alignment_contract_v1.md)
 - [Blueprint 31 Versioned Dataset Corpus v1](blueprints/blueprint_31_versioned_dataset_corpus_v1.md)
 - [Versioned Dataset Corpus v1](reviews/versioned_dataset_corpus_v1.md)
+- [Blueprint 32 Coverage-Driven Sampling Strategy v1](blueprints/blueprint_32_coverage_driven_sampling_strategy_v1.md)
+- [Coverage-Driven Sampling Strategy v1](reviews/coverage_driven_sampling_strategy_v1.md)
 
 ## Development
 

@@ -1,0 +1,1010 @@
+{
+  "allowed_next_action_values": [
+    "no_action",
+    "collect_distinct_second_point",
+    "collect_additional_point_candidate",
+    "add_human_review_labels",
+    "add_reviewer_confidence_bundle",
+    "add_multi_reviewer_review",
+    "add_intennse_alignment_reference",
+    "improve_provenance_reference",
+    "preserve_regression_protected_sample",
+    "not_applicable"
+  ],
+  "contract_type": "coverage_sampling_strategy_contract",
+  "contract_version": "v1",
+  "coverage_axes": [
+    {
+      "allowed_status_values": [
+        "covered",
+        "partial",
+        "gap",
+        "unknown",
+        "not_applicable"
+      ],
+      "key": "media_presence",
+      "planning_only": true,
+      "structural_only": true,
+      "warnings": {
+        "does_not_execute_sampling": true,
+        "does_not_ingest_media": true,
+        "next_action_is_not_execution": true,
+        "no_adjudication": true,
+        "planning_only": true,
+        "priority_is_not_truth": true,
+        "structural_sampling_candidate": true
+      }
+    },
+    {
+      "allowed_status_values": [
+        "covered",
+        "partial",
+        "gap",
+        "unknown",
+        "not_applicable"
+      ],
+      "key": "replay_availability",
+      "planning_only": true,
+      "structural_only": true,
+      "warnings": {
+        "does_not_execute_sampling": true,
+        "does_not_ingest_media": true,
+        "next_action_is_not_execution": true,
+        "no_adjudication": true,
+        "planning_only": true,
+        "priority_is_not_truth": true,
+        "structural_sampling_candidate": true
+      }
+    },
+    {
+      "allowed_status_values": [
+        "covered",
+        "partial",
+        "gap",
+        "unknown",
+        "not_applicable"
+      ],
+      "key": "point_manifest_availability",
+      "planning_only": true,
+      "structural_only": true,
+      "warnings": {
+        "does_not_execute_sampling": true,
+        "does_not_ingest_media": true,
+        "next_action_is_not_execution": true,
+        "no_adjudication": true,
+        "planning_only": true,
+        "priority_is_not_truth": true,
+        "structural_sampling_candidate": true
+      }
+    },
+    {
+      "allowed_status_values": [
+        "covered",
+        "partial",
+        "gap",
+        "unknown",
+        "not_applicable"
+      ],
+      "key": "event_candidate_availability",
+      "planning_only": true,
+      "structural_only": true,
+      "warnings": {
+        "does_not_execute_sampling": true,
+        "does_not_ingest_media": true,
+        "next_action_is_not_execution": true,
+        "no_adjudication": true,
+        "planning_only": true,
+        "priority_is_not_truth": true,
+        "structural_sampling_candidate": true
+      }
+    },
+    {
+      "allowed_status_values": [
+        "covered",
+        "partial",
+        "gap",
+        "unknown",
+        "not_applicable"
+      ],
+      "key": "trajectory_3d_availability",
+      "planning_only": true,
+      "structural_only": true,
+      "warnings": {
+        "does_not_execute_sampling": true,
+        "does_not_ingest_media": true,
+        "next_action_is_not_execution": true,
+        "no_adjudication": true,
+        "planning_only": true,
+        "priority_is_not_truth": true,
+        "structural_sampling_candidate": true
+      }
+    },
+    {
+      "allowed_status_values": [
+        "covered",
+        "partial",
+        "gap",
+        "unknown",
+        "not_applicable"
+      ],
+      "key": "review_annotation_availability",
+      "planning_only": true,
+      "structural_only": true,
+      "warnings": {
+        "does_not_execute_sampling": true,
+        "does_not_ingest_media": true,
+        "next_action_is_not_execution": true,
+        "no_adjudication": true,
+        "planning_only": true,
+        "priority_is_not_truth": true,
+        "structural_sampling_candidate": true
+      }
+    },
+    {
+      "allowed_status_values": [
+        "covered",
+        "partial",
+        "gap",
+        "unknown",
+        "not_applicable"
+      ],
+      "key": "observation_quality_coverage",
+      "planning_only": true,
+      "structural_only": true,
+      "warnings": {
+        "does_not_execute_sampling": true,
+        "does_not_ingest_media": true,
+        "next_action_is_not_execution": true,
+        "no_adjudication": true,
+        "planning_only": true,
+        "priority_is_not_truth": true,
+        "structural_sampling_candidate": true
+      }
+    },
+    {
+      "allowed_status_values": [
+        "covered",
+        "partial",
+        "gap",
+        "unknown",
+        "not_applicable"
+      ],
+      "key": "review_label_coverage",
+      "planning_only": true,
+      "structural_only": true,
+      "warnings": {
+        "does_not_execute_sampling": true,
+        "does_not_ingest_media": true,
+        "next_action_is_not_execution": true,
+        "no_adjudication": true,
+        "planning_only": true,
+        "priority_is_not_truth": true,
+        "structural_sampling_candidate": true
+      }
+    },
+    {
+      "allowed_status_values": [
+        "covered",
+        "partial",
+        "gap",
+        "unknown",
+        "not_applicable"
+      ],
+      "key": "reviewer_confidence_coverage",
+      "planning_only": true,
+      "structural_only": true,
+      "warnings": {
+        "does_not_execute_sampling": true,
+        "does_not_ingest_media": true,
+        "next_action_is_not_execution": true,
+        "no_adjudication": true,
+        "planning_only": true,
+        "priority_is_not_truth": true,
+        "structural_sampling_candidate": true
+      }
+    },
+    {
+      "allowed_status_values": [
+        "covered",
+        "partial",
+        "gap",
+        "unknown",
+        "not_applicable"
+      ],
+      "key": "multi_reviewer_coverage",
+      "planning_only": true,
+      "structural_only": true,
+      "warnings": {
+        "does_not_execute_sampling": true,
+        "does_not_ingest_media": true,
+        "next_action_is_not_execution": true,
+        "no_adjudication": true,
+        "planning_only": true,
+        "priority_is_not_truth": true,
+        "structural_sampling_candidate": true
+      }
+    },
+    {
+      "allowed_status_values": [
+        "covered",
+        "partial",
+        "gap",
+        "unknown",
+        "not_applicable"
+      ],
+      "key": "disagreement_coverage",
+      "planning_only": true,
+      "structural_only": true,
+      "warnings": {
+        "does_not_execute_sampling": true,
+        "does_not_ingest_media": true,
+        "next_action_is_not_execution": true,
+        "no_adjudication": true,
+        "planning_only": true,
+        "priority_is_not_truth": true,
+        "structural_sampling_candidate": true
+      }
+    },
+    {
+      "allowed_status_values": [
+        "covered",
+        "partial",
+        "gap",
+        "unknown",
+        "not_applicable"
+      ],
+      "key": "intennse_alignment_coverage",
+      "planning_only": true,
+      "structural_only": true,
+      "warnings": {
+        "does_not_execute_sampling": true,
+        "does_not_ingest_media": true,
+        "next_action_is_not_execution": true,
+        "no_adjudication": true,
+        "planning_only": true,
+        "priority_is_not_truth": true,
+        "structural_sampling_candidate": true
+      }
+    },
+    {
+      "allowed_status_values": [
+        "covered",
+        "partial",
+        "gap",
+        "unknown",
+        "not_applicable"
+      ],
+      "key": "provenance_completeness",
+      "planning_only": true,
+      "structural_only": true,
+      "warnings": {
+        "does_not_execute_sampling": true,
+        "does_not_ingest_media": true,
+        "next_action_is_not_execution": true,
+        "no_adjudication": true,
+        "planning_only": true,
+        "priority_is_not_truth": true,
+        "structural_sampling_candidate": true
+      }
+    },
+    {
+      "allowed_status_values": [
+        "covered",
+        "partial",
+        "gap",
+        "unknown",
+        "not_applicable"
+      ],
+      "key": "regression_protection_coverage",
+      "planning_only": true,
+      "structural_only": true,
+      "warnings": {
+        "does_not_execute_sampling": true,
+        "does_not_ingest_media": true,
+        "next_action_is_not_execution": true,
+        "no_adjudication": true,
+        "planning_only": true,
+        "priority_is_not_truth": true,
+        "structural_sampling_candidate": true
+      }
+    },
+    {
+      "allowed_status_values": [
+        "covered",
+        "partial",
+        "gap",
+        "unknown",
+        "not_applicable"
+      ],
+      "key": "second_point_distinctness",
+      "planning_only": true,
+      "structural_only": true,
+      "warnings": {
+        "does_not_execute_sampling": true,
+        "does_not_ingest_media": true,
+        "next_action_is_not_execution": true,
+        "no_adjudication": true,
+        "planning_only": true,
+        "priority_is_not_truth": true,
+        "structural_sampling_candidate": true
+      }
+    },
+    {
+      "allowed_status_values": [
+        "covered",
+        "partial",
+        "gap",
+        "unknown",
+        "not_applicable"
+      ],
+      "key": "evidence_diversity",
+      "planning_only": true,
+      "structural_only": true,
+      "warnings": {
+        "does_not_execute_sampling": true,
+        "does_not_ingest_media": true,
+        "next_action_is_not_execution": true,
+        "no_adjudication": true,
+        "planning_only": true,
+        "priority_is_not_truth": true,
+        "structural_sampling_candidate": true
+      }
+    }
+  ],
+  "coverage_gap_types": [
+    {
+      "key": "missing_media",
+      "planning_only": true,
+      "structural_only": true,
+      "warnings": {
+        "does_not_execute_sampling": true,
+        "does_not_ingest_media": true,
+        "next_action_is_not_execution": true,
+        "no_adjudication": true,
+        "planning_only": true,
+        "priority_is_not_truth": true,
+        "structural_sampling_candidate": true
+      }
+    },
+    {
+      "key": "missing_replay",
+      "planning_only": true,
+      "structural_only": true,
+      "warnings": {
+        "does_not_execute_sampling": true,
+        "does_not_ingest_media": true,
+        "next_action_is_not_execution": true,
+        "no_adjudication": true,
+        "planning_only": true,
+        "priority_is_not_truth": true,
+        "structural_sampling_candidate": true
+      }
+    },
+    {
+      "key": "missing_point_manifest",
+      "planning_only": true,
+      "structural_only": true,
+      "warnings": {
+        "does_not_execute_sampling": true,
+        "does_not_ingest_media": true,
+        "next_action_is_not_execution": true,
+        "no_adjudication": true,
+        "planning_only": true,
+        "priority_is_not_truth": true,
+        "structural_sampling_candidate": true
+      }
+    },
+    {
+      "key": "missing_event_candidates",
+      "planning_only": true,
+      "structural_only": true,
+      "warnings": {
+        "does_not_execute_sampling": true,
+        "does_not_ingest_media": true,
+        "next_action_is_not_execution": true,
+        "no_adjudication": true,
+        "planning_only": true,
+        "priority_is_not_truth": true,
+        "structural_sampling_candidate": true
+      }
+    },
+    {
+      "key": "missing_trajectory_3d",
+      "planning_only": true,
+      "structural_only": true,
+      "warnings": {
+        "does_not_execute_sampling": true,
+        "does_not_ingest_media": true,
+        "next_action_is_not_execution": true,
+        "no_adjudication": true,
+        "planning_only": true,
+        "priority_is_not_truth": true,
+        "structural_sampling_candidate": true
+      }
+    },
+    {
+      "key": "missing_review_annotations",
+      "planning_only": true,
+      "structural_only": true,
+      "warnings": {
+        "does_not_execute_sampling": true,
+        "does_not_ingest_media": true,
+        "next_action_is_not_execution": true,
+        "no_adjudication": true,
+        "planning_only": true,
+        "priority_is_not_truth": true,
+        "structural_sampling_candidate": true
+      }
+    },
+    {
+      "key": "missing_observation_quality_profile",
+      "planning_only": true,
+      "structural_only": true,
+      "warnings": {
+        "does_not_execute_sampling": true,
+        "does_not_ingest_media": true,
+        "next_action_is_not_execution": true,
+        "no_adjudication": true,
+        "planning_only": true,
+        "priority_is_not_truth": true,
+        "structural_sampling_candidate": true
+      }
+    },
+    {
+      "key": "missing_review_labels",
+      "planning_only": true,
+      "structural_only": true,
+      "warnings": {
+        "does_not_execute_sampling": true,
+        "does_not_ingest_media": true,
+        "next_action_is_not_execution": true,
+        "no_adjudication": true,
+        "planning_only": true,
+        "priority_is_not_truth": true,
+        "structural_sampling_candidate": true
+      }
+    },
+    {
+      "key": "missing_reviewer_confidence",
+      "planning_only": true,
+      "structural_only": true,
+      "warnings": {
+        "does_not_execute_sampling": true,
+        "does_not_ingest_media": true,
+        "next_action_is_not_execution": true,
+        "no_adjudication": true,
+        "planning_only": true,
+        "priority_is_not_truth": true,
+        "structural_sampling_candidate": true
+      }
+    },
+    {
+      "key": "missing_multi_reviewer_review",
+      "planning_only": true,
+      "structural_only": true,
+      "warnings": {
+        "does_not_execute_sampling": true,
+        "does_not_ingest_media": true,
+        "next_action_is_not_execution": true,
+        "no_adjudication": true,
+        "planning_only": true,
+        "priority_is_not_truth": true,
+        "structural_sampling_candidate": true
+      }
+    },
+    {
+      "key": "missing_disagreement_report",
+      "planning_only": true,
+      "structural_only": true,
+      "warnings": {
+        "does_not_execute_sampling": true,
+        "does_not_ingest_media": true,
+        "next_action_is_not_execution": true,
+        "no_adjudication": true,
+        "planning_only": true,
+        "priority_is_not_truth": true,
+        "structural_sampling_candidate": true
+      }
+    },
+    {
+      "key": "missing_intennse_alignment",
+      "planning_only": true,
+      "structural_only": true,
+      "warnings": {
+        "does_not_execute_sampling": true,
+        "does_not_ingest_media": true,
+        "next_action_is_not_execution": true,
+        "no_adjudication": true,
+        "planning_only": true,
+        "priority_is_not_truth": true,
+        "structural_sampling_candidate": true
+      }
+    },
+    {
+      "key": "missing_provenance",
+      "planning_only": true,
+      "structural_only": true,
+      "warnings": {
+        "does_not_execute_sampling": true,
+        "does_not_ingest_media": true,
+        "next_action_is_not_execution": true,
+        "no_adjudication": true,
+        "planning_only": true,
+        "priority_is_not_truth": true,
+        "structural_sampling_candidate": true
+      }
+    },
+    {
+      "key": "duplicate_manifest_only",
+      "planning_only": true,
+      "structural_only": true,
+      "warnings": {
+        "does_not_execute_sampling": true,
+        "does_not_ingest_media": true,
+        "next_action_is_not_execution": true,
+        "no_adjudication": true,
+        "planning_only": true,
+        "priority_is_not_truth": true,
+        "structural_sampling_candidate": true
+      }
+    },
+    {
+      "key": "demo_stand_in_only",
+      "planning_only": true,
+      "structural_only": true,
+      "warnings": {
+        "does_not_execute_sampling": true,
+        "does_not_ingest_media": true,
+        "next_action_is_not_execution": true,
+        "no_adjudication": true,
+        "planning_only": true,
+        "priority_is_not_truth": true,
+        "structural_sampling_candidate": true
+      }
+    },
+    {
+      "key": "single_point_only",
+      "planning_only": true,
+      "structural_only": true,
+      "warnings": {
+        "does_not_execute_sampling": true,
+        "does_not_ingest_media": true,
+        "next_action_is_not_execution": true,
+        "no_adjudication": true,
+        "planning_only": true,
+        "priority_is_not_truth": true,
+        "structural_sampling_candidate": true
+      }
+    },
+    {
+      "key": "unknown_quality",
+      "planning_only": true,
+      "structural_only": true,
+      "warnings": {
+        "does_not_execute_sampling": true,
+        "does_not_ingest_media": true,
+        "next_action_is_not_execution": true,
+        "no_adjudication": true,
+        "planning_only": true,
+        "priority_is_not_truth": true,
+        "structural_sampling_candidate": true
+      }
+    },
+    {
+      "key": "needs_human_review",
+      "planning_only": true,
+      "structural_only": true,
+      "warnings": {
+        "does_not_execute_sampling": true,
+        "does_not_ingest_media": true,
+        "next_action_is_not_execution": true,
+        "no_adjudication": true,
+        "planning_only": true,
+        "priority_is_not_truth": true,
+        "structural_sampling_candidate": true
+      }
+    },
+    {
+      "key": "not_applicable",
+      "planning_only": true,
+      "structural_only": true,
+      "warnings": {
+        "does_not_execute_sampling": true,
+        "does_not_ingest_media": true,
+        "next_action_is_not_execution": true,
+        "no_adjudication": true,
+        "planning_only": true,
+        "priority_is_not_truth": true,
+        "structural_sampling_candidate": true
+      }
+    }
+  ],
+  "exported_at": "2026-06-18T00:00:00+00:00",
+  "profile_type": "coverage_sampling_profile",
+  "profile_version": "v1",
+  "provenance_requirements": {
+    "associated_run_ids_preserved_when_available": true,
+    "coverage_gaps_are_structural_only": true,
+    "media_id_required": true,
+    "missing_optional_refs_are_coverage_gaps": true,
+    "next_actions_are_planning_labels_only": true,
+    "point_manifest_id_required": true,
+    "replay_url_preserved_when_available": true,
+    "source_corpus_manifest_path_required": true
+  },
+  "report_type": "coverage_sampling_report",
+  "report_version": "v1",
+  "sampling_candidate_fields": [
+    {
+      "key": "sampling_candidate_id",
+      "planning_only": true,
+      "required": true,
+      "structural_only": true,
+      "value_set": null,
+      "warnings": {
+        "does_not_execute_sampling": true,
+        "does_not_ingest_media": true,
+        "next_action_is_not_execution": true,
+        "no_adjudication": true,
+        "planning_only": true,
+        "priority_is_not_truth": true,
+        "structural_sampling_candidate": true
+      }
+    },
+    {
+      "key": "source_corpus_entry_id",
+      "planning_only": true,
+      "required": true,
+      "structural_only": true,
+      "value_set": null,
+      "warnings": {
+        "does_not_execute_sampling": true,
+        "does_not_ingest_media": true,
+        "next_action_is_not_execution": true,
+        "no_adjudication": true,
+        "planning_only": true,
+        "priority_is_not_truth": true,
+        "structural_sampling_candidate": true
+      }
+    },
+    {
+      "key": "point_manifest_id",
+      "planning_only": true,
+      "required": true,
+      "structural_only": true,
+      "value_set": null,
+      "warnings": {
+        "does_not_execute_sampling": true,
+        "does_not_ingest_media": true,
+        "next_action_is_not_execution": true,
+        "no_adjudication": true,
+        "planning_only": true,
+        "priority_is_not_truth": true,
+        "structural_sampling_candidate": true
+      }
+    },
+    {
+      "key": "media_id",
+      "planning_only": true,
+      "required": true,
+      "structural_only": true,
+      "value_set": null,
+      "warnings": {
+        "does_not_execute_sampling": true,
+        "does_not_ingest_media": true,
+        "next_action_is_not_execution": true,
+        "no_adjudication": true,
+        "planning_only": true,
+        "priority_is_not_truth": true,
+        "structural_sampling_candidate": true
+      }
+    },
+    {
+      "key": "replay_url",
+      "planning_only": true,
+      "required": false,
+      "structural_only": true,
+      "value_set": null,
+      "warnings": {
+        "does_not_execute_sampling": true,
+        "does_not_ingest_media": true,
+        "next_action_is_not_execution": true,
+        "no_adjudication": true,
+        "planning_only": true,
+        "priority_is_not_truth": true,
+        "structural_sampling_candidate": true
+      }
+    },
+    {
+      "key": "associated_run_ids",
+      "planning_only": true,
+      "required": false,
+      "structural_only": true,
+      "value_set": null,
+      "warnings": {
+        "does_not_execute_sampling": true,
+        "does_not_ingest_media": true,
+        "next_action_is_not_execution": true,
+        "no_adjudication": true,
+        "planning_only": true,
+        "priority_is_not_truth": true,
+        "structural_sampling_candidate": true
+      }
+    },
+    {
+      "key": "labels",
+      "planning_only": true,
+      "required": false,
+      "structural_only": true,
+      "value_set": null,
+      "warnings": {
+        "does_not_execute_sampling": true,
+        "does_not_ingest_media": true,
+        "next_action_is_not_execution": true,
+        "no_adjudication": true,
+        "planning_only": true,
+        "priority_is_not_truth": true,
+        "structural_sampling_candidate": true
+      }
+    },
+    {
+      "key": "coverage_axes",
+      "planning_only": true,
+      "required": true,
+      "structural_only": true,
+      "value_set": null,
+      "warnings": {
+        "does_not_execute_sampling": true,
+        "does_not_ingest_media": true,
+        "next_action_is_not_execution": true,
+        "no_adjudication": true,
+        "planning_only": true,
+        "priority_is_not_truth": true,
+        "structural_sampling_candidate": true
+      }
+    },
+    {
+      "key": "coverage_gaps",
+      "planning_only": true,
+      "required": true,
+      "structural_only": true,
+      "value_set": null,
+      "warnings": {
+        "does_not_execute_sampling": true,
+        "does_not_ingest_media": true,
+        "next_action_is_not_execution": true,
+        "no_adjudication": true,
+        "planning_only": true,
+        "priority_is_not_truth": true,
+        "structural_sampling_candidate": true
+      }
+    },
+    {
+      "key": "sampling_priority",
+      "planning_only": true,
+      "required": true,
+      "structural_only": true,
+      "value_set": "sampling_priority_values",
+      "warnings": {
+        "does_not_execute_sampling": true,
+        "does_not_ingest_media": true,
+        "next_action_is_not_execution": true,
+        "no_adjudication": true,
+        "planning_only": true,
+        "priority_is_not_truth": true,
+        "structural_sampling_candidate": true
+      }
+    },
+    {
+      "key": "priority_reason",
+      "planning_only": true,
+      "required": true,
+      "structural_only": true,
+      "value_set": null,
+      "warnings": {
+        "does_not_execute_sampling": true,
+        "does_not_ingest_media": true,
+        "next_action_is_not_execution": true,
+        "no_adjudication": true,
+        "planning_only": true,
+        "priority_is_not_truth": true,
+        "structural_sampling_candidate": true
+      }
+    },
+    {
+      "key": "required_human_review",
+      "planning_only": true,
+      "required": true,
+      "structural_only": true,
+      "value_set": "human_review_values",
+      "warnings": {
+        "does_not_execute_sampling": true,
+        "does_not_ingest_media": true,
+        "next_action_is_not_execution": true,
+        "no_adjudication": true,
+        "planning_only": true,
+        "priority_is_not_truth": true,
+        "structural_sampling_candidate": true
+      }
+    },
+    {
+      "key": "provenance_status",
+      "planning_only": true,
+      "required": true,
+      "structural_only": true,
+      "value_set": null,
+      "warnings": {
+        "does_not_execute_sampling": true,
+        "does_not_ingest_media": true,
+        "next_action_is_not_execution": true,
+        "no_adjudication": true,
+        "planning_only": true,
+        "priority_is_not_truth": true,
+        "structural_sampling_candidate": true
+      }
+    },
+    {
+      "key": "evidence_availability",
+      "planning_only": true,
+      "required": false,
+      "structural_only": true,
+      "value_set": null,
+      "warnings": {
+        "does_not_execute_sampling": true,
+        "does_not_ingest_media": true,
+        "next_action_is_not_execution": true,
+        "no_adjudication": true,
+        "planning_only": true,
+        "priority_is_not_truth": true,
+        "structural_sampling_candidate": true
+      }
+    },
+    {
+      "key": "profile_counts",
+      "planning_only": true,
+      "required": false,
+      "structural_only": true,
+      "value_set": null,
+      "warnings": {
+        "does_not_execute_sampling": true,
+        "does_not_ingest_media": true,
+        "next_action_is_not_execution": true,
+        "no_adjudication": true,
+        "planning_only": true,
+        "priority_is_not_truth": true,
+        "structural_sampling_candidate": true
+      }
+    },
+    {
+      "key": "suggested_next_action",
+      "planning_only": true,
+      "required": true,
+      "structural_only": true,
+      "value_set": "next_action_values",
+      "warnings": {
+        "does_not_execute_sampling": true,
+        "does_not_ingest_media": true,
+        "next_action_is_not_execution": true,
+        "no_adjudication": true,
+        "planning_only": true,
+        "priority_is_not_truth": true,
+        "structural_sampling_candidate": true
+      }
+    },
+    {
+      "key": "warnings",
+      "planning_only": true,
+      "required": true,
+      "structural_only": true,
+      "value_set": null,
+      "warnings": {
+        "does_not_execute_sampling": true,
+        "does_not_ingest_media": true,
+        "next_action_is_not_execution": true,
+        "no_adjudication": true,
+        "planning_only": true,
+        "priority_is_not_truth": true,
+        "structural_sampling_candidate": true
+      }
+    }
+  ],
+  "sampling_priority_values": [
+    "not_assessed",
+    "low",
+    "medium",
+    "high",
+    "blocked",
+    "not_applicable"
+  ],
+  "source_contract_refs": {
+    "intennse_label_alignment_contract_version": "v1",
+    "multi_point_regression_matrix_version": "v0",
+    "multi_reviewer_disagreement_schema_version": "v1",
+    "observation_quality_taxonomy_version": "v1",
+    "point_manifest_version": "v0",
+    "review_label_schema_version": "v1",
+    "reviewer_confidence_schema_version": "v1",
+    "versioned_dataset_corpus_contract_version": "v1"
+  },
+  "strategy_scope": {
+    "generalization_claim_allowed": false,
+    "media_ingestion_allowed": false,
+    "observation_generation_allowed": false,
+    "planning_only": true,
+    "purpose": "Describe structural evidence, provenance, review, and alignment coverage gaps for future controlled dataset expansion.",
+    "sampling_execution_allowed": false,
+    "training_truth_allowed": false,
+    "truth_creation_allowed": false
+  },
+  "tom_provenance": {
+    "blueprint": "blueprint_32",
+    "blueprint_name": "coverage_driven_sampling_strategy_v1",
+    "project": "tom-v3-simple",
+    "project_version": "0.0.0"
+  },
+  "validation_rules": {
+    "allowed_coverage_axes_only": true,
+    "allowed_gap_types_only": true,
+    "allowed_next_action_values_only": true,
+    "allowed_priority_values_only": true,
+    "does_not_create_labels": true,
+    "does_not_create_training_truth": true,
+    "does_not_create_truth": true,
+    "does_not_execute_sampling": true,
+    "does_not_infer_missing_labels": true,
+    "does_not_resolve_disagreement": true,
+    "does_not_validate_label_validity": true,
+    "forbidden_fields": [
+      "accepted",
+      "adjudication",
+      "betting_prediction",
+      "coaching_recommendation",
+      "correct",
+      "disagreement_resolution",
+      "in_out",
+      "incorrect",
+      "match_outcome",
+      "model_ready_truth",
+      "player_identity",
+      "point_winner",
+      "receiver",
+      "rejected",
+      "reviewer_rank",
+      "reviewer_score",
+      "score",
+      "server",
+      "tactical_recommendation",
+      "training_truth",
+      "truth",
+      "winner"
+    ],
+    "referenced_contract_versions_validated_when_paths_available": true,
+    "sampling_candidate_required_fields_checked": true,
+    "source_profile_paths_must_exist_when_supplied": true,
+    "structural_validation_only": true
+  },
+  "warnings": {
+    "coverage_sampling_is_not_training_truth": true,
+    "coverage_sampling_is_not_truth": true,
+    "does_not_create_3d_candidates": true,
+    "does_not_create_event_candidates": true,
+    "does_not_create_in_out": true,
+    "does_not_create_intennse_labels": true,
+    "does_not_create_labels": true,
+    "does_not_create_observations": true,
+    "does_not_create_score": true,
+    "does_not_determine_winner": true,
+    "does_not_execute_sampling": true,
+    "does_not_identify_players": true,
+    "does_not_ingest_media": true,
+    "does_not_resolve_disagreement": true,
+    "does_not_score_reviewers": true,
+    "does_not_validate_correctness": true,
+    "no_adjudication": true,
+    "not_generalization_claim": true,
+    "observation_only": true,
+    "planning_only": true,
+    "provenance_only": true,
+    "review_support_only": true
+  }
+}

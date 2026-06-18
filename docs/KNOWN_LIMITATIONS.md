@@ -243,6 +243,11 @@ This registry makes TOM v3 Simple boundaries explicit.
   references only. They do not create training truth, automatic labels, correctness claims,
   reviewer scores, disagreement resolution, INTENNSE conclusions, score, player identity, point
   winner, in/out, or adjudication.
+- Coverage-driven sampling strategy artifacts describe structural evidence/provenance/review
+  coverage gaps and planning labels only. They do not execute sampling, ingest media, create
+  observations, generate labels, create training truth, score correctness, claim dataset readiness,
+  score reviewers, resolve disagreement, decide in/out, identify players, determine a winner, or
+  adjudicate evidence.
 - Replay view presets are display defaults only. Operator view hides raw/debug layers by default,
   and debug/audit view enables them, but neither preset changes persisted observations or proves
   evidence correctness.
