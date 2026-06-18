@@ -328,6 +328,8 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Reviewer Confidence / Ambiguity Capture v1](reviews/reviewer_confidence_ambiguity_capture_v1.md)
 - [Blueprint 29 Multi-Reviewer / Disagreement Foundation v1](blueprints/blueprint_29_multi_reviewer_disagreement_foundation_v1.md)
 - [Multi-Reviewer / Disagreement Foundation v1](reviews/multi_reviewer_disagreement_foundation_v1.md)
+- [Blueprint 30 INTENNSE Label Alignment Contract v1](blueprints/blueprint_30_intennse_label_alignment_contract_v1.md)
+- [INTENNSE Label Alignment Contract v1](reviews/intennse_label_alignment_contract_v1.md)
 
 ## Development
 

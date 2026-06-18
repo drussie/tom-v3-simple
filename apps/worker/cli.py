@@ -39,6 +39,16 @@ from apps.worker.services.frame_artifacts import extract_frame_artifacts_for_run
 from apps.worker.services.gameplay_adapter import run_gameplay_adapter
 from apps.worker.services.hit_bounce_candidates import build_hit_bounce_candidates
 from apps.worker.services.homography_candidate_builder import build_homography_candidates
+from apps.worker.services.intennse_label_alignment import (
+    DEFAULT_INTENNSE_ALIGNMENT_CONTRACT_OUTPUT,
+    DEFAULT_INTENNSE_ALIGNMENT_REPORT_OUTPUT,
+    DEFAULT_INTENNSE_ALIGNMENT_TEMPLATE_OUTPUT,
+    DEFAULT_INTENNSE_ALIGNMENT_VALIDATION_OUTPUT,
+    build_intennse_alignment_report,
+    build_intennse_alignment_template,
+    export_intennse_label_alignment_contract,
+    validate_intennse_alignment_bundle,
+)
 from apps.worker.services.local_demo import run_local_fixture_demo
 from apps.worker.services.main_player_track_assignment import assign_main_player_tracks
 from apps.worker.services.main_subject_filter import select_main_player_subjects
@@ -1414,6 +1424,130 @@ def main() -> None:
     reviewer_disagreement_report_parser.add_argument("--skip-create-db", action="store_true")
     reviewer_disagreement_report_parser.set_defaults(
         handler=_handle_build_reviewer_disagreement_report,
+        skip_create_db=True,
+    )
+
+    intennse_alignment_contract_parser = subcommands.add_parser(
+        "export-intennse-label-alignment-contract",
+        help="Export the INTENNSE label alignment contract.",
+    )
+    intennse_alignment_contract_parser.add_argument(
+        "--output",
+        default=DEFAULT_INTENNSE_ALIGNMENT_CONTRACT_OUTPUT,
+        help="JSON INTENNSE label alignment contract output path.",
+    )
+    intennse_alignment_contract_parser.add_argument("--skip-create-db", action="store_true")
+    intennse_alignment_contract_parser.set_defaults(
+        handler=_handle_export_intennse_label_alignment_contract,
+        skip_create_db=True,
+    )
+
+    intennse_alignment_template_parser = subcommands.add_parser(
+        "build-intennse-alignment-template",
+        help="Build a blank INTENNSE alignment bundle template.",
+    )
+    intennse_alignment_template_parser.add_argument("--point-manifest-id")
+    intennse_alignment_template_parser.add_argument("--media-id")
+    intennse_alignment_template_parser.add_argument("--replay-url")
+    intennse_alignment_template_parser.add_argument("--event-candidate-run-id")
+    intennse_alignment_template_parser.add_argument("--trajectory-3d-run-id")
+    intennse_alignment_template_parser.add_argument("--camera-geometry-id")
+    intennse_alignment_template_parser.add_argument("--tom-review-label-bundle-ref")
+    intennse_alignment_template_parser.add_argument("--tom-reviewer-confidence-bundle-ref")
+    intennse_alignment_template_parser.add_argument("--tom-multi-reviewer-review-set-ref")
+    intennse_alignment_template_parser.add_argument("--tom-disagreement-report-ref")
+    intennse_alignment_template_parser.add_argument("--intennse-label-bundle-ref")
+    intennse_alignment_template_parser.add_argument("--intennse-schema-version")
+    intennse_alignment_template_parser.add_argument(
+        "--output",
+        default=DEFAULT_INTENNSE_ALIGNMENT_TEMPLATE_OUTPUT,
+        help="JSON INTENNSE alignment bundle template output path.",
+    )
+    intennse_alignment_template_parser.add_argument("--skip-create-db", action="store_true")
+    intennse_alignment_template_parser.set_defaults(
+        handler=_handle_build_intennse_alignment_template,
+        skip_create_db=True,
+    )
+
+    intennse_alignment_validate_parser = subcommands.add_parser(
+        "validate-intennse-alignment-bundle",
+        help="Validate an INTENNSE alignment bundle against the contract.",
+    )
+    intennse_alignment_validate_parser.add_argument(
+        "--contract",
+        default=DEFAULT_INTENNSE_ALIGNMENT_CONTRACT_OUTPUT,
+        help="INTENNSE label alignment contract JSON path.",
+    )
+    intennse_alignment_validate_parser.add_argument("--bundle", required=True)
+    intennse_alignment_validate_parser.add_argument(
+        "--observation-quality-taxonomy",
+        default=DEFAULT_OBSERVATION_QUALITY_TAXONOMY_OUTPUT,
+        help="Blueprint 26 observation-quality taxonomy JSON path.",
+    )
+    intennse_alignment_validate_parser.add_argument(
+        "--review-label-schema",
+        default=DEFAULT_REVIEW_LABEL_SCHEMA_OUTPUT,
+        help="Blueprint 27 review label schema JSON path.",
+    )
+    intennse_alignment_validate_parser.add_argument(
+        "--reviewer-confidence-schema",
+        default=DEFAULT_REVIEWER_CONFIDENCE_SCHEMA_OUTPUT,
+        help="Blueprint 28 reviewer confidence schema JSON path.",
+    )
+    intennse_alignment_validate_parser.add_argument(
+        "--multi-reviewer-schema",
+        default=DEFAULT_MULTI_REVIEWER_SCHEMA_OUTPUT,
+        help="Blueprint 29 multi-reviewer disagreement schema JSON path.",
+    )
+    intennse_alignment_validate_parser.add_argument(
+        "--output",
+        default=DEFAULT_INTENNSE_ALIGNMENT_VALIDATION_OUTPUT,
+        help="Optional JSON INTENNSE alignment validation report path.",
+    )
+    intennse_alignment_validate_parser.add_argument("--skip-create-db", action="store_true")
+    intennse_alignment_validate_parser.set_defaults(
+        handler=_handle_validate_intennse_alignment_bundle,
+        skip_create_db=True,
+    )
+
+    intennse_alignment_report_parser = subcommands.add_parser(
+        "build-intennse-alignment-report",
+        help="Build a structural INTENNSE alignment report from a bundle.",
+    )
+    intennse_alignment_report_parser.add_argument(
+        "--contract",
+        default=DEFAULT_INTENNSE_ALIGNMENT_CONTRACT_OUTPUT,
+        help="INTENNSE label alignment contract JSON path.",
+    )
+    intennse_alignment_report_parser.add_argument("--bundle", required=True)
+    intennse_alignment_report_parser.add_argument(
+        "--observation-quality-taxonomy",
+        default=DEFAULT_OBSERVATION_QUALITY_TAXONOMY_OUTPUT,
+        help="Blueprint 26 observation-quality taxonomy JSON path.",
+    )
+    intennse_alignment_report_parser.add_argument(
+        "--review-label-schema",
+        default=DEFAULT_REVIEW_LABEL_SCHEMA_OUTPUT,
+        help="Blueprint 27 review label schema JSON path.",
+    )
+    intennse_alignment_report_parser.add_argument(
+        "--reviewer-confidence-schema",
+        default=DEFAULT_REVIEWER_CONFIDENCE_SCHEMA_OUTPUT,
+        help="Blueprint 28 reviewer confidence schema JSON path.",
+    )
+    intennse_alignment_report_parser.add_argument(
+        "--multi-reviewer-schema",
+        default=DEFAULT_MULTI_REVIEWER_SCHEMA_OUTPUT,
+        help="Blueprint 29 multi-reviewer disagreement schema JSON path.",
+    )
+    intennse_alignment_report_parser.add_argument(
+        "--output",
+        default=DEFAULT_INTENNSE_ALIGNMENT_REPORT_OUTPUT,
+        help="JSON INTENNSE alignment report output path.",
+    )
+    intennse_alignment_report_parser.add_argument("--skip-create-db", action="store_true")
+    intennse_alignment_report_parser.set_defaults(
+        handler=_handle_build_intennse_alignment_report,
         skip_create_db=True,
     )
 
@@ -2822,6 +2956,75 @@ def _handle_build_reviewer_disagreement_report(
         review_set_path=args.review_set,
         review_label_schema_path=args.review_label_schema,
         reviewer_confidence_schema_path=args.reviewer_confidence_schema,
+        output_path=args.output,
+    )
+
+
+def _handle_export_intennse_label_alignment_contract(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return export_intennse_label_alignment_contract(output_path=args.output)
+
+
+def _handle_build_intennse_alignment_template(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    associated_run_ids = {
+        key: value
+        for key, value in {
+            "event_candidate_run_id": args.event_candidate_run_id,
+            "trajectory_3d_run_id": args.trajectory_3d_run_id,
+            "camera_geometry_id": args.camera_geometry_id,
+        }.items()
+        if value
+    }
+    return build_intennse_alignment_template(
+        point_manifest_id=args.point_manifest_id,
+        media_id=args.media_id,
+        replay_url=args.replay_url,
+        associated_run_ids=associated_run_ids,
+        tom_review_label_bundle_ref=args.tom_review_label_bundle_ref,
+        tom_reviewer_confidence_bundle_ref=args.tom_reviewer_confidence_bundle_ref,
+        tom_multi_reviewer_review_set_ref=args.tom_multi_reviewer_review_set_ref,
+        tom_disagreement_report_ref=args.tom_disagreement_report_ref,
+        intennse_label_bundle_ref=args.intennse_label_bundle_ref,
+        intennse_schema_version=args.intennse_schema_version,
+        output_path=args.output,
+    )
+
+
+def _handle_validate_intennse_alignment_bundle(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_intennse_alignment_bundle(
+        contract_path=args.contract,
+        bundle_path=args.bundle,
+        observation_quality_taxonomy_path=args.observation_quality_taxonomy,
+        review_label_schema_path=args.review_label_schema,
+        reviewer_confidence_schema_path=args.reviewer_confidence_schema,
+        multi_reviewer_schema_path=args.multi_reviewer_schema,
+        output_path=args.output,
+    )
+
+
+def _handle_build_intennse_alignment_report(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_intennse_alignment_report(
+        contract_path=args.contract,
+        bundle_path=args.bundle,
+        observation_quality_taxonomy_path=args.observation_quality_taxonomy,
+        review_label_schema_path=args.review_label_schema,
+        reviewer_confidence_schema_path=args.reviewer_confidence_schema,
+        multi_reviewer_schema_path=args.multi_reviewer_schema,
         output_path=args.output,
     )
 

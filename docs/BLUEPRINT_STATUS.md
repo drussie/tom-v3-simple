@@ -31,9 +31,10 @@
 - Blueprint 27: COMPLETE
 - Blueprint 28: COMPLETE
 - Blueprint 29: COMPLETE
+- Blueprint 30: COMPLETE
 - TOM v3 Simple: COMPLETE
 
-TOM v3 Simple is complete as a lightweight local observation/evidence platform. Blueprint 6 is complete as the visual replay/operator workstation layer. Blueprint 7 is complete as the real perception runtime layer for optional real detection, real-detection-derived candidate tracklets, and optional real pose keypoint evidence. Blueprint 8 is frozen as the visual evidence workstation milestone: real/fixture court evidence, smoothed motion candidates, court projection candidates, ball trajectory candidates, hit/bounce event candidates, marker-level arbitration, replay marker inspection, event candidate review, and point evidence snapshots remain candidate evidence only. Blueprint 9 is complete with manual candidate review annotations that attach operator metadata to candidate markers and missing-candidate moments without creating truth or adjudication. Blueprint 10 is complete with a read-only evaluation harness that summarizes generated candidate markers and Blueprint 9 review metadata. Blueprint 11 is complete with declared camera/court geometry evidence for future 3D readiness. Blueprint 12 is complete with provisional 3D ball trajectory candidate evidence that keeps height unknown by default and does not create 3D truth. Blueprints 13 through 16 add diagnostic-only 3D marker context, a display-only 3D Debug View, replay-time/selection coupling, and 3D debug review annotations without creating 3D truth, hit/bounce truth, in/out, score, or adjudication. Blueprints 17 through 19 add reviewed 3D debug dataset export, export-to-export regression reporting, and a local sample-point baseline gate without treating exported labels or baselines as truth. Blueprint 20 freezes the sample-point completion/readiness review and permits only controlled second-point expansion under the same candidate-only contract. Blueprint 21 adds that controlled second-point ingestion/replay smoke path without claiming generalization. Blueprint 22 turns that smoke into a second-point evidence parity manifest and protected baseline checkpoint. Blueprint 23 adds point-level provenance manifests. Blueprint 24 builds a manifest-backed multi-point replay navigator and index. Blueprint 25 adds a manifest-backed multi-point regression matrix. Blueprint 26 adds an observation-quality taxonomy and conservative profile. Blueprint 27 adds a structured human-review label schema and validator. Blueprint 28 adds a human-provided reviewer confidence and ambiguity metadata schema and validator. Blueprint 29 adds a multi-reviewer disagreement schema and structural report while still making no truth, in/out, score, winner, player identity, reviewer ranking, reviewer scoring, disagreement resolution, generalization, correctness, or adjudication claim.
+TOM v3 Simple is complete as a lightweight local observation/evidence platform. Blueprint 6 is complete as the visual replay/operator workstation layer. Blueprint 7 is complete as the real perception runtime layer for optional real detection, real-detection-derived candidate tracklets, and optional real pose keypoint evidence. Blueprint 8 is frozen as the visual evidence workstation milestone: real/fixture court evidence, smoothed motion candidates, court projection candidates, ball trajectory candidates, hit/bounce event candidates, marker-level arbitration, replay marker inspection, event candidate review, and point evidence snapshots remain candidate evidence only. Blueprint 9 is complete with manual candidate review annotations that attach operator metadata to candidate markers and missing-candidate moments without creating truth or adjudication. Blueprint 10 is complete with a read-only evaluation harness that summarizes generated candidate markers and Blueprint 9 review metadata. Blueprint 11 is complete with declared camera/court geometry evidence for future 3D readiness. Blueprint 12 is complete with provisional 3D ball trajectory candidate evidence that keeps height unknown by default and does not create 3D truth. Blueprints 13 through 16 add diagnostic-only 3D marker context, a display-only 3D Debug View, replay-time/selection coupling, and 3D debug review annotations without creating 3D truth, hit/bounce truth, in/out, score, or adjudication. Blueprints 17 through 19 add reviewed 3D debug dataset export, export-to-export regression reporting, and a local sample-point baseline gate without treating exported labels or baselines as truth. Blueprint 20 freezes the sample-point completion/readiness review and permits only controlled second-point expansion under the same candidate-only contract. Blueprint 21 adds that controlled second-point ingestion/replay smoke path without claiming generalization. Blueprint 22 turns that smoke into a second-point evidence parity manifest and protected baseline checkpoint. Blueprint 23 adds point-level provenance manifests. Blueprint 24 builds a manifest-backed multi-point replay navigator and index. Blueprint 25 adds a manifest-backed multi-point regression matrix. Blueprint 26 adds an observation-quality taxonomy and conservative profile. Blueprint 27 adds a structured human-review label schema and validator. Blueprint 28 adds a human-provided reviewer confidence and ambiguity metadata schema and validator. Blueprint 29 adds a multi-reviewer disagreement schema and structural report while still making no truth, in/out, score, winner, player identity, reviewer ranking, reviewer scoring, disagreement resolution, generalization, correctness, or adjudication claim. Blueprint 30 adds an INTENNSE label alignment contract that bridges TOM evidence/review/provenance structures to future external INTENNSE expert label references without importing labels, validating correctness, resolving disagreement, creating coaching/tactical conclusions, or adjudicating evidence.
 
 ## Blueprint 1 - Media, Observation Store, Viewer Foundation
 
@@ -964,3 +965,26 @@ present. The report compares human-provided values structurally. It does not inf
 create labels automatically, validate correctness, say which reviewer is right, rank reviewers,
 score reviewers, resolve disagreement, inspect video, decide truth, create observations, event
 candidates, 3D candidates, in/out, score, player identity, point winner, or adjudication.
+
+## Blueprint 30 - INTENNSE Label Alignment Contract
+
+Status: COMPLETE
+
+Blueprint 30 proves:
+
+```text
+TOM evidence/review/provenance structures
+-> versioned INTENNSE alignment contract
+-> blank alignment bundle template
+-> TOM contract reference validation
+-> structural alignment report
+```
+
+The contract records Blueprint 26 through 29 schema refs, alignment entities, alignment fields,
+neutral value sets, provenance requirements, validation rules, and warning flags. The template
+emits blank human-provided alignment entries. The validator checks structure, TOM contract
+references, allowed entities/values, forbidden fields, and human-only flags. The report summarizes
+reference presence and provenance issues structurally. It does not import INTENNSE labels, create
+TOM labels, infer expert interpretation, validate correctness, resolve disagreement, inspect video,
+decide truth, create observations, event candidates, 3D candidates, in/out, score, player identity,
+point winner, coaching/tactical conclusions, match-outcome conclusions, or adjudication.

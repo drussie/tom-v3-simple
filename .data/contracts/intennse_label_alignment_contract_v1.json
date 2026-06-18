@@ -1,0 +1,624 @@
+{
+  "alignment_bundle_type": "intennse_label_alignment_bundle",
+  "alignment_bundle_version": "v1",
+  "alignment_entities": [
+    {
+      "description": "Alignment between a TOM point manifest and an INTENNSE label bundle reference.",
+      "human_alignment_review_supported": true,
+      "key": "point_manifest_alignment",
+      "name": "Point manifest alignment",
+      "structural_only": true,
+      "warnings": {
+        "alignment_is_not_truth": true,
+        "does_not_create_intennse_labels": true,
+        "does_not_create_tom_labels": true,
+        "does_not_resolve_disagreement": true,
+        "does_not_validate_correctness": true,
+        "human_provided_only": true,
+        "machine_inferred": false,
+        "no_adjudication": true,
+        "provenance_only": true
+      }
+    },
+    {
+      "description": "Alignment between TOM replay URL/run context and external interpretation references.",
+      "human_alignment_review_supported": true,
+      "key": "replay_context_alignment",
+      "name": "Replay context alignment",
+      "structural_only": true,
+      "warnings": {
+        "alignment_is_not_truth": true,
+        "does_not_create_intennse_labels": true,
+        "does_not_create_tom_labels": true,
+        "does_not_resolve_disagreement": true,
+        "does_not_validate_correctness": true,
+        "human_provided_only": true,
+        "machine_inferred": false,
+        "no_adjudication": true,
+        "provenance_only": true
+      }
+    },
+    {
+      "description": "Alignment between TOM observation-quality structure and external interpretation context.",
+      "human_alignment_review_supported": true,
+      "key": "observation_quality_alignment",
+      "name": "Observation quality alignment",
+      "structural_only": true,
+      "warnings": {
+        "alignment_is_not_truth": true,
+        "does_not_create_intennse_labels": true,
+        "does_not_create_tom_labels": true,
+        "does_not_resolve_disagreement": true,
+        "does_not_validate_correctness": true,
+        "human_provided_only": true,
+        "machine_inferred": false,
+        "no_adjudication": true,
+        "provenance_only": true
+      }
+    },
+    {
+      "description": "Alignment between TOM human review-label bundles and external label references.",
+      "human_alignment_review_supported": true,
+      "key": "review_label_alignment",
+      "name": "Review label alignment",
+      "structural_only": true,
+      "warnings": {
+        "alignment_is_not_truth": true,
+        "does_not_create_intennse_labels": true,
+        "does_not_create_tom_labels": true,
+        "does_not_resolve_disagreement": true,
+        "does_not_validate_correctness": true,
+        "human_provided_only": true,
+        "machine_inferred": false,
+        "no_adjudication": true,
+        "provenance_only": true
+      }
+    },
+    {
+      "description": "Alignment between TOM reviewer confidence/ambiguity bundles and external label references.",
+      "human_alignment_review_supported": true,
+      "key": "reviewer_confidence_alignment",
+      "name": "Reviewer confidence alignment",
+      "structural_only": true,
+      "warnings": {
+        "alignment_is_not_truth": true,
+        "does_not_create_intennse_labels": true,
+        "does_not_create_tom_labels": true,
+        "does_not_resolve_disagreement": true,
+        "does_not_validate_correctness": true,
+        "human_provided_only": true,
+        "machine_inferred": false,
+        "no_adjudication": true,
+        "provenance_only": true
+      }
+    },
+    {
+      "description": "Alignment between TOM multi-reviewer disagreement reports and external review references.",
+      "human_alignment_review_supported": true,
+      "key": "multi_reviewer_disagreement_alignment",
+      "name": "Multi-reviewer disagreement alignment",
+      "structural_only": true,
+      "warnings": {
+        "alignment_is_not_truth": true,
+        "does_not_create_intennse_labels": true,
+        "does_not_create_tom_labels": true,
+        "does_not_resolve_disagreement": true,
+        "does_not_validate_correctness": true,
+        "human_provided_only": true,
+        "machine_inferred": false,
+        "no_adjudication": true,
+        "provenance_only": true
+      }
+    },
+    {
+      "description": "Placeholder for future INTENNSE expert interpretation references.",
+      "human_alignment_review_supported": true,
+      "key": "expert_interpretation_placeholder",
+      "name": "Expert interpretation placeholder",
+      "structural_only": true,
+      "warnings": {
+        "alignment_is_not_truth": true,
+        "does_not_create_intennse_labels": true,
+        "does_not_create_tom_labels": true,
+        "does_not_resolve_disagreement": true,
+        "does_not_validate_correctness": true,
+        "human_provided_only": true,
+        "machine_inferred": false,
+        "no_adjudication": true,
+        "provenance_only": true
+      }
+    },
+    {
+      "description": "Alignment between TOM provenance exports and external dataset references.",
+      "human_alignment_review_supported": true,
+      "key": "dataset_export_alignment",
+      "name": "Dataset export alignment",
+      "structural_only": true,
+      "warnings": {
+        "alignment_is_not_truth": true,
+        "does_not_create_intennse_labels": true,
+        "does_not_create_tom_labels": true,
+        "does_not_resolve_disagreement": true,
+        "does_not_validate_correctness": true,
+        "human_provided_only": true,
+        "machine_inferred": false,
+        "no_adjudication": true,
+        "provenance_only": true
+      }
+    }
+  ],
+  "alignment_fields": [
+    {
+      "description": "TOM point manifest identifier, when known.",
+      "human_provided_only": true,
+      "key": "tom_point_manifest_id",
+      "machine_inferred": false,
+      "required": false,
+      "value_set": null,
+      "warnings": {
+        "alignment_is_not_truth": true,
+        "does_not_create_intennse_labels": true,
+        "does_not_create_tom_labels": true,
+        "does_not_resolve_disagreement": true,
+        "does_not_validate_correctness": true,
+        "human_provided_only": true,
+        "machine_inferred": false,
+        "no_adjudication": true,
+        "provenance_only": true
+      }
+    },
+    {
+      "description": "TOM media identifier, when known.",
+      "human_provided_only": true,
+      "key": "tom_media_id",
+      "machine_inferred": false,
+      "required": false,
+      "value_set": null,
+      "warnings": {
+        "alignment_is_not_truth": true,
+        "does_not_create_intennse_labels": true,
+        "does_not_create_tom_labels": true,
+        "does_not_resolve_disagreement": true,
+        "does_not_validate_correctness": true,
+        "human_provided_only": true,
+        "machine_inferred": false,
+        "no_adjudication": true,
+        "provenance_only": true
+      }
+    },
+    {
+      "description": "Replay URL for human review, when available.",
+      "human_provided_only": true,
+      "key": "tom_replay_url",
+      "machine_inferred": false,
+      "required": false,
+      "value_set": null,
+      "warnings": {
+        "alignment_is_not_truth": true,
+        "does_not_create_intennse_labels": true,
+        "does_not_create_tom_labels": true,
+        "does_not_resolve_disagreement": true,
+        "does_not_validate_correctness": true,
+        "human_provided_only": true,
+        "machine_inferred": false,
+        "no_adjudication": true,
+        "provenance_only": true
+      }
+    },
+    {
+      "description": "Optional TOM event, 3D, and camera geometry run IDs.",
+      "human_provided_only": true,
+      "key": "tom_associated_run_ids",
+      "machine_inferred": false,
+      "required": false,
+      "value_set": null,
+      "warnings": {
+        "alignment_is_not_truth": true,
+        "does_not_create_intennse_labels": true,
+        "does_not_create_tom_labels": true,
+        "does_not_resolve_disagreement": true,
+        "does_not_validate_correctness": true,
+        "human_provided_only": true,
+        "machine_inferred": false,
+        "no_adjudication": true,
+        "provenance_only": true
+      }
+    },
+    {
+      "description": "Reference to a TOM structured review-label bundle.",
+      "human_provided_only": true,
+      "key": "tom_review_label_bundle_ref",
+      "machine_inferred": false,
+      "required": false,
+      "value_set": null,
+      "warnings": {
+        "alignment_is_not_truth": true,
+        "does_not_create_intennse_labels": true,
+        "does_not_create_tom_labels": true,
+        "does_not_resolve_disagreement": true,
+        "does_not_validate_correctness": true,
+        "human_provided_only": true,
+        "machine_inferred": false,
+        "no_adjudication": true,
+        "provenance_only": true
+      }
+    },
+    {
+      "description": "Reference to a TOM reviewer confidence/ambiguity bundle.",
+      "human_provided_only": true,
+      "key": "tom_reviewer_confidence_bundle_ref",
+      "machine_inferred": false,
+      "required": false,
+      "value_set": null,
+      "warnings": {
+        "alignment_is_not_truth": true,
+        "does_not_create_intennse_labels": true,
+        "does_not_create_tom_labels": true,
+        "does_not_resolve_disagreement": true,
+        "does_not_validate_correctness": true,
+        "human_provided_only": true,
+        "machine_inferred": false,
+        "no_adjudication": true,
+        "provenance_only": true
+      }
+    },
+    {
+      "description": "Reference to a TOM multi-reviewer review-set bundle.",
+      "human_provided_only": true,
+      "key": "tom_multi_reviewer_review_set_ref",
+      "machine_inferred": false,
+      "required": false,
+      "value_set": null,
+      "warnings": {
+        "alignment_is_not_truth": true,
+        "does_not_create_intennse_labels": true,
+        "does_not_create_tom_labels": true,
+        "does_not_resolve_disagreement": true,
+        "does_not_validate_correctness": true,
+        "human_provided_only": true,
+        "machine_inferred": false,
+        "no_adjudication": true,
+        "provenance_only": true
+      }
+    },
+    {
+      "description": "Reference to a TOM structural disagreement report.",
+      "human_provided_only": true,
+      "key": "tom_disagreement_report_ref",
+      "machine_inferred": false,
+      "required": false,
+      "value_set": null,
+      "warnings": {
+        "alignment_is_not_truth": true,
+        "does_not_create_intennse_labels": true,
+        "does_not_create_tom_labels": true,
+        "does_not_resolve_disagreement": true,
+        "does_not_validate_correctness": true,
+        "human_provided_only": true,
+        "machine_inferred": false,
+        "no_adjudication": true,
+        "provenance_only": true
+      }
+    },
+    {
+      "description": "External reference to a future INTENNSE expert interpretation label bundle.",
+      "human_provided_only": true,
+      "key": "intennse_label_bundle_ref",
+      "machine_inferred": false,
+      "required": false,
+      "value_set": null,
+      "warnings": {
+        "alignment_is_not_truth": true,
+        "does_not_create_intennse_labels": true,
+        "does_not_create_tom_labels": true,
+        "does_not_resolve_disagreement": true,
+        "does_not_validate_correctness": true,
+        "human_provided_only": true,
+        "machine_inferred": false,
+        "no_adjudication": true,
+        "provenance_only": true
+      }
+    },
+    {
+      "description": "External INTENNSE schema version, when supplied.",
+      "human_provided_only": true,
+      "key": "intennse_schema_version",
+      "machine_inferred": false,
+      "required": false,
+      "value_set": null,
+      "warnings": {
+        "alignment_is_not_truth": true,
+        "does_not_create_intennse_labels": true,
+        "does_not_create_tom_labels": true,
+        "does_not_resolve_disagreement": true,
+        "does_not_validate_correctness": true,
+        "human_provided_only": true,
+        "machine_inferred": false,
+        "no_adjudication": true,
+        "provenance_only": true
+      }
+    },
+    {
+      "description": "Human-provided structural alignment status.",
+      "human_provided_only": true,
+      "key": "alignment_status",
+      "machine_inferred": false,
+      "required": true,
+      "value_set": "alignment_status_values",
+      "warnings": {
+        "alignment_is_not_truth": true,
+        "does_not_create_intennse_labels": true,
+        "does_not_create_tom_labels": true,
+        "does_not_resolve_disagreement": true,
+        "does_not_validate_correctness": true,
+        "human_provided_only": true,
+        "machine_inferred": false,
+        "no_adjudication": true,
+        "provenance_only": true
+      }
+    },
+    {
+      "description": "Optional human-provided alignment note.",
+      "human_provided_only": true,
+      "key": "alignment_notes",
+      "machine_inferred": false,
+      "required": false,
+      "value_set": null,
+      "warnings": {
+        "alignment_is_not_truth": true,
+        "does_not_create_intennse_labels": true,
+        "does_not_create_tom_labels": true,
+        "does_not_resolve_disagreement": true,
+        "does_not_validate_correctness": true,
+        "human_provided_only": true,
+        "machine_inferred": false,
+        "no_adjudication": true,
+        "provenance_only": true
+      }
+    },
+    {
+      "description": "Human-provided provenance status for this alignment reference.",
+      "human_provided_only": true,
+      "key": "provenance_status",
+      "machine_inferred": false,
+      "required": true,
+      "value_set": "provenance_status_values",
+      "warnings": {
+        "alignment_is_not_truth": true,
+        "does_not_create_intennse_labels": true,
+        "does_not_create_tom_labels": true,
+        "does_not_resolve_disagreement": true,
+        "does_not_validate_correctness": true,
+        "human_provided_only": true,
+        "machine_inferred": false,
+        "no_adjudication": true,
+        "provenance_only": true
+      }
+    },
+    {
+      "description": "Human-provided status for whether another alignment review pass is requested.",
+      "human_provided_only": true,
+      "key": "requires_human_alignment_review",
+      "machine_inferred": false,
+      "required": true,
+      "value_set": "human_alignment_review_values",
+      "warnings": {
+        "alignment_is_not_truth": true,
+        "does_not_create_intennse_labels": true,
+        "does_not_create_tom_labels": true,
+        "does_not_resolve_disagreement": true,
+        "does_not_validate_correctness": true,
+        "human_provided_only": true,
+        "machine_inferred": false,
+        "no_adjudication": true,
+        "provenance_only": true
+      }
+    }
+  ],
+  "alignment_value_sets": [
+    {
+      "allowed_values": [
+        "not_assessed",
+        "unknown",
+        "aligned_by_reference",
+        "partially_aligned",
+        "not_aligned",
+        "missing_tom_context",
+        "missing_intennse_context",
+        "requires_human_alignment_review",
+        "not_applicable"
+      ],
+      "default_value": "not_assessed",
+      "description": "Neutral human-provided structural alignment statuses.",
+      "free_text": false,
+      "key": "alignment_status_values",
+      "name": "Alignment status values",
+      "warnings": {
+        "no_adjudication": true,
+        "provenance_only": true,
+        "review_support_only": true,
+        "value_set_is_not_truth": true
+      }
+    },
+    {
+      "allowed_values": [
+        "not_assessed",
+        "unknown",
+        "provenance_present",
+        "provenance_partial",
+        "provenance_missing",
+        "conflicting_references",
+        "not_applicable"
+      ],
+      "default_value": "not_assessed",
+      "description": "Neutral human-provided provenance statuses.",
+      "free_text": false,
+      "key": "provenance_status_values",
+      "name": "Provenance status values",
+      "warnings": {
+        "no_adjudication": true,
+        "provenance_only": true,
+        "review_support_only": true,
+        "value_set_is_not_truth": true
+      }
+    },
+    {
+      "allowed_values": [
+        "not_assessed",
+        "unknown",
+        "required",
+        "not_required",
+        "not_applicable"
+      ],
+      "default_value": "not_assessed",
+      "description": "Neutral values for whether another human alignment review pass is requested.",
+      "free_text": false,
+      "key": "human_alignment_review_values",
+      "name": "Human alignment review values",
+      "warnings": {
+        "no_adjudication": true,
+        "provenance_only": true,
+        "review_support_only": true,
+        "value_set_is_not_truth": true
+      }
+    }
+  ],
+  "contract_type": "intennse_label_alignment_contract",
+  "contract_version": "v1",
+  "exported_at": "2026-06-18T00:00:00+00:00",
+  "intennse_alignment_scope": {
+    "automatic_conclusion_creation_allowed": false,
+    "automatic_import_allowed": false,
+    "automatic_label_creation_allowed": false,
+    "intennse_role": "external structured human expert interpretation reference",
+    "provenance_only": true,
+    "purpose": "Align TOM evidence/review/provenance structures with future INTENNSE expert interpretation references.",
+    "review_support_only": true,
+    "tom_role": "observable evidence substrate and provenance record"
+  },
+  "provenance_requirements": {
+    "intennse_label_bundle_ref_allowed": true,
+    "intennse_references_are_external_placeholders": true,
+    "provenance_only": true,
+    "tom_associated_run_ids_allowed": [
+      "event_candidate_run_id",
+      "trajectory_3d_run_id",
+      "camera_geometry_id"
+    ],
+    "tom_disagreement_report_ref_allowed": true,
+    "tom_media_id_recommended": true,
+    "tom_multi_reviewer_review_set_ref_allowed": true,
+    "tom_point_manifest_id_recommended": true,
+    "tom_replay_url_recommended": true,
+    "tom_review_label_bundle_ref_allowed": true,
+    "tom_reviewer_confidence_bundle_ref_allowed": true
+  },
+  "report_type": "intennse_label_alignment_report",
+  "report_version": "v1",
+  "tom_provenance": {
+    "blueprint": "blueprint_30",
+    "blueprint_name": "intennse_label_alignment_contract_v1",
+    "project": "tom-v3-simple",
+    "project_version": "0.0.0"
+  },
+  "tom_schema_refs": {
+    "multi_reviewer_disagreement_schema_version": "v1",
+    "observation_quality_taxonomy_version": "v1",
+    "review_label_schema_version": "v1",
+    "reviewer_confidence_schema_version": "v1"
+  },
+  "validation_rules": {
+    "allowed_alignment_entities": [
+      "point_manifest_alignment",
+      "replay_context_alignment",
+      "observation_quality_alignment",
+      "review_label_alignment",
+      "reviewer_confidence_alignment",
+      "multi_reviewer_disagreement_alignment",
+      "expert_interpretation_placeholder",
+      "dataset_export_alignment"
+    ],
+    "allowed_alignment_status_values": [
+      "not_assessed",
+      "unknown",
+      "aligned_by_reference",
+      "partially_aligned",
+      "not_aligned",
+      "missing_tom_context",
+      "missing_intennse_context",
+      "requires_human_alignment_review",
+      "not_applicable"
+    ],
+    "allowed_human_alignment_review_values": [
+      "not_assessed",
+      "unknown",
+      "required",
+      "not_required",
+      "not_applicable"
+    ],
+    "allowed_provenance_status_values": [
+      "not_assessed",
+      "unknown",
+      "provenance_present",
+      "provenance_partial",
+      "provenance_missing",
+      "conflicting_references",
+      "not_applicable"
+    ],
+    "does_not_create_intennse_labels": true,
+    "does_not_create_tom_labels": true,
+    "does_not_create_truth": true,
+    "does_not_infer_missing_tom_labels": true,
+    "does_not_resolve_disagreement": true,
+    "does_not_validate_correctness": true,
+    "forbidden_fields": [
+      "accepted",
+      "adjudication",
+      "betting_prediction",
+      "coaching_recommendation",
+      "correct",
+      "disagreement_resolution",
+      "in_out",
+      "incorrect",
+      "match_outcome",
+      "player_identity",
+      "point_winner",
+      "receiver",
+      "rejected",
+      "reviewer_quality_score",
+      "reviewer_rank",
+      "reviewer_reliability",
+      "reviewer_score",
+      "score",
+      "server",
+      "tactical_recommendation",
+      "truth",
+      "winner"
+    ],
+    "human_provided_only_required": true,
+    "intennse_references_treated_as_external_placeholders": true,
+    "machine_inferred_must_be_false": true,
+    "referenced_tom_contract_versions_validated_when_paths_available": true,
+    "structural_validation_only": true
+  },
+  "warnings": {
+    "alignment_is_not_truth": true,
+    "does_not_create_in_out": true,
+    "does_not_create_intennse_labels": true,
+    "does_not_create_score": true,
+    "does_not_create_tom_labels": true,
+    "does_not_determine_winner": true,
+    "does_not_identify_players": true,
+    "does_not_import_intennse_truth": true,
+    "does_not_resolve_disagreement": true,
+    "does_not_score_reviewers": true,
+    "does_not_validate_correctness": true,
+    "intennse_alignment_is_not_adjudication": true,
+    "no_adjudication": true,
+    "not_generalization_claim": true,
+    "not_training_truth": true,
+    "observation_only": true,
+    "provenance_only": true,
+    "review_support_only": true
+  }
+}

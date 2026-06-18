@@ -235,6 +235,10 @@ This registry makes TOM v3 Simple boundaries explicit.
 - Multi-reviewer disagreement artifacts compare human-provided review structures only. They do not
   decide which reviewer is right, rank reviewers, score reviewer quality, resolve disagreement,
   create truth or training truth, score, identify players, decide in/out, or adjudicate evidence.
+- INTENNSE label alignment artifacts describe references between TOM provenance structures and
+  future external INTENNSE expert interpretation labels only. They do not import INTENNSE labels,
+  create TOM labels, validate correctness, resolve disagreement, create coaching or tactical
+  conclusions, score, identify players, decide in/out, or adjudicate evidence.
 - Replay view presets are display defaults only. Operator view hides raw/debug layers by default,
   and debug/audit view enables them, but neither preset changes persisted observations or proves
   evidence correctness.

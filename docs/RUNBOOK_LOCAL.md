@@ -2192,6 +2192,73 @@ human-only flags, and referenced Blueprint 27/28 bundle structure when paths are
 not infer missing labels, create labels, decide whether a reviewer is right, resolve disagreement,
 or score reviewers.
 
+## INTENNSE Label Alignment Contract
+
+Use this to export the INTENNSE label alignment contract, create a blank alignment bundle template,
+validate alignment bundle structure, and build a structural alignment report. This is a provenance
+bridge foundation only. It does not import INTENNSE labels, create TOM labels, infer expert
+interpretation, judge correctness, resolve disagreement, decide truth, decide in/out, score,
+identify players, determine a winner, produce coaching or tactical conclusions, or adjudicate
+evidence.
+
+Export the contract:
+
+```bash
+make tom-v1-export-intennse-label-alignment-contract \
+  PYTHON=.venv/bin/python
+```
+
+Build a blank alignment template:
+
+```bash
+make tom-v1-build-intennse-alignment-template \
+  PYTHON=.venv/bin/python
+```
+
+Validate an alignment bundle:
+
+```bash
+make tom-v1-validate-intennse-alignment-bundle \
+  PYTHON=.venv/bin/python \
+  INTENNSE_ALIGNMENT_BUNDLE=.data/exports/intennse_alignment_template.current.json
+```
+
+Build an alignment report:
+
+```bash
+make tom-v1-build-intennse-alignment-report \
+  PYTHON=.venv/bin/python \
+  INTENNSE_ALIGNMENT_BUNDLE=.data/exports/intennse_alignment_template.current.json
+```
+
+Default paths:
+
+```text
+.data/contracts/intennse_label_alignment_contract_v1.json
+.data/exports/intennse_alignment_template.current.json
+.data/exports/intennse_alignment_bundle.validation.json
+.data/exports/intennse_alignment_report.current.json
+```
+
+Expected:
+
+- `ok`: true for contract export and valid alignment bundle validation
+- `contract_type`: `intennse_label_alignment_contract`
+- `contract_version`: `v1`
+- `alignment_bundle_type`: `intennse_label_alignment_bundle`
+- `alignment_bundle_version`: `v1`
+- `alignment_report_type`: `intennse_label_alignment_report`
+- `alignment_report_version`: `v1`
+- `warnings.alignment_is_not_truth`: true
+- `warnings.does_not_import_intennse_truth`: true
+- `warnings.does_not_create_intennse_labels`: true
+- `warnings.does_not_resolve_disagreement`: true
+- `warnings.no_adjudication`: true
+
+Validation checks contract shape, TOM contract references, allowed alignment entities, allowed
+values, forbidden fields, and human-only flags. INTENNSE refs are external placeholders in v1.
+Missing TOM or INTENNSE refs are reported as structural/provenance context only.
+
 Build the point evidence snapshot:
 
 ```bash

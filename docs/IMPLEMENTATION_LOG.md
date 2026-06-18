@@ -3346,3 +3346,45 @@ builder compares human-provided values structurally. It does not generate eviden
 change review semantics, mutate protected baselines, decide in/out, score, identify players,
 determine a winner, claim generalization, validate correctness, rank reviewers, score reviewers,
 resolve disagreement, or adjudicate evidence.
+
+## Blueprint 30 INTENNSE Label Alignment Contract v1
+
+Status: complete
+
+### Goal
+
+Create a versioned alignment contract between TOM observation/review/provenance structures and
+future INTENNSE expert interpretation label references without importing labels, creating labels,
+deciding truth, resolving disagreement, scoring reviewers, producing coaching/tactical conclusions,
+or adjudicating evidence.
+
+### Notes
+
+This milestone adds:
+
+- `apps.worker.services.intennse_label_alignment`
+- `export-intennse-label-alignment-contract` worker CLI command
+- `build-intennse-alignment-template` worker CLI command
+- `validate-intennse-alignment-bundle` worker CLI command
+- `build-intennse-alignment-report` worker CLI command
+- `tom-v1-export-intennse-label-alignment-contract` Make helper
+- `tom-v1-build-intennse-alignment-template` Make helper
+- `tom-v1-validate-intennse-alignment-bundle` Make helper
+- `tom-v1-build-intennse-alignment-report` Make helper
+- `.data/contracts/intennse_label_alignment_contract_v1.json` local contract path
+- `.data/exports/intennse_alignment_template.current.json` local template path
+- `.data/exports/intennse_alignment_bundle.validation.json` local validation path
+- `.data/exports/intennse_alignment_report.current.json` local report path
+- `docs/blueprints/blueprint_30_intennse_label_alignment_contract_v1.md`
+- `docs/reviews/intennse_label_alignment_contract_v1.md`
+- `docs/agent_reports/blueprint_30_intennse_label_alignment_contract_v1_report.md`
+
+The contract defines TOM schema refs for Blueprints 26 through 29, alignment entities, alignment
+fields, neutral value sets, provenance requirements, validation rules, and warning flags. The
+template builder emits blank human-provided alignment entries. The validator checks contract
+shape, TOM contract references, allowed entities/values, forbidden fields, and human-only flags.
+The report summarizes reference presence and provenance issues structurally. It does not generate
+evidence, create TOM or INTENNSE labels, change review semantics, mutate protected baselines,
+decide in/out, score, identify players, determine a winner, claim generalization, validate
+correctness, resolve disagreement, produce INTENNSE coaching/tactical/match-outcome conclusions,
+or adjudicate evidence.

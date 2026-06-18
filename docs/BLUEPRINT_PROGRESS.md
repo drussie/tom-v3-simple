@@ -1277,3 +1277,16 @@ capture disagreement dimensions such as label-value, confidence, ambiguity, evid
 missing input, note differences, and provenance mismatch. They do not infer missing labels, create
 labels, decide which reviewer is right, resolve disagreement, score reviewers, inspect video,
 decide truth, score, player identity, point winner, in/out, generalization, or adjudication.
+
+## Blueprint 30 Status
+
+Status: complete.
+
+TOM v3 can now export a versioned INTENNSE label alignment contract, build a blank alignment
+bundle template, validate alignment bundle structure, and build a structural alignment report. The
+contract aligns TOM observation/review/provenance structures with future INTENNSE expert
+interpretation label references while treating INTENNSE references as external placeholders in v1.
+Reports summarize reference presence and provenance issues only. They do not import INTENNSE
+labels, create TOM labels, infer expert interpretation, validate correctness, resolve
+disagreement, inspect video, decide truth, score, player identity, point winner, in/out,
+generalization, coaching/tactical conclusions, or adjudication.
