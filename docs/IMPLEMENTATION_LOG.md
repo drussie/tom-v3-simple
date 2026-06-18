@@ -3267,3 +3267,40 @@ entries and does not infer labels. The validator checks bundle structure, known 
 values, forbidden fields, and human-only flags. It does not generate evidence, create labels,
 change review semantics, mutate protected baselines, decide in/out, score, identify players,
 determine a winner, claim generalization, validate correctness, or adjudicate evidence.
+
+## Blueprint 28 Reviewer Confidence / Ambiguity Capture v1
+
+Status: complete
+
+### Goal
+
+Create a versioned reviewer confidence and ambiguity metadata schema for future human-provided
+review uncertainty without creating truth, scoring, player identity, event generation, 3D
+generation, correctness claims, automatic confidence scoring, or adjudication.
+
+### Notes
+
+This milestone adds:
+
+- `apps.worker.services.reviewer_confidence_schema`
+- `export-reviewer-confidence-schema` worker CLI command
+- `build-reviewer-confidence-template` worker CLI command
+- `validate-reviewer-confidence-bundle` worker CLI command
+- `tom-v1-export-reviewer-confidence-schema` Make helper
+- `tom-v1-build-reviewer-confidence-template` Make helper
+- `tom-v1-validate-reviewer-confidence-bundle` Make helper
+- `tom-v1-post-codex-validate` Make helper
+- `.data/contracts/reviewer_confidence_ambiguity_schema_v1.json` local contract path
+- `.data/exports/reviewer_confidence_ambiguity_template.current.json` local template path
+- `.data/exports/reviewer_confidence_ambiguity.validation.json` local validation path
+- `docs/blueprints/blueprint_28_reviewer_confidence_ambiguity_capture_v1.md`
+- `docs/reviews/reviewer_confidence_ambiguity_capture_v1.md`
+- `docs/agent_reports/blueprint_28_reviewer_confidence_ambiguity_capture_v1_report.md`
+
+The schema defines neutral human-review confidence, ambiguity, ambiguity reason,
+evidence-sufficiency, additional-review, time-spent, and review-context metadata. The template
+builder emits blank `not_assessed` entries and does not infer confidence or ambiguity. The validator
+checks bundle structure, allowed values, optional Blueprint 27 label keys, forbidden fields, and
+human-only flags. It does not generate evidence, create labels, change review semantics, mutate
+protected baselines, decide in/out, score, identify players, determine a winner, claim
+generalization, validate correctness, score confidence automatically, or adjudicate evidence.

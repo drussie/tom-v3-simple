@@ -2065,6 +2065,68 @@ Expected:
 Validation checks shape, label keys, allowed values, forbidden fields, and human-only flags. It does
 not infer missing labels, create labels, validate correctness, or decide truth.
 
+## Reviewer Confidence / Ambiguity Capture
+
+Use this to export the human-review confidence and ambiguity metadata schema, create a blank
+confidence bundle template, and validate bundle structure. This is review metadata support only. It
+does not score confidence automatically, infer truth, judge correctness, decide in/out, score,
+identify players, determine a winner, or adjudicate evidence.
+
+Export the schema contract:
+
+```bash
+make tom-v1-export-reviewer-confidence-schema \
+  PYTHON=.venv/bin/python
+```
+
+Build a blank template:
+
+```bash
+make tom-v1-build-reviewer-confidence-template \
+  PYTHON=.venv/bin/python
+```
+
+Validate a bundle:
+
+```bash
+make tom-v1-validate-reviewer-confidence-bundle \
+  PYTHON=.venv/bin/python \
+  REVIEWER_CONFIDENCE_BUNDLE=.data/exports/reviewer_confidence_ambiguity_template.current.json
+```
+
+Run the post-Codex validation helper:
+
+```bash
+make tom-v1-post-codex-validate \
+  PYTHON=.venv/bin/python \
+  EXPECTED_BRANCH=codex/blueprint-28-reviewer-confidence-ambiguity-capture-v1
+```
+
+Default paths:
+
+```text
+.data/contracts/reviewer_confidence_ambiguity_schema_v1.json
+.data/exports/reviewer_confidence_ambiguity_template.current.json
+.data/exports/reviewer_confidence_ambiguity.validation.json
+.data/tmp/post_codex_validate/
+```
+
+Expected:
+
+- `ok`: true for schema export and valid bundle validation
+- `schema_type`: `reviewer_confidence_ambiguity_schema`
+- `schema_version`: `v1`
+- `confidence_bundle_type`: `reviewer_confidence_ambiguity_bundle`
+- `confidence_bundle_version`: `v1`
+- `warnings.confidence_is_not_truth`: true
+- `warnings.ambiguity_is_not_truth`: true
+- `warnings.human_review_only`: true
+- `warnings.no_adjudication`: true
+
+Validation checks shape, allowed metadata values, optional Blueprint 27 label keys, forbidden
+fields, and human-only flags. It does not infer missing confidence or ambiguity, create labels,
+validate correctness, decide whether confidence is appropriate, or decide truth.
+
 Build the point evidence snapshot:
 
 ```bash

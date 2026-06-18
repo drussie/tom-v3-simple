@@ -92,6 +92,13 @@ from apps.worker.services.reviewed_3d_debug_dataset_export import (
 from apps.worker.services.reviewed_3d_debug_dataset_regression import (
     compare_reviewed_3d_debug_dataset_exports,
 )
+from apps.worker.services.reviewer_confidence_schema import (
+    DEFAULT_REVIEWER_CONFIDENCE_SCHEMA_OUTPUT,
+    DEFAULT_REVIEWER_CONFIDENCE_TEMPLATE_OUTPUT,
+    build_reviewer_confidence_template,
+    export_reviewer_confidence_schema,
+    validate_reviewer_confidence_bundle,
+)
 from apps.worker.services.second_point_evidence_parity import (
     DEFAULT_SECOND_POINT_PARITY_MANIFEST,
     build_second_point_evidence_parity,
@@ -1233,6 +1240,66 @@ def main() -> None:
     review_label_validate_parser.add_argument("--skip-create-db", action="store_true")
     review_label_validate_parser.set_defaults(
         handler=_handle_validate_review_label_bundle,
+        skip_create_db=True,
+    )
+
+    reviewer_confidence_schema_parser = subcommands.add_parser(
+        "export-reviewer-confidence-schema",
+        help="Export the reviewer confidence and ambiguity schema contract.",
+    )
+    reviewer_confidence_schema_parser.add_argument(
+        "--output",
+        default=DEFAULT_REVIEWER_CONFIDENCE_SCHEMA_OUTPUT,
+        help="JSON reviewer confidence schema output path.",
+    )
+    reviewer_confidence_schema_parser.add_argument("--skip-create-db", action="store_true")
+    reviewer_confidence_schema_parser.set_defaults(
+        handler=_handle_export_reviewer_confidence_schema,
+        skip_create_db=True,
+    )
+
+    reviewer_confidence_template_parser = subcommands.add_parser(
+        "build-reviewer-confidence-template",
+        help="Build a blank reviewer confidence and ambiguity bundle template.",
+    )
+    reviewer_confidence_template_parser.add_argument("--point-manifest-id")
+    reviewer_confidence_template_parser.add_argument("--media-id")
+    reviewer_confidence_template_parser.add_argument("--replay-url")
+    reviewer_confidence_template_parser.add_argument("--event-candidate-run-id")
+    reviewer_confidence_template_parser.add_argument("--trajectory-3d-run-id")
+    reviewer_confidence_template_parser.add_argument("--camera-geometry-id")
+    reviewer_confidence_template_parser.add_argument(
+        "--output",
+        default=DEFAULT_REVIEWER_CONFIDENCE_TEMPLATE_OUTPUT,
+        help="JSON reviewer confidence template output path.",
+    )
+    reviewer_confidence_template_parser.add_argument("--skip-create-db", action="store_true")
+    reviewer_confidence_template_parser.set_defaults(
+        handler=_handle_build_reviewer_confidence_template,
+        skip_create_db=True,
+    )
+
+    reviewer_confidence_validate_parser = subcommands.add_parser(
+        "validate-reviewer-confidence-bundle",
+        help="Validate a reviewer confidence and ambiguity bundle against the schema.",
+    )
+    reviewer_confidence_validate_parser.add_argument(
+        "--schema",
+        default=DEFAULT_REVIEWER_CONFIDENCE_SCHEMA_OUTPUT,
+        help="Reviewer confidence schema JSON path.",
+    )
+    reviewer_confidence_validate_parser.add_argument("--bundle", required=True)
+    reviewer_confidence_validate_parser.add_argument(
+        "--review-label-schema",
+        help="Optional Blueprint 27 review label schema JSON path for label_key validation.",
+    )
+    reviewer_confidence_validate_parser.add_argument(
+        "--output",
+        help="Optional JSON validation report path.",
+    )
+    reviewer_confidence_validate_parser.add_argument("--skip-create-db", action="store_true")
+    reviewer_confidence_validate_parser.set_defaults(
+        handler=_handle_validate_reviewer_confidence_bundle,
         skip_create_db=True,
     )
 
@@ -2537,6 +2604,50 @@ def _handle_validate_review_label_bundle(
     return validate_review_label_bundle(
         schema_path=args.schema,
         bundle_path=args.bundle,
+        output_path=args.output,
+    )
+
+
+def _handle_export_reviewer_confidence_schema(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return export_reviewer_confidence_schema(output_path=args.output)
+
+
+def _handle_build_reviewer_confidence_template(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    associated_run_ids = {
+        key: value
+        for key, value in {
+            "event_candidate_run_id": args.event_candidate_run_id,
+            "trajectory_3d_run_id": args.trajectory_3d_run_id,
+            "camera_geometry_id": args.camera_geometry_id,
+        }.items()
+        if value
+    }
+    return build_reviewer_confidence_template(
+        point_manifest_id=args.point_manifest_id,
+        media_id=args.media_id,
+        replay_url=args.replay_url,
+        associated_run_ids=associated_run_ids,
+        output_path=args.output,
+    )
+
+
+def _handle_validate_reviewer_confidence_bundle(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_reviewer_confidence_bundle(
+        schema_path=args.schema,
+        bundle_path=args.bundle,
+        review_label_schema_path=args.review_label_schema,
         output_path=args.output,
     )
 

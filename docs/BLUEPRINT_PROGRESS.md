@@ -1252,3 +1252,15 @@ label definitions, value sets, provenance requirements, validation rules, and wa
 Validation rejects forbidden decision fields and invalid label keys/values, but it does not infer
 missing labels, create labels, judge correctness, inspect video, decide truth, score, player
 identity, point winner, in/out, generalization, or adjudication.
+
+## Blueprint 28 Status
+
+Status: complete.
+
+TOM v3 can now export a versioned reviewer confidence and ambiguity metadata schema, build a blank
+human-review confidence bundle template, validate confidence bundle structure, and run a
+validation-only post-Codex helper. The schema defines neutral confidence, ambiguity, ambiguity
+reason, evidence-sufficiency, additional-review, time-spent, and review-context metadata. Validation
+rejects forbidden decision fields and invalid metadata values, but it does not infer missing
+confidence, create labels, judge correctness, inspect video, decide truth, score, player identity,
+point winner, in/out, generalization, or adjudication.

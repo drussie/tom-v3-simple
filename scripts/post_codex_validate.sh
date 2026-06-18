@@ -1,0 +1,124 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+EXPECTED_BRANCH=""
+EXPECTED_TAG=""
+PYTHON_BIN=".venv/bin/python"
+TMP_ROOT=".data/tmp/post_codex_validate"
+
+usage() {
+  cat <<'EOF'
+Usage: scripts/post_codex_validate.sh [--branch <branch>] [--expected-tag <tag>] [--python <python>]
+
+Runs validation only. This script does not merge, commit, tag, push, clean files, or modify git
+state. Temporary validation artifacts are written under .data/tmp/post_codex_validate.
+EOF
+}
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --branch)
+      EXPECTED_BRANCH="${2:-}"
+      shift 2
+      ;;
+    --expected-tag)
+      EXPECTED_TAG="${2:-}"
+      shift 2
+      ;;
+    --python)
+      PYTHON_BIN="${2:-}"
+      shift 2
+      ;;
+    --help|-h)
+      usage
+      exit 0
+      ;;
+    *)
+      echo "Unknown argument: $1" >&2
+      usage >&2
+      exit 2
+      ;;
+  esac
+done
+
+run() {
+  echo "+ $*"
+  "$@"
+}
+
+run_shell() {
+  echo "+ $*"
+  bash -lc "$*"
+}
+
+CURRENT_BRANCH="$(git branch --show-current)"
+if [[ -n "$EXPECTED_BRANCH" && "$CURRENT_BRANCH" != "$EXPECTED_BRANCH" ]]; then
+  echo "Expected branch '$EXPECTED_BRANCH' but current branch is '$CURRENT_BRANCH'" >&2
+  exit 1
+fi
+
+if [[ -n "$EXPECTED_TAG" ]]; then
+  run git rev-parse --verify --quiet "refs/tags/$EXPECTED_TAG"
+fi
+
+mkdir -p "$TMP_ROOT"
+
+run "$PYTHON_BIN" -m pytest -q
+run ruff check .
+run git diff --check
+
+run_shell "cd apps/web && npm run lint && npm run build && npm audit --omit=dev"
+
+run make tom-v1-build-multi-point-replay-index \
+  PYTHON="$PYTHON_BIN" \
+  MULTI_POINT_REPLAY_INDEX_OUTPUT="$TMP_ROOT/multi_point_replay_index.json"
+
+run env TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_tom_v1_bridge.db \
+  make tom-v1-verify-multi-point-regression-matrix \
+  PYTHON="$PYTHON_BIN" \
+  MULTI_POINT_REPLAY_INDEX_OUTPUT="$TMP_ROOT/multi_point_replay_index.json" \
+  MULTI_POINT_REGRESSION_MATRIX_CURRENT="$TMP_ROOT/multi_point_regression_matrix.current.json" \
+  MULTI_POINT_REGRESSION_MATRIX_REGRESSION="$TMP_ROOT/multi_point_regression_matrix.regression.json" \
+  MULTI_POINT_REGRESSION_MATRIX_REGRESSION_MARKDOWN="$TMP_ROOT/multi_point_regression_matrix.regression.md"
+
+run env TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_tom_v1_bridge.db \
+  make tom-v1-verify-reviewed-3d-debug-baseline \
+  PYTHON="$PYTHON_BIN" \
+  MEDIA_ID=9518fb01-0da1-4344-9a84-ff88ec8e9b1e \
+  EVENT_CANDIDATE_RUN_ID=1b946366-7ec1-426f-8b40-494535a9b3fb \
+  TRAJECTORY_3D_RUN_ID=ea76ccab-c51d-4a63-9682-9fd0bbb83f14 \
+  CAMERA_GEOMETRY_ID=5afa67fb-7f6e-41eb-b4aa-b1100a97ee97 \
+  CURRENT_OUTPUT="$TMP_ROOT/reviewed_3d_debug_dataset_sample_point.current.json" \
+  REGRESSION="$TMP_ROOT/reviewed_3d_debug_dataset_sample_point.regression.json" \
+  REGRESSION_MARKDOWN="$TMP_ROOT/reviewed_3d_debug_dataset_sample_point.regression.md"
+
+run "$PYTHON_BIN" -m apps.worker.cli export-observation-quality-taxonomy \
+  --output "$TMP_ROOT/observation_quality_taxonomy_v1.smoke.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli export-review-label-schema \
+  --output "$TMP_ROOT/review_label_schema_v1.smoke.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli export-reviewer-confidence-schema \
+  --output "$TMP_ROOT/reviewer_confidence_ambiguity_schema_v1.smoke.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-reviewer-confidence-template \
+  --point-manifest-id point_manifest_v0_690dfd41205609e0caca1263 \
+  --media-id 9518fb01-0da1-4344-9a84-ff88ec8e9b1e \
+  --replay-url "http://127.0.0.1:3000/replay/9518fb01-0da1-4344-9a84-ff88ec8e9b1e" \
+  --event-candidate-run-id 1b946366-7ec1-426f-8b40-494535a9b3fb \
+  --trajectory-3d-run-id ea76ccab-c51d-4a63-9682-9fd0bbb83f14 \
+  --camera-geometry-id 5afa67fb-7f6e-41eb-b4aa-b1100a97ee97 \
+  --output "$TMP_ROOT/reviewer_confidence_ambiguity_template.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli validate-reviewer-confidence-bundle \
+  --schema "$TMP_ROOT/reviewer_confidence_ambiguity_schema_v1.smoke.json" \
+  --bundle "$TMP_ROOT/reviewer_confidence_ambiguity_template.current.json" \
+  --review-label-schema "$TMP_ROOT/review_label_schema_v1.smoke.json" \
+  --output "$TMP_ROOT/reviewer_confidence_ambiguity.validation.json" \
+  --skip-create-db
+
+run git status --short

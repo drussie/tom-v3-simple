@@ -324,6 +324,8 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Observation Quality Taxonomy v1](reviews/observation_quality_taxonomy_v1.md)
 - [Blueprint 27 Structured Review Label Schema v1](blueprints/blueprint_27_structured_review_label_schema_v1.md)
 - [Structured Review Label Schema v1](reviews/structured_review_label_schema_v1.md)
+- [Blueprint 28 Reviewer Confidence / Ambiguity Capture v1](blueprints/blueprint_28_reviewer_confidence_ambiguity_capture_v1.md)
+- [Reviewer Confidence / Ambiguity Capture v1](reviews/reviewer_confidence_ambiguity_capture_v1.md)
 
 ## Development
 

@@ -228,6 +228,10 @@ This registry makes TOM v3 Simple boundaries explicit.
   structural validation only. They do not create labels automatically, infer missing labels, judge
   whether a human label is correct, create truth or training truth, score, identify players,
   decide in/out, or adjudicate evidence.
+- Reviewer confidence and ambiguity schema artifacts define human-provided uncertainty metadata,
+  templates, and structural validation only. They do not score confidence automatically, infer
+  missing ambiguity, judge whether confidence is appropriate, create truth or training truth, score,
+  identify players, decide in/out, or adjudicate evidence.
 - Replay view presets are display defaults only. Operator view hides raw/debug layers by default,
   and debug/audit view enables them, but neither preset changes persisted observations or proves
   evidence correctness.

@@ -1,0 +1,528 @@
+{
+  "ambiguity_value_sets": [
+    {
+      "allowed_values": [
+        "not_assessed",
+        "unknown",
+        "none_observed",
+        "minor_ambiguity",
+        "moderate_ambiguity",
+        "high_ambiguity",
+        "unresolved",
+        "not_applicable"
+      ],
+      "default_value": "not_assessed",
+      "description": "Neutral human-provided ambiguity level values.",
+      "free_text": false,
+      "key": "ambiguity_level_values",
+      "name": "Ambiguity level values",
+      "warnings": {
+        "human_review_only": true,
+        "no_adjudication": true,
+        "review_support_only": true,
+        "value_set_is_not_truth": true
+      }
+    },
+    {
+      "allowed_values": [
+        "not_assessed",
+        "unknown",
+        "occlusion",
+        "motion_blur",
+        "low_resolution",
+        "lighting",
+        "camera_angle",
+        "partial_evidence",
+        "conflicting_evidence",
+        "missing_context",
+        "reviewer_uncertain",
+        "not_applicable"
+      ],
+      "default_value": "not_assessed",
+      "description": "Neutral human-provided ambiguity reason values.",
+      "free_text": false,
+      "key": "ambiguity_reason_values",
+      "name": "Ambiguity reason values",
+      "warnings": {
+        "human_review_only": true,
+        "no_adjudication": true,
+        "review_support_only": true,
+        "value_set_is_not_truth": true
+      }
+    }
+  ],
+  "confidence_value_sets": [
+    {
+      "allowed_values": [
+        "not_assessed",
+        "unknown",
+        "low",
+        "medium",
+        "high",
+        "mixed",
+        "not_applicable"
+      ],
+      "default_value": "not_assessed",
+      "description": "Neutral human-provided confidence values.",
+      "free_text": false,
+      "key": "reviewer_confidence_values",
+      "name": "Reviewer confidence values",
+      "warnings": {
+        "human_review_only": true,
+        "no_adjudication": true,
+        "review_support_only": true,
+        "value_set_is_not_truth": true
+      }
+    }
+  ],
+  "evidence_sufficiency_value_sets": [
+    {
+      "allowed_values": [
+        "not_assessed",
+        "unknown",
+        "sufficient_for_review",
+        "partially_sufficient",
+        "insufficient_for_review",
+        "evidence_missing",
+        "not_applicable"
+      ],
+      "default_value": "not_assessed",
+      "description": "Neutral human-provided evidence sufficiency values.",
+      "free_text": false,
+      "key": "evidence_sufficiency_values",
+      "name": "Evidence sufficiency values",
+      "warnings": {
+        "human_review_only": true,
+        "no_adjudication": true,
+        "review_support_only": true,
+        "value_set_is_not_truth": true
+      }
+    }
+  ],
+  "exported_at": "2026-06-18T20:36:20.122709+00:00",
+  "metadata_definitions": [
+    {
+      "applies_to": [
+        "structured_review_label_bundle",
+        "label_entry",
+        "review_session",
+        "point_manifest",
+        "replay",
+        "observation_quality_profile"
+      ],
+      "description": "Human-provided confidence about a review label or review context.",
+      "human_provided_only": true,
+      "key": "reviewer_confidence",
+      "machine_inferred": false,
+      "multi_select": false,
+      "name": "Reviewer confidence",
+      "required": false,
+      "value_set": "reviewer_confidence_values",
+      "warnings": {
+        "ambiguity_is_not_truth": true,
+        "confidence_is_not_truth": true,
+        "does_not_create_in_out": true,
+        "does_not_create_score": true,
+        "does_not_determine_winner": true,
+        "does_not_identify_players": true,
+        "does_not_validate_correctness": true,
+        "human_review_only": true,
+        "no_adjudication": true,
+        "not_generalization_claim": true,
+        "not_training_truth": true,
+        "observation_only": true,
+        "review_support_only": true
+      }
+    },
+    {
+      "applies_to": [
+        "structured_review_label_bundle",
+        "label_entry",
+        "review_session",
+        "point_manifest",
+        "replay",
+        "observation_quality_profile"
+      ],
+      "description": "Human-provided ambiguity level for a label or review context.",
+      "human_provided_only": true,
+      "key": "ambiguity_level",
+      "machine_inferred": false,
+      "multi_select": false,
+      "name": "Ambiguity level",
+      "required": false,
+      "value_set": "ambiguity_level_values",
+      "warnings": {
+        "ambiguity_is_not_truth": true,
+        "confidence_is_not_truth": true,
+        "does_not_create_in_out": true,
+        "does_not_create_score": true,
+        "does_not_determine_winner": true,
+        "does_not_identify_players": true,
+        "does_not_validate_correctness": true,
+        "human_review_only": true,
+        "no_adjudication": true,
+        "not_generalization_claim": true,
+        "not_training_truth": true,
+        "observation_only": true,
+        "review_support_only": true
+      }
+    },
+    {
+      "applies_to": [
+        "structured_review_label_bundle",
+        "label_entry",
+        "review_session",
+        "point_manifest",
+        "replay",
+        "observation_quality_profile"
+      ],
+      "description": "Human-provided reasons for ambiguity.",
+      "human_provided_only": true,
+      "key": "ambiguity_reasons",
+      "machine_inferred": false,
+      "multi_select": true,
+      "name": "Ambiguity reasons",
+      "required": false,
+      "value_set": "ambiguity_reason_values",
+      "warnings": {
+        "ambiguity_is_not_truth": true,
+        "confidence_is_not_truth": true,
+        "does_not_create_in_out": true,
+        "does_not_create_score": true,
+        "does_not_determine_winner": true,
+        "does_not_identify_players": true,
+        "does_not_validate_correctness": true,
+        "human_review_only": true,
+        "no_adjudication": true,
+        "not_generalization_claim": true,
+        "not_training_truth": true,
+        "observation_only": true,
+        "review_support_only": true
+      }
+    },
+    {
+      "applies_to": [
+        "structured_review_label_bundle",
+        "label_entry",
+        "review_session",
+        "point_manifest",
+        "replay",
+        "observation_quality_profile"
+      ],
+      "description": "Human-provided evidence sufficiency for review.",
+      "human_provided_only": true,
+      "key": "evidence_sufficiency",
+      "machine_inferred": false,
+      "multi_select": false,
+      "name": "Evidence sufficiency",
+      "required": false,
+      "value_set": "evidence_sufficiency_values",
+      "warnings": {
+        "ambiguity_is_not_truth": true,
+        "confidence_is_not_truth": true,
+        "does_not_create_in_out": true,
+        "does_not_create_score": true,
+        "does_not_determine_winner": true,
+        "does_not_identify_players": true,
+        "does_not_validate_correctness": true,
+        "human_review_only": true,
+        "no_adjudication": true,
+        "not_generalization_claim": true,
+        "not_training_truth": true,
+        "observation_only": true,
+        "review_support_only": true
+      }
+    },
+    {
+      "applies_to": [
+        "structured_review_label_bundle",
+        "label_entry",
+        "review_session",
+        "point_manifest",
+        "replay",
+        "observation_quality_profile"
+      ],
+      "description": "Optional human-provided note about uncertainty or ambiguity.",
+      "human_provided_only": true,
+      "key": "reviewer_uncertainty_note",
+      "machine_inferred": false,
+      "multi_select": false,
+      "name": "Reviewer uncertainty note",
+      "required": false,
+      "value_set": "free_text_optional",
+      "warnings": {
+        "ambiguity_is_not_truth": true,
+        "confidence_is_not_truth": true,
+        "does_not_create_in_out": true,
+        "does_not_create_score": true,
+        "does_not_determine_winner": true,
+        "does_not_identify_players": true,
+        "does_not_validate_correctness": true,
+        "human_review_only": true,
+        "no_adjudication": true,
+        "not_generalization_claim": true,
+        "not_training_truth": true,
+        "observation_only": true,
+        "review_support_only": true
+      }
+    },
+    {
+      "applies_to": [
+        "structured_review_label_bundle",
+        "label_entry",
+        "review_session",
+        "point_manifest",
+        "replay",
+        "observation_quality_profile"
+      ],
+      "description": "Human-provided flag for whether another review pass is requested.",
+      "human_provided_only": true,
+      "key": "requires_additional_review",
+      "machine_inferred": false,
+      "multi_select": false,
+      "name": "Requires additional review",
+      "required": false,
+      "value_set": "additional_review_values",
+      "warnings": {
+        "ambiguity_is_not_truth": true,
+        "confidence_is_not_truth": true,
+        "does_not_create_in_out": true,
+        "does_not_create_score": true,
+        "does_not_determine_winner": true,
+        "does_not_identify_players": true,
+        "does_not_validate_correctness": true,
+        "human_review_only": true,
+        "no_adjudication": true,
+        "not_generalization_claim": true,
+        "not_training_truth": true,
+        "observation_only": true,
+        "review_support_only": true
+      }
+    },
+    {
+      "applies_to": [
+        "label_entry",
+        "review_session"
+      ],
+      "description": "Optional neutral bucket for reviewer time spent.",
+      "human_provided_only": true,
+      "key": "reviewer_time_spent_bucket",
+      "machine_inferred": false,
+      "multi_select": false,
+      "name": "Reviewer time spent bucket",
+      "required": false,
+      "value_set": "time_spent_bucket_values",
+      "warnings": {
+        "ambiguity_is_not_truth": true,
+        "confidence_is_not_truth": true,
+        "does_not_create_in_out": true,
+        "does_not_create_score": true,
+        "does_not_determine_winner": true,
+        "does_not_identify_players": true,
+        "does_not_validate_correctness": true,
+        "human_review_only": true,
+        "no_adjudication": true,
+        "not_generalization_claim": true,
+        "not_training_truth": true,
+        "observation_only": true,
+        "review_support_only": true
+      }
+    },
+    {
+      "applies_to": [
+        "structured_review_label_bundle",
+        "label_entry",
+        "review_session",
+        "point_manifest",
+        "replay",
+        "observation_quality_profile"
+      ],
+      "description": "Human-provided review-context completeness label.",
+      "human_provided_only": true,
+      "key": "review_context_complete",
+      "machine_inferred": false,
+      "multi_select": false,
+      "name": "Review context complete",
+      "required": false,
+      "value_set": "review_context_complete_values",
+      "warnings": {
+        "ambiguity_is_not_truth": true,
+        "confidence_is_not_truth": true,
+        "does_not_create_in_out": true,
+        "does_not_create_score": true,
+        "does_not_determine_winner": true,
+        "does_not_identify_players": true,
+        "does_not_validate_correctness": true,
+        "human_review_only": true,
+        "no_adjudication": true,
+        "not_generalization_claim": true,
+        "not_training_truth": true,
+        "observation_only": true,
+        "review_support_only": true
+      }
+    }
+  ],
+  "metadata_value_sets": [
+    {
+      "allowed_values": [
+        "not_assessed",
+        "unknown",
+        "required",
+        "not_required",
+        "not_applicable"
+      ],
+      "default_value": "not_assessed",
+      "description": "Neutral values for whether additional review is requested.",
+      "free_text": false,
+      "key": "additional_review_values",
+      "name": "Additional review values",
+      "warnings": {
+        "human_review_only": true,
+        "no_adjudication": true,
+        "review_support_only": true,
+        "value_set_is_not_truth": true
+      }
+    },
+    {
+      "allowed_values": [
+        "not_assessed",
+        "unknown",
+        "under_30_seconds",
+        "30_to_120_seconds",
+        "over_120_seconds",
+        "not_applicable"
+      ],
+      "default_value": "not_assessed",
+      "description": "Optional neutral review duration buckets.",
+      "free_text": false,
+      "key": "time_spent_bucket_values",
+      "name": "Review time spent bucket values",
+      "warnings": {
+        "human_review_only": true,
+        "no_adjudication": true,
+        "review_support_only": true,
+        "value_set_is_not_truth": true
+      }
+    },
+    {
+      "allowed_values": [
+        "not_assessed",
+        "unknown",
+        "complete",
+        "partially_complete",
+        "incomplete",
+        "not_applicable"
+      ],
+      "default_value": "not_assessed",
+      "description": "Neutral values for human review-context completeness.",
+      "free_text": false,
+      "key": "review_context_complete_values",
+      "name": "Review context completeness values",
+      "warnings": {
+        "human_review_only": true,
+        "no_adjudication": true,
+        "review_support_only": true,
+        "value_set_is_not_truth": true
+      }
+    },
+    {
+      "allowed_values": [],
+      "default_value": null,
+      "description": "Optional human-provided reviewer text.",
+      "free_text": true,
+      "key": "free_text_optional",
+      "name": "Optional free text",
+      "warnings": {
+        "human_review_only": true,
+        "no_adjudication": true,
+        "review_support_only": true,
+        "value_set_is_not_truth": true
+      }
+    }
+  ],
+  "provenance_requirements": {
+    "associated_run_ids_allowed": [
+      "event_candidate_run_id",
+      "trajectory_3d_run_id",
+      "camera_geometry_id"
+    ],
+    "confidence_bundle_type_required": "reviewer_confidence_ambiguity_bundle",
+    "confidence_bundle_version_required": "v1",
+    "media_id_recommended": true,
+    "point_manifest_id_recommended": true,
+    "provenance_only": true,
+    "replay_url_recommended": true,
+    "review_label_schema_version_required": "v1",
+    "schema_version_required": "v1"
+  },
+  "schema_type": "reviewer_confidence_ambiguity_schema",
+  "schema_version": "v1",
+  "tom_provenance": {
+    "blueprint": "blueprint_28",
+    "blueprint_name": "reviewer_confidence_ambiguity_capture_v1",
+    "project": "tom-v3-simple",
+    "project_version": "0.0.0"
+  },
+  "validation_rules": {
+    "allowed_values_only": true,
+    "does_not_create_labels": true,
+    "does_not_infer_missing_confidence": true,
+    "does_not_validate_confidence_appropriateness": true,
+    "does_not_validate_truth": true,
+    "forbidden_fields": [
+      "accepted",
+      "adjudication",
+      "correct",
+      "in_out",
+      "incorrect",
+      "player_identity",
+      "point_winner",
+      "receiver",
+      "rejected",
+      "score",
+      "server",
+      "winner"
+    ],
+    "forbidden_values": [
+      "accepted",
+      "correct",
+      "in",
+      "incorrect",
+      "out",
+      "player_a",
+      "player_b",
+      "receiver",
+      "rejected",
+      "score",
+      "server",
+      "winner"
+    ],
+    "human_provided_only_required": true,
+    "known_metadata_keys_only": true,
+    "machine_inferred_must_be_false": true,
+    "optional_review_label_schema_label_key_validation": true,
+    "structural_validation_only": true
+  },
+  "warnings": {
+    "ambiguity_is_not_truth": true,
+    "confidence_is_not_truth": true,
+    "does_not_create_3d_candidates": true,
+    "does_not_create_automatic_confidence_scores": true,
+    "does_not_create_event_candidates": true,
+    "does_not_create_in_out": true,
+    "does_not_create_labels": true,
+    "does_not_create_observations": true,
+    "does_not_create_score": true,
+    "does_not_determine_winner": true,
+    "does_not_identify_players": true,
+    "does_not_infer_truth": true,
+    "does_not_validate_correctness": true,
+    "human_review_only": true,
+    "no_adjudication": true,
+    "not_generalization_claim": true,
+    "not_training_truth": true,
+    "observation_only": true,
+    "review_support_only": true,
+    "schema_is_not_truth": true
+  }
+}
