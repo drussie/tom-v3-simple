@@ -234,6 +234,18 @@ from apps.worker.services.real_broadcast_gameplay_gate_corpus_run import (
     run_real_broadcast_gameplay_corpus,
     validate_real_broadcast_gameplay_corpus_manifest,
 )
+from apps.worker.services.real_broadcast_gameplay_review_loop import (
+    DEFAULT_REAL_BROADCAST_GAMEPLAY_HUMAN_REVIEW_READINESS_REPORT_OUTPUT,
+    DEFAULT_REAL_BROADCAST_GAMEPLAY_REVIEW_BUNDLE_TEMPLATE_OUTPUT,
+    DEFAULT_REAL_BROADCAST_GAMEPLAY_REVIEW_BUNDLE_VALIDATION_OUTPUT,
+    DEFAULT_REAL_BROADCAST_GAMEPLAY_REVIEW_LOOP_CONTRACT_OUTPUT,
+    DEFAULT_REAL_BROADCAST_GAMEPLAY_REVIEW_LOOP_REPORT_OUTPUT,
+    build_real_broadcast_gameplay_human_review_readiness_report,
+    build_real_broadcast_gameplay_review_bundle_template,
+    build_real_broadcast_gameplay_review_loop_report,
+    export_real_broadcast_gameplay_review_loop_contract,
+    validate_real_broadcast_gameplay_review_bundle,
+)
 from apps.worker.services.real_court_keypoint_replay import run_real_court_keypoint_replay
 from apps.worker.services.real_detection_replay import run_real_detection_replay
 from apps.worker.services.real_pose_replay import run_real_pose_replay
@@ -3876,6 +3888,147 @@ def main() -> None:
         skip_create_db=True,
     )
 
+    real_broadcast_review_contract_parser = subcommands.add_parser(
+        "export-real-broadcast-gameplay-review-loop-contract",
+        help="Export the Blueprint 47 real broadcast gameplay review loop contract.",
+    )
+    real_broadcast_review_contract_parser.add_argument(
+        "--output",
+        default=DEFAULT_REAL_BROADCAST_GAMEPLAY_REVIEW_LOOP_CONTRACT_OUTPUT,
+        help="JSON real broadcast gameplay review loop contract output path.",
+    )
+    real_broadcast_review_contract_parser.add_argument("--skip-create-db", action="store_true")
+    real_broadcast_review_contract_parser.set_defaults(
+        handler=_handle_export_real_broadcast_gameplay_review_loop_contract,
+        skip_create_db=True,
+    )
+
+    real_broadcast_review_bundle_parser = subcommands.add_parser(
+        "build-real-broadcast-gameplay-review-bundle-template",
+        help="Build a BP47 human-review bundle template from BP46/BP44 outputs.",
+    )
+    real_broadcast_review_bundle_parser.add_argument(
+        "--contract",
+        default=DEFAULT_REAL_BROADCAST_GAMEPLAY_REVIEW_LOOP_CONTRACT_OUTPUT,
+        help="Blueprint 47 real broadcast gameplay review loop contract JSON path.",
+    )
+    real_broadcast_review_bundle_parser.add_argument(
+        "--source-corpus-run",
+        default=DEFAULT_REAL_BROADCAST_GAMEPLAY_CORPUS_OUTPUT,
+        help="Blueprint 46 real broadcast gameplay corpus run JSON path.",
+    )
+    real_broadcast_review_bundle_parser.add_argument(
+        "--source-review-dataset",
+        help="Optional BP44 gameplay gate review dataset JSON path.",
+    )
+    real_broadcast_review_bundle_parser.add_argument(
+        "--source-replay-timeline",
+        help="Optional BP41 replay timeline JSON path.",
+    )
+    real_broadcast_review_bundle_parser.add_argument(
+        "--source-routing-plan",
+        help="Optional BP39 routing plan JSON path.",
+    )
+    real_broadcast_review_bundle_parser.add_argument(
+        "--source-execution-plan",
+        help="Optional BP40 execution plan JSON path.",
+    )
+    real_broadcast_review_bundle_parser.add_argument(
+        "--source-regression-baseline",
+        default=DEFAULT_GAMEPLAY_GATE_REGRESSION_BASELINE_OUTPUT,
+        help="Optional BP43 gameplay gate regression baseline JSON path.",
+    )
+    real_broadcast_review_bundle_parser.add_argument(
+        "--model-asset-path",
+        default=DEFAULT_GAMEPLAY_CLASSIFIER_ASSET_PATH,
+        help="Local TOM v1 gameplay classifier asset path.",
+    )
+    real_broadcast_review_bundle_parser.add_argument(
+        "--output",
+        default=DEFAULT_REAL_BROADCAST_GAMEPLAY_REVIEW_BUNDLE_TEMPLATE_OUTPUT,
+        help="JSON real broadcast gameplay review bundle template output path.",
+    )
+    real_broadcast_review_bundle_parser.add_argument("--skip-create-db", action="store_true")
+    real_broadcast_review_bundle_parser.set_defaults(
+        handler=_handle_build_real_broadcast_gameplay_review_bundle_template,
+        skip_create_db=True,
+    )
+
+    real_broadcast_review_validate_parser = subcommands.add_parser(
+        "validate-real-broadcast-gameplay-review-bundle",
+        help="Validate a BP47 real broadcast gameplay review bundle structurally.",
+    )
+    real_broadcast_review_validate_parser.add_argument(
+        "--contract",
+        default=DEFAULT_REAL_BROADCAST_GAMEPLAY_REVIEW_LOOP_CONTRACT_OUTPUT,
+        help="Blueprint 47 real broadcast gameplay review loop contract JSON path.",
+    )
+    real_broadcast_review_validate_parser.add_argument(
+        "--bundle",
+        required=True,
+        help="Blueprint 47 real broadcast gameplay review bundle JSON path.",
+    )
+    real_broadcast_review_validate_parser.add_argument(
+        "--output",
+        default=DEFAULT_REAL_BROADCAST_GAMEPLAY_REVIEW_BUNDLE_VALIDATION_OUTPUT,
+        help="Optional JSON review bundle validation output path.",
+    )
+    real_broadcast_review_validate_parser.add_argument("--skip-create-db", action="store_true")
+    real_broadcast_review_validate_parser.set_defaults(
+        handler=_handle_validate_real_broadcast_gameplay_review_bundle,
+        skip_create_db=True,
+    )
+
+    real_broadcast_review_report_parser = subcommands.add_parser(
+        "build-real-broadcast-gameplay-review-loop-report",
+        help="Build a BP47 report summarizing human review metadata coverage.",
+    )
+    real_broadcast_review_report_parser.add_argument(
+        "--contract",
+        default=DEFAULT_REAL_BROADCAST_GAMEPLAY_REVIEW_LOOP_CONTRACT_OUTPUT,
+        help="Blueprint 47 real broadcast gameplay review loop contract JSON path.",
+    )
+    real_broadcast_review_report_parser.add_argument(
+        "--bundle",
+        default=DEFAULT_REAL_BROADCAST_GAMEPLAY_REVIEW_BUNDLE_TEMPLATE_OUTPUT,
+        help="Blueprint 47 real broadcast gameplay review bundle JSON path.",
+    )
+    real_broadcast_review_report_parser.add_argument(
+        "--output",
+        default=DEFAULT_REAL_BROADCAST_GAMEPLAY_REVIEW_LOOP_REPORT_OUTPUT,
+        help="JSON real broadcast gameplay review loop report output path.",
+    )
+    real_broadcast_review_report_parser.add_argument("--skip-create-db", action="store_true")
+    real_broadcast_review_report_parser.set_defaults(
+        handler=_handle_build_real_broadcast_gameplay_review_loop_report,
+        skip_create_db=True,
+    )
+
+    real_broadcast_review_readiness_parser = subcommands.add_parser(
+        "build-real-broadcast-gameplay-human-review-readiness-report",
+        help="Build a BP47 human review readiness report from a review bundle.",
+    )
+    real_broadcast_review_readiness_parser.add_argument(
+        "--contract",
+        default=DEFAULT_REAL_BROADCAST_GAMEPLAY_REVIEW_LOOP_CONTRACT_OUTPUT,
+        help="Blueprint 47 real broadcast gameplay review loop contract JSON path.",
+    )
+    real_broadcast_review_readiness_parser.add_argument(
+        "--bundle",
+        default=DEFAULT_REAL_BROADCAST_GAMEPLAY_REVIEW_BUNDLE_TEMPLATE_OUTPUT,
+        help="Blueprint 47 real broadcast gameplay review bundle JSON path.",
+    )
+    real_broadcast_review_readiness_parser.add_argument(
+        "--output",
+        default=DEFAULT_REAL_BROADCAST_GAMEPLAY_HUMAN_REVIEW_READINESS_REPORT_OUTPUT,
+        help="JSON real broadcast gameplay human review readiness report output path.",
+    )
+    real_broadcast_review_readiness_parser.add_argument("--skip-create-db", action="store_true")
+    real_broadcast_review_readiness_parser.set_defaults(
+        handler=_handle_build_real_broadcast_gameplay_human_review_readiness_report,
+        skip_create_db=True,
+    )
+
     point_evaluation_parser = subcommands.add_parser(
         "evaluate-point-candidates",
         help="Evaluate generated point candidate markers using operator review metadata.",
@@ -6252,6 +6405,68 @@ def _handle_build_real_broadcast_gameplay_corpus_report(
     return build_real_broadcast_gameplay_corpus_report(
         contract_path=args.contract,
         corpus_run_path=args.corpus_run,
+        output_path=args.output,
+    )
+
+
+def _handle_export_real_broadcast_gameplay_review_loop_contract(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return export_real_broadcast_gameplay_review_loop_contract(output_path=args.output)
+
+
+def _handle_build_real_broadcast_gameplay_review_bundle_template(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_real_broadcast_gameplay_review_bundle_template(
+        contract_path=args.contract,
+        source_corpus_run_path=args.source_corpus_run,
+        source_review_dataset_path=args.source_review_dataset,
+        source_replay_timeline_path=args.source_replay_timeline,
+        source_routing_plan_path=args.source_routing_plan,
+        source_execution_plan_path=args.source_execution_plan,
+        source_regression_baseline_path=args.source_regression_baseline,
+        model_asset_path=args.model_asset_path,
+        output_path=args.output,
+    )
+
+
+def _handle_validate_real_broadcast_gameplay_review_bundle(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_real_broadcast_gameplay_review_bundle(
+        contract_path=args.contract,
+        bundle_path=args.bundle,
+        output_path=args.output,
+    )
+
+
+def _handle_build_real_broadcast_gameplay_review_loop_report(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_real_broadcast_gameplay_review_loop_report(
+        contract_path=args.contract,
+        bundle_path=args.bundle,
+        output_path=args.output,
+    )
+
+
+def _handle_build_real_broadcast_gameplay_human_review_readiness_report(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_real_broadcast_gameplay_human_review_readiness_report(
+        contract_path=args.contract,
+        bundle_path=args.bundle,
         output_path=args.output,
     )
 

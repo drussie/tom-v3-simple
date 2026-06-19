@@ -1,5 +1,38 @@
 # TOM v3 Simple - Implementation Log
 
+## Real Broadcast Gameplay Review Loop v1
+
+Status: complete when accepted
+
+### Goal
+
+Create the first structured human review metadata loop over real-broadcast gameplay gate corpus
+outputs without creating labels, classifier correctness/accuracy claims, automatic relabeling,
+tennis truth, reviewer scoring, production readiness, generalization, or adjudication.
+
+### Outcome
+
+The milestone adds:
+
+- a tracked real broadcast gameplay review loop contract
+- CLI and Make targets to export the contract, build/validate review bundle templates, build a
+  review-loop report, and build a human review readiness report
+- review entries derived from existing BP46/BP44 artifacts with replay URLs, timestamps,
+  classifier evidence, routing/execution context, baseline context, expected broadcast tags, and
+  blank/not-assessed human review metadata
+- post-Codex validation coverage for the BP47 smoke path using temporary outputs
+- focused tests for contract stability, bundle generation, validation guardrails, reporting, and
+  readiness
+
+### Non-goals
+
+- No classifier training, classifier scoring, or classifier accuracy claim.
+- No model asset mutation, committed weights, or regression baseline mutation.
+- No truth labels, point detection claim, line-call claim, score, player identity, or
+  adjudication.
+- No automatic relabeling, reviewer ranking/scoring, production-readiness claim, or
+  generalization claim.
+
 ## Real Broadcast Gameplay Gate Corpus Run v1
 
 Status: complete when accepted

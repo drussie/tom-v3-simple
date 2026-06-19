@@ -2153,6 +2153,59 @@ validations, corpus run outputs, per-entry artifacts, and readiness reports live
 `.data/exports/` and should stay local unless a future milestone explicitly documents committing
 reviewed corpus fixtures.
 
+## Real Broadcast Gameplay Review Loop
+
+Blueprint 47 builds a human review metadata loop over Blueprint 46 corpus run outputs and
+Blueprint 44 review dataset entries. It reads existing artifacts, preserves replay URLs,
+timestamps, classifier probabilities, statuses, routing/execution context, baseline context, and
+expected broadcast tags, then emits a review bundle template. It does not infer labels, score the
+classifier, relabel automatically, decide tennis truth, mutate model assets, or mutate baselines.
+
+Export the tracked contract:
+
+```bash
+make tom-v1-export-real-broadcast-gameplay-review-loop-contract \
+  PYTHON=.venv/bin/python
+```
+
+Build a review bundle template from the latest local BP46 corpus run:
+
+```bash
+make tom-v1-build-real-broadcast-gameplay-review-bundle-template \
+  PYTHON=.venv/bin/python \
+  REAL_BROADCAST_GAMEPLAY_REVIEW_SOURCE_CORPUS_RUN=.data/exports/real_broadcast_gameplay_corpus_run.current.json
+```
+
+Validate a review bundle:
+
+```bash
+make tom-v1-validate-real-broadcast-gameplay-review-bundle \
+  PYTHON=.venv/bin/python
+```
+
+Build review metadata coverage and distribution reporting:
+
+```bash
+make tom-v1-build-real-broadcast-gameplay-review-loop-report \
+  PYTHON=.venv/bin/python
+```
+
+Build the human review readiness report:
+
+```bash
+make tom-v1-build-real-broadcast-gameplay-human-review-readiness-report \
+  PYTHON=.venv/bin/python
+```
+
+The tracked artifact is
+`.data/contracts/real_broadcast_gameplay_review_loop_contract_v1.json`. Generated review bundles,
+validations, review-loop reports, and readiness reports live under `.data/exports/` and should
+stay local unless a future milestone explicitly documents committing reviewed fixtures.
+
+Human review fields are metadata only. They do not create training truth, gameplay truth,
+classifier correctness, classifier accuracy, accepted/rejected lifecycle, automatic relabeling,
+reviewer scoring, production readiness, generalization, or adjudication.
+
 ## Camera Geometry Calibration Provenance
 
 Blueprint 36 builds a structural camera geometry / calibration provenance profile from existing

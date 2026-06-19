@@ -256,6 +256,18 @@ REAL_BROADCAST_GAMEPLAY_CORPUS_SOURCE_LABEL ?= real_broadcast_gameplay_corpus_en
 REAL_BROADCAST_GAMEPLAY_CORPUS_CONTENT_TAG ?= unknown
 REAL_BROADCAST_GAMEPLAY_CORPUS_REQUESTED_STEP ?=
 REAL_BROADCAST_GAMEPLAY_CORPUS_ALLOW_FIXTURE_MODE ?= false
+REAL_BROADCAST_GAMEPLAY_REVIEW_LOOP_CONTRACT_OUTPUT ?= .data/contracts/real_broadcast_gameplay_review_loop_contract_v1.json
+REAL_BROADCAST_GAMEPLAY_REVIEW_BUNDLE_OUTPUT ?= .data/exports/real_broadcast_gameplay_review_bundle.template.json
+REAL_BROADCAST_GAMEPLAY_REVIEW_BUNDLE ?= $(REAL_BROADCAST_GAMEPLAY_REVIEW_BUNDLE_OUTPUT)
+REAL_BROADCAST_GAMEPLAY_REVIEW_BUNDLE_VALIDATION_OUTPUT ?= .data/exports/real_broadcast_gameplay_review_bundle.validation.json
+REAL_BROADCAST_GAMEPLAY_REVIEW_LOOP_REPORT_OUTPUT ?= .data/exports/real_broadcast_gameplay_review_loop_report.current.json
+REAL_BROADCAST_GAMEPLAY_HUMAN_REVIEW_READINESS_REPORT_OUTPUT ?= .data/exports/real_broadcast_gameplay_human_review_readiness_report.current.json
+REAL_BROADCAST_GAMEPLAY_REVIEW_SOURCE_CORPUS_RUN ?= $(REAL_BROADCAST_GAMEPLAY_CORPUS_OUTPUT)
+REAL_BROADCAST_GAMEPLAY_REVIEW_SOURCE_REVIEW_DATASET ?=
+REAL_BROADCAST_GAMEPLAY_REVIEW_SOURCE_REPLAY_TIMELINE ?=
+REAL_BROADCAST_GAMEPLAY_REVIEW_SOURCE_ROUTING_PLAN ?=
+REAL_BROADCAST_GAMEPLAY_REVIEW_SOURCE_EXECUTION_PLAN ?=
+REAL_BROADCAST_GAMEPLAY_REVIEW_SOURCE_REGRESSION_BASELINE ?= $(GAMEPLAY_GATE_REGRESSION_BASELINE_OUTPUT)
 EXPECTED_BRANCH ?=
 EXPECTED_TAG ?=
 FORMAT ?= json
@@ -350,6 +362,7 @@ export TOM_V3_DATABASE_URL
 .PHONY: tom-v1-export-gameplay-gate-review-dataset-contract tom-v1-build-gameplay-gate-review-dataset tom-v1-validate-gameplay-gate-review-dataset tom-v1-build-gameplay-gate-review-dataset-report
 .PHONY: tom-v1-build-gameplay-gate-pathway-completion-freeze tom-v1-validate-gameplay-gate-pathway-completion-freeze tom-v1-build-gameplay-gate-next-phase-readiness-report
 .PHONY: tom-v1-export-real-broadcast-gameplay-corpus-run-contract tom-v1-build-real-broadcast-gameplay-corpus-manifest-template tom-v1-validate-real-broadcast-gameplay-corpus-manifest tom-v1-run-real-broadcast-gameplay-corpus tom-v1-build-real-broadcast-gameplay-corpus-report
+.PHONY: tom-v1-export-real-broadcast-gameplay-review-loop-contract tom-v1-build-real-broadcast-gameplay-review-bundle-template tom-v1-validate-real-broadcast-gameplay-review-bundle tom-v1-build-real-broadcast-gameplay-review-loop-report tom-v1-build-real-broadcast-gameplay-human-review-readiness-report
 
 install:
 	$(PYTHON) -m pip install -e ".[dev]"
@@ -922,6 +935,21 @@ tom-v1-run-real-broadcast-gameplay-corpus:
 
 tom-v1-build-real-broadcast-gameplay-corpus-report:
 	$(PYTHON) -m apps.worker.cli build-real-broadcast-gameplay-corpus-report --contract "$(REAL_BROADCAST_GAMEPLAY_CORPUS_CONTRACT_OUTPUT)" --corpus-run "$(REAL_BROADCAST_GAMEPLAY_CORPUS_RUN)" --output "$(REAL_BROADCAST_GAMEPLAY_CORPUS_REPORT_OUTPUT)" --skip-create-db
+
+tom-v1-export-real-broadcast-gameplay-review-loop-contract:
+	$(PYTHON) -m apps.worker.cli export-real-broadcast-gameplay-review-loop-contract --output "$(REAL_BROADCAST_GAMEPLAY_REVIEW_LOOP_CONTRACT_OUTPUT)" --skip-create-db
+
+tom-v1-build-real-broadcast-gameplay-review-bundle-template:
+	$(PYTHON) -m apps.worker.cli build-real-broadcast-gameplay-review-bundle-template --contract "$(REAL_BROADCAST_GAMEPLAY_REVIEW_LOOP_CONTRACT_OUTPUT)" --source-corpus-run "$(REAL_BROADCAST_GAMEPLAY_REVIEW_SOURCE_CORPUS_RUN)" $(if $(REAL_BROADCAST_GAMEPLAY_REVIEW_SOURCE_REVIEW_DATASET),--source-review-dataset "$(REAL_BROADCAST_GAMEPLAY_REVIEW_SOURCE_REVIEW_DATASET)",) $(if $(REAL_BROADCAST_GAMEPLAY_REVIEW_SOURCE_REPLAY_TIMELINE),--source-replay-timeline "$(REAL_BROADCAST_GAMEPLAY_REVIEW_SOURCE_REPLAY_TIMELINE)",) $(if $(REAL_BROADCAST_GAMEPLAY_REVIEW_SOURCE_ROUTING_PLAN),--source-routing-plan "$(REAL_BROADCAST_GAMEPLAY_REVIEW_SOURCE_ROUTING_PLAN)",) $(if $(REAL_BROADCAST_GAMEPLAY_REVIEW_SOURCE_EXECUTION_PLAN),--source-execution-plan "$(REAL_BROADCAST_GAMEPLAY_REVIEW_SOURCE_EXECUTION_PLAN)",) --source-regression-baseline "$(REAL_BROADCAST_GAMEPLAY_REVIEW_SOURCE_REGRESSION_BASELINE)" --model-asset-path "$(GAMEPLAY_CLASSIFIER_ASSET_PATH)" --output "$(REAL_BROADCAST_GAMEPLAY_REVIEW_BUNDLE_OUTPUT)" --skip-create-db
+
+tom-v1-validate-real-broadcast-gameplay-review-bundle:
+	$(PYTHON) -m apps.worker.cli validate-real-broadcast-gameplay-review-bundle --contract "$(REAL_BROADCAST_GAMEPLAY_REVIEW_LOOP_CONTRACT_OUTPUT)" --bundle "$(REAL_BROADCAST_GAMEPLAY_REVIEW_BUNDLE)" --output "$(REAL_BROADCAST_GAMEPLAY_REVIEW_BUNDLE_VALIDATION_OUTPUT)" --skip-create-db
+
+tom-v1-build-real-broadcast-gameplay-review-loop-report:
+	$(PYTHON) -m apps.worker.cli build-real-broadcast-gameplay-review-loop-report --contract "$(REAL_BROADCAST_GAMEPLAY_REVIEW_LOOP_CONTRACT_OUTPUT)" --bundle "$(REAL_BROADCAST_GAMEPLAY_REVIEW_BUNDLE)" --output "$(REAL_BROADCAST_GAMEPLAY_REVIEW_LOOP_REPORT_OUTPUT)" --skip-create-db
+
+tom-v1-build-real-broadcast-gameplay-human-review-readiness-report:
+	$(PYTHON) -m apps.worker.cli build-real-broadcast-gameplay-human-review-readiness-report --contract "$(REAL_BROADCAST_GAMEPLAY_REVIEW_LOOP_CONTRACT_OUTPUT)" --bundle "$(REAL_BROADCAST_GAMEPLAY_REVIEW_BUNDLE)" --output "$(REAL_BROADCAST_GAMEPLAY_HUMAN_REVIEW_READINESS_REPORT_OUTPUT)" --skip-create-db
 
 tom-v1-post-codex-validate:
 	scripts/post_codex_validate.sh $(if $(EXPECTED_BRANCH),--branch "$(EXPECTED_BRANCH)",) $(if $(EXPECTED_TAG),--expected-tag "$(EXPECTED_TAG)",) --python "$(PYTHON)"

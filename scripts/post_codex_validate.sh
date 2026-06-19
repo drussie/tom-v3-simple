@@ -641,4 +641,34 @@ run "$PYTHON_BIN" -m apps.worker.cli build-real-broadcast-gameplay-corpus-report
   --output "$TMP_ROOT/real_broadcast_gameplay_corpus_report.current.json" \
   --skip-create-db
 
+run "$PYTHON_BIN" -m apps.worker.cli export-real-broadcast-gameplay-review-loop-contract \
+  --output "$TMP_ROOT/real_broadcast_gameplay_review_loop_contract_v1.smoke.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-real-broadcast-gameplay-review-bundle-template \
+  --contract "$TMP_ROOT/real_broadcast_gameplay_review_loop_contract_v1.smoke.json" \
+  --source-corpus-run "$TMP_ROOT/real_broadcast_gameplay_corpus_run.current.json" \
+  --source-regression-baseline "$TMP_ROOT/gameplay_gate_regression.baseline.json" \
+  --model-asset-path "model_assets/tom_v1/view_classifier_gameplay.pt" \
+  --output "$TMP_ROOT/real_broadcast_gameplay_review_bundle.template.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli validate-real-broadcast-gameplay-review-bundle \
+  --contract "$TMP_ROOT/real_broadcast_gameplay_review_loop_contract_v1.smoke.json" \
+  --bundle "$TMP_ROOT/real_broadcast_gameplay_review_bundle.template.json" \
+  --output "$TMP_ROOT/real_broadcast_gameplay_review_bundle.validation.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-real-broadcast-gameplay-review-loop-report \
+  --contract "$TMP_ROOT/real_broadcast_gameplay_review_loop_contract_v1.smoke.json" \
+  --bundle "$TMP_ROOT/real_broadcast_gameplay_review_bundle.template.json" \
+  --output "$TMP_ROOT/real_broadcast_gameplay_review_loop_report.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-real-broadcast-gameplay-human-review-readiness-report \
+  --contract "$TMP_ROOT/real_broadcast_gameplay_review_loop_contract_v1.smoke.json" \
+  --bundle "$TMP_ROOT/real_broadcast_gameplay_review_bundle.template.json" \
+  --output "$TMP_ROOT/real_broadcast_gameplay_human_review_readiness_report.current.json" \
+  --skip-create-db
+
 run git status --short

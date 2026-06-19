@@ -10,6 +10,9 @@ This registry makes TOM v3 Simple boundaries explicit.
 - Gameplay gate review dataset exports are structural review bundles only. They do not prove
   classifier correctness, create labels, establish tennis truth, or make the exported entries
   training-ready.
+- Real broadcast gameplay review loop bundles capture human review metadata only. They do not
+  prove classifier correctness, create training labels, relabel automatically, rank reviewers,
+  score reviewers, establish tennis truth, or make the reviewed entries production-ready.
 - Fixture detection is deterministic demo output.
 - Optional YOLO requires a local optional runtime and local weights outside git.
 - TOM v1 model assets under `model_assets/tom_v1/` are local-only ignored files and are not part of the repository.
