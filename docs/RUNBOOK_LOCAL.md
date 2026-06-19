@@ -1924,6 +1924,74 @@ Expected:
 - `model_assets/tom_v1/view_classifier_gameplay.pt` is recorded as the existing classifier asset,
   but not wired by Blueprint 37
 
+## Gameplay Segment Gate
+
+Blueprint 38 adds a candidate-only gameplay segment gate around the existing local TOM v1 gameplay
+classifier asset. It records classifier asset provenance, builds explicit-media gameplay
+suitability candidate segments, validates the artifact, and emits a replay timeline lane
+structure for future downstream gating. It does not decide tennis truth, score, player identity,
+line calls, point state, automatic correctness, or adjudication.
+
+Export the tracked gate contract:
+
+```bash
+make tom-v1-export-gameplay-segment-gate-contract \
+  PYTHON=.venv/bin/python
+```
+
+Inspect the local classifier asset:
+
+```bash
+make tom-v1-inspect-gameplay-classifier-asset \
+  PYTHON=.venv/bin/python
+```
+
+Build candidate segments from explicit media input:
+
+```bash
+make tom-v1-build-gameplay-segment-candidates \
+  PYTHON=.venv/bin/python \
+  GAMEPLAY_SEGMENT_MEDIA_PATH=demo_assets/sample_point.mp4 \
+  GAMEPLAY_SEGMENT_MEDIA_ID=sample_point_gameplay_segment_gate_smoke
+```
+
+Validate the candidate artifact:
+
+```bash
+make tom-v1-validate-gameplay-segment-candidates \
+  PYTHON=.venv/bin/python \
+  GAMEPLAY_SEGMENT_CANDIDATES=.data/exports/gameplay_segment_candidates.current.json
+```
+
+Build the structural report:
+
+```bash
+make tom-v1-build-gameplay-segment-report \
+  PYTHON=.venv/bin/python \
+  GAMEPLAY_SEGMENT_CANDIDATES=.data/exports/gameplay_segment_candidates.current.json
+```
+
+Default paths:
+
+```text
+.data/contracts/gameplay_segment_gate_contract_v1.json
+.data/exports/gameplay_classifier_asset_inspection.current.json
+.data/exports/gameplay_segment_candidates.current.json
+.data/exports/gameplay_segment_candidates.validation.json
+.data/exports/gameplay_segment_report.current.json
+```
+
+Expected:
+
+- `ok`: true for contract export, asset inspection, candidate build, validation, and report
+- `contract_type`: `gameplay_segment_gate_contract`
+- `output_type`: `gameplay_segment_candidates`
+- `report_type`: `gameplay_segment_gate_report`
+- `model_asset_path`: `model_assets/tom_v1/view_classifier_gameplay.pt`
+- model asset hash is present when the local asset exists
+- generated `.data/exports/` files stay local and untracked
+- model weights stay ignored and unmodified
+
 ## Point Manifest / Evidence Provenance Contract
 
 Use this when an indexed point needs a durable provenance record for replay/review surfaces,

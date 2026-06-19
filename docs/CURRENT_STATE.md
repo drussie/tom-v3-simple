@@ -4,10 +4,10 @@
 
 - Project name: TOM v3 Simple
 - Repo: drussie/tom-v3-simple
-- Current phase: Blueprint 37 complete; TOM v3 expansion completion freeze recorded
-- Current goal: Preserve the BP22-BP36 structural expansion as tracked provenance/readiness state,
-  keep protected regression gates intact, and prepare the next phase for gameplay segment gating
-  with the existing TOM v1 gameplay classifier asset without wiring it in Blueprint 37
+- Current phase: Blueprint 38 complete; gameplay segment gate contract and candidate artifact path added
+- Current goal: Preserve the BP22-BP36 structural expansion freeze, keep protected regression
+  gates intact, and use the existing local TOM v1 gameplay classifier asset as candidate-only
+  gameplay segment gate provenance for explicit media inputs
 
 ## Mission
 
@@ -17,9 +17,11 @@ A lightweight tennis video observation platform that accepts model output as ope
 
 - Implementation status: complete lightweight local observation/evidence platform with persisted ball/player observations, candidate tracklets, pose schema/normalization/persistence/lineage/viewer/query/review/export foundations, canonical fixture demo, coherent evidence/candidate viewer, TOM-native exports, structural provenance audit, canonical docs, and final completion review
 - Model integration status: fixture gameplay and fixture detection adapters implemented for deterministic dev/test output
-- TOM v1 gameplay detector: known asset, portable source/assets not available in this repo/environment; integration stub documented
+- TOM v1 gameplay detector: local `model_assets/tom_v1/view_classifier_gameplay.pt` asset is
+  inspected/hashed by the Blueprint 38 gameplay segment gate; candidate segment exports remain
+  evidence-only and do not create tennis truth
 - YOLO/YOLO26: optional runtime probe, model weights registration, YOLO-like output normalization, frame-level inference persistence bridge, and local real-YOLO smoke helper implemented; runtime/assets are not required in the base environment
-- TOM v1 model assets bridge: local-only guardrails, TOM v1 model inventory, Makefile helpers, and runbook commands added for optional ball detection, player detection, real-detection-derived tracklets, and pose smoke through existing TOM v3 real perception commands
+- TOM v1 model assets bridge: local-only guardrails, TOM v1 model inventory, Makefile helpers, and runbook commands added for optional ball detection, player detection, real-detection-derived tracklets, pose smoke, and Blueprint 38 gameplay segment gate provenance through existing TOM v3 commands
 - Database: initial SQLAlchemy models and Alembic migration implemented
 - API: FastAPI backend foundation implemented
 - Media indexing: implemented for local files via ffprobe, sha256 checksum, local storage copy/register mode, and frame/time summary
@@ -36,13 +38,16 @@ A lightweight tennis video observation platform that accepts model output as ope
 - Blueprint 6 status: complete; video replay timeline foundation, replay info, local video serving, frame/time mapping, frontend replay route, synchronized detection observation overlay playback, tracklet candidate overlay playback, pose keypoint overlay playback, evidence timeline lanes, Stream Proxy Mode, and completion review are complete
 - Blueprint 7 status: complete; optional real YOLO detection replay, real-vs-fixture labeling, candidate tracklets from real detection observations, optional real pose keypoint observations, court/camera/homography deferral, and final perception orchestration closeout are complete
 - Blueprint 37 status: complete; tracked expansion completion freeze manifest, validator, and next-phase readiness report are implemented without creating new evidence, labels, tennis conclusions, or adjudication
+- Blueprint 38 status: complete; tracked gameplay segment gate contract, classifier asset inspection,
+  candidate segment export, validation, report, and replay timeline artifact are implemented
+  without downstream perception execution, truth labels, scoring, player identity, or adjudication
 - Observation writer: implemented with typed extension rows, lineage, artifacts, and idempotency
 - Worker synthetic seeder: implemented
 - Visual evidence viewer: implemented in `apps/web` with detection bbox overlay, pose keypoint/skeleton overlay, frame artifact image support, run evidence summary, clearer empty states, candidate/evidence wording, readable lineage context, and review/export metadata display
 - Replay workstation: Milestones 6A/6B/6C/6D/6E/6F implemented `/replay/<media_id>` with indexed local video playback, current timestamp/frame display, selected run context, persisted detection overlay chunks, candidate tracklet overlays, pose keypoint/skeleton overlays, layer toggles, run selectors, evidence timeline lanes, click-to-seek/select evidence details, Stream Proxy Mode for video-as-live review, and Blueprint 6 closeout docs; Milestones 7A/7B/7C/7D make real detection runs, real-detection-derived tracklet runs, and real pose runs compatible and source-labeled through `detectionRunId`, `trackletRunId`, and `poseRunId`; Milestones 8E/8F add court keypoint, court line, camera/view, homography candidate, and projection diagnostic replay layers through `courtRunId`, `homographyRunId`, and `projectionDiagnosticRunId`
 - Pose observation foundation: implemented with a typed `pose_observation` table, COCO17 skeleton registry, keypoint summary statistics, fake/serialized pose output normalization, crop projection, worker fixture pose persistence, optional real pose replay persistence, source detection candidate lineage, pose overlay viewer, pose-specific query filters, review annotations, and TOM-native review dataset export; pose observations remain keypoint evidence only
 - Court/homography evidence: Blueprint 8 has started; Milestone 8A adds typed schema contracts, storage models, migration, court template registry, writer persistence support, and fake persistence tests; Milestone 8B adds fixture court keypoint, court line, and camera/view evidence persistence; Milestone 8C adds camera/view query, summary, bundle, and `/court/camera-view` API read models; Milestone 8D adds homography candidate persistence with source court evidence lineage; Milestone 8E adds replay overlays for persisted court keypoints, court lines, camera/view evidence, and homography candidates; Milestone 8F adds projection diagnostic persistence, replay payload/detail support, and court review export, but no real camera/court inference or ball/player court-space projection exists yet
-- Local TOM v1 asset policy: model files under `model_assets/tom_v1/` remain ignored local assets; `best_ball_v2_1280.pt`, `yolo26x.pt`, `yolo26n.pt`, and `yolo26s.pt` are candidate inputs for existing real detection smoke; `yolo26x-pose.pt` is a candidate input for existing real pose smoke; `keypoints_model.pth` and `view_classifier_gameplay.pt` require future TOM v1-specific adapters
+- Local TOM v1 asset policy: model files under `model_assets/tom_v1/` remain ignored local assets; `best_ball_v2_1280.pt`, `yolo26x.pt`, `yolo26n.pt`, and `yolo26s.pt` are candidate inputs for existing real detection smoke; `yolo26x-pose.pt` is a candidate input for existing real pose smoke; `view_classifier_gameplay.pt` is inspected/hashed by the Blueprint 38 gameplay segment gate; `keypoints_model.pth` still requires a future TOM v1-specific adapter
 - Local fixture demo: implemented with worker `run-demo`, Makefile `demo` targets, deterministic media fallback, fixture gameplay/detection/tracklet/pose path, seeded review annotations, pose and tracklet review exports, summary IDs/counts/viewer URLs, and canonical `docs/RUNBOOK_LOCAL.md`
 - Viewer product polish: implemented with shared frontend evidence copy helpers, run evidence summary, detection/tracklet/pose/detail panel wording cleanup, lineage relationship descriptions, artifact/export metadata display, annotation/keypoint metadata display, and viewer payload regression coverage
 - Completion/provenance audit: implemented with worker `completion-audit`, Makefile `completion-audit`, PASS/WARN/FAIL JSON, demo completeness checks, media/run/step/observation/typed-row/lineage/artifact/annotation/export integrity checks, and tests proving the audit passes after `make demo`

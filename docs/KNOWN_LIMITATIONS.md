@@ -308,9 +308,11 @@ TOM v3 Simple does not include:
   refs, regression gates, limitations, and next-phase readiness only. They do not make TOM
   production-generalized, create training labels, wire gameplay classification, prove line calls,
   decide score, identify players, determine winners, or adjudicate evidence.
-- The recommended next phase is the Gameplay Segment Gate / TOM v1 View Classifier Integration
-  using `model_assets/tom_v1/view_classifier_gameplay.pt`; Blueprint 37 records that
-  recommendation but does not implement the classifier integration.
+- Gameplay segment gate artifacts describe candidate gameplay suitability windows and structural
+  downstream gate statuses only. They do not prove gameplay truth, point state, line calls, score,
+  player identity, model correctness, production readiness, training truth, or adjudication. The
+  local TOM v1 classifier asset remains ignored under `model_assets/` and is not copied or
+  committed.
 
 ## Boundary
 

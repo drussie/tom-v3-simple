@@ -3690,3 +3690,48 @@ next phase with `model_assets/tom_v1/view_classifier_gameplay.pt`. It does not g
 ingest media, execute sampling, create labels, mutate baselines, retrain models, wire gameplay
 classification, decide in/out, score, identify players, determine winners, make coaching/tactical
 conclusions, make betting/prediction claims, claim generalization, or adjudicate evidence.
+
+## Blueprint 38 Gameplay Segment Gate / TOM v1 View Classifier Integration v1
+
+Status: complete
+
+### Goal
+
+Add a candidate-only gameplay observation suitability gate around the existing local TOM v1
+gameplay classifier asset without creating tennis truth, scoring, adjudication, downstream
+perception execution, or model asset mutations.
+
+### Notes
+
+This milestone adds:
+
+- `apps.worker.services.gameplay_segment_gate`
+- `export-gameplay-segment-gate-contract` worker CLI command
+- `inspect-gameplay-classifier-asset` worker CLI command
+- `build-gameplay-segment-candidates` worker CLI command
+- `validate-gameplay-segment-candidates` worker CLI command
+- `build-gameplay-segment-report` worker CLI command
+- `tom-v1-export-gameplay-segment-gate-contract` Make helper
+- `tom-v1-inspect-gameplay-classifier-asset` Make helper
+- `tom-v1-build-gameplay-segment-candidates` Make helper
+- `tom-v1-validate-gameplay-segment-candidates` Make helper
+- `tom-v1-build-gameplay-segment-report` Make helper
+- `.data/contracts/gameplay_segment_gate_contract_v1.json` tracked contract path
+- `.data/exports/gameplay_classifier_asset_inspection.current.json` local asset inspection path
+- `.data/exports/gameplay_segment_candidates.current.json` local candidate path
+- `.data/exports/gameplay_segment_candidates.validation.json` local validation path
+- `.data/exports/gameplay_segment_report.current.json` local report path
+- `docs/blueprints/blueprint_38_gameplay_segment_gate_tom_v1_view_classifier_v1.md`
+- `docs/reviews/gameplay_segment_gate_tom_v1_view_classifier_v1.md`
+- `docs/agent_reports/blueprint_38_gameplay_segment_gate_tom_v1_view_classifier_v1_report.md`
+
+The contract defines gate scope, model asset provenance, classification output schema, temporal
+segment schema, smoothing/hysteresis defaults, downstream gate status values, validation rules,
+provenance requirements, and warnings. The candidate builder reads explicit media input only,
+hashes the local classifier asset when present, emits candidate classification rows, groups them
+into candidate segments, and includes a replay timeline lane. The validator checks contract shape,
+asset provenance shape, candidate shape, allowed statuses, required hashes when the asset exists,
+and forbidden fields/values. The report summarizes structural gate output only. Blueprint 38 does
+not decide gameplay truth, in/out, score, point winner, player identity, line calls, model
+correctness, training truth, production truth, or adjudication, and it does not run detections,
+tracklets, pose, court, event, or 3D jobs.

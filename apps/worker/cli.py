@@ -57,6 +57,19 @@ from apps.worker.services.event_candidate_3d_diagnostics import (
 )
 from apps.worker.services.frame_artifacts import extract_frame_artifacts_for_run
 from apps.worker.services.gameplay_adapter import run_gameplay_adapter
+from apps.worker.services.gameplay_segment_gate import (
+    DEFAULT_GAMEPLAY_CLASSIFIER_ASSET_PATH,
+    DEFAULT_GAMEPLAY_CLASSIFIER_INSPECTION_OUTPUT,
+    DEFAULT_GAMEPLAY_SEGMENT_CANDIDATES_OUTPUT,
+    DEFAULT_GAMEPLAY_SEGMENT_GATE_CONTRACT_OUTPUT,
+    DEFAULT_GAMEPLAY_SEGMENT_REPORT_OUTPUT,
+    DEFAULT_GAMEPLAY_SEGMENT_VALIDATION_OUTPUT,
+    build_gameplay_segment_candidates,
+    build_gameplay_segment_report,
+    export_gameplay_segment_gate_contract,
+    inspect_gameplay_classifier_asset,
+    validate_gameplay_segment_candidates,
+)
 from apps.worker.services.hit_bounce_candidates import build_hit_bounce_candidates
 from apps.worker.services.homography_candidate_builder import build_homography_candidates
 from apps.worker.services.intennse_label_alignment import (
@@ -2549,6 +2562,123 @@ def main() -> None:
         skip_create_db=True,
     )
 
+    gameplay_gate_contract_parser = subcommands.add_parser(
+        "export-gameplay-segment-gate-contract",
+        help="Export the Blueprint 38 gameplay segment gate contract.",
+    )
+    gameplay_gate_contract_parser.add_argument(
+        "--output",
+        default=DEFAULT_GAMEPLAY_SEGMENT_GATE_CONTRACT_OUTPUT,
+        help="JSON gameplay segment gate contract output path.",
+    )
+    gameplay_gate_contract_parser.add_argument("--skip-create-db", action="store_true")
+    gameplay_gate_contract_parser.set_defaults(
+        handler=_handle_export_gameplay_segment_gate_contract,
+        skip_create_db=True,
+    )
+
+    gameplay_asset_parser = subcommands.add_parser(
+        "inspect-gameplay-classifier-asset",
+        help="Inspect and hash the local TOM v1 gameplay classifier asset.",
+    )
+    gameplay_asset_parser.add_argument(
+        "--model-asset-path",
+        default=DEFAULT_GAMEPLAY_CLASSIFIER_ASSET_PATH,
+        help="Local TOM v1 gameplay classifier asset path.",
+    )
+    gameplay_asset_parser.add_argument(
+        "--output",
+        default=DEFAULT_GAMEPLAY_CLASSIFIER_INSPECTION_OUTPUT,
+        help="Optional JSON classifier asset inspection output path.",
+    )
+    gameplay_asset_parser.add_argument("--classifier-name", default=None)
+    gameplay_asset_parser.add_argument("--classifier-version", default=None)
+    gameplay_asset_parser.add_argument("--skip-create-db", action="store_true")
+    gameplay_asset_parser.set_defaults(
+        handler=_handle_inspect_gameplay_classifier_asset,
+        skip_create_db=True,
+    )
+
+    gameplay_candidates_parser = subcommands.add_parser(
+        "build-gameplay-segment-candidates",
+        help="Build gameplay segment candidate gate artifacts from explicit media.",
+    )
+    gameplay_candidates_parser.add_argument("--local-media-path", required=True)
+    gameplay_candidates_parser.add_argument("--media-id")
+    gameplay_candidates_parser.add_argument(
+        "--model-asset-path",
+        default=DEFAULT_GAMEPLAY_CLASSIFIER_ASSET_PATH,
+        help="Local TOM v1 gameplay classifier asset path.",
+    )
+    gameplay_candidates_parser.add_argument(
+        "--output",
+        default=DEFAULT_GAMEPLAY_SEGMENT_CANDIDATES_OUTPUT,
+        help="JSON gameplay segment candidates output path.",
+    )
+    gameplay_candidates_parser.add_argument("--threshold", type=float, default=0.55)
+    gameplay_candidates_parser.add_argument("--smoothing-window", type=int, default=3)
+    gameplay_candidates_parser.add_argument("--hysteresis-enter", type=float, default=0.60)
+    gameplay_candidates_parser.add_argument("--hysteresis-exit", type=float, default=0.45)
+    gameplay_candidates_parser.add_argument("--frame-sample-rate", type=int, default=30)
+    gameplay_candidates_parser.add_argument("--max-frames", type=int, default=240)
+    gameplay_candidates_parser.add_argument("--min-segment-duration-ms", type=int, default=500)
+    gameplay_candidates_parser.add_argument(
+        "--inference-mode",
+        default="provenance_fixture",
+        help="Safe local inference mode for candidate artifact generation.",
+    )
+    gameplay_candidates_parser.add_argument(
+        "--viewer-base-url",
+        default="http://127.0.0.1:3000",
+    )
+    gameplay_candidates_parser.add_argument("--skip-create-db", action="store_true")
+    gameplay_candidates_parser.set_defaults(
+        handler=_handle_build_gameplay_segment_candidates,
+        skip_create_db=True,
+    )
+
+    gameplay_validate_parser = subcommands.add_parser(
+        "validate-gameplay-segment-candidates",
+        help="Validate gameplay segment candidate artifacts structurally.",
+    )
+    gameplay_validate_parser.add_argument(
+        "--contract",
+        default=DEFAULT_GAMEPLAY_SEGMENT_GATE_CONTRACT_OUTPUT,
+        help="Gameplay segment gate contract JSON path.",
+    )
+    gameplay_validate_parser.add_argument("--candidates", required=True)
+    gameplay_validate_parser.add_argument(
+        "--output",
+        default=DEFAULT_GAMEPLAY_SEGMENT_VALIDATION_OUTPUT,
+        help="Optional JSON gameplay segment validation output path.",
+    )
+    gameplay_validate_parser.add_argument("--skip-create-db", action="store_true")
+    gameplay_validate_parser.set_defaults(
+        handler=_handle_validate_gameplay_segment_candidates,
+        skip_create_db=True,
+    )
+
+    gameplay_report_parser = subcommands.add_parser(
+        "build-gameplay-segment-report",
+        help="Build a structural gameplay segment gate report.",
+    )
+    gameplay_report_parser.add_argument(
+        "--contract",
+        default=DEFAULT_GAMEPLAY_SEGMENT_GATE_CONTRACT_OUTPUT,
+        help="Gameplay segment gate contract JSON path.",
+    )
+    gameplay_report_parser.add_argument("--candidates", required=True)
+    gameplay_report_parser.add_argument(
+        "--output",
+        default=DEFAULT_GAMEPLAY_SEGMENT_REPORT_OUTPUT,
+        help="JSON gameplay segment report output path.",
+    )
+    gameplay_report_parser.add_argument("--skip-create-db", action="store_true")
+    gameplay_report_parser.set_defaults(
+        handler=_handle_build_gameplay_segment_report,
+        skip_create_db=True,
+    )
+
     point_evaluation_parser = subcommands.add_parser(
         "evaluate-point-candidates",
         help="Evaluate generated point candidate markers using operator review metadata.",
@@ -4405,6 +4535,73 @@ def _handle_build_tom_v3_next_phase_readiness_report(
     del session
     return build_tom_v3_next_phase_readiness_report(
         freeze_path=args.freeze,
+        output_path=args.output,
+    )
+
+
+def _handle_export_gameplay_segment_gate_contract(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return export_gameplay_segment_gate_contract(output_path=args.output)
+
+
+def _handle_inspect_gameplay_classifier_asset(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return inspect_gameplay_classifier_asset(
+        model_asset_path=args.model_asset_path,
+        output_path=args.output,
+        classifier_name=args.classifier_name or "tom-v1-view-classifier-gameplay",
+        classifier_version=args.classifier_version or "v1-local",
+    )
+
+
+def _handle_build_gameplay_segment_candidates(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_gameplay_segment_candidates(
+        local_media_path=args.local_media_path,
+        output_path=args.output,
+        media_id=args.media_id,
+        model_asset_path=args.model_asset_path,
+        threshold=args.threshold,
+        smoothing_window=args.smoothing_window,
+        hysteresis_enter=args.hysteresis_enter,
+        hysteresis_exit=args.hysteresis_exit,
+        frame_sample_rate=args.frame_sample_rate,
+        max_frames=args.max_frames,
+        min_segment_duration_ms=args.min_segment_duration_ms,
+        inference_mode=args.inference_mode,
+        viewer_base_url=args.viewer_base_url,
+    )
+
+
+def _handle_validate_gameplay_segment_candidates(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_gameplay_segment_candidates(
+        contract_path=args.contract,
+        candidates_path=args.candidates,
+        output_path=args.output,
+    )
+
+
+def _handle_build_gameplay_segment_report(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_gameplay_segment_report(
+        contract_path=args.contract,
+        candidates_path=args.candidates,
         output_path=args.output,
     )
 

@@ -1,0 +1,169 @@
+{
+  "contract_type": "gameplay_segment_gate_contract",
+  "contract_version": "v1",
+  "downstream_gate_schema": {
+    "allowed_status_meaning": {
+      "allowed_for_downstream_observation": "Segment appears suitable for future downstream observation jobs.",
+      "blocked_from_downstream_observation": "Segment is structurally blocked from future downstream observation jobs.",
+      "not_applicable": "Downstream gating does not apply to this row.",
+      "not_assessed": "No downstream suitability assessment was made.",
+      "requires_human_review": "Segment is uncertain and should be inspected before downstream use."
+    },
+    "allowed_statuses": [
+      "allowed_for_downstream_observation",
+      "blocked_from_downstream_observation",
+      "not_applicable",
+      "not_assessed",
+      "requires_human_review"
+    ],
+    "future_downstream_jobs_are_not_executed_by_this_contract": true
+  },
+  "exported_at": "2026-06-19T00:00:00+00:00",
+  "gameplay_classification_schema": {
+    "allowed_raw_statuses": [
+      "gameplay_candidate",
+      "non_gameplay_candidate",
+      "not_applicable",
+      "not_assessed",
+      "uncertain"
+    ],
+    "output_type": "gameplay_segment_candidates",
+    "output_version": "v1",
+    "required_fields": [
+      "media_id",
+      "frame_index",
+      "time_ms",
+      "model_asset_ref",
+      "model_asset_sha256",
+      "class_name",
+      "gameplay_probability",
+      "non_gameplay_probability",
+      "threshold",
+      "raw_status",
+      "smoothed_status",
+      "warnings"
+    ]
+  },
+  "gate_scope": {
+    "auto_discovers_media": false,
+    "creates_segment_candidate_artifacts": true,
+    "mutates_regression_baselines": false,
+    "purpose": "gameplay_observation_suitability_gate",
+    "reads_explicit_media_input_only": true,
+    "runs_downstream_perception": false,
+    "silently_ingests_media": false,
+    "uses_existing_tom_v1_classifier_asset": true
+  },
+  "model_asset_contract": {
+    "classifier_name": "tom-v1-view-classifier-gameplay",
+    "classifier_version": "v1-local",
+    "default_model_asset_path": "model_assets/tom_v1/view_classifier_gameplay.pt",
+    "model_asset_is_not_copied_or_committed": true,
+    "model_asset_may_be_missing_in_ci": true,
+    "model_weights_are_local_ignored_assets": true,
+    "required_hash_algorithm": "sha256",
+    "safe_inference_modes": [
+      "asset_inspection_only",
+      "fixture_probabilities",
+      "provenance_fixture"
+    ]
+  },
+  "provenance_requirements": {
+    "classifier_name_required": true,
+    "classifier_version_required": true,
+    "hysteresis_settings_required": true,
+    "inference_mode_required": true,
+    "media_id_required": true,
+    "model_asset_path_required": true,
+    "model_asset_sha256_required_when_asset_exists": true,
+    "smoothing_window_required": true,
+    "source_media_path_or_uri_required": true,
+    "threshold_required": true
+  },
+  "segment_candidate_schema": {
+    "allowed_downstream_gate_statuses": [
+      "allowed_for_downstream_observation",
+      "blocked_from_downstream_observation",
+      "not_applicable",
+      "not_assessed",
+      "requires_human_review"
+    ],
+    "allowed_review_statuses": [
+      "not_applicable",
+      "not_assessed",
+      "requires_human_review",
+      "review_ready"
+    ],
+    "allowed_segment_statuses": [
+      "gameplay_segment_candidate",
+      "needs_review",
+      "non_gameplay_segment_candidate",
+      "not_applicable",
+      "not_assessed",
+      "short_segment_filtered",
+      "uncertain_segment"
+    ],
+    "required_fields": [
+      "segment_id",
+      "media_id",
+      "segment_start_ms",
+      "segment_end_ms",
+      "start_frame_index",
+      "end_frame_index",
+      "duration_ms",
+      "mean_gameplay_probability",
+      "min_gameplay_probability",
+      "max_gameplay_probability",
+      "segment_status",
+      "downstream_gate_status",
+      "review_status",
+      "warnings"
+    ]
+  },
+  "temporal_smoothing_schema": {
+    "default_hysteresis_enter": 0.6,
+    "default_hysteresis_exit": 0.45,
+    "default_min_segment_duration_ms": 500,
+    "default_smoothing_window": 3,
+    "default_threshold": 0.55,
+    "hysteresis_is_gate_stability_only": true,
+    "smoothing_is_structural_only": true
+  },
+  "tom_provenance": {
+    "blueprint": "blueprint_38",
+    "blueprint_name": "gameplay_segment_gate_tom_v1_view_classifier_v1",
+    "project": "tom-v3-simple",
+    "project_version": "0.0.0"
+  },
+  "validation_rules": {
+    "does_not_create_event_labels": true,
+    "does_not_create_point_labels": true,
+    "does_not_infer_tennis_meaning": true,
+    "does_not_modify_regression_baselines": true,
+    "reject_handoff_forbidden_exact_tokens": true,
+    "require_hash_when_asset_exists": true,
+    "structural_errors_only": true,
+    "validate_allowed_statuses": true,
+    "validate_classifier_asset_provenance_shape": true,
+    "validate_contract_shape": true,
+    "validate_segment_candidate_output_shape": true
+  },
+  "warnings": {
+    "candidate_evidence_only": true,
+    "classification_is_structural_suitability_evidence": true,
+    "does_not_claim_automatic_correctness": true,
+    "does_not_claim_generalization": true,
+    "does_not_convert_outputs_into_training_labels": true,
+    "does_not_create_event_labels": true,
+    "does_not_create_in_out": true,
+    "does_not_create_point_labels": true,
+    "does_not_create_score": true,
+    "does_not_determine_winner": true,
+    "does_not_identify_players": true,
+    "does_not_mutate_regression_baselines": true,
+    "does_not_run_downstream_perception": true,
+    "no_adjudication": true,
+    "observation_only": true,
+    "review_support_only": true
+  }
+}

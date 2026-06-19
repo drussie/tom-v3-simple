@@ -377,4 +377,32 @@ run "$PYTHON_BIN" -m apps.worker.cli build-tom-v3-next-phase-readiness-report \
   --output "$TMP_ROOT/tom_v3_next_phase_readiness_report.current.json" \
   --skip-create-db
 
+run "$PYTHON_BIN" -m apps.worker.cli export-gameplay-segment-gate-contract \
+  --output "$TMP_ROOT/gameplay_segment_gate_contract_v1.smoke.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli inspect-gameplay-classifier-asset \
+  --model-asset-path "model_assets/tom_v1/view_classifier_gameplay.pt" \
+  --output "$TMP_ROOT/gameplay_classifier_asset_inspection.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-gameplay-segment-candidates \
+  --local-media-path "demo_assets/sample_point.mp4" \
+  --media-id "sample_point_gameplay_segment_gate_smoke" \
+  --model-asset-path "model_assets/tom_v1/view_classifier_gameplay.pt" \
+  --output "$TMP_ROOT/gameplay_segment_candidates.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli validate-gameplay-segment-candidates \
+  --contract "$TMP_ROOT/gameplay_segment_gate_contract_v1.smoke.json" \
+  --candidates "$TMP_ROOT/gameplay_segment_candidates.current.json" \
+  --output "$TMP_ROOT/gameplay_segment_candidates.validation.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-gameplay-segment-report \
+  --contract "$TMP_ROOT/gameplay_segment_gate_contract_v1.smoke.json" \
+  --candidates "$TMP_ROOT/gameplay_segment_candidates.current.json" \
+  --output "$TMP_ROOT/gameplay_segment_report.current.json" \
+  --skip-create-db
+
 run git status --short
