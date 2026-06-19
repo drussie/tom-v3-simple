@@ -221,6 +221,19 @@ from apps.worker.services.point_evidence_snapshot import build_point_evidence_sn
 from apps.worker.services.point_manifest import build_point_manifest
 from apps.worker.services.pose_adapter import run_pose_adapter
 from apps.worker.services.projection_diagnostic_builder import build_projection_diagnostics
+from apps.worker.services.real_broadcast_gameplay_gate_corpus_run import (
+    DEFAULT_REAL_BROADCAST_GAMEPLAY_CORPUS_CONTRACT_OUTPUT,
+    DEFAULT_REAL_BROADCAST_GAMEPLAY_CORPUS_MANIFEST_OUTPUT,
+    DEFAULT_REAL_BROADCAST_GAMEPLAY_CORPUS_MANIFEST_VALIDATION_OUTPUT,
+    DEFAULT_REAL_BROADCAST_GAMEPLAY_CORPUS_OUTPUT,
+    DEFAULT_REAL_BROADCAST_GAMEPLAY_CORPUS_OUTPUT_DIR,
+    DEFAULT_REAL_BROADCAST_GAMEPLAY_CORPUS_REPORT_OUTPUT,
+    build_real_broadcast_gameplay_corpus_manifest_template,
+    build_real_broadcast_gameplay_corpus_report,
+    export_real_broadcast_gameplay_corpus_run_contract,
+    run_real_broadcast_gameplay_corpus,
+    validate_real_broadcast_gameplay_corpus_manifest,
+)
 from apps.worker.services.real_court_keypoint_replay import run_real_court_keypoint_replay
 from apps.worker.services.real_detection_replay import run_real_detection_replay
 from apps.worker.services.real_pose_replay import run_real_pose_replay
@@ -3656,6 +3669,213 @@ def main() -> None:
         skip_create_db=True,
     )
 
+    real_broadcast_corpus_contract_parser = subcommands.add_parser(
+        "export-real-broadcast-gameplay-corpus-run-contract",
+        help="Export the Blueprint 46 real broadcast gameplay corpus run contract.",
+    )
+    real_broadcast_corpus_contract_parser.add_argument(
+        "--output",
+        default=DEFAULT_REAL_BROADCAST_GAMEPLAY_CORPUS_CONTRACT_OUTPUT,
+        help="JSON real broadcast gameplay corpus contract output path.",
+    )
+    real_broadcast_corpus_contract_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    real_broadcast_corpus_contract_parser.set_defaults(
+        handler=_handle_export_real_broadcast_gameplay_corpus_run_contract,
+        skip_create_db=True,
+    )
+
+    real_broadcast_corpus_manifest_parser = subcommands.add_parser(
+        "build-real-broadcast-gameplay-corpus-manifest-template",
+        help="Build a BP46 explicit real broadcast gameplay corpus manifest template.",
+    )
+    real_broadcast_corpus_manifest_parser.add_argument(
+        "--local-media-path",
+        action="append",
+        default=[],
+        help="Explicit local broadcast-style media path. May be supplied more than once.",
+    )
+    real_broadcast_corpus_manifest_parser.add_argument(
+        "--source-label",
+        default="real_broadcast_gameplay_corpus_entry",
+        help="Source label prefix for generated corpus entries.",
+    )
+    real_broadcast_corpus_manifest_parser.add_argument(
+        "--expected-broadcast-content-tag",
+        action="append",
+        default=[],
+        help="Expected broadcast context tag. May be supplied more than once.",
+    )
+    real_broadcast_corpus_manifest_parser.add_argument(
+        "--requested-step",
+        action="append",
+        default=[],
+        help="Requested corpus step. Defaults to all BP46 safe structural steps.",
+    )
+    real_broadcast_corpus_manifest_parser.add_argument(
+        "--allow-fixture-mode",
+        action="store_true",
+        help="Set allow_fixture_mode=true in generated entries.",
+    )
+    real_broadcast_corpus_manifest_parser.add_argument(
+        "--output",
+        default=DEFAULT_REAL_BROADCAST_GAMEPLAY_CORPUS_MANIFEST_OUTPUT,
+        help="JSON real broadcast gameplay corpus manifest output path.",
+    )
+    real_broadcast_corpus_manifest_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    real_broadcast_corpus_manifest_parser.set_defaults(
+        handler=_handle_build_real_broadcast_gameplay_corpus_manifest_template,
+        skip_create_db=True,
+    )
+
+    real_broadcast_corpus_validate_parser = subcommands.add_parser(
+        "validate-real-broadcast-gameplay-corpus-manifest",
+        help="Validate a BP46 real broadcast gameplay corpus manifest structurally.",
+    )
+    real_broadcast_corpus_validate_parser.add_argument(
+        "--contract",
+        default=DEFAULT_REAL_BROADCAST_GAMEPLAY_CORPUS_CONTRACT_OUTPUT,
+        help="Blueprint 46 real broadcast gameplay corpus contract JSON path.",
+    )
+    real_broadcast_corpus_validate_parser.add_argument(
+        "--manifest",
+        required=True,
+        help="Blueprint 46 real broadcast gameplay corpus manifest JSON path.",
+    )
+    real_broadcast_corpus_validate_parser.add_argument(
+        "--run-mode",
+        default="dry_run",
+        help="Run mode used when validating path requirements.",
+    )
+    real_broadcast_corpus_validate_parser.add_argument(
+        "--output",
+        default=DEFAULT_REAL_BROADCAST_GAMEPLAY_CORPUS_MANIFEST_VALIDATION_OUTPUT,
+        help="Optional JSON corpus manifest validation output path.",
+    )
+    real_broadcast_corpus_validate_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    real_broadcast_corpus_validate_parser.set_defaults(
+        handler=_handle_validate_real_broadcast_gameplay_corpus_manifest,
+        skip_create_db=True,
+    )
+
+    real_broadcast_corpus_run_parser = subcommands.add_parser(
+        "run-real-broadcast-gameplay-corpus",
+        help="Run the BP46 explicit real broadcast gameplay corpus workflow.",
+    )
+    real_broadcast_corpus_run_parser.add_argument(
+        "--contract",
+        default=DEFAULT_REAL_BROADCAST_GAMEPLAY_CORPUS_CONTRACT_OUTPUT,
+        help="Blueprint 46 real broadcast gameplay corpus contract JSON path.",
+    )
+    real_broadcast_corpus_run_parser.add_argument(
+        "--manifest",
+        required=True,
+        help="Blueprint 46 real broadcast gameplay corpus manifest JSON path.",
+    )
+    real_broadcast_corpus_run_parser.add_argument(
+        "--run-mode",
+        default="dry_run",
+        help="Corpus run mode. Defaults to dry_run.",
+    )
+    real_broadcast_corpus_run_parser.add_argument(
+        "--output-dir",
+        default=DEFAULT_REAL_BROADCAST_GAMEPLAY_CORPUS_OUTPUT_DIR,
+        help="Directory for generated corpus entry artifacts.",
+    )
+    real_broadcast_corpus_run_parser.add_argument(
+        "--output",
+        default=DEFAULT_REAL_BROADCAST_GAMEPLAY_CORPUS_OUTPUT,
+        help="JSON corpus run output path.",
+    )
+    real_broadcast_corpus_run_parser.add_argument(
+        "--model-asset-path",
+        default=DEFAULT_GAMEPLAY_CLASSIFIER_ASSET_PATH,
+        help="Local TOM v1 gameplay classifier asset path.",
+    )
+    real_broadcast_corpus_run_parser.add_argument(
+        "--gameplay-segment-contract",
+        default=DEFAULT_GAMEPLAY_SEGMENT_GATE_CONTRACT_OUTPUT,
+        help="Blueprint 38 gameplay segment gate contract path.",
+    )
+    real_broadcast_corpus_run_parser.add_argument(
+        "--routing-contract",
+        default=DEFAULT_GAMEPLAY_GATED_ROUTING_CONTRACT_OUTPUT,
+        help="Blueprint 39 gameplay-gated routing contract path.",
+    )
+    real_broadcast_corpus_run_parser.add_argument(
+        "--execution-contract",
+        default=DEFAULT_GAMEPLAY_GATED_PERCEPTION_EXECUTION_CONTRACT_OUTPUT,
+        help="Blueprint 40 gameplay-gated execution contract path.",
+    )
+    real_broadcast_corpus_run_parser.add_argument(
+        "--replay-review-contract",
+        default=DEFAULT_GAMEPLAY_SEGMENT_REPLAY_REVIEW_CONTRACT_OUTPUT,
+        help="Blueprint 41 replay/review contract path.",
+    )
+    real_broadcast_corpus_run_parser.add_argument(
+        "--review-dataset-contract",
+        default=DEFAULT_GAMEPLAY_GATE_REVIEW_DATASET_CONTRACT_OUTPUT,
+        help="Blueprint 44 gameplay gate review dataset contract path.",
+    )
+    real_broadcast_corpus_run_parser.add_argument(
+        "--viewer-base-url",
+        default="http://127.0.0.1:3000",
+        help="Base URL for replay links.",
+    )
+    real_broadcast_corpus_run_parser.add_argument(
+        "--frame-sample-rate",
+        type=int,
+        default=30,
+        help="Frame sample interval for gameplay segment candidate construction.",
+    )
+    real_broadcast_corpus_run_parser.add_argument(
+        "--max-frames",
+        type=int,
+        default=240,
+        help="Maximum sampled frames per corpus entry.",
+    )
+    real_broadcast_corpus_run_parser.add_argument("--skip-create-db", action="store_true")
+    real_broadcast_corpus_run_parser.set_defaults(
+        handler=_handle_run_real_broadcast_gameplay_corpus,
+        skip_create_db=True,
+    )
+
+    real_broadcast_corpus_report_parser = subcommands.add_parser(
+        "build-real-broadcast-gameplay-corpus-report",
+        help="Build a BP46 human-review readiness report from a corpus run.",
+    )
+    real_broadcast_corpus_report_parser.add_argument(
+        "--contract",
+        default=DEFAULT_REAL_BROADCAST_GAMEPLAY_CORPUS_CONTRACT_OUTPUT,
+        help="Blueprint 46 real broadcast gameplay corpus contract JSON path.",
+    )
+    real_broadcast_corpus_report_parser.add_argument(
+        "--corpus-run",
+        default=DEFAULT_REAL_BROADCAST_GAMEPLAY_CORPUS_OUTPUT,
+        help="Blueprint 46 real broadcast gameplay corpus run JSON path.",
+    )
+    real_broadcast_corpus_report_parser.add_argument(
+        "--output",
+        default=DEFAULT_REAL_BROADCAST_GAMEPLAY_CORPUS_REPORT_OUTPUT,
+        help="JSON corpus readiness report output path.",
+    )
+    real_broadcast_corpus_report_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    real_broadcast_corpus_report_parser.set_defaults(
+        handler=_handle_build_real_broadcast_gameplay_corpus_report,
+        skip_create_db=True,
+    )
+
     point_evaluation_parser = subcommands.add_parser(
         "evaluate-point-candidates",
         help="Evaluate generated point candidate markers using operator review metadata.",
@@ -5959,6 +6179,79 @@ def _handle_build_gameplay_gate_next_phase_readiness_report(
     del session
     return build_gameplay_gate_next_phase_readiness_report(
         freeze_path=args.freeze,
+        output_path=args.output,
+    )
+
+
+def _handle_export_real_broadcast_gameplay_corpus_run_contract(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return export_real_broadcast_gameplay_corpus_run_contract(output_path=args.output)
+
+
+def _handle_build_real_broadcast_gameplay_corpus_manifest_template(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_real_broadcast_gameplay_corpus_manifest_template(
+        local_media_paths=args.local_media_path,
+        source_label=args.source_label,
+        expected_broadcast_content_tags=(
+            args.expected_broadcast_content_tag or None
+        ),
+        requested_steps=args.requested_step or None,
+        output_path=args.output,
+        allow_fixture_mode=args.allow_fixture_mode,
+    )
+
+
+def _handle_validate_real_broadcast_gameplay_corpus_manifest(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_real_broadcast_gameplay_corpus_manifest(
+        contract_path=args.contract,
+        manifest_path=args.manifest,
+        output_path=args.output,
+        run_mode=args.run_mode,
+    )
+
+
+def _handle_run_real_broadcast_gameplay_corpus(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return run_real_broadcast_gameplay_corpus(
+        contract_path=args.contract,
+        manifest_path=args.manifest,
+        run_mode=args.run_mode,
+        output_dir=args.output_dir,
+        output_path=args.output,
+        model_asset_path=args.model_asset_path,
+        gameplay_segment_contract_path=args.gameplay_segment_contract,
+        routing_contract_path=args.routing_contract,
+        execution_contract_path=args.execution_contract,
+        replay_review_contract_path=args.replay_review_contract,
+        review_dataset_contract_path=args.review_dataset_contract,
+        viewer_base_url=args.viewer_base_url,
+        frame_sample_rate=args.frame_sample_rate,
+        max_frames=args.max_frames,
+    )
+
+
+def _handle_build_real_broadcast_gameplay_corpus_report(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_real_broadcast_gameplay_corpus_report(
+        contract_path=args.contract,
+        corpus_run_path=args.corpus_run,
         output_path=args.output,
     )
 

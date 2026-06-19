@@ -1,5 +1,39 @@
 # TOM v3 Simple - Implementation Log
 
+## Real Broadcast Gameplay Gate Corpus Run v1
+
+Status: complete when accepted
+
+### Goal
+
+Create the first controlled real-broadcast gameplay gate corpus run over explicit local media
+entries without training or mutating the classifier, silently scanning folders, creating labels,
+claiming classifier correctness/accuracy, proving generalization, deciding tennis truth, or
+adjudicating evidence.
+
+### Outcome
+
+The milestone adds:
+
+- a tracked real broadcast gameplay corpus run contract
+- CLI and Make targets to export the contract, build/validate explicit manifests, run the corpus
+  path, and build a human review readiness report
+- safe run modes with `dry_run` as the default and explicit real-data modes for processing
+- expected broadcast content tags that are preserved as operator context only
+- per-entry structural artifacts for gameplay segment candidates, routing, execution planning,
+  replay timeline, and review dataset export
+- post-Codex validation coverage for the BP46 fixture-mode corpus path using temporary outputs
+- focused tests for manifest/run/report guardrails
+
+### Non-goals
+
+- No classifier training, classifier scoring, or classifier accuracy claim.
+- No model asset mutation, committed weights, or regression baseline mutation.
+- No truth labels, point detection claim, line-call claim, score, player identity, or
+  adjudication.
+- No silent folder scan, arbitrary media ingestion, production-readiness claim, or generalization
+  claim.
+
 ## Gameplay Gate Pathway Completion Freeze v1
 
 Status: complete when accepted

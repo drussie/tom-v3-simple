@@ -602,4 +602,43 @@ run "$PYTHON_BIN" -m apps.worker.cli build-gameplay-gate-next-phase-readiness-re
   --output "$TMP_ROOT/gameplay_gate_next_phase_readiness_report.current.json" \
   --skip-create-db
 
+run "$PYTHON_BIN" -m apps.worker.cli export-real-broadcast-gameplay-corpus-run-contract \
+  --output "$TMP_ROOT/real_broadcast_gameplay_corpus_run_contract_v1.smoke.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-real-broadcast-gameplay-corpus-manifest-template \
+  --local-media-path "demo_assets/sample_point.mp4" \
+  --source-label "post_codex_real_broadcast_fixture_clip" \
+  --expected-broadcast-content-tag "live_gameplay" \
+  --allow-fixture-mode \
+  --output "$TMP_ROOT/real_broadcast_gameplay_corpus_manifest.template.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli validate-real-broadcast-gameplay-corpus-manifest \
+  --contract "$TMP_ROOT/real_broadcast_gameplay_corpus_run_contract_v1.smoke.json" \
+  --manifest "$TMP_ROOT/real_broadcast_gameplay_corpus_manifest.template.json" \
+  --run-mode "fixture_only" \
+  --output "$TMP_ROOT/real_broadcast_gameplay_corpus_manifest.validation.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli run-real-broadcast-gameplay-corpus \
+  --contract "$TMP_ROOT/real_broadcast_gameplay_corpus_run_contract_v1.smoke.json" \
+  --manifest "$TMP_ROOT/real_broadcast_gameplay_corpus_manifest.template.json" \
+  --run-mode "fixture_only" \
+  --output-dir "$TMP_ROOT/real_broadcast_gameplay_corpus_run" \
+  --output "$TMP_ROOT/real_broadcast_gameplay_corpus_run.current.json" \
+  --model-asset-path "model_assets/tom_v1/view_classifier_gameplay.pt" \
+  --gameplay-segment-contract "$TMP_ROOT/gameplay_segment_gate_contract_v1.smoke.json" \
+  --routing-contract "$TMP_ROOT/gameplay_gated_pipeline_routing_contract_v1.smoke.json" \
+  --execution-contract "$TMP_ROOT/gameplay_gated_perception_execution_contract_v1.smoke.json" \
+  --replay-review-contract "$TMP_ROOT/gameplay_segment_replay_review_contract_v1.smoke.json" \
+  --review-dataset-contract "$TMP_ROOT/gameplay_gate_review_dataset_export_contract_v1.smoke.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-real-broadcast-gameplay-corpus-report \
+  --contract "$TMP_ROOT/real_broadcast_gameplay_corpus_run_contract_v1.smoke.json" \
+  --corpus-run "$TMP_ROOT/real_broadcast_gameplay_corpus_run.current.json" \
+  --output "$TMP_ROOT/real_broadcast_gameplay_corpus_report.current.json" \
+  --skip-create-db
+
 run git status --short

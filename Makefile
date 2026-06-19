@@ -242,6 +242,20 @@ GAMEPLAY_GATE_PATHWAY_COMPLETION_FREEZE_OUTPUT ?= .data/contracts/gameplay_gate_
 GAMEPLAY_GATE_PATHWAY_COMPLETION_FREEZE ?= $(GAMEPLAY_GATE_PATHWAY_COMPLETION_FREEZE_OUTPUT)
 GAMEPLAY_GATE_PATHWAY_COMPLETION_VALIDATION_OUTPUT ?= .data/exports/gameplay_gate_pathway_completion_freeze.validation.json
 GAMEPLAY_GATE_NEXT_PHASE_READINESS_REPORT_OUTPUT ?= .data/exports/gameplay_gate_next_phase_readiness_report.current.json
+REAL_BROADCAST_GAMEPLAY_CORPUS_CONTRACT_OUTPUT ?= .data/contracts/real_broadcast_gameplay_corpus_run_contract_v1.json
+REAL_BROADCAST_GAMEPLAY_CORPUS_MANIFEST_OUTPUT ?= .data/exports/real_broadcast_gameplay_corpus_manifest.template.json
+REAL_BROADCAST_GAMEPLAY_CORPUS_MANIFEST ?= $(REAL_BROADCAST_GAMEPLAY_CORPUS_MANIFEST_OUTPUT)
+REAL_BROADCAST_GAMEPLAY_CORPUS_MANIFEST_VALIDATION_OUTPUT ?= .data/exports/real_broadcast_gameplay_corpus_manifest.validation.json
+REAL_BROADCAST_GAMEPLAY_CORPUS_OUTPUT_DIR ?= .data/exports/real_broadcast_gameplay_corpus_run
+REAL_BROADCAST_GAMEPLAY_CORPUS_OUTPUT ?= .data/exports/real_broadcast_gameplay_corpus_run.current.json
+REAL_BROADCAST_GAMEPLAY_CORPUS_RUN ?= $(REAL_BROADCAST_GAMEPLAY_CORPUS_OUTPUT)
+REAL_BROADCAST_GAMEPLAY_CORPUS_REPORT_OUTPUT ?= .data/exports/real_broadcast_gameplay_corpus_report.current.json
+REAL_BROADCAST_GAMEPLAY_CORPUS_RUN_MODE ?= dry_run
+REAL_BROADCAST_GAMEPLAY_CORPUS_MEDIA_PATH ?=
+REAL_BROADCAST_GAMEPLAY_CORPUS_SOURCE_LABEL ?= real_broadcast_gameplay_corpus_entry
+REAL_BROADCAST_GAMEPLAY_CORPUS_CONTENT_TAG ?= unknown
+REAL_BROADCAST_GAMEPLAY_CORPUS_REQUESTED_STEP ?=
+REAL_BROADCAST_GAMEPLAY_CORPUS_ALLOW_FIXTURE_MODE ?= false
 EXPECTED_BRANCH ?=
 EXPECTED_TAG ?=
 FORMAT ?= json
@@ -335,6 +349,7 @@ export TOM_V3_DATABASE_URL
 .PHONY: tom-v1-export-gameplay-gate-regression-baseline-contract tom-v1-build-gameplay-gate-regression-baseline tom-v1-verify-gameplay-gate-regression-baseline tom-v1-build-gameplay-gate-regression-report
 .PHONY: tom-v1-export-gameplay-gate-review-dataset-contract tom-v1-build-gameplay-gate-review-dataset tom-v1-validate-gameplay-gate-review-dataset tom-v1-build-gameplay-gate-review-dataset-report
 .PHONY: tom-v1-build-gameplay-gate-pathway-completion-freeze tom-v1-validate-gameplay-gate-pathway-completion-freeze tom-v1-build-gameplay-gate-next-phase-readiness-report
+.PHONY: tom-v1-export-real-broadcast-gameplay-corpus-run-contract tom-v1-build-real-broadcast-gameplay-corpus-manifest-template tom-v1-validate-real-broadcast-gameplay-corpus-manifest tom-v1-run-real-broadcast-gameplay-corpus tom-v1-build-real-broadcast-gameplay-corpus-report
 
 install:
 	$(PYTHON) -m pip install -e ".[dev]"
@@ -890,6 +905,23 @@ tom-v1-validate-gameplay-gate-pathway-completion-freeze:
 
 tom-v1-build-gameplay-gate-next-phase-readiness-report:
 	$(PYTHON) -m apps.worker.cli build-gameplay-gate-next-phase-readiness-report --freeze "$(GAMEPLAY_GATE_PATHWAY_COMPLETION_FREEZE)" --output "$(GAMEPLAY_GATE_NEXT_PHASE_READINESS_REPORT_OUTPUT)" --skip-create-db
+
+tom-v1-export-real-broadcast-gameplay-corpus-run-contract:
+	$(PYTHON) -m apps.worker.cli export-real-broadcast-gameplay-corpus-run-contract --output "$(REAL_BROADCAST_GAMEPLAY_CORPUS_CONTRACT_OUTPUT)" --skip-create-db
+
+tom-v1-build-real-broadcast-gameplay-corpus-manifest-template:
+	$(PYTHON) -m apps.worker.cli build-real-broadcast-gameplay-corpus-manifest-template $(if $(REAL_BROADCAST_GAMEPLAY_CORPUS_MEDIA_PATH),--local-media-path "$(REAL_BROADCAST_GAMEPLAY_CORPUS_MEDIA_PATH)",) --source-label "$(REAL_BROADCAST_GAMEPLAY_CORPUS_SOURCE_LABEL)" --expected-broadcast-content-tag "$(REAL_BROADCAST_GAMEPLAY_CORPUS_CONTENT_TAG)" $(if $(REAL_BROADCAST_GAMEPLAY_CORPUS_REQUESTED_STEP),--requested-step "$(REAL_BROADCAST_GAMEPLAY_CORPUS_REQUESTED_STEP)",) $(if $(filter true,$(REAL_BROADCAST_GAMEPLAY_CORPUS_ALLOW_FIXTURE_MODE)),--allow-fixture-mode,) --output "$(REAL_BROADCAST_GAMEPLAY_CORPUS_MANIFEST_OUTPUT)" --skip-create-db
+
+tom-v1-validate-real-broadcast-gameplay-corpus-manifest:
+	@if [ -z "$(REAL_BROADCAST_GAMEPLAY_CORPUS_MANIFEST)" ]; then echo "REAL_BROADCAST_GAMEPLAY_CORPUS_MANIFEST is required: make tom-v1-validate-real-broadcast-gameplay-corpus-manifest REAL_BROADCAST_GAMEPLAY_CORPUS_MANIFEST=<manifest.json>"; exit 1; fi
+	$(PYTHON) -m apps.worker.cli validate-real-broadcast-gameplay-corpus-manifest --contract "$(REAL_BROADCAST_GAMEPLAY_CORPUS_CONTRACT_OUTPUT)" --manifest "$(REAL_BROADCAST_GAMEPLAY_CORPUS_MANIFEST)" --run-mode "$(REAL_BROADCAST_GAMEPLAY_CORPUS_RUN_MODE)" --output "$(REAL_BROADCAST_GAMEPLAY_CORPUS_MANIFEST_VALIDATION_OUTPUT)" --skip-create-db
+
+tom-v1-run-real-broadcast-gameplay-corpus:
+	@if [ -z "$(REAL_BROADCAST_GAMEPLAY_CORPUS_MANIFEST)" ]; then echo "REAL_BROADCAST_GAMEPLAY_CORPUS_MANIFEST is required: make tom-v1-run-real-broadcast-gameplay-corpus REAL_BROADCAST_GAMEPLAY_CORPUS_MANIFEST=<manifest.json>"; exit 1; fi
+	$(PYTHON) -m apps.worker.cli run-real-broadcast-gameplay-corpus --contract "$(REAL_BROADCAST_GAMEPLAY_CORPUS_CONTRACT_OUTPUT)" --manifest "$(REAL_BROADCAST_GAMEPLAY_CORPUS_MANIFEST)" --run-mode "$(REAL_BROADCAST_GAMEPLAY_CORPUS_RUN_MODE)" --output-dir "$(REAL_BROADCAST_GAMEPLAY_CORPUS_OUTPUT_DIR)" --output "$(REAL_BROADCAST_GAMEPLAY_CORPUS_OUTPUT)" --model-asset-path "$(GAMEPLAY_CLASSIFIER_ASSET_PATH)" --gameplay-segment-contract "$(GAMEPLAY_SEGMENT_GATE_CONTRACT_OUTPUT)" --routing-contract "$(GAMEPLAY_GATED_ROUTING_CONTRACT_OUTPUT)" --execution-contract "$(GAMEPLAY_GATED_PERCEPTION_EXECUTION_CONTRACT_OUTPUT)" --replay-review-contract "$(GAMEPLAY_SEGMENT_REPLAY_REVIEW_CONTRACT_OUTPUT)" --review-dataset-contract "$(GAMEPLAY_GATE_REVIEW_DATASET_CONTRACT_OUTPUT)" --viewer-base-url "$(VIEWER_BASE_URL)" --frame-sample-rate "$(GAMEPLAY_SEGMENT_FRAME_SAMPLE_RATE)" --max-frames "$(GAMEPLAY_SEGMENT_MAX_FRAMES)" --skip-create-db
+
+tom-v1-build-real-broadcast-gameplay-corpus-report:
+	$(PYTHON) -m apps.worker.cli build-real-broadcast-gameplay-corpus-report --contract "$(REAL_BROADCAST_GAMEPLAY_CORPUS_CONTRACT_OUTPUT)" --corpus-run "$(REAL_BROADCAST_GAMEPLAY_CORPUS_RUN)" --output "$(REAL_BROADCAST_GAMEPLAY_CORPUS_REPORT_OUTPUT)" --skip-create-db
 
 tom-v1-post-codex-validate:
 	scripts/post_codex_validate.sh $(if $(EXPECTED_BRANCH),--branch "$(EXPECTED_BRANCH)",) $(if $(EXPECTED_TAG),--expected-tag "$(EXPECTED_TAG)",) --python "$(PYTHON)"

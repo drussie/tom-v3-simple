@@ -360,6 +360,8 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Gameplay Gate Review Dataset Export v1](reviews/gameplay_gate_review_dataset_export_v1.md)
 - [Blueprint 45 Gameplay Gate Pathway Completion Freeze v1](blueprints/blueprint_45_gameplay_gate_pathway_completion_freeze_v1.md)
 - [Gameplay Gate Pathway Completion Freeze v1](reviews/gameplay_gate_pathway_completion_freeze_v1.md)
+- [Blueprint 46 Real Broadcast Gameplay Gate Corpus Run v1](blueprints/blueprint_46_real_broadcast_gameplay_gate_corpus_run_v1.md)
+- [Real Broadcast Gameplay Gate Corpus Run v1](reviews/real_broadcast_gameplay_gate_corpus_run_v1.md)
 
 ## Development
 

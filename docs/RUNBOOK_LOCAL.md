@@ -2099,6 +2099,60 @@ The tracked artifact is
 readiness report files live under `.data/exports/` and should stay local unless a future milestone
 explicitly documents committing them.
 
+## Real Broadcast Gameplay Gate Corpus Run
+
+Blueprint 46 runs explicit local broadcast-style media entries through the frozen gameplay gate
+pathway. It supports real local media supplied by the operator, but the default mode is `dry_run`.
+TOM does not scan folders, ingest arbitrary media, train the gameplay classifier, modify model
+assets, create labels, score classifier accuracy, prove generalization, decide tennis truth, or
+adjudicate evidence.
+
+Export the tracked contract:
+
+```bash
+make tom-v1-export-real-broadcast-gameplay-corpus-run-contract \
+  PYTHON=.venv/bin/python
+```
+
+Build an explicit manifest template:
+
+```bash
+make tom-v1-build-real-broadcast-gameplay-corpus-manifest-template \
+  PYTHON=.venv/bin/python \
+  REAL_BROADCAST_GAMEPLAY_CORPUS_MEDIA_PATH=/path/to/broadcast_clip.mp4 \
+  REAL_BROADCAST_GAMEPLAY_CORPUS_SOURCE_LABEL=local_broadcast_clip \
+  REAL_BROADCAST_GAMEPLAY_CORPUS_CONTENT_TAG=live_gameplay
+```
+
+Validate the manifest in the intended mode:
+
+```bash
+make tom-v1-validate-real-broadcast-gameplay-corpus-manifest \
+  PYTHON=.venv/bin/python \
+  REAL_BROADCAST_GAMEPLAY_CORPUS_RUN_MODE=dry_run
+```
+
+Run the corpus path only after the manifest is explicit:
+
+```bash
+make tom-v1-run-real-broadcast-gameplay-corpus \
+  PYTHON=.venv/bin/python \
+  REAL_BROADCAST_GAMEPLAY_CORPUS_RUN_MODE=explicit_local_media_run
+```
+
+Build the human-review readiness report:
+
+```bash
+make tom-v1-build-real-broadcast-gameplay-corpus-report \
+  PYTHON=.venv/bin/python
+```
+
+The tracked artifact is
+`.data/contracts/real_broadcast_gameplay_corpus_run_contract_v1.json`. Generated manifests,
+validations, corpus run outputs, per-entry artifacts, and readiness reports live under
+`.data/exports/` and should stay local unless a future milestone explicitly documents committing
+reviewed corpus fixtures.
+
 ## Camera Geometry Calibration Provenance
 
 Blueprint 36 builds a structural camera geometry / calibration provenance profile from existing

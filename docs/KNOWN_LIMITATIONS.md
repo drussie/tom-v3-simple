@@ -341,6 +341,10 @@ TOM v3 Simple does not include:
   only. Drift is a regression signal, not proof that the classifier, smoke output, or baseline is
   correct. The baseline does not prove point detection, line calls, scoring, player identity,
   production readiness, training truth, generalization, or adjudication.
+- Real broadcast gameplay corpus run artifacts require explicit local media manifests and safe run
+  modes. They do not silently scan folders, train or mutate the gameplay classifier, commit model
+  weights, create labels, prove classifier correctness or accuracy, prove real-world
+  generalization, create tennis truth, or adjudicate evidence.
 
 ## Boundary
 
