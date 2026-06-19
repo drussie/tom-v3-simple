@@ -671,4 +671,36 @@ run "$PYTHON_BIN" -m apps.worker.cli build-real-broadcast-gameplay-human-review-
   --output "$TMP_ROOT/real_broadcast_gameplay_human_review_readiness_report.current.json" \
   --skip-create-db
 
+run "$PYTHON_BIN" -m apps.worker.cli export-real-broadcast-gameplay-review-metrics-contract \
+  --output "$TMP_ROOT/real_broadcast_gameplay_review_metrics_contract_v1.smoke.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-real-broadcast-gameplay-review-metrics-report \
+  --contract "$TMP_ROOT/real_broadcast_gameplay_review_metrics_contract_v1.smoke.json" \
+  --source-review-loop-report "$TMP_ROOT/real_broadcast_gameplay_review_loop_report.current.json" \
+  --source-review-bundle "$TMP_ROOT/real_broadcast_gameplay_review_bundle.template.json" \
+  --source-corpus-run "$TMP_ROOT/real_broadcast_gameplay_corpus_run.current.json" \
+  --source-regression-baseline "$TMP_ROOT/gameplay_gate_regression.baseline.json" \
+  --model-asset-path "model_assets/tom_v1/view_classifier_gameplay.pt" \
+  --output "$TMP_ROOT/real_broadcast_gameplay_review_metrics_report.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli validate-real-broadcast-gameplay-review-metrics-report \
+  --contract "$TMP_ROOT/real_broadcast_gameplay_review_metrics_contract_v1.smoke.json" \
+  --metrics-report "$TMP_ROOT/real_broadcast_gameplay_review_metrics_report.current.json" \
+  --output "$TMP_ROOT/real_broadcast_gameplay_review_metrics_report.validation.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-real-broadcast-gameplay-review-qa-dashboard \
+  --contract "$TMP_ROOT/real_broadcast_gameplay_review_metrics_contract_v1.smoke.json" \
+  --metrics-report "$TMP_ROOT/real_broadcast_gameplay_review_metrics_report.current.json" \
+  --output "$TMP_ROOT/real_broadcast_gameplay_review_qa_dashboard.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-real-broadcast-gameplay-review-next-actions-report \
+  --contract "$TMP_ROOT/real_broadcast_gameplay_review_metrics_contract_v1.smoke.json" \
+  --metrics-report "$TMP_ROOT/real_broadcast_gameplay_review_metrics_report.current.json" \
+  --output "$TMP_ROOT/real_broadcast_gameplay_review_next_actions.current.json" \
+  --skip-create-db
+
 run git status --short

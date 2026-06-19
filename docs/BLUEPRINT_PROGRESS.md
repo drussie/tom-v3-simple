@@ -2,7 +2,7 @@
 
 ## Current Progress Gauge
 
-Current: Blueprints 1, 2, 3, 4, 5, 6, 7, and 8 complete/frozen; Blueprint 9 manual candidate review annotations are complete; Blueprint 10 benchmark/evaluation harness is complete; Blueprint 11 3D readiness / camera geometry evidence is complete; Blueprint 12 3D ball trajectory candidate evidence is complete; Blueprints 13 through 16 add diagnostic-only 3D marker context, the 3D Debug View, selection/timeline coupling, and 3D debug review annotations; Blueprint 17 exports reviewed 3D debug datasets; Blueprint 18 compares those exports for deterministic drift; Blueprint 19 freezes and verifies a local sample-point reviewed 3D debug baseline; Blueprint 20 completes the sample-point review and controlled expansion readiness freeze; Blueprint 21 adds a controlled second-point ingestion/replay smoke; Blueprint 22 adds second-point evidence parity and a local baseline manifest checkpoint; Blueprint 23 adds a point manifest / evidence provenance contract; Blueprint 24 adds manifest-backed multi-point replay navigation/review indexing; Blueprint 25 adds a manifest-backed multi-point regression matrix; Blueprint 26 adds an observation-quality taxonomy/profile; Blueprint 27 adds a structured review label schema; Blueprint 28 adds reviewer confidence/ambiguity metadata; Blueprint 29 adds multi-reviewer disagreement structure; Blueprint 30 adds INTENNSE label alignment refs; Blueprint 31 adds a versioned dataset corpus; Blueprint 32 adds a coverage-driven sampling strategy contract/profile/report layer; Blueprint 33 adds a controlled many-point evidence ingestion gate; Blueprint 34 adds review-ops metrics/report/dashboard data for structural coverage visibility; Blueprint 35 adds label-feedback evaluation inputs/reports for structural harness routing; Blueprint 36 adds camera geometry confidence / calibration provenance profiles and reports; Blueprint 37 freezes the BP22-BP36 expansion and records next-phase readiness; Blueprint 38 adds the gameplay segment gate around the local TOM v1 gameplay classifier asset; Blueprint 39 adds gameplay-gated downstream routing plans; Blueprint 40 adds perception execution constraints; Blueprint 41 adds gameplay replay/review timelines; Blueprint 42 adds explicit many-point gameplay-gated smoke; Blueprint 43 freezes the gameplay gate regression baseline; Blueprint 44 exports gameplay gate review datasets; Blueprint 45 freezes the gameplay gate pathway and records Blueprint 46 readiness; Blueprint 46 adds an explicit local broadcast-style gameplay corpus run and human-review readiness report; Blueprint 47 adds structured human review metadata bundles and reports over real-broadcast gameplay corpus outputs; TOM v3 Simple remains an observation-only evidence platform.
+Current: Blueprints 1, 2, 3, 4, 5, 6, 7, and 8 complete/frozen; Blueprint 9 manual candidate review annotations are complete; Blueprint 10 benchmark/evaluation harness is complete; Blueprint 11 3D readiness / camera geometry evidence is complete; Blueprint 12 3D ball trajectory candidate evidence is complete; Blueprints 13 through 16 add diagnostic-only 3D marker context, the 3D Debug View, selection/timeline coupling, and 3D debug review annotations; Blueprint 17 exports reviewed 3D debug datasets; Blueprint 18 compares those exports for deterministic drift; Blueprint 19 freezes and verifies a local sample-point reviewed 3D debug baseline; Blueprint 20 completes the sample-point review and controlled expansion readiness freeze; Blueprint 21 adds a controlled second-point ingestion/replay smoke; Blueprint 22 adds second-point evidence parity and a local baseline manifest checkpoint; Blueprint 23 adds a point manifest / evidence provenance contract; Blueprint 24 adds manifest-backed multi-point replay navigation/review indexing; Blueprint 25 adds a manifest-backed multi-point regression matrix; Blueprint 26 adds an observation-quality taxonomy/profile; Blueprint 27 adds a structured review label schema; Blueprint 28 adds reviewer confidence/ambiguity metadata; Blueprint 29 adds multi-reviewer disagreement structure; Blueprint 30 adds INTENNSE label alignment refs; Blueprint 31 adds a versioned dataset corpus; Blueprint 32 adds a coverage-driven sampling strategy contract/profile/report layer; Blueprint 33 adds a controlled many-point evidence ingestion gate; Blueprint 34 adds review-ops metrics/report/dashboard data for structural coverage visibility; Blueprint 35 adds label-feedback evaluation inputs/reports for structural harness routing; Blueprint 36 adds camera geometry confidence / calibration provenance profiles and reports; Blueprint 37 freezes the BP22-BP36 expansion and records next-phase readiness; Blueprint 38 adds the gameplay segment gate around the local TOM v1 gameplay classifier asset; Blueprint 39 adds gameplay-gated downstream routing plans; Blueprint 40 adds perception execution constraints; Blueprint 41 adds gameplay replay/review timelines; Blueprint 42 adds explicit many-point gameplay-gated smoke; Blueprint 43 freezes the gameplay gate regression baseline; Blueprint 44 exports gameplay gate review datasets; Blueprint 45 freezes the gameplay gate pathway and records Blueprint 46 readiness; Blueprint 46 adds an explicit local broadcast-style gameplay corpus run and human-review readiness report; Blueprint 47 adds structured human review metadata bundles and reports over real-broadcast gameplay corpus outputs; Blueprint 48 adds review metrics, QA dashboard data, and next-review actions over the BP47 review loop; TOM v3 Simple remains an observation-only evidence platform.
 
 ## Current
 
@@ -1628,3 +1628,27 @@ Blueprint 47 does not train or mutate the gameplay classifier, commit model weig
 baselines, create labels, prove classifier correctness or accuracy, perform automatic relabeling,
 decide tennis truth, claim production readiness, prove generalization, rank reviewers, score
 reviewers, or adjudicate.
+
+## Blueprint 48 Status
+
+Status: complete.
+
+Blueprint 48 adds the real broadcast gameplay review metrics / QA dashboard layer:
+
+```text
+BP47 review bundle/report
+-> review metrics report
+-> metrics validation
+-> QA dashboard data
+-> next-review actions report
+```
+
+The tracked contract is
+`.data/contracts/real_broadcast_gameplay_review_metrics_contract_v1.json`. Generated local
+exports include metrics reports, validation results, QA dashboard data, and next-actions reports
+under `.data/exports/`.
+
+Blueprint 48 does not train or mutate the gameplay classifier, commit model weights, mutate
+baselines, create labels, prove classifier correctness or accuracy, perform automatic relabeling,
+change thresholds or smoothing, tune models, decide tennis truth, claim production readiness,
+prove generalization, rank reviewers, score reviewers, or adjudicate.

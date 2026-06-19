@@ -246,6 +246,18 @@ from apps.worker.services.real_broadcast_gameplay_review_loop import (
     export_real_broadcast_gameplay_review_loop_contract,
     validate_real_broadcast_gameplay_review_bundle,
 )
+from apps.worker.services.real_broadcast_gameplay_review_metrics import (
+    DEFAULT_REAL_BROADCAST_GAMEPLAY_REVIEW_METRICS_CONTRACT_OUTPUT,
+    DEFAULT_REAL_BROADCAST_GAMEPLAY_REVIEW_METRICS_REPORT_OUTPUT,
+    DEFAULT_REAL_BROADCAST_GAMEPLAY_REVIEW_METRICS_VALIDATION_OUTPUT,
+    DEFAULT_REAL_BROADCAST_GAMEPLAY_REVIEW_NEXT_ACTIONS_OUTPUT,
+    DEFAULT_REAL_BROADCAST_GAMEPLAY_REVIEW_QA_DASHBOARD_OUTPUT,
+    build_real_broadcast_gameplay_review_metrics_report,
+    build_real_broadcast_gameplay_review_next_actions_report,
+    build_real_broadcast_gameplay_review_qa_dashboard,
+    export_real_broadcast_gameplay_review_metrics_contract,
+    validate_real_broadcast_gameplay_review_metrics_report,
+)
 from apps.worker.services.real_court_keypoint_replay import run_real_court_keypoint_replay
 from apps.worker.services.real_detection_replay import run_real_detection_replay
 from apps.worker.services.real_pose_replay import run_real_pose_replay
@@ -4029,6 +4041,145 @@ def main() -> None:
         skip_create_db=True,
     )
 
+    review_metrics_contract_parser = subcommands.add_parser(
+        "export-real-broadcast-gameplay-review-metrics-contract",
+        help="Export the Blueprint 48 real broadcast gameplay review metrics contract.",
+    )
+    review_metrics_contract_parser.add_argument(
+        "--output",
+        default=DEFAULT_REAL_BROADCAST_GAMEPLAY_REVIEW_METRICS_CONTRACT_OUTPUT,
+        help="JSON real broadcast gameplay review metrics contract output path.",
+    )
+    review_metrics_contract_parser.add_argument("--skip-create-db", action="store_true")
+    review_metrics_contract_parser.set_defaults(
+        handler=_handle_export_real_broadcast_gameplay_review_metrics_contract,
+        skip_create_db=True,
+    )
+
+    review_metrics_report_parser = subcommands.add_parser(
+        "build-real-broadcast-gameplay-review-metrics-report",
+        help="Build a BP48 operational metrics report from BP47 review artifacts.",
+    )
+    review_metrics_report_parser.add_argument(
+        "--contract",
+        default=DEFAULT_REAL_BROADCAST_GAMEPLAY_REVIEW_METRICS_CONTRACT_OUTPUT,
+        help="Blueprint 48 real broadcast gameplay review metrics contract JSON path.",
+    )
+    review_metrics_report_parser.add_argument(
+        "--source-review-loop-report",
+        default=DEFAULT_REAL_BROADCAST_GAMEPLAY_REVIEW_LOOP_REPORT_OUTPUT,
+        help="Blueprint 47 real broadcast gameplay review loop report JSON path.",
+    )
+    review_metrics_report_parser.add_argument(
+        "--source-review-bundle",
+        default=DEFAULT_REAL_BROADCAST_GAMEPLAY_REVIEW_BUNDLE_TEMPLATE_OUTPUT,
+        help="Blueprint 47 real broadcast gameplay review bundle JSON path.",
+    )
+    review_metrics_report_parser.add_argument(
+        "--source-corpus-run",
+        default=DEFAULT_REAL_BROADCAST_GAMEPLAY_CORPUS_OUTPUT,
+        help="Blueprint 46 real broadcast gameplay corpus run JSON path.",
+    )
+    review_metrics_report_parser.add_argument(
+        "--source-review-dataset",
+        help="Optional BP44 gameplay gate review dataset JSON path.",
+    )
+    review_metrics_report_parser.add_argument(
+        "--source-regression-baseline",
+        default=DEFAULT_GAMEPLAY_GATE_REGRESSION_BASELINE_OUTPUT,
+        help="Optional BP43 gameplay gate regression baseline JSON path.",
+    )
+    review_metrics_report_parser.add_argument(
+        "--model-asset-path",
+        default=DEFAULT_GAMEPLAY_CLASSIFIER_ASSET_PATH,
+        help="Local TOM v1 gameplay classifier asset path.",
+    )
+    review_metrics_report_parser.add_argument(
+        "--output",
+        default=DEFAULT_REAL_BROADCAST_GAMEPLAY_REVIEW_METRICS_REPORT_OUTPUT,
+        help="JSON real broadcast gameplay review metrics report output path.",
+    )
+    review_metrics_report_parser.add_argument("--skip-create-db", action="store_true")
+    review_metrics_report_parser.set_defaults(
+        handler=_handle_build_real_broadcast_gameplay_review_metrics_report,
+        skip_create_db=True,
+    )
+
+    review_metrics_validate_parser = subcommands.add_parser(
+        "validate-real-broadcast-gameplay-review-metrics-report",
+        help="Validate a BP48 real broadcast gameplay review metrics report.",
+    )
+    review_metrics_validate_parser.add_argument(
+        "--contract",
+        default=DEFAULT_REAL_BROADCAST_GAMEPLAY_REVIEW_METRICS_CONTRACT_OUTPUT,
+        help="Blueprint 48 real broadcast gameplay review metrics contract JSON path.",
+    )
+    review_metrics_validate_parser.add_argument(
+        "--metrics-report",
+        default=DEFAULT_REAL_BROADCAST_GAMEPLAY_REVIEW_METRICS_REPORT_OUTPUT,
+        help="Blueprint 48 real broadcast gameplay review metrics report JSON path.",
+    )
+    review_metrics_validate_parser.add_argument(
+        "--output",
+        default=DEFAULT_REAL_BROADCAST_GAMEPLAY_REVIEW_METRICS_VALIDATION_OUTPUT,
+        help="Optional JSON review metrics validation output path.",
+    )
+    review_metrics_validate_parser.add_argument("--skip-create-db", action="store_true")
+    review_metrics_validate_parser.set_defaults(
+        handler=_handle_validate_real_broadcast_gameplay_review_metrics_report,
+        skip_create_db=True,
+    )
+
+    review_metrics_dashboard_parser = subcommands.add_parser(
+        "build-real-broadcast-gameplay-review-qa-dashboard",
+        help="Build dashboard-ready BP48 review metrics QA data.",
+    )
+    review_metrics_dashboard_parser.add_argument(
+        "--contract",
+        default=DEFAULT_REAL_BROADCAST_GAMEPLAY_REVIEW_METRICS_CONTRACT_OUTPUT,
+        help="Blueprint 48 real broadcast gameplay review metrics contract JSON path.",
+    )
+    review_metrics_dashboard_parser.add_argument(
+        "--metrics-report",
+        default=DEFAULT_REAL_BROADCAST_GAMEPLAY_REVIEW_METRICS_REPORT_OUTPUT,
+        help="Blueprint 48 real broadcast gameplay review metrics report JSON path.",
+    )
+    review_metrics_dashboard_parser.add_argument(
+        "--output",
+        default=DEFAULT_REAL_BROADCAST_GAMEPLAY_REVIEW_QA_DASHBOARD_OUTPUT,
+        help="JSON real broadcast gameplay review QA dashboard output path.",
+    )
+    review_metrics_dashboard_parser.add_argument("--skip-create-db", action="store_true")
+    review_metrics_dashboard_parser.set_defaults(
+        handler=_handle_build_real_broadcast_gameplay_review_qa_dashboard,
+        skip_create_db=True,
+    )
+
+    review_metrics_actions_parser = subcommands.add_parser(
+        "build-real-broadcast-gameplay-review-next-actions-report",
+        help="Build a BP48 next-review actions report from review metrics.",
+    )
+    review_metrics_actions_parser.add_argument(
+        "--contract",
+        default=DEFAULT_REAL_BROADCAST_GAMEPLAY_REVIEW_METRICS_CONTRACT_OUTPUT,
+        help="Blueprint 48 real broadcast gameplay review metrics contract JSON path.",
+    )
+    review_metrics_actions_parser.add_argument(
+        "--metrics-report",
+        default=DEFAULT_REAL_BROADCAST_GAMEPLAY_REVIEW_METRICS_REPORT_OUTPUT,
+        help="Blueprint 48 real broadcast gameplay review metrics report JSON path.",
+    )
+    review_metrics_actions_parser.add_argument(
+        "--output",
+        default=DEFAULT_REAL_BROADCAST_GAMEPLAY_REVIEW_NEXT_ACTIONS_OUTPUT,
+        help="JSON real broadcast gameplay review next-actions output path.",
+    )
+    review_metrics_actions_parser.add_argument("--skip-create-db", action="store_true")
+    review_metrics_actions_parser.set_defaults(
+        handler=_handle_build_real_broadcast_gameplay_review_next_actions_report,
+        skip_create_db=True,
+    )
+
     point_evaluation_parser = subcommands.add_parser(
         "evaluate-point-candidates",
         help="Evaluate generated point candidate markers using operator review metadata.",
@@ -6467,6 +6618,67 @@ def _handle_build_real_broadcast_gameplay_human_review_readiness_report(
     return build_real_broadcast_gameplay_human_review_readiness_report(
         contract_path=args.contract,
         bundle_path=args.bundle,
+        output_path=args.output,
+    )
+
+
+def _handle_export_real_broadcast_gameplay_review_metrics_contract(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return export_real_broadcast_gameplay_review_metrics_contract(output_path=args.output)
+
+
+def _handle_build_real_broadcast_gameplay_review_metrics_report(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_real_broadcast_gameplay_review_metrics_report(
+        contract_path=args.contract,
+        source_review_loop_report_path=args.source_review_loop_report,
+        source_review_bundle_path=args.source_review_bundle,
+        source_corpus_run_path=args.source_corpus_run,
+        source_review_dataset_path=args.source_review_dataset,
+        source_regression_baseline_path=args.source_regression_baseline,
+        model_asset_path=args.model_asset_path,
+        output_path=args.output,
+    )
+
+
+def _handle_validate_real_broadcast_gameplay_review_metrics_report(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_real_broadcast_gameplay_review_metrics_report(
+        contract_path=args.contract,
+        metrics_report_path=args.metrics_report,
+        output_path=args.output,
+    )
+
+
+def _handle_build_real_broadcast_gameplay_review_qa_dashboard(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_real_broadcast_gameplay_review_qa_dashboard(
+        contract_path=args.contract,
+        metrics_report_path=args.metrics_report,
+        output_path=args.output,
+    )
+
+
+def _handle_build_real_broadcast_gameplay_review_next_actions_report(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_real_broadcast_gameplay_review_next_actions_report(
+        contract_path=args.contract,
+        metrics_report_path=args.metrics_report,
         output_path=args.output,
     )
 

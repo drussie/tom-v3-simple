@@ -1,5 +1,39 @@
 # TOM v3 Simple - Implementation Log
 
+## Real Broadcast Gameplay Review Metrics / QA Dashboard v1
+
+Status: complete when accepted
+
+### Goal
+
+Summarize the real-broadcast gameplay review loop into review operations metrics, QA dashboard
+data, and next-review actions without creating labels, classifier correctness/accuracy claims,
+automatic relabeling, threshold changes, model tuning, tennis truth, reviewer scoring,
+production readiness, generalization, or adjudication.
+
+### Outcome
+
+The milestone adds:
+
+- a tracked real broadcast gameplay review metrics contract
+- CLI and Make targets to export the contract, build/validate metrics reports, build
+  dashboard-ready QA data, and build next-review actions reports
+- review coverage, status distribution, downstream review, confidence, ambiguity, missing-field,
+  readiness, corpus coverage, replay context, model provenance, warning, and next-action metrics
+- post-Codex validation coverage for the BP48 smoke path using temporary outputs
+- focused tests for contract stability, metrics generation, validation guardrails, dashboard data,
+  and next-actions reports
+
+### Non-goals
+
+- No classifier training, classifier scoring, or classifier accuracy claim.
+- No model asset mutation, committed weights, threshold change, smoothing change, model tuning, or
+  regression baseline mutation.
+- No truth labels, point detection claim, line-call claim, score, player identity, or
+  adjudication.
+- No automatic relabeling, reviewer ranking/scoring, production-readiness claim, or
+  generalization claim.
+
 ## Real Broadcast Gameplay Review Loop v1
 
 Status: complete when accepted

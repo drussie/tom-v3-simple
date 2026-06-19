@@ -13,6 +13,10 @@ This registry makes TOM v3 Simple boundaries explicit.
 - Real broadcast gameplay review loop bundles capture human review metadata only. They do not
   prove classifier correctness, create training labels, relabel automatically, rank reviewers,
   score reviewers, establish tennis truth, or make the reviewed entries production-ready.
+- Real broadcast gameplay review metrics and QA dashboard outputs summarize review operations
+  only. They do not prove classifier correctness, create labels, relabel automatically, change
+  thresholds or smoothing, tune models, rank reviewers, score reviewers, establish tennis truth,
+  or make the reviewed entries production-ready.
 - Fixture detection is deterministic demo output.
 - Optional YOLO requires a local optional runtime and local weights outside git.
 - TOM v1 model assets under `model_assets/tom_v1/` are local-only ignored files and are not part of the repository.

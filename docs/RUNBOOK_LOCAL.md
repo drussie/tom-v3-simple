@@ -2206,6 +2206,58 @@ Human review fields are metadata only. They do not create training truth, gamepl
 classifier correctness, classifier accuracy, accepted/rejected lifecycle, automatic relabeling,
 reviewer scoring, production readiness, generalization, or adjudication.
 
+## Real Broadcast Gameplay Review Metrics / QA Dashboard
+
+Blueprint 48 summarizes Blueprint 47 review loop outputs into review operations metrics,
+dashboard-ready QA data, and next-review actions. It reads existing artifacts and does not infer
+labels, score the classifier, relabel automatically, change thresholds, tune models, decide
+tennis truth, mutate model assets, or mutate baselines.
+
+Export the tracked contract:
+
+```bash
+make tom-v1-export-real-broadcast-gameplay-review-metrics-contract \
+  PYTHON=.venv/bin/python
+```
+
+Build the review metrics report from the latest local BP47/BP46 outputs:
+
+```bash
+make tom-v1-build-real-broadcast-gameplay-review-metrics-report \
+  PYTHON=.venv/bin/python
+```
+
+Validate the metrics report:
+
+```bash
+make tom-v1-validate-real-broadcast-gameplay-review-metrics-report \
+  PYTHON=.venv/bin/python
+```
+
+Build dashboard-ready QA data:
+
+```bash
+make tom-v1-build-real-broadcast-gameplay-review-qa-dashboard \
+  PYTHON=.venv/bin/python
+```
+
+Build next-review actions:
+
+```bash
+make tom-v1-build-real-broadcast-gameplay-review-next-actions-report \
+  PYTHON=.venv/bin/python
+```
+
+The tracked artifact is
+`.data/contracts/real_broadcast_gameplay_review_metrics_contract_v1.json`. Generated metrics
+reports, validations, QA dashboard data, and next-actions reports live under `.data/exports/` and
+should stay local unless a future milestone explicitly documents committing reviewed fixtures.
+
+Metrics are operational visibility only. They do not create training truth, gameplay truth,
+classifier correctness, classifier accuracy, accepted/rejected lifecycle, automatic relabeling,
+reviewer scoring, production readiness, generalization, threshold changes, model tuning, or
+adjudication.
+
 ## Camera Geometry Calibration Provenance
 
 Blueprint 36 builds a structural camera geometry / calibration provenance profile from existing
