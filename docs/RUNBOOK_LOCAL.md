@@ -2396,6 +2396,87 @@ fields, allowed coverage axes, allowed gap types, allowed priority values, allow
 values, and forbidden fields. Missing optional review, observation-quality, disagreement,
 INTENNSE, and export refs are coverage gaps only.
 
+## Many-Point Evidence Ingestion Gate
+
+Use this to export the many-point ingestion gate contract, build an explicit local-media manifest
+template, validate the manifest, build a dry-run plan, and run the dry-run gate. This is controlled
+ingestion infrastructure only. It does not discover media automatically, silently ingest media,
+create observations, create event candidates, create 3D candidates, create review labels, create
+training truth, score correctness, claim generalization, produce tennis conclusions, or adjudicate
+evidence.
+
+Export the contract:
+
+```bash
+make tom-v1-export-many-point-ingestion-gate-contract \
+  PYTHON=.venv/bin/python
+```
+
+Build a manifest template using an explicit local path:
+
+```bash
+make tom-v1-build-many-point-ingestion-manifest-template \
+  PYTHON=.venv/bin/python \
+  MANY_POINT_INGESTION_MEDIA_PATH=demo_assets/sample_point.mp4
+```
+
+Validate the manifest:
+
+```bash
+make tom-v1-validate-many-point-ingestion-manifest \
+  PYTHON=.venv/bin/python \
+  MANY_POINT_INGESTION_MANIFEST=.data/exports/many_point_ingestion_manifest.template.json
+```
+
+Build the dry-run plan:
+
+```bash
+make tom-v1-build-many-point-ingestion-plan \
+  PYTHON=.venv/bin/python \
+  MANY_POINT_INGESTION_MANIFEST=.data/exports/many_point_ingestion_manifest.template.json
+```
+
+Run the dry-run gate:
+
+```bash
+make tom-v1-run-many-point-ingestion-gate \
+  PYTHON=.venv/bin/python \
+  MANY_POINT_INGESTION_MANIFEST=.data/exports/many_point_ingestion_manifest.template.json
+```
+
+Default paths:
+
+```text
+.data/contracts/many_point_ingestion_gate_contract_v1.json
+.data/exports/many_point_ingestion_manifest.template.json
+.data/exports/many_point_ingestion_manifest.validation.json
+.data/exports/many_point_ingestion_plan.current.json
+.data/exports/many_point_ingestion_gate.current.json
+```
+
+Expected:
+
+- `ok`: true for contract export, manifest validation, plan build, and dry-run gate
+- `contract_type`: `many_point_ingestion_gate_contract`
+- `contract_version`: `v1`
+- `manifest_type`: `many_point_ingestion_manifest`
+- `manifest_version`: `v1`
+- `ingestion_gate_type`: `many_point_ingestion_gate_report`
+- `ingestion_gate_version`: `v1`
+- `mode`: `dry_run`
+- `indexed_entry_count`: 0 in dry-run mode
+- `warnings.ingestion_gate_is_not_truth`: true
+- `warnings.does_not_create_event_candidates`: true
+- `warnings.does_not_create_3d_candidates`: true
+- `warnings.does_not_create_review_labels`: true
+- `warnings.does_not_claim_generalization`: true
+- `warnings.no_adjudication`: true
+
+Validation checks manifest type/version, source contract refs, local media path presence, file
+existence, duplicate path/checksum conflicts, allowed requested actions, expected media type, and
+forbidden fields. Demo asset smokes validate gate mechanics only; they do not prove many real
+distinct tennis points were ingested.
+
 Build the point evidence snapshot:
 
 ```bash

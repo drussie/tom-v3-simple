@@ -62,6 +62,18 @@ from apps.worker.services.intennse_label_alignment import (
 from apps.worker.services.local_demo import run_local_fixture_demo
 from apps.worker.services.main_player_track_assignment import assign_main_player_tracks
 from apps.worker.services.main_subject_filter import select_main_player_subjects
+from apps.worker.services.many_point_ingestion_gate import (
+    DEFAULT_MANY_POINT_INGESTION_CONTRACT_OUTPUT,
+    DEFAULT_MANY_POINT_INGESTION_GATE_OUTPUT,
+    DEFAULT_MANY_POINT_INGESTION_MANIFEST_TEMPLATE_OUTPUT,
+    DEFAULT_MANY_POINT_INGESTION_PLAN_OUTPUT,
+    DEFAULT_MANY_POINT_INGESTION_VALIDATION_OUTPUT,
+    build_many_point_ingestion_manifest_template,
+    build_many_point_ingestion_plan,
+    export_many_point_ingestion_gate_contract,
+    run_many_point_ingestion_gate,
+    validate_many_point_ingestion_manifest,
+)
 from apps.worker.services.media_indexer import index_media
 from apps.worker.services.motion_smoothing import smooth_motion_candidates
 from apps.worker.services.multi_point_regression_matrix import (
@@ -1856,6 +1868,144 @@ def main() -> None:
         skip_create_db=True,
     )
 
+    many_point_contract_parser = subcommands.add_parser(
+        "export-many-point-ingestion-gate-contract",
+        help="Export the many-point evidence ingestion gate contract.",
+    )
+    many_point_contract_parser.add_argument(
+        "--output",
+        default=DEFAULT_MANY_POINT_INGESTION_CONTRACT_OUTPUT,
+        help="JSON many-point ingestion gate contract output path.",
+    )
+    many_point_contract_parser.add_argument("--skip-create-db", action="store_true")
+    many_point_contract_parser.set_defaults(
+        handler=_handle_export_many_point_ingestion_gate_contract,
+        skip_create_db=True,
+    )
+
+    many_point_template_parser = subcommands.add_parser(
+        "build-many-point-ingestion-manifest-template",
+        help="Build a many-point ingestion manifest template from explicit local paths.",
+    )
+    many_point_template_parser.add_argument(
+        "--local-media-path",
+        action="append",
+        default=[],
+        help="Explicit local point/video path. May be supplied more than once.",
+    )
+    many_point_template_parser.add_argument(
+        "--source-label",
+        default="local_point_video",
+        help="Source label prefix for generated entries.",
+    )
+    many_point_template_parser.add_argument(
+        "--requested-action",
+        action="append",
+        default=[],
+        help="Requested action to include. Defaults to all BP33 safe actions.",
+    )
+    many_point_template_parser.add_argument(
+        "--output",
+        default=DEFAULT_MANY_POINT_INGESTION_MANIFEST_TEMPLATE_OUTPUT,
+        help="JSON many-point ingestion manifest template output path.",
+    )
+    many_point_template_parser.add_argument("--skip-create-db", action="store_true")
+    many_point_template_parser.set_defaults(
+        handler=_handle_build_many_point_ingestion_manifest_template,
+        skip_create_db=True,
+    )
+
+    many_point_validate_parser = subcommands.add_parser(
+        "validate-many-point-ingestion-manifest",
+        help="Validate a many-point ingestion manifest structurally.",
+    )
+    many_point_validate_parser.add_argument(
+        "--contract",
+        default=DEFAULT_MANY_POINT_INGESTION_CONTRACT_OUTPUT,
+        help="Many-point ingestion gate contract JSON path.",
+    )
+    many_point_validate_parser.add_argument("--manifest", required=True)
+    many_point_validate_parser.add_argument(
+        "--output",
+        default=DEFAULT_MANY_POINT_INGESTION_VALIDATION_OUTPUT,
+        help="Optional JSON many-point ingestion validation output path.",
+    )
+    many_point_validate_parser.add_argument("--skip-create-db", action="store_true")
+    many_point_validate_parser.set_defaults(
+        handler=_handle_validate_many_point_ingestion_manifest,
+        skip_create_db=True,
+    )
+
+    many_point_plan_parser = subcommands.add_parser(
+        "build-many-point-ingestion-plan",
+        help="Build a many-point ingestion plan without indexing media.",
+    )
+    many_point_plan_parser.add_argument(
+        "--contract",
+        default=DEFAULT_MANY_POINT_INGESTION_CONTRACT_OUTPUT,
+        help="Many-point ingestion gate contract JSON path.",
+    )
+    many_point_plan_parser.add_argument("--manifest", required=True)
+    many_point_plan_parser.add_argument(
+        "--mode",
+        choices=["dry_run", "validate_only", "index_only", "index_and_manifest"],
+        default="dry_run",
+    )
+    many_point_plan_parser.add_argument("--viewer-base-url", default="http://127.0.0.1:3000")
+    many_point_plan_parser.add_argument(
+        "--output",
+        default=DEFAULT_MANY_POINT_INGESTION_PLAN_OUTPUT,
+        help="JSON many-point ingestion plan output path.",
+    )
+    many_point_plan_parser.add_argument("--skip-create-db", action="store_true")
+    many_point_plan_parser.set_defaults(
+        handler=_handle_build_many_point_ingestion_plan,
+        skip_create_db=True,
+    )
+
+    many_point_gate_parser = subcommands.add_parser(
+        "run-many-point-ingestion-gate",
+        help="Run the many-point ingestion gate. Defaults to dry-run.",
+    )
+    many_point_gate_parser.add_argument(
+        "--contract",
+        default=DEFAULT_MANY_POINT_INGESTION_CONTRACT_OUTPUT,
+        help="Many-point ingestion gate contract JSON path.",
+    )
+    many_point_gate_parser.add_argument("--manifest", required=True)
+    many_point_gate_parser.add_argument(
+        "--mode",
+        choices=["dry_run", "validate_only", "index_only", "index_and_manifest"],
+        default="dry_run",
+    )
+    many_point_gate_parser.add_argument("--viewer-base-url", default="http://127.0.0.1:3000")
+    many_point_gate_parser.add_argument("--storage-root", default=".data/media")
+    many_point_gate_parser.add_argument(
+        "--copy-to-storage",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+    )
+    many_point_gate_parser.add_argument("--manifest-output-dir", default=".data/manifests")
+    many_point_gate_parser.add_argument(
+        "--multi-point-index-output",
+        default=MULTI_POINT_REPLAY_INDEX_OUTPUT,
+    )
+    many_point_gate_parser.add_argument(
+        "--dataset-corpus-manifest-output",
+        default=DEFAULT_DATASET_CORPUS_MANIFEST_OUTPUT,
+    )
+    many_point_gate_parser.add_argument(
+        "--multi-point-matrix",
+        default=DEFAULT_MULTI_POINT_REGRESSION_MATRIX_CURRENT,
+    )
+    many_point_gate_parser.add_argument(
+        "--output",
+        default=DEFAULT_MANY_POINT_INGESTION_GATE_OUTPUT,
+        help="JSON many-point ingestion gate report output path.",
+    )
+    many_point_gate_parser.add_argument("--skip-create-db", action="store_true")
+    many_point_gate_parser.set_defaults(handler=_handle_run_many_point_ingestion_gate)
+
     point_evaluation_parser = subcommands.add_parser(
         "evaluate-point-candidates",
         help="Evaluate generated point candidate markers using operator review metadata.",
@@ -3443,6 +3593,73 @@ def _handle_build_coverage_sampling_report(
         multi_reviewer_schema_path=args.multi_reviewer_schema,
         intennse_alignment_contract_path=args.intennse_alignment_contract,
         dataset_corpus_contract_path=args.dataset_corpus_contract,
+        output_path=args.output,
+    )
+
+
+def _handle_export_many_point_ingestion_gate_contract(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return export_many_point_ingestion_gate_contract(output_path=args.output)
+
+
+def _handle_build_many_point_ingestion_manifest_template(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_many_point_ingestion_manifest_template(
+        local_media_paths=args.local_media_path,
+        source_label=args.source_label,
+        requested_actions=args.requested_action or None,
+        output_path=args.output,
+    )
+
+
+def _handle_validate_many_point_ingestion_manifest(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_many_point_ingestion_manifest(
+        contract_path=args.contract,
+        manifest_path=args.manifest,
+        output_path=args.output,
+    )
+
+
+def _handle_build_many_point_ingestion_plan(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_many_point_ingestion_plan(
+        contract_path=args.contract,
+        manifest_path=args.manifest,
+        mode=args.mode,
+        viewer_base_url=args.viewer_base_url,
+        output_path=args.output,
+    )
+
+
+def _handle_run_many_point_ingestion_gate(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    return run_many_point_ingestion_gate(
+        session=session,
+        contract_path=args.contract,
+        manifest_path=args.manifest,
+        mode=args.mode,
+        viewer_base_url=args.viewer_base_url,
+        storage_root=args.storage_root,
+        copy_to_storage=args.copy_to_storage,
+        manifest_output_dir=args.manifest_output_dir,
+        multi_point_index_output=args.multi_point_index_output,
+        dataset_corpus_manifest_output=args.dataset_corpus_manifest_output,
+        multi_point_matrix_path=args.multi_point_matrix,
         output_path=args.output,
     )
 

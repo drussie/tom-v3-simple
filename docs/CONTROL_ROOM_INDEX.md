@@ -334,6 +334,8 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Versioned Dataset Corpus v1](reviews/versioned_dataset_corpus_v1.md)
 - [Blueprint 32 Coverage-Driven Sampling Strategy v1](blueprints/blueprint_32_coverage_driven_sampling_strategy_v1.md)
 - [Coverage-Driven Sampling Strategy v1](reviews/coverage_driven_sampling_strategy_v1.md)
+- [Blueprint 33 Many-Point Evidence Ingestion Gate v1](blueprints/blueprint_33_many_point_evidence_ingestion_gate_v1.md)
+- [Many-Point Evidence Ingestion Gate v1](reviews/many_point_evidence_ingestion_gate_v1.md)
 
 ## Development
 

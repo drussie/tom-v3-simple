@@ -229,4 +229,34 @@ run "$PYTHON_BIN" -m apps.worker.cli build-coverage-sampling-report \
   --output "$TMP_ROOT/coverage_sampling_report.current.json" \
   --skip-create-db
 
+run "$PYTHON_BIN" -m apps.worker.cli export-many-point-ingestion-gate-contract \
+  --output "$TMP_ROOT/many_point_ingestion_gate_contract_v1.smoke.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-many-point-ingestion-manifest-template \
+  --local-media-path "demo_assets/sample_point.mp4" \
+  --source-label "post_codex_demo_local_point_video" \
+  --output "$TMP_ROOT/many_point_ingestion_manifest.template.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli validate-many-point-ingestion-manifest \
+  --contract "$TMP_ROOT/many_point_ingestion_gate_contract_v1.smoke.json" \
+  --manifest "$TMP_ROOT/many_point_ingestion_manifest.template.json" \
+  --output "$TMP_ROOT/many_point_ingestion_manifest.validation.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-many-point-ingestion-plan \
+  --contract "$TMP_ROOT/many_point_ingestion_gate_contract_v1.smoke.json" \
+  --manifest "$TMP_ROOT/many_point_ingestion_manifest.template.json" \
+  --mode dry_run \
+  --output "$TMP_ROOT/many_point_ingestion_plan.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli run-many-point-ingestion-gate \
+  --contract "$TMP_ROOT/many_point_ingestion_gate_contract_v1.smoke.json" \
+  --manifest "$TMP_ROOT/many_point_ingestion_manifest.template.json" \
+  --mode dry_run \
+  --output "$TMP_ROOT/many_point_ingestion_gate.current.json" \
+  --skip-create-db
+
 run git status --short

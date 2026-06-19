@@ -248,6 +248,10 @@ This registry makes TOM v3 Simple boundaries explicit.
   observations, generate labels, create training truth, score correctness, claim dataset readiness,
   score reviewers, resolve disagreement, decide in/out, identify players, determine a winner, or
   adjudicate evidence.
+- Many-point ingestion gate artifacts validate and plan explicitly provided local media paths only.
+  Dry-run reports do not index media, and write modes must be explicit. Demo asset smokes do not
+  prove many real distinct tennis points, model generalization, event generation, 3D generation,
+  review-label creation, scoring, player identity, in/out, point winners, or adjudication.
 - Replay view presets are display defaults only. Operator view hides raw/debug layers by default,
   and debug/audit view enables them, but neither preset changes persisted observations or proves
   evidence correctness.

@@ -3477,3 +3477,50 @@ protected baselines, decide in/out, score, identify players, determine a winner,
 generalization, validate correctness, score reviewers, resolve disagreement, produce INTENNSE
 coaching/tactical/match outcome conclusions, create training truth, ingest media, execute
 sampling, or adjudicate evidence.
+
+## Blueprint 33 Many-Point Evidence Ingestion Gate v1
+
+Status: complete
+
+### Goal
+
+Create a controlled many-point evidence ingestion gate that validates, plans, and optionally
+indexes explicitly supplied local point/video files as replayable evidence assets without creating
+truth, event generation, 3D generation, scoring, adjudication, review labels, or generalization
+claims.
+
+### Notes
+
+This milestone adds:
+
+- `apps.worker.services.many_point_ingestion_gate`
+- `export-many-point-ingestion-gate-contract` worker CLI command
+- `build-many-point-ingestion-manifest-template` worker CLI command
+- `validate-many-point-ingestion-manifest` worker CLI command
+- `build-many-point-ingestion-plan` worker CLI command
+- `run-many-point-ingestion-gate` worker CLI command
+- `tom-v1-export-many-point-ingestion-gate-contract` Make helper
+- `tom-v1-build-many-point-ingestion-manifest-template` Make helper
+- `tom-v1-validate-many-point-ingestion-manifest` Make helper
+- `tom-v1-build-many-point-ingestion-plan` Make helper
+- `tom-v1-run-many-point-ingestion-gate` Make helper
+- `.data/contracts/many_point_ingestion_gate_contract_v1.json` local contract path
+- `.data/exports/many_point_ingestion_manifest.template.json` local template path
+- `.data/exports/many_point_ingestion_manifest.validation.json` local validation path
+- `.data/exports/many_point_ingestion_plan.current.json` local plan path
+- `.data/exports/many_point_ingestion_gate.current.json` local gate report path
+- `docs/blueprints/blueprint_33_many_point_evidence_ingestion_gate_v1.md`
+- `docs/reviews/many_point_evidence_ingestion_gate_v1.md`
+- `docs/agent_reports/blueprint_33_many_point_evidence_ingestion_gate_v1_report.md`
+
+The contract defines ingestion scope, source contract refs, manifest schema, entry fields,
+requested action values, disallowed requested actions, execution modes, output contracts,
+provenance requirements, validation rules, and warnings. The validator checks explicit local media
+paths, file existence, duplicate path/checksum conflicts, requested actions, expected media type,
+and forbidden fields. Dry-run planning and gate reports do not persist media. Explicit write modes
+reuse existing media indexing and point-manifest behavior only when selected. The gate does not
+generate evidence, create labels, change review semantics, mutate protected baselines, decide
+in/out, score, identify players, determine a winner, claim generalization, validate correctness,
+score reviewers, resolve disagreement, produce INTENNSE coaching/tactical/match outcome
+conclusions, create training truth, silently ingest media, discover media automatically, run event
+generation, run 3D generation, or adjudicate evidence.

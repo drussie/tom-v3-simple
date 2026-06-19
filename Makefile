@@ -113,6 +113,20 @@ COVERAGE_SAMPLING_PROFILE_OUTPUT ?= .data/exports/coverage_sampling_profile.curr
 COVERAGE_SAMPLING_PROFILE ?=
 COVERAGE_SAMPLING_VALIDATION_OUTPUT ?= .data/exports/coverage_sampling_profile.validation.json
 COVERAGE_SAMPLING_REPORT_OUTPUT ?= .data/exports/coverage_sampling_report.current.json
+MANY_POINT_INGESTION_CONTRACT_OUTPUT ?= .data/contracts/many_point_ingestion_gate_contract_v1.json
+MANY_POINT_INGESTION_MEDIA_PATH ?= demo_assets/sample_point.mp4
+MANY_POINT_INGESTION_SOURCE_LABEL ?= demo_local_point_video
+MANY_POINT_INGESTION_MANIFEST_OUTPUT ?= .data/exports/many_point_ingestion_manifest.template.json
+MANY_POINT_INGESTION_MANIFEST ?=
+MANY_POINT_INGESTION_VALIDATION_OUTPUT ?= .data/exports/many_point_ingestion_manifest.validation.json
+MANY_POINT_INGESTION_PLAN_OUTPUT ?= .data/exports/many_point_ingestion_plan.current.json
+MANY_POINT_INGESTION_GATE_OUTPUT ?= .data/exports/many_point_ingestion_gate.current.json
+MANY_POINT_INGESTION_MODE ?= dry_run
+MANY_POINT_INGESTION_STORAGE_ROOT ?= .data/media
+MANY_POINT_INGESTION_MANIFEST_OUTPUT_DIR ?= .data/manifests
+MANY_POINT_INGESTION_MULTI_POINT_INDEX_OUTPUT ?= $(MULTI_POINT_REPLAY_INDEX_OUTPUT)
+MANY_POINT_INGESTION_DATASET_CORPUS_MANIFEST_OUTPUT ?= $(DATASET_CORPUS_MANIFEST_OUTPUT)
+MANY_POINT_INGESTION_MULTI_POINT_MATRIX ?= $(MULTI_POINT_REGRESSION_MATRIX_CURRENT)
 EXPECTED_BRANCH ?=
 EXPECTED_TAG ?=
 FORMAT ?= json
@@ -200,7 +214,7 @@ DERIVE_LINES ?= true
 
 export TOM_V3_DATABASE_URL
 
-.PHONY: install web-install test lint migrate api seed verify index-media run-gameplay index-and-run-gameplay run-detection index-and-run-detection extract-frame-artifacts build-tracklets run-pose export-tracklet-review-dataset court-review-export demo demo-fixture demo-plan demo-reset demo-export demo-open replay-open completion-audit completion-check yolo-probe yolo-smoke yolo-runtime-probe register-yolo-model smoke-real-yolo-local real-detection real-pose tom-v1-yolo-probe tom-v1-ball-detection tom-v1-player-detection tom-v1-tracklets tom-v1-main-subjects tom-v1-main-player-tracks tom-v1-pose tom-v1-pose-main-subjects tom-v1-pose-main-tracks tom-v1-motion-smoothing tom-v1-court-keypoints-probe tom-v1-court-keypoints tom-v1-court-keypoint-audit tom-v1-object-court-projection tom-v1-ball-court-trajectory tom-v1-build-3d-ball-trajectory-candidates tom-v1-build-event-candidate-3d-diagnostics tom-v1-export-reviewed-3d-debug-dataset tom-v1-compare-reviewed-3d-debug-dataset tom-v1-freeze-reviewed-3d-debug-baseline tom-v1-verify-reviewed-3d-debug-baseline tom-v1-hit-bounce-candidates tom-v1-hit-bounce-candidates-verbose tom-v1-point-evidence-snapshot tom-v1-build-point-manifest tom-v1-build-multi-point-replay-index tom-v1-build-multi-point-regression-matrix tom-v1-compare-multi-point-regression-matrix tom-v1-verify-multi-point-regression-matrix tom-v1-export-observation-quality-taxonomy tom-v1-build-observation-quality-profile tom-v1-export-review-label-schema tom-v1-build-review-label-template tom-v1-validate-review-label-bundle tom-v1-export-reviewer-confidence-schema tom-v1-build-reviewer-confidence-template tom-v1-validate-reviewer-confidence-bundle tom-v1-export-multi-reviewer-disagreement-schema tom-v1-build-multi-reviewer-review-set-template tom-v1-validate-multi-reviewer-review-set tom-v1-build-reviewer-disagreement-report tom-v1-export-intennse-label-alignment-contract tom-v1-build-intennse-alignment-template tom-v1-validate-intennse-alignment-bundle tom-v1-build-intennse-alignment-report tom-v1-export-versioned-dataset-corpus-contract tom-v1-build-versioned-dataset-corpus-manifest tom-v1-validate-versioned-dataset-corpus-manifest tom-v1-build-versioned-dataset-corpus-report tom-v1-export-coverage-sampling-strategy-contract tom-v1-build-coverage-sampling-profile tom-v1-validate-coverage-sampling-profile tom-v1-build-coverage-sampling-report tom-v1-post-codex-validate tom-v1-evaluate-point-candidates tom-v1-declare-camera-geometry tom-v1-ingest-second-point-smoke tom-v1-build-second-point-evidence-parity court-fixture homography-candidates projection-diagnostics web web-build web-lint smoke all-checks
+.PHONY: install web-install test lint migrate api seed verify index-media run-gameplay index-and-run-gameplay run-detection index-and-run-detection extract-frame-artifacts build-tracklets run-pose export-tracklet-review-dataset court-review-export demo demo-fixture demo-plan demo-reset demo-export demo-open replay-open completion-audit completion-check yolo-probe yolo-smoke yolo-runtime-probe register-yolo-model smoke-real-yolo-local real-detection real-pose tom-v1-yolo-probe tom-v1-ball-detection tom-v1-player-detection tom-v1-tracklets tom-v1-main-subjects tom-v1-main-player-tracks tom-v1-pose tom-v1-pose-main-subjects tom-v1-pose-main-tracks tom-v1-motion-smoothing tom-v1-court-keypoints-probe tom-v1-court-keypoints tom-v1-court-keypoint-audit tom-v1-object-court-projection tom-v1-ball-court-trajectory tom-v1-build-3d-ball-trajectory-candidates tom-v1-build-event-candidate-3d-diagnostics tom-v1-export-reviewed-3d-debug-dataset tom-v1-compare-reviewed-3d-debug-dataset tom-v1-freeze-reviewed-3d-debug-baseline tom-v1-verify-reviewed-3d-debug-baseline tom-v1-hit-bounce-candidates tom-v1-hit-bounce-candidates-verbose tom-v1-point-evidence-snapshot tom-v1-build-point-manifest tom-v1-build-multi-point-replay-index tom-v1-build-multi-point-regression-matrix tom-v1-compare-multi-point-regression-matrix tom-v1-verify-multi-point-regression-matrix tom-v1-export-observation-quality-taxonomy tom-v1-build-observation-quality-profile tom-v1-export-review-label-schema tom-v1-build-review-label-template tom-v1-validate-review-label-bundle tom-v1-export-reviewer-confidence-schema tom-v1-build-reviewer-confidence-template tom-v1-validate-reviewer-confidence-bundle tom-v1-export-multi-reviewer-disagreement-schema tom-v1-build-multi-reviewer-review-set-template tom-v1-validate-multi-reviewer-review-set tom-v1-build-reviewer-disagreement-report tom-v1-export-intennse-label-alignment-contract tom-v1-build-intennse-alignment-template tom-v1-validate-intennse-alignment-bundle tom-v1-build-intennse-alignment-report tom-v1-export-versioned-dataset-corpus-contract tom-v1-build-versioned-dataset-corpus-manifest tom-v1-validate-versioned-dataset-corpus-manifest tom-v1-build-versioned-dataset-corpus-report tom-v1-export-coverage-sampling-strategy-contract tom-v1-build-coverage-sampling-profile tom-v1-validate-coverage-sampling-profile tom-v1-build-coverage-sampling-report tom-v1-export-many-point-ingestion-gate-contract tom-v1-build-many-point-ingestion-manifest-template tom-v1-validate-many-point-ingestion-manifest tom-v1-build-many-point-ingestion-plan tom-v1-run-many-point-ingestion-gate tom-v1-post-codex-validate tom-v1-evaluate-point-candidates tom-v1-declare-camera-geometry tom-v1-ingest-second-point-smoke tom-v1-build-second-point-evidence-parity court-fixture homography-candidates projection-diagnostics web web-build web-lint smoke all-checks
 
 install:
 	$(PYTHON) -m pip install -e ".[dev]"
@@ -562,6 +576,24 @@ tom-v1-validate-coverage-sampling-profile:
 tom-v1-build-coverage-sampling-report:
 	@if [ -z "$(COVERAGE_SAMPLING_PROFILE)" ]; then echo "COVERAGE_SAMPLING_PROFILE is required: make tom-v1-build-coverage-sampling-report COVERAGE_SAMPLING_PROFILE=<profile.json>"; exit 1; fi
 	$(PYTHON) -m apps.worker.cli build-coverage-sampling-report --contract "$(COVERAGE_SAMPLING_CONTRACT_OUTPUT)" --profile "$(COVERAGE_SAMPLING_PROFILE)" --observation-quality-taxonomy "$(OBSERVATION_QUALITY_TAXONOMY_OUTPUT)" --review-label-schema "$(REVIEW_LABEL_SCHEMA_OUTPUT)" --reviewer-confidence-schema "$(REVIEWER_CONFIDENCE_SCHEMA_OUTPUT)" --multi-reviewer-schema "$(MULTI_REVIEWER_SCHEMA_OUTPUT)" --intennse-alignment-contract "$(INTENNSE_ALIGNMENT_CONTRACT_OUTPUT)" --dataset-corpus-contract "$(DATASET_CORPUS_CONTRACT_OUTPUT)" --output "$(COVERAGE_SAMPLING_REPORT_OUTPUT)" --skip-create-db
+
+tom-v1-export-many-point-ingestion-gate-contract:
+	$(PYTHON) -m apps.worker.cli export-many-point-ingestion-gate-contract --output "$(MANY_POINT_INGESTION_CONTRACT_OUTPUT)" --skip-create-db
+
+tom-v1-build-many-point-ingestion-manifest-template:
+	$(PYTHON) -m apps.worker.cli build-many-point-ingestion-manifest-template --local-media-path "$(MANY_POINT_INGESTION_MEDIA_PATH)" --source-label "$(MANY_POINT_INGESTION_SOURCE_LABEL)" --output "$(MANY_POINT_INGESTION_MANIFEST_OUTPUT)" --skip-create-db
+
+tom-v1-validate-many-point-ingestion-manifest:
+	@if [ -z "$(MANY_POINT_INGESTION_MANIFEST)" ]; then echo "MANY_POINT_INGESTION_MANIFEST is required: make tom-v1-validate-many-point-ingestion-manifest MANY_POINT_INGESTION_MANIFEST=<manifest.json>"; exit 1; fi
+	$(PYTHON) -m apps.worker.cli validate-many-point-ingestion-manifest --contract "$(MANY_POINT_INGESTION_CONTRACT_OUTPUT)" --manifest "$(MANY_POINT_INGESTION_MANIFEST)" --output "$(MANY_POINT_INGESTION_VALIDATION_OUTPUT)" --skip-create-db
+
+tom-v1-build-many-point-ingestion-plan:
+	@if [ -z "$(MANY_POINT_INGESTION_MANIFEST)" ]; then echo "MANY_POINT_INGESTION_MANIFEST is required: make tom-v1-build-many-point-ingestion-plan MANY_POINT_INGESTION_MANIFEST=<manifest.json>"; exit 1; fi
+	$(PYTHON) -m apps.worker.cli build-many-point-ingestion-plan --contract "$(MANY_POINT_INGESTION_CONTRACT_OUTPUT)" --manifest "$(MANY_POINT_INGESTION_MANIFEST)" --mode "$(MANY_POINT_INGESTION_MODE)" --viewer-base-url "$(VIEWER_BASE_URL)" --output "$(MANY_POINT_INGESTION_PLAN_OUTPUT)" --skip-create-db
+
+tom-v1-run-many-point-ingestion-gate:
+	@if [ -z "$(MANY_POINT_INGESTION_MANIFEST)" ]; then echo "MANY_POINT_INGESTION_MANIFEST is required: make tom-v1-run-many-point-ingestion-gate MANY_POINT_INGESTION_MANIFEST=<manifest.json>"; exit 1; fi
+	$(PYTHON) -m apps.worker.cli run-many-point-ingestion-gate --contract "$(MANY_POINT_INGESTION_CONTRACT_OUTPUT)" --manifest "$(MANY_POINT_INGESTION_MANIFEST)" --mode "$(MANY_POINT_INGESTION_MODE)" --viewer-base-url "$(VIEWER_BASE_URL)" --storage-root "$(MANY_POINT_INGESTION_STORAGE_ROOT)" --manifest-output-dir "$(MANY_POINT_INGESTION_MANIFEST_OUTPUT_DIR)" --multi-point-index-output "$(MANY_POINT_INGESTION_MULTI_POINT_INDEX_OUTPUT)" --dataset-corpus-manifest-output "$(MANY_POINT_INGESTION_DATASET_CORPUS_MANIFEST_OUTPUT)" --multi-point-matrix "$(MANY_POINT_INGESTION_MULTI_POINT_MATRIX)" --output "$(MANY_POINT_INGESTION_GATE_OUTPUT)" $(if $(filter dry_run validate_only,$(MANY_POINT_INGESTION_MODE)),--skip-create-db,)
 
 tom-v1-post-codex-validate:
 	scripts/post_codex_validate.sh $(if $(EXPECTED_BRANCH),--branch "$(EXPECTED_BRANCH)",) $(if $(EXPECTED_TAG),--expected-tag "$(EXPECTED_TAG)",) --python "$(PYTHON)"

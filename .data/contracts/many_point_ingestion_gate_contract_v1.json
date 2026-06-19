@@ -1,0 +1,315 @@
+{
+  "contract_type": "many_point_ingestion_gate_contract",
+  "contract_version": "v1",
+  "disallowed_requested_action_values": [
+    "generate_event_candidates",
+    "arbitrate_markers",
+    "generate_3d_candidates",
+    "create_review_labels",
+    "create_truth",
+    "score_point",
+    "identify_players"
+  ],
+  "execution_modes": [
+    {
+      "mode": "dry_run",
+      "requires_explicit_mode": false,
+      "writes_media_or_manifest_state": false
+    },
+    {
+      "mode": "validate_only",
+      "requires_explicit_mode": false,
+      "writes_media_or_manifest_state": false
+    },
+    {
+      "mode": "index_only",
+      "requires_explicit_mode": true,
+      "writes_media_or_manifest_state": true
+    },
+    {
+      "mode": "index_and_manifest",
+      "requires_explicit_mode": true,
+      "writes_media_or_manifest_state": true
+    }
+  ],
+  "exported_at": "2026-06-18T00:00:00+00:00",
+  "ingestion_entry_fields": [
+    {
+      "key": "ingestion_entry_id",
+      "provenance_only": true,
+      "required": true,
+      "structural_only": true,
+      "warnings": {
+        "many_point_ingestion_entry_is_not_truth": true,
+        "no_adjudication": true,
+        "observation_only": true,
+        "planning_only": true,
+        "provenance_only": true,
+        "replay_support_only": true,
+        "requested_actions_are_not_tennis_conclusions": true
+      }
+    },
+    {
+      "key": "local_media_path",
+      "provenance_only": true,
+      "required": true,
+      "structural_only": true,
+      "warnings": {
+        "many_point_ingestion_entry_is_not_truth": true,
+        "no_adjudication": true,
+        "observation_only": true,
+        "planning_only": true,
+        "provenance_only": true,
+        "replay_support_only": true,
+        "requested_actions_are_not_tennis_conclusions": true
+      }
+    },
+    {
+      "key": "source_label",
+      "provenance_only": true,
+      "required": true,
+      "structural_only": true,
+      "warnings": {
+        "many_point_ingestion_entry_is_not_truth": true,
+        "no_adjudication": true,
+        "observation_only": true,
+        "planning_only": true,
+        "provenance_only": true,
+        "replay_support_only": true,
+        "requested_actions_are_not_tennis_conclusions": true
+      }
+    },
+    {
+      "key": "external_reference_id",
+      "provenance_only": true,
+      "required": false,
+      "structural_only": true,
+      "warnings": {
+        "many_point_ingestion_entry_is_not_truth": true,
+        "no_adjudication": true,
+        "observation_only": true,
+        "planning_only": true,
+        "provenance_only": true,
+        "replay_support_only": true,
+        "requested_actions_are_not_tennis_conclusions": true
+      }
+    },
+    {
+      "key": "intended_point_id",
+      "provenance_only": true,
+      "required": false,
+      "structural_only": true,
+      "warnings": {
+        "many_point_ingestion_entry_is_not_truth": true,
+        "no_adjudication": true,
+        "observation_only": true,
+        "planning_only": true,
+        "provenance_only": true,
+        "replay_support_only": true,
+        "requested_actions_are_not_tennis_conclusions": true
+      }
+    },
+    {
+      "key": "collection_notes",
+      "provenance_only": true,
+      "required": false,
+      "structural_only": true,
+      "warnings": {
+        "many_point_ingestion_entry_is_not_truth": true,
+        "no_adjudication": true,
+        "observation_only": true,
+        "planning_only": true,
+        "provenance_only": true,
+        "replay_support_only": true,
+        "requested_actions_are_not_tennis_conclusions": true
+      }
+    },
+    {
+      "key": "expected_media_type",
+      "provenance_only": true,
+      "required": false,
+      "structural_only": true,
+      "warnings": {
+        "many_point_ingestion_entry_is_not_truth": true,
+        "no_adjudication": true,
+        "observation_only": true,
+        "planning_only": true,
+        "provenance_only": true,
+        "replay_support_only": true,
+        "requested_actions_are_not_tennis_conclusions": true
+      }
+    },
+    {
+      "key": "allow_duplicate_media",
+      "provenance_only": true,
+      "required": false,
+      "structural_only": true,
+      "warnings": {
+        "many_point_ingestion_entry_is_not_truth": true,
+        "no_adjudication": true,
+        "observation_only": true,
+        "planning_only": true,
+        "provenance_only": true,
+        "replay_support_only": true,
+        "requested_actions_are_not_tennis_conclusions": true
+      }
+    },
+    {
+      "key": "requested_actions",
+      "provenance_only": true,
+      "required": true,
+      "structural_only": true,
+      "warnings": {
+        "many_point_ingestion_entry_is_not_truth": true,
+        "no_adjudication": true,
+        "observation_only": true,
+        "planning_only": true,
+        "provenance_only": true,
+        "replay_support_only": true,
+        "requested_actions_are_not_tennis_conclusions": true
+      }
+    },
+    {
+      "key": "warnings",
+      "provenance_only": true,
+      "required": true,
+      "structural_only": true,
+      "warnings": {
+        "many_point_ingestion_entry_is_not_truth": true,
+        "no_adjudication": true,
+        "observation_only": true,
+        "planning_only": true,
+        "provenance_only": true,
+        "replay_support_only": true,
+        "requested_actions_are_not_tennis_conclusions": true
+      }
+    }
+  ],
+  "ingestion_gate_type": "many_point_ingestion_gate_report",
+  "ingestion_gate_version": "v1",
+  "ingestion_manifest_schema": {
+    "automatic_media_discovery_allowed": false,
+    "entries_required": true,
+    "explicit_local_media_paths_required": true,
+    "manifest_type": "many_point_ingestion_manifest",
+    "manifest_version": "v1"
+  },
+  "ingestion_scope": {
+    "automatic_media_discovery_allowed": false,
+    "default_execution_mode": "dry_run",
+    "event_generation_allowed": false,
+    "generalization_claim_allowed": false,
+    "purpose": "Validate, plan, and explicitly gate indexing of multiple local point videos as replayable evidence assets.",
+    "review_label_creation_allowed": false,
+    "silent_ingestion_allowed": false,
+    "three_d_generation_allowed": false,
+    "training_truth_creation_allowed": false,
+    "truth_creation_allowed": false
+  },
+  "manifest_type": "many_point_ingestion_manifest",
+  "manifest_version": "v1",
+  "output_contracts": {
+    "gate_report_output": ".data/exports/many_point_ingestion_gate.current.json",
+    "generated_exports_are_local_outputs": true,
+    "manifest_template_output": ".data/exports/many_point_ingestion_manifest.template.json",
+    "plan_output": ".data/exports/many_point_ingestion_plan.current.json",
+    "validation_output": ".data/exports/many_point_ingestion_manifest.validation.json"
+  },
+  "plan_type": "many_point_ingestion_plan",
+  "plan_version": "v1",
+  "provenance_requirements": {
+    "checksum_recorded_when_path_exists": true,
+    "duplicate_detection_by_checksum_when_available": true,
+    "duplicate_detection_by_path": true,
+    "local_media_path_required": true,
+    "point_manifest_returned_when_built": true,
+    "replay_url_returned_when_media_indexed": true,
+    "requested_actions_are_planning_or_explicit_gate_actions": true,
+    "source_manifest_path_required": true
+  },
+  "requested_action_values": [
+    "validate_path",
+    "index_media",
+    "build_replay_url",
+    "build_point_manifest",
+    "include_in_multi_point_index",
+    "include_in_dataset_corpus_manifest"
+  ],
+  "source_contract_refs": {
+    "coverage_sampling_strategy_contract_version": "v1",
+    "intennse_label_alignment_contract_version": "v1",
+    "multi_point_regression_matrix_version": "v0",
+    "multi_reviewer_disagreement_schema_version": "v1",
+    "observation_quality_taxonomy_version": "v1",
+    "point_manifest_version": "v0",
+    "review_label_schema_version": "v1",
+    "reviewer_confidence_schema_version": "v1",
+    "versioned_dataset_corpus_contract_version": "v1"
+  },
+  "tom_provenance": {
+    "blueprint": "blueprint_33",
+    "blueprint_name": "many_point_evidence_ingestion_gate_v1",
+    "project": "tom-v3-simple",
+    "project_version": "0.0.0"
+  },
+  "validation_rules": {
+    "contract_version_checked": true,
+    "disallowed_requested_actions_rejected": true,
+    "does_not_create_review_labels": true,
+    "does_not_create_training_truth": true,
+    "does_not_create_truth": true,
+    "does_not_run_3d_generation": true,
+    "does_not_run_event_generation": true,
+    "does_not_run_marker_arbitration": true,
+    "duplicate_paths_or_checksums_rejected_unless_allowed": true,
+    "forbidden_fields": [
+      "accepted",
+      "adjudication",
+      "betting_prediction",
+      "coaching_recommendation",
+      "correct",
+      "disagreement_resolution",
+      "in_out",
+      "incorrect",
+      "match_outcome",
+      "model_ready_truth",
+      "player_identity",
+      "point_winner",
+      "receiver",
+      "rejected",
+      "reviewer_rank",
+      "reviewer_score",
+      "score",
+      "server",
+      "tactical_recommendation",
+      "training_truth",
+      "truth",
+      "winner"
+    ],
+    "local_media_paths_must_exist": true,
+    "manifest_type_version_checked": true,
+    "requested_actions_must_be_allowed": true,
+    "structural_validation_only": true,
+    "write_modes_require_explicit_execution_mode": true
+  },
+  "warnings": {
+    "does_not_claim_generalization": true,
+    "does_not_create_3d_candidates": true,
+    "does_not_create_event_candidates": true,
+    "does_not_create_in_out": true,
+    "does_not_create_observations": true,
+    "does_not_create_review_labels": true,
+    "does_not_create_score": true,
+    "does_not_create_training_truth": true,
+    "does_not_determine_winner": true,
+    "does_not_execute_sampling": true,
+    "does_not_identify_players": true,
+    "does_not_silently_ingest_media": true,
+    "ingestion_gate_is_not_truth": true,
+    "no_adjudication": true,
+    "observation_only": true,
+    "planning_only": true,
+    "provenance_only": true,
+    "replay_support_only": true
+  }
+}
