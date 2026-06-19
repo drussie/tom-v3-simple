@@ -57,6 +57,16 @@ from apps.worker.services.event_candidate_3d_diagnostics import (
 )
 from apps.worker.services.frame_artifacts import extract_frame_artifacts_for_run
 from apps.worker.services.gameplay_adapter import run_gameplay_adapter
+from apps.worker.services.gameplay_gated_perception_execution import (
+    DEFAULT_GAMEPLAY_GATED_PERCEPTION_EXECUTION_CONTRACT_OUTPUT,
+    DEFAULT_GAMEPLAY_GATED_PERCEPTION_EXECUTION_PLAN_OUTPUT,
+    DEFAULT_GAMEPLAY_GATED_PERCEPTION_EXECUTION_REPORT_OUTPUT,
+    DEFAULT_GAMEPLAY_GATED_PERCEPTION_EXECUTION_VALIDATION_OUTPUT,
+    build_gameplay_gated_perception_execution_plan,
+    build_gameplay_gated_perception_execution_report,
+    export_gameplay_gated_perception_execution_contract,
+    validate_gameplay_gated_perception_execution_plan,
+)
 from apps.worker.services.gameplay_gated_pipeline_routing import (
     DEFAULT_GAMEPLAY_GATED_ROUTING_CONTRACT_OUTPUT,
     DEFAULT_GAMEPLAY_GATED_ROUTING_PLAN_OUTPUT,
@@ -2799,6 +2809,126 @@ def main() -> None:
         skip_create_db=True,
     )
 
+    gated_perception_contract_parser = subcommands.add_parser(
+        "export-gameplay-gated-perception-execution-contract",
+        help="Export the Blueprint 40 gameplay-gated perception execution contract.",
+    )
+    gated_perception_contract_parser.add_argument(
+        "--output",
+        default=DEFAULT_GAMEPLAY_GATED_PERCEPTION_EXECUTION_CONTRACT_OUTPUT,
+        help="JSON gameplay-gated perception execution contract output path.",
+    )
+    gated_perception_contract_parser.add_argument("--skip-create-db", action="store_true")
+    gated_perception_contract_parser.set_defaults(
+        handler=_handle_export_gameplay_gated_perception_execution_contract,
+        skip_create_db=True,
+    )
+
+    gated_perception_plan_parser = subcommands.add_parser(
+        "build-gameplay-gated-perception-execution-plan",
+        help="Build a gameplay-gated perception execution plan.",
+    )
+    gated_perception_plan_parser.add_argument(
+        "--routing-plan",
+        required=True,
+        help="Blueprint 39 gameplay-gated routing plan JSON path.",
+    )
+    gated_perception_plan_parser.add_argument(
+        "--routing-contract",
+        default=DEFAULT_GAMEPLAY_GATED_ROUTING_CONTRACT_OUTPUT,
+        help="Blueprint 39 gameplay-gated routing contract JSON path.",
+    )
+    gated_perception_plan_parser.add_argument(
+        "--output",
+        default=DEFAULT_GAMEPLAY_GATED_PERCEPTION_EXECUTION_PLAN_OUTPUT,
+        help="JSON gameplay-gated perception execution plan output path.",
+    )
+    gated_perception_plan_parser.add_argument(
+        "--execution-mode",
+        default="dry_run",
+        help="Execution mode for structural perception execution plan generation.",
+    )
+    gated_perception_plan_parser.add_argument(
+        "--perception-stages",
+        default=None,
+        help="Optional comma-separated perception stage list.",
+    )
+    gated_perception_plan_parser.add_argument("--skip-create-db", action="store_true")
+    gated_perception_plan_parser.set_defaults(
+        handler=_handle_build_gameplay_gated_perception_execution_plan,
+        skip_create_db=True,
+    )
+
+    gated_perception_validate_parser = subcommands.add_parser(
+        "validate-gameplay-gated-perception-execution-plan",
+        help="Validate a gameplay-gated perception execution plan structurally.",
+    )
+    gated_perception_validate_parser.add_argument(
+        "--contract",
+        default=DEFAULT_GAMEPLAY_GATED_PERCEPTION_EXECUTION_CONTRACT_OUTPUT,
+        help="Gameplay-gated perception execution contract JSON path.",
+    )
+    gated_perception_validate_parser.add_argument(
+        "--plan",
+        required=True,
+        help="Gameplay-gated perception execution plan JSON path.",
+    )
+    gated_perception_validate_parser.add_argument(
+        "--routing-contract",
+        default=DEFAULT_GAMEPLAY_GATED_ROUTING_CONTRACT_OUTPUT,
+        help="Blueprint 39 gameplay-gated routing contract JSON path.",
+    )
+    gated_perception_validate_parser.add_argument(
+        "--routing-plan",
+        default=None,
+        help="Optional Blueprint 39 gameplay-gated routing plan JSON path.",
+    )
+    gated_perception_validate_parser.add_argument(
+        "--output",
+        default=DEFAULT_GAMEPLAY_GATED_PERCEPTION_EXECUTION_VALIDATION_OUTPUT,
+        help="Optional JSON gameplay-gated perception execution validation output path.",
+    )
+    gated_perception_validate_parser.add_argument("--skip-create-db", action="store_true")
+    gated_perception_validate_parser.set_defaults(
+        handler=_handle_validate_gameplay_gated_perception_execution_plan,
+        skip_create_db=True,
+    )
+
+    gated_perception_report_parser = subcommands.add_parser(
+        "build-gameplay-gated-perception-execution-report",
+        help="Build a structural gameplay-gated perception execution report.",
+    )
+    gated_perception_report_parser.add_argument(
+        "--contract",
+        default=DEFAULT_GAMEPLAY_GATED_PERCEPTION_EXECUTION_CONTRACT_OUTPUT,
+        help="Gameplay-gated perception execution contract JSON path.",
+    )
+    gated_perception_report_parser.add_argument(
+        "--plan",
+        required=True,
+        help="Gameplay-gated perception execution plan JSON path.",
+    )
+    gated_perception_report_parser.add_argument(
+        "--routing-contract",
+        default=DEFAULT_GAMEPLAY_GATED_ROUTING_CONTRACT_OUTPUT,
+        help="Blueprint 39 gameplay-gated routing contract JSON path.",
+    )
+    gated_perception_report_parser.add_argument(
+        "--routing-plan",
+        default=None,
+        help="Optional Blueprint 39 gameplay-gated routing plan JSON path.",
+    )
+    gated_perception_report_parser.add_argument(
+        "--output",
+        default=DEFAULT_GAMEPLAY_GATED_PERCEPTION_EXECUTION_REPORT_OUTPUT,
+        help="JSON gameplay-gated perception execution report output path.",
+    )
+    gated_perception_report_parser.add_argument("--skip-create-db", action="store_true")
+    gated_perception_report_parser.set_defaults(
+        handler=_handle_build_gameplay_gated_perception_execution_report,
+        skip_create_db=True,
+    )
+
     point_evaluation_parser = subcommands.add_parser(
         "evaluate-point-candidates",
         help="Evaluate generated point candidate markers using operator review metadata.",
@@ -4770,6 +4900,56 @@ def _handle_build_gameplay_gated_routing_report(
         contract_path=args.contract,
         plan_path=args.plan,
         gameplay_gate_contract_path=args.gameplay_segment_contract,
+        output_path=args.output,
+    )
+
+
+def _handle_export_gameplay_gated_perception_execution_contract(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return export_gameplay_gated_perception_execution_contract(output_path=args.output)
+
+
+def _handle_build_gameplay_gated_perception_execution_plan(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_gameplay_gated_perception_execution_plan(
+        routing_plan_path=args.routing_plan,
+        routing_contract_path=args.routing_contract,
+        output_path=args.output,
+        execution_mode=args.execution_mode,
+        perception_stages=args.perception_stages,
+    )
+
+
+def _handle_validate_gameplay_gated_perception_execution_plan(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_gameplay_gated_perception_execution_plan(
+        contract_path=args.contract,
+        plan_path=args.plan,
+        routing_contract_path=args.routing_contract,
+        routing_plan_path=args.routing_plan,
+        output_path=args.output,
+    )
+
+
+def _handle_build_gameplay_gated_perception_execution_report(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_gameplay_gated_perception_execution_report(
+        contract_path=args.contract,
+        plan_path=args.plan,
+        routing_contract_path=args.routing_contract,
+        routing_plan_path=args.routing_plan,
         output_path=args.output,
     )
 

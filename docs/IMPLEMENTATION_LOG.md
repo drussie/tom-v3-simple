@@ -3777,3 +3777,45 @@ fields/values. The report summarizes structural routing output only. Blueprint 3
 detections, tracklets, pose, court, event, 3D, replay, or corpus jobs; it does not create labels,
 training truth, gameplay truth, line-call conclusions, scoring, player identity, production
 readiness claims, or adjudication.
+
+## Blueprint 40 Gameplay-Gated Perception Execution Hook v1
+
+Status: complete
+
+### Goal
+
+Turn Blueprint 39 routing plans into perception-stage execution constraints without running heavy
+perception inference by default, creating tennis truth, mutating model assets, or mutating
+regression baselines.
+
+### Notes
+
+This milestone adds:
+
+- `apps.worker.services.gameplay_gated_perception_execution`
+- `export-gameplay-gated-perception-execution-contract` worker CLI command
+- `build-gameplay-gated-perception-execution-plan` worker CLI command
+- `validate-gameplay-gated-perception-execution-plan` worker CLI command
+- `build-gameplay-gated-perception-execution-report` worker CLI command
+- `tom-v1-export-gameplay-gated-perception-execution-contract` Make helper
+- `tom-v1-build-gameplay-gated-perception-execution-plan` Make helper
+- `tom-v1-validate-gameplay-gated-perception-execution-plan` Make helper
+- `tom-v1-build-gameplay-gated-perception-execution-report` Make helper
+- `.data/contracts/gameplay_gated_perception_execution_contract_v1.json` tracked contract path
+- `.data/exports/gameplay_gated_perception_execution_plan.current.json` local plan path
+- `.data/exports/gameplay_gated_perception_execution_plan.validation.json` local validation path
+- `.data/exports/gameplay_gated_perception_execution_report.current.json` local report path
+- `docs/blueprints/blueprint_40_gameplay_gated_perception_execution_hook_v1.md`
+- `docs/reviews/gameplay_gated_perception_execution_hook_v1.md`
+- `docs/agent_reports/blueprint_40_gameplay_gated_perception_execution_hook_v1_report.md`
+
+The contract defines execution scope, source contract refs, routing plan contract refs, perception
+stage schema, execution plan schema, skipped window schema, execution summary schema, validation
+rules, provenance requirements, and warnings. The plan builder reads Blueprint 39 routing plans
+and emits allowed execution windows, skipped windows, review-required windows, and execution
+entries for perception stages. The validator checks contract shape, plan shape, allowed execution
+modes, allowed decisions, skip reasons, provenance statuses, referenced routing plan/contract
+versions, and forbidden fields/values. The report summarizes structural execution constraints
+only. Blueprint 40 does not run detections, tracklets, pose, court, 3D, or GPU/model inference by
+default; it does not write observations by default, create labels, training truth, gameplay truth,
+line-call conclusions, scoring, player identity, production readiness claims, or adjudication.

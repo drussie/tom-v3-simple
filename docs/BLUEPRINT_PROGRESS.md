@@ -1436,3 +1436,26 @@ include the routing plan, validation, and report under `.data/exports/`. The def
 downstream detection, tracklet, pose, court, event, 3D, replay, or corpus jobs. It does not create
 truth, in/out, score, point winners, player identity, line calls, labels, automatic correctness
 claims, or adjudication.
+
+## Blueprint 40 Status
+
+Status: complete.
+
+Blueprint 40 turns Blueprint 39 routing rows into perception-stage execution constraints:
+
+```text
+gameplay-gated routing plan
+-> allowed gameplay execution windows
+-> skipped non-gameplay windows
+-> review-required windows
+-> perception execution entries
+-> structural execution report
+```
+
+The tracked execution contract is
+`.data/contracts/gameplay_gated_perception_execution_contract_v1.json`. Generated local exports
+include the execution plan, validation, and report under `.data/exports/`. The default mode is
+`dry_run`; the hook records how detection, tracklet, pose, court, homography, projection
+diagnostic, and 3D trajectory stages should be constrained without running GPU/model inference or
+writing observations by default. It does not create truth, in/out, score, point winners, player
+identity, line calls, labels, automatic correctness claims, or adjudication.

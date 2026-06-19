@@ -348,6 +348,8 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Gameplay Segment Gate / TOM v1 View Classifier Integration v1](reviews/gameplay_segment_gate_tom_v1_view_classifier_v1.md)
 - [Blueprint 39 Gameplay-Gated Evidence Pipeline Routing v1](blueprints/blueprint_39_gameplay_gated_evidence_pipeline_routing_v1.md)
 - [Gameplay-Gated Evidence Pipeline Routing v1](reviews/gameplay_gated_evidence_pipeline_routing_v1.md)
+- [Blueprint 40 Gameplay-Gated Perception Execution Hook v1](blueprints/blueprint_40_gameplay_gated_perception_execution_hook_v1.md)
+- [Gameplay-Gated Perception Execution Hook v1](reviews/gameplay_gated_perception_execution_hook_v1.md)
 
 ## Development
 

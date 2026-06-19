@@ -1242,3 +1242,33 @@ accepted/rejected lifecycle, coaching/tactical conclusions, betting/prediction o
 generalization, automatic correctness, training truth, production truth, or adjudication. It does
 not mutate model assets, commit weights, silently ingest media, auto-discover media folders, run
 heavy inference, or mutate protected regression baselines.
+
+## Blueprint 40 - Gameplay-Gated Perception Execution Hook
+
+Status: COMPLETE
+
+Blueprint 40 proves:
+
+```text
+gameplay-gated routing plan
+-> allowed gameplay execution windows
+-> skipped non-gameplay windows
+-> review-required windows
+-> perception execution entries
+-> structural execution report
+```
+
+The tracked execution contract is
+`.data/contracts/gameplay_gated_perception_execution_contract_v1.json`. The generated local
+outputs are the execution plan, execution validation, and execution report under `.data/exports/`.
+The hook records execution entries for detection, tracklet, pose, court geometry, homography,
+projection diagnostics, and 3D trajectory stages. Default mode is `dry_run`, so execution artifacts
+are structural constraints only and do not run perception jobs, GPU/model inference, or observation
+writes by default.
+
+Blueprint 40 does not decide tennis truth, in/out, score, point winner, player identity, rally
+state, server/receiver state, line-call truth, point truth, event truth, marker arbitration,
+accepted/rejected lifecycle, coaching/tactical conclusions, betting/prediction outcomes,
+generalization, automatic correctness, training truth, production truth, or adjudication. It does
+not mutate model assets, commit weights, silently ingest media, auto-discover media folders, run
+heavy inference by default, or mutate protected regression baselines.

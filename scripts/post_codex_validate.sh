@@ -64,7 +64,7 @@ fi
 mkdir -p "$TMP_ROOT"
 
 run "$PYTHON_BIN" -m pytest -q
-run ruff check .
+run "$PYTHON_BIN" -m ruff check .
 run git diff --check
 
 run_shell "cd apps/web && npm run lint && npm run build && npm audit --omit=dev"
@@ -428,6 +428,33 @@ run "$PYTHON_BIN" -m apps.worker.cli build-gameplay-gated-routing-report \
   --plan "$TMP_ROOT/gameplay_gated_routing_plan.current.json" \
   --gameplay-segment-contract "$TMP_ROOT/gameplay_segment_gate_contract_v1.smoke.json" \
   --output "$TMP_ROOT/gameplay_gated_routing_report.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli export-gameplay-gated-perception-execution-contract \
+  --output "$TMP_ROOT/gameplay_gated_perception_execution_contract_v1.smoke.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-gameplay-gated-perception-execution-plan \
+  --routing-plan "$TMP_ROOT/gameplay_gated_routing_plan.current.json" \
+  --routing-contract "$TMP_ROOT/gameplay_gated_pipeline_routing_contract_v1.smoke.json" \
+  --output "$TMP_ROOT/gameplay_gated_perception_execution_plan.current.json" \
+  --execution-mode "dry_run" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli validate-gameplay-gated-perception-execution-plan \
+  --contract "$TMP_ROOT/gameplay_gated_perception_execution_contract_v1.smoke.json" \
+  --plan "$TMP_ROOT/gameplay_gated_perception_execution_plan.current.json" \
+  --routing-contract "$TMP_ROOT/gameplay_gated_pipeline_routing_contract_v1.smoke.json" \
+  --routing-plan "$TMP_ROOT/gameplay_gated_routing_plan.current.json" \
+  --output "$TMP_ROOT/gameplay_gated_perception_execution_plan.validation.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-gameplay-gated-perception-execution-report \
+  --contract "$TMP_ROOT/gameplay_gated_perception_execution_contract_v1.smoke.json" \
+  --plan "$TMP_ROOT/gameplay_gated_perception_execution_plan.current.json" \
+  --routing-contract "$TMP_ROOT/gameplay_gated_pipeline_routing_contract_v1.smoke.json" \
+  --routing-plan "$TMP_ROOT/gameplay_gated_routing_plan.current.json" \
+  --output "$TMP_ROOT/gameplay_gated_perception_execution_report.current.json" \
   --skip-create-db
 
 run git status --short

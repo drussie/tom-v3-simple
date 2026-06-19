@@ -1811,6 +1811,56 @@ Expected:
 - `breaking_drift_detected`: false
 - `baseline_is_not_truth`: true
 
+## Gameplay-Gated Perception Execution Hook
+
+Use this after the Blueprint 38 gameplay segment gate and Blueprint 39 routing plan are available.
+The execution hook is structural by default: it records which perception stages should run on
+gameplay-approved windows and which windows should be skipped or reviewed. It does not run heavy
+perception inference, write observations by default, create tennis truth, or adjudicate evidence.
+
+Export the tracked contract:
+
+```bash
+make tom-v1-export-gameplay-gated-perception-execution-contract \
+  PYTHON=.venv/bin/python
+```
+
+Build a gameplay-gated perception execution plan from a Blueprint 39 routing plan:
+
+```bash
+make tom-v1-build-gameplay-gated-perception-execution-plan \
+  PYTHON=.venv/bin/python \
+  GAMEPLAY_GATED_PERCEPTION_EXECUTION_ROUTING_PLAN=.data/exports/gameplay_gated_routing_plan.current.json
+```
+
+Validate the plan:
+
+```bash
+make tom-v1-validate-gameplay-gated-perception-execution-plan \
+  PYTHON=.venv/bin/python \
+  GAMEPLAY_GATED_PERCEPTION_EXECUTION_PLAN=.data/exports/gameplay_gated_perception_execution_plan.current.json \
+  GAMEPLAY_GATED_PERCEPTION_EXECUTION_ROUTING_PLAN=.data/exports/gameplay_gated_routing_plan.current.json
+```
+
+Build the report:
+
+```bash
+make tom-v1-build-gameplay-gated-perception-execution-report \
+  PYTHON=.venv/bin/python \
+  GAMEPLAY_GATED_PERCEPTION_EXECUTION_PLAN=.data/exports/gameplay_gated_perception_execution_plan.current.json \
+  GAMEPLAY_GATED_PERCEPTION_EXECUTION_ROUTING_PLAN=.data/exports/gameplay_gated_routing_plan.current.json
+```
+
+Expected:
+
+- `ok`: true
+- `status`: `completed` or `valid`
+- `execution_mode`: `dry_run`
+- `perception_jobs_executed`: false
+- `gpu_or_model_inference_executed`: false
+- `observations_written`: false
+- skipped and review-required windows are preserved with reasons
+
 ## Camera Geometry Calibration Provenance
 
 Blueprint 36 builds a structural camera geometry / calibration provenance profile from existing

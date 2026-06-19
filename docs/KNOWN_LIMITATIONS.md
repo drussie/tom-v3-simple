@@ -318,6 +318,11 @@ TOM v3 Simple does not include:
   tracklet, pose, court, event, 3D, replay, or corpus jobs; they do not prove gameplay correctness,
   model readiness, scoring, line calls, player identity, production readiness, training truth, or
   adjudication.
+- Gameplay-gated perception execution artifacts convert routing plans into perception execution
+  constraints only. The default mode is dry-run planning, and the artifacts do not run GPU/model
+  inference, write observations by default, prove perception correctness, decide gameplay
+  correctness, score, line calls, player identity, production readiness, training truth, or
+  adjudication.
 
 ## Boundary
 
