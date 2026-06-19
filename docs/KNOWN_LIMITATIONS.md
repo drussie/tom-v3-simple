@@ -304,6 +304,13 @@ TOM v3 Simple does not include:
 - Camera geometry calibration provenance profiles summarize structural readiness and review gaps
   only; they are not calibration truth, geometry truth, line-call truth, model readiness, or
   adjudication.
+- TOM v3 expansion completion freeze artifacts summarize tracked contracts, protected baseline
+  refs, regression gates, limitations, and next-phase readiness only. They do not make TOM
+  production-generalized, create training labels, wire gameplay classification, prove line calls,
+  decide score, identify players, determine winners, or adjudicate evidence.
+- The recommended next phase is the Gameplay Segment Gate / TOM v1 View Classifier Integration
+  using `model_assets/tom_v1/view_classifier_gameplay.pt`; Blueprint 37 records that
+  recommendation but does not implement the classifier integration.
 
 ## Boundary
 

@@ -1870,6 +1870,60 @@ Expected protected-sample interpretation:
 - `requires_human_calibration_review` can be true while TOM still makes no calibration claim
 - `regression_protected_context` preserves baseline context only and is not a correctness finding
 
+## TOM v3 Expansion Completion Freeze
+
+Blueprint 37 freezes the completed BP22 through BP36 expansion as a tracked provenance/readiness
+manifest. It records frozen contract refs, protected baseline refs, required regression gates,
+capability summary, non-claims, known limitations, and the recommended first next phase. It does
+not create evidence, ingest media, execute sampling, create labels, mutate baselines, retrain
+models, wire gameplay classification, decide in/out, score, identify players, determine winners,
+or adjudicate evidence.
+
+Build the tracked freeze manifest:
+
+```bash
+make tom-v1-build-tom-v3-expansion-completion-freeze \
+  PYTHON=.venv/bin/python
+```
+
+Validate the freeze:
+
+```bash
+make tom-v1-validate-tom-v3-expansion-completion-freeze \
+  PYTHON=.venv/bin/python \
+  TOM_V3_EXPANSION_COMPLETION_FREEZE=.data/contracts/tom_v3_expansion_completion_freeze_v1.json
+```
+
+Build the next-phase readiness report:
+
+```bash
+make tom-v1-build-tom-v3-next-phase-readiness-report \
+  PYTHON=.venv/bin/python \
+  TOM_V3_EXPANSION_COMPLETION_FREEZE=.data/contracts/tom_v3_expansion_completion_freeze_v1.json
+```
+
+Default paths:
+
+```text
+.data/contracts/tom_v3_expansion_completion_freeze_v1.json
+.data/exports/tom_v3_expansion_completion_freeze.validation.json
+.data/exports/tom_v3_next_phase_readiness_report.current.json
+```
+
+Expected:
+
+- `ok`: true for freeze build, freeze validation, and readiness report
+- `freeze_type`: `tom_v3_expansion_completion_freeze`
+- `freeze_version`: `v1`
+- `report_type`: `tom_v3_next_phase_readiness_report`
+- `report_version`: `v1`
+- `completed_blueprint_count`: 15
+- `frozen_contract_count`: 11
+- `tracked_exports`: `[]` in validation
+- next phase recommends Gameplay Segment Gate / TOM v1 View Classifier Integration v1
+- `model_assets/tom_v1/view_classifier_gameplay.pt` is recorded as the existing classifier asset,
+  but not wired by Blueprint 37
+
 ## Point Manifest / Evidence Provenance Contract
 
 Use this when an indexed point needs a durable provenance record for replay/review surfaces,

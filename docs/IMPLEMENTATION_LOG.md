@@ -3652,3 +3652,41 @@ review needs, human-review readiness, and regression-protected context. It does 
 camera geometry, homography, projection diagnostics, event candidates, 3D candidates, labels,
 training truth, in/out, score, player identity, winner, tactical conclusions, reviewer ranking,
 reviewer scoring, or adjudication.
+
+## Blueprint 37 TOM v3 Expansion Completion Freeze / Next-Phase Readiness v1
+
+Status: complete
+
+### Goal
+
+Freeze the completed TOM v3 expansion path from Blueprint 22 through Blueprint 36 as a tracked
+provenance/readiness contract and record the recommended first next-phase capability without
+adding evidence generation, truth, scoring, adjudication, or gameplay classifier wiring.
+
+### Notes
+
+This milestone adds:
+
+- `apps.worker.services.tom_v3_expansion_completion_freeze`
+- `build-tom-v3-expansion-completion-freeze` worker CLI command
+- `validate-tom-v3-expansion-completion-freeze` worker CLI command
+- `build-tom-v3-next-phase-readiness-report` worker CLI command
+- `tom-v1-build-tom-v3-expansion-completion-freeze` Make helper
+- `tom-v1-validate-tom-v3-expansion-completion-freeze` Make helper
+- `tom-v1-build-tom-v3-next-phase-readiness-report` Make helper
+- `.data/contracts/tom_v3_expansion_completion_freeze_v1.json` tracked freeze path
+- `.data/exports/tom_v3_expansion_completion_freeze.validation.json` local validation path
+- `.data/exports/tom_v3_next_phase_readiness_report.current.json` local report path
+- `docs/blueprints/blueprint_37_tom_v3_expansion_completion_freeze_v1.md`
+- `docs/reviews/tom_v3_expansion_completion_freeze_v1.md`
+- `docs/agent_reports/blueprint_37_tom_v3_expansion_completion_freeze_v1_report.md`
+
+The freeze manifest records completed BP22-BP36 milestones, 11 frozen contract refs, protected
+baseline refs, required regression gates, capability summary, non-claims, known limitations,
+validation summary, and warnings. The validator checks shape, expected tracked refs, generated
+export tracking, frozen contract cleanliness, and forbidden claim tokens. The readiness report
+records Gameplay Segment Gate / TOM v1 View Classifier Integration v1 as the recommended first
+next phase with `model_assets/tom_v1/view_classifier_gameplay.pt`. It does not generate evidence,
+ingest media, execute sampling, create labels, mutate baselines, retrain models, wire gameplay
+classification, decide in/out, score, identify players, determine winners, make coaching/tactical
+conclusions, make betting/prediction claims, claim generalization, or adjudicate evidence.

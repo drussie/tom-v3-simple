@@ -176,6 +176,14 @@ from apps.worker.services.second_point_evidence_parity import (
     build_second_point_evidence_parity,
 )
 from apps.worker.services.second_point_smoke import run_second_point_ingestion_smoke
+from apps.worker.services.tom_v3_expansion_completion_freeze import (
+    DEFAULT_TOM_V3_EXPANSION_COMPLETION_FREEZE_OUTPUT,
+    DEFAULT_TOM_V3_EXPANSION_COMPLETION_VALIDATION_OUTPUT,
+    DEFAULT_TOM_V3_NEXT_PHASE_READINESS_REPORT_OUTPUT,
+    build_tom_v3_expansion_completion_freeze,
+    build_tom_v3_next_phase_readiness_report,
+    validate_tom_v3_expansion_completion_freeze,
+)
 from apps.worker.services.tracklet_builder import build_tracklets_from_detection_run
 from apps.worker.services.versioned_dataset_corpus import (
     DEFAULT_DATASET_CORPUS_CONTRACT_OUTPUT,
@@ -2482,6 +2490,65 @@ def main() -> None:
         skip_create_db=True,
     )
 
+    expansion_freeze_parser = subcommands.add_parser(
+        "build-tom-v3-expansion-completion-freeze",
+        help="Build the Blueprint 37 TOM v3 expansion completion freeze manifest.",
+    )
+    expansion_freeze_parser.add_argument(
+        "--output",
+        default=DEFAULT_TOM_V3_EXPANSION_COMPLETION_FREEZE_OUTPUT,
+        help="JSON TOM v3 expansion completion freeze output path.",
+    )
+    expansion_freeze_parser.add_argument(
+        "--current-main-commit",
+        help="Override the main commit recorded in the freeze manifest.",
+    )
+    expansion_freeze_parser.add_argument("--skip-create-db", action="store_true")
+    expansion_freeze_parser.set_defaults(
+        handler=_handle_build_tom_v3_expansion_completion_freeze,
+        skip_create_db=True,
+    )
+
+    expansion_freeze_validate_parser = subcommands.add_parser(
+        "validate-tom-v3-expansion-completion-freeze",
+        help="Validate the Blueprint 37 TOM v3 expansion completion freeze manifest.",
+    )
+    expansion_freeze_validate_parser.add_argument(
+        "--freeze",
+        required=True,
+        help="TOM v3 expansion completion freeze JSON path.",
+    )
+    expansion_freeze_validate_parser.add_argument(
+        "--output",
+        default=DEFAULT_TOM_V3_EXPANSION_COMPLETION_VALIDATION_OUTPUT,
+        help="Optional JSON TOM v3 expansion completion validation output path.",
+    )
+    expansion_freeze_validate_parser.add_argument("--skip-create-db", action="store_true")
+    expansion_freeze_validate_parser.set_defaults(
+        handler=_handle_validate_tom_v3_expansion_completion_freeze,
+        skip_create_db=True,
+    )
+
+    next_phase_readiness_parser = subcommands.add_parser(
+        "build-tom-v3-next-phase-readiness-report",
+        help="Build the Blueprint 37 TOM v3 next-phase readiness report.",
+    )
+    next_phase_readiness_parser.add_argument(
+        "--freeze",
+        default=DEFAULT_TOM_V3_EXPANSION_COMPLETION_FREEZE_OUTPUT,
+        help="TOM v3 expansion completion freeze JSON path.",
+    )
+    next_phase_readiness_parser.add_argument(
+        "--output",
+        default=DEFAULT_TOM_V3_NEXT_PHASE_READINESS_REPORT_OUTPUT,
+        help="JSON TOM v3 next-phase readiness report output path.",
+    )
+    next_phase_readiness_parser.add_argument("--skip-create-db", action="store_true")
+    next_phase_readiness_parser.set_defaults(
+        handler=_handle_build_tom_v3_next_phase_readiness_report,
+        skip_create_db=True,
+    )
+
     point_evaluation_parser = subcommands.add_parser(
         "evaluate-point-candidates",
         help="Evaluate generated point candidate markers using operator review metadata.",
@@ -4305,6 +4372,39 @@ def _handle_build_camera_geometry_calibration_report(
     return build_camera_geometry_calibration_report(
         contract_path=args.contract,
         profile_path=args.profile,
+        output_path=args.output,
+    )
+
+
+def _handle_build_tom_v3_expansion_completion_freeze(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_tom_v3_expansion_completion_freeze(
+        output_path=args.output,
+        current_main_commit=args.current_main_commit,
+    )
+
+
+def _handle_validate_tom_v3_expansion_completion_freeze(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_tom_v3_expansion_completion_freeze(
+        freeze_path=args.freeze,
+        output_path=args.output,
+    )
+
+
+def _handle_build_tom_v3_next_phase_readiness_report(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_tom_v3_next_phase_readiness_report(
+        freeze_path=args.freeze,
         output_path=args.output,
     )
 

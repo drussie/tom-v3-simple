@@ -1,0 +1,403 @@
+{
+  "capability_summary": [
+    {
+      "capability": "evidence persistence",
+      "status": "structurally_supported"
+    },
+    {
+      "capability": "replay workstation",
+      "status": "structurally_supported"
+    },
+    {
+      "capability": "review annotations",
+      "status": "structurally_supported"
+    },
+    {
+      "capability": "point manifests",
+      "status": "structurally_supported"
+    },
+    {
+      "capability": "multi-point replay index",
+      "status": "structurally_supported"
+    },
+    {
+      "capability": "regression matrix protection",
+      "status": "structurally_supported"
+    },
+    {
+      "capability": "observation quality taxonomy",
+      "status": "structurally_supported"
+    },
+    {
+      "capability": "structured review label schema",
+      "status": "structurally_supported"
+    },
+    {
+      "capability": "reviewer confidence and ambiguity schema",
+      "status": "structurally_supported"
+    },
+    {
+      "capability": "multi-reviewer disagreement structure",
+      "status": "structurally_supported"
+    },
+    {
+      "capability": "INTENNSE alignment contract",
+      "status": "structurally_supported"
+    },
+    {
+      "capability": "versioned dataset corpus contract",
+      "status": "structurally_supported"
+    },
+    {
+      "capability": "coverage-driven sampling strategy",
+      "status": "structurally_supported"
+    },
+    {
+      "capability": "many-point ingestion gate",
+      "status": "structurally_supported"
+    },
+    {
+      "capability": "review operations metrics",
+      "status": "structurally_supported"
+    },
+    {
+      "capability": "label feedback loop into evaluation harness",
+      "status": "structurally_supported"
+    },
+    {
+      "capability": "camera geometry calibration provenance",
+      "status": "structurally_supported"
+    }
+  ],
+  "completed_blueprints": [
+    {
+      "blueprint": "blueprint_22",
+      "status": "complete",
+      "title": "Second Point Evidence Parity / Protected Baseline Gate"
+    },
+    {
+      "blueprint": "blueprint_23",
+      "status": "complete",
+      "title": "Point Manifest / Evidence Provenance Contract"
+    },
+    {
+      "blueprint": "blueprint_24",
+      "status": "complete",
+      "title": "Multi-Point Replay Navigation / Review Surface"
+    },
+    {
+      "blueprint": "blueprint_25",
+      "status": "complete",
+      "title": "Multi-Point Regression Matrix / Baseline Expansion"
+    },
+    {
+      "blueprint": "blueprint_26",
+      "status": "complete",
+      "title": "Observation Quality Taxonomy"
+    },
+    {
+      "blueprint": "blueprint_27",
+      "status": "complete",
+      "title": "Structured Review Label Schema"
+    },
+    {
+      "blueprint": "blueprint_28",
+      "status": "complete",
+      "title": "Reviewer Confidence / Ambiguity Capture"
+    },
+    {
+      "blueprint": "blueprint_29",
+      "status": "complete",
+      "title": "Multi-Reviewer / Disagreement Foundation"
+    },
+    {
+      "blueprint": "blueprint_30",
+      "status": "complete",
+      "title": "INTENNSE Label Alignment Contract"
+    },
+    {
+      "blueprint": "blueprint_31",
+      "status": "complete",
+      "title": "Versioned Dataset Corpus"
+    },
+    {
+      "blueprint": "blueprint_32",
+      "status": "complete",
+      "title": "Coverage-Driven Sampling Strategy"
+    },
+    {
+      "blueprint": "blueprint_33",
+      "status": "complete",
+      "title": "Many-Point Evidence Ingestion Gate"
+    },
+    {
+      "blueprint": "blueprint_34",
+      "status": "complete",
+      "title": "Review Ops Metrics / Label Throughput Dashboard"
+    },
+    {
+      "blueprint": "blueprint_35",
+      "status": "complete",
+      "title": "Label Feedback Loop into Evaluation Harness"
+    },
+    {
+      "blueprint": "blueprint_36",
+      "status": "complete",
+      "title": "Camera Geometry Confidence / Calibration Provenance"
+    }
+  ],
+  "current_main_commit": "bb90aac8",
+  "freeze_type": "tom_v3_expansion_completion_freeze",
+  "freeze_version": "v1",
+  "frozen_contract_refs": [
+    {
+      "frozen": true,
+      "generated_exports_are_not_tracked": true,
+      "path": ".data/contracts/observation_quality_taxonomy_v1.json",
+      "tracked_required": true
+    },
+    {
+      "frozen": true,
+      "generated_exports_are_not_tracked": true,
+      "path": ".data/contracts/review_label_schema_v1.json",
+      "tracked_required": true
+    },
+    {
+      "frozen": true,
+      "generated_exports_are_not_tracked": true,
+      "path": ".data/contracts/reviewer_confidence_ambiguity_schema_v1.json",
+      "tracked_required": true
+    },
+    {
+      "frozen": true,
+      "generated_exports_are_not_tracked": true,
+      "path": ".data/contracts/multi_reviewer_disagreement_schema_v1.json",
+      "tracked_required": true
+    },
+    {
+      "frozen": true,
+      "generated_exports_are_not_tracked": true,
+      "path": ".data/contracts/intennse_label_alignment_contract_v1.json",
+      "tracked_required": true
+    },
+    {
+      "frozen": true,
+      "generated_exports_are_not_tracked": true,
+      "path": ".data/contracts/versioned_dataset_corpus_contract_v1.json",
+      "tracked_required": true
+    },
+    {
+      "frozen": true,
+      "generated_exports_are_not_tracked": true,
+      "path": ".data/contracts/coverage_sampling_strategy_contract_v1.json",
+      "tracked_required": true
+    },
+    {
+      "frozen": true,
+      "generated_exports_are_not_tracked": true,
+      "path": ".data/contracts/many_point_ingestion_gate_contract_v1.json",
+      "tracked_required": true
+    },
+    {
+      "frozen": true,
+      "generated_exports_are_not_tracked": true,
+      "path": ".data/contracts/review_ops_metrics_contract_v1.json",
+      "tracked_required": true
+    },
+    {
+      "frozen": true,
+      "generated_exports_are_not_tracked": true,
+      "path": ".data/contracts/label_feedback_evaluation_contract_v1.json",
+      "tracked_required": true
+    },
+    {
+      "frozen": true,
+      "generated_exports_are_not_tracked": true,
+      "path": ".data/contracts/camera_geometry_calibration_provenance_contract_v1.json",
+      "tracked_required": true
+    }
+  ],
+  "generated_at": "2026-06-18T00:00:00+00:00",
+  "known_limitations": [
+    "The expansion is structurally complete but not production-generalized.",
+    "Sample and demo assets still dominate protected regression examples.",
+    "A real many-point corpus still needs controlled data expansion.",
+    "Human review remains required.",
+    "INTENNSE alignment is structural and not automatic expert interpretation.",
+    "Camera calibration confidence is structural/provenance confidence only.",
+    "Gameplay and broadcast filtering are not yet first-class in TOM v3."
+  ],
+  "latest_completed_blueprint": {
+    "blueprint": "blueprint_36",
+    "commit": "bb90aac8",
+    "tag": "tom-v3-blueprint-36-camera-geometry-confidence-calibration-provenance-v1",
+    "title": "Camera Geometry Confidence / Calibration Provenance v1"
+  },
+  "next_phase_recommendations": [
+    {
+      "asset_treatment": "existing_proven_tom_v1_classifier",
+      "existing_asset": "model_assets/tom_v1/view_classifier_gameplay.pt",
+      "implementation_in_blueprint_37": false,
+      "recommended_first_blueprint": "Gameplay Segment Gate / TOM v1 View Classifier Integration v1",
+      "recommended_flow": [
+        "raw video",
+        "TOM v1 gameplay classifier",
+        "frame/window gameplay probabilities",
+        "temporal smoothing / hysteresis",
+        "gameplay segment candidates",
+        "replay-visible gameplay timeline",
+        "downstream processing gate",
+        "detections / tracklets / pose / court / 3D only on allowed gameplay windows"
+      ]
+    }
+  ],
+  "non_claims": [
+    {
+      "claim": "line calling correctness",
+      "claimed": false,
+      "structural_boundary": true
+    },
+    {
+      "claim": "in/out truth",
+      "claimed": false,
+      "structural_boundary": true
+    },
+    {
+      "claim": "scoring truth",
+      "claimed": false,
+      "structural_boundary": true
+    },
+    {
+      "claim": "player identity truth",
+      "claimed": false,
+      "structural_boundary": true
+    },
+    {
+      "claim": "event truth",
+      "claimed": false,
+      "structural_boundary": true
+    },
+    {
+      "claim": "rally truth",
+      "claimed": false,
+      "structural_boundary": true
+    },
+    {
+      "claim": "match truth",
+      "claimed": false,
+      "structural_boundary": true
+    },
+    {
+      "claim": "coaching conclusions",
+      "claimed": false,
+      "structural_boundary": true
+    },
+    {
+      "claim": "tactical recommendations",
+      "claimed": false,
+      "structural_boundary": true
+    },
+    {
+      "claim": "betting or prediction edge",
+      "claimed": false,
+      "structural_boundary": true
+    },
+    {
+      "claim": "training-ready truth labels",
+      "claimed": false,
+      "structural_boundary": true
+    },
+    {
+      "claim": "real-world generalization from sample or demo data",
+      "claimed": false,
+      "structural_boundary": true
+    },
+    {
+      "claim": "fully automated broadcast filtering yet",
+      "claimed": false,
+      "structural_boundary": true
+    }
+  ],
+  "protected_baseline_refs": [
+    {
+      "baseline_type": "multi_point_regression_matrix_baseline",
+      "path": ".data/baselines/multi_point_regression_matrix.baseline.json",
+      "tracked_required": true
+    },
+    {
+      "baseline_path": ".data/baselines/reviewed_3d_debug_dataset_sample_point.baseline.json",
+      "baseline_type": "protected_sample_point_reviewed_3d_debug_baseline",
+      "identifiers": {
+        "camera_geometry_id": "5afa67fb-7f6e-41eb-b4aa-b1100a97ee97",
+        "event_candidate_run_id": "1b946366-7ec1-426f-8b40-494535a9b3fb",
+        "media_id": "9518fb01-0da1-4344-9a84-ff88ec8e9b1e",
+        "trajectory_3d_run_id": "ea76ccab-c51d-4a63-9682-9fd0bbb83f14"
+      },
+      "note": "Protected sample baseline path may be locally generated while identifiers remain frozen.",
+      "tracked_required": false
+    }
+  ],
+  "required_regression_gates": [
+    {
+      "expected": {
+        "baseline_is_not_truth": true,
+        "breaking_drift_detected": false,
+        "drift_detected": false,
+        "matrix_is_not_truth": true,
+        "ok": true,
+        "status": "completed"
+      },
+      "gate_id": "multi_point_regression_matrix_gate",
+      "make_target": "tom-v1-verify-multi-point-regression-matrix"
+    },
+    {
+      "expected": {
+        "baseline_is_not_truth": true,
+        "breaking_drift_detected": false,
+        "drift_detected": false,
+        "ok": true,
+        "status": "completed"
+      },
+      "gate_id": "protected_sample_point_reviewed_3d_debug_gate",
+      "identifiers": {
+        "camera_geometry_id": "5afa67fb-7f6e-41eb-b4aa-b1100a97ee97",
+        "event_candidate_run_id": "1b946366-7ec1-426f-8b40-494535a9b3fb",
+        "media_id": "9518fb01-0da1-4344-9a84-ff88ec8e9b1e",
+        "trajectory_3d_run_id": "ea76ccab-c51d-4a63-9682-9fd0bbb83f14"
+      },
+      "make_target": "tom-v1-verify-reviewed-3d-debug-baseline"
+    }
+  ],
+  "tom_provenance": {
+    "blueprint": "blueprint_37",
+    "blueprint_name": "tom_v3_expansion_completion_freeze_v1",
+    "project": "tom-v3-simple",
+    "project_version": "0.0.0"
+  },
+  "validation_summary": {
+    "status": "not_assessed",
+    "structural_error_count": 0,
+    "structural_warning_count": 0,
+    "validation_does_not_create_truth": true
+  },
+  "warnings": {
+    "completion_freeze_is_not_truth": true,
+    "does_not_claim_generalization": true,
+    "does_not_convert_reviews_into_training_labels": true,
+    "does_not_create_3d_candidates": true,
+    "does_not_create_calibration_conclusions": true,
+    "does_not_create_event_candidates": true,
+    "does_not_create_evidence": true,
+    "does_not_create_observations": true,
+    "does_not_create_review_labels": true,
+    "does_not_execute_sampling": true,
+    "does_not_ingest_media": true,
+    "does_not_retrain_models": true,
+    "does_not_wire_gameplay_classifier": true,
+    "no_adjudication": true,
+    "observation_only": true,
+    "provenance_only": true,
+    "review_support_only": true,
+    "system_readiness_is_structural_only": true
+  }
+}

@@ -2,7 +2,7 @@
 
 ## Current Progress Gauge
 
-Current: Blueprints 1, 2, 3, 4, 5, 6, 7, and 8 complete/frozen; Blueprint 9 manual candidate review annotations are complete; Blueprint 10 benchmark/evaluation harness is complete; Blueprint 11 3D readiness / camera geometry evidence is complete; Blueprint 12 3D ball trajectory candidate evidence is complete; Blueprints 13 through 16 add diagnostic-only 3D marker context, the 3D Debug View, selection/timeline coupling, and 3D debug review annotations; Blueprint 17 exports reviewed 3D debug datasets; Blueprint 18 compares those exports for deterministic drift; Blueprint 19 freezes and verifies a local sample-point reviewed 3D debug baseline; Blueprint 20 completes the sample-point review and controlled expansion readiness freeze; Blueprint 21 adds a controlled second-point ingestion/replay smoke; Blueprint 22 adds second-point evidence parity and a local baseline manifest checkpoint; Blueprint 23 adds a point manifest / evidence provenance contract; Blueprint 24 adds manifest-backed multi-point replay navigation/review indexing; Blueprint 25 adds a manifest-backed multi-point regression matrix; Blueprint 26 adds an observation-quality taxonomy/profile; Blueprint 27 adds a structured review label schema; Blueprint 28 adds reviewer confidence/ambiguity metadata; Blueprint 29 adds multi-reviewer disagreement structure; Blueprint 30 adds INTENNSE label alignment refs; Blueprint 31 adds a versioned dataset corpus; Blueprint 32 adds a coverage-driven sampling strategy contract/profile/report layer; Blueprint 33 adds a controlled many-point evidence ingestion gate; Blueprint 34 adds review-ops metrics/report/dashboard data for structural coverage visibility; Blueprint 35 adds label-feedback evaluation inputs/reports for structural harness routing; Blueprint 36 adds camera geometry confidence / calibration provenance profiles and reports; TOM v3 Simple remains an observation-only evidence platform.
+Current: Blueprints 1, 2, 3, 4, 5, 6, 7, and 8 complete/frozen; Blueprint 9 manual candidate review annotations are complete; Blueprint 10 benchmark/evaluation harness is complete; Blueprint 11 3D readiness / camera geometry evidence is complete; Blueprint 12 3D ball trajectory candidate evidence is complete; Blueprints 13 through 16 add diagnostic-only 3D marker context, the 3D Debug View, selection/timeline coupling, and 3D debug review annotations; Blueprint 17 exports reviewed 3D debug datasets; Blueprint 18 compares those exports for deterministic drift; Blueprint 19 freezes and verifies a local sample-point reviewed 3D debug baseline; Blueprint 20 completes the sample-point review and controlled expansion readiness freeze; Blueprint 21 adds a controlled second-point ingestion/replay smoke; Blueprint 22 adds second-point evidence parity and a local baseline manifest checkpoint; Blueprint 23 adds a point manifest / evidence provenance contract; Blueprint 24 adds manifest-backed multi-point replay navigation/review indexing; Blueprint 25 adds a manifest-backed multi-point regression matrix; Blueprint 26 adds an observation-quality taxonomy/profile; Blueprint 27 adds a structured review label schema; Blueprint 28 adds reviewer confidence/ambiguity metadata; Blueprint 29 adds multi-reviewer disagreement structure; Blueprint 30 adds INTENNSE label alignment refs; Blueprint 31 adds a versioned dataset corpus; Blueprint 32 adds a coverage-driven sampling strategy contract/profile/report layer; Blueprint 33 adds a controlled many-point evidence ingestion gate; Blueprint 34 adds review-ops metrics/report/dashboard data for structural coverage visibility; Blueprint 35 adds label-feedback evaluation inputs/reports for structural harness routing; Blueprint 36 adds camera geometry confidence / calibration provenance profiles and reports; Blueprint 37 freezes the BP22-BP36 expansion and records next-phase readiness; TOM v3 Simple remains an observation-only evidence platform.
 
 ## Current
 
@@ -1361,3 +1361,32 @@ create labels, generate confidence scores, rank reviewers, score reviewer qualit
 disagreement, ingest media, execute sampling, modify baselines, retrain models, infer truth,
 create training truth, decide in/out, score, identify players, determine a winner, create
 coaching/tactical conclusions, or adjudicate evidence.
+
+## Blueprint 36 Status
+
+Status: complete.
+
+TOM v3 can now export a camera geometry calibration provenance contract, build structural camera
+geometry calibration profiles from existing replay/corpus/regression/feedback artifacts, validate
+those profiles against Blueprint 26 through 35 contract refs, and build a structural report. The
+profiles preserve replay URLs, point manifest refs, media IDs, camera geometry IDs, run IDs,
+evidence availability, profile counts, and provenance refs. Missing court keypoints, homography
+candidates, projection diagnostics, or review artifacts are structural review gaps only. They do
+not generate camera geometry, homography, projection diagnostics, event candidates, 3D candidates,
+labels, calibration conclusions, geometry conclusions, line-call conclusions, in/out, score,
+player identity, winners, tactical conclusions, reviewer ranking, reviewer scoring, training
+labels, generalization claims, or adjudication.
+
+## Blueprint 37 Status
+
+Status: complete.
+
+TOM v3 can now build a tracked expansion completion freeze manifest, validate that freeze against
+expected tracked BP26 through BP36 contract refs and protected baseline refs, and build a
+next-phase readiness report. The freeze records completed BP22 through BP36 milestones, 11 frozen
+contract refs, required regression gates, capability summary, non-claims, known limitations, and
+the recommended next phase: Gameplay Segment Gate / TOM v1 View Classifier Integration v1 using
+`model_assets/tom_v1/view_classifier_gameplay.pt`. It does not generate evidence, ingest media,
+execute sampling, create labels, mutate baselines, retrain models, wire gameplay classification,
+decide in/out, score, identify players, determine winners, create coaching/tactical conclusions,
+make betting/prediction claims, or adjudicate evidence.

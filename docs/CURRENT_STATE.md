@@ -4,8 +4,10 @@
 
 - Project name: TOM v3 Simple
 - Repo: drussie/tom-v3-simple
-- Current phase: Blueprint 8 in progress
-- Current goal: Build court/camera/homography evidence as observation-only geometry evidence, now with schema contracts, fixture court evidence persistence, camera/view evidence read models, homography candidate persistence, replay court overlays, projection diagnostics, and court review export; bridge local TOM v1 perception assets into TOM v3's optional observation/replay smoke path without committing weights
+- Current phase: Blueprint 37 complete; TOM v3 expansion completion freeze recorded
+- Current goal: Preserve the BP22-BP36 structural expansion as tracked provenance/readiness state,
+  keep protected regression gates intact, and prepare the next phase for gameplay segment gating
+  with the existing TOM v1 gameplay classifier asset without wiring it in Blueprint 37
 
 ## Mission
 
@@ -33,6 +35,7 @@ A lightweight tennis video observation platform that accepts model output as ope
 - Blueprint 5 status: complete; local demo, viewer polish, provenance audit, docs/control-room consolidation, and final completion review are complete
 - Blueprint 6 status: complete; video replay timeline foundation, replay info, local video serving, frame/time mapping, frontend replay route, synchronized detection observation overlay playback, tracklet candidate overlay playback, pose keypoint overlay playback, evidence timeline lanes, Stream Proxy Mode, and completion review are complete
 - Blueprint 7 status: complete; optional real YOLO detection replay, real-vs-fixture labeling, candidate tracklets from real detection observations, optional real pose keypoint observations, court/camera/homography deferral, and final perception orchestration closeout are complete
+- Blueprint 37 status: complete; tracked expansion completion freeze manifest, validator, and next-phase readiness report are implemented without creating new evidence, labels, tennis conclusions, or adjudication
 - Observation writer: implemented with typed extension rows, lineage, artifacts, and idempotency
 - Worker synthetic seeder: implemented
 - Visual evidence viewer: implemented in `apps/web` with detection bbox overlay, pose keypoint/skeleton overlay, frame artifact image support, run evidence summary, clearer empty states, candidate/evidence wording, readable lineage context, and review/export metadata display

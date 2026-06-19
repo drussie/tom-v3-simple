@@ -342,6 +342,8 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Label Feedback Loop into Evaluation Harness v1](reviews/label_feedback_loop_evaluation_harness_v1.md)
 - [Blueprint 36 Camera Geometry Confidence / Calibration Provenance v1](blueprints/blueprint_36_camera_geometry_confidence_calibration_provenance_v1.md)
 - [Camera Geometry Confidence / Calibration Provenance v1](reviews/camera_geometry_confidence_calibration_provenance_v1.md)
+- [Blueprint 37 TOM v3 Expansion Completion Freeze v1](blueprints/blueprint_37_tom_v3_expansion_completion_freeze_v1.md)
+- [TOM v3 Expansion Completion Freeze v1](reviews/tom_v3_expansion_completion_freeze_v1.md)
 
 ## Development
 

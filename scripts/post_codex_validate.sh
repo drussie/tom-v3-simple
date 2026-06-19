@@ -362,4 +362,19 @@ run "$PYTHON_BIN" -m apps.worker.cli build-camera-geometry-calibration-report \
   --output "$TMP_ROOT/camera_geometry_calibration_report.current.json" \
   --skip-create-db
 
+run "$PYTHON_BIN" -m apps.worker.cli build-tom-v3-expansion-completion-freeze \
+  --output "$TMP_ROOT/tom_v3_expansion_completion_freeze_v1.smoke.json" \
+  --current-main-commit bb90aac8 \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli validate-tom-v3-expansion-completion-freeze \
+  --freeze "$TMP_ROOT/tom_v3_expansion_completion_freeze_v1.smoke.json" \
+  --output "$TMP_ROOT/tom_v3_expansion_completion_freeze.validation.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-tom-v3-next-phase-readiness-report \
+  --freeze "$TMP_ROOT/tom_v3_expansion_completion_freeze_v1.smoke.json" \
+  --output "$TMP_ROOT/tom_v3_next_phase_readiness_report.current.json" \
+  --skip-create-db
+
 run git status --short
