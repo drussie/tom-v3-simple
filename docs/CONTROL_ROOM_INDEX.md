@@ -336,6 +336,8 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Coverage-Driven Sampling Strategy v1](reviews/coverage_driven_sampling_strategy_v1.md)
 - [Blueprint 33 Many-Point Evidence Ingestion Gate v1](blueprints/blueprint_33_many_point_evidence_ingestion_gate_v1.md)
 - [Many-Point Evidence Ingestion Gate v1](reviews/many_point_evidence_ingestion_gate_v1.md)
+- [Blueprint 34 Review Operations Metrics / Label Throughput Dashboard v1](blueprints/blueprint_34_review_ops_metrics_dashboard_v1.md)
+- [Review Operations Metrics / Label Throughput Dashboard v1](reviews/review_ops_metrics_dashboard_v1.md)
 
 ## Development
 

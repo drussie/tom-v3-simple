@@ -122,6 +122,16 @@ from apps.worker.services.review_label_schema import (
     export_review_label_schema,
     validate_review_label_bundle,
 )
+from apps.worker.services.review_ops_metrics import (
+    DEFAULT_REVIEW_OPS_DASHBOARD_DATA_OUTPUT,
+    DEFAULT_REVIEW_OPS_METRICS_CONTRACT_OUTPUT,
+    DEFAULT_REVIEW_OPS_METRICS_REPORT_OUTPUT,
+    DEFAULT_REVIEW_OPS_METRICS_VALIDATION_OUTPUT,
+    build_review_ops_dashboard_data,
+    build_review_ops_metrics_report,
+    export_review_ops_metrics_contract,
+    validate_review_ops_metrics_report,
+)
 from apps.worker.services.reviewed_3d_debug_baseline import (
     DEFAULT_BASELINE_FILE_STEM,
     DEFAULT_BASELINE_NAME,
@@ -2006,6 +2016,142 @@ def main() -> None:
     many_point_gate_parser.add_argument("--skip-create-db", action="store_true")
     many_point_gate_parser.set_defaults(handler=_handle_run_many_point_ingestion_gate)
 
+    review_ops_contract_parser = subcommands.add_parser(
+        "export-review-ops-metrics-contract",
+        help="Export the review operations metrics contract.",
+    )
+    review_ops_contract_parser.add_argument(
+        "--output",
+        default=DEFAULT_REVIEW_OPS_METRICS_CONTRACT_OUTPUT,
+        help="JSON review operations metrics contract output path.",
+    )
+    review_ops_contract_parser.add_argument("--skip-create-db", action="store_true")
+    review_ops_contract_parser.set_defaults(
+        handler=_handle_export_review_ops_metrics_contract,
+        skip_create_db=True,
+    )
+
+    review_ops_report_parser = subcommands.add_parser(
+        "build-review-ops-metrics-report",
+        help="Build a read-only structural review operations metrics report.",
+    )
+    review_ops_report_parser.add_argument(
+        "--contract",
+        default=DEFAULT_REVIEW_OPS_METRICS_CONTRACT_OUTPUT,
+        help="Review operations metrics contract JSON path.",
+    )
+    review_ops_report_parser.add_argument(
+        "--corpus-manifest",
+        default=DEFAULT_DATASET_CORPUS_MANIFEST_OUTPUT,
+        help="Versioned dataset corpus manifest JSON path.",
+    )
+    review_ops_report_parser.add_argument(
+        "--coverage-sampling-profile",
+        default=DEFAULT_COVERAGE_SAMPLING_PROFILE_OUTPUT,
+        help="Coverage sampling profile JSON path.",
+    )
+    review_ops_report_parser.add_argument(
+        "--coverage-sampling-report",
+        default=DEFAULT_COVERAGE_SAMPLING_REPORT_OUTPUT,
+        help="Coverage sampling report JSON path.",
+    )
+    review_ops_report_parser.add_argument(
+        "--many-point-ingestion-gate",
+        default=DEFAULT_MANY_POINT_INGESTION_GATE_OUTPUT,
+        help="Many-point ingestion gate report JSON path.",
+    )
+    review_ops_report_parser.add_argument(
+        "--output",
+        default=DEFAULT_REVIEW_OPS_METRICS_REPORT_OUTPUT,
+        help="JSON review operations metrics report output path.",
+    )
+    review_ops_report_parser.add_argument("--skip-create-db", action="store_true")
+    review_ops_report_parser.set_defaults(
+        handler=_handle_build_review_ops_metrics_report,
+        skip_create_db=True,
+    )
+
+    review_ops_validate_parser = subcommands.add_parser(
+        "validate-review-ops-metrics-report",
+        help="Validate a review operations metrics report structurally.",
+    )
+    review_ops_validate_parser.add_argument(
+        "--contract",
+        default=DEFAULT_REVIEW_OPS_METRICS_CONTRACT_OUTPUT,
+        help="Review operations metrics contract JSON path.",
+    )
+    review_ops_validate_parser.add_argument("--report", required=True)
+    review_ops_validate_parser.add_argument(
+        "--observation-quality-taxonomy",
+        default=DEFAULT_OBSERVATION_QUALITY_TAXONOMY_OUTPUT,
+        help="Blueprint 26 observation-quality taxonomy JSON path.",
+    )
+    review_ops_validate_parser.add_argument(
+        "--review-label-schema",
+        default=DEFAULT_REVIEW_LABEL_SCHEMA_OUTPUT,
+        help="Blueprint 27 review label schema JSON path.",
+    )
+    review_ops_validate_parser.add_argument(
+        "--reviewer-confidence-schema",
+        default=DEFAULT_REVIEWER_CONFIDENCE_SCHEMA_OUTPUT,
+        help="Blueprint 28 reviewer confidence schema JSON path.",
+    )
+    review_ops_validate_parser.add_argument(
+        "--multi-reviewer-schema",
+        default=DEFAULT_MULTI_REVIEWER_SCHEMA_OUTPUT,
+        help="Blueprint 29 multi-reviewer disagreement schema JSON path.",
+    )
+    review_ops_validate_parser.add_argument(
+        "--intennse-alignment-contract",
+        default=DEFAULT_INTENNSE_ALIGNMENT_CONTRACT_OUTPUT,
+        help="Blueprint 30 INTENNSE alignment contract JSON path.",
+    )
+    review_ops_validate_parser.add_argument(
+        "--dataset-corpus-contract",
+        default=DEFAULT_DATASET_CORPUS_CONTRACT_OUTPUT,
+        help="Blueprint 31 versioned dataset corpus contract JSON path.",
+    )
+    review_ops_validate_parser.add_argument(
+        "--coverage-sampling-contract",
+        default=DEFAULT_COVERAGE_SAMPLING_CONTRACT_OUTPUT,
+        help="Blueprint 32 coverage sampling strategy contract JSON path.",
+    )
+    review_ops_validate_parser.add_argument(
+        "--many-point-ingestion-contract",
+        default=DEFAULT_MANY_POINT_INGESTION_CONTRACT_OUTPUT,
+        help="Blueprint 33 many-point ingestion gate contract JSON path.",
+    )
+    review_ops_validate_parser.add_argument(
+        "--output",
+        default=DEFAULT_REVIEW_OPS_METRICS_VALIDATION_OUTPUT,
+        help="Optional JSON review operations metrics validation output path.",
+    )
+    review_ops_validate_parser.add_argument("--skip-create-db", action="store_true")
+    review_ops_validate_parser.set_defaults(
+        handler=_handle_validate_review_ops_metrics_report,
+        skip_create_db=True,
+    )
+
+    review_ops_dashboard_parser = subcommands.add_parser(
+        "build-review-ops-dashboard-data",
+        help="Build read-only dashboard JSON from a review operations metrics report.",
+    )
+    review_ops_dashboard_parser.add_argument(
+        "--report",
+        default=DEFAULT_REVIEW_OPS_METRICS_REPORT_OUTPUT,
+        help="Review operations metrics report JSON path.",
+    )
+    review_ops_dashboard_parser.add_argument(
+        "--output",
+        default=DEFAULT_REVIEW_OPS_DASHBOARD_DATA_OUTPUT,
+        help="JSON review operations dashboard data output path.",
+    )
+    review_ops_dashboard_parser.add_argument("--skip-create-db", action="store_true")
+    review_ops_dashboard_parser.set_defaults(
+        handler=_handle_build_review_ops_dashboard_data,
+        skip_create_db=True,
+    )
+
     point_evaluation_parser = subcommands.add_parser(
         "evaluate-point-candidates",
         help="Evaluate generated point candidate markers using operator review metadata.",
@@ -3660,6 +3806,60 @@ def _handle_run_many_point_ingestion_gate(
         multi_point_index_output=args.multi_point_index_output,
         dataset_corpus_manifest_output=args.dataset_corpus_manifest_output,
         multi_point_matrix_path=args.multi_point_matrix,
+        output_path=args.output,
+    )
+
+
+def _handle_export_review_ops_metrics_contract(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return export_review_ops_metrics_contract(output_path=args.output)
+
+
+def _handle_build_review_ops_metrics_report(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_review_ops_metrics_report(
+        contract_path=args.contract,
+        corpus_manifest_path=args.corpus_manifest,
+        coverage_sampling_profile_path=args.coverage_sampling_profile,
+        coverage_sampling_report_path=args.coverage_sampling_report,
+        many_point_ingestion_gate_path=args.many_point_ingestion_gate,
+        output_path=args.output,
+    )
+
+
+def _handle_validate_review_ops_metrics_report(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_review_ops_metrics_report(
+        contract_path=args.contract,
+        report_path=args.report,
+        observation_quality_taxonomy_path=args.observation_quality_taxonomy,
+        review_label_schema_path=args.review_label_schema,
+        reviewer_confidence_schema_path=args.reviewer_confidence_schema,
+        multi_reviewer_schema_path=args.multi_reviewer_schema,
+        intennse_alignment_contract_path=args.intennse_alignment_contract,
+        dataset_corpus_contract_path=args.dataset_corpus_contract,
+        coverage_sampling_contract_path=args.coverage_sampling_contract,
+        many_point_ingestion_contract_path=args.many_point_ingestion_contract,
+        output_path=args.output,
+    )
+
+
+def _handle_build_review_ops_dashboard_data(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_review_ops_dashboard_data(
+        report_path=args.report,
         output_path=args.output,
     )
 

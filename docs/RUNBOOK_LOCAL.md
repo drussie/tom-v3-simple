@@ -2477,6 +2477,72 @@ existence, duplicate path/checksum conflicts, allowed requested actions, expecte
 forbidden fields. Demo asset smokes validate gate mechanics only; they do not prove many real
 distinct tennis points were ingested.
 
+## Review Operations Metrics / Label Throughput Dashboard
+
+Use this to export the review-ops metrics contract, build a structural operations report, validate
+the report, and build read-only dashboard JSON. This is operations visibility only. It does not
+create evidence, create review labels, generate confidence scores, rank reviewers, score reviewer
+quality, resolve disagreement, infer tennis truth, ingest media, execute sampling, or adjudicate
+evidence.
+
+Export the contract:
+
+```bash
+make tom-v1-export-review-ops-metrics-contract \
+  PYTHON=.venv/bin/python
+```
+
+Build the report from current local corpus/coverage/ingestion artifacts:
+
+```bash
+make tom-v1-build-review-ops-metrics-report \
+  PYTHON=.venv/bin/python
+```
+
+Validate the report:
+
+```bash
+make tom-v1-validate-review-ops-metrics-report \
+  PYTHON=.venv/bin/python \
+  REVIEW_OPS_METRICS_REPORT=.data/exports/review_ops_metrics_report.current.json
+```
+
+Build dashboard data:
+
+```bash
+make tom-v1-build-review-ops-dashboard-data \
+  PYTHON=.venv/bin/python \
+  REVIEW_OPS_METRICS_REPORT=.data/exports/review_ops_metrics_report.current.json
+```
+
+Default paths:
+
+```text
+.data/contracts/review_ops_metrics_contract_v1.json
+.data/exports/review_ops_metrics_report.current.json
+.data/exports/review_ops_metrics_report.validation.json
+.data/exports/review_ops_dashboard_data.current.json
+```
+
+Expected:
+
+- `ok`: true for contract export, report build, validation, and dashboard-data build
+- `contract_type`: `review_ops_metrics_contract`
+- `contract_version`: `v1`
+- `report_type`: `review_ops_metrics_report`
+- `report_version`: `v1`
+- `dashboard_data_type`: `review_ops_dashboard_data`
+- `dashboard_data_version`: `v1`
+- `dashboard_card_count`: 13
+- `warnings.review_ops_metrics_are_not_truth`: true
+- `warnings.read_only_dashboard_data`: true
+- missing optional review/INTENNSE refs are structural gaps, not correctness findings
+
+Validation checks contract shape, report shape, dashboard-card schema, allowed structural status
+values, referenced contract versions, and forbidden fields. It does not infer missing labels,
+create labels, judge correctness, rank reviewers, score reviewer quality, resolve disagreement, or
+create training truth.
+
 Build the point evidence snapshot:
 
 ```bash

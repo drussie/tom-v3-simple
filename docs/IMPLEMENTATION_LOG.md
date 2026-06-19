@@ -3524,3 +3524,45 @@ in/out, score, identify players, determine a winner, claim generalization, valid
 score reviewers, resolve disagreement, produce INTENNSE coaching/tactical/match outcome
 conclusions, create training truth, silently ingest media, discover media automatically, run event
 generation, run 3D generation, or adjudicate evidence.
+
+## Blueprint 34 Review Operations Metrics / Label Throughput Dashboard v1
+
+Status: complete
+
+### Goal
+
+Create a read-only review-operations metrics contract, structural report, report validation, and
+dashboard-data JSON layer that summarizes review artifact coverage and missing operational refs
+without changing evidence, labels, truth, scoring, ingestion, sampling, or adjudication behavior.
+
+### Notes
+
+This milestone adds:
+
+- `apps.worker.services.review_ops_metrics`
+- `export-review-ops-metrics-contract` worker CLI command
+- `build-review-ops-metrics-report` worker CLI command
+- `validate-review-ops-metrics-report` worker CLI command
+- `build-review-ops-dashboard-data` worker CLI command
+- `tom-v1-export-review-ops-metrics-contract` Make helper
+- `tom-v1-build-review-ops-metrics-report` Make helper
+- `tom-v1-validate-review-ops-metrics-report` Make helper
+- `tom-v1-build-review-ops-dashboard-data` Make helper
+- `.data/contracts/review_ops_metrics_contract_v1.json` local contract path
+- `.data/exports/review_ops_metrics_report.current.json` local report path
+- `.data/exports/review_ops_metrics_report.validation.json` local validation path
+- `.data/exports/review_ops_dashboard_data.current.json` local dashboard-data path
+- `docs/blueprints/blueprint_34_review_ops_metrics_dashboard_v1.md`
+- `docs/reviews/review_ops_metrics_dashboard_v1.md`
+- `docs/agent_reports/blueprint_34_review_ops_metrics_dashboard_v1_report.md`
+
+The contract defines metrics scope, source contract refs, metric groups, dashboard-card schema,
+report schema, allowed structural status values, provenance requirements, validation rules, and
+warnings. The report builder reads existing dataset corpus, coverage sampling, and ingestion gate
+outputs where available, then summarizes structural counts and gaps. The validator checks contract
+shape, report shape, dashboard-card schema, allowed status values, and referenced contract
+versions. Dashboard data is derived read-only JSON. It does not generate evidence, create labels,
+change review semantics, mutate protected baselines, decide in/out, score, identify players,
+determine a winner, claim generalization, validate correctness, score or rank reviewers, resolve
+disagreement, produce INTENNSE coaching/tactical/match outcome conclusions, create training truth,
+ingest media, execute sampling, or adjudicate evidence.

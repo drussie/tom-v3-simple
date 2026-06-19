@@ -2,7 +2,7 @@
 
 ## Current Progress Gauge
 
-Current: Blueprints 1, 2, 3, 4, 5, 6, 7, and 8 complete/frozen; Blueprint 9 manual candidate review annotations are complete; Blueprint 10 benchmark/evaluation harness is complete; Blueprint 11 3D readiness / camera geometry evidence is complete; Blueprint 12 3D ball trajectory candidate evidence is complete; Blueprints 13 through 16 add diagnostic-only 3D marker context, the 3D Debug View, selection/timeline coupling, and 3D debug review annotations; Blueprint 17 exports reviewed 3D debug datasets; Blueprint 18 compares those exports for deterministic drift; Blueprint 19 freezes and verifies a local sample-point reviewed 3D debug baseline; Blueprint 20 completes the sample-point review and controlled expansion readiness freeze; Blueprint 21 adds a controlled second-point ingestion/replay smoke; Blueprint 22 adds second-point evidence parity and a local baseline manifest checkpoint; Blueprint 23 adds a point manifest / evidence provenance contract; Blueprint 24 adds manifest-backed multi-point replay navigation/review indexing; Blueprint 25 adds a manifest-backed multi-point regression matrix; Blueprint 26 adds an observation-quality taxonomy/profile; Blueprint 27 adds a structured review label schema; Blueprint 28 adds reviewer confidence/ambiguity metadata; Blueprint 29 adds multi-reviewer disagreement structure; Blueprint 30 adds INTENNSE label alignment refs; Blueprint 31 adds a versioned dataset corpus; Blueprint 32 adds a coverage-driven sampling strategy contract/profile/report layer; Blueprint 33 adds a controlled many-point evidence ingestion gate; TOM v3 Simple remains an observation-only evidence platform.
+Current: Blueprints 1, 2, 3, 4, 5, 6, 7, and 8 complete/frozen; Blueprint 9 manual candidate review annotations are complete; Blueprint 10 benchmark/evaluation harness is complete; Blueprint 11 3D readiness / camera geometry evidence is complete; Blueprint 12 3D ball trajectory candidate evidence is complete; Blueprints 13 through 16 add diagnostic-only 3D marker context, the 3D Debug View, selection/timeline coupling, and 3D debug review annotations; Blueprint 17 exports reviewed 3D debug datasets; Blueprint 18 compares those exports for deterministic drift; Blueprint 19 freezes and verifies a local sample-point reviewed 3D debug baseline; Blueprint 20 completes the sample-point review and controlled expansion readiness freeze; Blueprint 21 adds a controlled second-point ingestion/replay smoke; Blueprint 22 adds second-point evidence parity and a local baseline manifest checkpoint; Blueprint 23 adds a point manifest / evidence provenance contract; Blueprint 24 adds manifest-backed multi-point replay navigation/review indexing; Blueprint 25 adds a manifest-backed multi-point regression matrix; Blueprint 26 adds an observation-quality taxonomy/profile; Blueprint 27 adds a structured review label schema; Blueprint 28 adds reviewer confidence/ambiguity metadata; Blueprint 29 adds multi-reviewer disagreement structure; Blueprint 30 adds INTENNSE label alignment refs; Blueprint 31 adds a versioned dataset corpus; Blueprint 32 adds a coverage-driven sampling strategy contract/profile/report layer; Blueprint 33 adds a controlled many-point evidence ingestion gate; Blueprint 34 adds review-ops metrics/report/dashboard data for structural coverage visibility; TOM v3 Simple remains an observation-only evidence platform.
 
 ## Current
 
@@ -1331,3 +1331,18 @@ observations, create event candidates, create 3D candidates, create labels, deci
 correctness, create training truth, claim generalization, resolve disagreement, score reviewers,
 decide in/out, identify players, determine a winner, create coaching/tactical conclusions, or
 adjudicate evidence.
+
+## Blueprint 34 Status
+
+Status: complete.
+
+TOM v3 can now export a versioned review operations metrics contract, build a structural
+review-ops metrics report from existing corpus/coverage/ingestion artifacts, validate the report
+against Blueprint 26 through 33 contract refs, and build read-only dashboard JSON. The report
+summarizes corpus counts, review label coverage, confidence coverage, multi-reviewer coverage,
+disagreement report coverage, INTENNSE alignment coverage, observation-quality coverage,
+provenance completeness, ingestion readiness, coverage gaps, regression protection, missing
+optional refs, and human-review-required counts. It does not create labels, generate confidence
+scores, rank reviewers, score reviewer quality, resolve disagreement, ingest media, execute
+sampling, infer truth, create training truth, decide in/out, score, identify players, determine a
+winner, create coaching/tactical conclusions, or adjudicate evidence.

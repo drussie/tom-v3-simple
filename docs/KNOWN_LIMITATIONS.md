@@ -252,6 +252,9 @@ This registry makes TOM v3 Simple boundaries explicit.
   Dry-run reports do not index media, and write modes must be explicit. Demo asset smokes do not
   prove many real distinct tennis points, model generalization, event generation, 3D generation,
   review-label creation, scoring, player identity, in/out, point winners, or adjudication.
+- Review-ops metrics dashboard artifacts summarize structural review coverage and throughput gaps
+  only. They do not create labels, score confidence, rank reviewers, resolve disagreement, infer
+  tennis truth, ingest media, execute sampling, or adjudicate evidence.
 - Replay view presets are display defaults only. Operator view hides raw/debug layers by default,
   and debug/audit view enables them, but neither preset changes persisted observations or proves
   evidence correctness.
