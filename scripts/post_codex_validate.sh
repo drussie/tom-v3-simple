@@ -457,4 +457,43 @@ run "$PYTHON_BIN" -m apps.worker.cli build-gameplay-gated-perception-execution-r
   --output "$TMP_ROOT/gameplay_gated_perception_execution_report.current.json" \
   --skip-create-db
 
+run "$PYTHON_BIN" -m apps.worker.cli export-gameplay-segment-replay-review-contract \
+  --output "$TMP_ROOT/gameplay_segment_replay_review_contract_v1.smoke.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-gameplay-segment-replay-timeline \
+  --gameplay-segments "$TMP_ROOT/gameplay_segment_candidates.current.json" \
+  --routing-plan "$TMP_ROOT/gameplay_gated_routing_plan.current.json" \
+  --execution-plan "$TMP_ROOT/gameplay_gated_perception_execution_plan.current.json" \
+  --output "$TMP_ROOT/gameplay_segment_replay_timeline.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli validate-gameplay-segment-replay-timeline \
+  --contract "$TMP_ROOT/gameplay_segment_replay_review_contract_v1.smoke.json" \
+  --timeline "$TMP_ROOT/gameplay_segment_replay_timeline.current.json" \
+  --gameplay-segments "$TMP_ROOT/gameplay_segment_candidates.current.json" \
+  --routing-plan "$TMP_ROOT/gameplay_gated_routing_plan.current.json" \
+  --execution-plan "$TMP_ROOT/gameplay_gated_perception_execution_plan.current.json" \
+  --output "$TMP_ROOT/gameplay_segment_replay_timeline.validation.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-gameplay-segment-review-template \
+  --timeline "$TMP_ROOT/gameplay_segment_replay_timeline.current.json" \
+  --output "$TMP_ROOT/gameplay_segment_review_template.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli validate-gameplay-segment-review-bundle \
+  --contract "$TMP_ROOT/gameplay_segment_replay_review_contract_v1.smoke.json" \
+  --bundle "$TMP_ROOT/gameplay_segment_review_template.current.json" \
+  --timeline "$TMP_ROOT/gameplay_segment_replay_timeline.current.json" \
+  --output "$TMP_ROOT/gameplay_segment_review_bundle.validation.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-gameplay-segment-review-report \
+  --contract "$TMP_ROOT/gameplay_segment_replay_review_contract_v1.smoke.json" \
+  --timeline "$TMP_ROOT/gameplay_segment_replay_timeline.current.json" \
+  --bundle "$TMP_ROOT/gameplay_segment_review_template.current.json" \
+  --output "$TMP_ROOT/gameplay_segment_review_report.current.json" \
+  --skip-create-db
+
 run git status --short

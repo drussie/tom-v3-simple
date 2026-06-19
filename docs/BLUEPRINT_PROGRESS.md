@@ -1459,3 +1459,26 @@ include the execution plan, validation, and report under `.data/exports/`. The d
 diagnostic, and 3D trajectory stages should be constrained without running GPU/model inference or
 writing observations by default. It does not create truth, in/out, score, point winners, player
 identity, line calls, labels, automatic correctness claims, or adjudication.
+
+## Blueprint 41 Status
+
+Status: complete.
+
+Blueprint 41 turns Blueprint 38, Blueprint 39, and Blueprint 40 gameplay artifacts into a
+replay-review timeline surface:
+
+```text
+gameplay segment candidates
+-> gameplay-gated routing windows
+-> gameplay-gated perception execution windows
+-> replay timeline lanes
+-> operator review metadata template
+-> structural review report
+```
+
+The tracked replay/review contract is
+`.data/contracts/gameplay_segment_replay_review_contract_v1.json`. Generated local exports include
+the replay timeline, timeline validation, review template, review bundle validation, and review
+report under `.data/exports/`. The surface is review visibility only and does not run inference,
+write observations, create truth labels, score, identify players, determine winners, claim
+classifier correctness, or adjudicate evidence.

@@ -350,6 +350,8 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Gameplay-Gated Evidence Pipeline Routing v1](reviews/gameplay_gated_evidence_pipeline_routing_v1.md)
 - [Blueprint 40 Gameplay-Gated Perception Execution Hook v1](blueprints/blueprint_40_gameplay_gated_perception_execution_hook_v1.md)
 - [Gameplay-Gated Perception Execution Hook v1](reviews/gameplay_gated_perception_execution_hook_v1.md)
+- [Blueprint 41 Gameplay Segment Replay Timeline / Operator Review v1](blueprints/blueprint_41_gameplay_segment_replay_timeline_review_v1.md)
+- [Gameplay Segment Replay Timeline / Operator Review v1](reviews/gameplay_segment_replay_timeline_review_v1.md)
 
 ## Development
 

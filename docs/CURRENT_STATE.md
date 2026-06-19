@@ -4,10 +4,10 @@
 
 - Project name: TOM v3 Simple
 - Repo: drussie/tom-v3-simple
-- Current phase: Blueprint 40 complete; gameplay-gated perception execution hook added
+- Current phase: Blueprint 41 complete; gameplay segment replay timeline/operator review added
 - Current goal: Preserve the BP22-BP36 structural expansion freeze, keep protected regression
-  gates intact, and constrain future perception workflows through Blueprint 39 gameplay-gated
-  routing plans without executing heavy inference by default
+  gates intact, and make gameplay gate/routing/execution provenance reviewable as replay timeline
+  artifacts without creating tennis truth
 
 ## Mission
 
@@ -48,6 +48,9 @@ A lightweight tennis video observation platform that accepts model output as ope
   execution plan, validation, and report are implemented without running perception jobs,
   GPU/model inference, observation writes by default, truth labels, scoring, player identity, or
   adjudication
+- Blueprint 41 status: complete; tracked gameplay segment replay/review contract, replay timeline,
+  review template, validation, and report are implemented without persisting review notes,
+  running inference, writing observations, truth labels, scoring, player identity, or adjudication
 - Observation writer: implemented with typed extension rows, lineage, artifacts, and idempotency
 - Worker synthetic seeder: implemented
 - Visual evidence viewer: implemented in `apps/web` with detection bbox overlay, pose keypoint/skeleton overlay, frame artifact image support, run evidence summary, clearer empty states, candidate/evidence wording, readable lineage context, and review/export metadata display

@@ -90,6 +90,20 @@ from apps.worker.services.gameplay_segment_gate import (
     inspect_gameplay_classifier_asset,
     validate_gameplay_segment_candidates,
 )
+from apps.worker.services.gameplay_segment_replay_review import (
+    DEFAULT_GAMEPLAY_SEGMENT_REPLAY_REVIEW_CONTRACT_OUTPUT,
+    DEFAULT_GAMEPLAY_SEGMENT_REPLAY_TIMELINE_OUTPUT,
+    DEFAULT_GAMEPLAY_SEGMENT_REPLAY_TIMELINE_VALIDATION_OUTPUT,
+    DEFAULT_GAMEPLAY_SEGMENT_REVIEW_BUNDLE_VALIDATION_OUTPUT,
+    DEFAULT_GAMEPLAY_SEGMENT_REVIEW_REPORT_OUTPUT,
+    DEFAULT_GAMEPLAY_SEGMENT_REVIEW_TEMPLATE_OUTPUT,
+    build_gameplay_segment_replay_timeline,
+    build_gameplay_segment_review_report,
+    build_gameplay_segment_review_template,
+    export_gameplay_segment_replay_review_contract,
+    validate_gameplay_segment_replay_timeline,
+    validate_gameplay_segment_review_bundle,
+)
 from apps.worker.services.hit_bounce_candidates import build_hit_bounce_candidates
 from apps.worker.services.homography_candidate_builder import build_homography_candidates
 from apps.worker.services.intennse_label_alignment import (
@@ -2929,6 +2943,187 @@ def main() -> None:
         skip_create_db=True,
     )
 
+    gameplay_replay_contract_parser = subcommands.add_parser(
+        "export-gameplay-segment-replay-review-contract",
+        help="Export the Blueprint 41 gameplay segment replay/review contract.",
+    )
+    gameplay_replay_contract_parser.add_argument(
+        "--output",
+        default=DEFAULT_GAMEPLAY_SEGMENT_REPLAY_REVIEW_CONTRACT_OUTPUT,
+        help="JSON gameplay segment replay/review contract output path.",
+    )
+    gameplay_replay_contract_parser.add_argument("--skip-create-db", action="store_true")
+    gameplay_replay_contract_parser.set_defaults(
+        handler=_handle_export_gameplay_segment_replay_review_contract,
+        skip_create_db=True,
+    )
+
+    gameplay_replay_timeline_parser = subcommands.add_parser(
+        "build-gameplay-segment-replay-timeline",
+        help="Build a replay timeline lane from gameplay segment provenance.",
+    )
+    gameplay_replay_timeline_parser.add_argument(
+        "--gameplay-segments",
+        required=True,
+        help="Blueprint 38 gameplay segment candidates JSON path.",
+    )
+    gameplay_replay_timeline_parser.add_argument(
+        "--routing-plan",
+        default=None,
+        help="Optional Blueprint 39 gameplay-gated routing plan JSON path.",
+    )
+    gameplay_replay_timeline_parser.add_argument(
+        "--execution-plan",
+        default=None,
+        help="Optional Blueprint 40 gameplay-gated perception execution plan JSON path.",
+    )
+    gameplay_replay_timeline_parser.add_argument(
+        "--viewer-base-url",
+        default="http://127.0.0.1:3000",
+        help="Replay viewer base URL used to build replay links.",
+    )
+    gameplay_replay_timeline_parser.add_argument(
+        "--output",
+        default=DEFAULT_GAMEPLAY_SEGMENT_REPLAY_TIMELINE_OUTPUT,
+        help="JSON gameplay segment replay timeline output path.",
+    )
+    gameplay_replay_timeline_parser.add_argument("--skip-create-db", action="store_true")
+    gameplay_replay_timeline_parser.set_defaults(
+        handler=_handle_build_gameplay_segment_replay_timeline,
+        skip_create_db=True,
+    )
+
+    gameplay_replay_timeline_validate_parser = subcommands.add_parser(
+        "validate-gameplay-segment-replay-timeline",
+        help="Validate a gameplay segment replay timeline structurally.",
+    )
+    gameplay_replay_timeline_validate_parser.add_argument(
+        "--contract",
+        default=DEFAULT_GAMEPLAY_SEGMENT_REPLAY_REVIEW_CONTRACT_OUTPUT,
+        help="Gameplay segment replay/review contract JSON path.",
+    )
+    gameplay_replay_timeline_validate_parser.add_argument(
+        "--timeline",
+        required=True,
+        help="Gameplay segment replay timeline JSON path.",
+    )
+    gameplay_replay_timeline_validate_parser.add_argument(
+        "--gameplay-segments",
+        default=None,
+        help="Optional Blueprint 38 gameplay segment candidates JSON path.",
+    )
+    gameplay_replay_timeline_validate_parser.add_argument(
+        "--routing-plan",
+        default=None,
+        help="Optional Blueprint 39 gameplay-gated routing plan JSON path.",
+    )
+    gameplay_replay_timeline_validate_parser.add_argument(
+        "--execution-plan",
+        default=None,
+        help="Optional Blueprint 40 gameplay-gated perception execution plan JSON path.",
+    )
+    gameplay_replay_timeline_validate_parser.add_argument(
+        "--output",
+        default=DEFAULT_GAMEPLAY_SEGMENT_REPLAY_TIMELINE_VALIDATION_OUTPUT,
+        help="Optional JSON gameplay segment replay timeline validation output path.",
+    )
+    gameplay_replay_timeline_validate_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    gameplay_replay_timeline_validate_parser.set_defaults(
+        handler=_handle_validate_gameplay_segment_replay_timeline,
+        skip_create_db=True,
+    )
+
+    gameplay_review_template_parser = subcommands.add_parser(
+        "build-gameplay-segment-review-template",
+        help="Build a gameplay segment operator review metadata template.",
+    )
+    gameplay_review_template_parser.add_argument(
+        "--timeline",
+        required=True,
+        help="Gameplay segment replay timeline JSON path.",
+    )
+    gameplay_review_template_parser.add_argument(
+        "--reviewer-id",
+        default=None,
+        help="Optional freeform reviewer identifier metadata.",
+    )
+    gameplay_review_template_parser.add_argument(
+        "--output",
+        default=DEFAULT_GAMEPLAY_SEGMENT_REVIEW_TEMPLATE_OUTPUT,
+        help="JSON gameplay segment review template output path.",
+    )
+    gameplay_review_template_parser.add_argument("--skip-create-db", action="store_true")
+    gameplay_review_template_parser.set_defaults(
+        handler=_handle_build_gameplay_segment_review_template,
+        skip_create_db=True,
+    )
+
+    gameplay_review_bundle_validate_parser = subcommands.add_parser(
+        "validate-gameplay-segment-review-bundle",
+        help="Validate a gameplay segment review metadata bundle structurally.",
+    )
+    gameplay_review_bundle_validate_parser.add_argument(
+        "--contract",
+        default=DEFAULT_GAMEPLAY_SEGMENT_REPLAY_REVIEW_CONTRACT_OUTPUT,
+        help="Gameplay segment replay/review contract JSON path.",
+    )
+    gameplay_review_bundle_validate_parser.add_argument(
+        "--bundle",
+        required=True,
+        help="Gameplay segment review bundle JSON path.",
+    )
+    gameplay_review_bundle_validate_parser.add_argument(
+        "--timeline",
+        default=None,
+        help="Optional gameplay segment replay timeline JSON path.",
+    )
+    gameplay_review_bundle_validate_parser.add_argument(
+        "--output",
+        default=DEFAULT_GAMEPLAY_SEGMENT_REVIEW_BUNDLE_VALIDATION_OUTPUT,
+        help="Optional JSON gameplay segment review bundle validation output path.",
+    )
+    gameplay_review_bundle_validate_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    gameplay_review_bundle_validate_parser.set_defaults(
+        handler=_handle_validate_gameplay_segment_review_bundle,
+        skip_create_db=True,
+    )
+
+    gameplay_review_report_parser = subcommands.add_parser(
+        "build-gameplay-segment-review-report",
+        help="Build a structural gameplay segment replay/review report.",
+    )
+    gameplay_review_report_parser.add_argument(
+        "--contract",
+        default=DEFAULT_GAMEPLAY_SEGMENT_REPLAY_REVIEW_CONTRACT_OUTPUT,
+        help="Gameplay segment replay/review contract JSON path.",
+    )
+    gameplay_review_report_parser.add_argument(
+        "--timeline",
+        required=True,
+        help="Gameplay segment replay timeline JSON path.",
+    )
+    gameplay_review_report_parser.add_argument(
+        "--bundle",
+        required=True,
+        help="Gameplay segment review bundle JSON path.",
+    )
+    gameplay_review_report_parser.add_argument(
+        "--output",
+        default=DEFAULT_GAMEPLAY_SEGMENT_REVIEW_REPORT_OUTPUT,
+        help="JSON gameplay segment review report output path.",
+    )
+    gameplay_review_report_parser.add_argument("--skip-create-db", action="store_true")
+    gameplay_review_report_parser.set_defaults(
+        handler=_handle_build_gameplay_segment_review_report,
+        skip_create_db=True,
+    )
+
     point_evaluation_parser = subcommands.add_parser(
         "evaluate-point-candidates",
         help="Evaluate generated point candidate markers using operator review metadata.",
@@ -4950,6 +5145,81 @@ def _handle_build_gameplay_gated_perception_execution_report(
         plan_path=args.plan,
         routing_contract_path=args.routing_contract,
         routing_plan_path=args.routing_plan,
+        output_path=args.output,
+    )
+
+
+def _handle_export_gameplay_segment_replay_review_contract(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return export_gameplay_segment_replay_review_contract(output_path=args.output)
+
+
+def _handle_build_gameplay_segment_replay_timeline(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_gameplay_segment_replay_timeline(
+        gameplay_segments_path=args.gameplay_segments,
+        routing_plan_path=args.routing_plan,
+        execution_plan_path=args.execution_plan,
+        viewer_base_url=args.viewer_base_url,
+        output_path=args.output,
+    )
+
+
+def _handle_validate_gameplay_segment_replay_timeline(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_gameplay_segment_replay_timeline(
+        contract_path=args.contract,
+        timeline_path=args.timeline,
+        gameplay_segments_path=args.gameplay_segments,
+        routing_plan_path=args.routing_plan,
+        execution_plan_path=args.execution_plan,
+        output_path=args.output,
+    )
+
+
+def _handle_build_gameplay_segment_review_template(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_gameplay_segment_review_template(
+        timeline_path=args.timeline,
+        reviewer_id=args.reviewer_id,
+        output_path=args.output,
+    )
+
+
+def _handle_validate_gameplay_segment_review_bundle(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_gameplay_segment_review_bundle(
+        contract_path=args.contract,
+        bundle_path=args.bundle,
+        timeline_path=args.timeline,
+        output_path=args.output,
+    )
+
+
+def _handle_build_gameplay_segment_review_report(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_gameplay_segment_review_report(
+        contract_path=args.contract,
+        timeline_path=args.timeline,
+        bundle_path=args.bundle,
         output_path=args.output,
     )
 

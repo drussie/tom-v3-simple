@@ -3819,3 +3819,49 @@ versions, and forbidden fields/values. The report summarizes structural executio
 only. Blueprint 40 does not run detections, tracklets, pose, court, 3D, or GPU/model inference by
 default; it does not write observations by default, create labels, training truth, gameplay truth,
 line-call conclusions, scoring, player identity, production readiness claims, or adjudication.
+
+## Blueprint 41 Gameplay Segment Replay Timeline / Operator Review v1
+
+Status: complete
+
+### Goal
+
+Make gameplay segment candidates, gameplay-gated routing windows, and gameplay-gated perception
+execution windows visible as replay-review timeline lanes without creating tennis truth, mutating
+model assets, or mutating regression baselines.
+
+### Notes
+
+This milestone adds:
+
+- `apps.worker.services.gameplay_segment_replay_review`
+- `export-gameplay-segment-replay-review-contract` worker CLI command
+- `build-gameplay-segment-replay-timeline` worker CLI command
+- `validate-gameplay-segment-replay-timeline` worker CLI command
+- `build-gameplay-segment-review-template` worker CLI command
+- `validate-gameplay-segment-review-bundle` worker CLI command
+- `build-gameplay-segment-review-report` worker CLI command
+- `tom-v1-export-gameplay-segment-replay-review-contract` Make helper
+- `tom-v1-build-gameplay-segment-replay-timeline` Make helper
+- `tom-v1-validate-gameplay-segment-replay-timeline` Make helper
+- `tom-v1-build-gameplay-segment-review-template` Make helper
+- `tom-v1-validate-gameplay-segment-review-bundle` Make helper
+- `tom-v1-build-gameplay-segment-review-report` Make helper
+- `.data/contracts/gameplay_segment_replay_review_contract_v1.json` tracked contract path
+- `.data/exports/gameplay_segment_replay_timeline.current.json` local timeline path
+- `.data/exports/gameplay_segment_replay_timeline.validation.json` local validation path
+- `.data/exports/gameplay_segment_review_template.current.json` local review template path
+- `.data/exports/gameplay_segment_review_bundle.validation.json` local bundle validation path
+- `.data/exports/gameplay_segment_review_report.current.json` local review report path
+- `docs/blueprints/blueprint_41_gameplay_segment_replay_timeline_review_v1.md`
+- `docs/reviews/gameplay_segment_replay_timeline_review_v1.md`
+- `docs/agent_reports/blueprint_41_gameplay_segment_replay_timeline_review_v1_report.md`
+
+The contract defines replay review scope, source contract refs, timeline lane schema, review
+template schema, review bundle schema, validation rules, provenance requirements, and warnings.
+The timeline builder reads Blueprint 38 candidate segments plus optional Blueprint 39 routing and
+Blueprint 40 execution plans. The validator checks contract shape, timeline shape, allowed lane
+types, allowed review statuses, provenance statuses, referenced source artifacts, and forbidden
+fields/values. The review template records optional human metadata only. Blueprint 41 does not
+run perception jobs, write observations, create labels, training truth, gameplay truth, line-call
+conclusions, scoring, player identity, production readiness claims, or adjudication.

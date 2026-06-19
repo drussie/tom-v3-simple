@@ -323,6 +323,10 @@ TOM v3 Simple does not include:
   inference, write observations by default, prove perception correctness, decide gameplay
   correctness, score, line calls, player identity, production readiness, training truth, or
   adjudication.
+- Gameplay segment replay/review artifacts make gameplay gate, routing, and perception execution
+  provenance visible as timeline lanes only. Review statuses are human metadata, not truth,
+  classifier correctness, accepted/rejected lifecycle state, line-call conclusions, score, player
+  identity, production readiness, training truth, or adjudication.
 
 ## Boundary
 

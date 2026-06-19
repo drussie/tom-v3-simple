@@ -1,0 +1,193 @@
+{
+  "contract_type": "gameplay_segment_replay_review_contract",
+  "contract_version": "v1",
+  "exported_at": "2026-06-19T00:00:00+00:00",
+  "provenance_requirements": {
+    "gameplay_segment_source_path_required": true,
+    "lane_type_required": true,
+    "media_id_required": true,
+    "provenance_status_required": true,
+    "replay_url_required": true,
+    "review_status_required": true,
+    "segment_id_required": true,
+    "source_warnings_preserved": true,
+    "timeline_id_required": true,
+    "window_timestamps_required": true
+  },
+  "replay_review_scope": {
+    "creates_replay_timeline_artifacts": true,
+    "creates_review_template_artifacts": true,
+    "executes_gpu_or_model_inference": false,
+    "mutates_model_assets": false,
+    "mutates_regression_baselines": false,
+    "persists_database_review_notes": false,
+    "purpose": "gameplay_segment_replay_timeline_operator_review",
+    "reads_gameplay_gated_perception_execution_plan_when_supplied": true,
+    "reads_gameplay_gated_routing_plan_when_supplied": true,
+    "reads_gameplay_segment_candidates": true,
+    "review_status_is_human_metadata_only": true,
+    "writes_observations": false
+  },
+  "review_bundle_schema": {
+    "allowed_review_statuses": [
+      "needs_additional_review",
+      "not_applicable",
+      "not_reviewed",
+      "review_needed",
+      "review_optional",
+      "reviewed_as_gameplay_candidate",
+      "reviewed_as_non_gameplay_candidate",
+      "reviewed_as_uncertain"
+    ],
+    "review_status_does_not_adjudicate": true,
+    "review_status_does_not_imply_classifier_accuracy": true,
+    "review_status_does_not_imply_tennis_meaning": true
+  },
+  "review_template_schema": {
+    "optional_human_note_fields": [
+      "reviewer_id",
+      "reviewed_at",
+      "review_note"
+    ],
+    "review_bundle_type": "gameplay_segment_review_bundle",
+    "review_bundle_version": "v1",
+    "review_notes_are_metadata_only": true,
+    "reviewer_ids_are_freeform_metadata_only": true
+  },
+  "source_contract_artifacts": {
+    "gameplay_gated_perception_execution_contract": {
+      "contract_type": "gameplay_gated_perception_execution_contract",
+      "contract_version": "v1",
+      "plan_type": "gameplay_gated_perception_execution_plan",
+      "plan_version": "v1"
+    },
+    "gameplay_gated_pipeline_routing_contract": {
+      "contract_type": "gameplay_gated_pipeline_routing_contract",
+      "contract_version": "v1",
+      "plan_type": "gameplay_gated_pipeline_routing_plan",
+      "plan_version": "v1"
+    },
+    "gameplay_segment_gate_contract": {
+      "candidate_output_type": "gameplay_segment_candidates",
+      "candidate_output_version": "v1",
+      "contract_type": "gameplay_segment_gate_contract",
+      "contract_version": "v1"
+    }
+  },
+  "source_contract_refs": {
+    "camera_geometry_calibration_provenance_contract_version": "v1",
+    "coverage_sampling_strategy_contract_version": "v1",
+    "gameplay_gated_perception_execution_contract_version": "v1",
+    "gameplay_gated_pipeline_routing_contract_version": "v1",
+    "gameplay_segment_gate_contract_version": "v1",
+    "intennse_label_alignment_contract_version": "v1",
+    "label_feedback_evaluation_contract_version": "v1",
+    "many_point_ingestion_gate_contract_version": "v1",
+    "multi_point_regression_matrix_version": "v0",
+    "multi_reviewer_disagreement_schema_version": "v1",
+    "observation_quality_taxonomy_version": "v1",
+    "point_manifest_version": "v0",
+    "review_label_schema_version": "v1",
+    "review_ops_metrics_contract_version": "v1",
+    "reviewer_confidence_schema_version": "v1",
+    "tom_v3_expansion_completion_freeze_version": "v1",
+    "versioned_dataset_corpus_contract_version": "v1"
+  },
+  "timeline_lane_schema": {
+    "allowed_lane_types": [
+      "downstream_allowed",
+      "downstream_blocked",
+      "downstream_review_required",
+      "gameplay_segment_candidate",
+      "non_gameplay_segment_candidate",
+      "not_applicable",
+      "perception_execution_window",
+      "perception_skipped_window",
+      "uncertain_segment"
+    ],
+    "allowed_provenance_statuses": [
+      "execution_plan_provenance_available",
+      "gameplay_segment_provenance_available",
+      "missing",
+      "not_applicable",
+      "review_template_provenance_available",
+      "routing_plan_provenance_available"
+    ],
+    "allowed_review_statuses": [
+      "needs_additional_review",
+      "not_applicable",
+      "not_reviewed",
+      "review_needed",
+      "review_optional",
+      "reviewed_as_gameplay_candidate",
+      "reviewed_as_non_gameplay_candidate",
+      "reviewed_as_uncertain"
+    ],
+    "required_entry_fields": [
+      "timeline_entry_id",
+      "media_id",
+      "segment_id",
+      "start_ms",
+      "end_ms",
+      "start_frame_index",
+      "end_frame_index",
+      "lane_type",
+      "segment_status",
+      "downstream_gate_status",
+      "routing_decision",
+      "execution_decision",
+      "review_status",
+      "display_label",
+      "provenance_status",
+      "warnings"
+    ],
+    "timeline_type": "gameplay_segment_replay_timeline",
+    "timeline_version": "v1"
+  },
+  "tom_provenance": {
+    "blueprint": "blueprint_41",
+    "blueprint_name": "gameplay_segment_replay_timeline_review_v1",
+    "project": "tom-v3-simple",
+    "project_version": "0.0.0"
+  },
+  "validation_rules": {
+    "does_not_create_event_labels": true,
+    "does_not_create_point_labels": true,
+    "does_not_infer_tennis_meaning": true,
+    "does_not_modify_regression_baselines": true,
+    "reject_forbidden_exact_tokens": true,
+    "structural_errors_only": true,
+    "validate_allowed_lane_types": true,
+    "validate_allowed_provenance_statuses": true,
+    "validate_allowed_review_statuses": true,
+    "validate_contract_shape": true,
+    "validate_referenced_execution_plan_when_available": true,
+    "validate_referenced_gameplay_segment_file": true,
+    "validate_referenced_routing_plan_when_available": true,
+    "validate_review_bundle_shape": true,
+    "validate_review_template_shape": true,
+    "validate_timeline_shape": true
+  },
+  "warnings": {
+    "candidate_windows_only": true,
+    "does_not_claim_automatic_correctness": true,
+    "does_not_claim_classifier_correctness": true,
+    "does_not_claim_generalization": true,
+    "does_not_convert_outputs_into_training_labels": true,
+    "does_not_create_event_labels": true,
+    "does_not_create_in_out": true,
+    "does_not_create_point_labels": true,
+    "does_not_create_score": true,
+    "does_not_determine_winner": true,
+    "does_not_identify_players": true,
+    "does_not_mutate_model_assets": true,
+    "does_not_mutate_regression_baselines": true,
+    "does_not_run_gpu_or_model_inference": true,
+    "human_review_metadata_only": true,
+    "no_adjudication": true,
+    "observation_only": true,
+    "replay_review_surface_only": true,
+    "review_support_only": true,
+    "timeline_lane_only": true
+  }
+}

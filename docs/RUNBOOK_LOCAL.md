@@ -1861,6 +1861,78 @@ Expected:
 - `observations_written`: false
 - skipped and review-required windows are preserved with reasons
 
+## Gameplay Segment Replay Timeline / Operator Review
+
+Use this after the Blueprint 38 gameplay segment gate, Blueprint 39 routing plan, and Blueprint 40
+execution plan are available. The replay/review surface is structural by default: it records
+timeline lanes and review metadata templates for operator inspection. It does not run inference,
+write observations, persist review notes, decide classifier correctness, create tennis truth, or
+adjudicate evidence.
+
+Export the tracked contract:
+
+```bash
+make tom-v1-export-gameplay-segment-replay-review-contract \
+  PYTHON=.venv/bin/python
+```
+
+Build a gameplay segment replay timeline:
+
+```bash
+make tom-v1-build-gameplay-segment-replay-timeline \
+  PYTHON=.venv/bin/python \
+  GAMEPLAY_SEGMENT_REPLAY_REVIEW_GAMEPLAY_SEGMENTS=.data/exports/gameplay_segment_candidates.current.json \
+  GAMEPLAY_SEGMENT_REPLAY_REVIEW_ROUTING_PLAN=.data/exports/gameplay_gated_routing_plan.current.json \
+  GAMEPLAY_SEGMENT_REPLAY_REVIEW_EXECUTION_PLAN=.data/exports/gameplay_gated_perception_execution_plan.current.json
+```
+
+Validate the timeline:
+
+```bash
+make tom-v1-validate-gameplay-segment-replay-timeline \
+  PYTHON=.venv/bin/python \
+  GAMEPLAY_SEGMENT_REPLAY_TIMELINE=.data/exports/gameplay_segment_replay_timeline.current.json \
+  GAMEPLAY_SEGMENT_REPLAY_REVIEW_GAMEPLAY_SEGMENTS=.data/exports/gameplay_segment_candidates.current.json \
+  GAMEPLAY_SEGMENT_REPLAY_REVIEW_ROUTING_PLAN=.data/exports/gameplay_gated_routing_plan.current.json \
+  GAMEPLAY_SEGMENT_REPLAY_REVIEW_EXECUTION_PLAN=.data/exports/gameplay_gated_perception_execution_plan.current.json
+```
+
+Build a review template:
+
+```bash
+make tom-v1-build-gameplay-segment-review-template \
+  PYTHON=.venv/bin/python \
+  GAMEPLAY_SEGMENT_REPLAY_TIMELINE=.data/exports/gameplay_segment_replay_timeline.current.json
+```
+
+Validate the review bundle:
+
+```bash
+make tom-v1-validate-gameplay-segment-review-bundle \
+  PYTHON=.venv/bin/python \
+  GAMEPLAY_SEGMENT_REPLAY_TIMELINE=.data/exports/gameplay_segment_replay_timeline.current.json \
+  GAMEPLAY_SEGMENT_REVIEW_BUNDLE=.data/exports/gameplay_segment_review_template.current.json
+```
+
+Build the review report:
+
+```bash
+make tom-v1-build-gameplay-segment-review-report \
+  PYTHON=.venv/bin/python \
+  GAMEPLAY_SEGMENT_REPLAY_TIMELINE=.data/exports/gameplay_segment_replay_timeline.current.json \
+  GAMEPLAY_SEGMENT_REVIEW_BUNDLE=.data/exports/gameplay_segment_review_template.current.json
+```
+
+Expected:
+
+- `ok`: true
+- `status`: `completed` or `valid`
+- timeline lanes include gameplay candidate, non-gameplay candidate, uncertain, downstream, and
+  perception execution/skipped windows when source artifacts are supplied
+- review entries default to `not_reviewed`
+- review statuses are human metadata only
+- generated `.data/exports/` files stay local and untracked
+
 ## Camera Geometry Calibration Provenance
 
 Blueprint 36 builds a structural camera geometry / calibration provenance profile from existing

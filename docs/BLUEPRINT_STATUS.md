@@ -1272,3 +1272,32 @@ accepted/rejected lifecycle, coaching/tactical conclusions, betting/prediction o
 generalization, automatic correctness, training truth, production truth, or adjudication. It does
 not mutate model assets, commit weights, silently ingest media, auto-discover media folders, run
 heavy inference by default, or mutate protected regression baselines.
+
+## Blueprint 41 - Gameplay Segment Replay Timeline / Operator Review
+
+Status: COMPLETE
+
+Blueprint 41 proves:
+
+```text
+gameplay segment candidates
+-> gameplay-gated routing windows
+-> gameplay-gated perception execution windows
+-> replay timeline lanes
+-> operator review metadata template
+-> structural review report
+```
+
+The tracked replay/review contract is
+`.data/contracts/gameplay_segment_replay_review_contract_v1.json`. The generated local outputs are
+the replay timeline, timeline validation, review template, review bundle validation, and review
+report under `.data/exports/`. The timeline exposes gameplay candidate, non-gameplay candidate,
+uncertain, downstream allowed, downstream blocked, downstream review-required, perception
+execution, and perception skipped lanes.
+
+Blueprint 41 does not decide tennis truth, in/out, score, point winner, player identity, rally
+state, server/receiver state, line-call truth, point truth, event truth, classifier correctness,
+accepted/rejected lifecycle, coaching/tactical conclusions, betting/prediction outcomes,
+generalization, automatic correctness, training truth, production truth, or adjudication. It does
+not mutate model assets, commit weights, run heavy inference, write observations, or mutate
+protected regression baselines.
