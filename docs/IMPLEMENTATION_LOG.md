@@ -3566,3 +3566,46 @@ change review semantics, mutate protected baselines, decide in/out, score, ident
 determine a winner, claim generalization, validate correctness, score or rank reviewers, resolve
 disagreement, produce INTENNSE coaching/tactical/match outcome conclusions, create training truth,
 ingest media, execute sampling, or adjudicate evidence.
+
+## Blueprint 35 Label Feedback Loop into Evaluation Harness v1
+
+Status: complete
+
+### Goal
+
+Create a safe label-feedback evaluation bridge from TOM review artifacts into the evaluation
+harness without creating labels, truth, adjudication, automatic model behavior changes, or tennis
+conclusions.
+
+### Notes
+
+This milestone adds:
+
+- `apps.worker.services.label_feedback_evaluation`
+- `export-label-feedback-evaluation-contract` worker CLI command
+- `build-label-feedback-evaluation-inputs` worker CLI command
+- `validate-label-feedback-evaluation-inputs` worker CLI command
+- `build-label-feedback-evaluation-report` worker CLI command
+- `tom-v1-export-label-feedback-evaluation-contract` Make helper
+- `tom-v1-build-label-feedback-evaluation-inputs` Make helper
+- `tom-v1-validate-label-feedback-evaluation-inputs` Make helper
+- `tom-v1-build-label-feedback-evaluation-report` Make helper
+- `.data/contracts/label_feedback_evaluation_contract_v1.json` local contract path
+- `.data/exports/label_feedback_evaluation_inputs.current.json` local inputs path
+- `.data/exports/label_feedback_evaluation_inputs.validation.json` local validation path
+- `.data/exports/label_feedback_evaluation_report.current.json` local report path
+- `docs/blueprints/blueprint_35_label_feedback_loop_evaluation_harness_v1.md`
+- `docs/reviews/label_feedback_loop_evaluation_harness_v1.md`
+- `docs/agent_reports/blueprint_35_label_feedback_loop_evaluation_harness_v1_report.md`
+
+The contract defines feedback scope, source contract refs, feedback input entities/fields,
+evaluation signal/action/status values, provenance requirements, validation rules, and warnings.
+The input builder reads existing dataset corpus, review-ops, coverage sampling, and multi-point
+regression matrix outputs where available, then emits structural feedback entries. The validator
+checks contract shape, input shape, allowed signal/status/action values, forbidden fields/values,
+and referenced contract versions. The report summarizes structural feedback entries, missing
+review artifacts, provenance gaps, coverage gaps, and regression context. It does not generate
+evidence, create labels, change review semantics, mutate protected baselines, decide in/out,
+score, identify players, determine a winner, claim generalization, score or rank reviewers,
+resolve disagreement, produce INTENNSE coaching/tactical/match outcome conclusions, create
+training truth, retrain models, ingest media, execute sampling, or adjudicate evidence.

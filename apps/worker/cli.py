@@ -59,6 +59,16 @@ from apps.worker.services.intennse_label_alignment import (
     export_intennse_label_alignment_contract,
     validate_intennse_alignment_bundle,
 )
+from apps.worker.services.label_feedback_evaluation import (
+    DEFAULT_LABEL_FEEDBACK_EVALUATION_CONTRACT_OUTPUT,
+    DEFAULT_LABEL_FEEDBACK_EVALUATION_INPUTS_OUTPUT,
+    DEFAULT_LABEL_FEEDBACK_EVALUATION_REPORT_OUTPUT,
+    DEFAULT_LABEL_FEEDBACK_EVALUATION_VALIDATION_OUTPUT,
+    build_label_feedback_evaluation_inputs,
+    build_label_feedback_evaluation_report,
+    export_label_feedback_evaluation_contract,
+    validate_label_feedback_evaluation_inputs,
+)
 from apps.worker.services.local_demo import run_local_fixture_demo
 from apps.worker.services.main_player_track_assignment import assign_main_player_tracks
 from apps.worker.services.main_subject_filter import select_main_player_subjects
@@ -2152,6 +2162,162 @@ def main() -> None:
         skip_create_db=True,
     )
 
+    label_feedback_contract_parser = subcommands.add_parser(
+        "export-label-feedback-evaluation-contract",
+        help="Export the label feedback evaluation bridge contract.",
+    )
+    label_feedback_contract_parser.add_argument(
+        "--output",
+        default=DEFAULT_LABEL_FEEDBACK_EVALUATION_CONTRACT_OUTPUT,
+        help="JSON label feedback evaluation contract output path.",
+    )
+    label_feedback_contract_parser.add_argument("--skip-create-db", action="store_true")
+    label_feedback_contract_parser.set_defaults(
+        handler=_handle_export_label_feedback_evaluation_contract,
+        skip_create_db=True,
+    )
+
+    label_feedback_inputs_parser = subcommands.add_parser(
+        "build-label-feedback-evaluation-inputs",
+        help="Build structural label feedback inputs for the evaluation harness.",
+    )
+    label_feedback_inputs_parser.add_argument(
+        "--contract",
+        default=DEFAULT_LABEL_FEEDBACK_EVALUATION_CONTRACT_OUTPUT,
+        help="Label feedback evaluation contract JSON path.",
+    )
+    label_feedback_inputs_parser.add_argument(
+        "--corpus-manifest",
+        default=DEFAULT_DATASET_CORPUS_MANIFEST_OUTPUT,
+        help="Versioned dataset corpus manifest JSON path.",
+    )
+    label_feedback_inputs_parser.add_argument(
+        "--review-ops-metrics-report",
+        default=DEFAULT_REVIEW_OPS_METRICS_REPORT_OUTPUT,
+        help="Review operations metrics report JSON path.",
+    )
+    label_feedback_inputs_parser.add_argument(
+        "--review-ops-dashboard-data",
+        default=DEFAULT_REVIEW_OPS_DASHBOARD_DATA_OUTPUT,
+        help="Review operations dashboard data JSON path.",
+    )
+    label_feedback_inputs_parser.add_argument(
+        "--coverage-sampling-profile",
+        default=DEFAULT_COVERAGE_SAMPLING_PROFILE_OUTPUT,
+        help="Coverage sampling profile JSON path.",
+    )
+    label_feedback_inputs_parser.add_argument(
+        "--coverage-sampling-report",
+        default=DEFAULT_COVERAGE_SAMPLING_REPORT_OUTPUT,
+        help="Coverage sampling report JSON path.",
+    )
+    label_feedback_inputs_parser.add_argument(
+        "--multi-point-regression-matrix",
+        default=DEFAULT_MULTI_POINT_REGRESSION_MATRIX_CURRENT,
+        help="Multi-point regression matrix JSON path.",
+    )
+    label_feedback_inputs_parser.add_argument(
+        "--output",
+        default=DEFAULT_LABEL_FEEDBACK_EVALUATION_INPUTS_OUTPUT,
+        help="JSON label feedback evaluation inputs output path.",
+    )
+    label_feedback_inputs_parser.add_argument("--skip-create-db", action="store_true")
+    label_feedback_inputs_parser.set_defaults(
+        handler=_handle_build_label_feedback_evaluation_inputs,
+        skip_create_db=True,
+    )
+
+    label_feedback_validate_parser = subcommands.add_parser(
+        "validate-label-feedback-evaluation-inputs",
+        help="Validate label feedback evaluation inputs structurally.",
+    )
+    label_feedback_validate_parser.add_argument(
+        "--contract",
+        default=DEFAULT_LABEL_FEEDBACK_EVALUATION_CONTRACT_OUTPUT,
+        help="Label feedback evaluation contract JSON path.",
+    )
+    label_feedback_validate_parser.add_argument("--feedback-inputs", required=True)
+    label_feedback_validate_parser.add_argument(
+        "--observation-quality-taxonomy",
+        default=DEFAULT_OBSERVATION_QUALITY_TAXONOMY_OUTPUT,
+        help="Blueprint 26 observation-quality taxonomy JSON path.",
+    )
+    label_feedback_validate_parser.add_argument(
+        "--review-label-schema",
+        default=DEFAULT_REVIEW_LABEL_SCHEMA_OUTPUT,
+        help="Blueprint 27 review label schema JSON path.",
+    )
+    label_feedback_validate_parser.add_argument(
+        "--reviewer-confidence-schema",
+        default=DEFAULT_REVIEWER_CONFIDENCE_SCHEMA_OUTPUT,
+        help="Blueprint 28 reviewer confidence schema JSON path.",
+    )
+    label_feedback_validate_parser.add_argument(
+        "--multi-reviewer-schema",
+        default=DEFAULT_MULTI_REVIEWER_SCHEMA_OUTPUT,
+        help="Blueprint 29 multi-reviewer disagreement schema JSON path.",
+    )
+    label_feedback_validate_parser.add_argument(
+        "--intennse-alignment-contract",
+        default=DEFAULT_INTENNSE_ALIGNMENT_CONTRACT_OUTPUT,
+        help="Blueprint 30 INTENNSE alignment contract JSON path.",
+    )
+    label_feedback_validate_parser.add_argument(
+        "--dataset-corpus-contract",
+        default=DEFAULT_DATASET_CORPUS_CONTRACT_OUTPUT,
+        help="Blueprint 31 versioned dataset corpus contract JSON path.",
+    )
+    label_feedback_validate_parser.add_argument(
+        "--coverage-sampling-contract",
+        default=DEFAULT_COVERAGE_SAMPLING_CONTRACT_OUTPUT,
+        help="Blueprint 32 coverage sampling strategy contract JSON path.",
+    )
+    label_feedback_validate_parser.add_argument(
+        "--many-point-ingestion-contract",
+        default=DEFAULT_MANY_POINT_INGESTION_CONTRACT_OUTPUT,
+        help="Blueprint 33 many-point ingestion gate contract JSON path.",
+    )
+    label_feedback_validate_parser.add_argument(
+        "--review-ops-metrics-contract",
+        default=DEFAULT_REVIEW_OPS_METRICS_CONTRACT_OUTPUT,
+        help="Blueprint 34 review operations metrics contract JSON path.",
+    )
+    label_feedback_validate_parser.add_argument(
+        "--output",
+        default=DEFAULT_LABEL_FEEDBACK_EVALUATION_VALIDATION_OUTPUT,
+        help="Optional JSON label feedback evaluation validation output path.",
+    )
+    label_feedback_validate_parser.add_argument("--skip-create-db", action="store_true")
+    label_feedback_validate_parser.set_defaults(
+        handler=_handle_validate_label_feedback_evaluation_inputs,
+        skip_create_db=True,
+    )
+
+    label_feedback_report_parser = subcommands.add_parser(
+        "build-label-feedback-evaluation-report",
+        help="Build a structural label feedback evaluation report.",
+    )
+    label_feedback_report_parser.add_argument(
+        "--contract",
+        default=DEFAULT_LABEL_FEEDBACK_EVALUATION_CONTRACT_OUTPUT,
+        help="Label feedback evaluation contract JSON path.",
+    )
+    label_feedback_report_parser.add_argument(
+        "--feedback-inputs",
+        default=DEFAULT_LABEL_FEEDBACK_EVALUATION_INPUTS_OUTPUT,
+        help="Label feedback evaluation inputs JSON path.",
+    )
+    label_feedback_report_parser.add_argument(
+        "--output",
+        default=DEFAULT_LABEL_FEEDBACK_EVALUATION_REPORT_OUTPUT,
+        help="JSON label feedback evaluation report output path.",
+    )
+    label_feedback_report_parser.add_argument("--skip-create-db", action="store_true")
+    label_feedback_report_parser.set_defaults(
+        handler=_handle_build_label_feedback_evaluation_report,
+        skip_create_db=True,
+    )
+
     point_evaluation_parser = subcommands.add_parser(
         "evaluate-point-candidates",
         help="Evaluate generated point candidate markers using operator review metadata.",
@@ -3860,6 +4026,64 @@ def _handle_build_review_ops_dashboard_data(
     del session
     return build_review_ops_dashboard_data(
         report_path=args.report,
+        output_path=args.output,
+    )
+
+
+def _handle_export_label_feedback_evaluation_contract(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return export_label_feedback_evaluation_contract(output_path=args.output)
+
+
+def _handle_build_label_feedback_evaluation_inputs(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_label_feedback_evaluation_inputs(
+        contract_path=args.contract,
+        corpus_manifest_path=args.corpus_manifest,
+        review_ops_metrics_report_path=args.review_ops_metrics_report,
+        review_ops_dashboard_data_path=args.review_ops_dashboard_data,
+        coverage_sampling_profile_path=args.coverage_sampling_profile,
+        coverage_sampling_report_path=args.coverage_sampling_report,
+        multi_point_regression_matrix_path=args.multi_point_regression_matrix,
+        output_path=args.output,
+    )
+
+
+def _handle_validate_label_feedback_evaluation_inputs(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_label_feedback_evaluation_inputs(
+        contract_path=args.contract,
+        feedback_inputs_path=args.feedback_inputs,
+        observation_quality_taxonomy_path=args.observation_quality_taxonomy,
+        review_label_schema_path=args.review_label_schema,
+        reviewer_confidence_schema_path=args.reviewer_confidence_schema,
+        multi_reviewer_schema_path=args.multi_reviewer_schema,
+        intennse_alignment_contract_path=args.intennse_alignment_contract,
+        dataset_corpus_contract_path=args.dataset_corpus_contract,
+        coverage_sampling_contract_path=args.coverage_sampling_contract,
+        many_point_ingestion_contract_path=args.many_point_ingestion_contract,
+        review_ops_metrics_contract_path=args.review_ops_metrics_contract,
+        output_path=args.output,
+    )
+
+
+def _handle_build_label_feedback_evaluation_report(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_label_feedback_evaluation_report(
+        contract_path=args.contract,
+        feedback_inputs_path=args.feedback_inputs,
         output_path=args.output,
     )
 

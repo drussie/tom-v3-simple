@@ -2533,6 +2533,62 @@ Expected:
 - `report_version`: `v1`
 - `dashboard_data_type`: `review_ops_dashboard_data`
 - `dashboard_data_version`: `v1`
+
+## Label Feedback Loop into Evaluation Harness
+
+Use this to export the label-feedback evaluation contract, build structural feedback inputs,
+validate them, and build an evaluation report. This is evaluation-routing infrastructure only. It
+does not create labels, generate confidence scores, rank reviewers, resolve disagreement, infer
+truth, modify baselines, retrain models, ingest media, execute sampling, or adjudicate evidence.
+
+Export the contract:
+
+```bash
+make tom-v1-export-label-feedback-evaluation-contract \
+  PYTHON=.venv/bin/python
+```
+
+Build feedback inputs from current local corpus/review-ops/coverage/regression artifacts:
+
+```bash
+make tom-v1-build-label-feedback-evaluation-inputs \
+  PYTHON=.venv/bin/python
+```
+
+Validate feedback inputs:
+
+```bash
+make tom-v1-validate-label-feedback-evaluation-inputs \
+  PYTHON=.venv/bin/python \
+  LABEL_FEEDBACK_EVALUATION_INPUTS=.data/exports/label_feedback_evaluation_inputs.current.json
+```
+
+Build the evaluation report:
+
+```bash
+make tom-v1-build-label-feedback-evaluation-report \
+  PYTHON=.venv/bin/python \
+  LABEL_FEEDBACK_EVALUATION_INPUTS=.data/exports/label_feedback_evaluation_inputs.current.json
+```
+
+Default paths:
+
+```text
+.data/contracts/label_feedback_evaluation_contract_v1.json
+.data/exports/label_feedback_evaluation_inputs.current.json
+.data/exports/label_feedback_evaluation_inputs.validation.json
+.data/exports/label_feedback_evaluation_report.current.json
+```
+
+Expected:
+
+- `ok`: true for contract export, input build, validation, and report build
+- `contract_type`: `label_feedback_evaluation_contract`
+- `contract_version`: `v1`
+- `feedback_inputs_type`: `label_feedback_evaluation_inputs`
+- `feedback_inputs_version`: `v1`
+- `report_type`: `label_feedback_evaluation_report`
+- `report_version`: `v1`
 - `dashboard_card_count`: 13
 - `warnings.review_ops_metrics_are_not_truth`: true
 - `warnings.read_only_dashboard_data`: true

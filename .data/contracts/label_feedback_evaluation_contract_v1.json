@@ -1,0 +1,345 @@
+{
+  "contract_type": "label_feedback_evaluation_contract",
+  "contract_version": "v1",
+  "evaluation_bridge_schema": {
+    "actions_are_structural_routing_only": true,
+    "actions_do_not_decide_candidate_validity": true,
+    "allowed_evaluation_harness_actions": [
+      "no_action",
+      "include_as_structural_eval_case",
+      "include_as_review_coverage_case",
+      "include_as_regression_context",
+      "flag_missing_review_artifact",
+      "flag_missing_confidence_artifact",
+      "flag_missing_disagreement_artifact",
+      "flag_missing_intennse_alignment",
+      "flag_provenance_gap",
+      "preserve_regression_protected_sample",
+      "not_applicable"
+    ],
+    "allowed_evaluation_signal_statuses": [
+      "not_assessed",
+      "present",
+      "missing",
+      "partial",
+      "structurally_usable",
+      "structurally_blocked",
+      "requires_human_review",
+      "not_applicable"
+    ],
+    "allowed_evaluation_signal_types": [
+      "not_assessed",
+      "structural_review_available",
+      "structural_review_missing",
+      "reviewer_confidence_available",
+      "reviewer_confidence_missing",
+      "multi_reviewer_review_available",
+      "disagreement_present",
+      "disagreement_missing",
+      "intennse_alignment_available",
+      "intennse_alignment_missing",
+      "provenance_partial",
+      "provenance_missing",
+      "coverage_gap_present",
+      "regression_protected_entry",
+      "not_applicable"
+    ],
+    "evaluation_harness_action_field": "evaluation_harness_action",
+    "evaluation_signal_status_field": "evaluation_signal_status",
+    "evaluation_signal_type_field": "evaluation_signal_type"
+  },
+  "evaluation_harness_actions": [
+    "no_action",
+    "include_as_structural_eval_case",
+    "include_as_review_coverage_case",
+    "include_as_regression_context",
+    "flag_missing_review_artifact",
+    "flag_missing_confidence_artifact",
+    "flag_missing_disagreement_artifact",
+    "flag_missing_intennse_alignment",
+    "flag_provenance_gap",
+    "preserve_regression_protected_sample",
+    "not_applicable"
+  ],
+  "evaluation_signal_statuses": [
+    "not_assessed",
+    "present",
+    "missing",
+    "partial",
+    "structurally_usable",
+    "structurally_blocked",
+    "requires_human_review",
+    "not_applicable"
+  ],
+  "evaluation_signal_types": [
+    "not_assessed",
+    "structural_review_available",
+    "structural_review_missing",
+    "reviewer_confidence_available",
+    "reviewer_confidence_missing",
+    "multi_reviewer_review_available",
+    "disagreement_present",
+    "disagreement_missing",
+    "intennse_alignment_available",
+    "intennse_alignment_missing",
+    "provenance_partial",
+    "provenance_missing",
+    "coverage_gap_present",
+    "regression_protected_entry",
+    "not_applicable"
+  ],
+  "exported_at": "2026-06-18T00:00:00+00:00",
+  "feedback_input_schema": {
+    "allows_evaluation_signals_array": true,
+    "entities": [
+      "feedback_bundle",
+      "feedback_entry",
+      "corpus_entry_ref",
+      "point_manifest_ref",
+      "review_label_bundle_ref",
+      "reviewer_confidence_bundle_ref",
+      "multi_reviewer_review_set_ref",
+      "disagreement_report_ref",
+      "intennse_alignment_ref",
+      "evaluation_case_ref",
+      "regression_case_ref",
+      "coverage_gap_ref",
+      "provenance_ref"
+    ],
+    "feedback_entry_fields": [
+      {
+        "key": "feedback_entry_id",
+        "required": true
+      },
+      {
+        "key": "source_corpus_entry_id",
+        "required": true
+      },
+      {
+        "key": "point_manifest_id",
+        "required": true
+      },
+      {
+        "key": "media_id",
+        "required": true
+      },
+      {
+        "key": "replay_url",
+        "required": true
+      },
+      {
+        "key": "associated_run_ids",
+        "required": true
+      },
+      {
+        "key": "review_label_bundle_refs",
+        "required": true
+      },
+      {
+        "key": "reviewer_confidence_bundle_refs",
+        "required": true
+      },
+      {
+        "key": "multi_reviewer_review_set_refs",
+        "required": true
+      },
+      {
+        "key": "disagreement_report_refs",
+        "required": true
+      },
+      {
+        "key": "intennse_alignment_refs",
+        "required": true
+      },
+      {
+        "key": "observation_quality_refs",
+        "required": true
+      },
+      {
+        "key": "corpus_manifest_ref",
+        "required": true
+      },
+      {
+        "key": "coverage_sampling_ref",
+        "required": true
+      },
+      {
+        "key": "review_ops_metrics_ref",
+        "required": true
+      },
+      {
+        "key": "evaluation_signal_type",
+        "required": true
+      },
+      {
+        "key": "evaluation_signal_status",
+        "required": true
+      },
+      {
+        "key": "evaluation_harness_action",
+        "required": true
+      },
+      {
+        "key": "provenance_status",
+        "required": true
+      },
+      {
+        "key": "requires_human_review",
+        "required": true
+      },
+      {
+        "key": "warnings",
+        "required": true
+      }
+    ],
+    "missing_review_artifacts_are_gaps": true,
+    "read_only": true
+  },
+  "feedback_inputs_type": "label_feedback_evaluation_inputs",
+  "feedback_inputs_version": "v1",
+  "feedback_scope": {
+    "automatic_confidence_score_creation_allowed": false,
+    "automatic_review_label_creation_allowed": false,
+    "disagreement_resolution_allowed": false,
+    "evaluation_pass_fail_from_human_label_allowed": false,
+    "event_generation_allowed": false,
+    "feedback_loop_infrastructure_only": true,
+    "media_ingestion_allowed": false,
+    "model_retraining_allowed": false,
+    "purpose": "Bridge human review structures into evaluation coverage and regression diagnostics as structural inputs.",
+    "read_only": true,
+    "reviewer_quality_scoring_allowed": false,
+    "reviewer_ranking_allowed": false,
+    "sampling_execution_allowed": false,
+    "three_d_generation_allowed": false,
+    "truth_creation_allowed": false
+  },
+  "provenance_requirements": {
+    "associated_run_ids_preserved": true,
+    "evidence_availability_preserved": true,
+    "profile_counts_preserved": true,
+    "protected_sample_point_preserved_as_regression_context": true,
+    "replay_urls_preserved": true,
+    "source_contract_versions_preserved": true,
+    "source_paths_preserved": true,
+    "source_warnings_preserved_when_available": true
+  },
+  "report_type": "label_feedback_evaluation_report",
+  "report_version": "v1",
+  "source_contract_refs": {
+    "coverage_sampling_strategy_contract_version": "v1",
+    "intennse_label_alignment_contract_version": "v1",
+    "many_point_ingestion_gate_contract_version": "v1",
+    "multi_point_regression_matrix_version": "v0",
+    "multi_reviewer_disagreement_schema_version": "v1",
+    "observation_quality_taxonomy_version": "v1",
+    "point_manifest_version": "v0",
+    "review_label_schema_version": "v1",
+    "review_ops_metrics_contract_version": "v1",
+    "reviewer_confidence_schema_version": "v1",
+    "versioned_dataset_corpus_contract_version": "v1"
+  },
+  "tom_provenance": {
+    "blueprint": "blueprint_35",
+    "blueprint_name": "label_feedback_loop_evaluation_harness_v1",
+    "project": "tom-v3-simple",
+    "project_version": "0.0.0"
+  },
+  "validation_rules": {
+    "allowed_evaluation_harness_action_values_only": true,
+    "allowed_signal_status_values_only": true,
+    "allowed_signal_type_values_only": true,
+    "contract_shape_validated": true,
+    "does_not_create_confidence_scores": true,
+    "does_not_create_labels": true,
+    "does_not_create_training_truth": true,
+    "does_not_create_truth": true,
+    "does_not_execute_sampling": true,
+    "does_not_infer_missing_labels": true,
+    "does_not_ingest_media": true,
+    "does_not_modify_evaluation_baselines": true,
+    "does_not_rank_reviewers": true,
+    "does_not_resolve_disagreement": true,
+    "does_not_score_reviewers": true,
+    "feedback_input_shape_validated": true,
+    "forbidden_fields": [
+      "accepted",
+      "adjudication",
+      "betting_prediction",
+      "coaching_recommendation",
+      "correct",
+      "fail_due_to_label",
+      "in_out",
+      "incorrect",
+      "match_outcome",
+      "model_ready_truth",
+      "pass_due_to_label",
+      "player_identity",
+      "point_winner",
+      "quality_score",
+      "receiver",
+      "rejected",
+      "reviewer_rank",
+      "reviewer_score",
+      "score",
+      "server",
+      "tactical_recommendation",
+      "training_truth",
+      "truth",
+      "winner"
+    ],
+    "forbidden_values": [
+      "accepted",
+      "adjudication",
+      "betting_prediction",
+      "coaching_recommendation",
+      "correct",
+      "fail_due_to_label",
+      "in_out",
+      "incorrect",
+      "match_outcome",
+      "model_ready_truth",
+      "pass_due_to_label",
+      "player_identity",
+      "point_winner",
+      "quality_score",
+      "receiver",
+      "rejected",
+      "reviewer_rank",
+      "reviewer_score",
+      "score",
+      "server",
+      "tactical_recommendation",
+      "training_truth",
+      "truth",
+      "winner"
+    ],
+    "missing_optional_refs_are_structural_warnings": true,
+    "referenced_contract_versions_validated_when_paths_available": true,
+    "structural_validation_only": true
+  },
+  "warnings": {
+    "does_not_create_3d_candidates": true,
+    "does_not_create_event_candidates": true,
+    "does_not_create_in_out": true,
+    "does_not_create_score": true,
+    "does_not_determine_winner": true,
+    "does_not_execute_sampling": true,
+    "does_not_identify_players": true,
+    "does_not_ingest_media": true,
+    "does_not_rank_reviewers": true,
+    "does_not_resolve_disagreement": true,
+    "does_not_score_reviewers": true,
+    "evaluation_bridge_is_structural_only": true,
+    "feedback_loop_does_not_change_model_behavior": true,
+    "feedback_loop_does_not_create_labels": true,
+    "feedback_loop_does_not_create_training_truth": true,
+    "feedback_loop_does_not_modify_baselines": true,
+    "label_feedback_evaluation_is_not_truth": true,
+    "no_adjudication": true,
+    "not_generalization_claim": true,
+    "observation_only": true,
+    "provenance_only": true,
+    "review_support_only": true
+  }
+}

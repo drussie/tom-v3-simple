@@ -291,4 +291,40 @@ run "$PYTHON_BIN" -m apps.worker.cli build-review-ops-dashboard-data \
   --output "$TMP_ROOT/review_ops_dashboard_data.current.json" \
   --skip-create-db
 
+run "$PYTHON_BIN" -m apps.worker.cli export-label-feedback-evaluation-contract \
+  --output "$TMP_ROOT/label_feedback_evaluation_contract_v1.smoke.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-label-feedback-evaluation-inputs \
+  --contract "$TMP_ROOT/label_feedback_evaluation_contract_v1.smoke.json" \
+  --corpus-manifest "$TMP_ROOT/versioned_dataset_corpus_manifest.current.json" \
+  --review-ops-metrics-report "$TMP_ROOT/review_ops_metrics_report.current.json" \
+  --review-ops-dashboard-data "$TMP_ROOT/review_ops_dashboard_data.current.json" \
+  --coverage-sampling-profile "$TMP_ROOT/coverage_sampling_profile.current.json" \
+  --coverage-sampling-report "$TMP_ROOT/coverage_sampling_report.current.json" \
+  --multi-point-regression-matrix "$TMP_ROOT/multi_point_regression_matrix.current.json" \
+  --output "$TMP_ROOT/label_feedback_evaluation_inputs.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli validate-label-feedback-evaluation-inputs \
+  --contract "$TMP_ROOT/label_feedback_evaluation_contract_v1.smoke.json" \
+  --feedback-inputs "$TMP_ROOT/label_feedback_evaluation_inputs.current.json" \
+  --observation-quality-taxonomy "$TMP_ROOT/observation_quality_taxonomy_v1.smoke.json" \
+  --review-label-schema "$TMP_ROOT/review_label_schema_v1.smoke.json" \
+  --reviewer-confidence-schema "$TMP_ROOT/reviewer_confidence_ambiguity_schema_v1.smoke.json" \
+  --multi-reviewer-schema "$TMP_ROOT/multi_reviewer_disagreement_schema_v1.smoke.json" \
+  --intennse-alignment-contract "$TMP_ROOT/intennse_label_alignment_contract_v1.smoke.json" \
+  --dataset-corpus-contract "$TMP_ROOT/versioned_dataset_corpus_contract_v1.smoke.json" \
+  --coverage-sampling-contract "$TMP_ROOT/coverage_sampling_strategy_contract_v1.smoke.json" \
+  --many-point-ingestion-contract "$TMP_ROOT/many_point_ingestion_gate_contract_v1.smoke.json" \
+  --review-ops-metrics-contract "$TMP_ROOT/review_ops_metrics_contract_v1.smoke.json" \
+  --output "$TMP_ROOT/label_feedback_evaluation_inputs.validation.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-label-feedback-evaluation-report \
+  --contract "$TMP_ROOT/label_feedback_evaluation_contract_v1.smoke.json" \
+  --feedback-inputs "$TMP_ROOT/label_feedback_evaluation_inputs.current.json" \
+  --output "$TMP_ROOT/label_feedback_evaluation_report.current.json" \
+  --skip-create-db
+
 run git status --short

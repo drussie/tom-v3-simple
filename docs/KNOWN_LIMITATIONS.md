@@ -299,6 +299,8 @@ TOM v3 Simple does not include:
 - Large-scale analytics are not included.
 - Artifact storage lifecycle is local/demo-oriented.
 - Provenance audit checks structure, not model correctness.
+- Label-feedback evaluation inputs route review/corpus/coverage structure only; they are not
+  training truth and do not decide candidate validity.
 
 ## Boundary
 
