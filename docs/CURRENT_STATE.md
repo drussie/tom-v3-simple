@@ -4,10 +4,10 @@
 
 - Project name: TOM v3 Simple
 - Repo: drussie/tom-v3-simple
-- Current phase: Blueprint 41 complete; gameplay segment replay timeline/operator review added
+- Current phase: Blueprint 42 complete; gameplay-gated many-point ingestion smoke added
 - Current goal: Preserve the BP22-BP36 structural expansion freeze, keep protected regression
-  gates intact, and make gameplay gate/routing/execution provenance reviewable as replay timeline
-  artifacts without creating tennis truth
+  gates intact, and make gameplay gate/routing/execution/replay provenance runnable as an explicit
+  many-point structural smoke path without creating tennis truth
 
 ## Mission
 
@@ -51,6 +51,10 @@ A lightweight tennis video observation platform that accepts model output as ope
 - Blueprint 41 status: complete; tracked gameplay segment replay/review contract, replay timeline,
   review template, validation, and report are implemented without persisting review notes,
   running inference, writing observations, truth labels, scoring, player identity, or adjudication
+- Blueprint 42 status: complete; tracked gameplay-gated many-point smoke contract, explicit smoke
+  manifest, validation, structural runner, and report are implemented without auto-discovering
+  media, running GPU/model inference by default, mutating model assets or baselines, truth labels,
+  scoring, player identity, generalization claims, or adjudication
 - Observation writer: implemented with typed extension rows, lineage, artifacts, and idempotency
 - Worker synthetic seeder: implemented
 - Visual evidence viewer: implemented in `apps/web` with detection bbox overlay, pose keypoint/skeleton overlay, frame artifact image support, run evidence summary, clearer empty states, candidate/evidence wording, readable lineage context, and review/export metadata display

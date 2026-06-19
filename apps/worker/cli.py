@@ -57,6 +57,19 @@ from apps.worker.services.event_candidate_3d_diagnostics import (
 )
 from apps.worker.services.frame_artifacts import extract_frame_artifacts_for_run
 from apps.worker.services.gameplay_adapter import run_gameplay_adapter
+from apps.worker.services.gameplay_gated_many_point_smoke import (
+    DEFAULT_GAMEPLAY_GATED_MANY_POINT_SMOKE_CONTRACT_OUTPUT,
+    DEFAULT_GAMEPLAY_GATED_MANY_POINT_SMOKE_MANIFEST_OUTPUT,
+    DEFAULT_GAMEPLAY_GATED_MANY_POINT_SMOKE_MANIFEST_VALIDATION_OUTPUT,
+    DEFAULT_GAMEPLAY_GATED_MANY_POINT_SMOKE_OUTPUT,
+    DEFAULT_GAMEPLAY_GATED_MANY_POINT_SMOKE_OUTPUT_DIR,
+    DEFAULT_GAMEPLAY_GATED_MANY_POINT_SMOKE_REPORT_OUTPUT,
+    build_gameplay_gated_many_point_smoke_manifest_template,
+    build_gameplay_gated_many_point_smoke_report,
+    export_gameplay_gated_many_point_smoke_contract,
+    run_gameplay_gated_many_point_smoke,
+    validate_gameplay_gated_many_point_smoke_manifest,
+)
 from apps.worker.services.gameplay_gated_perception_execution import (
     DEFAULT_GAMEPLAY_GATED_PERCEPTION_EXECUTION_CONTRACT_OUTPUT,
     DEFAULT_GAMEPLAY_GATED_PERCEPTION_EXECUTION_PLAN_OUTPUT,
@@ -3124,6 +3137,171 @@ def main() -> None:
         skip_create_db=True,
     )
 
+    many_point_smoke_contract_parser = subcommands.add_parser(
+        "export-gameplay-gated-many-point-smoke-contract",
+        help="Export the Blueprint 42 gameplay-gated many-point smoke contract.",
+    )
+    many_point_smoke_contract_parser.add_argument(
+        "--output",
+        default=DEFAULT_GAMEPLAY_GATED_MANY_POINT_SMOKE_CONTRACT_OUTPUT,
+        help="JSON gameplay-gated many-point smoke contract output path.",
+    )
+    many_point_smoke_contract_parser.add_argument("--skip-create-db", action="store_true")
+    many_point_smoke_contract_parser.set_defaults(
+        handler=_handle_export_gameplay_gated_many_point_smoke_contract,
+        skip_create_db=True,
+    )
+
+    many_point_smoke_manifest_parser = subcommands.add_parser(
+        "build-gameplay-gated-many-point-smoke-manifest-template",
+        help="Build a BP42 explicit gameplay-gated many-point smoke manifest template.",
+    )
+    many_point_smoke_manifest_parser.add_argument(
+        "--local-media-path",
+        action="append",
+        default=[],
+        help="Explicit local media path. May be supplied more than once.",
+    )
+    many_point_smoke_manifest_parser.add_argument(
+        "--source-label",
+        default="gameplay_gated_smoke_point",
+        help="Source label prefix for generated smoke entries.",
+    )
+    many_point_smoke_manifest_parser.add_argument(
+        "--requested-smoke-step",
+        action="append",
+        default=[],
+        help="Requested smoke step. Defaults to all BP42 safe structural steps.",
+    )
+    many_point_smoke_manifest_parser.add_argument(
+        "--disable-fixture-mode",
+        action="store_true",
+        help="Set allow_fixture_mode=false in generated entries.",
+    )
+    many_point_smoke_manifest_parser.add_argument(
+        "--output",
+        default=DEFAULT_GAMEPLAY_GATED_MANY_POINT_SMOKE_MANIFEST_OUTPUT,
+        help="JSON gameplay-gated many-point smoke manifest output path.",
+    )
+    many_point_smoke_manifest_parser.add_argument("--skip-create-db", action="store_true")
+    many_point_smoke_manifest_parser.set_defaults(
+        handler=_handle_build_gameplay_gated_many_point_smoke_manifest_template,
+        skip_create_db=True,
+    )
+
+    many_point_smoke_validate_parser = subcommands.add_parser(
+        "validate-gameplay-gated-many-point-smoke-manifest",
+        help="Validate a BP42 gameplay-gated many-point smoke manifest structurally.",
+    )
+    many_point_smoke_validate_parser.add_argument(
+        "--contract",
+        default=DEFAULT_GAMEPLAY_GATED_MANY_POINT_SMOKE_CONTRACT_OUTPUT,
+        help="Blueprint 42 smoke contract JSON path.",
+    )
+    many_point_smoke_validate_parser.add_argument(
+        "--manifest",
+        required=True,
+        help="Blueprint 42 smoke manifest JSON path.",
+    )
+    many_point_smoke_validate_parser.add_argument(
+        "--output",
+        default=DEFAULT_GAMEPLAY_GATED_MANY_POINT_SMOKE_MANIFEST_VALIDATION_OUTPUT,
+        help="Optional JSON smoke manifest validation output path.",
+    )
+    many_point_smoke_validate_parser.add_argument("--skip-create-db", action="store_true")
+    many_point_smoke_validate_parser.set_defaults(
+        handler=_handle_validate_gameplay_gated_many_point_smoke_manifest,
+        skip_create_db=True,
+    )
+
+    many_point_smoke_run_parser = subcommands.add_parser(
+        "run-gameplay-gated-many-point-smoke",
+        help="Run the BP42 structural gameplay-gated many-point smoke workflow.",
+    )
+    many_point_smoke_run_parser.add_argument(
+        "--contract",
+        default=DEFAULT_GAMEPLAY_GATED_MANY_POINT_SMOKE_CONTRACT_OUTPUT,
+        help="Blueprint 42 smoke contract JSON path.",
+    )
+    many_point_smoke_run_parser.add_argument("--manifest", required=True)
+    many_point_smoke_run_parser.add_argument("--smoke-mode", default="fixture_only")
+    many_point_smoke_run_parser.add_argument(
+        "--output-dir",
+        default=DEFAULT_GAMEPLAY_GATED_MANY_POINT_SMOKE_OUTPUT_DIR,
+        help="Directory for generated BP42 smoke intermediate artifacts.",
+    )
+    many_point_smoke_run_parser.add_argument(
+        "--output",
+        default=DEFAULT_GAMEPLAY_GATED_MANY_POINT_SMOKE_OUTPUT,
+        help="JSON BP42 smoke run/report output path.",
+    )
+    many_point_smoke_run_parser.add_argument(
+        "--model-asset-path",
+        default=DEFAULT_GAMEPLAY_CLASSIFIER_ASSET_PATH,
+        help="Local TOM v1 gameplay classifier asset path.",
+    )
+    many_point_smoke_run_parser.add_argument(
+        "--many-point-contract",
+        default=DEFAULT_MANY_POINT_INGESTION_CONTRACT_OUTPUT,
+        help="Blueprint 33 many-point ingestion gate contract JSON path.",
+    )
+    many_point_smoke_run_parser.add_argument(
+        "--gameplay-segment-contract",
+        default=DEFAULT_GAMEPLAY_SEGMENT_GATE_CONTRACT_OUTPUT,
+        help="Blueprint 38 gameplay segment gate contract JSON path.",
+    )
+    many_point_smoke_run_parser.add_argument(
+        "--routing-contract",
+        default=DEFAULT_GAMEPLAY_GATED_ROUTING_CONTRACT_OUTPUT,
+        help="Blueprint 39 gameplay-gated routing contract JSON path.",
+    )
+    many_point_smoke_run_parser.add_argument(
+        "--execution-contract",
+        default=DEFAULT_GAMEPLAY_GATED_PERCEPTION_EXECUTION_CONTRACT_OUTPUT,
+        help="Blueprint 40 gameplay-gated execution contract JSON path.",
+    )
+    many_point_smoke_run_parser.add_argument(
+        "--replay-review-contract",
+        default=DEFAULT_GAMEPLAY_SEGMENT_REPLAY_REVIEW_CONTRACT_OUTPUT,
+        help="Blueprint 41 replay/review contract JSON path.",
+    )
+    many_point_smoke_run_parser.add_argument(
+        "--viewer-base-url",
+        default="http://127.0.0.1:3000",
+    )
+    many_point_smoke_run_parser.add_argument("--frame-sample-rate", type=int, default=30)
+    many_point_smoke_run_parser.add_argument("--max-frames", type=int, default=240)
+    many_point_smoke_run_parser.add_argument("--skip-create-db", action="store_true")
+    many_point_smoke_run_parser.set_defaults(
+        handler=_handle_run_gameplay_gated_many_point_smoke,
+        skip_create_db=True,
+    )
+
+    many_point_smoke_report_parser = subcommands.add_parser(
+        "build-gameplay-gated-many-point-smoke-report",
+        help="Build a validated BP42 structural smoke readiness report.",
+    )
+    many_point_smoke_report_parser.add_argument(
+        "--contract",
+        default=DEFAULT_GAMEPLAY_GATED_MANY_POINT_SMOKE_CONTRACT_OUTPUT,
+        help="Blueprint 42 smoke contract JSON path.",
+    )
+    many_point_smoke_report_parser.add_argument(
+        "--smoke-report",
+        required=True,
+        help="BP42 smoke run/report JSON path.",
+    )
+    many_point_smoke_report_parser.add_argument(
+        "--output",
+        default=DEFAULT_GAMEPLAY_GATED_MANY_POINT_SMOKE_REPORT_OUTPUT,
+        help="JSON BP42 smoke readiness report output path.",
+    )
+    many_point_smoke_report_parser.add_argument("--skip-create-db", action="store_true")
+    many_point_smoke_report_parser.set_defaults(
+        handler=_handle_build_gameplay_gated_many_point_smoke_report,
+        skip_create_db=True,
+    )
+
     point_evaluation_parser = subcommands.add_parser(
         "evaluate-point-candidates",
         help="Evaluate generated point candidate markers using operator review metadata.",
@@ -5220,6 +5398,75 @@ def _handle_build_gameplay_segment_review_report(
         contract_path=args.contract,
         timeline_path=args.timeline,
         bundle_path=args.bundle,
+        output_path=args.output,
+    )
+
+
+def _handle_export_gameplay_gated_many_point_smoke_contract(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return export_gameplay_gated_many_point_smoke_contract(output_path=args.output)
+
+
+def _handle_build_gameplay_gated_many_point_smoke_manifest_template(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_gameplay_gated_many_point_smoke_manifest_template(
+        local_media_paths=args.local_media_path,
+        source_label=args.source_label,
+        requested_smoke_steps=args.requested_smoke_step or None,
+        output_path=args.output,
+        allow_fixture_mode=not args.disable_fixture_mode,
+    )
+
+
+def _handle_validate_gameplay_gated_many_point_smoke_manifest(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_gameplay_gated_many_point_smoke_manifest(
+        contract_path=args.contract,
+        manifest_path=args.manifest,
+        output_path=args.output,
+    )
+
+
+def _handle_run_gameplay_gated_many_point_smoke(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return run_gameplay_gated_many_point_smoke(
+        contract_path=args.contract,
+        manifest_path=args.manifest,
+        smoke_mode=args.smoke_mode,
+        output_dir=args.output_dir,
+        output_path=args.output,
+        model_asset_path=args.model_asset_path,
+        many_point_contract_path=args.many_point_contract,
+        gameplay_segment_contract_path=args.gameplay_segment_contract,
+        routing_contract_path=args.routing_contract,
+        execution_contract_path=args.execution_contract,
+        replay_review_contract_path=args.replay_review_contract,
+        viewer_base_url=args.viewer_base_url,
+        frame_sample_rate=args.frame_sample_rate,
+        max_frames=args.max_frames,
+    )
+
+
+def _handle_build_gameplay_gated_many_point_smoke_report(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_gameplay_gated_many_point_smoke_report(
+        contract_path=args.contract,
+        smoke_report_path=args.smoke_report,
         output_path=args.output,
     )
 

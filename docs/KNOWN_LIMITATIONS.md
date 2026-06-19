@@ -327,6 +327,11 @@ TOM v3 Simple does not include:
   provenance visible as timeline lanes only. Review statuses are human metadata, not truth,
   classifier correctness, accepted/rejected lifecycle state, line-call conclusions, score, player
   identity, production readiness, training truth, or adjudication.
+- Gameplay-gated many-point smoke artifacts prove only that explicit manifest entries can flow
+  through the structural BP33 and BP38-BP41 contracts. Fixture reuse remains fixture reuse, not
+  distinct real points; the smoke report does not prove real-world generalization, point
+  detection, scoring, line calls, model correctness, training truth, production readiness, or
+  adjudication.
 
 ## Boundary
 

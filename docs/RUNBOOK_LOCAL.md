@@ -1933,6 +1933,57 @@ Expected:
 - review statuses are human metadata only
 - generated `.data/exports/` files stay local and untracked
 
+## Gameplay-Gated Many-Point Ingestion Smoke
+
+Use this after the Blueprint 38-41 contracts are available. The smoke workflow reads explicit
+media entries, runs the many-point ingestion gate in dry-run mode, and builds gameplay-gated
+structural artifacts for each entry. It does not auto-discover folders, run GPU/model inference by
+default, write observations, mutate model assets, mutate baselines, create labels, decide tennis
+truth, or adjudicate evidence.
+
+Export the tracked contract:
+
+```bash
+make tom-v1-export-gameplay-gated-many-point-smoke-contract \
+  PYTHON=.venv/bin/python
+```
+
+Build an explicit smoke manifest:
+
+```bash
+make tom-v1-build-gameplay-gated-many-point-smoke-manifest-template \
+  PYTHON=.venv/bin/python \
+  GAMEPLAY_GATED_MANY_POINT_SMOKE_MEDIA_PATH=demo_assets/sample_point.mp4
+```
+
+Validate the smoke manifest:
+
+```bash
+make tom-v1-validate-gameplay-gated-many-point-smoke-manifest \
+  PYTHON=.venv/bin/python \
+  GAMEPLAY_GATED_MANY_POINT_SMOKE_MANIFEST=.data/exports/gameplay_gated_many_point_smoke_manifest.template.json
+```
+
+Run the structural smoke:
+
+```bash
+make tom-v1-run-gameplay-gated-many-point-smoke \
+  PYTHON=.venv/bin/python \
+  GAMEPLAY_GATED_MANY_POINT_SMOKE_MANIFEST=.data/exports/gameplay_gated_many_point_smoke_manifest.template.json
+```
+
+Build the smoke report:
+
+```bash
+make tom-v1-build-gameplay-gated-many-point-smoke-report \
+  PYTHON=.venv/bin/python \
+  GAMEPLAY_GATED_MANY_POINT_SMOKE_REPORT=.data/exports/gameplay_gated_many_point_smoke.current.json
+```
+
+If `demo_assets/sample_point.mp4` is reused more than once as a fixture stand-in, generated
+manifests and reports must preserve `fixture_reuse_only`, `not_distinct_real_points`, and
+`does_not_claim_generalization`.
+
 ## Camera Geometry Calibration Provenance
 
 Blueprint 36 builds a structural camera geometry / calibration provenance profile from existing

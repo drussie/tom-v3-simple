@@ -1,0 +1,178 @@
+{
+  "contract_type": "gameplay_gated_many_point_smoke_contract",
+  "contract_version": "v1",
+  "exported_at": "2026-06-19T00:00:00+00:00",
+  "provenance_requirements": {
+    "execution_plan_output_path_recorded_when_built": true,
+    "fixture_reuse_warnings_preserved": true,
+    "gameplay_segment_output_path_recorded_when_built": true,
+    "local_media_path_required": true,
+    "model_asset_hash_recorded_when_available": true,
+    "path_exists_recorded": true,
+    "replay_timeline_output_path_recorded_when_built": true,
+    "routing_plan_output_path_recorded_when_built": true,
+    "smoke_entry_id_required": true,
+    "source_manifest_path_required": true
+  },
+  "smoke_entry_schema": {
+    "allowed_statuses": [
+      "dry_run_planned",
+      "failed",
+      "fixture_smoke_completed",
+      "skipped",
+      "structural_smoke_completed",
+      "validated"
+    ],
+    "expected_media_type": "local_video_file",
+    "required_fields": [
+      "smoke_entry_id",
+      "local_media_path",
+      "source_label",
+      "expected_media_type",
+      "allow_fixture_mode",
+      "requested_smoke_steps",
+      "notes",
+      "warnings"
+    ]
+  },
+  "smoke_manifest_schema": {
+    "allowed_requested_smoke_steps": [
+      "build_gameplay_gated_execution_plan",
+      "build_gameplay_gated_routing_plan",
+      "build_gameplay_replay_timeline",
+      "build_gameplay_segment_candidates",
+      "inspect_gameplay_classifier_asset",
+      "summarize_smoke_readiness",
+      "validate_media_path"
+    ],
+    "disallowed_requested_smoke_steps": [
+      "adjudicate",
+      "create_truth",
+      "generate_training_labels",
+      "identify_players",
+      "line_call",
+      "prove_generalization",
+      "score_point"
+    ],
+    "entries_required": true,
+    "explicit_local_media_paths_required": true,
+    "fixture_reuse_requires_warning": true,
+    "manifest_type": "gameplay_gated_many_point_smoke_manifest",
+    "manifest_version": "v1"
+  },
+  "smoke_report_schema": {
+    "allowed_report_statuses": [
+      "completed",
+      "completed_with_errors",
+      "invalid_smoke_manifest",
+      "invalid_smoke_report"
+    ],
+    "report_type": "gameplay_gated_many_point_smoke_report",
+    "report_version": "v1",
+    "required_fields": [
+      "smoke_report_id",
+      "generated_at",
+      "smoke_mode",
+      "source_manifest_path",
+      "entry_count",
+      "validated_entry_count",
+      "gameplay_candidate_entry_count",
+      "blocked_entry_count",
+      "review_required_entry_count",
+      "failed_entry_count",
+      "entries",
+      "summary",
+      "warnings"
+    ]
+  },
+  "smoke_scope": {
+    "allowed_smoke_modes": [
+      "dry_run",
+      "fixture_only",
+      "structural_smoke",
+      "validate_only"
+    ],
+    "automatic_media_discovery_allowed": false,
+    "creates_labels_or_tennis_conclusions": false,
+    "default_smoke_mode": "fixture_only",
+    "explicit_media_manifest_required": true,
+    "mutates_model_assets": false,
+    "mutates_regression_baselines": false,
+    "purpose": "gameplay_gated_many_point_structural_smoke",
+    "requires_external_downloads": false,
+    "runs_gpu_or_model_inference_by_default": false,
+    "silent_ingestion_allowed": false,
+    "uses_gameplay_gated_execution_plan": true,
+    "uses_gameplay_gated_routing_plan": true,
+    "uses_gameplay_replay_timeline": true,
+    "uses_gameplay_segment_gate_fixture_mode": true,
+    "uses_many_point_ingestion_gate_dry_run": true
+  },
+  "source_contract_refs": {
+    "camera_geometry_calibration_provenance_contract_version": "v1",
+    "coverage_sampling_strategy_contract_version": "v1",
+    "gameplay_gated_perception_execution_contract_version": "v1",
+    "gameplay_gated_pipeline_routing_contract_version": "v1",
+    "gameplay_segment_gate_contract_version": "v1",
+    "gameplay_segment_replay_review_contract_version": "v1",
+    "intennse_label_alignment_contract_version": "v1",
+    "label_feedback_evaluation_contract_version": "v1",
+    "many_point_ingestion_gate_contract_version": "v1",
+    "multi_point_regression_matrix_version": "v0",
+    "multi_reviewer_disagreement_schema_version": "v1",
+    "observation_quality_taxonomy_version": "v1",
+    "point_manifest_version": "v0",
+    "review_label_schema_version": "v1",
+    "review_ops_metrics_contract_version": "v1",
+    "reviewer_confidence_schema_version": "v1",
+    "tom_v3_expansion_completion_freeze_version": "v1",
+    "versioned_dataset_corpus_contract_version": "v1"
+  },
+  "tom_provenance": {
+    "blueprint": "blueprint_42",
+    "blueprint_name": "gameplay_gated_many_point_ingestion_smoke_v1",
+    "project": "tom-v3-simple",
+    "project_version": "0.0.0"
+  },
+  "validation_rules": {
+    "does_not_create_event_labels": true,
+    "does_not_create_point_labels": true,
+    "does_not_infer_tennis_meaning": true,
+    "does_not_modify_regression_baselines": true,
+    "reject_disallowed_requested_smoke_steps": true,
+    "reject_forbidden_exact_tokens": true,
+    "report_structural_errors_only": true,
+    "validate_allowed_smoke_modes": true,
+    "validate_allowed_statuses": true,
+    "validate_contract_shape": true,
+    "validate_referenced_contracts_when_available": true,
+    "validate_smoke_manifest_shape": true,
+    "validate_smoke_report_shape": true
+  },
+  "warnings": {
+    "does_not_claim_automatic_correctness": true,
+    "does_not_claim_generalization": true,
+    "does_not_convert_outputs_into_training_labels": true,
+    "does_not_create_event_labels": true,
+    "does_not_create_event_truth": true,
+    "does_not_create_in_out": true,
+    "does_not_create_line_call_truth": true,
+    "does_not_create_point_labels": true,
+    "does_not_create_point_truth": true,
+    "does_not_create_score": true,
+    "does_not_determine_winner": true,
+    "does_not_identify_players": true,
+    "does_not_mutate_model_assets": true,
+    "does_not_mutate_regression_baselines": true,
+    "does_not_run_gpu_or_model_inference_by_default": true,
+    "explicit_media_manifest_only": true,
+    "fixture_mode_available": true,
+    "fixture_reuse_only": false,
+    "no_adjudication": true,
+    "not_distinct_real_points": false,
+    "observation_only": true,
+    "review_support_only": true,
+    "smoke_only": true,
+    "structural_smoke_only": true
+  }
+}

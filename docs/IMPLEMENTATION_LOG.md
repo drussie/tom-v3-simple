@@ -3865,3 +3865,46 @@ types, allowed review statuses, provenance statuses, referenced source artifacts
 fields/values. The review template records optional human metadata only. Blueprint 41 does not
 run perception jobs, write observations, create labels, training truth, gameplay truth, line-call
 conclusions, scoring, player identity, production readiness claims, or adjudication.
+
+## Blueprint 42 Gameplay-Gated Many-Point Ingestion Smoke v1
+
+Status: complete
+
+### Goal
+
+Create a safe end-to-end gameplay-gated many-point smoke workflow that starts from explicit media
+entries and composes the Blueprint 33 and Blueprint 38-41 structural contracts without creating
+truth, labels, inference side effects, model asset changes, or baseline changes.
+
+### Notes
+
+This milestone adds:
+
+- `apps.worker.services.gameplay_gated_many_point_smoke`
+- `export-gameplay-gated-many-point-smoke-contract` worker CLI command
+- `build-gameplay-gated-many-point-smoke-manifest-template` worker CLI command
+- `validate-gameplay-gated-many-point-smoke-manifest` worker CLI command
+- `run-gameplay-gated-many-point-smoke` worker CLI command
+- `build-gameplay-gated-many-point-smoke-report` worker CLI command
+- `tom-v1-export-gameplay-gated-many-point-smoke-contract` Make helper
+- `tom-v1-build-gameplay-gated-many-point-smoke-manifest-template` Make helper
+- `tom-v1-validate-gameplay-gated-many-point-smoke-manifest` Make helper
+- `tom-v1-run-gameplay-gated-many-point-smoke` Make helper
+- `tom-v1-build-gameplay-gated-many-point-smoke-report` Make helper
+- `.data/contracts/gameplay_gated_many_point_smoke_contract_v1.json` tracked contract path
+- `.data/exports/gameplay_gated_many_point_smoke_manifest.template.json` local manifest path
+- `.data/exports/gameplay_gated_many_point_smoke_manifest.validation.json` local validation path
+- `.data/exports/gameplay_gated_many_point_smoke.current.json` local smoke output path
+- `.data/exports/gameplay_gated_many_point_smoke_report.current.json` local report path
+- `docs/blueprints/blueprint_42_gameplay_gated_many_point_ingestion_smoke_v1.md`
+- `docs/reviews/gameplay_gated_many_point_ingestion_smoke_v1.md`
+- `docs/agent_reports/blueprint_42_gameplay_gated_many_point_ingestion_smoke_v1_report.md`
+
+The contract defines smoke scope, source contract refs, smoke manifest schema, smoke entry schema,
+smoke report schema, validation rules, provenance requirements, and warnings. The smoke runner
+reads an explicit manifest, runs the Blueprint 33 many-point ingestion gate in dry-run mode, and
+then builds Blueprint 38 gameplay segment candidates, Blueprint 39 routing plans, Blueprint 40
+execution plans, and Blueprint 41 replay timelines for each entry using safe structural defaults.
+Blueprint 42 does not run GPU/model inference by default, write observations, mutate model assets,
+mutate baselines, create labels, training truth, gameplay truth, line-call conclusions, scoring,
+player identity, production readiness claims, or adjudication.

@@ -1482,3 +1482,28 @@ the replay timeline, timeline validation, review template, review bundle validat
 report under `.data/exports/`. The surface is review visibility only and does not run inference,
 write observations, create truth labels, score, identify players, determine winners, claim
 classifier correctness, or adjudicate evidence.
+
+## Blueprint 42 Status
+
+Status: complete.
+
+Blueprint 42 composes the explicit many-point ingestion gate and gameplay-gated artifacts into a
+structural many-point smoke workflow:
+
+```text
+explicit smoke manifest
+-> many-point ingestion gate dry run
+-> gameplay segment candidates
+-> gameplay-gated routing plan
+-> gameplay-gated perception execution plan
+-> gameplay segment replay timeline
+-> structural smoke report
+```
+
+The tracked smoke contract is
+`.data/contracts/gameplay_gated_many_point_smoke_contract_v1.json`. Generated local exports
+include the smoke manifest template, manifest validation, per-entry intermediate artifacts, smoke
+run output, and smoke report under `.data/exports/`. The workflow is explicit-manifest and
+fixture-safe; it does not auto-discover media, run GPU/model inference by default, mutate model
+assets or baselines, create labels, score, identify players, decide line calls, prove
+generalization, or adjudicate evidence.

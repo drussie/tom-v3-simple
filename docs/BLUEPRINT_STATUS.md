@@ -1301,3 +1301,33 @@ accepted/rejected lifecycle, coaching/tactical conclusions, betting/prediction o
 generalization, automatic correctness, training truth, production truth, or adjudication. It does
 not mutate model assets, commit weights, run heavy inference, write observations, or mutate
 protected regression baselines.
+
+## Blueprint 42 - Gameplay-Gated Many-Point Ingestion Smoke
+
+Status: COMPLETE
+
+Blueprint 42 proves:
+
+```text
+explicit smoke manifest
+-> many-point ingestion gate dry run
+-> gameplay segment candidates
+-> gameplay-gated routing plan
+-> gameplay-gated perception execution plan
+-> gameplay segment replay timeline
+-> structural smoke report
+```
+
+The tracked smoke contract is
+`.data/contracts/gameplay_gated_many_point_smoke_contract_v1.json`. The generated local outputs
+are the smoke manifest template, manifest validation, per-entry intermediate artifacts, smoke run
+output, and smoke report under `.data/exports/`. Default mode is `fixture_only`, so the workflow
+uses provenance fixture mode and dry-run routing/execution contracts rather than GPU/model
+inference or observation writes.
+
+Blueprint 42 does not decide tennis truth, in/out, score, point winner, player identity, rally
+state, server/receiver state, line-call truth, point truth, event truth, classifier correctness,
+accepted/rejected lifecycle, coaching/tactical conclusions, betting/prediction outcomes,
+generalization, automatic correctness, training truth, production truth, or adjudication. It does
+not mutate model assets, commit weights, silently ingest media, auto-discover media folders, or
+mutate protected regression baselines.

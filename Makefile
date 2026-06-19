@@ -205,6 +205,18 @@ GAMEPLAY_SEGMENT_REVIEW_BUNDLE ?=
 GAMEPLAY_SEGMENT_REVIEW_BUNDLE_VALIDATION_OUTPUT ?= .data/exports/gameplay_segment_review_bundle.validation.json
 GAMEPLAY_SEGMENT_REVIEW_REPORT_OUTPUT ?= .data/exports/gameplay_segment_review_report.current.json
 GAMEPLAY_SEGMENT_REVIEWER_ID ?=
+GAMEPLAY_GATED_MANY_POINT_SMOKE_CONTRACT_OUTPUT ?= .data/contracts/gameplay_gated_many_point_smoke_contract_v1.json
+GAMEPLAY_GATED_MANY_POINT_SMOKE_MEDIA_PATH ?= demo_assets/sample_point.mp4
+GAMEPLAY_GATED_MANY_POINT_SMOKE_SOURCE_LABEL ?= gameplay_gated_smoke_point
+GAMEPLAY_GATED_MANY_POINT_SMOKE_MANIFEST_OUTPUT ?= .data/exports/gameplay_gated_many_point_smoke_manifest.template.json
+GAMEPLAY_GATED_MANY_POINT_SMOKE_MANIFEST ?=
+GAMEPLAY_GATED_MANY_POINT_SMOKE_VALIDATION_OUTPUT ?= .data/exports/gameplay_gated_many_point_smoke_manifest.validation.json
+GAMEPLAY_GATED_MANY_POINT_SMOKE_MODE ?= fixture_only
+GAMEPLAY_GATED_MANY_POINT_SMOKE_OUTPUT_DIR ?= .data/exports/gameplay_gated_many_point_smoke
+GAMEPLAY_GATED_MANY_POINT_SMOKE_OUTPUT ?= .data/exports/gameplay_gated_many_point_smoke.current.json
+GAMEPLAY_GATED_MANY_POINT_SMOKE_REPORT ?= $(GAMEPLAY_GATED_MANY_POINT_SMOKE_OUTPUT)
+GAMEPLAY_GATED_MANY_POINT_SMOKE_REPORT_OUTPUT ?= .data/exports/gameplay_gated_many_point_smoke_report.current.json
+GAMEPLAY_GATED_MANY_POINT_SMOKE_REQUESTED_STEP ?=
 EXPECTED_BRANCH ?=
 EXPECTED_TAG ?=
 FORMAT ?= json
@@ -294,6 +306,7 @@ export TOM_V3_DATABASE_URL
 
 .PHONY: install web-install test lint migrate api seed verify index-media run-gameplay index-and-run-gameplay run-detection index-and-run-detection extract-frame-artifacts build-tracklets run-pose export-tracklet-review-dataset court-review-export demo demo-fixture demo-plan demo-reset demo-export demo-open replay-open completion-audit completion-check yolo-probe yolo-smoke yolo-runtime-probe register-yolo-model smoke-real-yolo-local real-detection real-pose tom-v1-yolo-probe tom-v1-ball-detection tom-v1-player-detection tom-v1-tracklets tom-v1-main-subjects tom-v1-main-player-tracks tom-v1-pose tom-v1-pose-main-subjects tom-v1-pose-main-tracks tom-v1-motion-smoothing tom-v1-court-keypoints-probe tom-v1-court-keypoints tom-v1-court-keypoint-audit tom-v1-object-court-projection tom-v1-ball-court-trajectory tom-v1-build-3d-ball-trajectory-candidates tom-v1-build-event-candidate-3d-diagnostics tom-v1-export-reviewed-3d-debug-dataset tom-v1-compare-reviewed-3d-debug-dataset tom-v1-freeze-reviewed-3d-debug-baseline tom-v1-verify-reviewed-3d-debug-baseline tom-v1-hit-bounce-candidates tom-v1-hit-bounce-candidates-verbose tom-v1-point-evidence-snapshot tom-v1-build-point-manifest tom-v1-build-multi-point-replay-index tom-v1-build-multi-point-regression-matrix tom-v1-compare-multi-point-regression-matrix tom-v1-verify-multi-point-regression-matrix tom-v1-export-observation-quality-taxonomy tom-v1-build-observation-quality-profile tom-v1-export-review-label-schema tom-v1-build-review-label-template tom-v1-validate-review-label-bundle tom-v1-export-reviewer-confidence-schema tom-v1-build-reviewer-confidence-template tom-v1-validate-reviewer-confidence-bundle tom-v1-export-multi-reviewer-disagreement-schema tom-v1-build-multi-reviewer-review-set-template tom-v1-validate-multi-reviewer-review-set tom-v1-build-reviewer-disagreement-report tom-v1-export-intennse-label-alignment-contract tom-v1-build-intennse-alignment-template tom-v1-validate-intennse-alignment-bundle tom-v1-build-intennse-alignment-report tom-v1-export-versioned-dataset-corpus-contract tom-v1-build-versioned-dataset-corpus-manifest tom-v1-validate-versioned-dataset-corpus-manifest tom-v1-build-versioned-dataset-corpus-report tom-v1-export-coverage-sampling-strategy-contract tom-v1-build-coverage-sampling-profile tom-v1-validate-coverage-sampling-profile tom-v1-build-coverage-sampling-report tom-v1-export-many-point-ingestion-gate-contract tom-v1-build-many-point-ingestion-manifest-template tom-v1-validate-many-point-ingestion-manifest tom-v1-build-many-point-ingestion-plan tom-v1-run-many-point-ingestion-gate tom-v1-export-review-ops-metrics-contract tom-v1-build-review-ops-metrics-report tom-v1-validate-review-ops-metrics-report tom-v1-build-review-ops-dashboard-data tom-v1-export-label-feedback-evaluation-contract tom-v1-build-label-feedback-evaluation-inputs tom-v1-validate-label-feedback-evaluation-inputs tom-v1-build-label-feedback-evaluation-report tom-v1-export-camera-geometry-calibration-provenance-contract tom-v1-build-camera-geometry-calibration-profile tom-v1-validate-camera-geometry-calibration-profile tom-v1-build-camera-geometry-calibration-report tom-v1-build-tom-v3-expansion-completion-freeze tom-v1-validate-tom-v3-expansion-completion-freeze tom-v1-build-tom-v3-next-phase-readiness-report tom-v1-export-gameplay-segment-gate-contract tom-v1-inspect-gameplay-classifier-asset tom-v1-build-gameplay-segment-candidates tom-v1-validate-gameplay-segment-candidates tom-v1-build-gameplay-segment-report tom-v1-export-gameplay-gated-routing-contract tom-v1-build-gameplay-gated-routing-plan tom-v1-validate-gameplay-gated-routing-plan tom-v1-build-gameplay-gated-routing-report tom-v1-export-gameplay-gated-perception-execution-contract tom-v1-build-gameplay-gated-perception-execution-plan tom-v1-validate-gameplay-gated-perception-execution-plan tom-v1-build-gameplay-gated-perception-execution-report tom-v1-post-codex-validate tom-v1-evaluate-point-candidates tom-v1-declare-camera-geometry tom-v1-ingest-second-point-smoke tom-v1-build-second-point-evidence-parity court-fixture homography-candidates projection-diagnostics web web-build web-lint smoke all-checks
 .PHONY: tom-v1-export-gameplay-segment-replay-review-contract tom-v1-build-gameplay-segment-replay-timeline tom-v1-validate-gameplay-segment-replay-timeline tom-v1-build-gameplay-segment-review-template tom-v1-validate-gameplay-segment-review-bundle tom-v1-build-gameplay-segment-review-report
+.PHONY: tom-v1-export-gameplay-gated-many-point-smoke-contract tom-v1-build-gameplay-gated-many-point-smoke-manifest-template tom-v1-validate-gameplay-gated-many-point-smoke-manifest tom-v1-run-gameplay-gated-many-point-smoke tom-v1-build-gameplay-gated-many-point-smoke-report
 
 install:
 	$(PYTHON) -m pip install -e ".[dev]"
@@ -798,6 +811,24 @@ tom-v1-build-gameplay-segment-review-report:
 	@if [ -z "$(GAMEPLAY_SEGMENT_REPLAY_TIMELINE)" ]; then echo "GAMEPLAY_SEGMENT_REPLAY_TIMELINE is required: make tom-v1-build-gameplay-segment-review-report GAMEPLAY_SEGMENT_REPLAY_TIMELINE=<timeline.json>"; exit 1; fi
 	@if [ -z "$(GAMEPLAY_SEGMENT_REVIEW_BUNDLE)" ]; then echo "GAMEPLAY_SEGMENT_REVIEW_BUNDLE is required: make tom-v1-build-gameplay-segment-review-report GAMEPLAY_SEGMENT_REVIEW_BUNDLE=<review_bundle.json>"; exit 1; fi
 	$(PYTHON) -m apps.worker.cli build-gameplay-segment-review-report --contract "$(GAMEPLAY_SEGMENT_REPLAY_REVIEW_CONTRACT_OUTPUT)" --timeline "$(GAMEPLAY_SEGMENT_REPLAY_TIMELINE)" --bundle "$(GAMEPLAY_SEGMENT_REVIEW_BUNDLE)" --output "$(GAMEPLAY_SEGMENT_REVIEW_REPORT_OUTPUT)" --skip-create-db
+
+tom-v1-export-gameplay-gated-many-point-smoke-contract:
+	$(PYTHON) -m apps.worker.cli export-gameplay-gated-many-point-smoke-contract --output "$(GAMEPLAY_GATED_MANY_POINT_SMOKE_CONTRACT_OUTPUT)" --skip-create-db
+
+tom-v1-build-gameplay-gated-many-point-smoke-manifest-template:
+	$(PYTHON) -m apps.worker.cli build-gameplay-gated-many-point-smoke-manifest-template --local-media-path "$(GAMEPLAY_GATED_MANY_POINT_SMOKE_MEDIA_PATH)" --source-label "$(GAMEPLAY_GATED_MANY_POINT_SMOKE_SOURCE_LABEL)" $(if $(GAMEPLAY_GATED_MANY_POINT_SMOKE_REQUESTED_STEP),--requested-smoke-step "$(GAMEPLAY_GATED_MANY_POINT_SMOKE_REQUESTED_STEP)",) --output "$(GAMEPLAY_GATED_MANY_POINT_SMOKE_MANIFEST_OUTPUT)" --skip-create-db
+
+tom-v1-validate-gameplay-gated-many-point-smoke-manifest:
+	@if [ -z "$(GAMEPLAY_GATED_MANY_POINT_SMOKE_MANIFEST)" ]; then echo "GAMEPLAY_GATED_MANY_POINT_SMOKE_MANIFEST is required: make tom-v1-validate-gameplay-gated-many-point-smoke-manifest GAMEPLAY_GATED_MANY_POINT_SMOKE_MANIFEST=<manifest.json>"; exit 1; fi
+	$(PYTHON) -m apps.worker.cli validate-gameplay-gated-many-point-smoke-manifest --contract "$(GAMEPLAY_GATED_MANY_POINT_SMOKE_CONTRACT_OUTPUT)" --manifest "$(GAMEPLAY_GATED_MANY_POINT_SMOKE_MANIFEST)" --output "$(GAMEPLAY_GATED_MANY_POINT_SMOKE_VALIDATION_OUTPUT)" --skip-create-db
+
+tom-v1-run-gameplay-gated-many-point-smoke:
+	@if [ -z "$(GAMEPLAY_GATED_MANY_POINT_SMOKE_MANIFEST)" ]; then echo "GAMEPLAY_GATED_MANY_POINT_SMOKE_MANIFEST is required: make tom-v1-run-gameplay-gated-many-point-smoke GAMEPLAY_GATED_MANY_POINT_SMOKE_MANIFEST=<manifest.json>"; exit 1; fi
+	$(PYTHON) -m apps.worker.cli run-gameplay-gated-many-point-smoke --contract "$(GAMEPLAY_GATED_MANY_POINT_SMOKE_CONTRACT_OUTPUT)" --manifest "$(GAMEPLAY_GATED_MANY_POINT_SMOKE_MANIFEST)" --smoke-mode "$(GAMEPLAY_GATED_MANY_POINT_SMOKE_MODE)" --output-dir "$(GAMEPLAY_GATED_MANY_POINT_SMOKE_OUTPUT_DIR)" --output "$(GAMEPLAY_GATED_MANY_POINT_SMOKE_OUTPUT)" --model-asset-path "$(GAMEPLAY_CLASSIFIER_ASSET_PATH)" --many-point-contract "$(MANY_POINT_INGESTION_CONTRACT_OUTPUT)" --gameplay-segment-contract "$(GAMEPLAY_SEGMENT_GATE_CONTRACT_OUTPUT)" --routing-contract "$(GAMEPLAY_GATED_ROUTING_CONTRACT_OUTPUT)" --execution-contract "$(GAMEPLAY_GATED_PERCEPTION_EXECUTION_CONTRACT_OUTPUT)" --replay-review-contract "$(GAMEPLAY_SEGMENT_REPLAY_REVIEW_CONTRACT_OUTPUT)" --viewer-base-url "$(VIEWER_BASE_URL)" --skip-create-db
+
+tom-v1-build-gameplay-gated-many-point-smoke-report:
+	@if [ -z "$(GAMEPLAY_GATED_MANY_POINT_SMOKE_REPORT)" ]; then echo "GAMEPLAY_GATED_MANY_POINT_SMOKE_REPORT is required: make tom-v1-build-gameplay-gated-many-point-smoke-report GAMEPLAY_GATED_MANY_POINT_SMOKE_REPORT=<smoke_report.json>"; exit 1; fi
+	$(PYTHON) -m apps.worker.cli build-gameplay-gated-many-point-smoke-report --contract "$(GAMEPLAY_GATED_MANY_POINT_SMOKE_CONTRACT_OUTPUT)" --smoke-report "$(GAMEPLAY_GATED_MANY_POINT_SMOKE_REPORT)" --output "$(GAMEPLAY_GATED_MANY_POINT_SMOKE_REPORT_OUTPUT)" --skip-create-db
 
 tom-v1-post-codex-validate:
 	scripts/post_codex_validate.sh $(if $(EXPECTED_BRANCH),--branch "$(EXPECTED_BRANCH)",) $(if $(EXPECTED_TAG),--expected-tag "$(EXPECTED_TAG)",) --python "$(PYTHON)"

@@ -496,4 +496,41 @@ run "$PYTHON_BIN" -m apps.worker.cli build-gameplay-segment-review-report \
   --output "$TMP_ROOT/gameplay_segment_review_report.current.json" \
   --skip-create-db
 
+run "$PYTHON_BIN" -m apps.worker.cli export-gameplay-gated-many-point-smoke-contract \
+  --output "$TMP_ROOT/gameplay_gated_many_point_smoke_contract_v1.smoke.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-gameplay-gated-many-point-smoke-manifest-template \
+  --local-media-path "demo_assets/sample_point.mp4" \
+  --local-media-path "demo_assets/sample_point.mp4" \
+  --source-label "post_codex_gameplay_gated_smoke" \
+  --output "$TMP_ROOT/gameplay_gated_many_point_smoke_manifest.template.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli validate-gameplay-gated-many-point-smoke-manifest \
+  --contract "$TMP_ROOT/gameplay_gated_many_point_smoke_contract_v1.smoke.json" \
+  --manifest "$TMP_ROOT/gameplay_gated_many_point_smoke_manifest.template.json" \
+  --output "$TMP_ROOT/gameplay_gated_many_point_smoke_manifest.validation.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli run-gameplay-gated-many-point-smoke \
+  --contract "$TMP_ROOT/gameplay_gated_many_point_smoke_contract_v1.smoke.json" \
+  --manifest "$TMP_ROOT/gameplay_gated_many_point_smoke_manifest.template.json" \
+  --smoke-mode "fixture_only" \
+  --output-dir "$TMP_ROOT/gameplay_gated_many_point_smoke_outputs" \
+  --output "$TMP_ROOT/gameplay_gated_many_point_smoke.current.json" \
+  --model-asset-path "model_assets/tom_v1/view_classifier_gameplay.pt" \
+  --many-point-contract "$TMP_ROOT/many_point_ingestion_gate_contract_v1.smoke.json" \
+  --gameplay-segment-contract "$TMP_ROOT/gameplay_segment_gate_contract_v1.smoke.json" \
+  --routing-contract "$TMP_ROOT/gameplay_gated_pipeline_routing_contract_v1.smoke.json" \
+  --execution-contract "$TMP_ROOT/gameplay_gated_perception_execution_contract_v1.smoke.json" \
+  --replay-review-contract "$TMP_ROOT/gameplay_segment_replay_review_contract_v1.smoke.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-gameplay-gated-many-point-smoke-report \
+  --contract "$TMP_ROOT/gameplay_gated_many_point_smoke_contract_v1.smoke.json" \
+  --smoke-report "$TMP_ROOT/gameplay_gated_many_point_smoke.current.json" \
+  --output "$TMP_ROOT/gameplay_gated_many_point_smoke_report.current.json" \
+  --skip-create-db
+
 run git status --short
