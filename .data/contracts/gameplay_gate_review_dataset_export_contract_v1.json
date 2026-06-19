@@ -1,0 +1,183 @@
+{
+  "contract_type": "gameplay_gate_review_dataset_export_contract",
+  "contract_version": "v1",
+  "dataset_schema": {
+    "dataset_type": "gameplay_gate_review_dataset",
+    "dataset_version": "v1",
+    "required_fields": [
+      "dataset_id",
+      "dataset_version",
+      "generated_at",
+      "source_paths",
+      "model_asset_ref",
+      "model_asset_sha256",
+      "threshold",
+      "smoothing_window",
+      "hysteresis_settings",
+      "entries",
+      "summary",
+      "warnings",
+      "non_claims"
+    ]
+  },
+  "dataset_scope": {
+    "automatic_relabeling_allowed": false,
+    "creates_review_dataset_export": true,
+    "creates_review_labels": false,
+    "mutates_model_assets": false,
+    "mutates_regression_baselines": false,
+    "purpose": "gameplay_gate_human_review_dataset_export",
+    "reads_execution_plan_when_supplied": true,
+    "reads_gameplay_segment_candidates": true,
+    "reads_regression_context_when_supplied": true,
+    "reads_replay_timeline_when_supplied": true,
+    "reads_routing_plan_when_supplied": true,
+    "runs_gpu_or_model_inference": false
+  },
+  "exported_at": "2026-06-19T00:00:00+00:00",
+  "provenance_requirements": {
+    "baseline_context_preserved_when_available": true,
+    "gate_config_preserved": true,
+    "model_asset_provenance_preserved": true,
+    "non_claims_preserved": true,
+    "replay_url_required": true,
+    "segment_id_required": true,
+    "source_paths_required": true,
+    "warnings_preserved": true
+  },
+  "review_annotation_template_schema": {
+    "fields": [
+      "reviewer_id",
+      "reviewed_at",
+      "reviewed_segment_status",
+      "reviewed_downstream_gate_status",
+      "review_confidence",
+      "ambiguity_flags",
+      "reviewer_notes",
+      "needs_additional_review"
+    ],
+    "human_review_fields_are_metadata_only": true,
+    "review_values_do_not_modify_source_artifacts": true
+  },
+  "review_entry_schema": {
+    "allowed_ambiguity_flags": [
+      "broadcast_replay_possible",
+      "camera_cut_unclear",
+      "classifier_boundary_unclear",
+      "commercial_or_graphic_possible",
+      "crowd_or_bench_cutaway_possible",
+      "not_applicable",
+      "short_segment_unclear",
+      "warmup_or_practice_possible"
+    ],
+    "allowed_review_confidence_values": [
+      "high",
+      "low",
+      "medium",
+      "not_applicable",
+      "not_assessed"
+    ],
+    "allowed_reviewed_downstream_gate_statuses": [
+      "no_review_decision",
+      "not_applicable",
+      "reviewer_requests_additional_review",
+      "reviewer_would_allow_downstream_observation",
+      "reviewer_would_block_downstream_observation"
+    ],
+    "allowed_reviewed_segment_statuses": [
+      "needs_additional_review",
+      "not_applicable",
+      "not_reviewed",
+      "reviewed_as_gameplay_candidate",
+      "reviewed_as_non_gameplay_candidate",
+      "reviewed_as_uncertain"
+    ],
+    "required_fields": [
+      "review_entry_id",
+      "media_id",
+      "source_media_path",
+      "replay_url",
+      "segment_id",
+      "segment_start_ms",
+      "segment_end_ms",
+      "start_frame_index",
+      "end_frame_index",
+      "gameplay_probability",
+      "non_gameplay_probability",
+      "raw_status",
+      "smoothed_status",
+      "segment_status",
+      "downstream_gate_status",
+      "routing_decision",
+      "execution_decision",
+      "replay_timeline_entry_id",
+      "baseline_context",
+      "review_status",
+      "human_review_fields",
+      "provenance_status",
+      "warnings"
+    ]
+  },
+  "source_contract_refs": {
+    "camera_geometry_calibration_provenance_contract_version": "v1",
+    "coverage_sampling_strategy_contract_version": "v1",
+    "gameplay_gate_regression_baseline_contract_version": "v1",
+    "gameplay_gated_many_point_smoke_contract_version": "v1",
+    "gameplay_gated_perception_execution_contract_version": "v1",
+    "gameplay_gated_pipeline_routing_contract_version": "v1",
+    "gameplay_segment_gate_contract_version": "v1",
+    "gameplay_segment_replay_review_contract_version": "v1",
+    "intennse_label_alignment_contract_version": "v1",
+    "label_feedback_evaluation_contract_version": "v1",
+    "many_point_ingestion_gate_contract_version": "v1",
+    "multi_point_regression_matrix_version": "v0",
+    "multi_reviewer_disagreement_schema_version": "v1",
+    "observation_quality_taxonomy_version": "v1",
+    "point_manifest_version": "v0",
+    "review_label_schema_version": "v1",
+    "review_ops_metrics_contract_version": "v1",
+    "reviewer_confidence_schema_version": "v1",
+    "tom_v3_expansion_completion_freeze_version": "v1",
+    "versioned_dataset_corpus_contract_version": "v1"
+  },
+  "tom_provenance": {
+    "blueprint": "blueprint_44",
+    "blueprint_name": "gameplay_gate_review_dataset_export_v1",
+    "project": "tom-v3-simple",
+    "project_version": "0.0.0"
+  },
+  "validation_rules": {
+    "does_not_create_event_labels": true,
+    "does_not_create_point_labels": true,
+    "does_not_infer_tennis_meaning": true,
+    "does_not_modify_regression_baselines": true,
+    "reject_forbidden_fields_and_values": true,
+    "report_structural_errors_only": true,
+    "validate_allowed_ambiguity_flags": true,
+    "validate_allowed_confidence_values": true,
+    "validate_allowed_statuses": true,
+    "validate_contract_shape": true,
+    "validate_referenced_contracts_when_available": true,
+    "validate_review_dataset_shape": true,
+    "validate_review_entry_shape": true
+  },
+  "warnings": {
+    "classifier_correctness_not_assessed": true,
+    "dataset_is_not_truth": true,
+    "does_not_create_event_labels": true,
+    "does_not_create_in_out": true,
+    "does_not_create_point_labels": true,
+    "does_not_create_score": true,
+    "does_not_determine_winner": true,
+    "does_not_identify_players": true,
+    "does_not_mutate_model_assets": true,
+    "does_not_mutate_regression_baselines": true,
+    "does_not_relabel_automatically": true,
+    "generalization_not_claimed": true,
+    "human_review_metadata_only": true,
+    "no_adjudication": true,
+    "observation_only": true,
+    "review_dataset_export_only": true,
+    "review_support_only": true
+  }
+}

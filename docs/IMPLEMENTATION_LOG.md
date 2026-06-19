@@ -1,5 +1,36 @@
 # TOM v3 Simple - Implementation Log
 
+## Gameplay Gate Review Dataset Export v1
+
+Status: complete when accepted
+
+### Goal
+
+Export gameplay gate segment candidates and their structural context as a human-review dataset
+without creating classifier correctness, point-detection, scoring, line-call, label, or
+adjudication claims.
+
+### Outcome
+
+The milestone adds:
+
+- a tracked gameplay gate review dataset export contract
+- CLI and Make targets to export the contract, build the review dataset, validate it, and report
+  on it
+- review entries with replay URLs, timestamp windows, source paths, routing/execution/timeline
+  context, regression context, neutral human review fields, provenance status, warnings, and
+  non-claims
+- post-Codex validation coverage for the BP44 smoke path using temporary outputs
+- focused service tests for contract stability, dataset build/validation, forbidden metadata
+  rejection, replay URL preservation, and report generation
+
+### Non-goals
+
+- No model asset mutation or committed weights.
+- No review label creation or automatic relabeling.
+- No point detection, line-call, scoring, player identity, or production-readiness proof.
+- No training truth, generalization claim, classifier correctness claim, or adjudication.
+
 ## Gameplay Gate Regression Baseline v1
 
 Status: complete when accepted

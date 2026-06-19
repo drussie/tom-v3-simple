@@ -2023,6 +2023,47 @@ The protected success shape is `ok=true`, `status=completed`, `drift_detected=fa
 `breaking_drift_detected=false`, `baseline_is_not_truth=true`, and
 `gameplay_gate_is_not_truth=true`.
 
+## Gameplay Gate Review Dataset Export
+
+Use this after the Blueprint 38-43 contracts and regression baseline are available. The review
+dataset export turns gameplay segment candidates, routing context, perception execution context,
+replay timeline context, and regression context into a local human-review bundle. It does not
+create labels, prove classifier correctness, detect points, call lines, score, identify players,
+relabel automatically, claim generalization, or adjudicate evidence.
+
+Export the tracked contract:
+
+```bash
+make tom-v1-export-gameplay-gate-review-dataset-contract \
+  PYTHON=.venv/bin/python
+```
+
+Build a local review dataset:
+
+```bash
+make tom-v1-build-gameplay-gate-review-dataset \
+  PYTHON=.venv/bin/python
+```
+
+Validate the local review dataset:
+
+```bash
+make tom-v1-validate-gameplay-gate-review-dataset \
+  PYTHON=.venv/bin/python
+```
+
+Build a local structural report:
+
+```bash
+make tom-v1-build-gameplay-gate-review-dataset-report \
+  PYTHON=.venv/bin/python
+```
+
+The tracked artifact is
+`.data/contracts/gameplay_gate_review_dataset_export_contract_v1.json`. Generated dataset,
+validation, report, and intermediate source artifacts live under `.data/exports/` and should stay
+local unless a future milestone explicitly documents committing them.
+
 ## Camera Geometry Calibration Provenance
 
 Blueprint 36 builds a structural camera geometry / calibration provenance profile from existing

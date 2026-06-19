@@ -561,4 +561,30 @@ run "$PYTHON_BIN" -m apps.worker.cli build-gameplay-gate-regression-report \
   --output "$TMP_ROOT/gameplay_gate_regression.report.json" \
   --skip-create-db
 
+run "$PYTHON_BIN" -m apps.worker.cli export-gameplay-gate-review-dataset-contract \
+  --output "$TMP_ROOT/gameplay_gate_review_dataset_export_contract_v1.smoke.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-gameplay-gate-review-dataset \
+  --contract "$TMP_ROOT/gameplay_gate_review_dataset_export_contract_v1.smoke.json" \
+  --work-dir "$TMP_ROOT/gameplay_gate_review_dataset" \
+  --fixture-media-path "demo_assets/sample_point.mp4" \
+  --model-asset-path "model_assets/tom_v1/view_classifier_gameplay.pt" \
+  --regression-baseline "$TMP_ROOT/gameplay_gate_regression.baseline.json" \
+  --regression-verification "$TMP_ROOT/gameplay_gate_regression.verification.json" \
+  --output "$TMP_ROOT/gameplay_gate_review_dataset.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli validate-gameplay-gate-review-dataset \
+  --contract "$TMP_ROOT/gameplay_gate_review_dataset_export_contract_v1.smoke.json" \
+  --dataset "$TMP_ROOT/gameplay_gate_review_dataset.current.json" \
+  --output "$TMP_ROOT/gameplay_gate_review_dataset.validation.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-gameplay-gate-review-dataset-report \
+  --contract "$TMP_ROOT/gameplay_gate_review_dataset_export_contract_v1.smoke.json" \
+  --dataset "$TMP_ROOT/gameplay_gate_review_dataset.current.json" \
+  --output "$TMP_ROOT/gameplay_gate_review_dataset.report.json" \
+  --skip-create-db
+
 run git status --short

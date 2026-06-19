@@ -68,6 +68,17 @@ from apps.worker.services.gameplay_gate_regression_baseline import (
     export_gameplay_gate_regression_baseline_contract,
     verify_gameplay_gate_regression_baseline,
 )
+from apps.worker.services.gameplay_gate_review_dataset_export import (
+    DEFAULT_GAMEPLAY_GATE_REVIEW_DATASET_CONTRACT_OUTPUT,
+    DEFAULT_GAMEPLAY_GATE_REVIEW_DATASET_OUTPUT,
+    DEFAULT_GAMEPLAY_GATE_REVIEW_DATASET_REPORT_OUTPUT,
+    DEFAULT_GAMEPLAY_GATE_REVIEW_DATASET_VALIDATION_OUTPUT,
+    DEFAULT_GAMEPLAY_GATE_REVIEW_DATASET_WORK_DIR,
+    build_gameplay_gate_review_dataset,
+    build_gameplay_gate_review_dataset_report,
+    export_gameplay_gate_review_dataset_contract,
+    validate_gameplay_gate_review_dataset,
+)
 from apps.worker.services.gameplay_gated_many_point_smoke import (
     DEFAULT_GAMEPLAY_GATED_MANY_POINT_SMOKE_CONTRACT_OUTPUT,
     DEFAULT_GAMEPLAY_GATED_MANY_POINT_SMOKE_MANIFEST_OUTPUT,
@@ -3443,6 +3454,141 @@ def main() -> None:
         skip_create_db=True,
     )
 
+    gameplay_review_dataset_contract_parser = subcommands.add_parser(
+        "export-gameplay-gate-review-dataset-contract",
+        help="Export the Blueprint 44 gameplay gate review dataset contract.",
+    )
+    gameplay_review_dataset_contract_parser.add_argument(
+        "--output",
+        default=DEFAULT_GAMEPLAY_GATE_REVIEW_DATASET_CONTRACT_OUTPUT,
+        help="JSON gameplay gate review dataset contract output path.",
+    )
+    gameplay_review_dataset_contract_parser.add_argument("--skip-create-db", action="store_true")
+    gameplay_review_dataset_contract_parser.set_defaults(
+        handler=_handle_export_gameplay_gate_review_dataset_contract,
+        skip_create_db=True,
+    )
+
+    gameplay_review_dataset_build_parser = subcommands.add_parser(
+        "build-gameplay-gate-review-dataset",
+        help="Build the Blueprint 44 gameplay gate review dataset export.",
+    )
+    gameplay_review_dataset_build_parser.add_argument(
+        "--contract",
+        default=DEFAULT_GAMEPLAY_GATE_REVIEW_DATASET_CONTRACT_OUTPUT,
+        help="Blueprint 44 review dataset contract JSON path.",
+    )
+    gameplay_review_dataset_build_parser.add_argument(
+        "--gameplay-segments",
+        default=None,
+        help="Optional BP38 gameplay segment candidates JSON path.",
+    )
+    gameplay_review_dataset_build_parser.add_argument(
+        "--routing-plan",
+        default=None,
+        help="Optional BP39 gameplay-gated routing plan JSON path.",
+    )
+    gameplay_review_dataset_build_parser.add_argument(
+        "--execution-plan",
+        default=None,
+        help="Optional BP40 perception execution plan JSON path.",
+    )
+    gameplay_review_dataset_build_parser.add_argument(
+        "--replay-timeline",
+        default=None,
+        help="Optional BP41 replay timeline JSON path.",
+    )
+    gameplay_review_dataset_build_parser.add_argument(
+        "--regression-baseline",
+        default=DEFAULT_GAMEPLAY_GATE_REGRESSION_BASELINE_OUTPUT,
+        help="Optional BP43 gameplay gate regression baseline JSON path.",
+    )
+    gameplay_review_dataset_build_parser.add_argument(
+        "--regression-verification",
+        default=DEFAULT_GAMEPLAY_GATE_REGRESSION_VERIFICATION_OUTPUT,
+        help="Optional BP43 gameplay gate regression verification JSON path.",
+    )
+    gameplay_review_dataset_build_parser.add_argument(
+        "--work-dir",
+        default=DEFAULT_GAMEPLAY_GATE_REVIEW_DATASET_WORK_DIR,
+        help="Directory for generated source artifacts when paths are not supplied.",
+    )
+    gameplay_review_dataset_build_parser.add_argument(
+        "--fixture-media-path",
+        default="demo_assets/sample_point.mp4",
+        help="Fixture/demo media path used when source artifacts are not supplied.",
+    )
+    gameplay_review_dataset_build_parser.add_argument(
+        "--model-asset-path",
+        default=DEFAULT_GAMEPLAY_CLASSIFIER_ASSET_PATH,
+        help="Local TOM v1 gameplay classifier asset path.",
+    )
+    gameplay_review_dataset_build_parser.add_argument(
+        "--viewer-base-url",
+        default="http://127.0.0.1:3000",
+        help="Base URL for replay links.",
+    )
+    gameplay_review_dataset_build_parser.add_argument(
+        "--output",
+        default=DEFAULT_GAMEPLAY_GATE_REVIEW_DATASET_OUTPUT,
+        help="JSON gameplay gate review dataset output path.",
+    )
+    gameplay_review_dataset_build_parser.add_argument("--skip-create-db", action="store_true")
+    gameplay_review_dataset_build_parser.set_defaults(
+        handler=_handle_build_gameplay_gate_review_dataset,
+        skip_create_db=True,
+    )
+
+    gameplay_review_dataset_validate_parser = subcommands.add_parser(
+        "validate-gameplay-gate-review-dataset",
+        help="Validate a Blueprint 44 gameplay gate review dataset export.",
+    )
+    gameplay_review_dataset_validate_parser.add_argument(
+        "--contract",
+        default=DEFAULT_GAMEPLAY_GATE_REVIEW_DATASET_CONTRACT_OUTPUT,
+        help="Blueprint 44 review dataset contract JSON path.",
+    )
+    gameplay_review_dataset_validate_parser.add_argument(
+        "--dataset",
+        default=DEFAULT_GAMEPLAY_GATE_REVIEW_DATASET_OUTPUT,
+        help="Gameplay gate review dataset JSON path.",
+    )
+    gameplay_review_dataset_validate_parser.add_argument(
+        "--output",
+        default=DEFAULT_GAMEPLAY_GATE_REVIEW_DATASET_VALIDATION_OUTPUT,
+        help="JSON gameplay gate review dataset validation output path.",
+    )
+    gameplay_review_dataset_validate_parser.add_argument("--skip-create-db", action="store_true")
+    gameplay_review_dataset_validate_parser.set_defaults(
+        handler=_handle_validate_gameplay_gate_review_dataset,
+        skip_create_db=True,
+    )
+
+    gameplay_review_dataset_report_parser = subcommands.add_parser(
+        "build-gameplay-gate-review-dataset-report",
+        help="Build a structural report for a Blueprint 44 review dataset.",
+    )
+    gameplay_review_dataset_report_parser.add_argument(
+        "--contract",
+        default=DEFAULT_GAMEPLAY_GATE_REVIEW_DATASET_CONTRACT_OUTPUT,
+        help="Blueprint 44 review dataset contract JSON path.",
+    )
+    gameplay_review_dataset_report_parser.add_argument(
+        "--dataset",
+        default=DEFAULT_GAMEPLAY_GATE_REVIEW_DATASET_OUTPUT,
+        help="Gameplay gate review dataset JSON path.",
+    )
+    gameplay_review_dataset_report_parser.add_argument(
+        "--output",
+        default=DEFAULT_GAMEPLAY_GATE_REVIEW_DATASET_REPORT_OUTPUT,
+        help="JSON gameplay gate review dataset report output path.",
+    )
+    gameplay_review_dataset_report_parser.add_argument("--skip-create-db", action="store_true")
+    gameplay_review_dataset_report_parser.set_defaults(
+        handler=_handle_build_gameplay_gate_review_dataset_report,
+        skip_create_db=True,
+    )
+
     point_evaluation_parser = subcommands.add_parser(
         "evaluate-point-candidates",
         help="Evaluate generated point candidate markers using operator review metadata.",
@@ -5660,6 +5806,59 @@ def _handle_build_gameplay_gate_regression_report(
         contract_path=args.contract,
         baseline_path=args.baseline,
         verification_path=args.verification,
+        output_path=args.output,
+    )
+
+
+def _handle_export_gameplay_gate_review_dataset_contract(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return export_gameplay_gate_review_dataset_contract(output_path=args.output)
+
+
+def _handle_build_gameplay_gate_review_dataset(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_gameplay_gate_review_dataset(
+        contract_path=args.contract,
+        gameplay_segments_path=args.gameplay_segments,
+        routing_plan_path=args.routing_plan,
+        execution_plan_path=args.execution_plan,
+        replay_timeline_path=args.replay_timeline,
+        regression_baseline_path=args.regression_baseline,
+        regression_verification_path=args.regression_verification,
+        work_dir=args.work_dir,
+        fixture_media_path=args.fixture_media_path,
+        model_asset_path=args.model_asset_path,
+        viewer_base_url=args.viewer_base_url,
+        output_path=args.output,
+    )
+
+
+def _handle_validate_gameplay_gate_review_dataset(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_gameplay_gate_review_dataset(
+        contract_path=args.contract,
+        dataset_path=args.dataset,
+        output_path=args.output,
+    )
+
+
+def _handle_build_gameplay_gate_review_dataset_report(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_gameplay_gate_review_dataset_report(
+        contract_path=args.contract,
+        dataset_path=args.dataset,
         output_path=args.output,
     )
 

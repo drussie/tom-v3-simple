@@ -225,6 +225,19 @@ GAMEPLAY_GATE_REGRESSION_REPORT_OUTPUT ?= .data/exports/gameplay_gate_regression
 GAMEPLAY_GATE_REGRESSION_WORK_DIR ?= .data/exports/gameplay_gate_regression
 GAMEPLAY_GATE_REGRESSION_SMOKE_MANIFEST ?=
 GAMEPLAY_GATE_REGRESSION_FIXTURE_MEDIA_PATH ?= demo_assets/sample_point.mp4
+GAMEPLAY_GATE_REVIEW_DATASET_CONTRACT_OUTPUT ?= .data/contracts/gameplay_gate_review_dataset_export_contract_v1.json
+GAMEPLAY_GATE_REVIEW_DATASET_OUTPUT ?= .data/exports/gameplay_gate_review_dataset.current.json
+GAMEPLAY_GATE_REVIEW_DATASET ?= $(GAMEPLAY_GATE_REVIEW_DATASET_OUTPUT)
+GAMEPLAY_GATE_REVIEW_DATASET_VALIDATION_OUTPUT ?= .data/exports/gameplay_gate_review_dataset.validation.json
+GAMEPLAY_GATE_REVIEW_DATASET_REPORT_OUTPUT ?= .data/exports/gameplay_gate_review_dataset.report.json
+GAMEPLAY_GATE_REVIEW_DATASET_WORK_DIR ?= .data/exports/gameplay_gate_review_dataset
+GAMEPLAY_GATE_REVIEW_DATASET_GAMEPLAY_SEGMENTS ?=
+GAMEPLAY_GATE_REVIEW_DATASET_ROUTING_PLAN ?=
+GAMEPLAY_GATE_REVIEW_DATASET_EXECUTION_PLAN ?=
+GAMEPLAY_GATE_REVIEW_DATASET_REPLAY_TIMELINE ?=
+GAMEPLAY_GATE_REVIEW_DATASET_REGRESSION_BASELINE ?= $(GAMEPLAY_GATE_REGRESSION_BASELINE_OUTPUT)
+GAMEPLAY_GATE_REVIEW_DATASET_REGRESSION_VERIFICATION ?= $(GAMEPLAY_GATE_REGRESSION_VERIFICATION_OUTPUT)
+GAMEPLAY_GATE_REVIEW_DATASET_FIXTURE_MEDIA_PATH ?= demo_assets/sample_point.mp4
 EXPECTED_BRANCH ?=
 EXPECTED_TAG ?=
 FORMAT ?= json
@@ -316,6 +329,7 @@ export TOM_V3_DATABASE_URL
 .PHONY: tom-v1-export-gameplay-segment-replay-review-contract tom-v1-build-gameplay-segment-replay-timeline tom-v1-validate-gameplay-segment-replay-timeline tom-v1-build-gameplay-segment-review-template tom-v1-validate-gameplay-segment-review-bundle tom-v1-build-gameplay-segment-review-report
 .PHONY: tom-v1-export-gameplay-gated-many-point-smoke-contract tom-v1-build-gameplay-gated-many-point-smoke-manifest-template tom-v1-validate-gameplay-gated-many-point-smoke-manifest tom-v1-run-gameplay-gated-many-point-smoke tom-v1-build-gameplay-gated-many-point-smoke-report
 .PHONY: tom-v1-export-gameplay-gate-regression-baseline-contract tom-v1-build-gameplay-gate-regression-baseline tom-v1-verify-gameplay-gate-regression-baseline tom-v1-build-gameplay-gate-regression-report
+.PHONY: tom-v1-export-gameplay-gate-review-dataset-contract tom-v1-build-gameplay-gate-review-dataset tom-v1-validate-gameplay-gate-review-dataset tom-v1-build-gameplay-gate-review-dataset-report
 
 install:
 	$(PYTHON) -m pip install -e ".[dev]"
@@ -850,6 +864,18 @@ tom-v1-verify-gameplay-gate-regression-baseline:
 
 tom-v1-build-gameplay-gate-regression-report:
 	$(PYTHON) -m apps.worker.cli build-gameplay-gate-regression-report --contract "$(GAMEPLAY_GATE_REGRESSION_CONTRACT_OUTPUT)" --baseline "$(GAMEPLAY_GATE_REGRESSION_BASELINE)" --verification "$(GAMEPLAY_GATE_REGRESSION_VERIFICATION_OUTPUT)" --output "$(GAMEPLAY_GATE_REGRESSION_REPORT_OUTPUT)" --skip-create-db
+
+tom-v1-export-gameplay-gate-review-dataset-contract:
+	$(PYTHON) -m apps.worker.cli export-gameplay-gate-review-dataset-contract --output "$(GAMEPLAY_GATE_REVIEW_DATASET_CONTRACT_OUTPUT)" --skip-create-db
+
+tom-v1-build-gameplay-gate-review-dataset:
+	$(PYTHON) -m apps.worker.cli build-gameplay-gate-review-dataset --contract "$(GAMEPLAY_GATE_REVIEW_DATASET_CONTRACT_OUTPUT)" $(if $(GAMEPLAY_GATE_REVIEW_DATASET_GAMEPLAY_SEGMENTS),--gameplay-segments "$(GAMEPLAY_GATE_REVIEW_DATASET_GAMEPLAY_SEGMENTS)",) $(if $(GAMEPLAY_GATE_REVIEW_DATASET_ROUTING_PLAN),--routing-plan "$(GAMEPLAY_GATE_REVIEW_DATASET_ROUTING_PLAN)",) $(if $(GAMEPLAY_GATE_REVIEW_DATASET_EXECUTION_PLAN),--execution-plan "$(GAMEPLAY_GATE_REVIEW_DATASET_EXECUTION_PLAN)",) $(if $(GAMEPLAY_GATE_REVIEW_DATASET_REPLAY_TIMELINE),--replay-timeline "$(GAMEPLAY_GATE_REVIEW_DATASET_REPLAY_TIMELINE)",) --regression-baseline "$(GAMEPLAY_GATE_REVIEW_DATASET_REGRESSION_BASELINE)" --regression-verification "$(GAMEPLAY_GATE_REVIEW_DATASET_REGRESSION_VERIFICATION)" --work-dir "$(GAMEPLAY_GATE_REVIEW_DATASET_WORK_DIR)" --fixture-media-path "$(GAMEPLAY_GATE_REVIEW_DATASET_FIXTURE_MEDIA_PATH)" --model-asset-path "$(GAMEPLAY_CLASSIFIER_ASSET_PATH)" --viewer-base-url "$(VIEWER_BASE_URL)" --output "$(GAMEPLAY_GATE_REVIEW_DATASET_OUTPUT)" --skip-create-db
+
+tom-v1-validate-gameplay-gate-review-dataset:
+	$(PYTHON) -m apps.worker.cli validate-gameplay-gate-review-dataset --contract "$(GAMEPLAY_GATE_REVIEW_DATASET_CONTRACT_OUTPUT)" --dataset "$(GAMEPLAY_GATE_REVIEW_DATASET)" --output "$(GAMEPLAY_GATE_REVIEW_DATASET_VALIDATION_OUTPUT)" --skip-create-db
+
+tom-v1-build-gameplay-gate-review-dataset-report:
+	$(PYTHON) -m apps.worker.cli build-gameplay-gate-review-dataset-report --contract "$(GAMEPLAY_GATE_REVIEW_DATASET_CONTRACT_OUTPUT)" --dataset "$(GAMEPLAY_GATE_REVIEW_DATASET)" --output "$(GAMEPLAY_GATE_REVIEW_DATASET_REPORT_OUTPUT)" --skip-create-db
 
 tom-v1-post-codex-validate:
 	scripts/post_codex_validate.sh $(if $(EXPECTED_BRANCH),--branch "$(EXPECTED_BRANCH)",) $(if $(EXPECTED_TAG),--expected-tag "$(EXPECTED_TAG)",) --python "$(PYTHON)"
