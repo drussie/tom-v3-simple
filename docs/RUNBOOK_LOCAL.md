@@ -1811,6 +1811,65 @@ Expected:
 - `breaking_drift_detected`: false
 - `baseline_is_not_truth`: true
 
+## Camera Geometry Calibration Provenance
+
+Blueprint 36 builds a structural camera geometry / calibration provenance profile from existing
+point manifests, replay indexes, regression matrices, corpus entries, and label-feedback inputs.
+It does not generate camera geometry, homography, projection diagnostics, event candidates, 3D
+candidates, labels, truth, scoring, or adjudication.
+
+Export the tracked contract:
+
+```bash
+make tom-v1-export-camera-geometry-calibration-provenance-contract \
+  PYTHON=.venv/bin/python
+```
+
+Build the current profile:
+
+```bash
+make tom-v1-build-camera-geometry-calibration-profile \
+  PYTHON=.venv/bin/python
+```
+
+Validate the profile:
+
+```bash
+make tom-v1-validate-camera-geometry-calibration-profile \
+  PYTHON=.venv/bin/python \
+  CAMERA_GEOMETRY_CALIBRATION_PROFILE=.data/exports/camera_geometry_calibration_profile.current.json
+```
+
+Build the report:
+
+```bash
+make tom-v1-build-camera-geometry-calibration-report \
+  PYTHON=.venv/bin/python \
+  CAMERA_GEOMETRY_CALIBRATION_PROFILE=.data/exports/camera_geometry_calibration_profile.current.json
+```
+
+Tracked contract:
+
+```text
+.data/contracts/camera_geometry_calibration_provenance_contract_v1.json
+```
+
+Generated outputs:
+
+```text
+.data/exports/camera_geometry_calibration_profile.current.json
+.data/exports/camera_geometry_calibration_profile.validation.json
+.data/exports/camera_geometry_calibration_report.current.json
+```
+
+Expected protected-sample interpretation:
+
+- camera geometry evidence may be present through `camera_geometry_id`
+- replay context may be present through the manifest-backed replay URL
+- missing court keypoints, homography candidates, or projection diagnostics are review gaps
+- `requires_human_calibration_review` can be true while TOM still makes no calibration claim
+- `regression_protected_context` preserves baseline context only and is not a correctness finding
+
 ## Point Manifest / Evidence Provenance Contract
 
 Use this when an indexed point needs a durable provenance record for replay/review surfaces,

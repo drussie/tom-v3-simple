@@ -28,6 +28,16 @@ from apps.worker.pipelines.synthetic_seed import seed_synthetic_run
 from apps.worker.services.ball_court_trajectory import build_ball_court_trajectory
 from apps.worker.services.ball_trajectory_3d import build_3d_ball_trajectory_candidates
 from apps.worker.services.camera_geometry import declare_camera_geometry
+from apps.worker.services.camera_geometry_calibration_provenance import (
+    DEFAULT_CAMERA_GEOMETRY_CALIBRATION_CONTRACT_OUTPUT,
+    DEFAULT_CAMERA_GEOMETRY_CALIBRATION_PROFILE_OUTPUT,
+    DEFAULT_CAMERA_GEOMETRY_CALIBRATION_REPORT_OUTPUT,
+    DEFAULT_CAMERA_GEOMETRY_CALIBRATION_VALIDATION_OUTPUT,
+    build_camera_geometry_calibration_profile,
+    build_camera_geometry_calibration_report,
+    export_camera_geometry_calibration_provenance_contract,
+    validate_camera_geometry_calibration_profile,
+)
 from apps.worker.services.completion_audit import run_completion_audit
 from apps.worker.services.court_adapter import run_fixture_court_adapter
 from apps.worker.services.court_review_export import export_court_review_dataset
@@ -2318,6 +2328,160 @@ def main() -> None:
         skip_create_db=True,
     )
 
+    camera_calibration_contract_parser = subcommands.add_parser(
+        "export-camera-geometry-calibration-provenance-contract",
+        help="Export the camera geometry calibration provenance contract.",
+    )
+    camera_calibration_contract_parser.add_argument(
+        "--output",
+        default=DEFAULT_CAMERA_GEOMETRY_CALIBRATION_CONTRACT_OUTPUT,
+        help="JSON camera geometry calibration provenance contract output path.",
+    )
+    camera_calibration_contract_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    camera_calibration_contract_parser.set_defaults(
+        handler=_handle_export_camera_geometry_calibration_provenance_contract,
+        skip_create_db=True,
+    )
+
+    camera_calibration_profile_parser = subcommands.add_parser(
+        "build-camera-geometry-calibration-profile",
+        help="Build a structural camera geometry calibration provenance profile.",
+    )
+    camera_calibration_profile_parser.add_argument(
+        "--contract",
+        default=DEFAULT_CAMERA_GEOMETRY_CALIBRATION_CONTRACT_OUTPUT,
+        help="Camera geometry calibration provenance contract JSON path.",
+    )
+    camera_calibration_profile_parser.add_argument(
+        "--replay-index",
+        default=MULTI_POINT_REPLAY_INDEX_OUTPUT,
+        help="Multi-point replay index JSON path.",
+    )
+    camera_calibration_profile_parser.add_argument(
+        "--regression-matrix",
+        default=DEFAULT_MULTI_POINT_REGRESSION_MATRIX_CURRENT,
+        help="Multi-point regression matrix JSON path.",
+    )
+    camera_calibration_profile_parser.add_argument(
+        "--corpus-manifest",
+        default=DEFAULT_DATASET_CORPUS_MANIFEST_OUTPUT,
+        help="Versioned dataset corpus manifest JSON path.",
+    )
+    camera_calibration_profile_parser.add_argument(
+        "--label-feedback-inputs",
+        default=DEFAULT_LABEL_FEEDBACK_EVALUATION_INPUTS_OUTPUT,
+        help="Label feedback evaluation inputs JSON path.",
+    )
+    camera_calibration_profile_parser.add_argument(
+        "--output",
+        default=DEFAULT_CAMERA_GEOMETRY_CALIBRATION_PROFILE_OUTPUT,
+        help="JSON camera geometry calibration profile output path.",
+    )
+    camera_calibration_profile_parser.add_argument("--skip-create-db", action="store_true")
+    camera_calibration_profile_parser.set_defaults(
+        handler=_handle_build_camera_geometry_calibration_profile,
+        skip_create_db=True,
+    )
+
+    camera_calibration_validate_parser = subcommands.add_parser(
+        "validate-camera-geometry-calibration-profile",
+        help="Validate a camera geometry calibration provenance profile structurally.",
+    )
+    camera_calibration_validate_parser.add_argument(
+        "--contract",
+        default=DEFAULT_CAMERA_GEOMETRY_CALIBRATION_CONTRACT_OUTPUT,
+        help="Camera geometry calibration provenance contract JSON path.",
+    )
+    camera_calibration_validate_parser.add_argument("--profile", required=True)
+    camera_calibration_validate_parser.add_argument(
+        "--observation-quality-taxonomy",
+        default=DEFAULT_OBSERVATION_QUALITY_TAXONOMY_OUTPUT,
+        help="Blueprint 26 observation-quality taxonomy JSON path.",
+    )
+    camera_calibration_validate_parser.add_argument(
+        "--review-label-schema",
+        default=DEFAULT_REVIEW_LABEL_SCHEMA_OUTPUT,
+        help="Blueprint 27 review label schema JSON path.",
+    )
+    camera_calibration_validate_parser.add_argument(
+        "--reviewer-confidence-schema",
+        default=DEFAULT_REVIEWER_CONFIDENCE_SCHEMA_OUTPUT,
+        help="Blueprint 28 reviewer confidence schema JSON path.",
+    )
+    camera_calibration_validate_parser.add_argument(
+        "--multi-reviewer-schema",
+        default=DEFAULT_MULTI_REVIEWER_SCHEMA_OUTPUT,
+        help="Blueprint 29 multi-reviewer disagreement schema JSON path.",
+    )
+    camera_calibration_validate_parser.add_argument(
+        "--intennse-alignment-contract",
+        default=DEFAULT_INTENNSE_ALIGNMENT_CONTRACT_OUTPUT,
+        help="Blueprint 30 INTENNSE alignment contract JSON path.",
+    )
+    camera_calibration_validate_parser.add_argument(
+        "--dataset-corpus-contract",
+        default=DEFAULT_DATASET_CORPUS_CONTRACT_OUTPUT,
+        help="Blueprint 31 versioned dataset corpus contract JSON path.",
+    )
+    camera_calibration_validate_parser.add_argument(
+        "--coverage-sampling-contract",
+        default=DEFAULT_COVERAGE_SAMPLING_CONTRACT_OUTPUT,
+        help="Blueprint 32 coverage sampling strategy contract JSON path.",
+    )
+    camera_calibration_validate_parser.add_argument(
+        "--many-point-ingestion-contract",
+        default=DEFAULT_MANY_POINT_INGESTION_CONTRACT_OUTPUT,
+        help="Blueprint 33 many-point ingestion gate contract JSON path.",
+    )
+    camera_calibration_validate_parser.add_argument(
+        "--review-ops-metrics-contract",
+        default=DEFAULT_REVIEW_OPS_METRICS_CONTRACT_OUTPUT,
+        help="Blueprint 34 review operations metrics contract JSON path.",
+    )
+    camera_calibration_validate_parser.add_argument(
+        "--label-feedback-contract",
+        default=DEFAULT_LABEL_FEEDBACK_EVALUATION_CONTRACT_OUTPUT,
+        help="Blueprint 35 label feedback evaluation contract JSON path.",
+    )
+    camera_calibration_validate_parser.add_argument(
+        "--output",
+        default=DEFAULT_CAMERA_GEOMETRY_CALIBRATION_VALIDATION_OUTPUT,
+        help="Optional JSON camera geometry calibration validation output path.",
+    )
+    camera_calibration_validate_parser.add_argument("--skip-create-db", action="store_true")
+    camera_calibration_validate_parser.set_defaults(
+        handler=_handle_validate_camera_geometry_calibration_profile,
+        skip_create_db=True,
+    )
+
+    camera_calibration_report_parser = subcommands.add_parser(
+        "build-camera-geometry-calibration-report",
+        help="Build a structural camera geometry calibration provenance report.",
+    )
+    camera_calibration_report_parser.add_argument(
+        "--contract",
+        default=DEFAULT_CAMERA_GEOMETRY_CALIBRATION_CONTRACT_OUTPUT,
+        help="Camera geometry calibration provenance contract JSON path.",
+    )
+    camera_calibration_report_parser.add_argument(
+        "--profile",
+        default=DEFAULT_CAMERA_GEOMETRY_CALIBRATION_PROFILE_OUTPUT,
+        help="Camera geometry calibration profile JSON path.",
+    )
+    camera_calibration_report_parser.add_argument(
+        "--output",
+        default=DEFAULT_CAMERA_GEOMETRY_CALIBRATION_REPORT_OUTPUT,
+        help="JSON camera geometry calibration report output path.",
+    )
+    camera_calibration_report_parser.add_argument("--skip-create-db", action="store_true")
+    camera_calibration_report_parser.set_defaults(
+        handler=_handle_build_camera_geometry_calibration_report,
+        skip_create_db=True,
+    )
+
     point_evaluation_parser = subcommands.add_parser(
         "evaluate-point-candidates",
         help="Evaluate generated point candidate markers using operator review metadata.",
@@ -4084,6 +4248,63 @@ def _handle_build_label_feedback_evaluation_report(
     return build_label_feedback_evaluation_report(
         contract_path=args.contract,
         feedback_inputs_path=args.feedback_inputs,
+        output_path=args.output,
+    )
+
+
+def _handle_export_camera_geometry_calibration_provenance_contract(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return export_camera_geometry_calibration_provenance_contract(output_path=args.output)
+
+
+def _handle_build_camera_geometry_calibration_profile(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_camera_geometry_calibration_profile(
+        contract_path=args.contract,
+        replay_index_path=args.replay_index,
+        regression_matrix_path=args.regression_matrix,
+        corpus_manifest_path=args.corpus_manifest,
+        label_feedback_inputs_path=args.label_feedback_inputs,
+        output_path=args.output,
+    )
+
+
+def _handle_validate_camera_geometry_calibration_profile(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_camera_geometry_calibration_profile(
+        contract_path=args.contract,
+        profile_path=args.profile,
+        observation_quality_taxonomy_path=args.observation_quality_taxonomy,
+        review_label_schema_path=args.review_label_schema,
+        reviewer_confidence_schema_path=args.reviewer_confidence_schema,
+        multi_reviewer_schema_path=args.multi_reviewer_schema,
+        intennse_alignment_contract_path=args.intennse_alignment_contract,
+        dataset_corpus_contract_path=args.dataset_corpus_contract,
+        coverage_sampling_contract_path=args.coverage_sampling_contract,
+        many_point_ingestion_contract_path=args.many_point_ingestion_contract,
+        review_ops_metrics_contract_path=args.review_ops_metrics_contract,
+        label_feedback_contract_path=args.label_feedback_contract,
+        output_path=args.output,
+    )
+
+
+def _handle_build_camera_geometry_calibration_report(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_camera_geometry_calibration_report(
+        contract_path=args.contract,
+        profile_path=args.profile,
         output_path=args.output,
     )
 

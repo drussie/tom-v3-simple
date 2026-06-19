@@ -301,6 +301,9 @@ TOM v3 Simple does not include:
 - Provenance audit checks structure, not model correctness.
 - Label-feedback evaluation inputs route review/corpus/coverage structure only; they are not
   training truth and do not decide candidate validity.
+- Camera geometry calibration provenance profiles summarize structural readiness and review gaps
+  only; they are not calibration truth, geometry truth, line-call truth, model readiness, or
+  adjudication.
 
 ## Boundary
 

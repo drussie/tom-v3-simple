@@ -3609,3 +3609,46 @@ evidence, create labels, change review semantics, mutate protected baselines, de
 score, identify players, determine a winner, claim generalization, score or rank reviewers,
 resolve disagreement, produce INTENNSE coaching/tactical/match outcome conclusions, create
 training truth, retrain models, ingest media, execute sampling, or adjudicate evidence.
+
+## Blueprint 36 Camera Geometry Confidence / Calibration Provenance v1
+
+Status: complete
+
+### Goal
+
+Create a read-only camera geometry / calibration provenance layer that summarizes structural
+readiness, provenance completeness, review needs, and diagnostic coverage for camera geometry,
+court geometry, homography, projection, replay, and review evidence.
+
+### Notes
+
+This milestone adds:
+
+- `apps.worker.services.camera_geometry_calibration_provenance`
+- `export-camera-geometry-calibration-provenance-contract` worker CLI command
+- `build-camera-geometry-calibration-profile` worker CLI command
+- `validate-camera-geometry-calibration-profile` worker CLI command
+- `build-camera-geometry-calibration-report` worker CLI command
+- `tom-v1-export-camera-geometry-calibration-provenance-contract` Make helper
+- `tom-v1-build-camera-geometry-calibration-profile` Make helper
+- `tom-v1-validate-camera-geometry-calibration-profile` Make helper
+- `tom-v1-build-camera-geometry-calibration-report` Make helper
+- `.data/contracts/camera_geometry_calibration_provenance_contract_v1.json` local contract path
+- `.data/exports/camera_geometry_calibration_profile.current.json` local profile path
+- `.data/exports/camera_geometry_calibration_profile.validation.json` local validation path
+- `.data/exports/camera_geometry_calibration_report.current.json` local report path
+- `docs/blueprints/blueprint_36_camera_geometry_confidence_calibration_provenance_v1.md`
+- `docs/reviews/camera_geometry_confidence_calibration_provenance_v1.md`
+- `docs/agent_reports/blueprint_36_camera_geometry_confidence_calibration_provenance_v1_report.md`
+
+The contract defines calibration scope, source contract refs, camera geometry entities, profile
+schema, report schema, confidence/evidence/provenance/review status values, provenance
+requirements, validation rules, and warnings. The profile builder reads existing replay index,
+multi-point regression matrix, versioned corpus, and label-feedback inputs where available, then
+emits structural camera-geometry calibration profiles. The validator checks contract shape, profile
+shape, allowed status values, forbidden fields/values, and referenced contract versions. The report
+summarizes camera geometry evidence presence, missing projection diagnostics, partial provenance,
+review needs, human-review readiness, and regression-protected context. It does not generate
+camera geometry, homography, projection diagnostics, event candidates, 3D candidates, labels,
+training truth, in/out, score, player identity, winner, tactical conclusions, reviewer ranking,
+reviewer scoring, or adjudication.

@@ -327,4 +327,39 @@ run "$PYTHON_BIN" -m apps.worker.cli build-label-feedback-evaluation-report \
   --output "$TMP_ROOT/label_feedback_evaluation_report.current.json" \
   --skip-create-db
 
+run "$PYTHON_BIN" -m apps.worker.cli export-camera-geometry-calibration-provenance-contract \
+  --output "$TMP_ROOT/camera_geometry_calibration_provenance_contract_v1.smoke.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-camera-geometry-calibration-profile \
+  --contract "$TMP_ROOT/camera_geometry_calibration_provenance_contract_v1.smoke.json" \
+  --replay-index "$TMP_ROOT/multi_point_replay_index.json" \
+  --regression-matrix "$TMP_ROOT/multi_point_regression_matrix.current.json" \
+  --corpus-manifest "$TMP_ROOT/versioned_dataset_corpus_manifest.current.json" \
+  --label-feedback-inputs "$TMP_ROOT/label_feedback_evaluation_inputs.current.json" \
+  --output "$TMP_ROOT/camera_geometry_calibration_profile.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli validate-camera-geometry-calibration-profile \
+  --contract "$TMP_ROOT/camera_geometry_calibration_provenance_contract_v1.smoke.json" \
+  --profile "$TMP_ROOT/camera_geometry_calibration_profile.current.json" \
+  --observation-quality-taxonomy "$TMP_ROOT/observation_quality_taxonomy_v1.smoke.json" \
+  --review-label-schema "$TMP_ROOT/review_label_schema_v1.smoke.json" \
+  --reviewer-confidence-schema "$TMP_ROOT/reviewer_confidence_ambiguity_schema_v1.smoke.json" \
+  --multi-reviewer-schema "$TMP_ROOT/multi_reviewer_disagreement_schema_v1.smoke.json" \
+  --intennse-alignment-contract "$TMP_ROOT/intennse_label_alignment_contract_v1.smoke.json" \
+  --dataset-corpus-contract "$TMP_ROOT/versioned_dataset_corpus_contract_v1.smoke.json" \
+  --coverage-sampling-contract "$TMP_ROOT/coverage_sampling_strategy_contract_v1.smoke.json" \
+  --many-point-ingestion-contract "$TMP_ROOT/many_point_ingestion_gate_contract_v1.smoke.json" \
+  --review-ops-metrics-contract "$TMP_ROOT/review_ops_metrics_contract_v1.smoke.json" \
+  --label-feedback-contract "$TMP_ROOT/label_feedback_evaluation_contract_v1.smoke.json" \
+  --output "$TMP_ROOT/camera_geometry_calibration_profile.validation.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-camera-geometry-calibration-report \
+  --contract "$TMP_ROOT/camera_geometry_calibration_provenance_contract_v1.smoke.json" \
+  --profile "$TMP_ROOT/camera_geometry_calibration_profile.current.json" \
+  --output "$TMP_ROOT/camera_geometry_calibration_report.current.json" \
+  --skip-create-db
+
 run git status --short

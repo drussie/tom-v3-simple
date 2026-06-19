@@ -1,0 +1,342 @@
+{
+  "calibration_profile_schema": {
+    "profile_fields": [
+      {
+        "key": "profile_type",
+        "required": true
+      },
+      {
+        "key": "profile_version",
+        "required": true
+      },
+      {
+        "key": "generated_at",
+        "required": true
+      },
+      {
+        "key": "media_id",
+        "required": true
+      },
+      {
+        "key": "camera_geometry_id",
+        "required": true
+      },
+      {
+        "key": "camera_view_id",
+        "required": true
+      },
+      {
+        "key": "homography_candidate_id",
+        "required": true
+      },
+      {
+        "key": "projection_diagnostic_id",
+        "required": true
+      },
+      {
+        "key": "trajectory_3d_run_id",
+        "required": true
+      },
+      {
+        "key": "associated_run_ids",
+        "required": true
+      },
+      {
+        "key": "replay_url",
+        "required": true
+      },
+      {
+        "key": "source_paths",
+        "required": true
+      },
+      {
+        "key": "evidence_availability",
+        "required": true
+      },
+      {
+        "key": "court_keypoint_count",
+        "required": true
+      },
+      {
+        "key": "court_line_count",
+        "required": true
+      },
+      {
+        "key": "homography_candidate_count",
+        "required": true
+      },
+      {
+        "key": "projection_diagnostic_count",
+        "required": true
+      },
+      {
+        "key": "projection_residual_summary",
+        "required": true
+      },
+      {
+        "key": "camera_geometry_source_status",
+        "required": true
+      },
+      {
+        "key": "calibration_provenance_status",
+        "required": true
+      },
+      {
+        "key": "calibration_evidence_status",
+        "required": true
+      },
+      {
+        "key": "calibration_review_status",
+        "required": true
+      },
+      {
+        "key": "calibration_confidence_status",
+        "required": true
+      },
+      {
+        "key": "requires_human_calibration_review",
+        "required": true
+      },
+      {
+        "key": "warnings",
+        "required": true
+      }
+    ],
+    "profile_type": "camera_geometry_calibration_profile",
+    "profile_version": "v1",
+    "profiles_array_field": "camera_geometry_profiles",
+    "read_only": true
+  },
+  "calibration_report_schema": {
+    "report_sections_are_review_routing_only": true,
+    "report_type": "camera_geometry_calibration_report",
+    "report_version": "v1",
+    "summary_is_structural_only": true
+  },
+  "calibration_scope": {
+    "camera_geometry_generation_allowed": false,
+    "event_generation_allowed": false,
+    "homography_generation_allowed": false,
+    "line_call_decision_allowed": false,
+    "media_ingestion_allowed": false,
+    "model_retraining_allowed": false,
+    "player_identity_decision_allowed": false,
+    "projection_diagnostic_generation_allowed": false,
+    "purpose": "Summarize camera-geometry, court-geometry, homography, projection, replay, and review provenance as structural evidence readiness.",
+    "read_only": true,
+    "reviewer_ranking_allowed": false,
+    "reviewer_scoring_allowed": false,
+    "score_decision_allowed": false,
+    "three_d_generation_allowed": false,
+    "uses_existing_artifacts_only": true
+  },
+  "camera_geometry_entities": [
+    "camera_geometry_profile",
+    "camera_geometry_evidence_ref",
+    "camera_view_evidence_ref",
+    "court_keypoint_evidence_ref",
+    "court_line_evidence_ref",
+    "homography_candidate_ref",
+    "projection_diagnostic_ref",
+    "object_to_court_projection_ref",
+    "ball_trajectory_3d_ref",
+    "replay_overlay_ref",
+    "calibration_review_ref",
+    "provenance_ref"
+  ],
+  "contract_type": "camera_geometry_calibration_provenance_contract",
+  "contract_version": "v1",
+  "evidence_confidence_semantics": {
+    "confidence_is_not_calibration_decision": true,
+    "confidence_is_not_probability": true,
+    "confidence_is_not_score": true,
+    "confidence_status_values": [
+      "not_assessed",
+      "unknown",
+      "evidence_missing",
+      "evidence_partial",
+      "evidence_present",
+      "provenance_partial",
+      "provenance_present",
+      "projection_diagnostics_present",
+      "calibration_review_needed",
+      "human_review_ready",
+      "regression_protected_context",
+      "not_applicable"
+    ],
+    "evidence_status_values": [
+      "not_assessed",
+      "missing_camera_geometry",
+      "missing_camera_view",
+      "missing_court_keypoints",
+      "missing_homography_candidate",
+      "missing_projection_diagnostics",
+      "missing_replay_context",
+      "evidence_partial",
+      "evidence_present",
+      "not_applicable"
+    ],
+    "missing_diagnostics_are_review_gaps": true,
+    "provenance_status_values": [
+      "not_assessed",
+      "provenance_present",
+      "provenance_partial",
+      "provenance_missing",
+      "conflicting_references",
+      "not_applicable"
+    ],
+    "review_status_values": [
+      "not_assessed",
+      "review_missing",
+      "review_optional",
+      "review_needed",
+      "review_ready",
+      "not_applicable"
+    ]
+  },
+  "exported_at": "2026-06-18T00:00:00+00:00",
+  "profile_type": "camera_geometry_calibration_profile",
+  "profile_version": "v1",
+  "provenance_requirements": {
+    "associated_run_ids_preserved": true,
+    "camera_geometry_ids_preserved": true,
+    "evidence_availability_preserved": true,
+    "point_manifest_refs_preserved": true,
+    "profile_counts_preserved": true,
+    "protected_sample_point_preserved_as_regression_context": true,
+    "replay_urls_preserved": true,
+    "source_contract_versions_preserved": true,
+    "source_paths_preserved": true,
+    "source_warnings_preserved_when_available": true,
+    "trajectory_3d_run_ids_preserved": true
+  },
+  "report_type": "camera_geometry_calibration_report",
+  "report_version": "v1",
+  "source_contract_refs": {
+    "coverage_sampling_strategy_contract_version": "v1",
+    "intennse_label_alignment_contract_version": "v1",
+    "label_feedback_evaluation_contract_version": "v1",
+    "many_point_ingestion_gate_contract_version": "v1",
+    "multi_point_regression_matrix_version": "v0",
+    "multi_reviewer_disagreement_schema_version": "v1",
+    "observation_quality_taxonomy_version": "v1",
+    "point_manifest_version": "v0",
+    "review_label_schema_version": "v1",
+    "review_ops_metrics_contract_version": "v1",
+    "reviewer_confidence_schema_version": "v1",
+    "versioned_dataset_corpus_contract_version": "v1"
+  },
+  "tom_provenance": {
+    "blueprint": "blueprint_36",
+    "blueprint_name": "camera_geometry_confidence_calibration_provenance_v1",
+    "project": "tom-v3-simple",
+    "project_version": "0.0.0"
+  },
+  "validation_rules": {
+    "allowed_confidence_status_values_only": true,
+    "allowed_evidence_status_values_only": true,
+    "allowed_provenance_status_values_only": true,
+    "allowed_review_status_values_only": true,
+    "contract_shape_validated": true,
+    "does_not_create_3d_truth": true,
+    "does_not_create_calibration_truth": true,
+    "does_not_create_event_truth": true,
+    "does_not_create_geometry_truth": true,
+    "does_not_create_homography_truth": true,
+    "does_not_create_labels": true,
+    "does_not_create_line_call_truth": true,
+    "does_not_execute_sampling": true,
+    "does_not_ingest_media": true,
+    "does_not_modify_evaluation_baselines": true,
+    "does_not_rank_reviewers": true,
+    "does_not_score_reviewers": true,
+    "forbidden_fields": [
+      "accepted",
+      "adjudication",
+      "betting_prediction",
+      "calibration_truth",
+      "coaching_recommendation",
+      "correct",
+      "fail_due_to_calibration",
+      "geometry_truth",
+      "homography_truth",
+      "in_out",
+      "incorrect",
+      "line_call_truth",
+      "match_outcome",
+      "model_ready_truth",
+      "pass_due_to_calibration",
+      "player_identity",
+      "point_winner",
+      "quality_score",
+      "receiver",
+      "rejected",
+      "reviewer_rank",
+      "reviewer_score",
+      "score",
+      "server",
+      "tactical_recommendation",
+      "training_truth",
+      "truth",
+      "winner"
+    ],
+    "forbidden_values": [
+      "accepted",
+      "adjudication",
+      "betting_prediction",
+      "calibration_truth",
+      "coaching_recommendation",
+      "correct",
+      "fail_due_to_calibration",
+      "geometry_truth",
+      "homography_truth",
+      "in_out",
+      "incorrect",
+      "line_call_truth",
+      "match_outcome",
+      "model_ready_truth",
+      "pass_due_to_calibration",
+      "player_identity",
+      "point_winner",
+      "quality_score",
+      "receiver",
+      "rejected",
+      "reviewer_rank",
+      "reviewer_score",
+      "score",
+      "server",
+      "tactical_recommendation",
+      "training_truth",
+      "truth",
+      "winner"
+    ],
+    "missing_optional_refs_are_structural_warnings": true,
+    "profile_shape_validated": true,
+    "referenced_contract_versions_validated_when_paths_available": true,
+    "structural_validation_only": true
+  },
+  "warnings": {
+    "calibration_profile_does_not_create_evidence": true,
+    "calibration_report_does_not_create_evidence": true,
+    "camera_geometry_calibration_provenance_is_not_truth": true,
+    "camera_geometry_confidence_is_structural_only": true,
+    "does_not_create_3d_candidates": true,
+    "does_not_create_calibration_truth": true,
+    "does_not_create_event_candidates": true,
+    "does_not_create_geometry_truth": true,
+    "does_not_create_homography_truth": true,
+    "does_not_create_in_out": true,
+    "does_not_create_line_call_truth": true,
+    "does_not_create_score": true,
+    "does_not_determine_winner": true,
+    "does_not_generate_camera_geometry": true,
+    "does_not_generate_homography": true,
+    "does_not_generate_projection_diagnostics": true,
+    "does_not_identify_players": true,
+    "no_adjudication": true,
+    "not_generalization_claim": true,
+    "observation_only": true,
+    "provenance_only": true,
+    "review_support_only": true
+  }
+}
