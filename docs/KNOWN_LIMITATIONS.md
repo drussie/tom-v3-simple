@@ -313,6 +313,11 @@ TOM v3 Simple does not include:
   player identity, model correctness, production readiness, training truth, or adjudication. The
   local TOM v1 classifier asset remains ignored under `model_assets/` and is not copied or
   committed.
+- Gameplay-gated routing artifacts convert gameplay segment candidates into downstream routing
+  plans only. The default mode is dry-run planning, and the artifacts do not execute detection,
+  tracklet, pose, court, event, 3D, replay, or corpus jobs; they do not prove gameplay correctness,
+  model readiness, scoring, line calls, player identity, production readiness, training truth, or
+  adjudication.
 
 ## Boundary
 

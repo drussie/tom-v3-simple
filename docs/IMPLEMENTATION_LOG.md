@@ -3735,3 +3735,45 @@ and forbidden fields/values. The report summarizes structural gate output only. 
 not decide gameplay truth, in/out, score, point winner, player identity, line calls, model
 correctness, training truth, production truth, or adjudication, and it does not run detections,
 tracklets, pose, court, event, or 3D jobs.
+
+## Blueprint 39 Gameplay-Gated Evidence Pipeline Routing v1
+
+Status: complete
+
+### Goal
+
+Turn Blueprint 38 gameplay segment candidates into structural downstream routing plans without
+running downstream evidence generation, creating tennis truth, mutating model assets, or mutating
+regression baselines.
+
+### Notes
+
+This milestone adds:
+
+- `apps.worker.services.gameplay_gated_pipeline_routing`
+- `export-gameplay-gated-routing-contract` worker CLI command
+- `build-gameplay-gated-routing-plan` worker CLI command
+- `validate-gameplay-gated-routing-plan` worker CLI command
+- `build-gameplay-gated-routing-report` worker CLI command
+- `tom-v1-export-gameplay-gated-routing-contract` Make helper
+- `tom-v1-build-gameplay-gated-routing-plan` Make helper
+- `tom-v1-validate-gameplay-gated-routing-plan` Make helper
+- `tom-v1-build-gameplay-gated-routing-report` Make helper
+- `.data/contracts/gameplay_gated_pipeline_routing_contract_v1.json` tracked contract path
+- `.data/exports/gameplay_gated_routing_plan.current.json` local plan path
+- `.data/exports/gameplay_gated_routing_plan.validation.json` local validation path
+- `.data/exports/gameplay_gated_routing_report.current.json` local report path
+- `docs/blueprints/blueprint_39_gameplay_gated_evidence_pipeline_routing_v1.md`
+- `docs/reviews/gameplay_gated_evidence_pipeline_routing_v1.md`
+- `docs/agent_reports/blueprint_39_gameplay_gated_evidence_pipeline_routing_v1_report.md`
+
+The contract defines routing scope, source contract refs, gameplay gate refs, routing plan schema,
+downstream stage schema, skip reasons, override policy, validation rules, provenance
+requirements, and warnings. The plan builder reads Blueprint 38 gameplay segment candidates and
+emits allowed, blocked, and review-required windows plus routing entries for downstream stages.
+The validator checks contract shape, plan shape, allowed routing modes, allowed decisions, skip
+reasons, override statuses, referenced gameplay segment gate contract version, and forbidden
+fields/values. The report summarizes structural routing output only. Blueprint 39 does not run
+detections, tracklets, pose, court, event, 3D, replay, or corpus jobs; it does not create labels,
+training truth, gameplay truth, line-call conclusions, scoring, player identity, production
+readiness claims, or adjudication.

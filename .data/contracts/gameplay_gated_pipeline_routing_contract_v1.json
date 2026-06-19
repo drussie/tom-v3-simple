@@ -1,0 +1,171 @@
+{
+  "contract_type": "gameplay_gated_pipeline_routing_contract",
+  "contract_version": "v1",
+  "downstream_stage_schema": {
+    "allowed_stages": [
+      "media_indexing",
+      "replay_indexing",
+      "detection_generation",
+      "tracklet_generation",
+      "pose_generation",
+      "court_geometry_generation",
+      "homography_candidate_generation",
+      "projection_diagnostics_generation",
+      "trajectory_3d_generation",
+      "point_manifest_generation",
+      "corpus_manifest_inclusion",
+      "review_queue_inclusion"
+    ],
+    "stage_entries_are_plan_rows_only": true,
+    "stage_execution_requires_future_explicit_mode": true
+  },
+  "exported_at": "2026-06-19T00:00:00+00:00",
+  "gameplay_gate_contract_ref": {
+    "candidate_output_type": "gameplay_segment_candidates",
+    "candidate_output_version": "v1",
+    "contract_type": "gameplay_segment_gate_contract",
+    "contract_version": "v1"
+  },
+  "override_policy_schema": {
+    "allowed_override_statuses": [
+      "explicit_operator_override_required",
+      "no_override",
+      "not_applicable",
+      "override_not_allowed",
+      "review_only_override"
+    ],
+    "default_override_status": "no_override",
+    "operator_override_required_for_non_allowed_windows": true,
+    "review_override_does_not_execute_jobs": true
+  },
+  "provenance_requirements": {
+    "downstream_stage_required": true,
+    "gameplay_segment_source_path_required": true,
+    "media_id_required": true,
+    "override_status_required": true,
+    "routing_decision_required": true,
+    "routing_plan_id_required": true,
+    "segment_id_required": true,
+    "segment_warnings_preserved": true,
+    "skip_reason_required": true
+  },
+  "routing_plan_schema": {
+    "allowed_routing_decisions": [
+      "allow_downstream_observation",
+      "block_downstream_observation",
+      "not_applicable",
+      "not_assessed",
+      "preserve_existing_behavior",
+      "require_human_review",
+      "skip_non_gameplay",
+      "skip_uncertain"
+    ],
+    "allowed_routing_modes": [
+      "dry_run",
+      "gated_execution_ready",
+      "override_allowed_for_review_only",
+      "plan_only",
+      "validate_only"
+    ],
+    "plan_type": "gameplay_gated_pipeline_routing_plan",
+    "plan_version": "v1",
+    "required_fields": [
+      "routing_plan_id",
+      "media_id",
+      "source_media_path",
+      "gameplay_segment_source_path",
+      "generated_at",
+      "routing_mode",
+      "downstream_stages",
+      "allowed_windows",
+      "blocked_windows",
+      "uncertain_windows",
+      "routing_entries",
+      "summary",
+      "warnings"
+    ]
+  },
+  "routing_scope": {
+    "creates_routing_plan_artifacts": true,
+    "default_routing_mode": "dry_run",
+    "executes_downstream_jobs_by_default": false,
+    "explicit_media_input_only": true,
+    "mutates_model_assets": false,
+    "mutates_regression_baselines": false,
+    "purpose": "gameplay_gated_downstream_observation_routing",
+    "reads_gameplay_segment_candidates": true,
+    "silently_discards_segments": false
+  },
+  "skip_reason_schema": {
+    "allowed_skip_reasons": [
+      "explicit_review_required",
+      "missing_gameplay_gate",
+      "missing_segment_candidate",
+      "non_gameplay_segment_candidate",
+      "not_applicable",
+      "short_segment_filtered",
+      "uncertain_segment",
+      "unsafe_execution_mode"
+    ],
+    "segments_must_be_preserved_with_reason": true,
+    "skip_reasons_are_structural": true
+  },
+  "source_contract_refs": {
+    "camera_geometry_calibration_provenance_contract_version": "v1",
+    "coverage_sampling_strategy_contract_version": "v1",
+    "gameplay_segment_gate_contract_version": "v1",
+    "intennse_label_alignment_contract_version": "v1",
+    "label_feedback_evaluation_contract_version": "v1",
+    "many_point_ingestion_gate_contract_version": "v1",
+    "multi_point_regression_matrix_version": "v0",
+    "multi_reviewer_disagreement_schema_version": "v1",
+    "observation_quality_taxonomy_version": "v1",
+    "point_manifest_version": "v0",
+    "review_label_schema_version": "v1",
+    "review_ops_metrics_contract_version": "v1",
+    "reviewer_confidence_schema_version": "v1",
+    "tom_v3_expansion_completion_freeze_version": "v1",
+    "versioned_dataset_corpus_contract_version": "v1"
+  },
+  "tom_provenance": {
+    "blueprint": "blueprint_39",
+    "blueprint_name": "gameplay_gated_evidence_pipeline_routing_v1",
+    "project": "tom-v3-simple",
+    "project_version": "0.0.0"
+  },
+  "validation_rules": {
+    "does_not_create_event_labels": true,
+    "does_not_create_point_labels": true,
+    "does_not_infer_tennis_meaning": true,
+    "does_not_modify_regression_baselines": true,
+    "reject_forbidden_exact_tokens": true,
+    "structural_errors_only": true,
+    "validate_allowed_override_statuses": true,
+    "validate_allowed_routing_decisions": true,
+    "validate_allowed_routing_modes": true,
+    "validate_allowed_skip_reasons": true,
+    "validate_contract_shape": true,
+    "validate_referenced_gameplay_segment_gate_contract": true,
+    "validate_routing_plan_shape": true
+  },
+  "warnings": {
+    "candidate_windows_only": true,
+    "does_not_claim_automatic_correctness": true,
+    "does_not_claim_generalization": true,
+    "does_not_convert_outputs_into_training_labels": true,
+    "does_not_create_event_labels": true,
+    "does_not_create_in_out": true,
+    "does_not_create_observations": true,
+    "does_not_create_point_labels": true,
+    "does_not_create_score": true,
+    "does_not_determine_winner": true,
+    "does_not_execute_downstream_jobs_by_default": true,
+    "does_not_identify_players": true,
+    "does_not_mutate_model_assets": true,
+    "does_not_mutate_regression_baselines": true,
+    "no_adjudication": true,
+    "observation_only": true,
+    "review_support_only": true,
+    "routing_plan_only": true
+  }
+}

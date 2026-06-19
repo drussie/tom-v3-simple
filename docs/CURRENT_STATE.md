@@ -4,10 +4,10 @@
 
 - Project name: TOM v3 Simple
 - Repo: drussie/tom-v3-simple
-- Current phase: Blueprint 38 complete; gameplay segment gate contract and candidate artifact path added
+- Current phase: Blueprint 39 complete; gameplay-gated downstream routing plans added
 - Current goal: Preserve the BP22-BP36 structural expansion freeze, keep protected regression
-  gates intact, and use the existing local TOM v1 gameplay classifier asset as candidate-only
-  gameplay segment gate provenance for explicit media inputs
+  gates intact, and route future downstream evidence workflows through Blueprint 38 gameplay
+  segment candidate windows without executing heavy inference by default
 
 ## Mission
 
@@ -41,6 +41,9 @@ A lightweight tennis video observation platform that accepts model output as ope
 - Blueprint 38 status: complete; tracked gameplay segment gate contract, classifier asset inspection,
   candidate segment export, validation, report, and replay timeline artifact are implemented
   without downstream perception execution, truth labels, scoring, player identity, or adjudication
+- Blueprint 39 status: complete; tracked gameplay-gated routing contract, routing plan,
+  validation, report, and replay timeline artifact are implemented without downstream evidence
+  execution, truth labels, scoring, player identity, or adjudication
 - Observation writer: implemented with typed extension rows, lineage, artifacts, and idempotency
 - Worker synthetic seeder: implemented
 - Visual evidence viewer: implemented in `apps/web` with detection bbox overlay, pose keypoint/skeleton overlay, frame artifact image support, run evidence summary, clearer empty states, candidate/evidence wording, readable lineage context, and review/export metadata display

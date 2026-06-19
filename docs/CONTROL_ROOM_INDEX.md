@@ -346,6 +346,8 @@ Use this index as the durable navigation point for project memory, architecture 
 - [TOM v3 Expansion Completion Freeze v1](reviews/tom_v3_expansion_completion_freeze_v1.md)
 - [Blueprint 38 Gameplay Segment Gate / TOM v1 View Classifier Integration v1](blueprints/blueprint_38_gameplay_segment_gate_tom_v1_view_classifier_v1.md)
 - [Gameplay Segment Gate / TOM v1 View Classifier Integration v1](reviews/gameplay_segment_gate_tom_v1_view_classifier_v1.md)
+- [Blueprint 39 Gameplay-Gated Evidence Pipeline Routing v1](blueprints/blueprint_39_gameplay_gated_evidence_pipeline_routing_v1.md)
+- [Gameplay-Gated Evidence Pipeline Routing v1](reviews/gameplay_gated_evidence_pipeline_routing_v1.md)
 
 ## Development
 

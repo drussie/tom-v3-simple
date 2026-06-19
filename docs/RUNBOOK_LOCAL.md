@@ -1992,6 +1992,63 @@ Expected:
 - generated `.data/exports/` files stay local and untracked
 - model weights stay ignored and unmodified
 
+## Gameplay-Gated Pipeline Routing
+
+Blueprint 39 turns Blueprint 38 gameplay segment candidates into a structural routing plan for
+future downstream evidence workflows. The default mode is `dry_run`; it records allowed, blocked,
+and review-required routes without running detection, tracklet, pose, court, event, 3D, replay, or
+corpus jobs.
+
+Export the tracked routing contract:
+
+```bash
+make tom-v1-export-gameplay-gated-routing-contract \
+  PYTHON=.venv/bin/python
+```
+
+Build a routing plan from gameplay segment candidates:
+
+```bash
+make tom-v1-build-gameplay-gated-routing-plan \
+  PYTHON=.venv/bin/python \
+  GAMEPLAY_GATED_ROUTING_GAMEPLAY_SEGMENTS=.data/exports/gameplay_segment_candidates.current.json
+```
+
+Validate the routing plan:
+
+```bash
+make tom-v1-validate-gameplay-gated-routing-plan \
+  PYTHON=.venv/bin/python \
+  GAMEPLAY_GATED_ROUTING_PLAN=.data/exports/gameplay_gated_routing_plan.current.json
+```
+
+Build the structural routing report:
+
+```bash
+make tom-v1-build-gameplay-gated-routing-report \
+  PYTHON=.venv/bin/python \
+  GAMEPLAY_GATED_ROUTING_PLAN=.data/exports/gameplay_gated_routing_plan.current.json
+```
+
+Default paths:
+
+```text
+.data/contracts/gameplay_gated_pipeline_routing_contract_v1.json
+.data/exports/gameplay_gated_routing_plan.current.json
+.data/exports/gameplay_gated_routing_plan.validation.json
+.data/exports/gameplay_gated_routing_report.current.json
+```
+
+Expected:
+
+- `ok`: true for contract export, routing plan build, plan validation, and report
+- `contract_type`: `gameplay_gated_pipeline_routing_contract`
+- `plan_type`: `gameplay_gated_pipeline_routing_plan`
+- `report_type`: `gameplay_gated_pipeline_routing_report`
+- `routing_mode`: `dry_run`
+- downstream jobs executed: false
+- generated `.data/exports/` files stay local and untracked
+
 ## Point Manifest / Evidence Provenance Contract
 
 Use this when an indexed point needs a durable provenance record for replay/review surfaces,

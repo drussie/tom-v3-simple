@@ -57,6 +57,16 @@ from apps.worker.services.event_candidate_3d_diagnostics import (
 )
 from apps.worker.services.frame_artifacts import extract_frame_artifacts_for_run
 from apps.worker.services.gameplay_adapter import run_gameplay_adapter
+from apps.worker.services.gameplay_gated_pipeline_routing import (
+    DEFAULT_GAMEPLAY_GATED_ROUTING_CONTRACT_OUTPUT,
+    DEFAULT_GAMEPLAY_GATED_ROUTING_PLAN_OUTPUT,
+    DEFAULT_GAMEPLAY_GATED_ROUTING_REPORT_OUTPUT,
+    DEFAULT_GAMEPLAY_GATED_ROUTING_VALIDATION_OUTPUT,
+    build_gameplay_gated_routing_plan,
+    build_gameplay_gated_routing_report,
+    export_gameplay_gated_routing_contract,
+    validate_gameplay_gated_routing_plan,
+)
 from apps.worker.services.gameplay_segment_gate import (
     DEFAULT_GAMEPLAY_CLASSIFIER_ASSET_PATH,
     DEFAULT_GAMEPLAY_CLASSIFIER_INSPECTION_OUTPUT,
@@ -2679,6 +2689,116 @@ def main() -> None:
         skip_create_db=True,
     )
 
+    gated_routing_contract_parser = subcommands.add_parser(
+        "export-gameplay-gated-routing-contract",
+        help="Export the Blueprint 39 gameplay-gated routing contract.",
+    )
+    gated_routing_contract_parser.add_argument(
+        "--output",
+        default=DEFAULT_GAMEPLAY_GATED_ROUTING_CONTRACT_OUTPUT,
+        help="JSON gameplay-gated routing contract output path.",
+    )
+    gated_routing_contract_parser.add_argument("--skip-create-db", action="store_true")
+    gated_routing_contract_parser.set_defaults(
+        handler=_handle_export_gameplay_gated_routing_contract,
+        skip_create_db=True,
+    )
+
+    gated_routing_plan_parser = subcommands.add_parser(
+        "build-gameplay-gated-routing-plan",
+        help="Build a gameplay-gated downstream routing plan.",
+    )
+    gated_routing_plan_parser.add_argument(
+        "--gameplay-segments",
+        required=True,
+        help="Blueprint 38 gameplay segment candidates JSON path.",
+    )
+    gated_routing_plan_parser.add_argument(
+        "--gameplay-segment-contract",
+        default=DEFAULT_GAMEPLAY_SEGMENT_GATE_CONTRACT_OUTPUT,
+        help="Blueprint 38 gameplay segment gate contract JSON path.",
+    )
+    gated_routing_plan_parser.add_argument(
+        "--output",
+        default=DEFAULT_GAMEPLAY_GATED_ROUTING_PLAN_OUTPUT,
+        help="JSON gameplay-gated routing plan output path.",
+    )
+    gated_routing_plan_parser.add_argument(
+        "--routing-mode",
+        default="dry_run",
+        help="Routing mode for structural plan generation.",
+    )
+    gated_routing_plan_parser.add_argument(
+        "--downstream-stages",
+        default=None,
+        help="Optional comma-separated downstream stage list.",
+    )
+    gated_routing_plan_parser.add_argument("--skip-create-db", action="store_true")
+    gated_routing_plan_parser.set_defaults(
+        handler=_handle_build_gameplay_gated_routing_plan,
+        skip_create_db=True,
+    )
+
+    gated_routing_validate_parser = subcommands.add_parser(
+        "validate-gameplay-gated-routing-plan",
+        help="Validate a gameplay-gated routing plan structurally.",
+    )
+    gated_routing_validate_parser.add_argument(
+        "--contract",
+        default=DEFAULT_GAMEPLAY_GATED_ROUTING_CONTRACT_OUTPUT,
+        help="Gameplay-gated routing contract JSON path.",
+    )
+    gated_routing_validate_parser.add_argument(
+        "--plan",
+        required=True,
+        help="Gameplay-gated routing plan JSON path.",
+    )
+    gated_routing_validate_parser.add_argument(
+        "--gameplay-segment-contract",
+        default=DEFAULT_GAMEPLAY_SEGMENT_GATE_CONTRACT_OUTPUT,
+        help="Blueprint 38 gameplay segment gate contract JSON path.",
+    )
+    gated_routing_validate_parser.add_argument(
+        "--output",
+        default=DEFAULT_GAMEPLAY_GATED_ROUTING_VALIDATION_OUTPUT,
+        help="Optional JSON gameplay-gated routing validation output path.",
+    )
+    gated_routing_validate_parser.add_argument("--skip-create-db", action="store_true")
+    gated_routing_validate_parser.set_defaults(
+        handler=_handle_validate_gameplay_gated_routing_plan,
+        skip_create_db=True,
+    )
+
+    gated_routing_report_parser = subcommands.add_parser(
+        "build-gameplay-gated-routing-report",
+        help="Build a structural gameplay-gated routing report.",
+    )
+    gated_routing_report_parser.add_argument(
+        "--contract",
+        default=DEFAULT_GAMEPLAY_GATED_ROUTING_CONTRACT_OUTPUT,
+        help="Gameplay-gated routing contract JSON path.",
+    )
+    gated_routing_report_parser.add_argument(
+        "--plan",
+        required=True,
+        help="Gameplay-gated routing plan JSON path.",
+    )
+    gated_routing_report_parser.add_argument(
+        "--gameplay-segment-contract",
+        default=DEFAULT_GAMEPLAY_SEGMENT_GATE_CONTRACT_OUTPUT,
+        help="Blueprint 38 gameplay segment gate contract JSON path.",
+    )
+    gated_routing_report_parser.add_argument(
+        "--output",
+        default=DEFAULT_GAMEPLAY_GATED_ROUTING_REPORT_OUTPUT,
+        help="JSON gameplay-gated routing report output path.",
+    )
+    gated_routing_report_parser.add_argument("--skip-create-db", action="store_true")
+    gated_routing_report_parser.set_defaults(
+        handler=_handle_build_gameplay_gated_routing_report,
+        skip_create_db=True,
+    )
+
     point_evaluation_parser = subcommands.add_parser(
         "evaluate-point-candidates",
         help="Evaluate generated point candidate markers using operator review metadata.",
@@ -4602,6 +4722,54 @@ def _handle_build_gameplay_segment_report(
     return build_gameplay_segment_report(
         contract_path=args.contract,
         candidates_path=args.candidates,
+        output_path=args.output,
+    )
+
+
+def _handle_export_gameplay_gated_routing_contract(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return export_gameplay_gated_routing_contract(output_path=args.output)
+
+
+def _handle_build_gameplay_gated_routing_plan(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_gameplay_gated_routing_plan(
+        gameplay_segments_path=args.gameplay_segments,
+        gameplay_gate_contract_path=args.gameplay_segment_contract,
+        output_path=args.output,
+        routing_mode=args.routing_mode,
+        downstream_stages=args.downstream_stages,
+    )
+
+
+def _handle_validate_gameplay_gated_routing_plan(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_gameplay_gated_routing_plan(
+        contract_path=args.contract,
+        plan_path=args.plan,
+        gameplay_gate_contract_path=args.gameplay_segment_contract,
+        output_path=args.output,
+    )
+
+
+def _handle_build_gameplay_gated_routing_report(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_gameplay_gated_routing_report(
+        contract_path=args.contract,
+        plan_path=args.plan,
+        gameplay_gate_contract_path=args.gameplay_segment_contract,
         output_path=args.output,
     )
 

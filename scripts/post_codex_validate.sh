@@ -405,4 +405,29 @@ run "$PYTHON_BIN" -m apps.worker.cli build-gameplay-segment-report \
   --output "$TMP_ROOT/gameplay_segment_report.current.json" \
   --skip-create-db
 
+run "$PYTHON_BIN" -m apps.worker.cli export-gameplay-gated-routing-contract \
+  --output "$TMP_ROOT/gameplay_gated_pipeline_routing_contract_v1.smoke.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-gameplay-gated-routing-plan \
+  --gameplay-segments "$TMP_ROOT/gameplay_segment_candidates.current.json" \
+  --gameplay-segment-contract "$TMP_ROOT/gameplay_segment_gate_contract_v1.smoke.json" \
+  --output "$TMP_ROOT/gameplay_gated_routing_plan.current.json" \
+  --routing-mode "dry_run" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli validate-gameplay-gated-routing-plan \
+  --contract "$TMP_ROOT/gameplay_gated_pipeline_routing_contract_v1.smoke.json" \
+  --plan "$TMP_ROOT/gameplay_gated_routing_plan.current.json" \
+  --gameplay-segment-contract "$TMP_ROOT/gameplay_segment_gate_contract_v1.smoke.json" \
+  --output "$TMP_ROOT/gameplay_gated_routing_plan.validation.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-gameplay-gated-routing-report \
+  --contract "$TMP_ROOT/gameplay_gated_pipeline_routing_contract_v1.smoke.json" \
+  --plan "$TMP_ROOT/gameplay_gated_routing_plan.current.json" \
+  --gameplay-segment-contract "$TMP_ROOT/gameplay_segment_gate_contract_v1.smoke.json" \
+  --output "$TMP_ROOT/gameplay_gated_routing_report.current.json" \
+  --skip-create-db
+
 run git status --short
