@@ -743,4 +743,45 @@ run "$PYTHON_BIN" -m apps.worker.cli build-review-guided-gameplay-calibration-pr
   --output "$TMP_ROOT/review_guided_gameplay_calibration_proposal_report.current.json" \
   --skip-create-db
 
+run "$PYTHON_BIN" -m apps.worker.cli export-review-guided-gameplay-calibration-evaluation-sandbox-contract \
+  --output "$TMP_ROOT/review_guided_gameplay_calibration_evaluation_sandbox_contract_v1.smoke.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-review-guided-gameplay-calibration-evaluation-inputs \
+  --contract "$TMP_ROOT/review_guided_gameplay_calibration_evaluation_sandbox_contract_v1.smoke.json" \
+  --source-calibration-proposal "$TMP_ROOT/review_guided_gameplay_calibration_proposal.current.json" \
+  --source-metrics-report "$TMP_ROOT/real_broadcast_gameplay_review_metrics_report.current.json" \
+  --source-review-loop-report "$TMP_ROOT/real_broadcast_gameplay_review_loop_report.current.json" \
+  --source-review-bundle "$TMP_ROOT/real_broadcast_gameplay_review_bundle.template.json" \
+  --source-corpus-run "$TMP_ROOT/real_broadcast_gameplay_corpus_run.current.json" \
+  --source-regression-baseline "$TMP_ROOT/gameplay_gate_regression.baseline.json" \
+  --model-asset-path "model_assets/tom_v1/view_classifier_gameplay.pt" \
+  --output "$TMP_ROOT/review_guided_gameplay_calibration_evaluation_inputs.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli validate-review-guided-gameplay-calibration-evaluation-inputs \
+  --contract "$TMP_ROOT/review_guided_gameplay_calibration_evaluation_sandbox_contract_v1.smoke.json" \
+  --evaluation-inputs "$TMP_ROOT/review_guided_gameplay_calibration_evaluation_inputs.current.json" \
+  --output "$TMP_ROOT/review_guided_gameplay_calibration_evaluation_inputs.validation.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli run-review-guided-gameplay-calibration-evaluation-sandbox \
+  --contract "$TMP_ROOT/review_guided_gameplay_calibration_evaluation_sandbox_contract_v1.smoke.json" \
+  --evaluation-inputs "$TMP_ROOT/review_guided_gameplay_calibration_evaluation_inputs.current.json" \
+  --evaluation-mode "structural_offline_evaluation" \
+  --output "$TMP_ROOT/review_guided_gameplay_calibration_evaluation_report.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli validate-review-guided-gameplay-calibration-evaluation-report \
+  --contract "$TMP_ROOT/review_guided_gameplay_calibration_evaluation_sandbox_contract_v1.smoke.json" \
+  --evaluation-report "$TMP_ROOT/review_guided_gameplay_calibration_evaluation_report.current.json" \
+  --output "$TMP_ROOT/review_guided_gameplay_calibration_evaluation_report.validation.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-review-guided-gameplay-calibration-evaluation-summary \
+  --contract "$TMP_ROOT/review_guided_gameplay_calibration_evaluation_sandbox_contract_v1.smoke.json" \
+  --evaluation-report "$TMP_ROOT/review_guided_gameplay_calibration_evaluation_report.current.json" \
+  --output "$TMP_ROOT/review_guided_gameplay_calibration_evaluation_summary.current.json" \
+  --skip-create-db
+
 run git status --short

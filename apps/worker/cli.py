@@ -266,6 +266,20 @@ from apps.worker.services.real_court_keypoint_replay import run_real_court_keypo
 from apps.worker.services.real_detection_replay import run_real_detection_replay
 from apps.worker.services.real_pose_replay import run_real_pose_replay
 from apps.worker.services.real_yolo_smoke import run_real_yolo_local_smoke
+from apps.worker.services.review_guided_gameplay_calibration_evaluation_sandbox import (
+    DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_INPUTS_OUTPUT,
+    DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_INPUTS_VALIDATION_OUTPUT,
+    DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_REPORT_OUTPUT,
+    DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_REPORT_VALIDATION_OUTPUT,
+    DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_SANDBOX_CONTRACT_OUTPUT,
+    DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_SUMMARY_OUTPUT,
+    build_review_guided_gameplay_calibration_evaluation_inputs,
+    build_review_guided_gameplay_calibration_evaluation_summary,
+    export_review_guided_gameplay_calibration_evaluation_sandbox_contract,
+    run_review_guided_gameplay_calibration_evaluation_sandbox,
+    validate_review_guided_gameplay_calibration_evaluation_inputs,
+    validate_review_guided_gameplay_calibration_evaluation_report,
+)
 from apps.worker.services.review_guided_gameplay_gate_calibration_proposal import (
     DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_INPUTS_OUTPUT,
     DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_INPUTS_VALIDATION_OUTPUT,
@@ -4392,6 +4406,241 @@ def main() -> None:
         skip_create_db=True,
     )
 
+    calibration_evaluation_contract_parser = subcommands.add_parser(
+        "export-review-guided-gameplay-calibration-evaluation-sandbox-contract",
+        help="Export the Blueprint 50 offline calibration evaluation sandbox contract.",
+    )
+    calibration_evaluation_contract_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_SANDBOX_CONTRACT_OUTPUT
+        ),
+        help="JSON review-guided gameplay calibration evaluation sandbox contract path.",
+    )
+    calibration_evaluation_contract_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    calibration_evaluation_contract_parser.set_defaults(
+        handler=(
+            _handle_export_review_guided_gameplay_calibration_evaluation_sandbox_contract
+        ),
+        skip_create_db=True,
+    )
+
+    calibration_evaluation_inputs_parser = subcommands.add_parser(
+        "build-review-guided-gameplay-calibration-evaluation-inputs",
+        help="Build BP50 offline evaluation inputs from BP49 calibration proposals.",
+    )
+    calibration_evaluation_inputs_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_SANDBOX_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 50 calibration evaluation sandbox contract JSON path.",
+    )
+    calibration_evaluation_inputs_parser.add_argument(
+        "--source-calibration-proposal",
+        default=DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_PROPOSAL_OUTPUT,
+        help="Blueprint 49 review-guided gameplay calibration proposal JSON path.",
+    )
+    calibration_evaluation_inputs_parser.add_argument(
+        "--source-metrics-report",
+        default=DEFAULT_REAL_BROADCAST_GAMEPLAY_REVIEW_METRICS_REPORT_OUTPUT,
+        help="Optional Blueprint 48 gameplay review metrics report JSON path.",
+    )
+    calibration_evaluation_inputs_parser.add_argument(
+        "--source-review-loop-report",
+        default=DEFAULT_REAL_BROADCAST_GAMEPLAY_REVIEW_LOOP_REPORT_OUTPUT,
+        help="Optional Blueprint 47 real broadcast gameplay review loop report JSON path.",
+    )
+    calibration_evaluation_inputs_parser.add_argument(
+        "--source-review-bundle",
+        default=DEFAULT_REAL_BROADCAST_GAMEPLAY_REVIEW_BUNDLE_TEMPLATE_OUTPUT,
+        help="Optional Blueprint 47 real broadcast gameplay review bundle JSON path.",
+    )
+    calibration_evaluation_inputs_parser.add_argument(
+        "--source-corpus-run",
+        default=DEFAULT_REAL_BROADCAST_GAMEPLAY_CORPUS_OUTPUT,
+        help="Optional Blueprint 46 real broadcast gameplay corpus run JSON path.",
+    )
+    calibration_evaluation_inputs_parser.add_argument(
+        "--source-regression-baseline",
+        default=DEFAULT_GAMEPLAY_GATE_REGRESSION_BASELINE_OUTPUT,
+        help="Optional Blueprint 43 gameplay gate regression baseline JSON path.",
+    )
+    calibration_evaluation_inputs_parser.add_argument(
+        "--model-asset-path",
+        default=DEFAULT_GAMEPLAY_CLASSIFIER_ASSET_PATH,
+        help="Read-only local TOM v1 gameplay classifier asset path.",
+    )
+    calibration_evaluation_inputs_parser.add_argument(
+        "--current-threshold",
+        type=float,
+        default=DEFAULT_THRESHOLD,
+        help="Read-only current gameplay gate threshold context.",
+    )
+    calibration_evaluation_inputs_parser.add_argument(
+        "--current-smoothing-window",
+        type=int,
+        default=DEFAULT_SMOOTHING_WINDOW,
+        help="Read-only current gameplay gate smoothing-window context.",
+    )
+    calibration_evaluation_inputs_parser.add_argument(
+        "--hysteresis-enter",
+        type=float,
+        default=DEFAULT_HYSTERESIS_ENTER,
+        help="Read-only current gameplay gate hysteresis-enter context.",
+    )
+    calibration_evaluation_inputs_parser.add_argument(
+        "--hysteresis-exit",
+        type=float,
+        default=DEFAULT_HYSTERESIS_EXIT,
+        help="Read-only current gameplay gate hysteresis-exit context.",
+    )
+    calibration_evaluation_inputs_parser.add_argument(
+        "--output",
+        default=DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_INPUTS_OUTPUT,
+        help="JSON review-guided gameplay calibration evaluation inputs output path.",
+    )
+    calibration_evaluation_inputs_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    calibration_evaluation_inputs_parser.set_defaults(
+        handler=_handle_build_review_guided_gameplay_calibration_evaluation_inputs,
+        skip_create_db=True,
+    )
+
+    calibration_evaluation_inputs_validate_parser = subcommands.add_parser(
+        "validate-review-guided-gameplay-calibration-evaluation-inputs",
+        help="Validate BP50 review-guided gameplay calibration evaluation inputs.",
+    )
+    calibration_evaluation_inputs_validate_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_SANDBOX_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 50 calibration evaluation sandbox contract JSON path.",
+    )
+    calibration_evaluation_inputs_validate_parser.add_argument(
+        "--evaluation-inputs",
+        default=DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_INPUTS_OUTPUT,
+        help="Blueprint 50 calibration evaluation inputs JSON path.",
+    )
+    calibration_evaluation_inputs_validate_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_INPUTS_VALIDATION_OUTPUT
+        ),
+        help="Optional JSON calibration evaluation inputs validation output path.",
+    )
+    calibration_evaluation_inputs_validate_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    calibration_evaluation_inputs_validate_parser.set_defaults(
+        handler=_handle_validate_review_guided_gameplay_calibration_evaluation_inputs,
+        skip_create_db=True,
+    )
+
+    calibration_evaluation_report_parser = subcommands.add_parser(
+        "run-review-guided-gameplay-calibration-evaluation-sandbox",
+        help="Run BP50 offline-only evaluation sandbox for calibration proposals.",
+    )
+    calibration_evaluation_report_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_SANDBOX_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 50 calibration evaluation sandbox contract JSON path.",
+    )
+    calibration_evaluation_report_parser.add_argument(
+        "--evaluation-inputs",
+        default=DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_INPUTS_OUTPUT,
+        help="Blueprint 50 calibration evaluation inputs JSON path.",
+    )
+    calibration_evaluation_report_parser.add_argument(
+        "--evaluation-mode",
+        default="structural_offline_evaluation",
+        help="Offline evaluation mode; runtime calibration is never changed.",
+    )
+    calibration_evaluation_report_parser.add_argument(
+        "--output",
+        default=DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_REPORT_OUTPUT,
+        help="JSON review-guided gameplay calibration evaluation report output path.",
+    )
+    calibration_evaluation_report_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    calibration_evaluation_report_parser.set_defaults(
+        handler=_handle_run_review_guided_gameplay_calibration_evaluation_sandbox,
+        skip_create_db=True,
+    )
+
+    calibration_evaluation_report_validate_parser = subcommands.add_parser(
+        "validate-review-guided-gameplay-calibration-evaluation-report",
+        help="Validate a BP50 offline calibration evaluation report structurally.",
+    )
+    calibration_evaluation_report_validate_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_SANDBOX_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 50 calibration evaluation sandbox contract JSON path.",
+    )
+    calibration_evaluation_report_validate_parser.add_argument(
+        "--evaluation-report",
+        default=DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_REPORT_OUTPUT,
+        help="Blueprint 50 calibration evaluation report JSON path.",
+    )
+    calibration_evaluation_report_validate_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_REPORT_VALIDATION_OUTPUT
+        ),
+        help="Optional JSON calibration evaluation report validation output path.",
+    )
+    calibration_evaluation_report_validate_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    calibration_evaluation_report_validate_parser.set_defaults(
+        handler=_handle_validate_review_guided_gameplay_calibration_evaluation_report,
+        skip_create_db=True,
+    )
+
+    calibration_evaluation_summary_parser = subcommands.add_parser(
+        "build-review-guided-gameplay-calibration-evaluation-summary",
+        help="Build a BP50 summary from the offline calibration evaluation report.",
+    )
+    calibration_evaluation_summary_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_SANDBOX_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 50 calibration evaluation sandbox contract JSON path.",
+    )
+    calibration_evaluation_summary_parser.add_argument(
+        "--evaluation-report",
+        default=DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_REPORT_OUTPUT,
+        help="Blueprint 50 calibration evaluation report JSON path.",
+    )
+    calibration_evaluation_summary_parser.add_argument(
+        "--output",
+        default=DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_SUMMARY_OUTPUT,
+        help="JSON review-guided gameplay calibration evaluation summary output path.",
+    )
+    calibration_evaluation_summary_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    calibration_evaluation_summary_parser.set_defaults(
+        handler=_handle_build_review_guided_gameplay_calibration_evaluation_summary,
+        skip_create_db=True,
+    )
+
     point_evaluation_parser = subcommands.add_parser(
         "evaluate-point-candidates",
         help="Evaluate generated point candidate markers using operator review metadata.",
@@ -6971,6 +7220,87 @@ def _handle_build_review_guided_gameplay_calibration_proposal_report(
     return build_review_guided_gameplay_calibration_proposal_report(
         contract_path=args.contract,
         calibration_proposal_path=args.calibration_proposal,
+        output_path=args.output,
+    )
+
+
+def _handle_export_review_guided_gameplay_calibration_evaluation_sandbox_contract(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return export_review_guided_gameplay_calibration_evaluation_sandbox_contract(
+        output_path=args.output,
+    )
+
+
+def _handle_build_review_guided_gameplay_calibration_evaluation_inputs(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_review_guided_gameplay_calibration_evaluation_inputs(
+        contract_path=args.contract,
+        source_calibration_proposal_path=args.source_calibration_proposal,
+        source_metrics_report_path=args.source_metrics_report,
+        source_review_loop_report_path=args.source_review_loop_report,
+        source_review_bundle_path=args.source_review_bundle,
+        source_corpus_run_path=args.source_corpus_run,
+        source_regression_baseline_path=args.source_regression_baseline,
+        model_asset_path=args.model_asset_path,
+        current_threshold=args.current_threshold,
+        current_smoothing_window=args.current_smoothing_window,
+        hysteresis_enter=args.hysteresis_enter,
+        hysteresis_exit=args.hysteresis_exit,
+        output_path=args.output,
+    )
+
+
+def _handle_validate_review_guided_gameplay_calibration_evaluation_inputs(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_review_guided_gameplay_calibration_evaluation_inputs(
+        contract_path=args.contract,
+        evaluation_inputs_path=args.evaluation_inputs,
+        output_path=args.output,
+    )
+
+
+def _handle_run_review_guided_gameplay_calibration_evaluation_sandbox(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return run_review_guided_gameplay_calibration_evaluation_sandbox(
+        contract_path=args.contract,
+        evaluation_inputs_path=args.evaluation_inputs,
+        evaluation_mode=args.evaluation_mode,
+        output_path=args.output,
+    )
+
+
+def _handle_validate_review_guided_gameplay_calibration_evaluation_report(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_review_guided_gameplay_calibration_evaluation_report(
+        contract_path=args.contract,
+        evaluation_report_path=args.evaluation_report,
+        output_path=args.output,
+    )
+
+
+def _handle_build_review_guided_gameplay_calibration_evaluation_summary(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_review_guided_gameplay_calibration_evaluation_summary(
+        contract_path=args.contract,
+        evaluation_report_path=args.evaluation_report,
         output_path=args.output,
     )
 

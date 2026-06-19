@@ -2317,6 +2317,66 @@ classifier correctness, classifier accuracy, accepted/rejected lifecycle, automa
 reviewer scoring, production readiness, generalization, threshold changes, smoothing changes,
 hysteresis changes, runtime changes, model tuning, or adjudication.
 
+## Review-Guided Gameplay Calibration Evaluation Sandbox
+
+Blueprint 50 evaluates Blueprint 49 proposal candidates in an offline sandbox. It reads existing
+artifacts and does not infer labels, score the classifier, relabel automatically, change
+thresholds, smoothing, hysteresis, runtime config, tune models, decide tennis truth, mutate model
+assets, or mutate baselines.
+
+Export the tracked contract:
+
+```bash
+make tom-v1-export-review-guided-gameplay-calibration-evaluation-sandbox-contract \
+  PYTHON=.venv/bin/python
+```
+
+Build evaluation inputs from the latest local BP49/BP48/BP47/BP46 outputs:
+
+```bash
+make tom-v1-build-review-guided-gameplay-calibration-evaluation-inputs \
+  PYTHON=.venv/bin/python
+```
+
+Validate the evaluation inputs:
+
+```bash
+make tom-v1-validate-review-guided-gameplay-calibration-evaluation-inputs \
+  PYTHON=.venv/bin/python
+```
+
+Run the offline-only sandbox:
+
+```bash
+make tom-v1-run-review-guided-gameplay-calibration-evaluation-sandbox \
+  PYTHON=.venv/bin/python
+```
+
+Validate the sandbox report:
+
+```bash
+make tom-v1-validate-review-guided-gameplay-calibration-evaluation-report \
+  PYTHON=.venv/bin/python
+```
+
+Build the sandbox summary:
+
+```bash
+make tom-v1-build-review-guided-gameplay-calibration-evaluation-summary \
+  PYTHON=.venv/bin/python
+```
+
+The tracked artifact is
+`.data/contracts/review_guided_gameplay_calibration_evaluation_sandbox_contract_v1.json`.
+Generated evaluation inputs, validations, sandbox reports, and summaries live under
+`.data/exports/` and should stay local unless a future milestone explicitly documents committing
+reviewed fixtures.
+
+Evaluation candidates are sandbox records only. They do not create training truth, gameplay truth,
+classifier correctness, classifier accuracy, accepted/rejected lifecycle, automatic relabeling,
+reviewer scoring, production readiness, generalization, threshold changes, smoothing changes,
+hysteresis changes, runtime changes, model tuning, baseline replacement, or adjudication.
+
 ## Camera Geometry Calibration Provenance
 
 Blueprint 36 builds a structural camera geometry / calibration provenance profile from existing

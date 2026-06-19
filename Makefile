@@ -297,6 +297,25 @@ REVIEW_GUIDED_GAMEPLAY_CALIBRATION_CURRENT_THRESHOLD ?= $(GAMEPLAY_SEGMENT_THRES
 REVIEW_GUIDED_GAMEPLAY_CALIBRATION_CURRENT_SMOOTHING_WINDOW ?= $(GAMEPLAY_SEGMENT_SMOOTHING_WINDOW)
 REVIEW_GUIDED_GAMEPLAY_CALIBRATION_HYSTERESIS_ENTER ?= $(GAMEPLAY_SEGMENT_HYSTERESIS_ENTER)
 REVIEW_GUIDED_GAMEPLAY_CALIBRATION_HYSTERESIS_EXIT ?= $(GAMEPLAY_SEGMENT_HYSTERESIS_EXIT)
+REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_SANDBOX_CONTRACT_OUTPUT ?= .data/contracts/review_guided_gameplay_calibration_evaluation_sandbox_contract_v1.json
+REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_INPUTS_OUTPUT ?= .data/exports/review_guided_gameplay_calibration_evaluation_inputs.current.json
+REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_INPUTS ?= $(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_INPUTS_OUTPUT)
+REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_INPUTS_VALIDATION_OUTPUT ?= .data/exports/review_guided_gameplay_calibration_evaluation_inputs.validation.json
+REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_REPORT_OUTPUT ?= .data/exports/review_guided_gameplay_calibration_evaluation_report.current.json
+REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_REPORT ?= $(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_REPORT_OUTPUT)
+REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_REPORT_VALIDATION_OUTPUT ?= .data/exports/review_guided_gameplay_calibration_evaluation_report.validation.json
+REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_SUMMARY_OUTPUT ?= .data/exports/review_guided_gameplay_calibration_evaluation_summary.current.json
+REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_SOURCE_CALIBRATION_PROPOSAL ?= $(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_PROPOSAL_OUTPUT)
+REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_SOURCE_METRICS_REPORT ?= $(REAL_BROADCAST_GAMEPLAY_REVIEW_METRICS_REPORT_OUTPUT)
+REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_SOURCE_REVIEW_LOOP_REPORT ?= $(REAL_BROADCAST_GAMEPLAY_REVIEW_LOOP_REPORT_OUTPUT)
+REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_SOURCE_REVIEW_BUNDLE ?= $(REAL_BROADCAST_GAMEPLAY_REVIEW_BUNDLE_OUTPUT)
+REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_SOURCE_CORPUS_RUN ?= $(REAL_BROADCAST_GAMEPLAY_CORPUS_OUTPUT)
+REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_SOURCE_REGRESSION_BASELINE ?= $(GAMEPLAY_GATE_REGRESSION_BASELINE_OUTPUT)
+REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_CURRENT_THRESHOLD ?= $(GAMEPLAY_SEGMENT_THRESHOLD)
+REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_CURRENT_SMOOTHING_WINDOW ?= $(GAMEPLAY_SEGMENT_SMOOTHING_WINDOW)
+REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_HYSTERESIS_ENTER ?= $(GAMEPLAY_SEGMENT_HYSTERESIS_ENTER)
+REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_HYSTERESIS_EXIT ?= $(GAMEPLAY_SEGMENT_HYSTERESIS_EXIT)
+REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_MODE ?= structural_offline_evaluation
 EXPECTED_BRANCH ?=
 EXPECTED_TAG ?=
 FORMAT ?= json
@@ -394,6 +413,7 @@ export TOM_V3_DATABASE_URL
 .PHONY: tom-v1-export-real-broadcast-gameplay-review-loop-contract tom-v1-build-real-broadcast-gameplay-review-bundle-template tom-v1-validate-real-broadcast-gameplay-review-bundle tom-v1-build-real-broadcast-gameplay-review-loop-report tom-v1-build-real-broadcast-gameplay-human-review-readiness-report
 .PHONY: tom-v1-export-real-broadcast-gameplay-review-metrics-contract tom-v1-build-real-broadcast-gameplay-review-metrics-report tom-v1-validate-real-broadcast-gameplay-review-metrics-report tom-v1-build-real-broadcast-gameplay-review-qa-dashboard tom-v1-build-real-broadcast-gameplay-review-next-actions-report
 .PHONY: tom-v1-export-review-guided-gameplay-calibration-proposal-contract tom-v1-build-review-guided-gameplay-calibration-inputs tom-v1-validate-review-guided-gameplay-calibration-inputs tom-v1-build-review-guided-gameplay-calibration-proposal tom-v1-validate-review-guided-gameplay-calibration-proposal tom-v1-build-review-guided-gameplay-calibration-proposal-report
+.PHONY: tom-v1-export-review-guided-gameplay-calibration-evaluation-sandbox-contract tom-v1-build-review-guided-gameplay-calibration-evaluation-inputs tom-v1-validate-review-guided-gameplay-calibration-evaluation-inputs tom-v1-run-review-guided-gameplay-calibration-evaluation-sandbox tom-v1-validate-review-guided-gameplay-calibration-evaluation-report tom-v1-build-review-guided-gameplay-calibration-evaluation-summary
 
 install:
 	$(PYTHON) -m pip install -e ".[dev]"
@@ -1014,6 +1034,24 @@ tom-v1-validate-review-guided-gameplay-calibration-proposal:
 
 tom-v1-build-review-guided-gameplay-calibration-proposal-report:
 	$(PYTHON) -m apps.worker.cli build-review-guided-gameplay-calibration-proposal-report --contract "$(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_PROPOSAL_CONTRACT_OUTPUT)" --calibration-proposal "$(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_PROPOSAL)" --output "$(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_PROPOSAL_REPORT_OUTPUT)" --skip-create-db
+
+tom-v1-export-review-guided-gameplay-calibration-evaluation-sandbox-contract:
+	$(PYTHON) -m apps.worker.cli export-review-guided-gameplay-calibration-evaluation-sandbox-contract --output "$(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_SANDBOX_CONTRACT_OUTPUT)" --skip-create-db
+
+tom-v1-build-review-guided-gameplay-calibration-evaluation-inputs:
+	$(PYTHON) -m apps.worker.cli build-review-guided-gameplay-calibration-evaluation-inputs --contract "$(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_SANDBOX_CONTRACT_OUTPUT)" --source-calibration-proposal "$(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_SOURCE_CALIBRATION_PROPOSAL)" --source-metrics-report "$(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_SOURCE_METRICS_REPORT)" --source-review-loop-report "$(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_SOURCE_REVIEW_LOOP_REPORT)" --source-review-bundle "$(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_SOURCE_REVIEW_BUNDLE)" --source-corpus-run "$(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_SOURCE_CORPUS_RUN)" --source-regression-baseline "$(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_SOURCE_REGRESSION_BASELINE)" --model-asset-path "$(GAMEPLAY_CLASSIFIER_ASSET_PATH)" --current-threshold "$(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_CURRENT_THRESHOLD)" --current-smoothing-window "$(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_CURRENT_SMOOTHING_WINDOW)" --hysteresis-enter "$(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_HYSTERESIS_ENTER)" --hysteresis-exit "$(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_HYSTERESIS_EXIT)" --output "$(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_INPUTS_OUTPUT)" --skip-create-db
+
+tom-v1-validate-review-guided-gameplay-calibration-evaluation-inputs:
+	$(PYTHON) -m apps.worker.cli validate-review-guided-gameplay-calibration-evaluation-inputs --contract "$(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_SANDBOX_CONTRACT_OUTPUT)" --evaluation-inputs "$(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_INPUTS)" --output "$(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_INPUTS_VALIDATION_OUTPUT)" --skip-create-db
+
+tom-v1-run-review-guided-gameplay-calibration-evaluation-sandbox:
+	$(PYTHON) -m apps.worker.cli run-review-guided-gameplay-calibration-evaluation-sandbox --contract "$(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_SANDBOX_CONTRACT_OUTPUT)" --evaluation-inputs "$(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_INPUTS)" --evaluation-mode "$(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_MODE)" --output "$(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_REPORT_OUTPUT)" --skip-create-db
+
+tom-v1-validate-review-guided-gameplay-calibration-evaluation-report:
+	$(PYTHON) -m apps.worker.cli validate-review-guided-gameplay-calibration-evaluation-report --contract "$(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_SANDBOX_CONTRACT_OUTPUT)" --evaluation-report "$(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_REPORT)" --output "$(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_REPORT_VALIDATION_OUTPUT)" --skip-create-db
+
+tom-v1-build-review-guided-gameplay-calibration-evaluation-summary:
+	$(PYTHON) -m apps.worker.cli build-review-guided-gameplay-calibration-evaluation-summary --contract "$(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_SANDBOX_CONTRACT_OUTPUT)" --evaluation-report "$(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_REPORT)" --output "$(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_SUMMARY_OUTPUT)" --skip-create-db
 
 tom-v1-post-codex-validate:
 	scripts/post_codex_validate.sh $(if $(EXPECTED_BRANCH),--branch "$(EXPECTED_BRANCH)",) $(if $(EXPECTED_TAG),--expected-tag "$(EXPECTED_TAG)",) --python "$(PYTHON)"

@@ -1,5 +1,43 @@
 # TOM v3 Simple - Implementation Log
 
+## Review-Guided Gameplay Calibration Evaluation Sandbox v1
+
+Status: complete when accepted
+
+### Goal
+
+Evaluate review-guided gameplay calibration proposal candidates offline without creating labels,
+classifier correctness/accuracy claims, automatic relabeling, threshold changes, smoothing
+changes, hysteresis changes, runtime config changes, model tuning, baseline mutation, tennis
+truth, reviewer scoring, production readiness, generalization, or adjudication.
+
+### Outcome
+
+The milestone adds:
+
+- a tracked review-guided gameplay calibration evaluation sandbox contract
+- CLI and Make targets to export the contract, build/validate evaluation inputs, run the offline
+  sandbox, validate sandbox reports, and build summaries
+- candidate setting snapshots derived from BP49 proposal items with blocked/ready/informational
+  statuses and read-only current gate settings
+- offline sandbox reports with candidate evaluations, blocked candidate summaries, drift
+  summaries, review-data limitations, decision-support statuses, warning, and non-claim summaries
+- post-Codex validation coverage for the BP50 smoke path using temporary outputs
+- focused tests for contract stability, input generation, fixture-only blocking, validation
+  guardrails, offline reports, report rejection, and summary structure
+
+### Non-goals
+
+- No classifier training, classifier scoring, classifier correctness claim, or classifier accuracy
+  claim.
+- No model asset mutation, committed weights, threshold change, smoothing change, hysteresis
+  change, model tuning, runtime config change, baseline replacement, or regression baseline
+  mutation.
+- No truth labels, point detection claim, line-call claim, score, player identity, or
+  adjudication.
+- No automatic relabeling, reviewer ranking/scoring, production-readiness claim, or
+  generalization claim.
+
 ## Review-Guided Gameplay Gate Calibration Proposal v1
 
 Status: complete when accepted
