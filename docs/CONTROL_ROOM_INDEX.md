@@ -354,6 +354,8 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Gameplay Segment Replay Timeline / Operator Review v1](reviews/gameplay_segment_replay_timeline_review_v1.md)
 - [Blueprint 42 Gameplay-Gated Many-Point Ingestion Smoke v1](blueprints/blueprint_42_gameplay_gated_many_point_ingestion_smoke_v1.md)
 - [Gameplay-Gated Many-Point Ingestion Smoke v1](reviews/gameplay_gated_many_point_ingestion_smoke_v1.md)
+- [Blueprint 43 Gameplay Gate Regression Baseline v1](blueprints/blueprint_43_gameplay_gate_regression_baseline_v1.md)
+- [Gameplay Gate Regression Baseline v1](reviews/gameplay_gate_regression_baseline_v1.md)
 
 ## Development
 

@@ -533,4 +533,32 @@ run "$PYTHON_BIN" -m apps.worker.cli build-gameplay-gated-many-point-smoke-repor
   --output "$TMP_ROOT/gameplay_gated_many_point_smoke_report.current.json" \
   --skip-create-db
 
+run "$PYTHON_BIN" -m apps.worker.cli export-gameplay-gate-regression-baseline-contract \
+  --output "$TMP_ROOT/gameplay_gate_regression_baseline_contract_v1.smoke.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-gameplay-gate-regression-baseline \
+  --contract "$TMP_ROOT/gameplay_gate_regression_baseline_contract_v1.smoke.json" \
+  --work-dir "$TMP_ROOT/gameplay_gate_regression" \
+  --fixture-media-path "demo_assets/sample_point.mp4" \
+  --model-asset-path "model_assets/tom_v1/view_classifier_gameplay.pt" \
+  --output "$TMP_ROOT/gameplay_gate_regression.baseline.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli verify-gameplay-gate-regression-baseline \
+  --contract "$TMP_ROOT/gameplay_gate_regression_baseline_contract_v1.smoke.json" \
+  --baseline "$TMP_ROOT/gameplay_gate_regression.baseline.json" \
+  --work-dir "$TMP_ROOT/gameplay_gate_regression" \
+  --fixture-media-path "demo_assets/sample_point.mp4" \
+  --model-asset-path "model_assets/tom_v1/view_classifier_gameplay.pt" \
+  --output "$TMP_ROOT/gameplay_gate_regression.verification.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-gameplay-gate-regression-report \
+  --contract "$TMP_ROOT/gameplay_gate_regression_baseline_contract_v1.smoke.json" \
+  --baseline "$TMP_ROOT/gameplay_gate_regression.baseline.json" \
+  --verification "$TMP_ROOT/gameplay_gate_regression.verification.json" \
+  --output "$TMP_ROOT/gameplay_gate_regression.report.json" \
+  --skip-create-db
+
 run git status --short

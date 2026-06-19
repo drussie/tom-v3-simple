@@ -1,5 +1,33 @@
 # TOM v3 Simple - Implementation Log
 
+## Gameplay Gate Regression Baseline v1
+
+Status: complete when accepted
+
+### Goal
+
+Freeze the fixture-safe gameplay gate stack as a structural regression baseline without creating
+classifier correctness, point-detection, scoring, line-call, or adjudication claims.
+
+### Outcome
+
+The milestone adds:
+
+- a tracked gameplay gate regression baseline contract
+- a tracked frozen baseline for the fixture-only BP38-BP42 output profile
+- CLI and Make targets to export, build, verify, and report on the baseline
+- drift and breaking-drift reporting for structural count/config/contract changes
+- post-Codex validation coverage for the BP43 gate using temporary outputs
+- focused service tests for contract stability, baseline build, verification, drift detection, and
+  report generation
+
+### Non-goals
+
+- No model asset mutation or committed weights.
+- No GPU/model inference by default.
+- No point detection, line-call, scoring, player identity, or production-readiness proof.
+- No training truth, generalization claim, or adjudication.
+
 ## Replay Marker Inspector v0
 
 Status: complete when accepted

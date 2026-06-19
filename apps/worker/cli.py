@@ -57,6 +57,17 @@ from apps.worker.services.event_candidate_3d_diagnostics import (
 )
 from apps.worker.services.frame_artifacts import extract_frame_artifacts_for_run
 from apps.worker.services.gameplay_adapter import run_gameplay_adapter
+from apps.worker.services.gameplay_gate_regression_baseline import (
+    DEFAULT_GAMEPLAY_GATE_REGRESSION_BASELINE_OUTPUT,
+    DEFAULT_GAMEPLAY_GATE_REGRESSION_CONTRACT_OUTPUT,
+    DEFAULT_GAMEPLAY_GATE_REGRESSION_REPORT_OUTPUT,
+    DEFAULT_GAMEPLAY_GATE_REGRESSION_VERIFICATION_OUTPUT,
+    DEFAULT_GAMEPLAY_GATE_REGRESSION_WORK_DIR,
+    build_gameplay_gate_regression_baseline,
+    build_gameplay_gate_regression_report,
+    export_gameplay_gate_regression_baseline_contract,
+    verify_gameplay_gate_regression_baseline,
+)
 from apps.worker.services.gameplay_gated_many_point_smoke import (
     DEFAULT_GAMEPLAY_GATED_MANY_POINT_SMOKE_CONTRACT_OUTPUT,
     DEFAULT_GAMEPLAY_GATED_MANY_POINT_SMOKE_MANIFEST_OUTPUT,
@@ -3302,6 +3313,136 @@ def main() -> None:
         skip_create_db=True,
     )
 
+    gameplay_regression_contract_parser = subcommands.add_parser(
+        "export-gameplay-gate-regression-baseline-contract",
+        help="Export the Blueprint 43 gameplay gate regression baseline contract.",
+    )
+    gameplay_regression_contract_parser.add_argument(
+        "--output",
+        default=DEFAULT_GAMEPLAY_GATE_REGRESSION_CONTRACT_OUTPUT,
+        help="JSON gameplay gate regression contract output path.",
+    )
+    gameplay_regression_contract_parser.add_argument("--skip-create-db", action="store_true")
+    gameplay_regression_contract_parser.set_defaults(
+        handler=_handle_export_gameplay_gate_regression_baseline_contract,
+        skip_create_db=True,
+    )
+
+    gameplay_regression_baseline_parser = subcommands.add_parser(
+        "build-gameplay-gate-regression-baseline",
+        help="Build the frozen Blueprint 43 gameplay gate regression baseline.",
+    )
+    gameplay_regression_baseline_parser.add_argument(
+        "--contract",
+        default=DEFAULT_GAMEPLAY_GATE_REGRESSION_CONTRACT_OUTPUT,
+        help="Blueprint 43 regression contract JSON path.",
+    )
+    gameplay_regression_baseline_parser.add_argument(
+        "--smoke-manifest",
+        default=None,
+        help="Optional explicit BP42 smoke manifest path.",
+    )
+    gameplay_regression_baseline_parser.add_argument(
+        "--work-dir",
+        default=DEFAULT_GAMEPLAY_GATE_REGRESSION_WORK_DIR,
+        help="Directory for generated current smoke artifacts.",
+    )
+    gameplay_regression_baseline_parser.add_argument(
+        "--fixture-media-path",
+        default="demo_assets/sample_point.mp4",
+        help="Fixture/demo media path used when no smoke manifest is supplied.",
+    )
+    gameplay_regression_baseline_parser.add_argument(
+        "--model-asset-path",
+        default=DEFAULT_GAMEPLAY_CLASSIFIER_ASSET_PATH,
+        help="Local TOM v1 gameplay classifier asset path.",
+    )
+    gameplay_regression_baseline_parser.add_argument(
+        "--output",
+        default=DEFAULT_GAMEPLAY_GATE_REGRESSION_BASELINE_OUTPUT,
+        help="JSON gameplay gate regression baseline output path.",
+    )
+    gameplay_regression_baseline_parser.add_argument("--skip-create-db", action="store_true")
+    gameplay_regression_baseline_parser.set_defaults(
+        handler=_handle_build_gameplay_gate_regression_baseline,
+        skip_create_db=True,
+    )
+
+    gameplay_regression_verify_parser = subcommands.add_parser(
+        "verify-gameplay-gate-regression-baseline",
+        help="Verify current gameplay gate structural output against the frozen baseline.",
+    )
+    gameplay_regression_verify_parser.add_argument(
+        "--contract",
+        default=DEFAULT_GAMEPLAY_GATE_REGRESSION_CONTRACT_OUTPUT,
+        help="Blueprint 43 regression contract JSON path.",
+    )
+    gameplay_regression_verify_parser.add_argument(
+        "--baseline",
+        default=DEFAULT_GAMEPLAY_GATE_REGRESSION_BASELINE_OUTPUT,
+        help="Frozen gameplay gate regression baseline JSON path.",
+    )
+    gameplay_regression_verify_parser.add_argument(
+        "--smoke-manifest",
+        default=None,
+        help="Optional explicit BP42 smoke manifest path.",
+    )
+    gameplay_regression_verify_parser.add_argument(
+        "--work-dir",
+        default=DEFAULT_GAMEPLAY_GATE_REGRESSION_WORK_DIR,
+        help="Directory for generated current smoke artifacts.",
+    )
+    gameplay_regression_verify_parser.add_argument(
+        "--fixture-media-path",
+        default="demo_assets/sample_point.mp4",
+        help="Fixture/demo media path used when no smoke manifest is supplied.",
+    )
+    gameplay_regression_verify_parser.add_argument(
+        "--model-asset-path",
+        default=DEFAULT_GAMEPLAY_CLASSIFIER_ASSET_PATH,
+        help="Local TOM v1 gameplay classifier asset path.",
+    )
+    gameplay_regression_verify_parser.add_argument(
+        "--output",
+        default=DEFAULT_GAMEPLAY_GATE_REGRESSION_VERIFICATION_OUTPUT,
+        help="JSON gameplay gate regression verification output path.",
+    )
+    gameplay_regression_verify_parser.add_argument("--skip-create-db", action="store_true")
+    gameplay_regression_verify_parser.set_defaults(
+        handler=_handle_verify_gameplay_gate_regression_baseline,
+        skip_create_db=True,
+    )
+
+    gameplay_regression_report_parser = subcommands.add_parser(
+        "build-gameplay-gate-regression-report",
+        help="Build a structural report from gameplay gate regression verification.",
+    )
+    gameplay_regression_report_parser.add_argument(
+        "--contract",
+        default=DEFAULT_GAMEPLAY_GATE_REGRESSION_CONTRACT_OUTPUT,
+        help="Blueprint 43 regression contract JSON path.",
+    )
+    gameplay_regression_report_parser.add_argument(
+        "--baseline",
+        default=DEFAULT_GAMEPLAY_GATE_REGRESSION_BASELINE_OUTPUT,
+        help="Frozen gameplay gate regression baseline JSON path.",
+    )
+    gameplay_regression_report_parser.add_argument(
+        "--verification",
+        default=DEFAULT_GAMEPLAY_GATE_REGRESSION_VERIFICATION_OUTPUT,
+        help="Gameplay gate regression verification JSON path.",
+    )
+    gameplay_regression_report_parser.add_argument(
+        "--output",
+        default=DEFAULT_GAMEPLAY_GATE_REGRESSION_REPORT_OUTPUT,
+        help="JSON gameplay gate regression report output path.",
+    )
+    gameplay_regression_report_parser.add_argument("--skip-create-db", action="store_true")
+    gameplay_regression_report_parser.set_defaults(
+        handler=_handle_build_gameplay_gate_regression_report,
+        skip_create_db=True,
+    )
+
     point_evaluation_parser = subcommands.add_parser(
         "evaluate-point-candidates",
         help="Evaluate generated point candidate markers using operator review metadata.",
@@ -5467,6 +5608,58 @@ def _handle_build_gameplay_gated_many_point_smoke_report(
     return build_gameplay_gated_many_point_smoke_report(
         contract_path=args.contract,
         smoke_report_path=args.smoke_report,
+        output_path=args.output,
+    )
+
+
+def _handle_export_gameplay_gate_regression_baseline_contract(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return export_gameplay_gate_regression_baseline_contract(output_path=args.output)
+
+
+def _handle_build_gameplay_gate_regression_baseline(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_gameplay_gate_regression_baseline(
+        contract_path=args.contract,
+        smoke_manifest_path=args.smoke_manifest,
+        work_dir=args.work_dir,
+        fixture_media_path=args.fixture_media_path,
+        model_asset_path=args.model_asset_path,
+        output_path=args.output,
+    )
+
+
+def _handle_verify_gameplay_gate_regression_baseline(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return verify_gameplay_gate_regression_baseline(
+        contract_path=args.contract,
+        baseline_path=args.baseline,
+        smoke_manifest_path=args.smoke_manifest,
+        work_dir=args.work_dir,
+        fixture_media_path=args.fixture_media_path,
+        model_asset_path=args.model_asset_path,
+        output_path=args.output,
+    )
+
+
+def _handle_build_gameplay_gate_regression_report(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_gameplay_gate_regression_report(
+        contract_path=args.contract,
+        baseline_path=args.baseline,
+        verification_path=args.verification,
         output_path=args.output,
     )
 

@@ -1984,6 +1984,45 @@ If `demo_assets/sample_point.mp4` is reused more than once as a fixture stand-in
 manifests and reports must preserve `fixture_reuse_only`, `not_distinct_real_points`, and
 `does_not_claim_generalization`.
 
+## Gameplay Gate Regression Baseline
+
+Use this after the Blueprint 38-42 contracts are available. The regression gate freezes a
+fixture-safe structural summary for the gameplay gate stack and verifies future runs against that
+baseline. It does not prove classifier correctness, point detection, line calls, score, player
+identity, production readiness, training truth, generalization, or adjudication.
+
+Export the tracked contract:
+
+```bash
+make tom-v1-export-gameplay-gate-regression-baseline-contract \
+  PYTHON=.venv/bin/python
+```
+
+Build the tracked baseline:
+
+```bash
+make tom-v1-build-gameplay-gate-regression-baseline \
+  PYTHON=.venv/bin/python
+```
+
+Verify the current fixture-safe gameplay gate profile:
+
+```bash
+make tom-v1-verify-gameplay-gate-regression-baseline \
+  PYTHON=.venv/bin/python
+```
+
+Build a local verification report:
+
+```bash
+make tom-v1-build-gameplay-gate-regression-report \
+  PYTHON=.venv/bin/python
+```
+
+The protected success shape is `ok=true`, `status=completed`, `drift_detected=false`,
+`breaking_drift_detected=false`, `baseline_is_not_truth=true`, and
+`gameplay_gate_is_not_truth=true`.
+
 ## Camera Geometry Calibration Provenance
 
 Blueprint 36 builds a structural camera geometry / calibration provenance profile from existing

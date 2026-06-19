@@ -332,6 +332,10 @@ TOM v3 Simple does not include:
   distinct real points; the smoke report does not prove real-world generalization, point
   detection, scoring, line calls, model correctness, training truth, production readiness, or
   adjudication.
+- Gameplay gate regression baselines freeze the structural BP38-BP42 fixture-safe output profile
+  only. Drift is a regression signal, not proof that the classifier, smoke output, or baseline is
+  correct. The baseline does not prove point detection, line calls, scoring, player identity,
+  production readiness, training truth, generalization, or adjudication.
 
 ## Boundary
 
