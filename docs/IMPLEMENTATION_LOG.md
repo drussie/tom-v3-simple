@@ -1,5 +1,43 @@
 # TOM v3 Simple - Implementation Log
 
+## Review-Guided Gameplay Gate Calibration Proposal v1
+
+Status: complete when accepted
+
+### Goal
+
+Summarize real-broadcast gameplay review metrics into calibration input snapshots and
+future-evaluation proposal reports without creating labels, classifier correctness/accuracy
+claims, automatic relabeling, threshold changes, smoothing changes, hysteresis changes, runtime
+config changes, model tuning, baseline mutation, tennis truth, reviewer scoring, production
+readiness, generalization, or adjudication.
+
+### Outcome
+
+The milestone adds:
+
+- a tracked review-guided gameplay calibration proposal contract
+- CLI and Make targets to export the contract, build/validate calibration inputs, build/validate
+  proposals, and build proposal reports
+- review coverage, ambiguity, boundary case, missing review data, source context, current gate
+  setting, model provenance, warning, and non-claim summaries
+- proposal items that remain future-evaluation-only with candidate settings marked not applied,
+  non-runtime-writing, and non-baseline-affecting
+- post-Codex validation coverage for the BP49 smoke path using temporary outputs
+- focused tests for contract stability, input generation, validation guardrails, proposal
+  generation, runtime-change rejection, and proposal report structure
+
+### Non-goals
+
+- No classifier training, classifier scoring, classifier correctness claim, or classifier accuracy
+  claim.
+- No model asset mutation, committed weights, threshold change, smoothing change, hysteresis
+  change, model tuning, runtime config change, or regression baseline mutation.
+- No truth labels, point detection claim, line-call claim, score, player identity, or
+  adjudication.
+- No automatic relabeling, reviewer ranking/scoring, production-readiness claim, or
+  generalization claim.
+
 ## Real Broadcast Gameplay Review Metrics / QA Dashboard v1
 
 Status: complete when accepted

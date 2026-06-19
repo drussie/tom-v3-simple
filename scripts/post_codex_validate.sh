@@ -703,4 +703,44 @@ run "$PYTHON_BIN" -m apps.worker.cli build-real-broadcast-gameplay-review-next-a
   --output "$TMP_ROOT/real_broadcast_gameplay_review_next_actions.current.json" \
   --skip-create-db
 
+run "$PYTHON_BIN" -m apps.worker.cli export-review-guided-gameplay-calibration-proposal-contract \
+  --output "$TMP_ROOT/review_guided_gameplay_calibration_proposal_contract_v1.smoke.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-review-guided-gameplay-calibration-inputs \
+  --contract "$TMP_ROOT/review_guided_gameplay_calibration_proposal_contract_v1.smoke.json" \
+  --source-metrics-report "$TMP_ROOT/real_broadcast_gameplay_review_metrics_report.current.json" \
+  --source-review-loop-report "$TMP_ROOT/real_broadcast_gameplay_review_loop_report.current.json" \
+  --source-review-bundle "$TMP_ROOT/real_broadcast_gameplay_review_bundle.template.json" \
+  --source-review-dataset "$TMP_ROOT/gameplay_gate_review_dataset.current.json" \
+  --source-corpus-run "$TMP_ROOT/real_broadcast_gameplay_corpus_run.current.json" \
+  --source-regression-baseline "$TMP_ROOT/gameplay_gate_regression.baseline.json" \
+  --model-asset-path "model_assets/tom_v1/view_classifier_gameplay.pt" \
+  --output "$TMP_ROOT/review_guided_gameplay_calibration_inputs.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli validate-review-guided-gameplay-calibration-inputs \
+  --contract "$TMP_ROOT/review_guided_gameplay_calibration_proposal_contract_v1.smoke.json" \
+  --calibration-inputs "$TMP_ROOT/review_guided_gameplay_calibration_inputs.current.json" \
+  --output "$TMP_ROOT/review_guided_gameplay_calibration_inputs.validation.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-review-guided-gameplay-calibration-proposal \
+  --contract "$TMP_ROOT/review_guided_gameplay_calibration_proposal_contract_v1.smoke.json" \
+  --calibration-inputs "$TMP_ROOT/review_guided_gameplay_calibration_inputs.current.json" \
+  --output "$TMP_ROOT/review_guided_gameplay_calibration_proposal.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli validate-review-guided-gameplay-calibration-proposal \
+  --contract "$TMP_ROOT/review_guided_gameplay_calibration_proposal_contract_v1.smoke.json" \
+  --calibration-proposal "$TMP_ROOT/review_guided_gameplay_calibration_proposal.current.json" \
+  --output "$TMP_ROOT/review_guided_gameplay_calibration_proposal.validation.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-review-guided-gameplay-calibration-proposal-report \
+  --contract "$TMP_ROOT/review_guided_gameplay_calibration_proposal_contract_v1.smoke.json" \
+  --calibration-proposal "$TMP_ROOT/review_guided_gameplay_calibration_proposal.current.json" \
+  --output "$TMP_ROOT/review_guided_gameplay_calibration_proposal_report.current.json" \
+  --skip-create-db
+
 run git status --short

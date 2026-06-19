@@ -366,6 +366,8 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Real Broadcast Gameplay Review Loop v1](reviews/real_broadcast_gameplay_review_loop_v1.md)
 - [Blueprint 48 Real Broadcast Gameplay Review Metrics / QA Dashboard v1](blueprints/blueprint_48_real_broadcast_gameplay_review_metrics_dashboard_v1.md)
 - [Real Broadcast Gameplay Review Metrics / QA Dashboard v1](reviews/real_broadcast_gameplay_review_metrics_dashboard_v1.md)
+- [Blueprint 49 Review-Guided Gameplay Gate Calibration Proposal v1](blueprints/blueprint_49_review_guided_gameplay_gate_calibration_proposal_v1.md)
+- [Review-Guided Gameplay Gate Calibration Proposal v1](reviews/review_guided_gameplay_gate_calibration_proposal_v1.md)
 
 ## Development
 

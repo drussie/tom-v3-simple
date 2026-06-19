@@ -2258,6 +2258,65 @@ classifier correctness, classifier accuracy, accepted/rejected lifecycle, automa
 reviewer scoring, production readiness, generalization, threshold changes, model tuning, or
 adjudication.
 
+## Review-Guided Gameplay Gate Calibration Proposal
+
+Blueprint 49 summarizes Blueprint 48 review metrics into calibration inputs and proposal-only
+future-evaluation records. It reads existing artifacts and does not infer labels, score the
+classifier, relabel automatically, change thresholds, smoothing, hysteresis, runtime config, tune
+models, decide tennis truth, mutate model assets, or mutate baselines.
+
+Export the tracked contract:
+
+```bash
+make tom-v1-export-review-guided-gameplay-calibration-proposal-contract \
+  PYTHON=.venv/bin/python
+```
+
+Build calibration inputs from the latest local BP48/BP47/BP46 outputs:
+
+```bash
+make tom-v1-build-review-guided-gameplay-calibration-inputs \
+  PYTHON=.venv/bin/python
+```
+
+Validate the calibration inputs:
+
+```bash
+make tom-v1-validate-review-guided-gameplay-calibration-inputs \
+  PYTHON=.venv/bin/python
+```
+
+Build the future-evaluation proposal:
+
+```bash
+make tom-v1-build-review-guided-gameplay-calibration-proposal \
+  PYTHON=.venv/bin/python
+```
+
+Validate the proposal:
+
+```bash
+make tom-v1-validate-review-guided-gameplay-calibration-proposal \
+  PYTHON=.venv/bin/python
+```
+
+Build the proposal report:
+
+```bash
+make tom-v1-build-review-guided-gameplay-calibration-proposal-report \
+  PYTHON=.venv/bin/python
+```
+
+The tracked artifact is
+`.data/contracts/review_guided_gameplay_calibration_proposal_contract_v1.json`. Generated
+calibration inputs, validations, proposal JSON, and proposal reports live under `.data/exports/`
+and should stay local unless a future milestone explicitly documents committing reviewed fixtures.
+
+Proposal items are planning records only. They do not create training truth, gameplay truth,
+classifier correctness, classifier accuracy, accepted/rejected lifecycle, automatic relabeling,
+reviewer scoring, production readiness, generalization, threshold changes, smoothing changes,
+hysteresis changes, runtime changes, model tuning, or adjudication.
+
 ## Camera Geometry Calibration Provenance
 
 Blueprint 36 builds a structural camera geometry / calibration provenance profile from existing

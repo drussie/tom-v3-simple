@@ -17,6 +17,9 @@ This registry makes TOM v3 Simple boundaries explicit.
   only. They do not prove classifier correctness, create labels, relabel automatically, change
   thresholds or smoothing, tune models, rank reviewers, score reviewers, establish tennis truth,
   or make the reviewed entries production-ready.
+- Review-guided gameplay calibration proposals are planning records only. They do not apply
+  threshold, smoothing, hysteresis, runtime, model, or baseline changes, do not prove classifier
+  correctness, do not create labels, and do not make reviewed entries production-ready.
 - Fixture detection is deterministic demo output.
 - Optional YOLO requires a local optional runtime and local weights outside git.
 - TOM v1 model assets under `model_assets/tom_v1/` are local-only ignored files and are not part of the repository.
