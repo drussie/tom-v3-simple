@@ -238,6 +238,10 @@ GAMEPLAY_GATE_REVIEW_DATASET_REPLAY_TIMELINE ?=
 GAMEPLAY_GATE_REVIEW_DATASET_REGRESSION_BASELINE ?= $(GAMEPLAY_GATE_REGRESSION_BASELINE_OUTPUT)
 GAMEPLAY_GATE_REVIEW_DATASET_REGRESSION_VERIFICATION ?= $(GAMEPLAY_GATE_REGRESSION_VERIFICATION_OUTPUT)
 GAMEPLAY_GATE_REVIEW_DATASET_FIXTURE_MEDIA_PATH ?= demo_assets/sample_point.mp4
+GAMEPLAY_GATE_PATHWAY_COMPLETION_FREEZE_OUTPUT ?= .data/contracts/gameplay_gate_pathway_completion_freeze_v1.json
+GAMEPLAY_GATE_PATHWAY_COMPLETION_FREEZE ?= $(GAMEPLAY_GATE_PATHWAY_COMPLETION_FREEZE_OUTPUT)
+GAMEPLAY_GATE_PATHWAY_COMPLETION_VALIDATION_OUTPUT ?= .data/exports/gameplay_gate_pathway_completion_freeze.validation.json
+GAMEPLAY_GATE_NEXT_PHASE_READINESS_REPORT_OUTPUT ?= .data/exports/gameplay_gate_next_phase_readiness_report.current.json
 EXPECTED_BRANCH ?=
 EXPECTED_TAG ?=
 FORMAT ?= json
@@ -330,6 +334,7 @@ export TOM_V3_DATABASE_URL
 .PHONY: tom-v1-export-gameplay-gated-many-point-smoke-contract tom-v1-build-gameplay-gated-many-point-smoke-manifest-template tom-v1-validate-gameplay-gated-many-point-smoke-manifest tom-v1-run-gameplay-gated-many-point-smoke tom-v1-build-gameplay-gated-many-point-smoke-report
 .PHONY: tom-v1-export-gameplay-gate-regression-baseline-contract tom-v1-build-gameplay-gate-regression-baseline tom-v1-verify-gameplay-gate-regression-baseline tom-v1-build-gameplay-gate-regression-report
 .PHONY: tom-v1-export-gameplay-gate-review-dataset-contract tom-v1-build-gameplay-gate-review-dataset tom-v1-validate-gameplay-gate-review-dataset tom-v1-build-gameplay-gate-review-dataset-report
+.PHONY: tom-v1-build-gameplay-gate-pathway-completion-freeze tom-v1-validate-gameplay-gate-pathway-completion-freeze tom-v1-build-gameplay-gate-next-phase-readiness-report
 
 install:
 	$(PYTHON) -m pip install -e ".[dev]"
@@ -876,6 +881,15 @@ tom-v1-validate-gameplay-gate-review-dataset:
 
 tom-v1-build-gameplay-gate-review-dataset-report:
 	$(PYTHON) -m apps.worker.cli build-gameplay-gate-review-dataset-report --contract "$(GAMEPLAY_GATE_REVIEW_DATASET_CONTRACT_OUTPUT)" --dataset "$(GAMEPLAY_GATE_REVIEW_DATASET)" --output "$(GAMEPLAY_GATE_REVIEW_DATASET_REPORT_OUTPUT)" --skip-create-db
+
+tom-v1-build-gameplay-gate-pathway-completion-freeze:
+	$(PYTHON) -m apps.worker.cli build-gameplay-gate-pathway-completion-freeze --output "$(GAMEPLAY_GATE_PATHWAY_COMPLETION_FREEZE_OUTPUT)" --skip-create-db
+
+tom-v1-validate-gameplay-gate-pathway-completion-freeze:
+	$(PYTHON) -m apps.worker.cli validate-gameplay-gate-pathway-completion-freeze --freeze "$(GAMEPLAY_GATE_PATHWAY_COMPLETION_FREEZE)" --output "$(GAMEPLAY_GATE_PATHWAY_COMPLETION_VALIDATION_OUTPUT)" --skip-create-db
+
+tom-v1-build-gameplay-gate-next-phase-readiness-report:
+	$(PYTHON) -m apps.worker.cli build-gameplay-gate-next-phase-readiness-report --freeze "$(GAMEPLAY_GATE_PATHWAY_COMPLETION_FREEZE)" --output "$(GAMEPLAY_GATE_NEXT_PHASE_READINESS_REPORT_OUTPUT)" --skip-create-db
 
 tom-v1-post-codex-validate:
 	scripts/post_codex_validate.sh $(if $(EXPECTED_BRANCH),--branch "$(EXPECTED_BRANCH)",) $(if $(EXPECTED_TAG),--expected-tag "$(EXPECTED_TAG)",) --python "$(PYTHON)"

@@ -2064,6 +2064,41 @@ The tracked artifact is
 validation, report, and intermediate source artifacts live under `.data/exports/` and should stay
 local unless a future milestone explicitly documents committing them.
 
+## Gameplay Gate Pathway Completion Freeze
+
+Use this after the Blueprint 38-44 gameplay pathway is complete. The freeze records completed
+gameplay milestones, frozen gameplay contracts, the protected gameplay regression baseline,
+required gates, model asset guardrails, non-claims, limitations, and the recommended Blueprint 46
+controlled real broadcast corpus run. It does not add gameplay capability, run model inference,
+create labels, prove classifier correctness/accuracy, mutate model assets, claim generalization,
+or adjudicate evidence.
+
+Build the tracked freeze manifest:
+
+```bash
+make tom-v1-build-gameplay-gate-pathway-completion-freeze \
+  PYTHON=.venv/bin/python
+```
+
+Validate the freeze:
+
+```bash
+make tom-v1-validate-gameplay-gate-pathway-completion-freeze \
+  PYTHON=.venv/bin/python
+```
+
+Build the local next-phase readiness report:
+
+```bash
+make tom-v1-build-gameplay-gate-next-phase-readiness-report \
+  PYTHON=.venv/bin/python
+```
+
+The tracked artifact is
+`.data/contracts/gameplay_gate_pathway_completion_freeze_v1.json`. Generated validation and
+readiness report files live under `.data/exports/` and should stay local unless a future milestone
+explicitly documents committing them.
+
 ## Camera Geometry Calibration Provenance
 
 Blueprint 36 builds a structural camera geometry / calibration provenance profile from existing

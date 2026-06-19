@@ -1,0 +1,321 @@
+{
+  "capability_summary": [
+    {
+      "capability": "TOM v1 gameplay classifier asset provenance",
+      "status": "structurally_supported"
+    },
+    {
+      "capability": "gameplay segment candidate contract",
+      "status": "structurally_supported"
+    },
+    {
+      "capability": "gameplay/non-gameplay/uncertain segment structure",
+      "status": "structurally_supported"
+    },
+    {
+      "capability": "downstream routing plan",
+      "status": "structurally_supported"
+    },
+    {
+      "capability": "gameplay-gated perception execution plan",
+      "status": "structurally_supported"
+    },
+    {
+      "capability": "replay timeline / operator review structure",
+      "status": "structurally_supported"
+    },
+    {
+      "capability": "gameplay-gated many-point smoke path",
+      "status": "structurally_supported"
+    },
+    {
+      "capability": "gameplay gate regression baseline",
+      "status": "structurally_supported"
+    },
+    {
+      "capability": "gameplay gate review dataset export",
+      "status": "structurally_supported"
+    }
+  ],
+  "completed_gameplay_blueprints": [
+    {
+      "blueprint": "blueprint_38",
+      "status": "complete",
+      "title": "Gameplay Segment Gate / TOM v1 View Classifier Integration"
+    },
+    {
+      "blueprint": "blueprint_39",
+      "status": "complete",
+      "title": "Gameplay-Gated Evidence Pipeline Routing"
+    },
+    {
+      "blueprint": "blueprint_40",
+      "status": "complete",
+      "title": "Gameplay-Gated Perception Execution Hook"
+    },
+    {
+      "blueprint": "blueprint_41",
+      "status": "complete",
+      "title": "Gameplay Segment Replay Timeline / Operator Review"
+    },
+    {
+      "blueprint": "blueprint_42",
+      "status": "complete",
+      "title": "Gameplay-Gated Many-Point Ingestion Smoke"
+    },
+    {
+      "blueprint": "blueprint_43",
+      "status": "complete",
+      "title": "Gameplay Gate Regression Baseline"
+    },
+    {
+      "blueprint": "blueprint_44",
+      "status": "complete",
+      "title": "Gameplay Gate Review Dataset Export"
+    }
+  ],
+  "current_main_commit": "6d0f5441",
+  "earlier_tom_v3_completion_freeze_ref": {
+    "path": ".data/contracts/tom_v3_expansion_completion_freeze_v1.json",
+    "referenced": true,
+    "tracked_required": true
+  },
+  "freeze_type": "gameplay_gate_pathway_completion_freeze",
+  "freeze_version": "v1",
+  "frozen_gameplay_contract_refs": [
+    {
+      "frozen": true,
+      "generated_exports_are_not_tracked": true,
+      "path": ".data/contracts/gameplay_segment_gate_contract_v1.json",
+      "tracked_required": true
+    },
+    {
+      "frozen": true,
+      "generated_exports_are_not_tracked": true,
+      "path": ".data/contracts/gameplay_gated_pipeline_routing_contract_v1.json",
+      "tracked_required": true
+    },
+    {
+      "frozen": true,
+      "generated_exports_are_not_tracked": true,
+      "path": ".data/contracts/gameplay_gated_perception_execution_contract_v1.json",
+      "tracked_required": true
+    },
+    {
+      "frozen": true,
+      "generated_exports_are_not_tracked": true,
+      "path": ".data/contracts/gameplay_segment_replay_review_contract_v1.json",
+      "tracked_required": true
+    },
+    {
+      "frozen": true,
+      "generated_exports_are_not_tracked": true,
+      "path": ".data/contracts/gameplay_gated_many_point_smoke_contract_v1.json",
+      "tracked_required": true
+    },
+    {
+      "frozen": true,
+      "generated_exports_are_not_tracked": true,
+      "path": ".data/contracts/gameplay_gate_regression_baseline_contract_v1.json",
+      "tracked_required": true
+    },
+    {
+      "frozen": true,
+      "generated_exports_are_not_tracked": true,
+      "path": ".data/contracts/gameplay_gate_review_dataset_export_contract_v1.json",
+      "tracked_required": true
+    }
+  ],
+  "gameplay_classifier_asset_ref": {
+    "must_not_be_committed": true,
+    "must_not_be_modified": true,
+    "path": "model_assets/tom_v1/view_classifier_gameplay.pt"
+  },
+  "generated_at": "2026-06-19T00:00:00+00:00",
+  "known_limitations": [
+    "Gameplay gate pathway is structurally complete but not yet real-data generalized.",
+    "Fixture/demo assets may still dominate regression examples.",
+    "Model inference may be fixture/mock-mode in CI.",
+    "Human review remains required for gameplay boundary evaluation.",
+    "Gameplay classifier output is structural suitability evidence, not truth.",
+    "Review dataset export is pending actual reviewed human labels.",
+    "Downstream perception execution is safely gated/planned but may still require explicit real execution wiring per stage."
+  ],
+  "latest_completed_blueprint": {
+    "blueprint": "blueprint_44",
+    "commit": "6d0f5441",
+    "tag": "tom-v3-blueprint-44-gameplay-gate-review-dataset-export-v1",
+    "title": "Gameplay Gate Review Dataset Export v1"
+  },
+  "next_phase_recommendations": [
+    {
+      "goal": "controlled_real_data_expansion",
+      "implementation_in_blueprint_45": false,
+      "recommended_blueprint": "Blueprint 46 - Real Broadcast Gameplay Gate Corpus Run v1",
+      "required_boundary": {
+        "no_new_classifier_in_blueprint_45": true,
+        "no_new_model_inference_in_blueprint_45": true,
+        "no_production_or_generalization_claim": true
+      },
+      "suggested_architecture": [
+        "explicit real broadcast clips",
+        "gameplay segment gate",
+        "gameplay-gated routing",
+        "gameplay-gated perception execution",
+        "replay timeline review",
+        "review dataset export",
+        "human review",
+        "regression update candidate"
+      ]
+    }
+  ],
+  "non_claims": [
+    {
+      "claim": "true gameplay",
+      "claimed": false,
+      "structural_boundary": true
+    },
+    {
+      "claim": "classifier correctness",
+      "claimed": false,
+      "structural_boundary": true
+    },
+    {
+      "claim": "classifier accuracy",
+      "claimed": false,
+      "structural_boundary": true
+    },
+    {
+      "claim": "in/out truth",
+      "claimed": false,
+      "structural_boundary": true
+    },
+    {
+      "claim": "point truth",
+      "claimed": false,
+      "structural_boundary": true
+    },
+    {
+      "claim": "event truth",
+      "claimed": false,
+      "structural_boundary": true
+    },
+    {
+      "claim": "rally truth",
+      "claimed": false,
+      "structural_boundary": true
+    },
+    {
+      "claim": "score truth",
+      "claimed": false,
+      "structural_boundary": true
+    },
+    {
+      "claim": "player identity truth",
+      "claimed": false,
+      "structural_boundary": true
+    },
+    {
+      "claim": "production readiness",
+      "claimed": false,
+      "structural_boundary": true
+    },
+    {
+      "claim": "real-world generalization from fixture/demo data",
+      "claimed": false,
+      "structural_boundary": true
+    },
+    {
+      "claim": "automatic training labels",
+      "claimed": false,
+      "structural_boundary": true
+    },
+    {
+      "claim": "automatic review correctness",
+      "claimed": false,
+      "structural_boundary": true
+    }
+  ],
+  "protected_gameplay_baseline_refs": [
+    {
+      "baseline_type": "gameplay_gate_regression_baseline",
+      "path": ".data/baselines/gameplay_gate_regression.baseline.json",
+      "tracked_required": true
+    }
+  ],
+  "required_regression_gates": [
+    {
+      "expected": {
+        "baseline_is_not_truth": true,
+        "breaking_drift_detected": false,
+        "drift_detected": false,
+        "matrix_is_not_truth": true,
+        "ok": true,
+        "status": "completed"
+      },
+      "gate_id": "multi_point_regression_matrix_gate",
+      "make_target": "tom-v1-verify-multi-point-regression-matrix"
+    },
+    {
+      "expected": {
+        "baseline_is_not_truth": true,
+        "breaking_drift_detected": false,
+        "drift_detected": false,
+        "ok": true,
+        "status": "completed"
+      },
+      "gate_id": "protected_sample_point_reviewed_3d_debug_gate",
+      "make_target": "tom-v1-verify-reviewed-3d-debug-baseline"
+    },
+    {
+      "expected": {
+        "baseline_is_not_truth": true,
+        "breaking_drift_detected": false,
+        "classifier_correctness_not_assessed": true,
+        "drift_detected": false,
+        "gameplay_gate_is_not_truth": true,
+        "generalization_not_claimed": true,
+        "ok": true,
+        "status": "completed"
+      },
+      "gate_id": "gameplay_gate_regression_baseline_gate",
+      "make_target": "tom-v1-verify-gameplay-gate-regression-baseline"
+    }
+  ],
+  "tom_provenance": {
+    "blueprint": "blueprint_45",
+    "blueprint_name": "gameplay_gate_pathway_completion_freeze_v1",
+    "project": "tom-v3-simple",
+    "project_version": "0.0.0"
+  },
+  "validation_summary": {
+    "status": "not_assessed",
+    "structural_error_count": 0,
+    "structural_warning_count": 0,
+    "validation_does_not_create_truth": true,
+    "validation_does_not_score_classifier": true
+  },
+  "warnings": {
+    "classifier_accuracy_not_claimed": true,
+    "classifier_correctness_not_assessed": true,
+    "completion_freeze_is_structural_only": true,
+    "does_not_create_evidence": true,
+    "does_not_create_in_out": true,
+    "does_not_create_observations": true,
+    "does_not_create_review_labels": true,
+    "does_not_create_score": true,
+    "does_not_create_training_labels": true,
+    "does_not_determine_winner": true,
+    "does_not_execute_real_data_expansion": true,
+    "does_not_identify_players": true,
+    "does_not_mutate_gameplay_baselines": true,
+    "does_not_mutate_model_assets": true,
+    "gameplay_gate_is_not_truth": true,
+    "gameplay_pathway_freeze_is_not_truth": true,
+    "generalization_not_claimed": true,
+    "no_adjudication": true,
+    "observation_only": true,
+    "provenance_only": true,
+    "review_support_only": true
+  }
+}

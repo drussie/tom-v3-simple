@@ -587,4 +587,19 @@ run "$PYTHON_BIN" -m apps.worker.cli build-gameplay-gate-review-dataset-report \
   --output "$TMP_ROOT/gameplay_gate_review_dataset.report.json" \
   --skip-create-db
 
+run "$PYTHON_BIN" -m apps.worker.cli build-gameplay-gate-pathway-completion-freeze \
+  --output "$TMP_ROOT/gameplay_gate_pathway_completion_freeze_v1.smoke.json" \
+  --current-main-commit 6d0f5441 \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli validate-gameplay-gate-pathway-completion-freeze \
+  --freeze "$TMP_ROOT/gameplay_gate_pathway_completion_freeze_v1.smoke.json" \
+  --output "$TMP_ROOT/gameplay_gate_pathway_completion_freeze.validation.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-gameplay-gate-next-phase-readiness-report \
+  --freeze "$TMP_ROOT/gameplay_gate_pathway_completion_freeze_v1.smoke.json" \
+  --output "$TMP_ROOT/gameplay_gate_next_phase_readiness_report.current.json" \
+  --skip-create-db
+
 run git status --short

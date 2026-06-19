@@ -57,6 +57,14 @@ from apps.worker.services.event_candidate_3d_diagnostics import (
 )
 from apps.worker.services.frame_artifacts import extract_frame_artifacts_for_run
 from apps.worker.services.gameplay_adapter import run_gameplay_adapter
+from apps.worker.services.gameplay_gate_pathway_completion_freeze import (
+    DEFAULT_GAMEPLAY_GATE_NEXT_PHASE_READINESS_REPORT_OUTPUT,
+    DEFAULT_GAMEPLAY_GATE_PATHWAY_COMPLETION_FREEZE_OUTPUT,
+    DEFAULT_GAMEPLAY_GATE_PATHWAY_COMPLETION_VALIDATION_OUTPUT,
+    build_gameplay_gate_next_phase_readiness_report,
+    build_gameplay_gate_pathway_completion_freeze,
+    validate_gameplay_gate_pathway_completion_freeze,
+)
 from apps.worker.services.gameplay_gate_regression_baseline import (
     DEFAULT_GAMEPLAY_GATE_REGRESSION_BASELINE_OUTPUT,
     DEFAULT_GAMEPLAY_GATE_REGRESSION_CONTRACT_OUTPUT,
@@ -3589,6 +3597,65 @@ def main() -> None:
         skip_create_db=True,
     )
 
+    gameplay_pathway_freeze_parser = subcommands.add_parser(
+        "build-gameplay-gate-pathway-completion-freeze",
+        help="Build the Blueprint 45 gameplay gate pathway completion freeze manifest.",
+    )
+    gameplay_pathway_freeze_parser.add_argument(
+        "--output",
+        default=DEFAULT_GAMEPLAY_GATE_PATHWAY_COMPLETION_FREEZE_OUTPUT,
+        help="JSON gameplay gate pathway completion freeze output path.",
+    )
+    gameplay_pathway_freeze_parser.add_argument(
+        "--current-main-commit",
+        help="Override the main commit recorded in the freeze manifest.",
+    )
+    gameplay_pathway_freeze_parser.add_argument("--skip-create-db", action="store_true")
+    gameplay_pathway_freeze_parser.set_defaults(
+        handler=_handle_build_gameplay_gate_pathway_completion_freeze,
+        skip_create_db=True,
+    )
+
+    gameplay_pathway_freeze_validate_parser = subcommands.add_parser(
+        "validate-gameplay-gate-pathway-completion-freeze",
+        help="Validate the Blueprint 45 gameplay gate pathway completion freeze.",
+    )
+    gameplay_pathway_freeze_validate_parser.add_argument(
+        "--freeze",
+        required=True,
+        help="Gameplay gate pathway completion freeze JSON path.",
+    )
+    gameplay_pathway_freeze_validate_parser.add_argument(
+        "--output",
+        default=DEFAULT_GAMEPLAY_GATE_PATHWAY_COMPLETION_VALIDATION_OUTPUT,
+        help="Optional JSON gameplay gate pathway completion validation output path.",
+    )
+    gameplay_pathway_freeze_validate_parser.add_argument("--skip-create-db", action="store_true")
+    gameplay_pathway_freeze_validate_parser.set_defaults(
+        handler=_handle_validate_gameplay_gate_pathway_completion_freeze,
+        skip_create_db=True,
+    )
+
+    gameplay_next_phase_report_parser = subcommands.add_parser(
+        "build-gameplay-gate-next-phase-readiness-report",
+        help="Build the Blueprint 45 gameplay gate next-phase readiness report.",
+    )
+    gameplay_next_phase_report_parser.add_argument(
+        "--freeze",
+        default=DEFAULT_GAMEPLAY_GATE_PATHWAY_COMPLETION_FREEZE_OUTPUT,
+        help="Gameplay gate pathway completion freeze JSON path.",
+    )
+    gameplay_next_phase_report_parser.add_argument(
+        "--output",
+        default=DEFAULT_GAMEPLAY_GATE_NEXT_PHASE_READINESS_REPORT_OUTPUT,
+        help="JSON gameplay gate next-phase readiness report output path.",
+    )
+    gameplay_next_phase_report_parser.add_argument("--skip-create-db", action="store_true")
+    gameplay_next_phase_report_parser.set_defaults(
+        handler=_handle_build_gameplay_gate_next_phase_readiness_report,
+        skip_create_db=True,
+    )
+
     point_evaluation_parser = subcommands.add_parser(
         "evaluate-point-candidates",
         help="Evaluate generated point candidate markers using operator review metadata.",
@@ -5859,6 +5926,39 @@ def _handle_build_gameplay_gate_review_dataset_report(
     return build_gameplay_gate_review_dataset_report(
         contract_path=args.contract,
         dataset_path=args.dataset,
+        output_path=args.output,
+    )
+
+
+def _handle_build_gameplay_gate_pathway_completion_freeze(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_gameplay_gate_pathway_completion_freeze(
+        output_path=args.output,
+        current_main_commit=args.current_main_commit,
+    )
+
+
+def _handle_validate_gameplay_gate_pathway_completion_freeze(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_gameplay_gate_pathway_completion_freeze(
+        freeze_path=args.freeze,
+        output_path=args.output,
+    )
+
+
+def _handle_build_gameplay_gate_next_phase_readiness_report(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_gameplay_gate_next_phase_readiness_report(
+        freeze_path=args.freeze,
         output_path=args.output,
     )
 

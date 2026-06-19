@@ -358,6 +358,8 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Gameplay Gate Regression Baseline v1](reviews/gameplay_gate_regression_baseline_v1.md)
 - [Blueprint 44 Gameplay Gate Review Dataset Export v1](blueprints/blueprint_44_gameplay_gate_review_dataset_export_v1.md)
 - [Gameplay Gate Review Dataset Export v1](reviews/gameplay_gate_review_dataset_export_v1.md)
+- [Blueprint 45 Gameplay Gate Pathway Completion Freeze v1](blueprints/blueprint_45_gameplay_gate_pathway_completion_freeze_v1.md)
+- [Gameplay Gate Pathway Completion Freeze v1](reviews/gameplay_gate_pathway_completion_freeze_v1.md)
 
 ## Development
 

@@ -5,6 +5,8 @@ This registry makes TOM v3 Simple boundaries explicit.
 ## Model / Runtime Limitations
 
 - Fixture gameplay is deterministic demo output, not real gameplay inference.
+- Gameplay gate pathway completion is a structural freeze only. Real broadcast generalization,
+  classifier correctness, and production readiness still require controlled real-data review.
 - Gameplay gate review dataset exports are structural review bundles only. They do not prove
   classifier correctness, create labels, establish tennis truth, or make the exported entries
   training-ready.
