@@ -28,6 +28,7 @@ from apps.worker.pipelines.synthetic_seed import seed_synthetic_run
 from apps.worker.services.ball_court_trajectory import build_ball_court_trajectory
 from apps.worker.services.ball_trajectory_3d import build_3d_ball_trajectory_candidates
 from apps.worker.services.calibration_candidate_config_freeze import (
+    DEFAULT_CALIBRATION_CANDIDATE_CONFIG_FREEZE_ARTIFACT_OUTPUT,
     DEFAULT_CALIBRATION_CANDIDATE_CONFIG_FREEZE_CONTRACT_OUTPUT,
     DEFAULT_CALIBRATION_CANDIDATE_CONFIG_FREEZE_INPUTS_OUTPUT,
     DEFAULT_CALIBRATION_CANDIDATE_CONFIG_FREEZE_INPUTS_VALIDATION_OUTPUT,
@@ -257,6 +258,14 @@ from apps.worker.services.point_evidence_snapshot import build_point_evidence_sn
 from apps.worker.services.point_manifest import build_point_manifest
 from apps.worker.services.pose_adapter import run_pose_adapter
 from apps.worker.services.projection_diagnostic_builder import build_projection_diagnostics
+from apps.worker.services.real_broadcast_gameplay_calibration_decision_phase_freeze import (
+    DEFAULT_REAL_BROADCAST_GAMEPLAY_CALIBRATION_DECISION_PHASE_FREEZE_OUTPUT,
+    DEFAULT_REAL_BROADCAST_GAMEPLAY_CALIBRATION_DECISION_PHASE_FREEZE_VALIDATION_OUTPUT,
+    DEFAULT_REAL_BROADCAST_GAMEPLAY_CALIBRATION_NEXT_PHASE_READINESS_REPORT_OUTPUT,
+    build_real_broadcast_gameplay_calibration_decision_phase_freeze,
+    build_real_broadcast_gameplay_calibration_next_phase_readiness_report,
+    validate_real_broadcast_gameplay_calibration_decision_phase_freeze,
+)
 from apps.worker.services.real_broadcast_gameplay_gate_corpus_run import (
     DEFAULT_REAL_BROADCAST_GAMEPLAY_CORPUS_CONTRACT_OUTPUT,
     DEFAULT_REAL_BROADCAST_GAMEPLAY_CORPUS_MANIFEST_OUTPUT,
@@ -5324,6 +5333,88 @@ def main() -> None:
         skip_create_db=True,
     )
 
+    calibration_decision_phase_freeze_parser = subcommands.add_parser(
+        "build-real-broadcast-gameplay-calibration-decision-phase-freeze",
+        help="Build the Blueprint 54 real broadcast calibration decision phase freeze.",
+    )
+    calibration_decision_phase_freeze_parser.add_argument(
+        "--candidate-config-freeze",
+        default=DEFAULT_CALIBRATION_CANDIDATE_CONFIG_FREEZE_ARTIFACT_OUTPUT,
+        help="Tracked Blueprint 53 candidate config freeze artifact path.",
+    )
+    calibration_decision_phase_freeze_parser.add_argument(
+        "--manual-approval-packet",
+        default=DEFAULT_CALIBRATION_CANDIDATE_MANUAL_APPROVAL_PACKET_OUTPUT,
+        help="Blueprint 53 manual approval packet JSON path, if locally available.",
+    )
+    calibration_decision_phase_freeze_parser.add_argument(
+        "--output",
+        default=DEFAULT_REAL_BROADCAST_GAMEPLAY_CALIBRATION_DECISION_PHASE_FREEZE_OUTPUT,
+        help="JSON Blueprint 54 phase freeze output path.",
+    )
+    calibration_decision_phase_freeze_parser.add_argument(
+        "--current-main-commit",
+        help="Override the main commit recorded in the phase freeze manifest.",
+    )
+    calibration_decision_phase_freeze_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    calibration_decision_phase_freeze_parser.set_defaults(
+        handler=_handle_build_real_broadcast_gameplay_calibration_decision_phase_freeze,
+        skip_create_db=True,
+    )
+
+    calibration_decision_phase_freeze_validate_parser = subcommands.add_parser(
+        "validate-real-broadcast-gameplay-calibration-decision-phase-freeze",
+        help="Validate the Blueprint 54 real broadcast calibration decision phase freeze.",
+    )
+    calibration_decision_phase_freeze_validate_parser.add_argument(
+        "--freeze",
+        default=DEFAULT_REAL_BROADCAST_GAMEPLAY_CALIBRATION_DECISION_PHASE_FREEZE_OUTPUT,
+        help="Blueprint 54 real broadcast calibration decision phase freeze JSON path.",
+    )
+    calibration_decision_phase_freeze_validate_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_REAL_BROADCAST_GAMEPLAY_CALIBRATION_DECISION_PHASE_FREEZE_VALIDATION_OUTPUT
+        ),
+        help="Optional JSON Blueprint 54 phase freeze validation output path.",
+    )
+    calibration_decision_phase_freeze_validate_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    calibration_decision_phase_freeze_validate_parser.set_defaults(
+        handler=_handle_validate_real_broadcast_gameplay_calibration_decision_phase_freeze,
+        skip_create_db=True,
+    )
+
+    calibration_next_phase_report_parser = subcommands.add_parser(
+        "build-real-broadcast-gameplay-calibration-next-phase-readiness-report",
+        help="Build the Blueprint 54 next-phase readiness report.",
+    )
+    calibration_next_phase_report_parser.add_argument(
+        "--freeze",
+        default=DEFAULT_REAL_BROADCAST_GAMEPLAY_CALIBRATION_DECISION_PHASE_FREEZE_OUTPUT,
+        help="Blueprint 54 real broadcast calibration decision phase freeze JSON path.",
+    )
+    calibration_next_phase_report_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_REAL_BROADCAST_GAMEPLAY_CALIBRATION_NEXT_PHASE_READINESS_REPORT_OUTPUT
+        ),
+        help="JSON Blueprint 54 next-phase readiness report output path.",
+    )
+    calibration_next_phase_report_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    calibration_next_phase_report_parser.set_defaults(
+        handler=_handle_build_real_broadcast_gameplay_calibration_next_phase_readiness_report,
+        skip_create_db=True,
+    )
+
     point_evaluation_parser = subcommands.add_parser(
         "evaluate-point-candidates",
         help="Evaluate generated point candidate markers using operator review metadata.",
@@ -8232,6 +8323,41 @@ def _handle_build_calibration_candidate_config_freeze_report(
         contract_path=args.contract,
         candidate_config_freeze_path=args.candidate_config_freeze,
         manual_approval_packet_path=args.manual_approval_packet,
+        output_path=args.output,
+    )
+
+
+def _handle_build_real_broadcast_gameplay_calibration_decision_phase_freeze(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_real_broadcast_gameplay_calibration_decision_phase_freeze(
+        candidate_config_freeze_path=args.candidate_config_freeze,
+        manual_approval_packet_path=args.manual_approval_packet,
+        output_path=args.output,
+        current_main_commit=args.current_main_commit,
+    )
+
+
+def _handle_validate_real_broadcast_gameplay_calibration_decision_phase_freeze(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_real_broadcast_gameplay_calibration_decision_phase_freeze(
+        freeze_path=args.freeze,
+        output_path=args.output,
+    )
+
+
+def _handle_build_real_broadcast_gameplay_calibration_next_phase_readiness_report(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_real_broadcast_gameplay_calibration_next_phase_readiness_report(
+        freeze_path=args.freeze,
         output_path=args.output,
     )
 

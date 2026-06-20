@@ -1,0 +1,458 @@
+{
+  "capability_summary": [
+    {
+      "capability": "explicit real broadcast gameplay corpus run structure",
+      "status": "structurally_supported"
+    },
+    {
+      "capability": "real broadcast gameplay review loop",
+      "status": "structurally_supported"
+    },
+    {
+      "capability": "real broadcast gameplay review metrics / QA dashboard",
+      "status": "structurally_supported"
+    },
+    {
+      "capability": "review-guided calibration proposal",
+      "status": "structurally_supported"
+    },
+    {
+      "capability": "offline calibration evaluation sandbox",
+      "status": "structurally_supported"
+    },
+    {
+      "capability": "sandbox regression gate",
+      "status": "structurally_supported"
+    },
+    {
+      "capability": "calibration candidate decision packet",
+      "status": "structurally_supported"
+    },
+    {
+      "capability": "candidate config freeze / manual approval packet",
+      "status": "structurally_supported"
+    }
+  ],
+  "completed_phase_blueprints": [
+    {
+      "blueprint": "blueprint_46",
+      "status": "complete",
+      "title": "Real Broadcast Gameplay Gate Corpus Run"
+    },
+    {
+      "blueprint": "blueprint_47",
+      "status": "complete",
+      "title": "Real Broadcast Gameplay Review Loop"
+    },
+    {
+      "blueprint": "blueprint_48",
+      "status": "complete",
+      "title": "Real Broadcast Gameplay Review Metrics / QA Dashboard"
+    },
+    {
+      "blueprint": "blueprint_49",
+      "status": "complete",
+      "title": "Review-Guided Gameplay Gate Calibration Proposal"
+    },
+    {
+      "blueprint": "blueprint_50",
+      "status": "complete",
+      "title": "Review-Guided Gameplay Calibration Evaluation Sandbox"
+    },
+    {
+      "blueprint": "blueprint_51",
+      "status": "complete",
+      "title": "Calibration Evaluation Sandbox Regression Gate"
+    },
+    {
+      "blueprint": "blueprint_52",
+      "status": "complete",
+      "title": "Calibration Candidate Decision Packet"
+    },
+    {
+      "blueprint": "blueprint_53",
+      "status": "complete",
+      "title": "Candidate Config Freeze / Manual Approval Packet"
+    }
+  ],
+  "current_main_commit": "133ddb23bdcdcb9eba153711f503cf95c0d87e94",
+  "decision_support_summary": {
+    "approval_blockers": [
+      "not_applicable"
+    ],
+    "candidate_config_status": "no_candidate_selected",
+    "candidate_settings_remain_not_applied": true,
+    "candidates_packaged_for_human_review": true,
+    "drift_summary": {
+      "baseline_comparison_status": "no_structural_drift",
+      "baseline_id": "review_guided_gameplay_calibration_sandbox_regression_baseline_v1_a715412e9f11b942000fd25c",
+      "baseline_is_not_truth": true,
+      "baseline_not_replaced": true,
+      "breaking_drift_detected": false,
+      "classifier_correctness_not_assessed": true,
+      "drift_detected": false,
+      "drift_item_count": 0,
+      "runtime_application_status": "not_applied",
+      "runtime_change_status": "not_applied",
+      "sandbox_regression_status": "regression_gate_passed",
+      "status": "completed"
+    },
+    "human_review_coverage_summary": {
+      "candidate_packet_count": 4,
+      "candidate_status_counts": {
+        "blocked_fixture_only_data": 2,
+        "blocked_missing_review_data": 1,
+        "blocked_no_human_review": 1
+      },
+      "decision_support_status_counts": {
+        "blocked_from_runtime_consideration": 2,
+        "needs_more_human_review": 2
+      },
+      "human_operator_approval_required": true,
+      "operator_review_required_count": 2,
+      "ready_for_human_decision_count": 0
+    },
+    "manual_approval_required_before_future_runtime_calibration": true,
+    "not_applied": true,
+    "regression_gates_required_before_future_consideration": true,
+    "runtime_application_status": "not_applied",
+    "runtime_application_supported_in_this_phase": false
+  },
+  "freeze_type": "real_broadcast_gameplay_calibration_decision_phase_freeze",
+  "freeze_version": "v1",
+  "frozen_contract_refs": [
+    {
+      "frozen": true,
+      "generated_exports_are_not_tracked": true,
+      "path": ".data/contracts/tom_v3_expansion_completion_freeze_v1.json",
+      "tracked_required": true
+    },
+    {
+      "frozen": true,
+      "generated_exports_are_not_tracked": true,
+      "path": ".data/contracts/gameplay_gate_pathway_completion_freeze_v1.json",
+      "tracked_required": true
+    },
+    {
+      "frozen": true,
+      "generated_exports_are_not_tracked": true,
+      "path": ".data/contracts/gameplay_segment_gate_contract_v1.json",
+      "tracked_required": true
+    },
+    {
+      "frozen": true,
+      "generated_exports_are_not_tracked": true,
+      "path": ".data/contracts/gameplay_gated_pipeline_routing_contract_v1.json",
+      "tracked_required": true
+    },
+    {
+      "frozen": true,
+      "generated_exports_are_not_tracked": true,
+      "path": ".data/contracts/gameplay_gated_perception_execution_contract_v1.json",
+      "tracked_required": true
+    },
+    {
+      "frozen": true,
+      "generated_exports_are_not_tracked": true,
+      "path": ".data/contracts/gameplay_segment_replay_review_contract_v1.json",
+      "tracked_required": true
+    },
+    {
+      "frozen": true,
+      "generated_exports_are_not_tracked": true,
+      "path": ".data/contracts/gameplay_gated_many_point_smoke_contract_v1.json",
+      "tracked_required": true
+    },
+    {
+      "frozen": true,
+      "generated_exports_are_not_tracked": true,
+      "path": ".data/contracts/gameplay_gate_regression_baseline_contract_v1.json",
+      "tracked_required": true
+    },
+    {
+      "frozen": true,
+      "generated_exports_are_not_tracked": true,
+      "path": ".data/contracts/gameplay_gate_review_dataset_export_contract_v1.json",
+      "tracked_required": true
+    },
+    {
+      "frozen": true,
+      "generated_exports_are_not_tracked": true,
+      "path": ".data/contracts/real_broadcast_gameplay_corpus_run_contract_v1.json",
+      "tracked_required": true
+    },
+    {
+      "frozen": true,
+      "generated_exports_are_not_tracked": true,
+      "path": ".data/contracts/real_broadcast_gameplay_review_loop_contract_v1.json",
+      "tracked_required": true
+    },
+    {
+      "frozen": true,
+      "generated_exports_are_not_tracked": true,
+      "path": ".data/contracts/real_broadcast_gameplay_review_metrics_contract_v1.json",
+      "tracked_required": true
+    },
+    {
+      "frozen": true,
+      "generated_exports_are_not_tracked": true,
+      "path": ".data/contracts/review_guided_gameplay_calibration_proposal_contract_v1.json",
+      "tracked_required": true
+    },
+    {
+      "frozen": true,
+      "generated_exports_are_not_tracked": true,
+      "path": ".data/contracts/review_guided_gameplay_calibration_evaluation_sandbox_contract_v1.json",
+      "tracked_required": true
+    },
+    {
+      "frozen": true,
+      "generated_exports_are_not_tracked": true,
+      "path": ".data/contracts/review_guided_gameplay_calibration_sandbox_regression_contract_v1.json",
+      "tracked_required": true
+    },
+    {
+      "frozen": true,
+      "generated_exports_are_not_tracked": true,
+      "path": ".data/contracts/calibration_candidate_decision_packet_contract_v1.json",
+      "tracked_required": true
+    },
+    {
+      "frozen": true,
+      "generated_exports_are_not_tracked": true,
+      "path": ".data/contracts/calibration_candidate_config_freeze_contract_v1.json",
+      "tracked_required": true
+    },
+    {
+      "frozen": true,
+      "generated_exports_are_not_tracked": true,
+      "path": ".data/contracts/calibration_candidate_config_freeze_v1.json",
+      "tracked_required": true
+    }
+  ],
+  "gameplay_classifier_asset_ref": {
+    "existing_model_asset": true,
+    "must_not_be_committed": true,
+    "must_not_be_modified": true,
+    "must_not_be_tuned": true,
+    "path": "model_assets/tom_v1/view_classifier_gameplay.pt"
+  },
+  "generated_at": "2026-06-20T00:00:00+00:00",
+  "known_limitations": [
+    "Phase is decision-support complete, not runtime-calibration complete.",
+    "Real broadcast support is structurally ready but still depends on explicit local media manifests.",
+    "Human review remains required.",
+    "Candidate configs are frozen for manual review only.",
+    "No candidate setting is applied to runtime behavior.",
+    "No classifier accuracy metrics are claimed.",
+    "No production or generalization claims are made.",
+    "Future runtime calibration requires a separate controlled phase and explicit human approval."
+  ],
+  "latest_completed_blueprint": {
+    "blueprint": "blueprint_53",
+    "commit": "133ddb23bdcdcb9eba153711f503cf95c0d87e94",
+    "tag": "tom-v3-blueprint-53-candidate-config-freeze-manual-approval-packet-v1",
+    "title": "Candidate Config Freeze / Manual Approval Packet v1"
+  },
+  "manual_approval_summary": {
+    "approval_required": true,
+    "automatic_approval_occurred": false,
+    "automatic_rejection_occurred": false,
+    "candidate_config_freeze_exists": true,
+    "candidate_config_freeze_id": "calibration_candidate_config_freeze_v1_74ba66e52a61d382ef2e3c01",
+    "candidate_config_freeze_path": ".data/contracts/calibration_candidate_config_freeze_v1.json",
+    "candidate_config_freeze_referenced": true,
+    "deployable_runtime_configuration_created": false,
+    "human_operator_approval_required": true,
+    "known_blockers": [
+      "not_applicable"
+    ],
+    "manual_approval_packet_exists": true,
+    "manual_approval_packet_id": "calibration_candidate_manual_approval_packet_v1_901411a87ccb08ba18f5b4cf",
+    "manual_approval_packet_path": ".data/exports/calibration_candidate_manual_approval_packet.current.json",
+    "manual_approval_packet_referenced": true,
+    "operator_checklist_item_count": 10,
+    "operator_checklist_requirements_present": true,
+    "runtime_application_status": "not_applied",
+    "source_candidate_approval_required": false
+  },
+  "next_phase_recommendations": [
+    {
+      "goal": "controlled_runtime_calibration_change_request",
+      "implementation_in_blueprint_54": false,
+      "recommended_blueprint": "Blueprint 55 - Controlled Runtime Calibration Change Request v1",
+      "requirements": [
+        "explicit_human_approval_artifact",
+        "selected_candidate_config_freeze",
+        "all_regression_gates_passing",
+        "no_unresolved_blockers",
+        "explicit_rollback_plan",
+        "runtime_config_change_request_not_direct_runtime_mutation",
+        "dry_run_first",
+        "review_after_application",
+        "post_change_regression_baseline_candidate_only_after_validation",
+        "still_no_truth_or_accuracy_claims"
+      ]
+    }
+  ],
+  "non_claims": {
+    "automatic_approval_not_performed": true,
+    "automatic_rejection_not_performed": true,
+    "automatic_relabeling_not_performed": true,
+    "baseline_not_replaced": true,
+    "calibration_decision_phase_is_not_runtime_calibration": true,
+    "candidate_config_freeze_is_not_runtime_config": true,
+    "classifier_accuracy_not_assessed": true,
+    "classifier_correctness_not_assessed": true,
+    "classifier_not_modified": true,
+    "gameplay_gate_is_not_truth": true,
+    "generalization_not_claimed": true,
+    "human_operator_approval_required": true,
+    "hysteresis_changes_not_applied": true,
+    "model_weights_not_modified": true,
+    "phase_freeze_is_not_truth": true,
+    "production_config_not_created": true,
+    "production_readiness_not_claimed": true,
+    "runtime_config_not_updated": true,
+    "smoothing_changes_not_applied": true,
+    "threshold_changes_not_applied": true
+  },
+  "protected_baseline_refs": [
+    {
+      "baseline_type": "multi_point_regression_matrix_baseline",
+      "path": ".data/baselines/multi_point_regression_matrix.baseline.json",
+      "tracked_required": true
+    },
+    {
+      "baseline_type": "gameplay_gate_regression_baseline",
+      "path": ".data/baselines/gameplay_gate_regression.baseline.json",
+      "tracked_required": true
+    },
+    {
+      "baseline_type": "review_guided_gameplay_calibration_sandbox_regression_baseline",
+      "path": ".data/baselines/review_guided_gameplay_calibration_sandbox.baseline.json",
+      "tracked_required": true
+    }
+  ],
+  "required_regression_gates": [
+    {
+      "expected": {
+        "baseline_is_not_truth": true,
+        "breaking_drift_detected": false,
+        "drift_detected": false,
+        "matrix_is_not_truth": true,
+        "ok": true,
+        "status": "completed"
+      },
+      "gate_id": "multi_point_regression_matrix_gate",
+      "make_target": "tom-v1-verify-multi-point-regression-matrix"
+    },
+    {
+      "expected": {
+        "baseline_is_not_truth": true,
+        "breaking_drift_detected": false,
+        "drift_detected": false,
+        "ok": true,
+        "status": "completed"
+      },
+      "gate_id": "protected_sample_point_reviewed_3d_debug_gate",
+      "make_target": "tom-v1-verify-reviewed-3d-debug-baseline",
+      "protected_sample_point_identifiers": {
+        "camera_geometry_id": "5afa67fb-7f6e-41eb-b4aa-b1100a97ee97",
+        "event_candidate_run_id": "1b946366-7ec1-426f-8b40-494535a9b3fb",
+        "media_id": "9518fb01-0da1-4344-9a84-ff88ec8e9b1e",
+        "trajectory_3d_run_id": "ea76ccab-c51d-4a63-9682-9fd0bbb83f14"
+      }
+    },
+    {
+      "expected": {
+        "baseline_is_not_truth": true,
+        "breaking_drift_detected": false,
+        "classifier_correctness_not_assessed": true,
+        "drift_detected": false,
+        "gameplay_gate_is_not_truth": true,
+        "generalization_not_claimed": true,
+        "ok": true,
+        "status": "completed"
+      },
+      "gate_id": "gameplay_gate_regression_baseline_gate",
+      "make_target": "tom-v1-verify-gameplay-gate-regression-baseline"
+    },
+    {
+      "expected": {
+        "baseline_is_not_truth": true,
+        "baseline_not_replaced": true,
+        "breaking_drift_detected": false,
+        "classifier_correctness_not_assessed": true,
+        "drift_detected": false,
+        "generalization_not_claimed": true,
+        "hysteresis_changes_not_applied": true,
+        "model_weights_not_modified": true,
+        "ok": true,
+        "runtime_config_not_updated": true,
+        "sandbox_is_not_accuracy_scoring": true,
+        "sandbox_is_not_truth": true,
+        "smoothing_changes_not_applied": true,
+        "status": "completed",
+        "threshold_changes_not_applied": true
+      },
+      "gate_id": "calibration_sandbox_regression_baseline_gate",
+      "make_target": "tom-v1-verify-review-guided-gameplay-calibration-sandbox-regression-baseline"
+    }
+  ],
+  "tom_provenance": {
+    "blueprint": "blueprint_54",
+    "blueprint_name": "real_broadcast_gameplay_calibration_decision_phase_freeze_v1",
+    "project": "tom-v3-simple",
+    "project_version": "0.0.0"
+  },
+  "validation_summary": {
+    "runtime_application_status": "not_applied",
+    "status": "not_assessed",
+    "structural_error_count": 0,
+    "validation_does_not_apply_candidate_settings": true,
+    "validation_does_not_create_truth": true,
+    "validation_does_not_score_classifier": true
+  },
+  "warnings": {
+    "automatic_approval_not_performed": true,
+    "automatic_rejection_not_performed": true,
+    "automatic_relabeling_not_performed": true,
+    "baseline_not_replaced": true,
+    "calibration_decision_phase_is_not_runtime_calibration": true,
+    "candidate_config_freeze_is_not_runtime_config": true,
+    "classifier_accuracy_not_assessed": true,
+    "classifier_correctness_not_assessed": true,
+    "classifier_not_modified": true,
+    "decision_support_only": true,
+    "does_not_create_event_labels": true,
+    "does_not_create_evidence": true,
+    "does_not_create_in_out": true,
+    "does_not_create_observations": true,
+    "does_not_create_point_labels": true,
+    "does_not_create_score": true,
+    "does_not_create_training_labels": true,
+    "does_not_determine_winner": true,
+    "does_not_identify_players": true,
+    "does_not_mutate_model_assets": true,
+    "does_not_mutate_regression_baselines": true,
+    "does_not_train_classifier": true,
+    "gameplay_gate_is_not_truth": true,
+    "generalization_not_claimed": true,
+    "human_operator_approval_required": true,
+    "hysteresis_changes_not_applied": true,
+    "manual_approval_packet_required_before_future_runtime_change": true,
+    "model_weights_not_modified": true,
+    "no_adjudication": true,
+    "observation_only": true,
+    "phase_freeze_is_not_truth": true,
+    "phase_freeze_is_structural_only": true,
+    "production_config_not_created": true,
+    "production_readiness_not_claimed": true,
+    "provenance_only": true,
+    "review_support_only": true,
+    "runtime_config_not_updated": true,
+    "smoothing_changes_not_applied": true,
+    "threshold_changes_not_applied": true
+  }
+}

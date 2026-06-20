@@ -363,6 +363,12 @@ CALIBRATION_CANDIDATE_CONFIG_FREEZE_SOURCE_CORPUS_RUN ?= $(REAL_BROADCAST_GAMEPL
 CALIBRATION_CANDIDATE_CONFIG_FREEZE_SOURCE_GAMEPLAY_GATE_REGRESSION_BASELINE ?= $(GAMEPLAY_GATE_REGRESSION_BASELINE_OUTPUT)
 CALIBRATION_CANDIDATE_CONFIG_FREEZE_SOURCE_CALIBRATION_SANDBOX_BASELINE ?= $(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_BASELINE_OUTPUT)
 CALIBRATION_CANDIDATE_CONFIG_FREEZE_SELECTED_CANDIDATE_PACKET_REF ?=
+REAL_BROADCAST_GAMEPLAY_CALIBRATION_DECISION_PHASE_FREEZE_OUTPUT ?= .data/contracts/real_broadcast_gameplay_calibration_decision_phase_freeze_v1.json
+REAL_BROADCAST_GAMEPLAY_CALIBRATION_DECISION_PHASE_FREEZE ?= $(REAL_BROADCAST_GAMEPLAY_CALIBRATION_DECISION_PHASE_FREEZE_OUTPUT)
+REAL_BROADCAST_GAMEPLAY_CALIBRATION_DECISION_PHASE_FREEZE_VALIDATION_OUTPUT ?= .data/exports/real_broadcast_gameplay_calibration_decision_phase_freeze.validation.json
+REAL_BROADCAST_GAMEPLAY_CALIBRATION_NEXT_PHASE_READINESS_REPORT_OUTPUT ?= .data/exports/real_broadcast_gameplay_calibration_next_phase_readiness_report.current.json
+REAL_BROADCAST_GAMEPLAY_CALIBRATION_DECISION_PHASE_SOURCE_CANDIDATE_CONFIG_FREEZE ?= $(CALIBRATION_CANDIDATE_CONFIG_FREEZE_ARTIFACT_OUTPUT)
+REAL_BROADCAST_GAMEPLAY_CALIBRATION_DECISION_PHASE_SOURCE_MANUAL_APPROVAL_PACKET ?= $(CALIBRATION_CANDIDATE_MANUAL_APPROVAL_PACKET_OUTPUT)
 EXPECTED_BRANCH ?=
 EXPECTED_TAG ?=
 FORMAT ?= json
@@ -464,6 +470,7 @@ export TOM_V3_DATABASE_URL
 .PHONY: tom-v1-export-review-guided-gameplay-calibration-sandbox-regression-contract tom-v1-build-review-guided-gameplay-calibration-sandbox-regression-baseline tom-v1-verify-review-guided-gameplay-calibration-sandbox-regression-baseline tom-v1-build-review-guided-gameplay-calibration-sandbox-regression-report
 .PHONY: tom-v1-export-calibration-candidate-decision-packet-contract tom-v1-build-calibration-candidate-decision-packet-inputs tom-v1-validate-calibration-candidate-decision-packet-inputs tom-v1-build-calibration-candidate-decision-packet tom-v1-validate-calibration-candidate-decision-packet tom-v1-build-calibration-candidate-decision-packet-report
 .PHONY: tom-v1-export-calibration-candidate-config-freeze-contract tom-v1-build-calibration-candidate-config-freeze-inputs tom-v1-validate-calibration-candidate-config-freeze-inputs tom-v1-build-calibration-candidate-config-freeze tom-v1-validate-calibration-candidate-config-freeze tom-v1-build-calibration-candidate-manual-approval-packet tom-v1-validate-calibration-candidate-manual-approval-packet tom-v1-build-calibration-candidate-config-freeze-report
+.PHONY: tom-v1-build-real-broadcast-gameplay-calibration-decision-phase-freeze tom-v1-validate-real-broadcast-gameplay-calibration-decision-phase-freeze tom-v1-build-real-broadcast-gameplay-calibration-next-phase-readiness-report
 
 install:
 	$(PYTHON) -m pip install -e ".[dev]"
@@ -1156,6 +1163,15 @@ tom-v1-validate-calibration-candidate-manual-approval-packet:
 
 tom-v1-build-calibration-candidate-config-freeze-report:
 	$(PYTHON) -m apps.worker.cli build-calibration-candidate-config-freeze-report --contract "$(CALIBRATION_CANDIDATE_CONFIG_FREEZE_CONTRACT_OUTPUT)" --candidate-config-freeze "$(CALIBRATION_CANDIDATE_CONFIG_FREEZE)" --manual-approval-packet "$(CALIBRATION_CANDIDATE_MANUAL_APPROVAL_PACKET)" --output "$(CALIBRATION_CANDIDATE_CONFIG_FREEZE_REPORT_OUTPUT)" --skip-create-db
+
+tom-v1-build-real-broadcast-gameplay-calibration-decision-phase-freeze:
+	$(PYTHON) -m apps.worker.cli build-real-broadcast-gameplay-calibration-decision-phase-freeze --candidate-config-freeze "$(REAL_BROADCAST_GAMEPLAY_CALIBRATION_DECISION_PHASE_SOURCE_CANDIDATE_CONFIG_FREEZE)" --manual-approval-packet "$(REAL_BROADCAST_GAMEPLAY_CALIBRATION_DECISION_PHASE_SOURCE_MANUAL_APPROVAL_PACKET)" --output "$(REAL_BROADCAST_GAMEPLAY_CALIBRATION_DECISION_PHASE_FREEZE_OUTPUT)" --skip-create-db
+
+tom-v1-validate-real-broadcast-gameplay-calibration-decision-phase-freeze:
+	$(PYTHON) -m apps.worker.cli validate-real-broadcast-gameplay-calibration-decision-phase-freeze --freeze "$(REAL_BROADCAST_GAMEPLAY_CALIBRATION_DECISION_PHASE_FREEZE)" --output "$(REAL_BROADCAST_GAMEPLAY_CALIBRATION_DECISION_PHASE_FREEZE_VALIDATION_OUTPUT)" --skip-create-db
+
+tom-v1-build-real-broadcast-gameplay-calibration-next-phase-readiness-report:
+	$(PYTHON) -m apps.worker.cli build-real-broadcast-gameplay-calibration-next-phase-readiness-report --freeze "$(REAL_BROADCAST_GAMEPLAY_CALIBRATION_DECISION_PHASE_FREEZE)" --output "$(REAL_BROADCAST_GAMEPLAY_CALIBRATION_NEXT_PHASE_READINESS_REPORT_OUTPUT)" --skip-create-db
 
 tom-v1-post-codex-validate:
 	scripts/post_codex_validate.sh $(if $(EXPECTED_BRANCH),--branch "$(EXPECTED_BRANCH)",) $(if $(EXPECTED_TAG),--expected-tag "$(EXPECTED_TAG)",) --python "$(PYTHON)"

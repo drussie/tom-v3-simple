@@ -911,4 +911,20 @@ run "$PYTHON_BIN" -m apps.worker.cli build-calibration-candidate-config-freeze-r
   --output "$TMP_ROOT/calibration_candidate_config_freeze.report.json" \
   --skip-create-db
 
+run "$PYTHON_BIN" -m apps.worker.cli build-real-broadcast-gameplay-calibration-decision-phase-freeze \
+  --candidate-config-freeze "$TMP_ROOT/calibration_candidate_config_freeze.current.json" \
+  --manual-approval-packet "$TMP_ROOT/calibration_candidate_manual_approval_packet.current.json" \
+  --output "$TMP_ROOT/real_broadcast_gameplay_calibration_decision_phase_freeze_v1.smoke.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli validate-real-broadcast-gameplay-calibration-decision-phase-freeze \
+  --freeze "$TMP_ROOT/real_broadcast_gameplay_calibration_decision_phase_freeze_v1.smoke.json" \
+  --output "$TMP_ROOT/real_broadcast_gameplay_calibration_decision_phase_freeze.validation.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-real-broadcast-gameplay-calibration-next-phase-readiness-report \
+  --freeze "$TMP_ROOT/real_broadcast_gameplay_calibration_decision_phase_freeze_v1.smoke.json" \
+  --output "$TMP_ROOT/real_broadcast_gameplay_calibration_next_phase_readiness_report.current.json" \
+  --skip-create-db
+
 run git status --short

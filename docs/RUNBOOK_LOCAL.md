@@ -1979,6 +1979,46 @@ automatic approval, perform automatic rejection, create review labels, infer ten
 classifier correctness. A separate human-controlled change request is required for any future
 runtime application phase.
 
+## Real Broadcast Gameplay Calibration Decision Phase Freeze
+
+Use this after Blueprint 53 has produced the candidate config freeze/manual approval packet. The
+phase freeze records the completed BP46-BP53 decision-support phase, frozen contract refs,
+protected baseline refs, required gates, manual approval requirements, known limitations, and the
+future Blueprint 55 recommendation. It does not apply candidate settings or update runtime
+behavior.
+
+Build the tracked phase freeze:
+
+```bash
+make tom-v1-build-real-broadcast-gameplay-calibration-decision-phase-freeze \
+  PYTHON=.venv/bin/python
+```
+
+Validate the freeze:
+
+```bash
+make tom-v1-validate-real-broadcast-gameplay-calibration-decision-phase-freeze \
+  PYTHON=.venv/bin/python
+```
+
+Build the local next-phase readiness report:
+
+```bash
+make tom-v1-build-real-broadcast-gameplay-calibration-next-phase-readiness-report \
+  PYTHON=.venv/bin/python
+```
+
+The tracked artifact is
+`.data/contracts/real_broadcast_gameplay_calibration_decision_phase_freeze_v1.json`.
+Generated validation and readiness report files live under `.data/exports/` and should stay local.
+
+The phase freeze does not apply threshold, smoothing, or hysteresis changes, update runtime config,
+mutate model weights, replace baselines, create production config, perform automatic approval,
+perform automatic rejection, create review labels, infer tennis truth, score classifier
+correctness, or implement Blueprint 55. Blueprint 55 remains a future controlled change-request
+phase requiring explicit human approval, passing gates, no unresolved blockers, rollback planning,
+dry-run first, and post-change review.
+
 ## Gameplay-Gated Perception Execution Hook
 
 Use this after the Blueprint 38 gameplay segment gate and Blueprint 39 routing plan are available.

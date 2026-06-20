@@ -24,6 +24,17 @@ This registry makes TOM v3 Simple boundaries explicit.
   only. They do not apply threshold, smoothing, hysteresis, runtime, model, or baseline changes,
   do not prove classifier correctness or accuracy, do not create labels, and do not make reviewed
   entries production-ready.
+- Review-guided gameplay calibration sandbox regression gates compare structural sandbox outputs
+  only. They do not establish candidate correctness, replace baselines, apply settings, or prove
+  classifier accuracy.
+- Calibration candidate decision packets are decision-support artifacts only. They do not select,
+  approve, reject, or apply candidates for runtime use.
+- Candidate config freeze and manual approval packets preserve review context only. They keep
+  candidate settings not applied and do not update runtime behavior.
+- The real broadcast gameplay calibration decision phase freeze is a phase completion/readiness
+  artifact only. It does not apply runtime calibration, create production config, mutate model
+  weights, replace baselines, approve/reject candidates automatically, or make truth, accuracy,
+  production readiness, or generalization claims.
 - Fixture detection is deterministic demo output.
 - Optional YOLO requires a local optional runtime and local weights outside git.
 - TOM v1 model assets under `model_assets/tom_v1/` are local-only ignored files and are not part of the repository.

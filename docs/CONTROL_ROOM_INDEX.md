@@ -376,6 +376,8 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Calibration Candidate Decision Packet v1](reviews/calibration_candidate_decision_packet_v1.md)
 - [Blueprint 53 Candidate Config Freeze / Manual Approval Packet v1](blueprints/blueprint_53_candidate_config_freeze_manual_approval_packet_v1.md)
 - [Candidate Config Freeze / Manual Approval Packet v1](reviews/calibration_candidate_config_freeze_manual_approval_packet_v1.md)
+- [Blueprint 54 Real Broadcast Gameplay Calibration Decision Phase Freeze v1](blueprints/blueprint_54_real_broadcast_gameplay_calibration_decision_phase_freeze_v1.md)
+- [Real Broadcast Gameplay Calibration Decision Phase Freeze v1](reviews/real_broadcast_gameplay_calibration_decision_phase_freeze_v1.md)
 
 ## Development
 

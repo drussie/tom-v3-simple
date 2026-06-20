@@ -4176,3 +4176,42 @@ execution plans, and Blueprint 41 replay timelines for each entry using safe str
 Blueprint 42 does not run GPU/model inference by default, write observations, mutate model assets,
 mutate baselines, create labels, training truth, gameplay truth, line-call conclusions, scoring,
 player identity, production readiness claims, or adjudication.
+
+## Blueprint 54 Real Broadcast Gameplay Calibration Decision Phase Freeze v1
+
+Status: complete
+
+### Goal
+
+Freeze the completed Blueprint 46 through Blueprint 53 real broadcast gameplay calibration
+decision-support phase and record next-phase readiness without applying runtime calibration.
+
+### Notes
+
+This milestone adds:
+
+- `apps.worker.services.real_broadcast_gameplay_calibration_decision_phase_freeze`
+- `build-real-broadcast-gameplay-calibration-decision-phase-freeze` worker CLI command
+- `validate-real-broadcast-gameplay-calibration-decision-phase-freeze` worker CLI command
+- `build-real-broadcast-gameplay-calibration-next-phase-readiness-report` worker CLI command
+- `tom-v1-build-real-broadcast-gameplay-calibration-decision-phase-freeze` Make helper
+- `tom-v1-validate-real-broadcast-gameplay-calibration-decision-phase-freeze` Make helper
+- `tom-v1-build-real-broadcast-gameplay-calibration-next-phase-readiness-report` Make helper
+- `.data/contracts/real_broadcast_gameplay_calibration_decision_phase_freeze_v1.json`
+  tracked freeze artifact
+- `.data/exports/real_broadcast_gameplay_calibration_decision_phase_freeze.validation.json`
+  local validation path
+- `.data/exports/real_broadcast_gameplay_calibration_next_phase_readiness_report.current.json`
+  local readiness report path
+- `docs/blueprints/blueprint_54_real_broadcast_gameplay_calibration_decision_phase_freeze_v1.md`
+- `docs/reviews/real_broadcast_gameplay_calibration_decision_phase_freeze_v1.md`
+- `docs/agent_reports/blueprint_54_real_broadcast_gameplay_calibration_decision_phase_freeze_v1_report.md`
+
+The phase freeze records completed phase blueprints, frozen contract refs, protected baseline refs,
+required regression gates, capability summary, decision-support summary, manual approval summary,
+non-claims, known limitations, validation summary, and Blueprint 55 as a future controlled
+runtime-calibration change-request phase. Blueprint 54 does not apply threshold, smoothing, or
+hysteresis changes; does not update runtime config; does not mutate model weights; does not replace
+baselines; does not create production config; does not approve or reject candidates; and does not
+claim tennis truth, classifier correctness, classifier accuracy, production readiness, or
+generalization.
