@@ -4,15 +4,16 @@
 
 - Project name: TOM v3 Simple
 - Repo: drussie/tom-v3-simple
-- Current phase: Blueprint 56 complete; controlled runtime calibration dry-run execution v1 added
+- Current phase: Blueprint 57 complete; controlled runtime calibration dry-run review packet v1 added
 - Current goal: Preserve the BP22-BP36 structural expansion freeze, keep protected regression
   gates intact, and make gameplay gate/routing/execution/replay provenance verifiable through a
   fixture-safe structural regression baseline, review dataset export, pathway completion freeze,
   explicit local broadcast-style corpus run, human review metadata loop, review operations
   metrics/dashboard layer, proposal-only calibration planning surface, offline-only calibration
   evaluation sandbox, sandbox regression gate, decision packet, candidate config freeze/manual
-  approval packet, BP46-BP53 phase freeze, controlled change-request artifacts, and dry-run-only
-  execution reports without creating tennis truth or runtime calibration
+  approval packet, BP46-BP53 phase freeze, controlled change-request artifacts, dry-run-only
+  execution reports, and dry-run review packets/checklists without creating tennis truth or runtime
+  calibration
 
 ## Mission
 
@@ -124,13 +125,19 @@ A lightweight tennis video observation platform that accepts model output as ope
   dry-run input builder/validator, dry-run executor, report validator, summary, and rollback
   readiness report preserve `not_applied`, `no_runtime_mutation`, `not_created`, `not_replaced`,
   and `not_modified` statuses without applying runtime calibration or claiming truth
+- Blueprint 57 status: complete; tracked controlled runtime calibration dry-run review packet
+  contract and frozen review packet preserve `not_applied`, `no_runtime_mutation`, `not_created`,
+  `not_replaced`, `not_modified`, `operator_review_required`, and
+  `future_blueprint_required_for_runtime_application` statuses while packaging structural
+  comparison, rollback readiness, regression gate, blocker, warning, and operator checklist context
+  without applying runtime calibration or claiming truth
 - Observation writer: implemented with typed extension rows, lineage, artifacts, and idempotency
 - Worker synthetic seeder: implemented
 - Visual evidence viewer: implemented in `apps/web` with detection bbox overlay, pose keypoint/skeleton overlay, frame artifact image support, run evidence summary, clearer empty states, candidate/evidence wording, readable lineage context, and review/export metadata display
 - Replay workstation: Milestones 6A/6B/6C/6D/6E/6F implemented `/replay/<media_id>` with indexed local video playback, current timestamp/frame display, selected run context, persisted detection overlay chunks, candidate tracklet overlays, pose keypoint/skeleton overlays, layer toggles, run selectors, evidence timeline lanes, click-to-seek/select evidence details, Stream Proxy Mode for video-as-live review, and Blueprint 6 closeout docs; Milestones 7A/7B/7C/7D make real detection runs, real-detection-derived tracklet runs, and real pose runs compatible and source-labeled through `detectionRunId`, `trackletRunId`, and `poseRunId`; Milestones 8E/8F add court keypoint, court line, camera/view, homography candidate, and projection diagnostic replay layers through `courtRunId`, `homographyRunId`, and `projectionDiagnosticRunId`
 - Pose observation foundation: implemented with a typed `pose_observation` table, COCO17 skeleton registry, keypoint summary statistics, fake/serialized pose output normalization, crop projection, worker fixture pose persistence, optional real pose replay persistence, source detection candidate lineage, pose overlay viewer, pose-specific query filters, review annotations, and TOM-native review dataset export; pose observations remain keypoint evidence only
 - Court/homography evidence: Blueprint 8 has started; Milestone 8A adds typed schema contracts, storage models, migration, court template registry, writer persistence support, and fake persistence tests; Milestone 8B adds fixture court keypoint, court line, and camera/view evidence persistence; Milestone 8C adds camera/view query, summary, bundle, and `/court/camera-view` API read models; Milestone 8D adds homography candidate persistence with source court evidence lineage; Milestone 8E adds replay overlays for persisted court keypoints, court lines, camera/view evidence, and homography candidates; Milestone 8F adds projection diagnostic persistence, replay payload/detail support, and court review export, but no real camera/court inference or ball/player court-space projection exists yet
-- Local TOM v1 asset policy: model files under `model_assets/tom_v1/` remain ignored local assets; `best_ball_v2_1280.pt`, `yolo26x.pt`, `yolo26n.pt`, and `yolo26s.pt` are candidate inputs for existing real detection smoke; `yolo26x-pose.pt` is a candidate input for existing real pose smoke; `view_classifier_gameplay.pt` is inspected/hashed by the Blueprint 38 gameplay segment gate, Blueprint 43 regression baseline verifier, Blueprint 44 review dataset export, Blueprint 45 pathway freeze validator, Blueprint 46 real broadcast corpus run, Blueprint 47 review loop metadata bundle, Blueprint 48 review metrics provenance layer, Blueprint 49 calibration proposal input snapshot, Blueprint 50 calibration evaluation sandbox input/report path, Blueprint 51 sandbox regression gate, Blueprint 52 decision packet, Blueprint 53 candidate config freeze, Blueprint 54 phase freeze validation, Blueprint 55 controlled change-request inputs, and Blueprint 56 controlled dry-run inputs; `keypoints_model.pth` still requires a future TOM v1-specific adapter
+- Local TOM v1 asset policy: model files under `model_assets/tom_v1/` remain ignored local assets; `best_ball_v2_1280.pt`, `yolo26x.pt`, `yolo26n.pt`, and `yolo26s.pt` are candidate inputs for existing real detection smoke; `yolo26x-pose.pt` is a candidate input for existing real pose smoke; `view_classifier_gameplay.pt` is inspected/hashed by the Blueprint 38 gameplay segment gate, Blueprint 43 regression baseline verifier, Blueprint 44 review dataset export, Blueprint 45 pathway freeze validator, Blueprint 46 real broadcast corpus run, Blueprint 47 review loop metadata bundle, Blueprint 48 review metrics provenance layer, Blueprint 49 calibration proposal input snapshot, Blueprint 50 calibration evaluation sandbox input/report path, Blueprint 51 sandbox regression gate, Blueprint 52 decision packet, Blueprint 53 candidate config freeze, Blueprint 54 phase freeze validation, Blueprint 55 controlled change-request inputs, Blueprint 56 controlled dry-run inputs, and Blueprint 57 dry-run review packet inputs; `keypoints_model.pth` still requires a future TOM v1-specific adapter
 - Local fixture demo: implemented with worker `run-demo`, Makefile `demo` targets, deterministic media fallback, fixture gameplay/detection/tracklet/pose path, seeded review annotations, pose and tracklet review exports, summary IDs/counts/viewer URLs, and canonical `docs/RUNBOOK_LOCAL.md`
 - Viewer product polish: implemented with shared frontend evidence copy helpers, run evidence summary, detection/tracklet/pose/detail panel wording cleanup, lineage relationship descriptions, artifact/export metadata display, annotation/keypoint metadata display, and viewer payload regression coverage
 - Completion/provenance audit: implemented with worker `completion-audit`, Makefile `completion-audit`, PASS/WARN/FAIL JSON, demo completeness checks, media/run/step/observation/typed-row/lineage/artifact/annotation/export integrity checks, and tests proving the audit passes after `make demo`
@@ -495,6 +502,36 @@ remain local under `.data/exports/`. Dry-run execution reports preserve
 `model_update_status: not_modified`.
 
 Blueprint 56 does not apply threshold, smoothing, or hysteresis changes; does not update runtime
+config; does not mutate model weights; does not replace baselines; does not create production
+config; does not approve or reject candidates automatically; and does not claim tennis truth,
+classifier correctness, classifier accuracy, production readiness, or generalization.
+
+## Blueprint 57 Result
+
+Status: complete.
+
+Blueprint 57 adds a controlled runtime calibration dry-run review packet layer over the Blueprint 56
+dry-run execution report. It creates tracked artifacts:
+
+```text
+.data/contracts/controlled_runtime_calibration_dry_run_review_packet_contract_v1.json
+.data/contracts/controlled_runtime_calibration_dry_run_review_packet_v1.json
+```
+
+Generated review packet inputs, validations, summaries, and operator checklists remain local under
+`.data/exports/`. Review packets preserve `runtime_application_status: not_applied`,
+`mutation_status: no_runtime_mutation`, `production_config_status: not_created`,
+`baseline_update_status: not_replaced`, `model_update_status: not_modified`,
+`operator_review_required: true`, and
+`future_blueprint_required_for_runtime_application: true`.
+
+The current packet is `review_packet_informational_only` with
+`next_step_recommendation: no_future_runtime_action_recommended` because no selected candidate is
+present in the dry-run context. The packet still summarizes structural comparison results,
+rollback readiness, regression gate refs, blockers, warnings, and operator checklist items for
+human review.
+
+Blueprint 57 does not apply threshold, smoothing, or hysteresis changes; does not update runtime
 config; does not mutate model weights; does not replace baselines; does not create production
 config; does not approve or reject candidates automatically; and does not claim tennis truth,
 classifier correctness, classifier accuracy, production readiness, or generalization.

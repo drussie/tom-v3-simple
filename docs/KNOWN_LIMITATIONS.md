@@ -380,6 +380,15 @@ TOM v3 Simple does not include:
   not apply threshold, smoothing, or hysteresis changes; update runtime config; mutate model
   weights; replace baselines; create production config; automatically approve or reject candidates;
   prove classifier correctness or accuracy; prove production readiness; or decide tennis truth.
+- Controlled runtime calibration dry-run execution artifacts execute the change request in
+  dry-run mode only. They do not apply threshold, smoothing, or hysteresis changes; update runtime
+  config; mutate model weights; replace baselines; create production config; automatically approve
+  or reject candidates; prove classifier correctness or accuracy; prove production readiness; or
+  decide tennis truth.
+- Controlled runtime calibration dry-run review packet artifacts package dry-run output for human
+  operator review only. They do not perform runtime calibration, approve a candidate, create a
+  production config, update baselines, modify model weights, prove classifier correctness or
+  accuracy, claim production readiness, or decide tennis truth.
 
 ## Boundary
 

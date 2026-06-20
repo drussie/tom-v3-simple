@@ -1889,6 +1889,43 @@ Generated outputs under `.data/exports/` remain local. Expected safe-state field
 - `model_weights_not_modified`: true
 - `baseline_not_replaced`: true
 
+## Controlled Runtime Calibration Dry-Run Review Packet
+
+Use this after Blueprint 56 dry-run inputs and execution reports have been built. The review packet
+packages existing dry-run output for human-operator review only. It does not apply threshold,
+smoothing, hysteresis, model, runtime config, production config, or baseline changes.
+
+Build the tracked contract and frozen review packet:
+
+```bash
+make tom-v1-export-controlled-runtime-calibration-dry-run-review-packet-contract \
+  tom-v1-build-controlled-runtime-calibration-dry-run-review-packet-inputs \
+  tom-v1-validate-controlled-runtime-calibration-dry-run-review-packet-inputs \
+  tom-v1-build-controlled-runtime-calibration-dry-run-review-packet \
+  tom-v1-validate-controlled-runtime-calibration-dry-run-review-packet \
+  tom-v1-build-controlled-runtime-calibration-dry-run-review-summary \
+  tom-v1-build-controlled-runtime-calibration-dry-run-operator-checklist \
+  PYTHON=.venv/bin/python
+```
+
+Tracked outputs:
+
+```text
+.data/contracts/controlled_runtime_calibration_dry_run_review_packet_contract_v1.json
+.data/contracts/controlled_runtime_calibration_dry_run_review_packet_v1.json
+```
+
+Generated inputs, validations, summaries, and operator checklists remain under `.data/exports/`.
+Expected safe-state fields include:
+
+- `runtime_application_status`: `not_applied`
+- `mutation_status`: `no_runtime_mutation`
+- `production_config_status`: `not_created`
+- `baseline_update_status`: `not_replaced`
+- `model_update_status`: `not_modified`
+- `operator_review_required`: true
+- `future_blueprint_required_for_runtime_application`: true
+
 ## Calibration Evaluation Sandbox Regression Gate
 
 Use this after Blueprint 50 evaluation inputs and reports have been built. The gate freezes and

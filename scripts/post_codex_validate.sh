@@ -1029,4 +1029,53 @@ run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-dry-ru
   --output "$TMP_ROOT/controlled_runtime_calibration_dry_run_rollback_readiness_report.current.json" \
   --skip-create-db
 
+run "$PYTHON_BIN" -m apps.worker.cli export-controlled-runtime-calibration-dry-run-review-packet-contract \
+  --output "$TMP_ROOT/controlled_runtime_calibration_dry_run_review_packet_contract_v1.smoke.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-dry-run-review-packet-inputs \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_dry_run_review_packet_contract_v1.smoke.json" \
+  --source-dry-run-execution-report "$TMP_ROOT/controlled_runtime_calibration_dry_run_execution.current.json" \
+  --source-dry-run-inputs "$TMP_ROOT/controlled_runtime_calibration_dry_run_inputs.current.json" \
+  --source-change-request "$TMP_ROOT/controlled_runtime_calibration_change_request.current.json" \
+  --source-candidate-config-freeze "$TMP_ROOT/calibration_candidate_config_freeze.current.json" \
+  --source-manual-approval-packet "$TMP_ROOT/calibration_candidate_manual_approval_packet.current.json" \
+  --source-decision-packet "$TMP_ROOT/calibration_candidate_decision_packet.current.json" \
+  --source-phase-freeze "$TMP_ROOT/real_broadcast_gameplay_calibration_decision_phase_freeze_v1.smoke.json" \
+  --source-gameplay-gate-regression-baseline "$TMP_ROOT/gameplay_gate_regression.baseline.json" \
+  --source-calibration-sandbox-baseline "$TMP_ROOT/review_guided_gameplay_calibration_sandbox.baseline.json" \
+  --model-asset-path "model_assets/tom_v1/view_classifier_gameplay.pt" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_dry_run_review_packet_inputs.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli validate-controlled-runtime-calibration-dry-run-review-packet-inputs \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_dry_run_review_packet_contract_v1.smoke.json" \
+  --review-packet-inputs "$TMP_ROOT/controlled_runtime_calibration_dry_run_review_packet_inputs.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_dry_run_review_packet_inputs.validation.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-dry-run-review-packet \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_dry_run_review_packet_contract_v1.smoke.json" \
+  --review-packet-inputs "$TMP_ROOT/controlled_runtime_calibration_dry_run_review_packet_inputs.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_dry_run_review_packet.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli validate-controlled-runtime-calibration-dry-run-review-packet \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_dry_run_review_packet_contract_v1.smoke.json" \
+  --review-packet "$TMP_ROOT/controlled_runtime_calibration_dry_run_review_packet.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_dry_run_review_packet.validation.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-dry-run-review-summary \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_dry_run_review_packet_contract_v1.smoke.json" \
+  --review-packet "$TMP_ROOT/controlled_runtime_calibration_dry_run_review_packet.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_dry_run_review_summary.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-dry-run-operator-checklist \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_dry_run_review_packet_contract_v1.smoke.json" \
+  --review-packet "$TMP_ROOT/controlled_runtime_calibration_dry_run_review_packet.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_dry_run_operator_checklist.current.json" \
+  --skip-create-db
+
 run git status --short
