@@ -631,3 +631,30 @@ unresolved blocker context and no selected candidate.
 Blueprint 60 does not apply threshold, smoothing, or hysteresis changes; does not update runtime
 config; does not mutate model weights; does not replace baselines; does not create production
 config; does not auto approve or auto reject candidates; and does not perform runtime application.
+
+## Blueprint 61 Result
+
+Status: complete.
+
+Blueprint 61 adds a controlled pre-application final gate over the Blueprint 60 staging package. It
+creates tracked artifacts:
+
+```text
+.data/contracts/controlled_runtime_calibration_pre_application_final_gate_contract_v1.json
+.data/contracts/controlled_runtime_calibration_pre_application_final_gate_v1.json
+```
+
+Generated final gate inputs, validations, readiness reports, blocker reports, artifact checklists,
+and regression checklists remain local under `.data/exports/`.
+
+The frozen final gate artifact is `final_gate_blocked_missing_operator_signoff` with
+`readiness_status: not_ready_for_future_runtime_application_blueprint`,
+`runtime_application_status: blocked_from_runtime_application`,
+`mutation_status: no_runtime_mutation`, `runtime_config_status: not_updated`,
+`production_config_status: not_created`, `baseline_update_status: not_replaced`,
+`model_update_status: not_modified`, and
+`future_blueprint_required_for_runtime_application: true`.
+
+Blueprint 61 does not apply threshold, smoothing, or hysteresis changes; does not update runtime
+config; does not mutate model weights; does not replace baselines; does not create production
+config; does not auto approve or auto reject candidates; and does not perform runtime application.

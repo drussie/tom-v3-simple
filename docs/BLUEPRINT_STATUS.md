@@ -1879,3 +1879,46 @@ not train or mutate the gameplay classifier, commit model weights, create review
 classifier, apply threshold, smoothing, or hysteresis changes, update runtime config, replace
 baselines, create production config, perform runtime application, perform automatic approval, or
 perform automatic rejection.
+
+## Blueprint 61 - Controlled Runtime Calibration Pre-Application Final Gate
+
+Status: COMPLETE
+
+Blueprint 61 proves:
+
+```text
+BP60 controlled runtime application staging artifact
+-> final gate input bundle
+-> controlled pre-application final gate
+-> final gate readiness report
+-> final gate blocker report
+-> final gate artifact checklist
+-> final gate regression checklist
+```
+
+The tracked artifacts are
+`.data/contracts/controlled_runtime_calibration_pre_application_final_gate_contract_v1.json` and
+`.data/contracts/controlled_runtime_calibration_pre_application_final_gate_v1.json`. Generated
+inputs, validations, readiness reports, blocker reports, artifact checklists, and regression
+checklists remain under `.data/exports/`.
+
+Blueprint 61 requires every final gate artifact to preserve
+`mutation_status: no_runtime_mutation`, `runtime_config_status: not_updated`,
+`production_config_status: not_created`, `baseline_update_status: not_replaced`,
+`model_update_status: not_modified`, and
+`future_blueprint_required_for_runtime_application: true`.
+
+The current final gate is `final_gate_blocked_missing_operator_signoff` with
+`readiness_status: not_ready_for_future_runtime_application_blueprint` and
+`runtime_application_status: blocked_from_runtime_application`. It carries forward the prior
+blocker context, including no selected candidate, and remains a pre-application safety gate only.
+
+Blueprint 61 does not decide tennis truth, in/out, score, point winner, player identity, rally
+state, server/receiver state, line-call truth, point truth, event truth, gameplay truth,
+classifier correctness, classifier accuracy, accepted/rejected lifecycle, automatic relabeling,
+reviewer ranking or quality scoring, coaching/tactical conclusions, betting/prediction outcomes,
+generalization, automatic correctness, training truth, production truth, or adjudication. It does
+not train or mutate the gameplay classifier, commit model weights, create review labels, score the
+classifier, apply threshold, smoothing, or hysteresis changes, update runtime config, replace
+baselines, create production config, perform runtime application, perform automatic approval, or
+perform automatic rejection.

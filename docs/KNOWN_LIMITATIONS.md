@@ -403,6 +403,15 @@ TOM v3 Simple does not include:
   only. They do not perform runtime calibration, apply threshold/smoothing/hysteresis changes,
   create production config, update runtime config, modify model weights, replace baselines, or auto
   approve or auto reject candidates.
+- Controlled runtime calibration runtime application staging artifacts stage future application
+  packages only. They do not perform runtime calibration, apply threshold/smoothing/hysteresis
+  changes, create production config, update runtime config, modify model weights, replace
+  baselines, or auto approve or auto reject candidates.
+- Controlled runtime calibration pre-application final gate artifacts report final structural
+  readiness and blockers only. The current gate is blocked because operator signoff and selected
+  candidate context are missing. They do not perform runtime calibration, apply
+  threshold/smoothing/hysteresis changes, create production config, update runtime config, modify
+  model weights, replace baselines, or auto approve or auto reject candidates.
 
 ## Boundary
 

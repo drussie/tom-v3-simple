@@ -1,5 +1,37 @@
 # TOM v3 Simple - Implementation Log
 
+## Blueprint 61 Controlled Runtime Calibration Pre-Application Final Gate v1
+
+Status: complete
+
+### Goal
+
+Create the final pre-application safety gate for controlled gameplay gate calibration without
+performing runtime application.
+
+### Notes
+
+This milestone adds:
+
+- `apps.worker.services.controlled_runtime_calibration_pre_application_final_gate`
+- worker CLI commands for contract export, inputs, input validation, final gate build, final gate
+  validation, readiness report, blocker report, artifact checklist, and regression checklist
+- matching `tom-v1-*controlled-runtime-calibration-pre-application-final-gate*` Make helpers
+- `.data/contracts/controlled_runtime_calibration_pre_application_final_gate_contract_v1.json`
+  tracked contract
+- `.data/contracts/controlled_runtime_calibration_pre_application_final_gate_v1.json` tracked
+  frozen final gate
+- generated inputs, validations, readiness reports, blocker reports, artifact checklists, and
+  regression checklists under `.data/exports/`
+- focused tests for contract stability, final gate readiness, blocked candidate/signoff behavior,
+  report builders, and forbidden runtime application terms
+
+Blueprint 61 final gate artifacts preserve `no_runtime_mutation`, `not_updated` runtime config,
+`not_created` production config, `not_replaced` baseline state, `not_modified` model state, and
+`future_blueprint_required_for_runtime_application: true`. It does not apply threshold, smoothing,
+or hysteresis changes; does not update runtime config; does not mutate model weights; does not
+replace baselines; does not create production config; and does not approve or reject candidates.
+
 ## Review-Guided Gameplay Calibration Evaluation Sandbox v1
 
 Status: complete when accepted

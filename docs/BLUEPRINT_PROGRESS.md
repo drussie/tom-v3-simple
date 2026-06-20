@@ -1841,3 +1841,37 @@ Blueprint 60 does not train or mutate the gameplay classifier, commit model weig
 baselines, create labels, perform automatic relabeling, change thresholds, smoothing, hysteresis,
 or runtime config, create production config, auto approve or auto reject candidates, or perform
 runtime application.
+
+## Blueprint 61 Status
+
+Status: complete.
+
+Blueprint 61 adds the controlled pre-application final gate:
+
+```text
+BP60 controlled runtime application staging artifact
+-> final gate input bundle
+-> controlled pre-application final gate
+-> readiness report
+-> blocker report
+-> artifact checklist
+-> regression checklist
+```
+
+The tracked artifacts are
+`.data/contracts/controlled_runtime_calibration_pre_application_final_gate_contract_v1.json` and
+`.data/contracts/controlled_runtime_calibration_pre_application_final_gate_v1.json`. Generated
+local exports include inputs, validations, readiness reports, blocker reports, artifact checklists,
+and regression checklists under `.data/exports/`.
+
+The current frozen final gate is `final_gate_blocked_missing_operator_signoff` with
+`runtime_application_status: blocked_from_runtime_application`,
+`mutation_status: no_runtime_mutation`, `runtime_config_status: not_updated`,
+`production_config_status: not_created`, `baseline_update_status: not_replaced`,
+`model_update_status: not_modified`, and
+`future_blueprint_required_for_runtime_application: true`.
+
+Blueprint 61 does not train or mutate the gameplay classifier, commit model weights, mutate
+baselines, create labels, perform automatic relabeling, change thresholds, smoothing, hysteresis,
+or runtime config, create production config, auto approve or auto reject candidates, or perform
+runtime application.

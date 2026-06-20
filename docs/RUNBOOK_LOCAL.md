@@ -1811,6 +1811,40 @@ Expected:
 - `breaking_drift_detected`: false
 - `baseline_is_not_truth`: true
 
+## Controlled Runtime Calibration Pre-Application Final Gate
+
+Blueprint 61 builds the final pre-application gate over the Blueprint 60 staging artifact. It is a
+structural readiness/blocker report only and must not apply threshold, smoothing, hysteresis, or
+runtime configuration changes.
+
+Run the local smoke chain:
+
+```bash
+make tom-v1-export-controlled-runtime-calibration-pre-application-final-gate-contract \
+  tom-v1-build-controlled-runtime-calibration-pre-application-final-gate-inputs \
+  tom-v1-validate-controlled-runtime-calibration-pre-application-final-gate-inputs \
+  tom-v1-build-controlled-runtime-calibration-pre-application-final-gate \
+  tom-v1-validate-controlled-runtime-calibration-pre-application-final-gate \
+  tom-v1-build-controlled-runtime-calibration-final-gate-readiness-report \
+  tom-v1-build-controlled-runtime-calibration-final-gate-blocker-report \
+  tom-v1-build-controlled-runtime-calibration-final-gate-artifact-checklist \
+  tom-v1-build-controlled-runtime-calibration-final-gate-regression-checklist \
+  PYTHON=.venv/bin/python
+```
+
+Expected for the current frozen chain:
+
+- `mutation_status`: `no_runtime_mutation`
+- `runtime_config_status`: `not_updated`
+- `production_config_status`: `not_created`
+- `baseline_update_status`: `not_replaced`
+- `model_update_status`: `not_modified`
+- `future_blueprint_required_for_runtime_application`: true
+
+The current final gate may be blocked because prior controlled calibration artifacts still carry
+operator signoff and selected-candidate blockers. That blocked status is expected until a future
+human/operator workflow supplies those records.
+
 ## Controlled Runtime Calibration Change Request
 
 Use this after the Blueprint 54 phase freeze exists. The command chain creates a controlled
