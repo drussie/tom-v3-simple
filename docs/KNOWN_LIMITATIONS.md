@@ -394,6 +394,10 @@ TOM v3 Simple does not include:
   calibration, apply threshold/smoothing/hysteresis changes, create production config, update
   runtime config, modify model weights, replace baselines, auto approve or auto reject candidates,
   prove classifier correctness or accuracy, claim production readiness, or decide tennis truth.
+- Controlled runtime calibration application plan artifacts define future application planning
+  only. They do not perform runtime calibration, apply threshold/smoothing/hysteresis changes,
+  create production config, update runtime config, modify model weights, replace baselines, or auto
+  approve or auto reject candidates.
 
 ## Boundary
 

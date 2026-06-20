@@ -72,6 +72,24 @@ from apps.worker.services.camera_geometry_calibration_provenance import (
     validate_camera_geometry_calibration_profile,
 )
 from apps.worker.services.completion_audit import run_completion_audit
+from apps.worker.services.controlled_runtime_calibration_application_plan import (
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_CONTRACT_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_INPUTS_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_INPUTS_VALIDATION_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_VALIDATION_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_POST_APPLICATION_VERIFICATION_PLAN_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_PRE_APPLICATION_GATE_REPORT_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_ROLLBACK_PLAN_REPORT_OUTPUT,
+    build_controlled_runtime_calibration_application_plan,
+    build_controlled_runtime_calibration_application_plan_inputs,
+    build_controlled_runtime_calibration_post_application_verification_plan,
+    build_controlled_runtime_calibration_pre_application_gate_report,
+    build_controlled_runtime_calibration_rollback_plan_report,
+    export_controlled_runtime_calibration_application_plan_contract,
+    validate_controlled_runtime_calibration_application_plan,
+    validate_controlled_runtime_calibration_application_plan_inputs,
+)
 from apps.worker.services.controlled_runtime_calibration_change_request import (
     DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_CONTRACT_OUTPUT,
     DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_DRY_RUN_OUTPUT,
@@ -6503,6 +6521,286 @@ def main() -> None:
         skip_create_db=True,
     )
 
+    application_plan_contract_parser = subcommands.add_parser(
+        "export-controlled-runtime-calibration-application-plan-contract",
+        help=(
+            "Export the Blueprint 59 controlled runtime calibration application "
+            "plan contract."
+        ),
+    )
+    application_plan_contract_parser.add_argument(
+        "--output",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_CONTRACT_OUTPUT,
+        help="JSON Blueprint 59 application plan contract path.",
+    )
+    application_plan_contract_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    application_plan_contract_parser.set_defaults(
+        handler=_handle_export_controlled_runtime_calibration_application_plan_contract,
+        skip_create_db=True,
+    )
+
+    application_plan_inputs_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-application-plan-inputs",
+        help="Build Blueprint 59 controlled application plan inputs.",
+    )
+    application_plan_inputs_parser.add_argument(
+        "--contract",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_CONTRACT_OUTPUT,
+        help="Blueprint 59 application plan contract path.",
+    )
+    application_plan_inputs_parser.add_argument(
+        "--source-human-approval-gate",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_APPROVAL_GATE_OUTPUT,
+        help="Blueprint 58 human approval gate JSON path.",
+    )
+    application_plan_inputs_parser.add_argument(
+        "--source-dry-run-review-packet",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_DRY_RUN_REVIEW_PACKET_OUTPUT,
+        help="Blueprint 57 dry-run review packet JSON path.",
+    )
+    application_plan_inputs_parser.add_argument(
+        "--source-dry-run-execution-report",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_DRY_RUN_REPORT_OUTPUT,
+        help="Blueprint 56 dry-run execution report JSON path.",
+    )
+    application_plan_inputs_parser.add_argument(
+        "--source-change-request",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_OUTPUT,
+        help="Blueprint 55 controlled runtime calibration change request JSON path.",
+    )
+    application_plan_inputs_parser.add_argument(
+        "--source-candidate-config-freeze",
+        default=DEFAULT_CALIBRATION_CANDIDATE_CONFIG_FREEZE_ARTIFACT_OUTPUT,
+        help="Blueprint 53 candidate config freeze JSON path.",
+    )
+    application_plan_inputs_parser.add_argument(
+        "--source-manual-approval-packet",
+        default=DEFAULT_CALIBRATION_CANDIDATE_MANUAL_APPROVAL_PACKET_OUTPUT,
+        help="Optional Blueprint 53 manual approval packet JSON path.",
+    )
+    application_plan_inputs_parser.add_argument(
+        "--source-decision-packet",
+        default=DEFAULT_CALIBRATION_CANDIDATE_DECISION_PACKET_OUTPUT,
+        help="Optional Blueprint 52 decision packet JSON path.",
+    )
+    application_plan_inputs_parser.add_argument(
+        "--source-phase-freeze",
+        default=DEFAULT_REAL_BROADCAST_GAMEPLAY_CALIBRATION_DECISION_PHASE_FREEZE_OUTPUT,
+        help="Optional Blueprint 54 decision phase freeze JSON path.",
+    )
+    application_plan_inputs_parser.add_argument(
+        "--source-gameplay-gate-regression-baseline",
+        default=DEFAULT_GAMEPLAY_GATE_REGRESSION_BASELINE_OUTPUT,
+        help="Optional Blueprint 43 gameplay gate regression baseline path.",
+    )
+    application_plan_inputs_parser.add_argument(
+        "--source-calibration-sandbox-baseline",
+        default=(
+            DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_BASELINE_OUTPUT
+        ),
+        help="Optional Blueprint 51 calibration sandbox baseline path.",
+    )
+    application_plan_inputs_parser.add_argument(
+        "--model-asset-path",
+        default=DEFAULT_GAMEPLAY_CLASSIFIER_ASSET_PATH,
+        help="Read-only local TOM v1 gameplay classifier asset path.",
+    )
+    application_plan_inputs_parser.add_argument(
+        "--current-runtime-settings-ref",
+        default=None,
+        help="Optional current runtime settings reference for provenance.",
+    )
+    application_plan_inputs_parser.add_argument(
+        "--output",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_INPUTS_OUTPUT,
+        help="JSON Blueprint 59 application plan inputs output path.",
+    )
+    application_plan_inputs_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    application_plan_inputs_parser.set_defaults(
+        handler=_handle_build_controlled_runtime_calibration_application_plan_inputs,
+        skip_create_db=True,
+    )
+
+    application_plan_inputs_validate_parser = subcommands.add_parser(
+        "validate-controlled-runtime-calibration-application-plan-inputs",
+        help="Validate Blueprint 59 controlled application plan inputs.",
+    )
+    application_plan_inputs_validate_parser.add_argument(
+        "--contract",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_CONTRACT_OUTPUT,
+        help="Blueprint 59 application plan contract path.",
+    )
+    application_plan_inputs_validate_parser.add_argument(
+        "--application-plan-inputs",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_INPUTS_OUTPUT,
+        help="Blueprint 59 application plan inputs JSON path.",
+    )
+    application_plan_inputs_validate_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_INPUTS_VALIDATION_OUTPUT
+        ),
+        help="Optional Blueprint 59 application plan inputs validation output path.",
+    )
+    application_plan_inputs_validate_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    application_plan_inputs_validate_parser.set_defaults(
+        handler=_handle_validate_controlled_runtime_calibration_application_plan_inputs,
+        skip_create_db=True,
+    )
+
+    application_plan_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-application-plan",
+        help="Build the Blueprint 59 controlled application plan.",
+    )
+    application_plan_parser.add_argument(
+        "--contract",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_CONTRACT_OUTPUT,
+        help="Blueprint 59 application plan contract path.",
+    )
+    application_plan_parser.add_argument(
+        "--application-plan-inputs",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_INPUTS_OUTPUT,
+        help="Blueprint 59 application plan inputs JSON path.",
+    )
+    application_plan_parser.add_argument(
+        "--output",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_OUTPUT,
+        help="JSON Blueprint 59 application plan output path.",
+    )
+    application_plan_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    application_plan_parser.set_defaults(
+        handler=_handle_build_controlled_runtime_calibration_application_plan,
+        skip_create_db=True,
+    )
+
+    application_plan_validate_parser = subcommands.add_parser(
+        "validate-controlled-runtime-calibration-application-plan",
+        help="Validate the Blueprint 59 controlled application plan.",
+    )
+    application_plan_validate_parser.add_argument(
+        "--contract",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_CONTRACT_OUTPUT,
+        help="Blueprint 59 application plan contract path.",
+    )
+    application_plan_validate_parser.add_argument(
+        "--application-plan",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_OUTPUT,
+        help="Blueprint 59 application plan JSON path.",
+    )
+    application_plan_validate_parser.add_argument(
+        "--output",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_VALIDATION_OUTPUT,
+        help="Optional Blueprint 59 application plan validation output path.",
+    )
+    application_plan_validate_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    application_plan_validate_parser.set_defaults(
+        handler=_handle_validate_controlled_runtime_calibration_application_plan,
+        skip_create_db=True,
+    )
+
+    pre_application_gate_report_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-pre-application-gate-report",
+        help="Build the Blueprint 59 pre-application gate report.",
+    )
+    pre_application_gate_report_parser.add_argument(
+        "--contract",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_CONTRACT_OUTPUT,
+        help="Blueprint 59 application plan contract path.",
+    )
+    pre_application_gate_report_parser.add_argument(
+        "--application-plan",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_OUTPUT,
+        help="Blueprint 59 application plan JSON path.",
+    )
+    pre_application_gate_report_parser.add_argument(
+        "--output",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_PRE_APPLICATION_GATE_REPORT_OUTPUT,
+        help="JSON Blueprint 59 pre-application gate report output path.",
+    )
+    pre_application_gate_report_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    pre_application_gate_report_parser.set_defaults(
+        handler=_handle_build_controlled_runtime_calibration_pre_application_gate_report,
+        skip_create_db=True,
+    )
+
+    rollback_plan_report_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-rollback-plan-report",
+        help="Build the Blueprint 59 rollback plan report.",
+    )
+    rollback_plan_report_parser.add_argument(
+        "--contract",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_CONTRACT_OUTPUT,
+        help="Blueprint 59 application plan contract path.",
+    )
+    rollback_plan_report_parser.add_argument(
+        "--application-plan",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_OUTPUT,
+        help="Blueprint 59 application plan JSON path.",
+    )
+    rollback_plan_report_parser.add_argument(
+        "--output",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_ROLLBACK_PLAN_REPORT_OUTPUT,
+        help="JSON Blueprint 59 rollback plan report output path.",
+    )
+    rollback_plan_report_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    rollback_plan_report_parser.set_defaults(
+        handler=_handle_build_controlled_runtime_calibration_rollback_plan_report,
+        skip_create_db=True,
+    )
+
+    verification_plan_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-post-application-verification-plan",
+        help="Build the Blueprint 59 post-application verification plan.",
+    )
+    verification_plan_parser.add_argument(
+        "--contract",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_CONTRACT_OUTPUT,
+        help="Blueprint 59 application plan contract path.",
+    )
+    verification_plan_parser.add_argument(
+        "--application-plan",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_OUTPUT,
+        help="Blueprint 59 application plan JSON path.",
+    )
+    verification_plan_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_POST_APPLICATION_VERIFICATION_PLAN_OUTPUT
+        ),
+        help="JSON Blueprint 59 post-application verification plan output path.",
+    )
+    verification_plan_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    verification_plan_parser.set_defaults(
+        handler=(
+            _handle_build_controlled_runtime_calibration_post_application_verification_plan
+        ),
+        skip_create_db=True,
+    )
+
     point_evaluation_parser = subcommands.add_parser(
         "evaluate-point-candidates",
         help="Evaluate generated point candidate markers using operator review metadata.",
@@ -9845,6 +10143,115 @@ def _handle_build_controlled_runtime_calibration_future_application_readiness_re
     return build_controlled_runtime_calibration_future_application_readiness_report(
         contract_path=args.contract,
         approval_gate_path=args.approval_gate,
+        output_path=args.output,
+    )
+
+
+def _handle_export_controlled_runtime_calibration_application_plan_contract(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return export_controlled_runtime_calibration_application_plan_contract(
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_application_plan_inputs(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_application_plan_inputs(
+        contract_path=args.contract,
+        source_human_approval_gate_path=args.source_human_approval_gate,
+        source_dry_run_review_packet_path=args.source_dry_run_review_packet,
+        source_dry_run_execution_report_path=args.source_dry_run_execution_report,
+        source_change_request_path=args.source_change_request,
+        source_candidate_config_freeze_path=args.source_candidate_config_freeze,
+        source_manual_approval_packet_path=args.source_manual_approval_packet,
+        source_decision_packet_path=args.source_decision_packet,
+        source_phase_freeze_path=args.source_phase_freeze,
+        source_gameplay_gate_regression_baseline_path=(
+            args.source_gameplay_gate_regression_baseline
+        ),
+        source_calibration_sandbox_baseline_path=(
+            args.source_calibration_sandbox_baseline
+        ),
+        model_asset_path=args.model_asset_path,
+        current_runtime_settings_ref=args.current_runtime_settings_ref,
+        output_path=args.output,
+    )
+
+
+def _handle_validate_controlled_runtime_calibration_application_plan_inputs(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_controlled_runtime_calibration_application_plan_inputs(
+        contract_path=args.contract,
+        application_plan_inputs_path=args.application_plan_inputs,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_application_plan(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_application_plan(
+        contract_path=args.contract,
+        application_plan_inputs_path=args.application_plan_inputs,
+        output_path=args.output,
+    )
+
+
+def _handle_validate_controlled_runtime_calibration_application_plan(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_controlled_runtime_calibration_application_plan(
+        contract_path=args.contract,
+        application_plan_path=args.application_plan,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_pre_application_gate_report(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_pre_application_gate_report(
+        contract_path=args.contract,
+        application_plan_path=args.application_plan,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_rollback_plan_report(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_rollback_plan_report(
+        contract_path=args.contract,
+        application_plan_path=args.application_plan,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_post_application_verification_plan(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_post_application_verification_plan(
+        contract_path=args.contract,
+        application_plan_path=args.application_plan,
         output_path=args.output,
     )
 

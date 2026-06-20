@@ -447,6 +447,27 @@ CONTROLLED_RUNTIME_CALIBRATION_HUMAN_APPROVAL_OPERATOR_REVIEW_TIMESTAMP ?=
 CONTROLLED_RUNTIME_CALIBRATION_HUMAN_APPROVAL_SIGNOFF_SCOPE ?= no_runtime_action_acknowledgement
 CONTROLLED_RUNTIME_CALIBRATION_HUMAN_APPROVAL_SIGNOFF_STATUS ?= signoff_required
 CONTROLLED_RUNTIME_CALIBRATION_HUMAN_APPROVAL_SIGNOFF_NOTES ?=
+CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_CONTRACT_OUTPUT ?= .data/contracts/controlled_runtime_calibration_application_plan_contract_v1.json
+CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_INPUTS_OUTPUT ?= .data/exports/controlled_runtime_calibration_application_plan_inputs.current.json
+CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_INPUTS ?= $(CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_INPUTS_OUTPUT)
+CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_INPUTS_VALIDATION_OUTPUT ?= .data/exports/controlled_runtime_calibration_application_plan_inputs.validation.json
+CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_OUTPUT ?= .data/contracts/controlled_runtime_calibration_application_plan_v1.json
+CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN ?= $(CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_OUTPUT)
+CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_VALIDATION_OUTPUT ?= .data/exports/controlled_runtime_calibration_application_plan.validation.json
+CONTROLLED_RUNTIME_CALIBRATION_PRE_APPLICATION_GATE_REPORT_OUTPUT ?= .data/exports/controlled_runtime_calibration_pre_application_gate_report.current.json
+CONTROLLED_RUNTIME_CALIBRATION_ROLLBACK_PLAN_REPORT_OUTPUT ?= .data/exports/controlled_runtime_calibration_rollback_plan_report.current.json
+CONTROLLED_RUNTIME_CALIBRATION_POST_APPLICATION_VERIFICATION_PLAN_OUTPUT ?= .data/exports/controlled_runtime_calibration_post_application_verification_plan.current.json
+CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_SOURCE_HUMAN_APPROVAL_GATE ?= $(CONTROLLED_RUNTIME_CALIBRATION_HUMAN_APPROVAL_GATE_OUTPUT)
+CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_SOURCE_REVIEW_PACKET ?= $(CONTROLLED_RUNTIME_CALIBRATION_DRY_RUN_REVIEW_PACKET_OUTPUT)
+CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_SOURCE_DRY_RUN_REPORT ?= $(CONTROLLED_RUNTIME_CALIBRATION_DRY_RUN_REPORT_OUTPUT)
+CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_SOURCE_CHANGE_REQUEST ?= $(CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_OUTPUT)
+CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_SOURCE_CANDIDATE_CONFIG_FREEZE ?= $(CALIBRATION_CANDIDATE_CONFIG_FREEZE_ARTIFACT_OUTPUT)
+CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_SOURCE_MANUAL_APPROVAL_PACKET ?= $(CALIBRATION_CANDIDATE_MANUAL_APPROVAL_PACKET_OUTPUT)
+CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_SOURCE_DECISION_PACKET ?= $(CALIBRATION_CANDIDATE_DECISION_PACKET_OUTPUT)
+CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_SOURCE_PHASE_FREEZE ?= $(REAL_BROADCAST_GAMEPLAY_CALIBRATION_DECISION_PHASE_FREEZE_OUTPUT)
+CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_SOURCE_GAMEPLAY_GATE_REGRESSION_BASELINE ?= $(GAMEPLAY_GATE_REGRESSION_BASELINE_OUTPUT)
+CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_SOURCE_CALIBRATION_SANDBOX_BASELINE ?= $(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_BASELINE_OUTPUT)
+CONTROLLED_RUNTIME_CALIBRATION_CURRENT_RUNTIME_SETTINGS_REF ?=
 EXPECTED_BRANCH ?=
 EXPECTED_TAG ?=
 FORMAT ?= json
@@ -553,6 +574,7 @@ export TOM_V3_DATABASE_URL
 .PHONY: tom-v1-export-controlled-runtime-calibration-dry-run-execution-contract tom-v1-build-controlled-runtime-calibration-dry-run-inputs tom-v1-validate-controlled-runtime-calibration-dry-run-inputs tom-v1-run-controlled-runtime-calibration-dry-run tom-v1-validate-controlled-runtime-calibration-dry-run-report tom-v1-build-controlled-runtime-calibration-dry-run-summary tom-v1-build-controlled-runtime-calibration-dry-run-rollback-readiness-report
 .PHONY: tom-v1-export-controlled-runtime-calibration-dry-run-review-packet-contract tom-v1-build-controlled-runtime-calibration-dry-run-review-packet-inputs tom-v1-validate-controlled-runtime-calibration-dry-run-review-packet-inputs tom-v1-build-controlled-runtime-calibration-dry-run-review-packet tom-v1-validate-controlled-runtime-calibration-dry-run-review-packet tom-v1-build-controlled-runtime-calibration-dry-run-review-summary tom-v1-build-controlled-runtime-calibration-dry-run-operator-checklist
 .PHONY: tom-v1-export-controlled-runtime-calibration-human-approval-gate-contract tom-v1-build-controlled-runtime-calibration-human-approval-gate-inputs tom-v1-validate-controlled-runtime-calibration-human-approval-gate-inputs tom-v1-build-controlled-runtime-calibration-human-approval-gate tom-v1-validate-controlled-runtime-calibration-human-approval-gate tom-v1-build-controlled-runtime-calibration-human-approval-summary tom-v1-build-controlled-runtime-calibration-future-application-readiness-report
+.PHONY: tom-v1-export-controlled-runtime-calibration-application-plan-contract tom-v1-build-controlled-runtime-calibration-application-plan-inputs tom-v1-validate-controlled-runtime-calibration-application-plan-inputs tom-v1-build-controlled-runtime-calibration-application-plan tom-v1-validate-controlled-runtime-calibration-application-plan tom-v1-build-controlled-runtime-calibration-pre-application-gate-report tom-v1-build-controlled-runtime-calibration-rollback-plan-report tom-v1-build-controlled-runtime-calibration-post-application-verification-plan
 
 install:
 	$(PYTHON) -m pip install -e ".[dev]"
@@ -1341,6 +1363,30 @@ tom-v1-build-controlled-runtime-calibration-human-approval-summary:
 
 tom-v1-build-controlled-runtime-calibration-future-application-readiness-report:
 	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-future-application-readiness-report --contract "$(CONTROLLED_RUNTIME_CALIBRATION_HUMAN_APPROVAL_GATE_CONTRACT_OUTPUT)" --approval-gate "$(CONTROLLED_RUNTIME_CALIBRATION_HUMAN_APPROVAL_GATE)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_FUTURE_APPLICATION_READINESS_REPORT_OUTPUT)" --skip-create-db
+
+tom-v1-export-controlled-runtime-calibration-application-plan-contract:
+	$(PYTHON) -m apps.worker.cli export-controlled-runtime-calibration-application-plan-contract --output "$(CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_CONTRACT_OUTPUT)" --skip-create-db
+
+tom-v1-build-controlled-runtime-calibration-application-plan-inputs:
+	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-application-plan-inputs --contract "$(CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_CONTRACT_OUTPUT)" --source-human-approval-gate "$(CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_SOURCE_HUMAN_APPROVAL_GATE)" --source-dry-run-review-packet "$(CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_SOURCE_REVIEW_PACKET)" --source-dry-run-execution-report "$(CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_SOURCE_DRY_RUN_REPORT)" --source-change-request "$(CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_SOURCE_CHANGE_REQUEST)" --source-candidate-config-freeze "$(CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_SOURCE_CANDIDATE_CONFIG_FREEZE)" --source-manual-approval-packet "$(CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_SOURCE_MANUAL_APPROVAL_PACKET)" --source-decision-packet "$(CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_SOURCE_DECISION_PACKET)" --source-phase-freeze "$(CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_SOURCE_PHASE_FREEZE)" --source-gameplay-gate-regression-baseline "$(CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_SOURCE_GAMEPLAY_GATE_REGRESSION_BASELINE)" --source-calibration-sandbox-baseline "$(CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_SOURCE_CALIBRATION_SANDBOX_BASELINE)" --model-asset-path "$(GAMEPLAY_CLASSIFIER_ASSET_PATH)" $(if $(CONTROLLED_RUNTIME_CALIBRATION_CURRENT_RUNTIME_SETTINGS_REF),--current-runtime-settings-ref "$(CONTROLLED_RUNTIME_CALIBRATION_CURRENT_RUNTIME_SETTINGS_REF)",) --output "$(CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_INPUTS_OUTPUT)" --skip-create-db
+
+tom-v1-validate-controlled-runtime-calibration-application-plan-inputs:
+	$(PYTHON) -m apps.worker.cli validate-controlled-runtime-calibration-application-plan-inputs --contract "$(CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_CONTRACT_OUTPUT)" --application-plan-inputs "$(CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_INPUTS)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_INPUTS_VALIDATION_OUTPUT)" --skip-create-db
+
+tom-v1-build-controlled-runtime-calibration-application-plan:
+	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-application-plan --contract "$(CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_CONTRACT_OUTPUT)" --application-plan-inputs "$(CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_INPUTS)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_OUTPUT)" --skip-create-db
+
+tom-v1-validate-controlled-runtime-calibration-application-plan:
+	$(PYTHON) -m apps.worker.cli validate-controlled-runtime-calibration-application-plan --contract "$(CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_CONTRACT_OUTPUT)" --application-plan "$(CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_VALIDATION_OUTPUT)" --skip-create-db
+
+tom-v1-build-controlled-runtime-calibration-pre-application-gate-report:
+	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-pre-application-gate-report --contract "$(CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_CONTRACT_OUTPUT)" --application-plan "$(CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_PRE_APPLICATION_GATE_REPORT_OUTPUT)" --skip-create-db
+
+tom-v1-build-controlled-runtime-calibration-rollback-plan-report:
+	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-rollback-plan-report --contract "$(CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_CONTRACT_OUTPUT)" --application-plan "$(CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_ROLLBACK_PLAN_REPORT_OUTPUT)" --skip-create-db
+
+tom-v1-build-controlled-runtime-calibration-post-application-verification-plan:
+	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-post-application-verification-plan --contract "$(CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_CONTRACT_OUTPUT)" --application-plan "$(CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_POST_APPLICATION_VERIFICATION_PLAN_OUTPUT)" --skip-create-db
 
 tom-v1-post-codex-validate:
 	scripts/post_codex_validate.sh $(if $(EXPECTED_BRANCH),--branch "$(EXPECTED_BRANCH)",) $(if $(EXPECTED_TAG),--expected-tag "$(EXPECTED_TAG)",) --python "$(PYTHON)"

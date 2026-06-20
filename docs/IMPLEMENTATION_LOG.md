@@ -4216,6 +4216,44 @@ baselines; does not create production config; does not approve or reject candida
 claim tennis truth, classifier correctness, classifier accuracy, production readiness, or
 generalization.
 
+## Blueprint 59 Controlled Runtime Calibration Application Plan v1
+
+Status: complete
+
+### Goal
+
+Create the formal future application plan for controlled runtime calibration without applying
+runtime calibration.
+
+### Notes
+
+This milestone adds:
+
+- `apps.worker.services.controlled_runtime_calibration_application_plan`
+- eight worker CLI commands for contract export, input build, input validation, plan build, plan
+  validation, pre-application gate report build, rollback plan report build, and post-application
+  verification plan build
+- matching `tom-v1-*controlled-runtime-calibration-application-plan*` Make helpers
+- `.data/contracts/controlled_runtime_calibration_application_plan_contract_v1.json` tracked
+  contract
+- `.data/contracts/controlled_runtime_calibration_application_plan_v1.json` tracked application
+  plan
+- generated inputs, validation, pre-application gate, rollback, and verification paths under
+  `.data/exports/`
+- `docs/blueprints/blueprint_59_controlled_runtime_calibration_application_plan_v1.md`
+- `docs/reviews/controlled_runtime_calibration_application_plan_v1.md`
+- `docs/agent_reports/blueprint_59_controlled_runtime_calibration_application_plan_v1_report.md`
+
+Blueprint 59 application plans preserve `runtime_application_status: not_applied`,
+`mutation_status: no_runtime_mutation`, `production_config_status: not_created`,
+`baseline_update_status: not_replaced`, `model_update_status: not_modified`, and
+`future_blueprint_required_for_runtime_application: true`. The current plan is
+`application_plan_blocked_unresolved_blockers`, with rollback and post-application verification
+plans defined for future use only. It does not apply threshold, smoothing, or hysteresis changes;
+does not update runtime config; does not mutate model weights; does not replace baselines; does
+not create production config; does not auto approve or auto reject candidates; and does not perform
+runtime application.
+
 ## Blueprint 58 Controlled Runtime Calibration Human Approval Gate v1
 
 Status: complete

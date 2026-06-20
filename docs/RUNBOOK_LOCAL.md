@@ -1964,6 +1964,44 @@ Generated inputs, validations, summaries, and future-readiness reports remain un
 - `human_operator_signoff_required`: true
 - `future_blueprint_required_for_runtime_application`: true
 
+## Controlled Runtime Calibration Application Plan
+
+Use this after Blueprint 58 human approval gate artifacts have been built. The application plan
+records source provenance, config delta proposal state, pre-application gates, rollback planning,
+post-application verification planning, and future baseline candidate policy only. It does not apply
+threshold, smoothing, hysteresis, model, runtime config, production config, or baseline changes.
+
+Build the tracked contract and frozen application plan:
+
+```bash
+make tom-v1-export-controlled-runtime-calibration-application-plan-contract \
+  tom-v1-build-controlled-runtime-calibration-application-plan-inputs \
+  tom-v1-validate-controlled-runtime-calibration-application-plan-inputs \
+  tom-v1-build-controlled-runtime-calibration-application-plan \
+  tom-v1-validate-controlled-runtime-calibration-application-plan \
+  tom-v1-build-controlled-runtime-calibration-pre-application-gate-report \
+  tom-v1-build-controlled-runtime-calibration-rollback-plan-report \
+  tom-v1-build-controlled-runtime-calibration-post-application-verification-plan \
+  PYTHON=.venv/bin/python
+```
+
+Tracked outputs:
+
+```text
+.data/contracts/controlled_runtime_calibration_application_plan_contract_v1.json
+.data/contracts/controlled_runtime_calibration_application_plan_v1.json
+```
+
+Generated inputs, validations, gate reports, rollback reports, and verification plans remain under
+`.data/exports/`. Expected safe-state fields include:
+
+- `runtime_application_status`: `not_applied`
+- `mutation_status`: `no_runtime_mutation`
+- `production_config_status`: `not_created`
+- `baseline_update_status`: `not_replaced`
+- `model_update_status`: `not_modified`
+- `future_blueprint_required_for_runtime_application`: true
+
 ## Calibration Evaluation Sandbox Regression Gate
 
 Use this after Blueprint 50 evaluation inputs and reports have been built. The gate freezes and
