@@ -122,6 +122,22 @@ from apps.worker.services.controlled_runtime_calibration_dry_run_review_packet i
     validate_controlled_runtime_calibration_dry_run_review_packet,
     validate_controlled_runtime_calibration_dry_run_review_packet_inputs,
 )
+from apps.worker.services.controlled_runtime_calibration_human_approval_gate import (
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FUTURE_APPLICATION_READINESS_REPORT_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_APPROVAL_GATE_CONTRACT_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_APPROVAL_GATE_INPUTS_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_APPROVAL_GATE_INPUTS_VALIDATION_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_APPROVAL_GATE_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_APPROVAL_GATE_VALIDATION_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_APPROVAL_SUMMARY_OUTPUT,
+    build_controlled_runtime_calibration_future_application_readiness_report,
+    build_controlled_runtime_calibration_human_approval_gate,
+    build_controlled_runtime_calibration_human_approval_gate_inputs,
+    build_controlled_runtime_calibration_human_approval_summary,
+    export_controlled_runtime_calibration_human_approval_gate_contract,
+    validate_controlled_runtime_calibration_human_approval_gate,
+    validate_controlled_runtime_calibration_human_approval_gate_inputs,
+)
 from apps.worker.services.court_adapter import run_fixture_court_adapter
 from apps.worker.services.court_review_export import export_court_review_dataset
 from apps.worker.services.coverage_driven_sampling_strategy import (
@@ -6220,6 +6236,273 @@ def main() -> None:
         skip_create_db=True,
     )
 
+    human_approval_gate_contract_parser = subcommands.add_parser(
+        "export-controlled-runtime-calibration-human-approval-gate-contract",
+        help=(
+            "Export the Blueprint 58 controlled runtime calibration human "
+            "approval gate contract."
+        ),
+    )
+    human_approval_gate_contract_parser.add_argument(
+        "--output",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_APPROVAL_GATE_CONTRACT_OUTPUT,
+        help="JSON Blueprint 58 human approval gate contract path.",
+    )
+    human_approval_gate_contract_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    human_approval_gate_contract_parser.set_defaults(
+        handler=_handle_export_controlled_runtime_calibration_human_approval_gate_contract,
+        skip_create_db=True,
+    )
+
+    human_approval_inputs_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-human-approval-gate-inputs",
+        help="Build Blueprint 58 controlled human approval gate inputs.",
+    )
+    human_approval_inputs_parser.add_argument(
+        "--contract",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_APPROVAL_GATE_CONTRACT_OUTPUT,
+        help="Blueprint 58 human approval gate contract path.",
+    )
+    human_approval_inputs_parser.add_argument(
+        "--source-dry-run-review-packet",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_DRY_RUN_REVIEW_PACKET_OUTPUT,
+        help="Blueprint 57 dry-run review packet JSON path.",
+    )
+    human_approval_inputs_parser.add_argument(
+        "--source-dry-run-execution-report",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_DRY_RUN_REPORT_OUTPUT,
+        help="Blueprint 56 dry-run execution report JSON path.",
+    )
+    human_approval_inputs_parser.add_argument(
+        "--source-change-request",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_OUTPUT,
+        help="Blueprint 55 controlled runtime calibration change request JSON path.",
+    )
+    human_approval_inputs_parser.add_argument(
+        "--source-candidate-config-freeze",
+        default=DEFAULT_CALIBRATION_CANDIDATE_CONFIG_FREEZE_ARTIFACT_OUTPUT,
+        help="Blueprint 53 candidate config freeze JSON path.",
+    )
+    human_approval_inputs_parser.add_argument(
+        "--source-manual-approval-packet",
+        default=DEFAULT_CALIBRATION_CANDIDATE_MANUAL_APPROVAL_PACKET_OUTPUT,
+        help="Optional Blueprint 53 manual approval packet JSON path.",
+    )
+    human_approval_inputs_parser.add_argument(
+        "--source-decision-packet",
+        default=DEFAULT_CALIBRATION_CANDIDATE_DECISION_PACKET_OUTPUT,
+        help="Optional Blueprint 52 decision packet JSON path.",
+    )
+    human_approval_inputs_parser.add_argument(
+        "--source-phase-freeze",
+        default=DEFAULT_REAL_BROADCAST_GAMEPLAY_CALIBRATION_DECISION_PHASE_FREEZE_OUTPUT,
+        help="Optional Blueprint 54 decision phase freeze JSON path.",
+    )
+    human_approval_inputs_parser.add_argument(
+        "--source-gameplay-gate-regression-baseline",
+        default=DEFAULT_GAMEPLAY_GATE_REGRESSION_BASELINE_OUTPUT,
+        help="Optional Blueprint 43 gameplay gate regression baseline path.",
+    )
+    human_approval_inputs_parser.add_argument(
+        "--source-calibration-sandbox-baseline",
+        default=(
+            DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_BASELINE_OUTPUT
+        ),
+        help="Optional Blueprint 51 calibration sandbox baseline path.",
+    )
+    human_approval_inputs_parser.add_argument(
+        "--model-asset-path",
+        default=DEFAULT_GAMEPLAY_CLASSIFIER_ASSET_PATH,
+        help="Read-only local TOM v1 gameplay classifier asset path.",
+    )
+    human_approval_inputs_parser.add_argument(
+        "--operator-identity-ref",
+        default=None,
+        help="Optional operator identity reference for signoff provenance.",
+    )
+    human_approval_inputs_parser.add_argument(
+        "--operator-review-timestamp",
+        default=None,
+        help="Optional operator review timestamp for signoff provenance.",
+    )
+    human_approval_inputs_parser.add_argument(
+        "--signoff-scope",
+        default="no_runtime_action_acknowledgement",
+        help="Operator signoff scope for Blueprint 58 provenance.",
+    )
+    human_approval_inputs_parser.add_argument(
+        "--signoff-status",
+        default="signoff_required",
+        help="Operator signoff status for Blueprint 58 provenance.",
+    )
+    human_approval_inputs_parser.add_argument(
+        "--signoff-notes",
+        default=None,
+        help="Optional operator signoff notes.",
+    )
+    human_approval_inputs_parser.add_argument(
+        "--output",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_APPROVAL_GATE_INPUTS_OUTPUT,
+        help="JSON Blueprint 58 human approval gate inputs output path.",
+    )
+    human_approval_inputs_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    human_approval_inputs_parser.set_defaults(
+        handler=_handle_build_controlled_runtime_calibration_human_approval_gate_inputs,
+        skip_create_db=True,
+    )
+
+    human_approval_inputs_validate_parser = subcommands.add_parser(
+        "validate-controlled-runtime-calibration-human-approval-gate-inputs",
+        help="Validate Blueprint 58 controlled human approval gate inputs.",
+    )
+    human_approval_inputs_validate_parser.add_argument(
+        "--contract",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_APPROVAL_GATE_CONTRACT_OUTPUT,
+        help="Blueprint 58 human approval gate contract path.",
+    )
+    human_approval_inputs_validate_parser.add_argument(
+        "--approval-gate-inputs",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_APPROVAL_GATE_INPUTS_OUTPUT,
+        help="Blueprint 58 human approval gate inputs JSON path.",
+    )
+    human_approval_inputs_validate_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_APPROVAL_GATE_INPUTS_VALIDATION_OUTPUT
+        ),
+        help="Optional Blueprint 58 approval gate inputs validation output path.",
+    )
+    human_approval_inputs_validate_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    human_approval_inputs_validate_parser.set_defaults(
+        handler=_handle_validate_controlled_runtime_calibration_human_approval_gate_inputs,
+        skip_create_db=True,
+    )
+
+    human_approval_gate_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-human-approval-gate",
+        help="Build the Blueprint 58 controlled human approval gate.",
+    )
+    human_approval_gate_parser.add_argument(
+        "--contract",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_APPROVAL_GATE_CONTRACT_OUTPUT,
+        help="Blueprint 58 human approval gate contract path.",
+    )
+    human_approval_gate_parser.add_argument(
+        "--approval-gate-inputs",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_APPROVAL_GATE_INPUTS_OUTPUT,
+        help="Blueprint 58 human approval gate inputs JSON path.",
+    )
+    human_approval_gate_parser.add_argument(
+        "--output",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_APPROVAL_GATE_OUTPUT,
+        help="JSON Blueprint 58 human approval gate output path.",
+    )
+    human_approval_gate_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    human_approval_gate_parser.set_defaults(
+        handler=_handle_build_controlled_runtime_calibration_human_approval_gate,
+        skip_create_db=True,
+    )
+
+    human_approval_gate_validate_parser = subcommands.add_parser(
+        "validate-controlled-runtime-calibration-human-approval-gate",
+        help="Validate the Blueprint 58 controlled human approval gate.",
+    )
+    human_approval_gate_validate_parser.add_argument(
+        "--contract",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_APPROVAL_GATE_CONTRACT_OUTPUT,
+        help="Blueprint 58 human approval gate contract path.",
+    )
+    human_approval_gate_validate_parser.add_argument(
+        "--approval-gate",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_APPROVAL_GATE_OUTPUT,
+        help="Blueprint 58 human approval gate JSON path.",
+    )
+    human_approval_gate_validate_parser.add_argument(
+        "--output",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_APPROVAL_GATE_VALIDATION_OUTPUT,
+        help="Optional Blueprint 58 human approval gate validation output path.",
+    )
+    human_approval_gate_validate_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    human_approval_gate_validate_parser.set_defaults(
+        handler=_handle_validate_controlled_runtime_calibration_human_approval_gate,
+        skip_create_db=True,
+    )
+
+    human_approval_summary_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-human-approval-summary",
+        help="Build the Blueprint 58 controlled human approval summary.",
+    )
+    human_approval_summary_parser.add_argument(
+        "--contract",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_APPROVAL_GATE_CONTRACT_OUTPUT,
+        help="Blueprint 58 human approval gate contract path.",
+    )
+    human_approval_summary_parser.add_argument(
+        "--approval-gate",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_APPROVAL_GATE_OUTPUT,
+        help="Blueprint 58 human approval gate JSON path.",
+    )
+    human_approval_summary_parser.add_argument(
+        "--output",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_APPROVAL_SUMMARY_OUTPUT,
+        help="JSON Blueprint 58 human approval summary output path.",
+    )
+    human_approval_summary_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    human_approval_summary_parser.set_defaults(
+        handler=_handle_build_controlled_runtime_calibration_human_approval_summary,
+        skip_create_db=True,
+    )
+
+    human_approval_readiness_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-future-application-readiness-report",
+        help="Build the Blueprint 58 future application readiness report.",
+    )
+    human_approval_readiness_parser.add_argument(
+        "--contract",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_APPROVAL_GATE_CONTRACT_OUTPUT,
+        help="Blueprint 58 human approval gate contract path.",
+    )
+    human_approval_readiness_parser.add_argument(
+        "--approval-gate",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_APPROVAL_GATE_OUTPUT,
+        help="Blueprint 58 human approval gate JSON path.",
+    )
+    human_approval_readiness_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FUTURE_APPLICATION_READINESS_REPORT_OUTPUT
+        ),
+        help="JSON Blueprint 58 future application readiness output path.",
+    )
+    human_approval_readiness_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    human_approval_readiness_parser.set_defaults(
+        handler=(
+            _handle_build_controlled_runtime_calibration_future_application_readiness_report
+        ),
+        skip_create_db=True,
+    )
+
     point_evaluation_parser = subcommands.add_parser(
         "evaluate-point-candidates",
         help="Evaluate generated point candidate markers using operator review metadata.",
@@ -9462,6 +9745,106 @@ def _handle_build_controlled_runtime_calibration_dry_run_operator_checklist(
     return build_controlled_runtime_calibration_dry_run_operator_checklist(
         contract_path=args.contract,
         review_packet_path=args.review_packet,
+        output_path=args.output,
+    )
+
+
+def _handle_export_controlled_runtime_calibration_human_approval_gate_contract(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return export_controlled_runtime_calibration_human_approval_gate_contract(
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_human_approval_gate_inputs(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_human_approval_gate_inputs(
+        contract_path=args.contract,
+        source_dry_run_review_packet_path=args.source_dry_run_review_packet,
+        source_dry_run_execution_report_path=args.source_dry_run_execution_report,
+        source_change_request_path=args.source_change_request,
+        source_candidate_config_freeze_path=args.source_candidate_config_freeze,
+        source_manual_approval_packet_path=args.source_manual_approval_packet,
+        source_decision_packet_path=args.source_decision_packet,
+        source_phase_freeze_path=args.source_phase_freeze,
+        source_gameplay_gate_regression_baseline_path=(
+            args.source_gameplay_gate_regression_baseline
+        ),
+        source_calibration_sandbox_baseline_path=(
+            args.source_calibration_sandbox_baseline
+        ),
+        model_asset_path=args.model_asset_path,
+        operator_identity_ref=args.operator_identity_ref,
+        operator_review_timestamp=args.operator_review_timestamp,
+        signoff_scope=args.signoff_scope,
+        signoff_status=args.signoff_status,
+        signoff_notes=args.signoff_notes,
+        output_path=args.output,
+    )
+
+
+def _handle_validate_controlled_runtime_calibration_human_approval_gate_inputs(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_controlled_runtime_calibration_human_approval_gate_inputs(
+        contract_path=args.contract,
+        approval_gate_inputs_path=args.approval_gate_inputs,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_human_approval_gate(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_human_approval_gate(
+        contract_path=args.contract,
+        approval_gate_inputs_path=args.approval_gate_inputs,
+        output_path=args.output,
+    )
+
+
+def _handle_validate_controlled_runtime_calibration_human_approval_gate(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_controlled_runtime_calibration_human_approval_gate(
+        contract_path=args.contract,
+        approval_gate_path=args.approval_gate,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_human_approval_summary(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_human_approval_summary(
+        contract_path=args.contract,
+        approval_gate_path=args.approval_gate,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_future_application_readiness_report(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_future_application_readiness_report(
+        contract_path=args.contract,
+        approval_gate_path=args.approval_gate,
         output_path=args.output,
     )
 

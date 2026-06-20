@@ -4216,6 +4216,43 @@ baselines; does not create production config; does not approve or reject candida
 claim tennis truth, classifier correctness, classifier accuracy, production readiness, or
 generalization.
 
+## Blueprint 58 Controlled Runtime Calibration Human Approval Gate v1
+
+Status: complete
+
+### Goal
+
+Create the formal human/operator approval gate for controlled runtime calibration without applying
+runtime calibration.
+
+### Notes
+
+This milestone adds:
+
+- `apps.worker.services.controlled_runtime_calibration_human_approval_gate`
+- seven worker CLI commands for contract export, input build, input validation, gate build, gate
+  validation, human approval summary build, and future application readiness report build
+- matching `tom-v1-*controlled-runtime-calibration-human-approval*` Make helpers
+- `.data/contracts/controlled_runtime_calibration_human_approval_gate_contract_v1.json` tracked
+  contract
+- `.data/contracts/controlled_runtime_calibration_human_approval_gate_v1.json` tracked approval
+  gate
+- generated inputs, validation, summary, and future-readiness report paths under `.data/exports/`
+- `docs/blueprints/blueprint_58_controlled_runtime_calibration_human_approval_gate_v1.md`
+- `docs/reviews/controlled_runtime_calibration_human_approval_gate_v1.md`
+- `docs/agent_reports/blueprint_58_controlled_runtime_calibration_human_approval_gate_v1_report.md`
+
+Blueprint 58 approval gates preserve `runtime_application_status: not_applied`,
+`mutation_status: no_runtime_mutation`, `production_config_status: not_created`,
+`baseline_update_status: not_replaced`, `model_update_status: not_modified`,
+`human_operator_signoff_required: true`, and
+`future_blueprint_required_for_runtime_application: true`. The current gate is
+`approval_gate_blocked_unresolved_blockers` because the BP57 source review packet still carries
+unresolved blocker context. It does not apply threshold, smoothing, or hysteresis changes; does not
+update runtime config; does not mutate model weights; does not replace baselines; does not create
+production config; does not auto approve or auto reject candidates; and does not claim tennis truth,
+classifier correctness, classifier accuracy, production readiness, or generalization.
+
 ## Blueprint 57 Controlled Runtime Calibration Dry-Run Review Packet v1
 
 Status: complete

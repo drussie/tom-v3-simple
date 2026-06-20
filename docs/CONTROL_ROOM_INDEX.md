@@ -384,6 +384,8 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Controlled Runtime Calibration Dry-Run Execution v1](reviews/controlled_runtime_calibration_dry_run_execution_v1.md)
 - [Blueprint 57 Controlled Runtime Calibration Dry-Run Review Packet v1](blueprints/blueprint_57_controlled_runtime_calibration_dry_run_review_packet_v1.md)
 - [Controlled Runtime Calibration Dry-Run Review Packet v1](reviews/controlled_runtime_calibration_dry_run_review_packet_v1.md)
+- [Blueprint 58 Controlled Runtime Calibration Human Approval Gate v1](blueprints/blueprint_58_controlled_runtime_calibration_human_approval_gate_v1.md)
+- [Controlled Runtime Calibration Human Approval Gate v1](reviews/controlled_runtime_calibration_human_approval_gate_v1.md)
 
 ## Development
 

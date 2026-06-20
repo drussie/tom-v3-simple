@@ -389,6 +389,11 @@ TOM v3 Simple does not include:
   operator review only. They do not perform runtime calibration, approve a candidate, create a
   production config, update baselines, modify model weights, prove classifier correctness or
   accuracy, claim production readiness, or decide tennis truth.
+- Controlled runtime calibration human approval gate artifacts record operator signoff state,
+  blocker context, and future-readiness requirements only. They do not perform runtime
+  calibration, apply threshold/smoothing/hysteresis changes, create production config, update
+  runtime config, modify model weights, replace baselines, auto approve or auto reject candidates,
+  prove classifier correctness or accuracy, claim production readiness, or decide tennis truth.
 
 ## Boundary
 

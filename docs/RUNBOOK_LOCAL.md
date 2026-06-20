@@ -1926,6 +1926,44 @@ Expected safe-state fields include:
 - `operator_review_required`: true
 - `future_blueprint_required_for_runtime_application`: true
 
+## Controlled Runtime Calibration Human Approval Gate
+
+Use this after Blueprint 57 dry-run review packet artifacts have been built. The approval gate
+records human/operator signoff state, blocker context, warning context, and future-readiness
+requirements only. It does not apply threshold, smoothing, hysteresis, model, runtime config,
+production config, or baseline changes.
+
+Build the tracked contract and frozen approval gate:
+
+```bash
+make tom-v1-export-controlled-runtime-calibration-human-approval-gate-contract \
+  tom-v1-build-controlled-runtime-calibration-human-approval-gate-inputs \
+  tom-v1-validate-controlled-runtime-calibration-human-approval-gate-inputs \
+  tom-v1-build-controlled-runtime-calibration-human-approval-gate \
+  tom-v1-validate-controlled-runtime-calibration-human-approval-gate \
+  tom-v1-build-controlled-runtime-calibration-human-approval-summary \
+  tom-v1-build-controlled-runtime-calibration-future-application-readiness-report \
+  PYTHON=.venv/bin/python
+```
+
+Tracked outputs:
+
+```text
+.data/contracts/controlled_runtime_calibration_human_approval_gate_contract_v1.json
+.data/contracts/controlled_runtime_calibration_human_approval_gate_v1.json
+```
+
+Generated inputs, validations, summaries, and future-readiness reports remain under
+`.data/exports/`. Expected safe-state fields include:
+
+- `runtime_application_status`: `not_applied`
+- `mutation_status`: `no_runtime_mutation`
+- `production_config_status`: `not_created`
+- `baseline_update_status`: `not_replaced`
+- `model_update_status`: `not_modified`
+- `human_operator_signoff_required`: true
+- `future_blueprint_required_for_runtime_application`: true
+
 ## Calibration Evaluation Sandbox Regression Gate
 
 Use this after Blueprint 50 evaluation inputs and reports have been built. The gate freezes and
