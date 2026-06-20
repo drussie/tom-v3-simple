@@ -1808,3 +1808,36 @@ Blueprint 59 does not train or mutate the gameplay classifier, commit model weig
 baselines, create labels, perform automatic relabeling, change thresholds, smoothing, hysteresis,
 or runtime config, create production config, auto approve or auto reject candidates, or perform
 runtime application.
+
+## Blueprint 60 Status
+
+Status: complete.
+
+Blueprint 60 adds the controlled runtime application staging layer:
+
+```text
+BP59 controlled application plan
+-> runtime application staging input bundle
+-> controlled runtime application staging artifact
+-> staged config delta
+-> pre-apply manifest
+-> rollback staging report
+-> staged post-application verification report
+```
+
+The tracked artifacts are
+`.data/contracts/controlled_runtime_calibration_runtime_application_staging_contract_v1.json` and
+`.data/contracts/controlled_runtime_calibration_runtime_application_staging_v1.json`. Generated
+local exports include inputs, validations, staged config deltas, pre-apply manifests, rollback
+reports, and staged verification reports under `.data/exports/`.
+
+The current frozen staging artifact is `staging_blocked_unresolved_blockers` with
+`runtime_application_status: staged_not_applied`, `mutation_status: no_runtime_mutation`,
+`runtime_config_status: not_updated`, `production_config_status: not_created`,
+`baseline_update_status: not_replaced`, `model_update_status: not_modified`, and
+`future_blueprint_required_for_runtime_application: true`.
+
+Blueprint 60 does not train or mutate the gameplay classifier, commit model weights, mutate
+baselines, create labels, perform automatic relabeling, change thresholds, smoothing, hysteresis,
+or runtime config, create production config, auto approve or auto reject candidates, or perform
+runtime application.

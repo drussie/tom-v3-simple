@@ -1183,4 +1183,73 @@ run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-post-a
   --output "$TMP_ROOT/controlled_runtime_calibration_post_application_verification_plan.current.json" \
   --skip-create-db
 
+run "$PYTHON_BIN" -m apps.worker.cli export-controlled-runtime-calibration-runtime-application-staging-contract \
+  --output "$TMP_ROOT/controlled_runtime_calibration_runtime_application_staging_contract_v1.smoke.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-runtime-application-staging-inputs \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_runtime_application_staging_contract_v1.smoke.json" \
+  --source-application-plan "$TMP_ROOT/controlled_runtime_calibration_application_plan.current.json" \
+  --source-human-approval-gate "$TMP_ROOT/controlled_runtime_calibration_human_approval_gate.current.json" \
+  --source-dry-run-review-packet "$TMP_ROOT/controlled_runtime_calibration_dry_run_review_packet.current.json" \
+  --source-dry-run-execution-report "$TMP_ROOT/controlled_runtime_calibration_dry_run_execution.current.json" \
+  --source-change-request "$TMP_ROOT/controlled_runtime_calibration_change_request.current.json" \
+  --source-candidate-config-freeze "$TMP_ROOT/calibration_candidate_config_freeze.current.json" \
+  --source-manual-approval-packet "$TMP_ROOT/calibration_candidate_manual_approval_packet.current.json" \
+  --source-decision-packet "$TMP_ROOT/calibration_candidate_decision_packet.current.json" \
+  --source-phase-freeze "$TMP_ROOT/real_broadcast_gameplay_calibration_decision_phase_freeze_v1.smoke.json" \
+  --source-gameplay-gate-regression-baseline "$TMP_ROOT/gameplay_gate_regression.baseline.json" \
+  --source-calibration-sandbox-baseline "$TMP_ROOT/review_guided_gameplay_calibration_sandbox.baseline.json" \
+  --model-asset-path "model_assets/tom_v1/view_classifier_gameplay.pt" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_runtime_application_staging_inputs.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli validate-controlled-runtime-calibration-runtime-application-staging-inputs \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_runtime_application_staging_contract_v1.smoke.json" \
+  --staging-inputs "$TMP_ROOT/controlled_runtime_calibration_runtime_application_staging_inputs.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_runtime_application_staging_inputs.validation.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-runtime-application-staging \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_runtime_application_staging_contract_v1.smoke.json" \
+  --staging-inputs "$TMP_ROOT/controlled_runtime_calibration_runtime_application_staging_inputs.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_runtime_application_staging.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli validate-controlled-runtime-calibration-runtime-application-staging \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_runtime_application_staging_contract_v1.smoke.json" \
+  --staging "$TMP_ROOT/controlled_runtime_calibration_runtime_application_staging.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_runtime_application_staging.validation.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-staged-config-delta \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_runtime_application_staging_contract_v1.smoke.json" \
+  --staging "$TMP_ROOT/controlled_runtime_calibration_runtime_application_staging.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_staged_config_delta.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli validate-controlled-runtime-calibration-staged-config-delta \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_runtime_application_staging_contract_v1.smoke.json" \
+  --staged-config-delta "$TMP_ROOT/controlled_runtime_calibration_staged_config_delta.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_staged_config_delta.validation.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-pre-apply-manifest \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_runtime_application_staging_contract_v1.smoke.json" \
+  --staging "$TMP_ROOT/controlled_runtime_calibration_runtime_application_staging.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_pre_apply_manifest.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-staged-rollback-report \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_runtime_application_staging_contract_v1.smoke.json" \
+  --staging "$TMP_ROOT/controlled_runtime_calibration_runtime_application_staging.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_staged_rollback_report.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-staged-post-application-verification-report \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_runtime_application_staging_contract_v1.smoke.json" \
+  --staging "$TMP_ROOT/controlled_runtime_calibration_runtime_application_staging.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_staged_post_application_verification_report.current.json" \
+  --skip-create-db
+
 run git status --short

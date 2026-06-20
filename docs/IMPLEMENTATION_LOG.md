@@ -4216,6 +4216,45 @@ baselines; does not create production config; does not approve or reject candida
 claim tennis truth, classifier correctness, classifier accuracy, production readiness, or
 generalization.
 
+## Blueprint 60 Controlled Runtime Calibration Runtime Application Staging v1
+
+Status: complete
+
+### Goal
+
+Create a controlled runtime application staging package for a future gameplay gate calibration
+runtime application blueprint, without applying any runtime calibration.
+
+### Notes
+
+This milestone adds:
+
+- `apps.worker.services.controlled_runtime_calibration_runtime_application_staging`
+- ten worker CLI commands for contract export, inputs, input validation, staging build, staging
+  validation, staged config delta build/validation, pre-apply manifest, staged rollback report, and
+  staged post-application verification report
+- matching `tom-v1-*controlled-runtime-calibration-runtime-application-staging*` Make helpers
+- `.data/contracts/controlled_runtime_calibration_runtime_application_staging_contract_v1.json`
+  tracked contract
+- `.data/contracts/controlled_runtime_calibration_runtime_application_staging_v1.json` tracked
+  frozen staging artifact
+- generated inputs, validations, staged config delta, pre-apply manifest, rollback, and
+  verification report paths under `.data/exports/`
+- `docs/blueprints/blueprint_60_controlled_runtime_calibration_runtime_application_staging_v1.md`
+- `docs/reviews/controlled_runtime_calibration_runtime_application_staging_v1.md`
+- `docs/agent_reports/blueprint_60_controlled_runtime_calibration_runtime_application_staging_v1_report.md`
+
+The committed staging artifact records `staging_status: staging_blocked_unresolved_blockers`
+because the BP59 source plan still carries unresolved blocker context and no selected candidate.
+It preserves `runtime_application_status: staged_not_applied`, `mutation_status:
+no_runtime_mutation`, `runtime_config_status: not_updated`, `production_config_status:
+not_created`, `baseline_update_status: not_replaced`, `model_update_status: not_modified`, and
+`future_blueprint_required_for_runtime_application: true`.
+
+Blueprint 60 does not apply threshold, smoothing, or hysteresis changes; does not update runtime
+config; does not mutate model weights; does not replace baselines; does not create production
+config; does not approve or reject candidates; and does not perform runtime application.
+
 ## Blueprint 59 Controlled Runtime Calibration Application Plan v1
 
 Status: complete

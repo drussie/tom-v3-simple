@@ -2002,6 +2002,47 @@ Generated inputs, validations, gate reports, rollback reports, and verification 
 - `model_update_status`: `not_modified`
 - `future_blueprint_required_for_runtime_application`: true
 
+## Controlled Runtime Calibration Runtime Application Staging
+
+Use this after Blueprint 59 application plan artifacts have been built. The staging package records
+a staged config delta, pre-apply manifest, rollback staging record, staged post-application
+verification record, and future baseline candidate staging policy only. It does not apply threshold,
+smoothing, hysteresis, model, runtime config, production config, or baseline changes.
+
+Build the tracked contract and frozen staging artifact:
+
+```bash
+make tom-v1-export-controlled-runtime-calibration-runtime-application-staging-contract \
+  tom-v1-build-controlled-runtime-calibration-runtime-application-staging-inputs \
+  tom-v1-validate-controlled-runtime-calibration-runtime-application-staging-inputs \
+  tom-v1-build-controlled-runtime-calibration-runtime-application-staging \
+  tom-v1-validate-controlled-runtime-calibration-runtime-application-staging \
+  tom-v1-build-controlled-runtime-calibration-staged-config-delta \
+  tom-v1-validate-controlled-runtime-calibration-staged-config-delta \
+  tom-v1-build-controlled-runtime-calibration-pre-apply-manifest \
+  tom-v1-build-controlled-runtime-calibration-staged-rollback-report \
+  tom-v1-build-controlled-runtime-calibration-staged-post-application-verification-report \
+  PYTHON=.venv/bin/python
+```
+
+Tracked outputs:
+
+```text
+.data/contracts/controlled_runtime_calibration_runtime_application_staging_contract_v1.json
+.data/contracts/controlled_runtime_calibration_runtime_application_staging_v1.json
+```
+
+Generated inputs, validations, staged config deltas, pre-apply manifests, rollback reports, and
+verification reports remain under `.data/exports/`. Expected safe-state fields include:
+
+- `runtime_application_status`: `staged_not_applied`
+- `mutation_status`: `no_runtime_mutation`
+- `runtime_config_status`: `not_updated`
+- `production_config_status`: `not_created`
+- `baseline_update_status`: `not_replaced`
+- `model_update_status`: `not_modified`
+- `future_blueprint_required_for_runtime_application`: true
+
 ## Calibration Evaluation Sandbox Regression Gate
 
 Use this after Blueprint 50 evaluation inputs and reports have been built. The gate freezes and

@@ -1,0 +1,913 @@
+{
+  "baseline_update_status": "not_replaced",
+  "blockers": [
+    "human_operator_approval_required",
+    "no_candidate_selected",
+    "no_unresolved_blockers"
+  ],
+  "current_settings": {
+    "current_hysteresis_settings": {
+      "enter_gameplay_probability": 0.6,
+      "exit_gameplay_probability": 0.45
+    },
+    "current_smoothing_window": 3,
+    "current_threshold": 0.55,
+    "runtime_application_status": "not_applied"
+  },
+  "future_baseline_candidate_staging_policy": {
+    "baseline_not_replaced_in_this_blueprint": true,
+    "baseline_update_status": "not_replaced",
+    "future_baseline_candidate_may_be_considered_only_after_runtime_application": true,
+    "future_baseline_candidate_not_created_in_this_blueprint": true,
+    "future_baseline_candidate_not_truth": true,
+    "future_baseline_candidate_requires_human_review": true,
+    "future_baseline_candidate_requires_post_application_review": true,
+    "future_baseline_candidate_requires_regression_gates": true,
+    "future_baseline_policy_status": "future_baseline_candidate_staging_policy_defined",
+    "mutation_status": "no_runtime_mutation",
+    "non_claims": {
+      "automatic_approval_not_performed": true,
+      "automatic_rejection_not_performed": true,
+      "automatic_relabeling_not_performed": true,
+      "baseline_not_replaced": true,
+      "classifier_correctness_not_assessed": true,
+      "classifier_not_modified": true,
+      "future_blueprint_required_for_runtime_application": true,
+      "generalization_not_claimed": true,
+      "hysteresis_changes_not_applied": true,
+      "model_weights_not_modified": true,
+      "production_config_not_created": true,
+      "production_readiness_not_claimed": true,
+      "runtime_application_not_performed": true,
+      "runtime_config_not_updated": true,
+      "smoothing_changes_not_applied": true,
+      "staged_config_delta_is_not_production_config": true,
+      "staged_config_delta_is_not_runtime_config": true,
+      "staging_artifact_is_not_accuracy_scoring": true,
+      "staging_artifact_is_not_runtime_application": true,
+      "staging_artifact_is_not_runtime_calibration": true,
+      "staging_artifact_is_not_truth": true,
+      "threshold_changes_not_applied": true
+    },
+    "runtime_application_status": "staged_not_applied",
+    "warnings": {
+      "baseline_not_replaced": true,
+      "future_blueprint_required_for_runtime_application": true
+    }
+  },
+  "future_blueprint_required_for_runtime_application": true,
+  "generated_at": "2026-06-20T15:05:44.911284+00:00",
+  "model_asset_ref": "model_assets/tom_v1/view_classifier_gameplay.pt",
+  "model_asset_sha256": "8282e03787c43b4ea75312a2ff2b8bda69535d2a40af2ba91f067e69c93b144b",
+  "model_update_status": "not_modified",
+  "mutation_status": "no_runtime_mutation",
+  "non_claims": {
+    "automatic_approval_not_performed": true,
+    "automatic_rejection_not_performed": true,
+    "automatic_relabeling_not_performed": true,
+    "baseline_not_replaced": true,
+    "classifier_correctness_not_assessed": true,
+    "classifier_not_modified": true,
+    "future_blueprint_required_for_runtime_application": true,
+    "generalization_not_claimed": true,
+    "hysteresis_changes_not_applied": true,
+    "model_weights_not_modified": true,
+    "production_config_not_created": true,
+    "production_readiness_not_claimed": true,
+    "runtime_application_not_performed": true,
+    "runtime_config_not_updated": true,
+    "smoothing_changes_not_applied": true,
+    "staged_config_delta_is_not_production_config": true,
+    "staged_config_delta_is_not_runtime_config": true,
+    "staging_artifact_is_not_accuracy_scoring": true,
+    "staging_artifact_is_not_runtime_application": true,
+    "staging_artifact_is_not_runtime_calibration": true,
+    "staging_artifact_is_not_truth": true,
+    "threshold_changes_not_applied": true
+  },
+  "post_application_verification_staging_record": {
+    "future_baseline_candidate_conditions": [
+      "separate future runtime application exists",
+      "post-application review packet exists",
+      "required regression gates pass structurally",
+      "human operator review is recorded",
+      "future baseline candidate remains review-only"
+    ],
+    "generated_at": "2026-06-20T15:05:44.911284+00:00",
+    "mutation_status": "no_runtime_mutation",
+    "non_claims": {
+      "automatic_approval_not_performed": true,
+      "automatic_rejection_not_performed": true,
+      "automatic_relabeling_not_performed": true,
+      "baseline_not_replaced": true,
+      "classifier_correctness_not_assessed": true,
+      "classifier_not_modified": true,
+      "future_blueprint_required_for_runtime_application": true,
+      "generalization_not_claimed": true,
+      "hysteresis_changes_not_applied": true,
+      "model_weights_not_modified": true,
+      "production_config_not_created": true,
+      "production_readiness_not_claimed": true,
+      "runtime_application_not_performed": true,
+      "runtime_config_not_updated": true,
+      "smoothing_changes_not_applied": true,
+      "staged_config_delta_is_not_production_config": true,
+      "staged_config_delta_is_not_runtime_config": true,
+      "staging_artifact_is_not_accuracy_scoring": true,
+      "staging_artifact_is_not_runtime_application": true,
+      "staging_artifact_is_not_runtime_calibration": true,
+      "staging_artifact_is_not_truth": true,
+      "threshold_changes_not_applied": true
+    },
+    "post_application_verification_staging_id": "controlled_runtime_calibration_post_application_verification_staging_v1_4eda6a934e769ec6ec36a95b",
+    "post_application_verification_staging_type": "controlled_runtime_calibration_staged_post_application_verification_report",
+    "post_application_verification_staging_version": "v1",
+    "required_operator_review_after_application": true,
+    "required_post_application_review_packet": true,
+    "required_regression_gates": [
+      {
+        "gate": "multi_point_regression_matrix",
+        "mutation_status": "no_runtime_mutation",
+        "required": true,
+        "runtime_application_status": "staged_not_applied"
+      },
+      {
+        "gate": "protected_sample_point_reviewed_3d_debug",
+        "mutation_status": "no_runtime_mutation",
+        "required": true,
+        "runtime_application_status": "staged_not_applied"
+      },
+      {
+        "gate": "gameplay_gate_regression_baseline",
+        "mutation_status": "no_runtime_mutation",
+        "required": true,
+        "runtime_application_status": "staged_not_applied"
+      },
+      {
+        "gate": "review_guided_gameplay_calibration_sandbox_regression",
+        "mutation_status": "no_runtime_mutation",
+        "required": true,
+        "runtime_application_status": "staged_not_applied"
+      }
+    ],
+    "required_replay_checks": [
+      "manifest-backed multi-point replay review",
+      "protected sample_point replay review",
+      "gameplay segment replay review timeline check"
+    ],
+    "required_rollback_readiness_check": true,
+    "runtime_application_status": "staged_not_applied",
+    "source_staging_id": "controlled_runtime_calibration_runtime_application_staging_v1_69d9e6a2b5efbe604d514691",
+    "verification_scope": {
+      "mutation_status": "no_runtime_mutation",
+      "runtime_application_status": "staged_not_applied",
+      "separate_future_runtime_application_required": true,
+      "source_application_plan_id": "controlled_runtime_calibration_application_plan_v1_033eb99844c21ab0c7c4ad97",
+      "source_staging_id": "controlled_runtime_calibration_runtime_application_staging_v1_69d9e6a2b5efbe604d514691"
+    },
+    "verification_staging_status": "post_application_verification_staged",
+    "warnings": {
+      "future_blueprint_required_for_runtime_application": true,
+      "post_application_verification_not_executed": true,
+      "post_application_verification_staging_record": true
+    }
+  },
+  "pre_apply_manifest": {
+    "baseline_update_status": "not_replaced",
+    "blockers": [
+      "human_operator_approval_required",
+      "no_candidate_selected",
+      "no_unresolved_blockers"
+    ],
+    "generated_at": "2026-06-20T15:05:44.911284+00:00",
+    "manifest_status": "pre_apply_manifest_blocked",
+    "missing_requirements": [
+      "no_unresolved_blockers"
+    ],
+    "mutation_status": "no_runtime_mutation",
+    "non_claims": {
+      "automatic_approval_not_performed": true,
+      "automatic_rejection_not_performed": true,
+      "automatic_relabeling_not_performed": true,
+      "baseline_not_replaced": true,
+      "classifier_correctness_not_assessed": true,
+      "classifier_not_modified": true,
+      "future_blueprint_required_for_runtime_application": true,
+      "generalization_not_claimed": true,
+      "hysteresis_changes_not_applied": true,
+      "model_weights_not_modified": true,
+      "production_config_not_created": true,
+      "production_readiness_not_claimed": true,
+      "runtime_application_not_performed": true,
+      "runtime_config_not_updated": true,
+      "smoothing_changes_not_applied": true,
+      "staged_config_delta_is_not_production_config": true,
+      "staged_config_delta_is_not_runtime_config": true,
+      "staging_artifact_is_not_accuracy_scoring": true,
+      "staging_artifact_is_not_runtime_application": true,
+      "staging_artifact_is_not_runtime_calibration": true,
+      "staging_artifact_is_not_truth": true,
+      "threshold_changes_not_applied": true
+    },
+    "pre_apply_manifest_id": "controlled_runtime_calibration_pre_apply_manifest_v1_ca242032a58a50ad69bf5739",
+    "pre_apply_manifest_type": "controlled_runtime_calibration_pre_apply_manifest",
+    "pre_apply_manifest_version": "v1",
+    "production_config_status": "not_created",
+    "required_artifacts": [
+      {
+        "mutation_status": "no_runtime_mutation",
+        "requirement": "application_plan_present",
+        "runtime_application_status": "staged_not_applied",
+        "runtime_config_status": "not_updated",
+        "status": "present",
+        "warnings": {
+          "future_blueprint_required_for_runtime_application": true
+        }
+      },
+      {
+        "mutation_status": "no_runtime_mutation",
+        "requirement": "human_approval_gate_present",
+        "runtime_application_status": "staged_not_applied",
+        "runtime_config_status": "not_updated",
+        "status": "present",
+        "warnings": {
+          "future_blueprint_required_for_runtime_application": true
+        }
+      },
+      {
+        "mutation_status": "no_runtime_mutation",
+        "requirement": "operator_signoff_artifact_present",
+        "runtime_application_status": "staged_not_applied",
+        "runtime_config_status": "not_updated",
+        "status": "present",
+        "warnings": {
+          "future_blueprint_required_for_runtime_application": true
+        }
+      },
+      {
+        "mutation_status": "no_runtime_mutation",
+        "requirement": "dry_run_review_packet_present",
+        "runtime_application_status": "staged_not_applied",
+        "runtime_config_status": "not_updated",
+        "status": "present",
+        "warnings": {
+          "future_blueprint_required_for_runtime_application": true
+        }
+      },
+      {
+        "mutation_status": "no_runtime_mutation",
+        "requirement": "dry_run_execution_report_present",
+        "runtime_application_status": "staged_not_applied",
+        "runtime_config_status": "not_updated",
+        "status": "present",
+        "warnings": {
+          "future_blueprint_required_for_runtime_application": true
+        }
+      },
+      {
+        "mutation_status": "no_runtime_mutation",
+        "requirement": "controlled_change_request_present",
+        "runtime_application_status": "staged_not_applied",
+        "runtime_config_status": "not_updated",
+        "status": "present",
+        "warnings": {
+          "future_blueprint_required_for_runtime_application": true
+        }
+      },
+      {
+        "mutation_status": "no_runtime_mutation",
+        "requirement": "candidate_config_freeze_present",
+        "runtime_application_status": "staged_not_applied",
+        "runtime_config_status": "not_updated",
+        "status": "present",
+        "warnings": {
+          "future_blueprint_required_for_runtime_application": true
+        }
+      },
+      {
+        "mutation_status": "no_runtime_mutation",
+        "requirement": "rollback_plan_present",
+        "runtime_application_status": "staged_not_applied",
+        "runtime_config_status": "not_updated",
+        "status": "present",
+        "warnings": {
+          "future_blueprint_required_for_runtime_application": true
+        }
+      },
+      {
+        "mutation_status": "no_runtime_mutation",
+        "requirement": "post_application_verification_plan_present",
+        "runtime_application_status": "staged_not_applied",
+        "runtime_config_status": "not_updated",
+        "status": "present",
+        "warnings": {
+          "future_blueprint_required_for_runtime_application": true
+        }
+      }
+    ],
+    "required_model_asset_checks": [
+      {
+        "mutation_status": "no_runtime_mutation",
+        "requirement": "model_asset_hash_captured",
+        "runtime_application_status": "staged_not_applied",
+        "runtime_config_status": "not_updated",
+        "status": "present",
+        "warnings": {
+          "future_blueprint_required_for_runtime_application": true
+        }
+      }
+    ],
+    "required_no_baseline_replacement_checks": [
+      {
+        "mutation_status": "no_runtime_mutation",
+        "requirement": "baseline_not_replaced",
+        "runtime_application_status": "staged_not_applied",
+        "runtime_config_status": "not_updated",
+        "status": "present",
+        "warnings": {
+          "future_blueprint_required_for_runtime_application": true
+        }
+      }
+    ],
+    "required_no_mutation_checks": [
+      {
+        "mutation_status": "no_runtime_mutation",
+        "requirement": "no_generated_exports_committed",
+        "runtime_application_status": "staged_not_applied",
+        "runtime_config_status": "not_updated",
+        "status": "present",
+        "warnings": {
+          "future_blueprint_required_for_runtime_application": true
+        }
+      },
+      {
+        "mutation_status": "no_runtime_mutation",
+        "requirement": "no_unresolved_blockers",
+        "runtime_application_status": "staged_not_applied",
+        "runtime_config_status": "not_updated",
+        "status": "missing",
+        "warnings": {
+          "future_blueprint_required_for_runtime_application": true
+        }
+      },
+      {
+        "mutation_status": "no_runtime_mutation",
+        "requirement": "no_runtime_mutation_in_prior_artifacts",
+        "runtime_application_status": "staged_not_applied",
+        "runtime_config_status": "not_updated",
+        "status": "present",
+        "warnings": {
+          "future_blueprint_required_for_runtime_application": true
+        }
+      },
+      {
+        "mutation_status": "no_runtime_mutation",
+        "requirement": "future_blueprint_required",
+        "runtime_application_status": "staged_not_applied",
+        "runtime_config_status": "not_updated",
+        "status": "present",
+        "warnings": {
+          "future_blueprint_required_for_runtime_application": true
+        }
+      }
+    ],
+    "required_operator_artifacts": [
+      {
+        "artifact": "human_approval_gate",
+        "mutation_status": "no_runtime_mutation",
+        "required": true,
+        "runtime_application_status": "staged_not_applied"
+      },
+      {
+        "artifact": "operator_signoff_record",
+        "mutation_status": "no_runtime_mutation",
+        "required": true,
+        "runtime_application_status": "staged_not_applied"
+      },
+      {
+        "artifact": "dry_run_review_packet",
+        "mutation_status": "no_runtime_mutation",
+        "required": true,
+        "runtime_application_status": "staged_not_applied"
+      },
+      {
+        "artifact": "future_runtime_application_blueprint",
+        "mutation_status": "no_runtime_mutation",
+        "required": true,
+        "runtime_application_status": "staged_not_applied"
+      }
+    ],
+    "required_regression_gates": [
+      {
+        "gate": "multi_point_regression_matrix",
+        "mutation_status": "no_runtime_mutation",
+        "required": true,
+        "runtime_application_status": "staged_not_applied"
+      },
+      {
+        "gate": "protected_sample_point_reviewed_3d_debug",
+        "mutation_status": "no_runtime_mutation",
+        "required": true,
+        "runtime_application_status": "staged_not_applied"
+      },
+      {
+        "gate": "gameplay_gate_regression_baseline",
+        "mutation_status": "no_runtime_mutation",
+        "required": true,
+        "runtime_application_status": "staged_not_applied"
+      },
+      {
+        "gate": "review_guided_gameplay_calibration_sandbox_regression",
+        "mutation_status": "no_runtime_mutation",
+        "required": true,
+        "runtime_application_status": "staged_not_applied"
+      }
+    ],
+    "runtime_application_status": "staged_not_applied",
+    "runtime_config_status": "not_updated",
+    "source_staging_id": "controlled_runtime_calibration_runtime_application_staging_v1_69d9e6a2b5efbe604d514691",
+    "warnings": {
+      "no_runtime_mutation": true,
+      "pre_apply_manifest": true,
+      "runtime_application_status_staged_not_applied": true
+    }
+  },
+  "production_config_status": "not_created",
+  "required_operator_artifacts": [
+    {
+      "artifact": "human_approval_gate",
+      "mutation_status": "no_runtime_mutation",
+      "required": true,
+      "runtime_application_status": "staged_not_applied"
+    },
+    {
+      "artifact": "operator_signoff_record",
+      "mutation_status": "no_runtime_mutation",
+      "required": true,
+      "runtime_application_status": "staged_not_applied"
+    },
+    {
+      "artifact": "dry_run_review_packet",
+      "mutation_status": "no_runtime_mutation",
+      "required": true,
+      "runtime_application_status": "staged_not_applied"
+    },
+    {
+      "artifact": "future_runtime_application_blueprint",
+      "mutation_status": "no_runtime_mutation",
+      "required": true,
+      "runtime_application_status": "staged_not_applied"
+    }
+  ],
+  "required_regression_gates": [
+    {
+      "gate": "multi_point_regression_matrix",
+      "mutation_status": "no_runtime_mutation",
+      "required": true,
+      "runtime_application_status": "staged_not_applied"
+    },
+    {
+      "gate": "protected_sample_point_reviewed_3d_debug",
+      "mutation_status": "no_runtime_mutation",
+      "required": true,
+      "runtime_application_status": "staged_not_applied"
+    },
+    {
+      "gate": "gameplay_gate_regression_baseline",
+      "mutation_status": "no_runtime_mutation",
+      "required": true,
+      "runtime_application_status": "staged_not_applied"
+    },
+    {
+      "gate": "review_guided_gameplay_calibration_sandbox_regression",
+      "mutation_status": "no_runtime_mutation",
+      "required": true,
+      "runtime_application_status": "staged_not_applied"
+    }
+  ],
+  "rollback_staging_record": {
+    "generated_at": "2026-06-20T15:05:44.911284+00:00",
+    "mutation_status": "no_runtime_mutation",
+    "non_claims": {
+      "automatic_approval_not_performed": true,
+      "automatic_rejection_not_performed": true,
+      "automatic_relabeling_not_performed": true,
+      "baseline_not_replaced": true,
+      "classifier_correctness_not_assessed": true,
+      "classifier_not_modified": true,
+      "future_blueprint_required_for_runtime_application": true,
+      "generalization_not_claimed": true,
+      "hysteresis_changes_not_applied": true,
+      "model_weights_not_modified": true,
+      "production_config_not_created": true,
+      "production_readiness_not_claimed": true,
+      "runtime_application_not_performed": true,
+      "runtime_config_not_updated": true,
+      "smoothing_changes_not_applied": true,
+      "staged_config_delta_is_not_production_config": true,
+      "staged_config_delta_is_not_runtime_config": true,
+      "staging_artifact_is_not_accuracy_scoring": true,
+      "staging_artifact_is_not_runtime_application": true,
+      "staging_artifact_is_not_runtime_calibration": true,
+      "staging_artifact_is_not_truth": true,
+      "threshold_changes_not_applied": true
+    },
+    "rollback_artifact_refs": {
+      "source_application_plan_input_path": ".data/exports/controlled_runtime_calibration_application_plan_inputs.current.json",
+      "source_application_plan_path": ".data/contracts/controlled_runtime_calibration_application_plan_v1.json",
+      "source_change_request_path": ".data/contracts/controlled_runtime_calibration_change_request_v1.json",
+      "source_dry_run_execution_report_path": ".data/exports/controlled_runtime_calibration_dry_run_execution.current.json",
+      "source_dry_run_review_packet_path": ".data/contracts/controlled_runtime_calibration_dry_run_review_packet_v1.json",
+      "source_human_approval_gate_path": ".data/contracts/controlled_runtime_calibration_human_approval_gate_v1.json",
+      "source_staging_input_path": null
+    },
+    "rollback_scope": {
+      "future_blueprint_only": true,
+      "mutation_status": "no_runtime_mutation",
+      "runtime_application_status": "staged_not_applied",
+      "source_application_plan_id": "controlled_runtime_calibration_application_plan_v1_033eb99844c21ab0c7c4ad97",
+      "source_staging_id": "controlled_runtime_calibration_runtime_application_staging_v1_69d9e6a2b5efbe604d514691"
+    },
+    "rollback_staging_id": "controlled_runtime_calibration_rollback_staging_v1_0db6d9e7c953fa8180065dc5",
+    "rollback_staging_status": "rollback_staging_record_defined",
+    "rollback_staging_type": "controlled_runtime_calibration_staged_rollback_report",
+    "rollback_staging_version": "v1",
+    "rollback_steps_for_future_blueprint": [
+      "capture pre-application runtime settings",
+      "restore captured runtime settings in a separate runtime application blueprint",
+      "run required regression gates",
+      "build post-rollback review packet",
+      "record human operator review state"
+    ],
+    "rollback_target_settings": {
+      "current_hysteresis_settings": {
+        "enter_gameplay_probability": 0.6,
+        "exit_gameplay_probability": 0.45
+      },
+      "current_smoothing_window": 3,
+      "current_threshold": 0.55,
+      "runtime_application_status": "not_applied"
+    },
+    "rollback_trigger_conditions": [
+      "operator requests rollback after separate future runtime application",
+      "future post-application verification gate blocks",
+      "future regression gate blocks",
+      "future review packet raises blocker"
+    ],
+    "rollback_verification_gates": [
+      {
+        "gate": "multi_point_regression_matrix",
+        "mutation_status": "no_runtime_mutation",
+        "required": true,
+        "runtime_application_status": "staged_not_applied"
+      },
+      {
+        "gate": "protected_sample_point_reviewed_3d_debug",
+        "mutation_status": "no_runtime_mutation",
+        "required": true,
+        "runtime_application_status": "staged_not_applied"
+      },
+      {
+        "gate": "gameplay_gate_regression_baseline",
+        "mutation_status": "no_runtime_mutation",
+        "required": true,
+        "runtime_application_status": "staged_not_applied"
+      },
+      {
+        "gate": "review_guided_gameplay_calibration_sandbox_regression",
+        "mutation_status": "no_runtime_mutation",
+        "required": true,
+        "runtime_application_status": "staged_not_applied"
+      }
+    ],
+    "runtime_application_status": "staged_not_applied",
+    "source_staging_id": "controlled_runtime_calibration_runtime_application_staging_v1_69d9e6a2b5efbe604d514691",
+    "warnings": {
+      "future_blueprint_required_for_runtime_application": true,
+      "rollback_not_executed": true,
+      "rollback_staging_record": true
+    }
+  },
+  "runtime_application_status": "staged_not_applied",
+  "runtime_config_status": "not_updated",
+  "selected_candidate_config_ref": {
+    "candidate_packet_id": null,
+    "candidate_setting_id": null,
+    "source_proposal_item_id": null
+  },
+  "source_application_plan_path": ".data/contracts/controlled_runtime_calibration_application_plan_v1.json",
+  "source_change_request_path": ".data/contracts/controlled_runtime_calibration_change_request_v1.json",
+  "source_contract_refs": {
+    "calibration_candidate_config_freeze_contract_version": "v1",
+    "calibration_candidate_decision_packet_contract_version": "v1",
+    "camera_geometry_calibration_provenance_contract_version": "v1",
+    "controlled_runtime_calibration_application_plan_contract_version": "v1",
+    "controlled_runtime_calibration_change_request_contract_version": "v1",
+    "controlled_runtime_calibration_dry_run_execution_contract_version": "v1",
+    "controlled_runtime_calibration_dry_run_review_packet_contract_version": "v1",
+    "controlled_runtime_calibration_human_approval_gate_contract_version": "v1",
+    "coverage_sampling_strategy_contract_version": "v1",
+    "gameplay_gate_pathway_completion_freeze_version": "v1",
+    "gameplay_gate_regression_baseline_contract_version": "v1",
+    "gameplay_gate_review_dataset_export_contract_version": "v1",
+    "gameplay_gated_many_point_smoke_contract_version": "v1",
+    "gameplay_gated_perception_execution_contract_version": "v1",
+    "gameplay_gated_pipeline_routing_contract_version": "v1",
+    "gameplay_segment_gate_contract_version": "v1",
+    "gameplay_segment_replay_review_contract_version": "v1",
+    "intennse_label_alignment_contract_version": "v1",
+    "label_feedback_evaluation_contract_version": "v1",
+    "many_point_ingestion_gate_contract_version": "v1",
+    "multi_point_regression_matrix_version": "v0",
+    "multi_reviewer_disagreement_schema_version": "v1",
+    "observation_quality_taxonomy_version": "v1",
+    "point_manifest_version": "v0",
+    "real_broadcast_gameplay_calibration_decision_phase_freeze_version": "v1",
+    "real_broadcast_gameplay_corpus_run_contract_version": "v1",
+    "real_broadcast_gameplay_review_loop_contract_version": "v1",
+    "real_broadcast_gameplay_review_metrics_contract_version": "v1",
+    "review_guided_gameplay_calibration_evaluation_sandbox_contract_version": "v1",
+    "review_guided_gameplay_calibration_proposal_contract_version": "v1",
+    "review_guided_gameplay_calibration_sandbox_regression_contract_version": "v1",
+    "review_label_schema_version": "v1",
+    "review_ops_metrics_contract_version": "v1",
+    "reviewer_confidence_schema_version": "v1",
+    "tom_v3_expansion_completion_freeze_version": "v1",
+    "versioned_dataset_corpus_contract_version": "v1"
+  },
+  "source_dry_run_execution_report_path": ".data/exports/controlled_runtime_calibration_dry_run_execution.current.json",
+  "source_dry_run_review_packet_path": ".data/contracts/controlled_runtime_calibration_dry_run_review_packet_v1.json",
+  "source_human_approval_gate_path": ".data/contracts/controlled_runtime_calibration_human_approval_gate_v1.json",
+  "source_staging_input_path": ".data/exports/controlled_runtime_calibration_runtime_application_staging_inputs.current.json",
+  "staged_candidate_settings": {
+    "affects_regression_baselines": false,
+    "candidate_source": {
+      "candidate_packet_id": null,
+      "candidate_setting_id": null,
+      "source_proposal_item_id": null
+    },
+    "candidate_type": "not_applicable",
+    "staged_candidate_hysteresis_settings": {},
+    "staged_candidate_smoothing_window": null,
+    "staged_candidate_threshold": null,
+    "staged_not_applied": true,
+    "writes_runtime_configuration": false
+  },
+  "staged_config_delta": {
+    "current_settings": {
+      "current_hysteresis_settings": {
+        "enter_gameplay_probability": 0.6,
+        "exit_gameplay_probability": 0.45
+      },
+      "current_smoothing_window": 3,
+      "current_threshold": 0.55,
+      "runtime_application_status": "not_applied"
+    },
+    "delta_fields": [
+      {
+        "change_present": false,
+        "current_value": 0.55,
+        "field": "threshold",
+        "mutation_status": "no_runtime_mutation",
+        "runtime_application_status": "staged_not_applied",
+        "runtime_config_status": "not_updated",
+        "staged_value": null
+      },
+      {
+        "change_present": false,
+        "current_value": 3,
+        "field": "smoothing_window",
+        "mutation_status": "no_runtime_mutation",
+        "runtime_application_status": "staged_not_applied",
+        "runtime_config_status": "not_updated",
+        "staged_value": null
+      },
+      {
+        "change_present": false,
+        "current_value": {
+          "enter_gameplay_probability": 0.6,
+          "exit_gameplay_probability": 0.45
+        },
+        "field": "hysteresis_settings",
+        "mutation_status": "no_runtime_mutation",
+        "runtime_application_status": "staged_not_applied",
+        "runtime_config_status": "not_updated",
+        "staged_value": {}
+      }
+    ],
+    "delta_status": "staged_blocked_missing_candidate_settings",
+    "generated_at": "2026-06-20T15:05:44.911284+00:00",
+    "mutation_status": "no_runtime_mutation",
+    "non_claims": {
+      "automatic_approval_not_performed": true,
+      "automatic_rejection_not_performed": true,
+      "automatic_relabeling_not_performed": true,
+      "baseline_not_replaced": true,
+      "classifier_correctness_not_assessed": true,
+      "classifier_not_modified": true,
+      "future_blueprint_required_for_runtime_application": true,
+      "generalization_not_claimed": true,
+      "hysteresis_changes_not_applied": true,
+      "model_weights_not_modified": true,
+      "production_config_not_created": true,
+      "production_readiness_not_claimed": true,
+      "runtime_application_not_performed": true,
+      "runtime_config_not_updated": true,
+      "smoothing_changes_not_applied": true,
+      "staged_config_delta_is_not_production_config": true,
+      "staged_config_delta_is_not_runtime_config": true,
+      "staging_artifact_is_not_accuracy_scoring": true,
+      "staging_artifact_is_not_runtime_application": true,
+      "staging_artifact_is_not_runtime_calibration": true,
+      "staging_artifact_is_not_truth": true,
+      "threshold_changes_not_applied": true
+    },
+    "production_config_status": "not_created",
+    "runtime_application_status": "staged_not_applied",
+    "runtime_config_status": "not_updated",
+    "source_staging_id": "controlled_runtime_calibration_runtime_application_staging_v1_69d9e6a2b5efbe604d514691",
+    "staged_candidate_settings": {
+      "affects_regression_baselines": false,
+      "candidate_source": {
+        "candidate_packet_id": null,
+        "candidate_setting_id": null,
+        "source_proposal_item_id": null
+      },
+      "candidate_type": "not_applicable",
+      "staged_candidate_hysteresis_settings": {},
+      "staged_candidate_smoothing_window": null,
+      "staged_candidate_threshold": null,
+      "staged_not_applied": true,
+      "writes_runtime_configuration": false
+    },
+    "staged_config_delta_id": "controlled_runtime_calibration_staged_config_delta_v1_da9b508c3aeefcd9bdd72b29",
+    "staged_config_delta_type": "controlled_runtime_calibration_staged_config_delta",
+    "staged_config_delta_version": "v1",
+    "warnings": {
+      "runtime_application_status_staged_not_applied": true,
+      "staged_config_delta": true,
+      "staged_config_delta_is_not_production_config": true,
+      "staged_config_delta_is_not_runtime_config": true
+    }
+  },
+  "staging_id": "controlled_runtime_calibration_runtime_application_staging_v1_69d9e6a2b5efbe604d514691",
+  "staging_status": "staging_blocked_unresolved_blockers",
+  "staging_type": "controlled_runtime_calibration_runtime_application_staging",
+  "staging_version": "v1",
+  "tom_provenance": {
+    "blueprint": "blueprint_60",
+    "blueprint_name": "controlled_runtime_calibration_runtime_application_staging_v1",
+    "project": "tom-v3-simple",
+    "project_version": "0.0.0"
+  },
+  "warnings": {
+    "application_plan_is_not_accuracy_scoring": true,
+    "application_plan_is_not_runtime_application": true,
+    "application_plan_is_not_runtime_calibration": true,
+    "application_plan_is_not_truth": true,
+    "approval_gate_is_not_accuracy_scoring": true,
+    "approval_gate_is_not_runtime_application": true,
+    "approval_gate_is_not_runtime_calibration": true,
+    "approval_gate_is_not_truth": true,
+    "automatic_approval_not_performed": true,
+    "automatic_rejection_not_performed": true,
+    "automatic_relabeling_not_performed": true,
+    "baseline_is_not_truth": true,
+    "baseline_not_replaced": true,
+    "calibration_decision_phase_is_not_runtime_calibration": true,
+    "calibration_proposal_is_not_accuracy_scoring": true,
+    "calibration_proposal_is_not_truth": true,
+    "candidate_config_freeze_is_not_accuracy_scoring": true,
+    "candidate_config_freeze_is_not_runtime_calibration": true,
+    "candidate_config_freeze_is_not_runtime_config": true,
+    "candidate_config_freeze_is_not_truth": true,
+    "change_request_is_not_accuracy_scoring": true,
+    "change_request_is_not_runtime_calibration": true,
+    "change_request_is_not_truth": true,
+    "classifier_accuracy_not_assessed": true,
+    "classifier_accuracy_not_claimed": true,
+    "classifier_correctness_not_assessed": true,
+    "classifier_not_modified": true,
+    "config_delta_proposal": true,
+    "config_delta_proposal_is_not_production_config": true,
+    "config_delta_proposal_is_not_runtime_config": true,
+    "content_tags_are_operator_context_not_truth": true,
+    "controlled_application_plan": true,
+    "controlled_change_request": true,
+    "controlled_dry_run": true,
+    "controlled_dry_run_review_packet": true,
+    "controlled_human_approval_gate": true,
+    "controlled_real_data_readiness_only": true,
+    "controlled_runtime_application_staging": true,
+    "corpus_run_is_not_truth": true,
+    "decision_packet_is_not_accuracy_scoring": true,
+    "decision_packet_is_not_runtime_calibration": true,
+    "decision_packet_is_not_truth": true,
+    "decision_support_only": true,
+    "default_mode_is_dry_run": true,
+    "does_not_claim_automatic_correctness": true,
+    "does_not_claim_generalization": true,
+    "does_not_convert_outputs_into_training_labels": true,
+    "does_not_create_event_labels": true,
+    "does_not_create_event_truth": true,
+    "does_not_create_evidence": true,
+    "does_not_create_gameplay_truth": true,
+    "does_not_create_in_out": true,
+    "does_not_create_line_call_truth": true,
+    "does_not_create_observations": true,
+    "does_not_create_point_labels": true,
+    "does_not_create_point_truth": true,
+    "does_not_create_score": true,
+    "does_not_create_training_labels": true,
+    "does_not_determine_winner": true,
+    "does_not_identify_players": true,
+    "does_not_mutate_model_assets": true,
+    "does_not_mutate_regression_baselines": true,
+    "does_not_run_gpu_or_model_inference_by_default": true,
+    "does_not_train_classifier": true,
+    "dry_run_is_not_accuracy_scoring": true,
+    "dry_run_is_not_runtime_calibration": true,
+    "dry_run_is_not_truth": true,
+    "dry_run_required": true,
+    "expected_tags_are_not_truth": true,
+    "explicit_media_manifest_only": true,
+    "fixture_mode_available": true,
+    "fixture_mode_used": true,
+    "fixture_reuse_only": true,
+    "future_application_readiness": true,
+    "future_blueprint_required_for_runtime_application": true,
+    "future_evaluation_proposals_only": true,
+    "gameplay_gate_is_not_truth": true,
+    "generalization_not_claimed": true,
+    "human_approval_required": true,
+    "human_operator_approval_required": true,
+    "human_operator_decision_required": true,
+    "human_operator_review_required": true,
+    "human_operator_signoff_required": true,
+    "human_review_required": true,
+    "human_signoff_is_not_runtime_application": true,
+    "hysteresis_changes_not_applied": true,
+    "manual_approval_packet_is_not_runtime_config": true,
+    "manual_approval_packet_required_before_future_runtime_change": true,
+    "metrics_are_not_truth": true,
+    "model_assets_are_not_mutated": true,
+    "model_weights_not_modified": true,
+    "no_adjudication": true,
+    "no_runtime_mutation": true,
+    "no_silent_folder_scan": true,
+    "not_distinct_real_broadcast_corpus": true,
+    "not_distinct_real_points": true,
+    "observation_only": true,
+    "offline_evaluation_only": true,
+    "operations_visibility_only": true,
+    "phase_freeze_is_not_truth": true,
+    "phase_freeze_is_structural_only": true,
+    "planning_artifact_only": true,
+    "post_application_verification_plan": true,
+    "post_application_verification_staging_record": true,
+    "pre_apply_manifest": true,
+    "production_config_not_created": true,
+    "production_readiness_not_claimed": true,
+    "provenance_only": true,
+    "real_media_processing_requires_explicit_mode": true,
+    "regression_baselines_are_not_mutated": true,
+    "regression_gate_only": true,
+    "review_loop_is_not_truth": true,
+    "review_metadata_is_not_training_truth": true,
+    "review_packet_is_not_accuracy_scoring": true,
+    "review_packet_is_not_human_approval": true,
+    "review_packet_is_not_runtime_calibration": true,
+    "review_packet_is_not_truth": true,
+    "review_support_only": true,
+    "review_values_do_not_modify_source_artifacts": true,
+    "rollback_plan_defined": true,
+    "rollback_plan_required": true,
+    "rollback_readiness": true,
+    "rollback_staging_record": true,
+    "runtime_application_not_performed": true,
+    "runtime_application_status_not_applied": true,
+    "runtime_application_status_staged_not_applied": true,
+    "runtime_config_not_updated": true,
+    "sandbox_is_not_accuracy_scoring": true,
+    "sandbox_is_not_truth": true,
+    "smoke_only": true,
+    "smoothing_changes_not_applied": true,
+    "staged_config_delta": true,
+    "staged_config_delta_is_not_production_config": true,
+    "staged_config_delta_is_not_runtime_config": true,
+    "staged_not_applied": true,
+    "staging_artifact_is_not_accuracy_scoring": true,
+    "staging_artifact_is_not_runtime_application": true,
+    "staging_artifact_is_not_runtime_calibration": true,
+    "staging_artifact_is_not_truth": true,
+    "staging_artifact_only": true,
+    "structural_change_summary": true,
+    "structural_decision_support_only": true,
+    "structural_dry_run": true,
+    "structural_manual_approval_support_only": true,
+    "structural_outputs_only": true,
+    "structural_smoke_only": true,
+    "threshold_changes_not_applied": true,
+    "threshold_changes_not_performed": true
+  }
+}

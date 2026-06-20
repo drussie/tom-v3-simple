@@ -40,6 +40,11 @@ This registry makes TOM v3 Simple boundaries explicit.
   production config, mutate model weights, replace baselines, approve/reject candidates
   automatically, prove classifier accuracy, or make truth, production readiness, or generalization
   claims.
+- Controlled runtime calibration runtime application staging artifacts are staging packages only.
+  They do not apply threshold, smoothing, or hysteresis changes, update runtime config, create
+  production config, mutate model weights, replace baselines, approve/reject candidates
+  automatically, perform runtime application, or make production readiness or generalization
+  claims.
 - Fixture detection is deterministic demo output.
 - Optional YOLO requires a local optional runtime and local weights outside git.
 - TOM v1 model assets under `model_assets/tom_v1/` are local-only ignored files and are not part of the repository.

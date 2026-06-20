@@ -388,6 +388,8 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Controlled Runtime Calibration Human Approval Gate v1](reviews/controlled_runtime_calibration_human_approval_gate_v1.md)
 - [Blueprint 59 Controlled Runtime Calibration Application Plan v1](blueprints/blueprint_59_controlled_runtime_calibration_application_plan_v1.md)
 - [Controlled Runtime Calibration Application Plan v1](reviews/controlled_runtime_calibration_application_plan_v1.md)
+- [Blueprint 60 Controlled Runtime Calibration Runtime Application Staging v1](blueprints/blueprint_60_controlled_runtime_calibration_runtime_application_staging_v1.md)
+- [Controlled Runtime Calibration Runtime Application Staging v1](reviews/controlled_runtime_calibration_runtime_application_staging_v1.md)
 
 ## Development
 
