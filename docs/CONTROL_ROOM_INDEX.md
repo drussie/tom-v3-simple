@@ -372,6 +372,8 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Review-Guided Gameplay Calibration Evaluation Sandbox v1](reviews/review_guided_gameplay_calibration_evaluation_sandbox_v1.md)
 - [Blueprint 51 Calibration Evaluation Sandbox Regression Gate v1](blueprints/blueprint_51_calibration_evaluation_sandbox_regression_gate_v1.md)
 - [Review-Guided Gameplay Calibration Sandbox Regression Gate v1](reviews/review_guided_gameplay_calibration_sandbox_regression_gate_v1.md)
+- [Blueprint 52 Calibration Candidate Decision Packet v1](blueprints/blueprint_52_calibration_candidate_decision_packet_v1.md)
+- [Calibration Candidate Decision Packet v1](reviews/calibration_candidate_decision_packet_v1.md)
 
 ## Development
 

@@ -1603,3 +1603,31 @@ generalization, automatic correctness, training truth, production truth, or adju
 not train or mutate the gameplay classifier, commit model weights, create review labels, score the
 classifier, apply threshold, smoothing, or hysteresis changes, update runtime config, replace the
 gameplay regression baseline, or tune models.
+
+## Blueprint 52 - Calibration Candidate Decision Packet
+
+Status: COMPLETE
+
+Blueprint 52 proves:
+
+```text
+BP49 calibration proposal
+-> BP50 sandbox evaluation report
+-> BP51 sandbox regression verification
+-> decision packet inputs
+-> decision packet
+-> decision packet report
+```
+
+The tracked decision packet contract is
+`.data/contracts/calibration_candidate_decision_packet_contract_v1.json`. Generated packet inputs,
+validations, decision packets, and reports remain under `.data/exports/`.
+
+Blueprint 52 does not decide tennis truth, in/out, score, point winner, player identity, rally
+state, server/receiver state, line-call truth, point truth, event truth, gameplay truth,
+classifier correctness, classifier accuracy, accepted/rejected lifecycle, automatic relabeling,
+reviewer ranking or quality scoring, coaching/tactical conclusions, betting/prediction outcomes,
+generalization, automatic correctness, training truth, production truth, or adjudication. It does
+not train or mutate the gameplay classifier, commit model weights, create review labels, score the
+classifier, apply threshold, smoothing, or hysteresis changes, update runtime config, replace
+baselines, auto-select a candidate, or tune models.

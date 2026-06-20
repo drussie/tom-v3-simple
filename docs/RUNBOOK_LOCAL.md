@@ -1863,6 +1863,56 @@ make tom-v1-build-review-guided-gameplay-calibration-sandbox-regression-report \
 The tracked baseline currently marks fixture/demo reuse only. It is not a distinct real broadcast
 corpus and does not claim generalization.
 
+## Calibration Candidate Decision Packet
+
+Use this after Blueprint 49 proposal, Blueprint 50 sandbox evaluation, and Blueprint 51 sandbox
+regression verification outputs have been built. The packet packages prior calibration evidence
+for operator review only. It keeps candidates marked `not_applied` and keeps
+`runtime_change_status` as `not_applied`.
+
+Build the tracked contract:
+
+```bash
+make tom-v1-export-calibration-candidate-decision-packet-contract \
+  PYTHON=.venv/bin/python
+```
+
+Build and validate packet inputs:
+
+```bash
+make tom-v1-build-calibration-candidate-decision-packet-inputs \
+  PYTHON=.venv/bin/python
+
+make tom-v1-validate-calibration-candidate-decision-packet-inputs \
+  PYTHON=.venv/bin/python
+```
+
+Build and validate the decision packet:
+
+```bash
+make tom-v1-build-calibration-candidate-decision-packet \
+  PYTHON=.venv/bin/python
+
+make tom-v1-validate-calibration-candidate-decision-packet \
+  PYTHON=.venv/bin/python
+```
+
+Build the operator report:
+
+```bash
+make tom-v1-build-calibration-candidate-decision-packet-report \
+  PYTHON=.venv/bin/python
+```
+
+The tracked artifact is
+`.data/contracts/calibration_candidate_decision_packet_contract_v1.json`. Generated packet inputs,
+validations, decision packets, and reports live under `.data/exports/` and should stay local.
+
+The decision packet does not apply threshold, smoothing, or hysteresis changes, update runtime
+config, mutate model weights, replace baselines, create review labels, infer tennis truth, score
+classifier correctness, or select candidates for runtime use. Human operator decision remains
+required for future manual review.
+
 ## Gameplay-Gated Perception Execution Hook
 
 Use this after the Blueprint 38 gameplay segment gate and Blueprint 39 routing plan are available.

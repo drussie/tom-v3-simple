@@ -325,6 +325,22 @@ REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_REPORT_OUTPUT ?= .data/exp
 REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_SOURCE_EVALUATION_INPUTS ?= $(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_INPUTS_OUTPUT)
 REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_SOURCE_EVALUATION_REPORT ?= $(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_REPORT_OUTPUT)
 REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_SOURCE_EVALUATION_CONTRACT ?= $(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_SANDBOX_CONTRACT_OUTPUT)
+CALIBRATION_CANDIDATE_DECISION_PACKET_CONTRACT_OUTPUT ?= .data/contracts/calibration_candidate_decision_packet_contract_v1.json
+CALIBRATION_CANDIDATE_DECISION_PACKET_INPUTS_OUTPUT ?= .data/exports/calibration_candidate_decision_packet_inputs.current.json
+CALIBRATION_CANDIDATE_DECISION_PACKET_INPUTS ?= $(CALIBRATION_CANDIDATE_DECISION_PACKET_INPUTS_OUTPUT)
+CALIBRATION_CANDIDATE_DECISION_PACKET_INPUTS_VALIDATION_OUTPUT ?= .data/exports/calibration_candidate_decision_packet_inputs.validation.json
+CALIBRATION_CANDIDATE_DECISION_PACKET_OUTPUT ?= .data/exports/calibration_candidate_decision_packet.current.json
+CALIBRATION_CANDIDATE_DECISION_PACKET ?= $(CALIBRATION_CANDIDATE_DECISION_PACKET_OUTPUT)
+CALIBRATION_CANDIDATE_DECISION_PACKET_VALIDATION_OUTPUT ?= .data/exports/calibration_candidate_decision_packet.validation.json
+CALIBRATION_CANDIDATE_DECISION_PACKET_REPORT_OUTPUT ?= .data/exports/calibration_candidate_decision_packet.report.json
+CALIBRATION_CANDIDATE_DECISION_PACKET_SOURCE_CALIBRATION_PROPOSAL ?= $(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_PROPOSAL_OUTPUT)
+CALIBRATION_CANDIDATE_DECISION_PACKET_SOURCE_SANDBOX_EVALUATION_REPORT ?= $(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_REPORT_OUTPUT)
+CALIBRATION_CANDIDATE_DECISION_PACKET_SOURCE_SANDBOX_REGRESSION_VERIFICATION ?= $(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_VERIFICATION_OUTPUT)
+CALIBRATION_CANDIDATE_DECISION_PACKET_SOURCE_REVIEW_METRICS_REPORT ?= $(REAL_BROADCAST_GAMEPLAY_REVIEW_METRICS_REPORT_OUTPUT)
+CALIBRATION_CANDIDATE_DECISION_PACKET_SOURCE_REVIEW_LOOP_REPORT ?= $(REAL_BROADCAST_GAMEPLAY_REVIEW_LOOP_REPORT_OUTPUT)
+CALIBRATION_CANDIDATE_DECISION_PACKET_SOURCE_CORPUS_RUN ?= $(REAL_BROADCAST_GAMEPLAY_CORPUS_OUTPUT)
+CALIBRATION_CANDIDATE_DECISION_PACKET_SOURCE_GAMEPLAY_GATE_REGRESSION_BASELINE ?= $(GAMEPLAY_GATE_REGRESSION_BASELINE_OUTPUT)
+CALIBRATION_CANDIDATE_DECISION_PACKET_SOURCE_CALIBRATION_SANDBOX_BASELINE ?= $(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_BASELINE_OUTPUT)
 EXPECTED_BRANCH ?=
 EXPECTED_TAG ?=
 FORMAT ?= json
@@ -424,6 +440,7 @@ export TOM_V3_DATABASE_URL
 .PHONY: tom-v1-export-review-guided-gameplay-calibration-proposal-contract tom-v1-build-review-guided-gameplay-calibration-inputs tom-v1-validate-review-guided-gameplay-calibration-inputs tom-v1-build-review-guided-gameplay-calibration-proposal tom-v1-validate-review-guided-gameplay-calibration-proposal tom-v1-build-review-guided-gameplay-calibration-proposal-report
 .PHONY: tom-v1-export-review-guided-gameplay-calibration-evaluation-sandbox-contract tom-v1-build-review-guided-gameplay-calibration-evaluation-inputs tom-v1-validate-review-guided-gameplay-calibration-evaluation-inputs tom-v1-run-review-guided-gameplay-calibration-evaluation-sandbox tom-v1-validate-review-guided-gameplay-calibration-evaluation-report tom-v1-build-review-guided-gameplay-calibration-evaluation-summary
 .PHONY: tom-v1-export-review-guided-gameplay-calibration-sandbox-regression-contract tom-v1-build-review-guided-gameplay-calibration-sandbox-regression-baseline tom-v1-verify-review-guided-gameplay-calibration-sandbox-regression-baseline tom-v1-build-review-guided-gameplay-calibration-sandbox-regression-report
+.PHONY: tom-v1-export-calibration-candidate-decision-packet-contract tom-v1-build-calibration-candidate-decision-packet-inputs tom-v1-validate-calibration-candidate-decision-packet-inputs tom-v1-build-calibration-candidate-decision-packet tom-v1-validate-calibration-candidate-decision-packet tom-v1-build-calibration-candidate-decision-packet-report
 
 install:
 	$(PYTHON) -m pip install -e ".[dev]"
@@ -1074,6 +1091,24 @@ tom-v1-verify-review-guided-gameplay-calibration-sandbox-regression-baseline:
 
 tom-v1-build-review-guided-gameplay-calibration-sandbox-regression-report:
 	$(PYTHON) -m apps.worker.cli build-review-guided-gameplay-calibration-sandbox-regression-report --contract "$(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_CONTRACT_OUTPUT)" --baseline "$(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_BASELINE)" --verification "$(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_VERIFICATION_OUTPUT)" --output "$(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_REPORT_OUTPUT)" --skip-create-db
+
+tom-v1-export-calibration-candidate-decision-packet-contract:
+	$(PYTHON) -m apps.worker.cli export-calibration-candidate-decision-packet-contract --output "$(CALIBRATION_CANDIDATE_DECISION_PACKET_CONTRACT_OUTPUT)" --skip-create-db
+
+tom-v1-build-calibration-candidate-decision-packet-inputs:
+	$(PYTHON) -m apps.worker.cli build-calibration-candidate-decision-packet-inputs --contract "$(CALIBRATION_CANDIDATE_DECISION_PACKET_CONTRACT_OUTPUT)" --source-calibration-proposal "$(CALIBRATION_CANDIDATE_DECISION_PACKET_SOURCE_CALIBRATION_PROPOSAL)" --source-sandbox-evaluation-report "$(CALIBRATION_CANDIDATE_DECISION_PACKET_SOURCE_SANDBOX_EVALUATION_REPORT)" --source-sandbox-regression-verification "$(CALIBRATION_CANDIDATE_DECISION_PACKET_SOURCE_SANDBOX_REGRESSION_VERIFICATION)" --source-review-metrics-report "$(CALIBRATION_CANDIDATE_DECISION_PACKET_SOURCE_REVIEW_METRICS_REPORT)" --source-review-loop-report "$(CALIBRATION_CANDIDATE_DECISION_PACKET_SOURCE_REVIEW_LOOP_REPORT)" --source-corpus-run "$(CALIBRATION_CANDIDATE_DECISION_PACKET_SOURCE_CORPUS_RUN)" --source-gameplay-gate-regression-baseline "$(CALIBRATION_CANDIDATE_DECISION_PACKET_SOURCE_GAMEPLAY_GATE_REGRESSION_BASELINE)" --source-calibration-sandbox-baseline "$(CALIBRATION_CANDIDATE_DECISION_PACKET_SOURCE_CALIBRATION_SANDBOX_BASELINE)" --model-asset-path "$(GAMEPLAY_CLASSIFIER_ASSET_PATH)" --output "$(CALIBRATION_CANDIDATE_DECISION_PACKET_INPUTS_OUTPUT)" --skip-create-db
+
+tom-v1-validate-calibration-candidate-decision-packet-inputs:
+	$(PYTHON) -m apps.worker.cli validate-calibration-candidate-decision-packet-inputs --contract "$(CALIBRATION_CANDIDATE_DECISION_PACKET_CONTRACT_OUTPUT)" --packet-inputs "$(CALIBRATION_CANDIDATE_DECISION_PACKET_INPUTS)" --output "$(CALIBRATION_CANDIDATE_DECISION_PACKET_INPUTS_VALIDATION_OUTPUT)" --skip-create-db
+
+tom-v1-build-calibration-candidate-decision-packet:
+	$(PYTHON) -m apps.worker.cli build-calibration-candidate-decision-packet --contract "$(CALIBRATION_CANDIDATE_DECISION_PACKET_CONTRACT_OUTPUT)" --packet-inputs "$(CALIBRATION_CANDIDATE_DECISION_PACKET_INPUTS)" --output "$(CALIBRATION_CANDIDATE_DECISION_PACKET_OUTPUT)" --skip-create-db
+
+tom-v1-validate-calibration-candidate-decision-packet:
+	$(PYTHON) -m apps.worker.cli validate-calibration-candidate-decision-packet --contract "$(CALIBRATION_CANDIDATE_DECISION_PACKET_CONTRACT_OUTPUT)" --decision-packet "$(CALIBRATION_CANDIDATE_DECISION_PACKET)" --output "$(CALIBRATION_CANDIDATE_DECISION_PACKET_VALIDATION_OUTPUT)" --skip-create-db
+
+tom-v1-build-calibration-candidate-decision-packet-report:
+	$(PYTHON) -m apps.worker.cli build-calibration-candidate-decision-packet-report --contract "$(CALIBRATION_CANDIDATE_DECISION_PACKET_CONTRACT_OUTPUT)" --decision-packet "$(CALIBRATION_CANDIDATE_DECISION_PACKET)" --output "$(CALIBRATION_CANDIDATE_DECISION_PACKET_REPORT_OUTPUT)" --skip-create-db
 
 tom-v1-post-codex-validate:
 	scripts/post_codex_validate.sh $(if $(EXPECTED_BRANCH),--branch "$(EXPECTED_BRANCH)",) $(if $(EXPECTED_TAG),--expected-tag "$(EXPECTED_TAG)",) --python "$(PYTHON)"

@@ -27,6 +27,20 @@ from apps.worker.config import settings
 from apps.worker.pipelines.synthetic_seed import seed_synthetic_run
 from apps.worker.services.ball_court_trajectory import build_ball_court_trajectory
 from apps.worker.services.ball_trajectory_3d import build_3d_ball_trajectory_candidates
+from apps.worker.services.calibration_candidate_decision_packet import (
+    DEFAULT_CALIBRATION_CANDIDATE_DECISION_PACKET_CONTRACT_OUTPUT,
+    DEFAULT_CALIBRATION_CANDIDATE_DECISION_PACKET_INPUTS_OUTPUT,
+    DEFAULT_CALIBRATION_CANDIDATE_DECISION_PACKET_INPUTS_VALIDATION_OUTPUT,
+    DEFAULT_CALIBRATION_CANDIDATE_DECISION_PACKET_OUTPUT,
+    DEFAULT_CALIBRATION_CANDIDATE_DECISION_PACKET_REPORT_OUTPUT,
+    DEFAULT_CALIBRATION_CANDIDATE_DECISION_PACKET_VALIDATION_OUTPUT,
+    build_calibration_candidate_decision_packet,
+    build_calibration_candidate_decision_packet_inputs,
+    build_calibration_candidate_decision_packet_report,
+    export_calibration_candidate_decision_packet_contract,
+    validate_calibration_candidate_decision_packet,
+    validate_calibration_candidate_decision_packet_inputs,
+)
 from apps.worker.services.camera_geometry import declare_camera_geometry
 from apps.worker.services.camera_geometry_calibration_provenance import (
     DEFAULT_CAMERA_GEOMETRY_CALIBRATION_CONTRACT_OUTPUT,
@@ -4815,6 +4829,208 @@ def main() -> None:
         skip_create_db=True,
     )
 
+    decision_packet_contract_parser = subcommands.add_parser(
+        "export-calibration-candidate-decision-packet-contract",
+        help="Export the Blueprint 52 calibration candidate decision packet contract.",
+    )
+    decision_packet_contract_parser.add_argument(
+        "--output",
+        default=DEFAULT_CALIBRATION_CANDIDATE_DECISION_PACKET_CONTRACT_OUTPUT,
+        help="JSON calibration candidate decision packet contract path.",
+    )
+    decision_packet_contract_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    decision_packet_contract_parser.set_defaults(
+        handler=_handle_export_calibration_candidate_decision_packet_contract,
+        skip_create_db=True,
+    )
+
+    decision_packet_inputs_parser = subcommands.add_parser(
+        "build-calibration-candidate-decision-packet-inputs",
+        help="Build BP52 decision packet inputs from BP49-BP51 calibration outputs.",
+    )
+    decision_packet_inputs_parser.add_argument(
+        "--contract",
+        default=DEFAULT_CALIBRATION_CANDIDATE_DECISION_PACKET_CONTRACT_OUTPUT,
+        help="Blueprint 52 calibration candidate decision packet contract JSON path.",
+    )
+    decision_packet_inputs_parser.add_argument(
+        "--source-calibration-proposal",
+        default=DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_PROPOSAL_OUTPUT,
+        help="Blueprint 49 review-guided calibration proposal JSON path.",
+    )
+    decision_packet_inputs_parser.add_argument(
+        "--source-sandbox-evaluation-report",
+        default=DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_REPORT_OUTPUT,
+        help="Blueprint 50 calibration evaluation report JSON path.",
+    )
+    decision_packet_inputs_parser.add_argument(
+        "--source-sandbox-regression-verification",
+        default=(
+            DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_VERIFICATION_OUTPUT
+        ),
+        help="Blueprint 51 calibration sandbox regression verification JSON path.",
+    )
+    decision_packet_inputs_parser.add_argument(
+        "--source-review-metrics-report",
+        default=DEFAULT_REAL_BROADCAST_GAMEPLAY_REVIEW_METRICS_REPORT_OUTPUT,
+        help="Optional Blueprint 48 real broadcast gameplay review metrics report path.",
+    )
+    decision_packet_inputs_parser.add_argument(
+        "--source-review-loop-report",
+        default=DEFAULT_REAL_BROADCAST_GAMEPLAY_REVIEW_LOOP_REPORT_OUTPUT,
+        help="Optional Blueprint 47 real broadcast gameplay review loop report path.",
+    )
+    decision_packet_inputs_parser.add_argument(
+        "--source-corpus-run",
+        default=DEFAULT_REAL_BROADCAST_GAMEPLAY_CORPUS_OUTPUT,
+        help="Optional Blueprint 46 real broadcast gameplay corpus run path.",
+    )
+    decision_packet_inputs_parser.add_argument(
+        "--source-gameplay-gate-regression-baseline",
+        default=DEFAULT_GAMEPLAY_GATE_REGRESSION_BASELINE_OUTPUT,
+        help="Optional Blueprint 43 gameplay gate regression baseline path.",
+    )
+    decision_packet_inputs_parser.add_argument(
+        "--source-calibration-sandbox-baseline",
+        default=(
+            DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_BASELINE_OUTPUT
+        ),
+        help="Optional Blueprint 51 calibration sandbox regression baseline path.",
+    )
+    decision_packet_inputs_parser.add_argument(
+        "--model-asset-path",
+        default=DEFAULT_GAMEPLAY_CLASSIFIER_ASSET_PATH,
+        help="Read-only local TOM v1 gameplay classifier asset path.",
+    )
+    decision_packet_inputs_parser.add_argument(
+        "--output",
+        default=DEFAULT_CALIBRATION_CANDIDATE_DECISION_PACKET_INPUTS_OUTPUT,
+        help="JSON calibration candidate decision packet inputs output path.",
+    )
+    decision_packet_inputs_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    decision_packet_inputs_parser.set_defaults(
+        handler=_handle_build_calibration_candidate_decision_packet_inputs,
+        skip_create_db=True,
+    )
+
+    decision_packet_inputs_validate_parser = subcommands.add_parser(
+        "validate-calibration-candidate-decision-packet-inputs",
+        help="Validate BP52 decision packet inputs structurally.",
+    )
+    decision_packet_inputs_validate_parser.add_argument(
+        "--contract",
+        default=DEFAULT_CALIBRATION_CANDIDATE_DECISION_PACKET_CONTRACT_OUTPUT,
+        help="Blueprint 52 calibration candidate decision packet contract JSON path.",
+    )
+    decision_packet_inputs_validate_parser.add_argument(
+        "--packet-inputs",
+        default=DEFAULT_CALIBRATION_CANDIDATE_DECISION_PACKET_INPUTS_OUTPUT,
+        help="Blueprint 52 calibration candidate decision packet inputs JSON path.",
+    )
+    decision_packet_inputs_validate_parser.add_argument(
+        "--output",
+        default=DEFAULT_CALIBRATION_CANDIDATE_DECISION_PACKET_INPUTS_VALIDATION_OUTPUT,
+        help="Optional JSON decision packet inputs validation output path.",
+    )
+    decision_packet_inputs_validate_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    decision_packet_inputs_validate_parser.set_defaults(
+        handler=_handle_validate_calibration_candidate_decision_packet_inputs,
+        skip_create_db=True,
+    )
+
+    decision_packet_parser = subcommands.add_parser(
+        "build-calibration-candidate-decision-packet",
+        help="Build the BP52 operator decision-support packet.",
+    )
+    decision_packet_parser.add_argument(
+        "--contract",
+        default=DEFAULT_CALIBRATION_CANDIDATE_DECISION_PACKET_CONTRACT_OUTPUT,
+        help="Blueprint 52 calibration candidate decision packet contract JSON path.",
+    )
+    decision_packet_parser.add_argument(
+        "--packet-inputs",
+        default=DEFAULT_CALIBRATION_CANDIDATE_DECISION_PACKET_INPUTS_OUTPUT,
+        help="Blueprint 52 calibration candidate decision packet inputs JSON path.",
+    )
+    decision_packet_parser.add_argument(
+        "--output",
+        default=DEFAULT_CALIBRATION_CANDIDATE_DECISION_PACKET_OUTPUT,
+        help="JSON calibration candidate decision packet output path.",
+    )
+    decision_packet_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    decision_packet_parser.set_defaults(
+        handler=_handle_build_calibration_candidate_decision_packet,
+        skip_create_db=True,
+    )
+
+    decision_packet_validate_parser = subcommands.add_parser(
+        "validate-calibration-candidate-decision-packet",
+        help="Validate a BP52 calibration candidate decision packet structurally.",
+    )
+    decision_packet_validate_parser.add_argument(
+        "--contract",
+        default=DEFAULT_CALIBRATION_CANDIDATE_DECISION_PACKET_CONTRACT_OUTPUT,
+        help="Blueprint 52 calibration candidate decision packet contract JSON path.",
+    )
+    decision_packet_validate_parser.add_argument(
+        "--decision-packet",
+        default=DEFAULT_CALIBRATION_CANDIDATE_DECISION_PACKET_OUTPUT,
+        help="Blueprint 52 calibration candidate decision packet JSON path.",
+    )
+    decision_packet_validate_parser.add_argument(
+        "--output",
+        default=DEFAULT_CALIBRATION_CANDIDATE_DECISION_PACKET_VALIDATION_OUTPUT,
+        help="Optional JSON decision packet validation output path.",
+    )
+    decision_packet_validate_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    decision_packet_validate_parser.set_defaults(
+        handler=_handle_validate_calibration_candidate_decision_packet,
+        skip_create_db=True,
+    )
+
+    decision_packet_report_parser = subcommands.add_parser(
+        "build-calibration-candidate-decision-packet-report",
+        help="Build the BP52 operator-facing decision packet report.",
+    )
+    decision_packet_report_parser.add_argument(
+        "--contract",
+        default=DEFAULT_CALIBRATION_CANDIDATE_DECISION_PACKET_CONTRACT_OUTPUT,
+        help="Blueprint 52 calibration candidate decision packet contract JSON path.",
+    )
+    decision_packet_report_parser.add_argument(
+        "--decision-packet",
+        default=DEFAULT_CALIBRATION_CANDIDATE_DECISION_PACKET_OUTPUT,
+        help="Blueprint 52 calibration candidate decision packet JSON path.",
+    )
+    decision_packet_report_parser.add_argument(
+        "--output",
+        default=DEFAULT_CALIBRATION_CANDIDATE_DECISION_PACKET_REPORT_OUTPUT,
+        help="JSON calibration candidate decision packet report output path.",
+    )
+    decision_packet_report_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    decision_packet_report_parser.set_defaults(
+        handler=_handle_build_calibration_candidate_decision_packet_report,
+        skip_create_db=True,
+    )
+
     point_evaluation_parser = subcommands.add_parser(
         "evaluate-point-candidates",
         help="Evaluate generated point candidate markers using operator review metadata.",
@@ -7528,6 +7744,90 @@ def _handle_build_review_guided_gameplay_calibration_sandbox_regression_report(
         contract_path=args.contract,
         baseline_path=args.baseline,
         verification_path=args.verification,
+        output_path=args.output,
+    )
+
+
+def _handle_export_calibration_candidate_decision_packet_contract(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return export_calibration_candidate_decision_packet_contract(
+        output_path=args.output,
+    )
+
+
+def _handle_build_calibration_candidate_decision_packet_inputs(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_calibration_candidate_decision_packet_inputs(
+        contract_path=args.contract,
+        source_calibration_proposal_path=args.source_calibration_proposal,
+        source_sandbox_evaluation_report_path=args.source_sandbox_evaluation_report,
+        source_sandbox_regression_verification_path=(
+            args.source_sandbox_regression_verification
+        ),
+        source_review_metrics_report_path=args.source_review_metrics_report,
+        source_review_loop_report_path=args.source_review_loop_report,
+        source_corpus_run_path=args.source_corpus_run,
+        source_gameplay_gate_regression_baseline_path=(
+            args.source_gameplay_gate_regression_baseline
+        ),
+        source_calibration_sandbox_baseline_path=(
+            args.source_calibration_sandbox_baseline
+        ),
+        model_asset_path=args.model_asset_path,
+        output_path=args.output,
+    )
+
+
+def _handle_validate_calibration_candidate_decision_packet_inputs(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_calibration_candidate_decision_packet_inputs(
+        contract_path=args.contract,
+        packet_inputs_path=args.packet_inputs,
+        output_path=args.output,
+    )
+
+
+def _handle_build_calibration_candidate_decision_packet(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_calibration_candidate_decision_packet(
+        contract_path=args.contract,
+        packet_inputs_path=args.packet_inputs,
+        output_path=args.output,
+    )
+
+
+def _handle_validate_calibration_candidate_decision_packet(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_calibration_candidate_decision_packet(
+        contract_path=args.contract,
+        decision_packet_path=args.decision_packet,
+        output_path=args.output,
+    )
+
+
+def _handle_build_calibration_candidate_decision_packet_report(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_calibration_candidate_decision_packet_report(
+        contract_path=args.contract,
+        decision_packet_path=args.decision_packet,
         output_path=args.output,
     )
 
