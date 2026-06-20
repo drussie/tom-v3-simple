@@ -855,4 +855,60 @@ run "$PYTHON_BIN" -m apps.worker.cli build-calibration-candidate-decision-packet
   --output "$TMP_ROOT/calibration_candidate_decision_packet.report.json" \
   --skip-create-db
 
+run "$PYTHON_BIN" -m apps.worker.cli export-calibration-candidate-config-freeze-contract \
+  --output "$TMP_ROOT/calibration_candidate_config_freeze_contract_v1.smoke.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-calibration-candidate-config-freeze-inputs \
+  --contract "$TMP_ROOT/calibration_candidate_config_freeze_contract_v1.smoke.json" \
+  --source-decision-packet "$TMP_ROOT/calibration_candidate_decision_packet.current.json" \
+  --source-sandbox-evaluation-report "$TMP_ROOT/review_guided_gameplay_calibration_evaluation_report.current.json" \
+  --source-sandbox-regression-verification "$TMP_ROOT/review_guided_gameplay_calibration_sandbox.regression.json" \
+  --source-calibration-proposal "$TMP_ROOT/review_guided_gameplay_calibration_proposal.current.json" \
+  --source-review-metrics-report "$TMP_ROOT/real_broadcast_gameplay_review_metrics_report.current.json" \
+  --source-review-loop-report "$TMP_ROOT/real_broadcast_gameplay_review_loop_report.current.json" \
+  --source-corpus-run "$TMP_ROOT/real_broadcast_gameplay_corpus_run.current.json" \
+  --source-gameplay-gate-regression-baseline "$TMP_ROOT/gameplay_gate_regression.baseline.json" \
+  --source-calibration-sandbox-baseline "$TMP_ROOT/review_guided_gameplay_calibration_sandbox.baseline.json" \
+  --model-asset-path "model_assets/tom_v1/view_classifier_gameplay.pt" \
+  --output "$TMP_ROOT/calibration_candidate_config_freeze_inputs.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli validate-calibration-candidate-config-freeze-inputs \
+  --contract "$TMP_ROOT/calibration_candidate_config_freeze_contract_v1.smoke.json" \
+  --freeze-inputs "$TMP_ROOT/calibration_candidate_config_freeze_inputs.current.json" \
+  --output "$TMP_ROOT/calibration_candidate_config_freeze_inputs.validation.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-calibration-candidate-config-freeze \
+  --contract "$TMP_ROOT/calibration_candidate_config_freeze_contract_v1.smoke.json" \
+  --freeze-inputs "$TMP_ROOT/calibration_candidate_config_freeze_inputs.current.json" \
+  --output "$TMP_ROOT/calibration_candidate_config_freeze.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli validate-calibration-candidate-config-freeze \
+  --contract "$TMP_ROOT/calibration_candidate_config_freeze_contract_v1.smoke.json" \
+  --candidate-config-freeze "$TMP_ROOT/calibration_candidate_config_freeze.current.json" \
+  --output "$TMP_ROOT/calibration_candidate_config_freeze.validation.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-calibration-candidate-manual-approval-packet \
+  --contract "$TMP_ROOT/calibration_candidate_config_freeze_contract_v1.smoke.json" \
+  --candidate-config-freeze "$TMP_ROOT/calibration_candidate_config_freeze.current.json" \
+  --output "$TMP_ROOT/calibration_candidate_manual_approval_packet.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli validate-calibration-candidate-manual-approval-packet \
+  --contract "$TMP_ROOT/calibration_candidate_config_freeze_contract_v1.smoke.json" \
+  --manual-approval-packet "$TMP_ROOT/calibration_candidate_manual_approval_packet.current.json" \
+  --output "$TMP_ROOT/calibration_candidate_manual_approval_packet.validation.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-calibration-candidate-config-freeze-report \
+  --contract "$TMP_ROOT/calibration_candidate_config_freeze_contract_v1.smoke.json" \
+  --candidate-config-freeze "$TMP_ROOT/calibration_candidate_config_freeze.current.json" \
+  --manual-approval-packet "$TMP_ROOT/calibration_candidate_manual_approval_packet.current.json" \
+  --output "$TMP_ROOT/calibration_candidate_config_freeze.report.json" \
+  --skip-create-db
+
 run git status --short

@@ -1913,6 +1913,72 @@ config, mutate model weights, replace baselines, create review labels, infer ten
 classifier correctness, or select candidates for runtime use. Human operator decision remains
 required for future manual review.
 
+## Candidate Config Freeze / Manual Approval Packet
+
+Use this after the Blueprint 52 calibration candidate decision packet has been built. The freeze
+packages a candidate configuration under consideration for manual review only. It keeps
+`not_applied` as true and keeps `runtime_application_status` as `not_applied`.
+
+Build the tracked contract:
+
+```bash
+make tom-v1-export-calibration-candidate-config-freeze-contract \
+  PYTHON=.venv/bin/python
+```
+
+Build and validate freeze inputs:
+
+```bash
+make tom-v1-build-calibration-candidate-config-freeze-inputs \
+  PYTHON=.venv/bin/python
+
+make tom-v1-validate-calibration-candidate-config-freeze-inputs \
+  PYTHON=.venv/bin/python
+```
+
+Build and validate the candidate config freeze:
+
+```bash
+make tom-v1-build-calibration-candidate-config-freeze \
+  PYTHON=.venv/bin/python
+
+make tom-v1-validate-calibration-candidate-config-freeze \
+  PYTHON=.venv/bin/python
+```
+
+Build and validate the manual approval packet:
+
+```bash
+make tom-v1-build-calibration-candidate-manual-approval-packet \
+  PYTHON=.venv/bin/python
+
+make tom-v1-validate-calibration-candidate-manual-approval-packet \
+  PYTHON=.venv/bin/python
+```
+
+Build the freeze report:
+
+```bash
+make tom-v1-build-calibration-candidate-config-freeze-report \
+  PYTHON=.venv/bin/python
+```
+
+The tracked artifacts are
+`.data/contracts/calibration_candidate_config_freeze_contract_v1.json` and
+`.data/contracts/calibration_candidate_config_freeze_v1.json`. Generated freeze inputs,
+validations, manual approval packets, and reports live under `.data/exports/` and should stay
+local.
+
+The committed frozen artifact currently records `candidate_config_status: no_candidate_selected`
+because the source decision packet has no `ready_for_human_decision` candidate. That is a
+structural review result, not a runtime change.
+
+The freeze and manual approval packet do not apply threshold, smoothing, or hysteresis changes,
+update runtime config, mutate model weights, replace baselines, create production config, perform
+automatic approval, perform automatic rejection, create review labels, infer tennis truth, or score
+classifier correctness. A separate human-controlled change request is required for any future
+runtime application phase.
+
 ## Gameplay-Gated Perception Execution Hook
 
 Use this after the Blueprint 38 gameplay segment gate and Blueprint 39 routing plan are available.

@@ -27,6 +27,24 @@ from apps.worker.config import settings
 from apps.worker.pipelines.synthetic_seed import seed_synthetic_run
 from apps.worker.services.ball_court_trajectory import build_ball_court_trajectory
 from apps.worker.services.ball_trajectory_3d import build_3d_ball_trajectory_candidates
+from apps.worker.services.calibration_candidate_config_freeze import (
+    DEFAULT_CALIBRATION_CANDIDATE_CONFIG_FREEZE_CONTRACT_OUTPUT,
+    DEFAULT_CALIBRATION_CANDIDATE_CONFIG_FREEZE_INPUTS_OUTPUT,
+    DEFAULT_CALIBRATION_CANDIDATE_CONFIG_FREEZE_INPUTS_VALIDATION_OUTPUT,
+    DEFAULT_CALIBRATION_CANDIDATE_CONFIG_FREEZE_OUTPUT,
+    DEFAULT_CALIBRATION_CANDIDATE_CONFIG_FREEZE_REPORT_OUTPUT,
+    DEFAULT_CALIBRATION_CANDIDATE_CONFIG_FREEZE_VALIDATION_OUTPUT,
+    DEFAULT_CALIBRATION_CANDIDATE_MANUAL_APPROVAL_PACKET_OUTPUT,
+    DEFAULT_CALIBRATION_CANDIDATE_MANUAL_APPROVAL_PACKET_VALIDATION_OUTPUT,
+    build_calibration_candidate_config_freeze,
+    build_calibration_candidate_config_freeze_inputs,
+    build_calibration_candidate_config_freeze_report,
+    build_calibration_candidate_manual_approval_packet,
+    export_calibration_candidate_config_freeze_contract,
+    validate_calibration_candidate_config_freeze,
+    validate_calibration_candidate_config_freeze_inputs,
+    validate_calibration_candidate_manual_approval_packet,
+)
 from apps.worker.services.calibration_candidate_decision_packet import (
     DEFAULT_CALIBRATION_CANDIDATE_DECISION_PACKET_CONTRACT_OUTPUT,
     DEFAULT_CALIBRATION_CANDIDATE_DECISION_PACKET_INPUTS_OUTPUT,
@@ -5031,6 +5049,281 @@ def main() -> None:
         skip_create_db=True,
     )
 
+    config_freeze_contract_parser = subcommands.add_parser(
+        "export-calibration-candidate-config-freeze-contract",
+        help="Export the Blueprint 53 candidate config freeze contract.",
+    )
+    config_freeze_contract_parser.add_argument(
+        "--output",
+        default=DEFAULT_CALIBRATION_CANDIDATE_CONFIG_FREEZE_CONTRACT_OUTPUT,
+        help="JSON calibration candidate config freeze contract path.",
+    )
+    config_freeze_contract_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    config_freeze_contract_parser.set_defaults(
+        handler=_handle_export_calibration_candidate_config_freeze_contract,
+        skip_create_db=True,
+    )
+
+    config_freeze_inputs_parser = subcommands.add_parser(
+        "build-calibration-candidate-config-freeze-inputs",
+        help="Build BP53 config freeze inputs from BP52 and sandbox outputs.",
+    )
+    config_freeze_inputs_parser.add_argument(
+        "--contract",
+        default=DEFAULT_CALIBRATION_CANDIDATE_CONFIG_FREEZE_CONTRACT_OUTPUT,
+        help="Blueprint 53 calibration candidate config freeze contract JSON path.",
+    )
+    config_freeze_inputs_parser.add_argument(
+        "--source-decision-packet",
+        default=DEFAULT_CALIBRATION_CANDIDATE_DECISION_PACKET_OUTPUT,
+        help="Blueprint 52 calibration candidate decision packet JSON path.",
+    )
+    config_freeze_inputs_parser.add_argument(
+        "--source-sandbox-evaluation-report",
+        default=DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_REPORT_OUTPUT,
+        help="Blueprint 50 calibration evaluation report JSON path.",
+    )
+    config_freeze_inputs_parser.add_argument(
+        "--source-sandbox-regression-verification",
+        default=(
+            DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_VERIFICATION_OUTPUT
+        ),
+        help="Blueprint 51 calibration sandbox regression verification JSON path.",
+    )
+    config_freeze_inputs_parser.add_argument(
+        "--source-calibration-proposal",
+        default=DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_PROPOSAL_OUTPUT,
+        help="Optional Blueprint 49 review-guided calibration proposal JSON path.",
+    )
+    config_freeze_inputs_parser.add_argument(
+        "--source-review-metrics-report",
+        default=DEFAULT_REAL_BROADCAST_GAMEPLAY_REVIEW_METRICS_REPORT_OUTPUT,
+        help="Optional Blueprint 48 real broadcast gameplay review metrics report path.",
+    )
+    config_freeze_inputs_parser.add_argument(
+        "--source-review-loop-report",
+        default=DEFAULT_REAL_BROADCAST_GAMEPLAY_REVIEW_LOOP_REPORT_OUTPUT,
+        help="Optional Blueprint 47 real broadcast gameplay review loop report path.",
+    )
+    config_freeze_inputs_parser.add_argument(
+        "--source-corpus-run",
+        default=DEFAULT_REAL_BROADCAST_GAMEPLAY_CORPUS_OUTPUT,
+        help="Optional Blueprint 46 real broadcast gameplay corpus run path.",
+    )
+    config_freeze_inputs_parser.add_argument(
+        "--source-gameplay-gate-regression-baseline",
+        default=DEFAULT_GAMEPLAY_GATE_REGRESSION_BASELINE_OUTPUT,
+        help="Optional Blueprint 43 gameplay gate regression baseline path.",
+    )
+    config_freeze_inputs_parser.add_argument(
+        "--source-calibration-sandbox-baseline",
+        default=(
+            DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_BASELINE_OUTPUT
+        ),
+        help="Optional Blueprint 51 calibration sandbox regression baseline path.",
+    )
+    config_freeze_inputs_parser.add_argument(
+        "--selected-candidate-packet-ref",
+        default=None,
+        help="Optional explicit BP52 candidate packet, setting, or proposal id.",
+    )
+    config_freeze_inputs_parser.add_argument(
+        "--model-asset-path",
+        default=DEFAULT_GAMEPLAY_CLASSIFIER_ASSET_PATH,
+        help="Read-only local TOM v1 gameplay classifier asset path.",
+    )
+    config_freeze_inputs_parser.add_argument(
+        "--output",
+        default=DEFAULT_CALIBRATION_CANDIDATE_CONFIG_FREEZE_INPUTS_OUTPUT,
+        help="JSON calibration candidate config freeze inputs output path.",
+    )
+    config_freeze_inputs_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    config_freeze_inputs_parser.set_defaults(
+        handler=_handle_build_calibration_candidate_config_freeze_inputs,
+        skip_create_db=True,
+    )
+
+    config_freeze_inputs_validate_parser = subcommands.add_parser(
+        "validate-calibration-candidate-config-freeze-inputs",
+        help="Validate BP53 candidate config freeze inputs structurally.",
+    )
+    config_freeze_inputs_validate_parser.add_argument(
+        "--contract",
+        default=DEFAULT_CALIBRATION_CANDIDATE_CONFIG_FREEZE_CONTRACT_OUTPUT,
+        help="Blueprint 53 calibration candidate config freeze contract JSON path.",
+    )
+    config_freeze_inputs_validate_parser.add_argument(
+        "--freeze-inputs",
+        default=DEFAULT_CALIBRATION_CANDIDATE_CONFIG_FREEZE_INPUTS_OUTPUT,
+        help="Blueprint 53 calibration candidate config freeze inputs JSON path.",
+    )
+    config_freeze_inputs_validate_parser.add_argument(
+        "--output",
+        default=DEFAULT_CALIBRATION_CANDIDATE_CONFIG_FREEZE_INPUTS_VALIDATION_OUTPUT,
+        help="Optional JSON candidate config freeze inputs validation output path.",
+    )
+    config_freeze_inputs_validate_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    config_freeze_inputs_validate_parser.set_defaults(
+        handler=_handle_validate_calibration_candidate_config_freeze_inputs,
+        skip_create_db=True,
+    )
+
+    config_freeze_parser = subcommands.add_parser(
+        "build-calibration-candidate-config-freeze",
+        help="Build the BP53 frozen candidate config review artifact.",
+    )
+    config_freeze_parser.add_argument(
+        "--contract",
+        default=DEFAULT_CALIBRATION_CANDIDATE_CONFIG_FREEZE_CONTRACT_OUTPUT,
+        help="Blueprint 53 calibration candidate config freeze contract JSON path.",
+    )
+    config_freeze_parser.add_argument(
+        "--freeze-inputs",
+        default=DEFAULT_CALIBRATION_CANDIDATE_CONFIG_FREEZE_INPUTS_OUTPUT,
+        help="Blueprint 53 calibration candidate config freeze inputs JSON path.",
+    )
+    config_freeze_parser.add_argument(
+        "--output",
+        default=DEFAULT_CALIBRATION_CANDIDATE_CONFIG_FREEZE_OUTPUT,
+        help="JSON calibration candidate config freeze output path.",
+    )
+    config_freeze_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    config_freeze_parser.set_defaults(
+        handler=_handle_build_calibration_candidate_config_freeze,
+        skip_create_db=True,
+    )
+
+    config_freeze_validate_parser = subcommands.add_parser(
+        "validate-calibration-candidate-config-freeze",
+        help="Validate a BP53 frozen candidate config artifact structurally.",
+    )
+    config_freeze_validate_parser.add_argument(
+        "--contract",
+        default=DEFAULT_CALIBRATION_CANDIDATE_CONFIG_FREEZE_CONTRACT_OUTPUT,
+        help="Blueprint 53 calibration candidate config freeze contract JSON path.",
+    )
+    config_freeze_validate_parser.add_argument(
+        "--candidate-config-freeze",
+        default=DEFAULT_CALIBRATION_CANDIDATE_CONFIG_FREEZE_OUTPUT,
+        help="Blueprint 53 calibration candidate config freeze JSON path.",
+    )
+    config_freeze_validate_parser.add_argument(
+        "--output",
+        default=DEFAULT_CALIBRATION_CANDIDATE_CONFIG_FREEZE_VALIDATION_OUTPUT,
+        help="Optional JSON candidate config freeze validation output path.",
+    )
+    config_freeze_validate_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    config_freeze_validate_parser.set_defaults(
+        handler=_handle_validate_calibration_candidate_config_freeze,
+        skip_create_db=True,
+    )
+
+    manual_approval_packet_parser = subcommands.add_parser(
+        "build-calibration-candidate-manual-approval-packet",
+        help="Build the BP53 manual approval packet.",
+    )
+    manual_approval_packet_parser.add_argument(
+        "--contract",
+        default=DEFAULT_CALIBRATION_CANDIDATE_CONFIG_FREEZE_CONTRACT_OUTPUT,
+        help="Blueprint 53 calibration candidate config freeze contract JSON path.",
+    )
+    manual_approval_packet_parser.add_argument(
+        "--candidate-config-freeze",
+        default=DEFAULT_CALIBRATION_CANDIDATE_CONFIG_FREEZE_OUTPUT,
+        help="Blueprint 53 calibration candidate config freeze JSON path.",
+    )
+    manual_approval_packet_parser.add_argument(
+        "--output",
+        default=DEFAULT_CALIBRATION_CANDIDATE_MANUAL_APPROVAL_PACKET_OUTPUT,
+        help="JSON calibration candidate manual approval packet output path.",
+    )
+    manual_approval_packet_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    manual_approval_packet_parser.set_defaults(
+        handler=_handle_build_calibration_candidate_manual_approval_packet,
+        skip_create_db=True,
+    )
+
+    manual_approval_packet_validate_parser = subcommands.add_parser(
+        "validate-calibration-candidate-manual-approval-packet",
+        help="Validate a BP53 manual approval packet structurally.",
+    )
+    manual_approval_packet_validate_parser.add_argument(
+        "--contract",
+        default=DEFAULT_CALIBRATION_CANDIDATE_CONFIG_FREEZE_CONTRACT_OUTPUT,
+        help="Blueprint 53 calibration candidate config freeze contract JSON path.",
+    )
+    manual_approval_packet_validate_parser.add_argument(
+        "--manual-approval-packet",
+        default=DEFAULT_CALIBRATION_CANDIDATE_MANUAL_APPROVAL_PACKET_OUTPUT,
+        help="Blueprint 53 calibration candidate manual approval packet JSON path.",
+    )
+    manual_approval_packet_validate_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CALIBRATION_CANDIDATE_MANUAL_APPROVAL_PACKET_VALIDATION_OUTPUT
+        ),
+        help="Optional JSON manual approval packet validation output path.",
+    )
+    manual_approval_packet_validate_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    manual_approval_packet_validate_parser.set_defaults(
+        handler=_handle_validate_calibration_candidate_manual_approval_packet,
+        skip_create_db=True,
+    )
+
+    config_freeze_report_parser = subcommands.add_parser(
+        "build-calibration-candidate-config-freeze-report",
+        help="Build the BP53 candidate config freeze report.",
+    )
+    config_freeze_report_parser.add_argument(
+        "--contract",
+        default=DEFAULT_CALIBRATION_CANDIDATE_CONFIG_FREEZE_CONTRACT_OUTPUT,
+        help="Blueprint 53 calibration candidate config freeze contract JSON path.",
+    )
+    config_freeze_report_parser.add_argument(
+        "--candidate-config-freeze",
+        default=DEFAULT_CALIBRATION_CANDIDATE_CONFIG_FREEZE_OUTPUT,
+        help="Blueprint 53 calibration candidate config freeze JSON path.",
+    )
+    config_freeze_report_parser.add_argument(
+        "--manual-approval-packet",
+        default=DEFAULT_CALIBRATION_CANDIDATE_MANUAL_APPROVAL_PACKET_OUTPUT,
+        help="Optional Blueprint 53 manual approval packet JSON path.",
+    )
+    config_freeze_report_parser.add_argument(
+        "--output",
+        default=DEFAULT_CALIBRATION_CANDIDATE_CONFIG_FREEZE_REPORT_OUTPUT,
+        help="JSON calibration candidate config freeze report output path.",
+    )
+    config_freeze_report_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    config_freeze_report_parser.set_defaults(
+        handler=_handle_build_calibration_candidate_config_freeze_report,
+        skip_create_db=True,
+    )
+
     point_evaluation_parser = subcommands.add_parser(
         "evaluate-point-candidates",
         help="Evaluate generated point candidate markers using operator review metadata.",
@@ -7828,6 +8121,117 @@ def _handle_build_calibration_candidate_decision_packet_report(
     return build_calibration_candidate_decision_packet_report(
         contract_path=args.contract,
         decision_packet_path=args.decision_packet,
+        output_path=args.output,
+    )
+
+
+def _handle_export_calibration_candidate_config_freeze_contract(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return export_calibration_candidate_config_freeze_contract(
+        output_path=args.output,
+    )
+
+
+def _handle_build_calibration_candidate_config_freeze_inputs(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_calibration_candidate_config_freeze_inputs(
+        contract_path=args.contract,
+        source_decision_packet_path=args.source_decision_packet,
+        source_sandbox_evaluation_report_path=args.source_sandbox_evaluation_report,
+        source_sandbox_regression_verification_path=(
+            args.source_sandbox_regression_verification
+        ),
+        source_calibration_proposal_path=args.source_calibration_proposal,
+        source_review_metrics_report_path=args.source_review_metrics_report,
+        source_review_loop_report_path=args.source_review_loop_report,
+        source_corpus_run_path=args.source_corpus_run,
+        source_gameplay_gate_regression_baseline_path=(
+            args.source_gameplay_gate_regression_baseline
+        ),
+        source_calibration_sandbox_baseline_path=(
+            args.source_calibration_sandbox_baseline
+        ),
+        selected_candidate_packet_ref=args.selected_candidate_packet_ref,
+        model_asset_path=args.model_asset_path,
+        output_path=args.output,
+    )
+
+
+def _handle_validate_calibration_candidate_config_freeze_inputs(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_calibration_candidate_config_freeze_inputs(
+        contract_path=args.contract,
+        freeze_inputs_path=args.freeze_inputs,
+        output_path=args.output,
+    )
+
+
+def _handle_build_calibration_candidate_config_freeze(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_calibration_candidate_config_freeze(
+        contract_path=args.contract,
+        freeze_inputs_path=args.freeze_inputs,
+        output_path=args.output,
+    )
+
+
+def _handle_validate_calibration_candidate_config_freeze(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_calibration_candidate_config_freeze(
+        contract_path=args.contract,
+        candidate_config_freeze_path=args.candidate_config_freeze,
+        output_path=args.output,
+    )
+
+
+def _handle_build_calibration_candidate_manual_approval_packet(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_calibration_candidate_manual_approval_packet(
+        contract_path=args.contract,
+        candidate_config_freeze_path=args.candidate_config_freeze,
+        output_path=args.output,
+    )
+
+
+def _handle_validate_calibration_candidate_manual_approval_packet(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_calibration_candidate_manual_approval_packet(
+        contract_path=args.contract,
+        manual_approval_packet_path=args.manual_approval_packet,
+        output_path=args.output,
+    )
+
+
+def _handle_build_calibration_candidate_config_freeze_report(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_calibration_candidate_config_freeze_report(
+        contract_path=args.contract,
+        candidate_config_freeze_path=args.candidate_config_freeze,
+        manual_approval_packet_path=args.manual_approval_packet,
         output_path=args.output,
     )
 

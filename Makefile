@@ -341,6 +341,28 @@ CALIBRATION_CANDIDATE_DECISION_PACKET_SOURCE_REVIEW_LOOP_REPORT ?= $(REAL_BROADC
 CALIBRATION_CANDIDATE_DECISION_PACKET_SOURCE_CORPUS_RUN ?= $(REAL_BROADCAST_GAMEPLAY_CORPUS_OUTPUT)
 CALIBRATION_CANDIDATE_DECISION_PACKET_SOURCE_GAMEPLAY_GATE_REGRESSION_BASELINE ?= $(GAMEPLAY_GATE_REGRESSION_BASELINE_OUTPUT)
 CALIBRATION_CANDIDATE_DECISION_PACKET_SOURCE_CALIBRATION_SANDBOX_BASELINE ?= $(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_BASELINE_OUTPUT)
+CALIBRATION_CANDIDATE_CONFIG_FREEZE_CONTRACT_OUTPUT ?= .data/contracts/calibration_candidate_config_freeze_contract_v1.json
+CALIBRATION_CANDIDATE_CONFIG_FREEZE_ARTIFACT_OUTPUT ?= .data/contracts/calibration_candidate_config_freeze_v1.json
+CALIBRATION_CANDIDATE_CONFIG_FREEZE_INPUTS_OUTPUT ?= .data/exports/calibration_candidate_config_freeze_inputs.current.json
+CALIBRATION_CANDIDATE_CONFIG_FREEZE_INPUTS ?= $(CALIBRATION_CANDIDATE_CONFIG_FREEZE_INPUTS_OUTPUT)
+CALIBRATION_CANDIDATE_CONFIG_FREEZE_INPUTS_VALIDATION_OUTPUT ?= .data/exports/calibration_candidate_config_freeze_inputs.validation.json
+CALIBRATION_CANDIDATE_CONFIG_FREEZE_OUTPUT ?= .data/exports/calibration_candidate_config_freeze.current.json
+CALIBRATION_CANDIDATE_CONFIG_FREEZE ?= $(CALIBRATION_CANDIDATE_CONFIG_FREEZE_OUTPUT)
+CALIBRATION_CANDIDATE_CONFIG_FREEZE_VALIDATION_OUTPUT ?= .data/exports/calibration_candidate_config_freeze.validation.json
+CALIBRATION_CANDIDATE_MANUAL_APPROVAL_PACKET_OUTPUT ?= .data/exports/calibration_candidate_manual_approval_packet.current.json
+CALIBRATION_CANDIDATE_MANUAL_APPROVAL_PACKET ?= $(CALIBRATION_CANDIDATE_MANUAL_APPROVAL_PACKET_OUTPUT)
+CALIBRATION_CANDIDATE_MANUAL_APPROVAL_PACKET_VALIDATION_OUTPUT ?= .data/exports/calibration_candidate_manual_approval_packet.validation.json
+CALIBRATION_CANDIDATE_CONFIG_FREEZE_REPORT_OUTPUT ?= .data/exports/calibration_candidate_config_freeze.report.json
+CALIBRATION_CANDIDATE_CONFIG_FREEZE_SOURCE_DECISION_PACKET ?= $(CALIBRATION_CANDIDATE_DECISION_PACKET_OUTPUT)
+CALIBRATION_CANDIDATE_CONFIG_FREEZE_SOURCE_SANDBOX_EVALUATION_REPORT ?= $(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_REPORT_OUTPUT)
+CALIBRATION_CANDIDATE_CONFIG_FREEZE_SOURCE_SANDBOX_REGRESSION_VERIFICATION ?= $(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_VERIFICATION_OUTPUT)
+CALIBRATION_CANDIDATE_CONFIG_FREEZE_SOURCE_CALIBRATION_PROPOSAL ?= $(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_PROPOSAL_OUTPUT)
+CALIBRATION_CANDIDATE_CONFIG_FREEZE_SOURCE_REVIEW_METRICS_REPORT ?= $(REAL_BROADCAST_GAMEPLAY_REVIEW_METRICS_REPORT_OUTPUT)
+CALIBRATION_CANDIDATE_CONFIG_FREEZE_SOURCE_REVIEW_LOOP_REPORT ?= $(REAL_BROADCAST_GAMEPLAY_REVIEW_LOOP_REPORT_OUTPUT)
+CALIBRATION_CANDIDATE_CONFIG_FREEZE_SOURCE_CORPUS_RUN ?= $(REAL_BROADCAST_GAMEPLAY_CORPUS_OUTPUT)
+CALIBRATION_CANDIDATE_CONFIG_FREEZE_SOURCE_GAMEPLAY_GATE_REGRESSION_BASELINE ?= $(GAMEPLAY_GATE_REGRESSION_BASELINE_OUTPUT)
+CALIBRATION_CANDIDATE_CONFIG_FREEZE_SOURCE_CALIBRATION_SANDBOX_BASELINE ?= $(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_BASELINE_OUTPUT)
+CALIBRATION_CANDIDATE_CONFIG_FREEZE_SELECTED_CANDIDATE_PACKET_REF ?=
 EXPECTED_BRANCH ?=
 EXPECTED_TAG ?=
 FORMAT ?= json
@@ -441,6 +463,7 @@ export TOM_V3_DATABASE_URL
 .PHONY: tom-v1-export-review-guided-gameplay-calibration-evaluation-sandbox-contract tom-v1-build-review-guided-gameplay-calibration-evaluation-inputs tom-v1-validate-review-guided-gameplay-calibration-evaluation-inputs tom-v1-run-review-guided-gameplay-calibration-evaluation-sandbox tom-v1-validate-review-guided-gameplay-calibration-evaluation-report tom-v1-build-review-guided-gameplay-calibration-evaluation-summary
 .PHONY: tom-v1-export-review-guided-gameplay-calibration-sandbox-regression-contract tom-v1-build-review-guided-gameplay-calibration-sandbox-regression-baseline tom-v1-verify-review-guided-gameplay-calibration-sandbox-regression-baseline tom-v1-build-review-guided-gameplay-calibration-sandbox-regression-report
 .PHONY: tom-v1-export-calibration-candidate-decision-packet-contract tom-v1-build-calibration-candidate-decision-packet-inputs tom-v1-validate-calibration-candidate-decision-packet-inputs tom-v1-build-calibration-candidate-decision-packet tom-v1-validate-calibration-candidate-decision-packet tom-v1-build-calibration-candidate-decision-packet-report
+.PHONY: tom-v1-export-calibration-candidate-config-freeze-contract tom-v1-build-calibration-candidate-config-freeze-inputs tom-v1-validate-calibration-candidate-config-freeze-inputs tom-v1-build-calibration-candidate-config-freeze tom-v1-validate-calibration-candidate-config-freeze tom-v1-build-calibration-candidate-manual-approval-packet tom-v1-validate-calibration-candidate-manual-approval-packet tom-v1-build-calibration-candidate-config-freeze-report
 
 install:
 	$(PYTHON) -m pip install -e ".[dev]"
@@ -1109,6 +1132,30 @@ tom-v1-validate-calibration-candidate-decision-packet:
 
 tom-v1-build-calibration-candidate-decision-packet-report:
 	$(PYTHON) -m apps.worker.cli build-calibration-candidate-decision-packet-report --contract "$(CALIBRATION_CANDIDATE_DECISION_PACKET_CONTRACT_OUTPUT)" --decision-packet "$(CALIBRATION_CANDIDATE_DECISION_PACKET)" --output "$(CALIBRATION_CANDIDATE_DECISION_PACKET_REPORT_OUTPUT)" --skip-create-db
+
+tom-v1-export-calibration-candidate-config-freeze-contract:
+	$(PYTHON) -m apps.worker.cli export-calibration-candidate-config-freeze-contract --output "$(CALIBRATION_CANDIDATE_CONFIG_FREEZE_CONTRACT_OUTPUT)" --skip-create-db
+
+tom-v1-build-calibration-candidate-config-freeze-inputs:
+	$(PYTHON) -m apps.worker.cli build-calibration-candidate-config-freeze-inputs --contract "$(CALIBRATION_CANDIDATE_CONFIG_FREEZE_CONTRACT_OUTPUT)" --source-decision-packet "$(CALIBRATION_CANDIDATE_CONFIG_FREEZE_SOURCE_DECISION_PACKET)" --source-sandbox-evaluation-report "$(CALIBRATION_CANDIDATE_CONFIG_FREEZE_SOURCE_SANDBOX_EVALUATION_REPORT)" --source-sandbox-regression-verification "$(CALIBRATION_CANDIDATE_CONFIG_FREEZE_SOURCE_SANDBOX_REGRESSION_VERIFICATION)" --source-calibration-proposal "$(CALIBRATION_CANDIDATE_CONFIG_FREEZE_SOURCE_CALIBRATION_PROPOSAL)" --source-review-metrics-report "$(CALIBRATION_CANDIDATE_CONFIG_FREEZE_SOURCE_REVIEW_METRICS_REPORT)" --source-review-loop-report "$(CALIBRATION_CANDIDATE_CONFIG_FREEZE_SOURCE_REVIEW_LOOP_REPORT)" --source-corpus-run "$(CALIBRATION_CANDIDATE_CONFIG_FREEZE_SOURCE_CORPUS_RUN)" --source-gameplay-gate-regression-baseline "$(CALIBRATION_CANDIDATE_CONFIG_FREEZE_SOURCE_GAMEPLAY_GATE_REGRESSION_BASELINE)" --source-calibration-sandbox-baseline "$(CALIBRATION_CANDIDATE_CONFIG_FREEZE_SOURCE_CALIBRATION_SANDBOX_BASELINE)" $(if $(CALIBRATION_CANDIDATE_CONFIG_FREEZE_SELECTED_CANDIDATE_PACKET_REF),--selected-candidate-packet-ref "$(CALIBRATION_CANDIDATE_CONFIG_FREEZE_SELECTED_CANDIDATE_PACKET_REF)",) --model-asset-path "$(GAMEPLAY_CLASSIFIER_ASSET_PATH)" --output "$(CALIBRATION_CANDIDATE_CONFIG_FREEZE_INPUTS_OUTPUT)" --skip-create-db
+
+tom-v1-validate-calibration-candidate-config-freeze-inputs:
+	$(PYTHON) -m apps.worker.cli validate-calibration-candidate-config-freeze-inputs --contract "$(CALIBRATION_CANDIDATE_CONFIG_FREEZE_CONTRACT_OUTPUT)" --freeze-inputs "$(CALIBRATION_CANDIDATE_CONFIG_FREEZE_INPUTS)" --output "$(CALIBRATION_CANDIDATE_CONFIG_FREEZE_INPUTS_VALIDATION_OUTPUT)" --skip-create-db
+
+tom-v1-build-calibration-candidate-config-freeze:
+	$(PYTHON) -m apps.worker.cli build-calibration-candidate-config-freeze --contract "$(CALIBRATION_CANDIDATE_CONFIG_FREEZE_CONTRACT_OUTPUT)" --freeze-inputs "$(CALIBRATION_CANDIDATE_CONFIG_FREEZE_INPUTS)" --output "$(CALIBRATION_CANDIDATE_CONFIG_FREEZE_OUTPUT)" --skip-create-db
+
+tom-v1-validate-calibration-candidate-config-freeze:
+	$(PYTHON) -m apps.worker.cli validate-calibration-candidate-config-freeze --contract "$(CALIBRATION_CANDIDATE_CONFIG_FREEZE_CONTRACT_OUTPUT)" --candidate-config-freeze "$(CALIBRATION_CANDIDATE_CONFIG_FREEZE)" --output "$(CALIBRATION_CANDIDATE_CONFIG_FREEZE_VALIDATION_OUTPUT)" --skip-create-db
+
+tom-v1-build-calibration-candidate-manual-approval-packet:
+	$(PYTHON) -m apps.worker.cli build-calibration-candidate-manual-approval-packet --contract "$(CALIBRATION_CANDIDATE_CONFIG_FREEZE_CONTRACT_OUTPUT)" --candidate-config-freeze "$(CALIBRATION_CANDIDATE_CONFIG_FREEZE)" --output "$(CALIBRATION_CANDIDATE_MANUAL_APPROVAL_PACKET_OUTPUT)" --skip-create-db
+
+tom-v1-validate-calibration-candidate-manual-approval-packet:
+	$(PYTHON) -m apps.worker.cli validate-calibration-candidate-manual-approval-packet --contract "$(CALIBRATION_CANDIDATE_CONFIG_FREEZE_CONTRACT_OUTPUT)" --manual-approval-packet "$(CALIBRATION_CANDIDATE_MANUAL_APPROVAL_PACKET)" --output "$(CALIBRATION_CANDIDATE_MANUAL_APPROVAL_PACKET_VALIDATION_OUTPUT)" --skip-create-db
+
+tom-v1-build-calibration-candidate-config-freeze-report:
+	$(PYTHON) -m apps.worker.cli build-calibration-candidate-config-freeze-report --contract "$(CALIBRATION_CANDIDATE_CONFIG_FREEZE_CONTRACT_OUTPUT)" --candidate-config-freeze "$(CALIBRATION_CANDIDATE_CONFIG_FREEZE)" --manual-approval-packet "$(CALIBRATION_CANDIDATE_MANUAL_APPROVAL_PACKET)" --output "$(CALIBRATION_CANDIDATE_CONFIG_FREEZE_REPORT_OUTPUT)" --skip-create-db
 
 tom-v1-post-codex-validate:
 	scripts/post_codex_validate.sh $(if $(EXPECTED_BRANCH),--branch "$(EXPECTED_BRANCH)",) $(if $(EXPECTED_TAG),--expected-tag "$(EXPECTED_TAG)",) --python "$(PYTHON)"
