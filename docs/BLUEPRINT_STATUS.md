@@ -1573,3 +1573,33 @@ generalization, automatic correctness, training truth, production truth, or adju
 not train or mutate the gameplay classifier, commit model weights, create review labels, mutate
 gameplay baselines, score the classifier, change thresholds, smoothing, hysteresis, or runtime
 config, replace baselines, or tune models.
+
+## Blueprint 51 - Calibration Evaluation Sandbox Regression Gate
+
+Status: COMPLETE
+
+Blueprint 51 proves:
+
+```text
+BP50 evaluation inputs/report
+-> sandbox regression contract
+-> frozen sandbox baseline
+-> current structural summary
+-> baseline verification
+-> regression report
+```
+
+The tracked regression contract is
+`.data/contracts/review_guided_gameplay_calibration_sandbox_regression_contract_v1.json`.
+The tracked frozen baseline is
+`.data/baselines/review_guided_gameplay_calibration_sandbox.baseline.json`. Generated current
+summaries, verification output, and reports remain under `.data/exports/`.
+
+Blueprint 51 does not decide tennis truth, in/out, score, point winner, player identity, rally
+state, server/receiver state, line-call truth, point truth, event truth, gameplay truth,
+classifier correctness, classifier accuracy, accepted/rejected lifecycle, automatic relabeling,
+reviewer ranking or quality scoring, coaching/tactical conclusions, betting/prediction outcomes,
+generalization, automatic correctness, training truth, production truth, or adjudication. It does
+not train or mutate the gameplay classifier, commit model weights, create review labels, score the
+classifier, apply threshold, smoothing, or hysteresis changes, update runtime config, replace the
+gameplay regression baseline, or tune models.

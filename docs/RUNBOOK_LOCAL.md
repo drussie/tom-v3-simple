@@ -1811,6 +1811,58 @@ Expected:
 - `breaking_drift_detected`: false
 - `baseline_is_not_truth`: true
 
+## Calibration Evaluation Sandbox Regression Gate
+
+Use this after Blueprint 50 evaluation inputs and reports have been built. The gate freezes and
+verifies structural sandbox behavior only. It does not apply threshold, smoothing, hysteresis, model,
+runtime config, or baseline changes.
+
+Build the tracked contract and frozen baseline:
+
+```bash
+make tom-v1-export-review-guided-gameplay-calibration-sandbox-regression-contract \
+  PYTHON=.venv/bin/python
+
+make tom-v1-build-review-guided-gameplay-calibration-sandbox-regression-baseline \
+  PYTHON=.venv/bin/python
+```
+
+Verify the baseline:
+
+```bash
+TOM_V3_DATABASE_URL=sqlite+pysqlite:///./tmp_tom_v3_tom_v1_bridge.db \
+make tom-v1-verify-review-guided-gameplay-calibration-sandbox-regression-baseline \
+  PYTHON=.venv/bin/python
+```
+
+Expected:
+
+- `ok`: true
+- `status`: `completed`
+- `drift_detected`: false
+- `breaking_drift_detected`: false
+- `baseline_is_not_truth`: true
+- `sandbox_is_not_truth`: true
+- `sandbox_is_not_accuracy_scoring`: true
+- `threshold_changes_not_applied`: true
+- `smoothing_changes_not_applied`: true
+- `hysteresis_changes_not_applied`: true
+- `runtime_config_not_updated`: true
+- `model_weights_not_modified`: true
+- `baseline_not_replaced`: true
+- `classifier_correctness_not_assessed`: true
+- `generalization_not_claimed`: true
+
+Build the local regression report if needed:
+
+```bash
+make tom-v1-build-review-guided-gameplay-calibration-sandbox-regression-report \
+  PYTHON=.venv/bin/python
+```
+
+The tracked baseline currently marks fixture/demo reuse only. It is not a distinct real broadcast
+corpus and does not claim generalization.
+
 ## Gameplay-Gated Perception Execution Hook
 
 Use this after the Blueprint 38 gameplay segment gate and Blueprint 39 routing plan are available.

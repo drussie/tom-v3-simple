@@ -784,4 +784,33 @@ run "$PYTHON_BIN" -m apps.worker.cli build-review-guided-gameplay-calibration-ev
   --output "$TMP_ROOT/review_guided_gameplay_calibration_evaluation_summary.current.json" \
   --skip-create-db
 
+run "$PYTHON_BIN" -m apps.worker.cli export-review-guided-gameplay-calibration-sandbox-regression-contract \
+  --output "$TMP_ROOT/review_guided_gameplay_calibration_sandbox_regression_contract_v1.smoke.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-review-guided-gameplay-calibration-sandbox-regression-baseline \
+  --contract "$TMP_ROOT/review_guided_gameplay_calibration_sandbox_regression_contract_v1.smoke.json" \
+  --source-evaluation-inputs "$TMP_ROOT/review_guided_gameplay_calibration_evaluation_inputs.current.json" \
+  --source-evaluation-report "$TMP_ROOT/review_guided_gameplay_calibration_evaluation_report.current.json" \
+  --source-evaluation-contract "$TMP_ROOT/review_guided_gameplay_calibration_evaluation_sandbox_contract_v1.smoke.json" \
+  --output "$TMP_ROOT/review_guided_gameplay_calibration_sandbox.baseline.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli verify-review-guided-gameplay-calibration-sandbox-regression-baseline \
+  --contract "$TMP_ROOT/review_guided_gameplay_calibration_sandbox_regression_contract_v1.smoke.json" \
+  --baseline "$TMP_ROOT/review_guided_gameplay_calibration_sandbox.baseline.json" \
+  --source-evaluation-inputs "$TMP_ROOT/review_guided_gameplay_calibration_evaluation_inputs.current.json" \
+  --source-evaluation-report "$TMP_ROOT/review_guided_gameplay_calibration_evaluation_report.current.json" \
+  --source-evaluation-contract "$TMP_ROOT/review_guided_gameplay_calibration_evaluation_sandbox_contract_v1.smoke.json" \
+  --current-output "$TMP_ROOT/review_guided_gameplay_calibration_sandbox.current.json" \
+  --output "$TMP_ROOT/review_guided_gameplay_calibration_sandbox.regression.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-review-guided-gameplay-calibration-sandbox-regression-report \
+  --contract "$TMP_ROOT/review_guided_gameplay_calibration_sandbox_regression_contract_v1.smoke.json" \
+  --baseline "$TMP_ROOT/review_guided_gameplay_calibration_sandbox.baseline.json" \
+  --verification "$TMP_ROOT/review_guided_gameplay_calibration_sandbox.regression.json" \
+  --output "$TMP_ROOT/review_guided_gameplay_calibration_sandbox.report.json" \
+  --skip-create-db
+
 run git status --short

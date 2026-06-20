@@ -280,6 +280,17 @@ from apps.worker.services.review_guided_gameplay_calibration_evaluation_sandbox 
     validate_review_guided_gameplay_calibration_evaluation_inputs,
     validate_review_guided_gameplay_calibration_evaluation_report,
 )
+from apps.worker.services.review_guided_gameplay_calibration_sandbox_regression import (
+    DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_BASELINE_OUTPUT,
+    DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_CONTRACT_OUTPUT,
+    DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_CURRENT_OUTPUT,
+    DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_REPORT_OUTPUT,
+    DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_VERIFICATION_OUTPUT,
+    build_review_guided_gameplay_calibration_sandbox_regression_baseline,
+    build_review_guided_gameplay_calibration_sandbox_regression_report,
+    export_review_guided_gameplay_calibration_sandbox_regression_contract,
+    verify_review_guided_gameplay_calibration_sandbox_regression_baseline,
+)
 from apps.worker.services.review_guided_gameplay_gate_calibration_proposal import (
     DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_INPUTS_OUTPUT,
     DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_INPUTS_VALIDATION_OUTPUT,
@@ -4641,6 +4652,169 @@ def main() -> None:
         skip_create_db=True,
     )
 
+    calibration_sandbox_regression_contract_parser = subcommands.add_parser(
+        "export-review-guided-gameplay-calibration-sandbox-regression-contract",
+        help="Export the Blueprint 51 calibration sandbox regression contract.",
+    )
+    calibration_sandbox_regression_contract_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_CONTRACT_OUTPUT
+        ),
+        help="JSON calibration sandbox regression contract path.",
+    )
+    calibration_sandbox_regression_contract_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    calibration_sandbox_regression_contract_parser.set_defaults(
+        handler=(
+            _handle_export_review_guided_gameplay_calibration_sandbox_regression_contract
+        ),
+        skip_create_db=True,
+    )
+
+    calibration_sandbox_regression_baseline_parser = subcommands.add_parser(
+        "build-review-guided-gameplay-calibration-sandbox-regression-baseline",
+        help="Build the Blueprint 51 frozen calibration sandbox regression baseline.",
+    )
+    calibration_sandbox_regression_baseline_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 51 calibration sandbox regression contract JSON path.",
+    )
+    calibration_sandbox_regression_baseline_parser.add_argument(
+        "--source-evaluation-inputs",
+        default=DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_INPUTS_OUTPUT,
+        help="Blueprint 50 calibration evaluation inputs JSON path.",
+    )
+    calibration_sandbox_regression_baseline_parser.add_argument(
+        "--source-evaluation-report",
+        default=DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_REPORT_OUTPUT,
+        help="Blueprint 50 calibration evaluation report JSON path.",
+    )
+    calibration_sandbox_regression_baseline_parser.add_argument(
+        "--source-evaluation-contract",
+        default=(
+            DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_SANDBOX_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 50 calibration evaluation sandbox contract JSON path.",
+    )
+    calibration_sandbox_regression_baseline_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_BASELINE_OUTPUT
+        ),
+        help="JSON calibration sandbox regression baseline output path.",
+    )
+    calibration_sandbox_regression_baseline_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    calibration_sandbox_regression_baseline_parser.set_defaults(
+        handler=_handle_build_review_guided_gameplay_calibration_sandbox_regression_baseline,
+        skip_create_db=True,
+    )
+
+    calibration_sandbox_regression_verify_parser = subcommands.add_parser(
+        "verify-review-guided-gameplay-calibration-sandbox-regression-baseline",
+        help="Verify current BP50 sandbox structure against the BP51 frozen baseline.",
+    )
+    calibration_sandbox_regression_verify_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 51 calibration sandbox regression contract JSON path.",
+    )
+    calibration_sandbox_regression_verify_parser.add_argument(
+        "--baseline",
+        default=(
+            DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_BASELINE_OUTPUT
+        ),
+        help="Blueprint 51 calibration sandbox regression baseline JSON path.",
+    )
+    calibration_sandbox_regression_verify_parser.add_argument(
+        "--source-evaluation-inputs",
+        default=DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_INPUTS_OUTPUT,
+        help="Blueprint 50 calibration evaluation inputs JSON path.",
+    )
+    calibration_sandbox_regression_verify_parser.add_argument(
+        "--source-evaluation-report",
+        default=DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_REPORT_OUTPUT,
+        help="Blueprint 50 calibration evaluation report JSON path.",
+    )
+    calibration_sandbox_regression_verify_parser.add_argument(
+        "--source-evaluation-contract",
+        default=(
+            DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_SANDBOX_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 50 calibration evaluation sandbox contract JSON path.",
+    )
+    calibration_sandbox_regression_verify_parser.add_argument(
+        "--current-output",
+        default=(
+            DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_CURRENT_OUTPUT
+        ),
+        help="Optional JSON current calibration sandbox regression summary output path.",
+    )
+    calibration_sandbox_regression_verify_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_VERIFICATION_OUTPUT
+        ),
+        help="JSON calibration sandbox regression verification output path.",
+    )
+    calibration_sandbox_regression_verify_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    calibration_sandbox_regression_verify_parser.set_defaults(
+        handler=_handle_verify_review_guided_gameplay_calibration_sandbox_regression_baseline,
+        skip_create_db=True,
+    )
+
+    calibration_sandbox_regression_report_parser = subcommands.add_parser(
+        "build-review-guided-gameplay-calibration-sandbox-regression-report",
+        help="Build a Blueprint 51 calibration sandbox regression report.",
+    )
+    calibration_sandbox_regression_report_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 51 calibration sandbox regression contract JSON path.",
+    )
+    calibration_sandbox_regression_report_parser.add_argument(
+        "--baseline",
+        default=(
+            DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_BASELINE_OUTPUT
+        ),
+        help="Blueprint 51 calibration sandbox regression baseline JSON path.",
+    )
+    calibration_sandbox_regression_report_parser.add_argument(
+        "--verification",
+        default=(
+            DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_VERIFICATION_OUTPUT
+        ),
+        help="Blueprint 51 calibration sandbox regression verification JSON path.",
+    )
+    calibration_sandbox_regression_report_parser.add_argument(
+        "--output",
+        default=DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_REPORT_OUTPUT,
+        help="JSON calibration sandbox regression report output path.",
+    )
+    calibration_sandbox_regression_report_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    calibration_sandbox_regression_report_parser.set_defaults(
+        handler=_handle_build_review_guided_gameplay_calibration_sandbox_regression_report,
+        skip_create_db=True,
+    )
+
     point_evaluation_parser = subcommands.add_parser(
         "evaluate-point-candidates",
         help="Evaluate generated point candidate markers using operator review metadata.",
@@ -7301,6 +7475,59 @@ def _handle_build_review_guided_gameplay_calibration_evaluation_summary(
     return build_review_guided_gameplay_calibration_evaluation_summary(
         contract_path=args.contract,
         evaluation_report_path=args.evaluation_report,
+        output_path=args.output,
+    )
+
+
+def _handle_export_review_guided_gameplay_calibration_sandbox_regression_contract(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return export_review_guided_gameplay_calibration_sandbox_regression_contract(
+        output_path=args.output,
+    )
+
+
+def _handle_build_review_guided_gameplay_calibration_sandbox_regression_baseline(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_review_guided_gameplay_calibration_sandbox_regression_baseline(
+        contract_path=args.contract,
+        source_evaluation_input_path=args.source_evaluation_inputs,
+        source_evaluation_report_path=args.source_evaluation_report,
+        source_evaluation_contract_path=args.source_evaluation_contract,
+        output_path=args.output,
+    )
+
+
+def _handle_verify_review_guided_gameplay_calibration_sandbox_regression_baseline(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return verify_review_guided_gameplay_calibration_sandbox_regression_baseline(
+        contract_path=args.contract,
+        baseline_path=args.baseline,
+        source_evaluation_input_path=args.source_evaluation_inputs,
+        source_evaluation_report_path=args.source_evaluation_report,
+        source_evaluation_contract_path=args.source_evaluation_contract,
+        current_output_path=args.current_output,
+        output_path=args.output,
+    )
+
+
+def _handle_build_review_guided_gameplay_calibration_sandbox_regression_report(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_review_guided_gameplay_calibration_sandbox_regression_report(
+        contract_path=args.contract,
+        baseline_path=args.baseline,
+        verification_path=args.verification,
         output_path=args.output,
     )
 

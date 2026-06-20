@@ -316,6 +316,15 @@ REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_CURRENT_SMOOTHING_WINDOW ?= $(GAME
 REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_HYSTERESIS_ENTER ?= $(GAMEPLAY_SEGMENT_HYSTERESIS_ENTER)
 REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_HYSTERESIS_EXIT ?= $(GAMEPLAY_SEGMENT_HYSTERESIS_EXIT)
 REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_MODE ?= structural_offline_evaluation
+REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_CONTRACT_OUTPUT ?= .data/contracts/review_guided_gameplay_calibration_sandbox_regression_contract_v1.json
+REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_BASELINE_OUTPUT ?= .data/baselines/review_guided_gameplay_calibration_sandbox.baseline.json
+REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_BASELINE ?= $(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_BASELINE_OUTPUT)
+REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_CURRENT_OUTPUT ?= .data/exports/review_guided_gameplay_calibration_sandbox.current.json
+REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_VERIFICATION_OUTPUT ?= .data/exports/review_guided_gameplay_calibration_sandbox.regression.json
+REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_REPORT_OUTPUT ?= .data/exports/review_guided_gameplay_calibration_sandbox.report.json
+REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_SOURCE_EVALUATION_INPUTS ?= $(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_INPUTS_OUTPUT)
+REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_SOURCE_EVALUATION_REPORT ?= $(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_REPORT_OUTPUT)
+REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_SOURCE_EVALUATION_CONTRACT ?= $(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_SANDBOX_CONTRACT_OUTPUT)
 EXPECTED_BRANCH ?=
 EXPECTED_TAG ?=
 FORMAT ?= json
@@ -414,6 +423,7 @@ export TOM_V3_DATABASE_URL
 .PHONY: tom-v1-export-real-broadcast-gameplay-review-metrics-contract tom-v1-build-real-broadcast-gameplay-review-metrics-report tom-v1-validate-real-broadcast-gameplay-review-metrics-report tom-v1-build-real-broadcast-gameplay-review-qa-dashboard tom-v1-build-real-broadcast-gameplay-review-next-actions-report
 .PHONY: tom-v1-export-review-guided-gameplay-calibration-proposal-contract tom-v1-build-review-guided-gameplay-calibration-inputs tom-v1-validate-review-guided-gameplay-calibration-inputs tom-v1-build-review-guided-gameplay-calibration-proposal tom-v1-validate-review-guided-gameplay-calibration-proposal tom-v1-build-review-guided-gameplay-calibration-proposal-report
 .PHONY: tom-v1-export-review-guided-gameplay-calibration-evaluation-sandbox-contract tom-v1-build-review-guided-gameplay-calibration-evaluation-inputs tom-v1-validate-review-guided-gameplay-calibration-evaluation-inputs tom-v1-run-review-guided-gameplay-calibration-evaluation-sandbox tom-v1-validate-review-guided-gameplay-calibration-evaluation-report tom-v1-build-review-guided-gameplay-calibration-evaluation-summary
+.PHONY: tom-v1-export-review-guided-gameplay-calibration-sandbox-regression-contract tom-v1-build-review-guided-gameplay-calibration-sandbox-regression-baseline tom-v1-verify-review-guided-gameplay-calibration-sandbox-regression-baseline tom-v1-build-review-guided-gameplay-calibration-sandbox-regression-report
 
 install:
 	$(PYTHON) -m pip install -e ".[dev]"
@@ -1052,6 +1062,18 @@ tom-v1-validate-review-guided-gameplay-calibration-evaluation-report:
 
 tom-v1-build-review-guided-gameplay-calibration-evaluation-summary:
 	$(PYTHON) -m apps.worker.cli build-review-guided-gameplay-calibration-evaluation-summary --contract "$(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_SANDBOX_CONTRACT_OUTPUT)" --evaluation-report "$(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_REPORT)" --output "$(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_SUMMARY_OUTPUT)" --skip-create-db
+
+tom-v1-export-review-guided-gameplay-calibration-sandbox-regression-contract:
+	$(PYTHON) -m apps.worker.cli export-review-guided-gameplay-calibration-sandbox-regression-contract --output "$(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_CONTRACT_OUTPUT)" --skip-create-db
+
+tom-v1-build-review-guided-gameplay-calibration-sandbox-regression-baseline:
+	$(PYTHON) -m apps.worker.cli build-review-guided-gameplay-calibration-sandbox-regression-baseline --contract "$(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_CONTRACT_OUTPUT)" --source-evaluation-inputs "$(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_SOURCE_EVALUATION_INPUTS)" --source-evaluation-report "$(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_SOURCE_EVALUATION_REPORT)" --source-evaluation-contract "$(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_SOURCE_EVALUATION_CONTRACT)" --output "$(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_BASELINE_OUTPUT)" --skip-create-db
+
+tom-v1-verify-review-guided-gameplay-calibration-sandbox-regression-baseline:
+	$(PYTHON) -m apps.worker.cli verify-review-guided-gameplay-calibration-sandbox-regression-baseline --contract "$(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_CONTRACT_OUTPUT)" --baseline "$(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_BASELINE)" --source-evaluation-inputs "$(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_SOURCE_EVALUATION_INPUTS)" --source-evaluation-report "$(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_SOURCE_EVALUATION_REPORT)" --source-evaluation-contract "$(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_SOURCE_EVALUATION_CONTRACT)" --current-output "$(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_CURRENT_OUTPUT)" --output "$(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_VERIFICATION_OUTPUT)" --skip-create-db
+
+tom-v1-build-review-guided-gameplay-calibration-sandbox-regression-report:
+	$(PYTHON) -m apps.worker.cli build-review-guided-gameplay-calibration-sandbox-regression-report --contract "$(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_CONTRACT_OUTPUT)" --baseline "$(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_BASELINE)" --verification "$(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_VERIFICATION_OUTPUT)" --output "$(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_REPORT_OUTPUT)" --skip-create-db
 
 tom-v1-post-codex-validate:
 	scripts/post_codex_validate.sh $(if $(EXPECTED_BRANCH),--branch "$(EXPECTED_BRANCH)",) $(if $(EXPECTED_TAG),--expected-tag "$(EXPECTED_TAG)",) --python "$(PYTHON)"
