@@ -1811,6 +1811,45 @@ Expected:
 - `breaking_drift_detected`: false
 - `baseline_is_not_truth`: true
 
+## Controlled Runtime Calibration Change Request
+
+Use this after the Blueprint 54 phase freeze exists. The command chain creates a controlled
+change-request contract, input bundle, frozen request artifact, structural dry-run / rollback plan,
+and report. It does not apply threshold, smoothing, or hysteresis changes, update runtime config,
+modify model weights, replace baselines, or create production config.
+
+```bash
+make tom-v1-export-controlled-runtime-calibration-change-request-contract \
+  tom-v1-build-controlled-runtime-calibration-change-request-inputs \
+  tom-v1-validate-controlled-runtime-calibration-change-request-inputs \
+  tom-v1-build-controlled-runtime-calibration-change-request \
+  tom-v1-validate-controlled-runtime-calibration-change-request \
+  tom-v1-build-controlled-runtime-calibration-change-request-dry-run \
+  tom-v1-validate-controlled-runtime-calibration-change-request-dry-run \
+  tom-v1-build-controlled-runtime-calibration-change-request-report \
+  PYTHON=.venv/bin/python
+```
+
+Tracked outputs:
+
+```text
+.data/contracts/controlled_runtime_calibration_change_request_contract_v1.json
+.data/contracts/controlled_runtime_calibration_change_request_v1.json
+```
+
+Generated outputs under `.data/exports/` remain local. Expected safe-state fields include:
+
+- `approval_status`: `human_approval_required`
+- `runtime_application_status`: `not_applied`
+- `dry_run_required`: true
+- `rollback_plan_required`: true
+- `threshold_changes_not_applied`: true
+- `smoothing_changes_not_applied`: true
+- `hysteresis_changes_not_applied`: true
+- `runtime_config_not_updated`: true
+- `model_weights_not_modified`: true
+- `baseline_not_replaced`: true
+
 ## Calibration Evaluation Sandbox Regression Gate
 
 Use this after Blueprint 50 evaluation inputs and reports have been built. The gate freezes and

@@ -370,6 +370,11 @@ TOM v3 Simple does not include:
   modes. They do not silently scan folders, train or mutate the gameplay classifier, commit model
   weights, create labels, prove classifier correctness or accuracy, prove real-world
   generalization, create tennis truth, or adjudicate evidence.
+- Controlled runtime calibration change-request artifacts are request and dry-run planning records
+  only. The current frozen request is informational because no BP53 candidate is selected. They do
+  not apply threshold, smoothing, or hysteresis changes; update runtime config; mutate model
+  weights; replace baselines; create production config; automatically approve or reject candidates;
+  prove classifier correctness or accuracy; prove production readiness; or decide tennis truth.
 
 ## Boundary
 

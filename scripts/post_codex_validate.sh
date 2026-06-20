@@ -927,4 +927,59 @@ run "$PYTHON_BIN" -m apps.worker.cli build-real-broadcast-gameplay-calibration-n
   --output "$TMP_ROOT/real_broadcast_gameplay_calibration_next_phase_readiness_report.current.json" \
   --skip-create-db
 
+run "$PYTHON_BIN" -m apps.worker.cli export-controlled-runtime-calibration-change-request-contract \
+  --output "$TMP_ROOT/controlled_runtime_calibration_change_request_contract_v1.smoke.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-change-request-inputs \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_change_request_contract_v1.smoke.json" \
+  --source-phase-freeze "$TMP_ROOT/real_broadcast_gameplay_calibration_decision_phase_freeze_v1.smoke.json" \
+  --source-candidate-config-freeze "$TMP_ROOT/calibration_candidate_config_freeze.current.json" \
+  --source-manual-approval-packet "$TMP_ROOT/calibration_candidate_manual_approval_packet.current.json" \
+  --source-decision-packet "$TMP_ROOT/calibration_candidate_decision_packet.current.json" \
+  --source-sandbox-evaluation-report "$TMP_ROOT/review_guided_gameplay_calibration_evaluation_report.current.json" \
+  --source-sandbox-regression-verification "$TMP_ROOT/review_guided_gameplay_calibration_sandbox.regression.json" \
+  --source-gameplay-gate-regression-baseline "$TMP_ROOT/gameplay_gate_regression.baseline.json" \
+  --source-calibration-sandbox-baseline "$TMP_ROOT/review_guided_gameplay_calibration_sandbox.baseline.json" \
+  --model-asset-path "model_assets/tom_v1/view_classifier_gameplay.pt" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_change_request_inputs.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli validate-controlled-runtime-calibration-change-request-inputs \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_change_request_contract_v1.smoke.json" \
+  --change-request-inputs "$TMP_ROOT/controlled_runtime_calibration_change_request_inputs.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_change_request_inputs.validation.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-change-request \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_change_request_contract_v1.smoke.json" \
+  --change-request-inputs "$TMP_ROOT/controlled_runtime_calibration_change_request_inputs.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_change_request.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli validate-controlled-runtime-calibration-change-request \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_change_request_contract_v1.smoke.json" \
+  --change-request "$TMP_ROOT/controlled_runtime_calibration_change_request.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_change_request.validation.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-change-request-dry-run \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_change_request_contract_v1.smoke.json" \
+  --change-request "$TMP_ROOT/controlled_runtime_calibration_change_request.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_change_request_dry_run.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli validate-controlled-runtime-calibration-change-request-dry-run \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_change_request_contract_v1.smoke.json" \
+  --dry-run "$TMP_ROOT/controlled_runtime_calibration_change_request_dry_run.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_change_request_dry_run.validation.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-change-request-report \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_change_request_contract_v1.smoke.json" \
+  --change-request "$TMP_ROOT/controlled_runtime_calibration_change_request.current.json" \
+  --dry-run "$TMP_ROOT/controlled_runtime_calibration_change_request_dry_run.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_change_request.report.json" \
+  --skip-create-db
+
 run git status --short

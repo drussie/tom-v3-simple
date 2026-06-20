@@ -1677,3 +1677,30 @@ Blueprint 49 does not train or mutate the gameplay classifier, commit model weig
 baselines, create labels, prove classifier correctness or accuracy, perform automatic relabeling,
 change thresholds, smoothing, hysteresis, or runtime config, tune models, decide tennis truth,
 claim production readiness, prove generalization, rank reviewers, score reviewers, or adjudicate.
+
+## Blueprint 55 Status
+
+Status: complete.
+
+Blueprint 55 adds the controlled runtime calibration change-request layer:
+
+```text
+BP54 decision phase freeze
+-> change-request contract
+-> change-request inputs
+-> controlled change request
+-> structural dry-run and rollback plan
+-> change-request report
+```
+
+The tracked contract is
+`.data/contracts/controlled_runtime_calibration_change_request_contract_v1.json`. The tracked
+frozen request artifact is
+`.data/contracts/controlled_runtime_calibration_change_request_v1.json`. Generated local exports
+include inputs, validations, dry-run output, and report files under `.data/exports/`.
+
+Blueprint 55 does not train or mutate the gameplay classifier, commit model weights, mutate
+baselines, create labels, prove classifier correctness or accuracy, perform automatic relabeling,
+change thresholds, smoothing, hysteresis, or runtime config, create production config, decide
+tennis truth, claim production readiness, prove generalization, rank reviewers, score reviewers,
+approve or reject candidates automatically, or adjudicate.

@@ -1,0 +1,626 @@
+{
+  "approval_context": {
+    "automatic_approval_occurred": false,
+    "automatic_rejection_occurred": false,
+    "candidate_config_status": "no_candidate_selected",
+    "human_operator_approval_required": true,
+    "manual_approval_packet_id": "calibration_candidate_manual_approval_packet_v1_901411a87ccb08ba18f5b4cf",
+    "manual_approval_packet_present": true,
+    "runtime_application_status": "not_applied",
+    "source_candidate_approval_required": false,
+    "source_manual_approval_status": "not_applicable"
+  },
+  "approval_status": "human_approval_required",
+  "blockers": [
+    "human_operator_approval_required",
+    "no_candidate_selected"
+  ],
+  "change_request_id": "controlled_runtime_calibration_change_request_v1_800b5354d382deaf5386eeaf",
+  "change_request_status": "informational_only",
+  "change_request_type": "controlled_runtime_calibration_change_request",
+  "change_request_version": "v1",
+  "current_settings": {
+    "current_hysteresis_settings": {
+      "enter_gameplay_probability": 0.6,
+      "exit_gameplay_probability": 0.45
+    },
+    "current_smoothing_window": 3,
+    "current_threshold": 0.55,
+    "runtime_application_status": "not_applied"
+  },
+  "dry_run_required": true,
+  "dry_run_status": "dry_run_plan_created",
+  "generated_at": "2026-06-20T00:00:00+00:00",
+  "model_asset_ref": "model_assets/tom_v1/view_classifier_gameplay.pt",
+  "model_asset_sha256": "8282e03787c43b4ea75312a2ff2b8bda69535d2a40af2ba91f067e69c93b144b",
+  "non_claims": {
+    "automatic_approval_not_performed": true,
+    "automatic_rejection_not_performed": true,
+    "automatic_relabeling_not_performed": true,
+    "baseline_not_replaced": true,
+    "change_request_is_not_accuracy_scoring": true,
+    "change_request_is_not_runtime_calibration": true,
+    "change_request_is_not_truth": true,
+    "classifier_correctness_not_assessed": true,
+    "classifier_not_modified": true,
+    "future_blueprint_required_for_runtime_application": true,
+    "generalization_not_claimed": true,
+    "human_operator_approval_required": true,
+    "hysteresis_changes_not_applied": true,
+    "model_weights_not_modified": true,
+    "production_config_not_created": true,
+    "production_readiness_not_claimed": true,
+    "runtime_application_not_performed": true,
+    "runtime_config_not_updated": true,
+    "smoothing_changes_not_applied": true,
+    "threshold_changes_not_applied": true
+  },
+  "operator_approval_requirements": {
+    "all_regression_gates_required": true,
+    "approval_status": "human_approval_required",
+    "automatic_approval_allowed": false,
+    "automatic_rejection_allowed": false,
+    "dry_run_review_required": true,
+    "future_blueprint_required_for_runtime_application": true,
+    "human_operator_approval_required": true,
+    "manual_packet_review_required": true,
+    "requested_change_scope": "no_candidate_selected",
+    "rollback_plan_review_required": true,
+    "runtime_application_status": "not_applied"
+  },
+  "preconditions": [
+    "confirm_baselines_unchanged",
+    "confirm_human_approval_required",
+    "confirm_model_weights_unchanged",
+    "confirm_no_runtime_application",
+    "prepare_rollback_plan",
+    "prepare_structural_dry_run",
+    "review_candidate_config_freeze",
+    "review_manual_approval_packet_when_available",
+    "review_non_claims",
+    "review_regression_gates",
+    "review_source_phase_freeze",
+    "select_candidate_before_future_runtime_application"
+  ],
+  "requested_candidate_settings": {
+    "affects_regression_baselines": false,
+    "candidate_hysteresis_settings": {},
+    "candidate_smoothing_window": null,
+    "candidate_source": {
+      "candidate_packet_id": null,
+      "candidate_setting_id": null,
+      "source_proposal_item_id": null
+    },
+    "candidate_threshold": null,
+    "candidate_type": "not_applicable",
+    "not_applied": true,
+    "writes_runtime_configuration": false
+  },
+  "requested_change_scope": "no_candidate_selected",
+  "required_regression_gates": [
+    {
+      "expected": {
+        "baseline_is_not_truth": true,
+        "breaking_drift_detected": false,
+        "drift_detected": false,
+        "matrix_is_not_truth": true,
+        "ok": true,
+        "status": "completed"
+      },
+      "gate_id": "multi_point_regression_matrix_gate",
+      "make_target": "tom-v1-verify-multi-point-regression-matrix"
+    },
+    {
+      "expected": {
+        "baseline_is_not_truth": true,
+        "breaking_drift_detected": false,
+        "drift_detected": false,
+        "ok": true,
+        "status": "completed"
+      },
+      "gate_id": "protected_sample_point_reviewed_3d_debug_gate",
+      "make_target": "tom-v1-verify-reviewed-3d-debug-baseline",
+      "protected_sample_point_identifiers": {
+        "camera_geometry_id": "5afa67fb-7f6e-41eb-b4aa-b1100a97ee97",
+        "event_candidate_run_id": "1b946366-7ec1-426f-8b40-494535a9b3fb",
+        "media_id": "9518fb01-0da1-4344-9a84-ff88ec8e9b1e",
+        "trajectory_3d_run_id": "ea76ccab-c51d-4a63-9682-9fd0bbb83f14"
+      }
+    },
+    {
+      "expected": {
+        "baseline_is_not_truth": true,
+        "breaking_drift_detected": false,
+        "classifier_correctness_not_assessed": true,
+        "drift_detected": false,
+        "gameplay_gate_is_not_truth": true,
+        "generalization_not_claimed": true,
+        "ok": true,
+        "status": "completed"
+      },
+      "gate_id": "gameplay_gate_regression_baseline_gate",
+      "make_target": "tom-v1-verify-gameplay-gate-regression-baseline"
+    },
+    {
+      "expected": {
+        "baseline_is_not_truth": true,
+        "baseline_not_replaced": true,
+        "breaking_drift_detected": false,
+        "classifier_correctness_not_assessed": true,
+        "drift_detected": false,
+        "generalization_not_claimed": true,
+        "hysteresis_changes_not_applied": true,
+        "model_weights_not_modified": true,
+        "ok": true,
+        "runtime_config_not_updated": true,
+        "sandbox_is_not_accuracy_scoring": true,
+        "sandbox_is_not_truth": true,
+        "smoothing_changes_not_applied": true,
+        "status": "completed",
+        "threshold_changes_not_applied": true
+      },
+      "gate_id": "calibration_sandbox_regression_baseline_gate",
+      "make_target": "tom-v1-verify-review-guided-gameplay-calibration-sandbox-regression-baseline"
+    }
+  ],
+  "rollback_plan": {
+    "generated_at": "2026-06-20T00:00:00+00:00",
+    "non_claims": {
+      "automatic_approval_not_performed": true,
+      "automatic_rejection_not_performed": true,
+      "automatic_relabeling_not_performed": true,
+      "baseline_not_replaced": true,
+      "change_request_is_not_accuracy_scoring": true,
+      "change_request_is_not_runtime_calibration": true,
+      "change_request_is_not_truth": true,
+      "classifier_correctness_not_assessed": true,
+      "classifier_not_modified": true,
+      "future_blueprint_required_for_runtime_application": true,
+      "generalization_not_claimed": true,
+      "human_operator_approval_required": true,
+      "hysteresis_changes_not_applied": true,
+      "model_weights_not_modified": true,
+      "production_config_not_created": true,
+      "production_readiness_not_claimed": true,
+      "runtime_application_not_performed": true,
+      "runtime_config_not_updated": true,
+      "smoothing_changes_not_applied": true,
+      "threshold_changes_not_applied": true
+    },
+    "rollback_plan_id": "controlled_runtime_calibration_rollback_plan_v1_500845d46848f2fb9155d466",
+    "rollback_plan_version": "v1",
+    "rollback_preconditions": [
+      "runtime_application_status_must_be_not_applied",
+      "model_weights_must_remain_unchanged",
+      "baselines_must_remain_unchanged",
+      "threshold_changes_must_remain_not_applied",
+      "smoothing_changes_must_remain_not_applied",
+      "hysteresis_changes_must_remain_not_applied"
+    ],
+    "rollback_scope": "no_runtime_mutation",
+    "rollback_status": "rollback_plan_created",
+    "rollback_target": {
+      "current_settings": {
+        "current_hysteresis_settings": {
+          "enter_gameplay_probability": 0.6,
+          "exit_gameplay_probability": 0.45
+        },
+        "current_smoothing_window": 3,
+        "current_threshold": 0.55,
+        "runtime_application_status": "not_applied"
+      },
+      "runtime_application_status": "not_applied"
+    },
+    "rollback_verification_gates": [
+      {
+        "expected": {
+          "baseline_is_not_truth": true,
+          "breaking_drift_detected": false,
+          "drift_detected": false,
+          "matrix_is_not_truth": true,
+          "ok": true,
+          "status": "completed"
+        },
+        "gate_id": "multi_point_regression_matrix_gate",
+        "make_target": "tom-v1-verify-multi-point-regression-matrix"
+      },
+      {
+        "expected": {
+          "baseline_is_not_truth": true,
+          "breaking_drift_detected": false,
+          "drift_detected": false,
+          "ok": true,
+          "status": "completed"
+        },
+        "gate_id": "protected_sample_point_reviewed_3d_debug_gate",
+        "make_target": "tom-v1-verify-reviewed-3d-debug-baseline",
+        "protected_sample_point_identifiers": {
+          "camera_geometry_id": "5afa67fb-7f6e-41eb-b4aa-b1100a97ee97",
+          "event_candidate_run_id": "1b946366-7ec1-426f-8b40-494535a9b3fb",
+          "media_id": "9518fb01-0da1-4344-9a84-ff88ec8e9b1e",
+          "trajectory_3d_run_id": "ea76ccab-c51d-4a63-9682-9fd0bbb83f14"
+        }
+      },
+      {
+        "expected": {
+          "baseline_is_not_truth": true,
+          "breaking_drift_detected": false,
+          "classifier_correctness_not_assessed": true,
+          "drift_detected": false,
+          "gameplay_gate_is_not_truth": true,
+          "generalization_not_claimed": true,
+          "ok": true,
+          "status": "completed"
+        },
+        "gate_id": "gameplay_gate_regression_baseline_gate",
+        "make_target": "tom-v1-verify-gameplay-gate-regression-baseline"
+      },
+      {
+        "expected": {
+          "baseline_is_not_truth": true,
+          "baseline_not_replaced": true,
+          "breaking_drift_detected": false,
+          "classifier_correctness_not_assessed": true,
+          "drift_detected": false,
+          "generalization_not_claimed": true,
+          "hysteresis_changes_not_applied": true,
+          "model_weights_not_modified": true,
+          "ok": true,
+          "runtime_config_not_updated": true,
+          "sandbox_is_not_accuracy_scoring": true,
+          "sandbox_is_not_truth": true,
+          "smoothing_changes_not_applied": true,
+          "status": "completed",
+          "threshold_changes_not_applied": true
+        },
+        "gate_id": "calibration_sandbox_regression_baseline_gate",
+        "make_target": "tom-v1-verify-review-guided-gameplay-calibration-sandbox-regression-baseline"
+      }
+    ],
+    "source_change_request_id": "controlled_runtime_calibration_change_request_v1_800b5354d382deaf5386eeaf",
+    "warnings": {
+      "automatic_approval_not_performed": true,
+      "automatic_rejection_not_performed": true,
+      "automatic_relabeling_not_performed": true,
+      "baseline_not_replaced": true,
+      "change_request_is_not_accuracy_scoring": true,
+      "change_request_is_not_runtime_calibration": true,
+      "change_request_is_not_truth": true,
+      "classifier_correctness_not_assessed": true,
+      "classifier_not_modified": true,
+      "controlled_change_request": true,
+      "does_not_create_event_labels": true,
+      "does_not_create_evidence": true,
+      "does_not_create_in_out": true,
+      "does_not_create_observations": true,
+      "does_not_create_point_labels": true,
+      "does_not_create_score": true,
+      "does_not_create_training_labels": true,
+      "does_not_determine_winner": true,
+      "does_not_identify_players": true,
+      "does_not_mutate_model_assets": true,
+      "does_not_mutate_regression_baselines": true,
+      "does_not_train_classifier": true,
+      "dry_run_required": true,
+      "future_blueprint_required_for_runtime_application": true,
+      "generalization_not_claimed": true,
+      "human_approval_required": true,
+      "human_operator_approval_required": true,
+      "hysteresis_changes_not_applied": true,
+      "model_weights_not_modified": true,
+      "no_adjudication": true,
+      "no_runtime_mutation": true,
+      "production_config_not_created": true,
+      "production_readiness_not_claimed": true,
+      "provenance_only": true,
+      "review_support_only": true,
+      "rollback_plan_required": true,
+      "runtime_application_not_performed": true,
+      "runtime_application_status_not_applied": true,
+      "runtime_config_not_updated": true,
+      "smoothing_changes_not_applied": true,
+      "structural_dry_run": true,
+      "threshold_changes_not_applied": true
+    }
+  },
+  "rollback_plan_required": true,
+  "rollback_plan_status": "rollback_plan_created",
+  "runtime_application_status": "not_applied",
+  "selected_candidate_config_ref": {
+    "candidate_packet_id": null,
+    "candidate_setting_id": null,
+    "source_proposal_item_id": null
+  },
+  "source_candidate_config_freeze_path": ".data/contracts/calibration_candidate_config_freeze_v1.json",
+  "source_change_request_input_path": ".data/exports/controlled_runtime_calibration_change_request_inputs.current.json",
+  "source_contract_refs": {
+    "calibration_candidate_config_freeze_contract_version": "v1",
+    "calibration_candidate_decision_packet_contract_version": "v1",
+    "camera_geometry_calibration_provenance_contract_version": "v1",
+    "coverage_sampling_strategy_contract_version": "v1",
+    "gameplay_gate_pathway_completion_freeze_version": "v1",
+    "gameplay_gate_regression_baseline_contract_version": "v1",
+    "gameplay_gate_review_dataset_export_contract_version": "v1",
+    "gameplay_gated_many_point_smoke_contract_version": "v1",
+    "gameplay_gated_perception_execution_contract_version": "v1",
+    "gameplay_gated_pipeline_routing_contract_version": "v1",
+    "gameplay_segment_gate_contract_version": "v1",
+    "gameplay_segment_replay_review_contract_version": "v1",
+    "intennse_label_alignment_contract_version": "v1",
+    "label_feedback_evaluation_contract_version": "v1",
+    "many_point_ingestion_gate_contract_version": "v1",
+    "multi_point_regression_matrix_version": "v0",
+    "multi_reviewer_disagreement_schema_version": "v1",
+    "observation_quality_taxonomy_version": "v1",
+    "point_manifest_version": "v0",
+    "real_broadcast_gameplay_calibration_decision_phase_freeze_version": "v1",
+    "real_broadcast_gameplay_corpus_run_contract_version": "v1",
+    "real_broadcast_gameplay_review_loop_contract_version": "v1",
+    "real_broadcast_gameplay_review_metrics_contract_version": "v1",
+    "review_guided_gameplay_calibration_evaluation_sandbox_contract_version": "v1",
+    "review_guided_gameplay_calibration_proposal_contract_version": "v1",
+    "review_guided_gameplay_calibration_sandbox_regression_contract_version": "v1",
+    "review_label_schema_version": "v1",
+    "review_ops_metrics_contract_version": "v1",
+    "reviewer_confidence_schema_version": "v1",
+    "tom_v3_expansion_completion_freeze_version": "v1",
+    "versioned_dataset_corpus_contract_version": "v1"
+  },
+  "source_manual_approval_packet_path": ".data/exports/calibration_candidate_manual_approval_packet.current.json",
+  "source_phase_freeze_path": ".data/contracts/real_broadcast_gameplay_calibration_decision_phase_freeze_v1.json",
+  "supporting_evidence_refs": {
+    "candidate_config_freeze_id": "calibration_candidate_config_freeze_v1_74ba66e52a61d382ef2e3c01",
+    "candidate_supporting_evidence_refs": {
+      "candidate_evidence_refs": {},
+      "candidate_packet_ref": null,
+      "source_calibration_proposal_path": ".data/exports/review_guided_gameplay_calibration_proposal.current.json",
+      "source_calibration_sandbox_baseline_path": ".data/baselines/review_guided_gameplay_calibration_sandbox.baseline.json",
+      "source_corpus_run_path": ".data/exports/real_broadcast_gameplay_corpus_run.current.json",
+      "source_decision_packet_path": ".data/exports/calibration_candidate_decision_packet.current.json",
+      "source_gameplay_gate_regression_baseline_path": ".data/baselines/gameplay_gate_regression.baseline.json",
+      "source_review_loop_report_path": ".data/exports/real_broadcast_gameplay_review_loop_report.current.json",
+      "source_review_metrics_report_path": ".data/exports/real_broadcast_gameplay_review_metrics_report.current.json",
+      "source_sandbox_evaluation_report_path": ".data/exports/review_guided_gameplay_calibration_evaluation_report.current.json",
+      "source_sandbox_regression_verification_path": ".data/exports/review_guided_gameplay_calibration_sandbox.regression.json"
+    },
+    "selected_candidate_packet_ref": null,
+    "source_phase_freeze_contract_refs": [
+      {
+        "frozen": true,
+        "generated_exports_are_not_tracked": true,
+        "path": ".data/contracts/tom_v3_expansion_completion_freeze_v1.json",
+        "tracked_required": true
+      },
+      {
+        "frozen": true,
+        "generated_exports_are_not_tracked": true,
+        "path": ".data/contracts/gameplay_gate_pathway_completion_freeze_v1.json",
+        "tracked_required": true
+      },
+      {
+        "frozen": true,
+        "generated_exports_are_not_tracked": true,
+        "path": ".data/contracts/gameplay_segment_gate_contract_v1.json",
+        "tracked_required": true
+      },
+      {
+        "frozen": true,
+        "generated_exports_are_not_tracked": true,
+        "path": ".data/contracts/gameplay_gated_pipeline_routing_contract_v1.json",
+        "tracked_required": true
+      },
+      {
+        "frozen": true,
+        "generated_exports_are_not_tracked": true,
+        "path": ".data/contracts/gameplay_gated_perception_execution_contract_v1.json",
+        "tracked_required": true
+      },
+      {
+        "frozen": true,
+        "generated_exports_are_not_tracked": true,
+        "path": ".data/contracts/gameplay_segment_replay_review_contract_v1.json",
+        "tracked_required": true
+      },
+      {
+        "frozen": true,
+        "generated_exports_are_not_tracked": true,
+        "path": ".data/contracts/gameplay_gated_many_point_smoke_contract_v1.json",
+        "tracked_required": true
+      },
+      {
+        "frozen": true,
+        "generated_exports_are_not_tracked": true,
+        "path": ".data/contracts/gameplay_gate_regression_baseline_contract_v1.json",
+        "tracked_required": true
+      },
+      {
+        "frozen": true,
+        "generated_exports_are_not_tracked": true,
+        "path": ".data/contracts/gameplay_gate_review_dataset_export_contract_v1.json",
+        "tracked_required": true
+      },
+      {
+        "frozen": true,
+        "generated_exports_are_not_tracked": true,
+        "path": ".data/contracts/real_broadcast_gameplay_corpus_run_contract_v1.json",
+        "tracked_required": true
+      },
+      {
+        "frozen": true,
+        "generated_exports_are_not_tracked": true,
+        "path": ".data/contracts/real_broadcast_gameplay_review_loop_contract_v1.json",
+        "tracked_required": true
+      },
+      {
+        "frozen": true,
+        "generated_exports_are_not_tracked": true,
+        "path": ".data/contracts/real_broadcast_gameplay_review_metrics_contract_v1.json",
+        "tracked_required": true
+      },
+      {
+        "frozen": true,
+        "generated_exports_are_not_tracked": true,
+        "path": ".data/contracts/review_guided_gameplay_calibration_proposal_contract_v1.json",
+        "tracked_required": true
+      },
+      {
+        "frozen": true,
+        "generated_exports_are_not_tracked": true,
+        "path": ".data/contracts/review_guided_gameplay_calibration_evaluation_sandbox_contract_v1.json",
+        "tracked_required": true
+      },
+      {
+        "frozen": true,
+        "generated_exports_are_not_tracked": true,
+        "path": ".data/contracts/review_guided_gameplay_calibration_sandbox_regression_contract_v1.json",
+        "tracked_required": true
+      },
+      {
+        "frozen": true,
+        "generated_exports_are_not_tracked": true,
+        "path": ".data/contracts/calibration_candidate_decision_packet_contract_v1.json",
+        "tracked_required": true
+      },
+      {
+        "frozen": true,
+        "generated_exports_are_not_tracked": true,
+        "path": ".data/contracts/calibration_candidate_config_freeze_contract_v1.json",
+        "tracked_required": true
+      },
+      {
+        "frozen": true,
+        "generated_exports_are_not_tracked": true,
+        "path": ".data/contracts/calibration_candidate_config_freeze_v1.json",
+        "tracked_required": true
+      }
+    ],
+    "source_protected_baseline_refs": [
+      {
+        "baseline_type": "multi_point_regression_matrix_baseline",
+        "path": ".data/baselines/multi_point_regression_matrix.baseline.json",
+        "tracked_required": true
+      },
+      {
+        "baseline_type": "gameplay_gate_regression_baseline",
+        "path": ".data/baselines/gameplay_gate_regression.baseline.json",
+        "tracked_required": true
+      },
+      {
+        "baseline_type": "review_guided_gameplay_calibration_sandbox_regression_baseline",
+        "path": ".data/baselines/review_guided_gameplay_calibration_sandbox.baseline.json",
+        "tracked_required": true
+      }
+    ]
+  },
+  "tom_provenance": {
+    "blueprint": "blueprint_55",
+    "blueprint_name": "controlled_runtime_calibration_change_request_v1",
+    "project": "tom-v3-simple",
+    "project_version": "0.0.0"
+  },
+  "warnings": {
+    "automatic_approval_not_performed": true,
+    "automatic_rejection_not_performed": true,
+    "automatic_relabeling_not_performed": true,
+    "baseline_is_not_truth": true,
+    "baseline_not_replaced": true,
+    "calibration_decision_phase_is_not_runtime_calibration": true,
+    "calibration_proposal_is_not_accuracy_scoring": true,
+    "calibration_proposal_is_not_truth": true,
+    "candidate_config_freeze_is_not_accuracy_scoring": true,
+    "candidate_config_freeze_is_not_runtime_calibration": true,
+    "candidate_config_freeze_is_not_runtime_config": true,
+    "candidate_config_freeze_is_not_truth": true,
+    "change_request_is_not_accuracy_scoring": true,
+    "change_request_is_not_runtime_calibration": true,
+    "change_request_is_not_truth": true,
+    "classifier_accuracy_not_assessed": true,
+    "classifier_accuracy_not_claimed": true,
+    "classifier_correctness_not_assessed": true,
+    "classifier_not_modified": true,
+    "content_tags_are_operator_context_not_truth": true,
+    "controlled_change_request": true,
+    "controlled_real_data_readiness_only": true,
+    "corpus_run_is_not_truth": true,
+    "decision_packet_is_not_accuracy_scoring": true,
+    "decision_packet_is_not_runtime_calibration": true,
+    "decision_packet_is_not_truth": true,
+    "decision_support_only": true,
+    "default_mode_is_dry_run": true,
+    "does_not_claim_automatic_correctness": true,
+    "does_not_claim_generalization": true,
+    "does_not_convert_outputs_into_training_labels": true,
+    "does_not_create_event_labels": true,
+    "does_not_create_event_truth": true,
+    "does_not_create_evidence": true,
+    "does_not_create_gameplay_truth": true,
+    "does_not_create_in_out": true,
+    "does_not_create_line_call_truth": true,
+    "does_not_create_observations": true,
+    "does_not_create_point_labels": true,
+    "does_not_create_point_truth": true,
+    "does_not_create_score": true,
+    "does_not_create_training_labels": true,
+    "does_not_determine_winner": true,
+    "does_not_identify_players": true,
+    "does_not_mutate_model_assets": true,
+    "does_not_mutate_regression_baselines": true,
+    "does_not_run_gpu_or_model_inference_by_default": true,
+    "does_not_train_classifier": true,
+    "dry_run_required": true,
+    "expected_tags_are_not_truth": true,
+    "explicit_media_manifest_only": true,
+    "fixture_mode_available": true,
+    "fixture_mode_used": true,
+    "fixture_reuse_only": true,
+    "future_blueprint_required_for_runtime_application": true,
+    "future_evaluation_proposals_only": true,
+    "gameplay_gate_is_not_truth": true,
+    "generalization_not_claimed": true,
+    "human_approval_required": true,
+    "human_operator_approval_required": true,
+    "human_operator_decision_required": true,
+    "human_review_required": true,
+    "hysteresis_changes_not_applied": true,
+    "manual_approval_packet_is_not_runtime_config": true,
+    "manual_approval_packet_required_before_future_runtime_change": true,
+    "metrics_are_not_truth": true,
+    "model_assets_are_not_mutated": true,
+    "model_weights_not_modified": true,
+    "no_adjudication": true,
+    "no_runtime_mutation": true,
+    "no_silent_folder_scan": true,
+    "not_distinct_real_broadcast_corpus": true,
+    "not_distinct_real_points": true,
+    "observation_only": true,
+    "offline_evaluation_only": true,
+    "operations_visibility_only": true,
+    "phase_freeze_is_not_truth": true,
+    "phase_freeze_is_structural_only": true,
+    "production_config_not_created": true,
+    "production_readiness_not_claimed": true,
+    "provenance_only": true,
+    "real_media_processing_requires_explicit_mode": true,
+    "regression_baselines_are_not_mutated": true,
+    "regression_gate_only": true,
+    "review_loop_is_not_truth": true,
+    "review_metadata_is_not_training_truth": true,
+    "review_support_only": true,
+    "review_values_do_not_modify_source_artifacts": true,
+    "rollback_plan_required": true,
+    "runtime_application_not_performed": true,
+    "runtime_application_status_not_applied": true,
+    "runtime_config_not_updated": true,
+    "sandbox_is_not_accuracy_scoring": true,
+    "sandbox_is_not_truth": true,
+    "smoke_only": true,
+    "smoothing_changes_not_applied": true,
+    "structural_decision_support_only": true,
+    "structural_dry_run": true,
+    "structural_manual_approval_support_only": true,
+    "structural_outputs_only": true,
+    "structural_smoke_only": true,
+    "threshold_changes_not_applied": true,
+    "threshold_changes_not_performed": true
+  }
+}

@@ -4215,3 +4215,31 @@ hysteresis changes; does not update runtime config; does not mutate model weight
 baselines; does not create production config; does not approve or reject candidates; and does not
 claim tennis truth, classifier correctness, classifier accuracy, production readiness, or
 generalization.
+
+## Blueprint 55 Controlled Runtime Calibration Change Request v1
+
+Status: complete
+
+### Goal
+
+Create a controlled runtime calibration change-request mechanism for gameplay gate calibration
+candidates without applying any runtime calibration.
+
+### Notes
+
+This milestone adds:
+
+- `apps.worker.services.controlled_runtime_calibration_change_request`
+- eight worker CLI commands for contract export, inputs, validation, request build, request
+  validation, dry-run, dry-run validation, and report build
+- matching `tom-v1-*controlled-runtime-calibration-change-request*` Make helpers
+- `.data/contracts/controlled_runtime_calibration_change_request_contract_v1.json` tracked contract
+- `.data/contracts/controlled_runtime_calibration_change_request_v1.json` tracked frozen request
+- generated inputs, validation, dry-run, and report paths under `.data/exports/`
+- `docs/blueprints/blueprint_55_controlled_runtime_calibration_change_request_v1.md`
+- `docs/reviews/controlled_runtime_calibration_change_request_v1.md`
+- `docs/agent_reports/blueprint_55_controlled_runtime_calibration_change_request_v1_report.md`
+
+The committed request records `candidate_config_status: no_candidate_selected`, so its request
+status is `informational_only`. Blueprint 55 requires human approval, dry-run planning, rollback
+planning, and regression gates, while leaving runtime state `not_applied`.

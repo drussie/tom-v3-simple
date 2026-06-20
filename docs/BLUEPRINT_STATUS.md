@@ -1691,3 +1691,33 @@ not train or mutate the gameplay classifier, commit model weights, create review
 classifier, apply threshold, smoothing, or hysteresis changes, update runtime config, replace
 baselines, create production config, perform automatic approval, perform automatic rejection, or
 implement the future Blueprint 55 runtime calibration change-request phase.
+
+## Blueprint 55 - Controlled Runtime Calibration Change Request
+
+Status: COMPLETE
+
+Blueprint 55 proves:
+
+```text
+BP54 decision phase freeze
+-> controlled change-request contract
+-> change-request inputs
+-> controlled change request
+-> structural dry-run / rollback plan
+-> change-request report
+```
+
+The tracked contract is
+`.data/contracts/controlled_runtime_calibration_change_request_contract_v1.json`. The tracked
+frozen request artifact is
+`.data/contracts/controlled_runtime_calibration_change_request_v1.json`. Generated inputs,
+validations, dry-run outputs, and reports remain under `.data/exports/`.
+
+Blueprint 55 does not decide tennis truth, in/out, score, point winner, player identity, rally
+state, server/receiver state, line-call truth, point truth, event truth, gameplay truth,
+classifier correctness, classifier accuracy, accepted/rejected lifecycle, automatic relabeling,
+reviewer ranking or quality scoring, coaching/tactical conclusions, betting/prediction outcomes,
+generalization, automatic correctness, training truth, production truth, or adjudication. It does
+not train or mutate the gameplay classifier, commit model weights, create review labels, score the
+classifier, apply threshold, smoothing, or hysteresis changes, update runtime config, replace
+baselines, create production config, perform automatic approval, or perform automatic rejection.

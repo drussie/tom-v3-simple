@@ -369,6 +369,25 @@ REAL_BROADCAST_GAMEPLAY_CALIBRATION_DECISION_PHASE_FREEZE_VALIDATION_OUTPUT ?= .
 REAL_BROADCAST_GAMEPLAY_CALIBRATION_NEXT_PHASE_READINESS_REPORT_OUTPUT ?= .data/exports/real_broadcast_gameplay_calibration_next_phase_readiness_report.current.json
 REAL_BROADCAST_GAMEPLAY_CALIBRATION_DECISION_PHASE_SOURCE_CANDIDATE_CONFIG_FREEZE ?= $(CALIBRATION_CANDIDATE_CONFIG_FREEZE_ARTIFACT_OUTPUT)
 REAL_BROADCAST_GAMEPLAY_CALIBRATION_DECISION_PHASE_SOURCE_MANUAL_APPROVAL_PACKET ?= $(CALIBRATION_CANDIDATE_MANUAL_APPROVAL_PACKET_OUTPUT)
+CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_CONTRACT_OUTPUT ?= .data/contracts/controlled_runtime_calibration_change_request_contract_v1.json
+CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_INPUTS_OUTPUT ?= .data/exports/controlled_runtime_calibration_change_request_inputs.current.json
+CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_INPUTS ?= $(CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_INPUTS_OUTPUT)
+CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_INPUTS_VALIDATION_OUTPUT ?= .data/exports/controlled_runtime_calibration_change_request_inputs.validation.json
+CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_OUTPUT ?= .data/contracts/controlled_runtime_calibration_change_request_v1.json
+CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST ?= $(CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_OUTPUT)
+CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_VALIDATION_OUTPUT ?= .data/exports/controlled_runtime_calibration_change_request.validation.json
+CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_DRY_RUN_OUTPUT ?= .data/exports/controlled_runtime_calibration_change_request_dry_run.current.json
+CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_DRY_RUN ?= $(CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_DRY_RUN_OUTPUT)
+CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_DRY_RUN_VALIDATION_OUTPUT ?= .data/exports/controlled_runtime_calibration_change_request_dry_run.validation.json
+CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_REPORT_OUTPUT ?= .data/exports/controlled_runtime_calibration_change_request.report.json
+CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_SOURCE_PHASE_FREEZE ?= $(REAL_BROADCAST_GAMEPLAY_CALIBRATION_DECISION_PHASE_FREEZE_OUTPUT)
+CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_SOURCE_CANDIDATE_CONFIG_FREEZE ?= $(CALIBRATION_CANDIDATE_CONFIG_FREEZE_ARTIFACT_OUTPUT)
+CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_SOURCE_MANUAL_APPROVAL_PACKET ?= $(CALIBRATION_CANDIDATE_MANUAL_APPROVAL_PACKET_OUTPUT)
+CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_SOURCE_DECISION_PACKET ?= $(CALIBRATION_CANDIDATE_DECISION_PACKET_OUTPUT)
+CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_SOURCE_SANDBOX_EVALUATION_REPORT ?= $(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_REPORT_OUTPUT)
+CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_SOURCE_SANDBOX_REGRESSION_VERIFICATION ?= $(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_VERIFICATION_OUTPUT)
+CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_SOURCE_GAMEPLAY_GATE_REGRESSION_BASELINE ?= $(GAMEPLAY_GATE_REGRESSION_BASELINE_OUTPUT)
+CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_SOURCE_CALIBRATION_SANDBOX_BASELINE ?= $(REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_BASELINE_OUTPUT)
 EXPECTED_BRANCH ?=
 EXPECTED_TAG ?=
 FORMAT ?= json
@@ -471,6 +490,7 @@ export TOM_V3_DATABASE_URL
 .PHONY: tom-v1-export-calibration-candidate-decision-packet-contract tom-v1-build-calibration-candidate-decision-packet-inputs tom-v1-validate-calibration-candidate-decision-packet-inputs tom-v1-build-calibration-candidate-decision-packet tom-v1-validate-calibration-candidate-decision-packet tom-v1-build-calibration-candidate-decision-packet-report
 .PHONY: tom-v1-export-calibration-candidate-config-freeze-contract tom-v1-build-calibration-candidate-config-freeze-inputs tom-v1-validate-calibration-candidate-config-freeze-inputs tom-v1-build-calibration-candidate-config-freeze tom-v1-validate-calibration-candidate-config-freeze tom-v1-build-calibration-candidate-manual-approval-packet tom-v1-validate-calibration-candidate-manual-approval-packet tom-v1-build-calibration-candidate-config-freeze-report
 .PHONY: tom-v1-build-real-broadcast-gameplay-calibration-decision-phase-freeze tom-v1-validate-real-broadcast-gameplay-calibration-decision-phase-freeze tom-v1-build-real-broadcast-gameplay-calibration-next-phase-readiness-report
+.PHONY: tom-v1-export-controlled-runtime-calibration-change-request-contract tom-v1-build-controlled-runtime-calibration-change-request-inputs tom-v1-validate-controlled-runtime-calibration-change-request-inputs tom-v1-build-controlled-runtime-calibration-change-request tom-v1-validate-controlled-runtime-calibration-change-request tom-v1-build-controlled-runtime-calibration-change-request-dry-run tom-v1-validate-controlled-runtime-calibration-change-request-dry-run tom-v1-build-controlled-runtime-calibration-change-request-report
 
 install:
 	$(PYTHON) -m pip install -e ".[dev]"
@@ -1172,6 +1192,30 @@ tom-v1-validate-real-broadcast-gameplay-calibration-decision-phase-freeze:
 
 tom-v1-build-real-broadcast-gameplay-calibration-next-phase-readiness-report:
 	$(PYTHON) -m apps.worker.cli build-real-broadcast-gameplay-calibration-next-phase-readiness-report --freeze "$(REAL_BROADCAST_GAMEPLAY_CALIBRATION_DECISION_PHASE_FREEZE)" --output "$(REAL_BROADCAST_GAMEPLAY_CALIBRATION_NEXT_PHASE_READINESS_REPORT_OUTPUT)" --skip-create-db
+
+tom-v1-export-controlled-runtime-calibration-change-request-contract:
+	$(PYTHON) -m apps.worker.cli export-controlled-runtime-calibration-change-request-contract --output "$(CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_CONTRACT_OUTPUT)" --skip-create-db
+
+tom-v1-build-controlled-runtime-calibration-change-request-inputs:
+	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-change-request-inputs --contract "$(CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_CONTRACT_OUTPUT)" --source-phase-freeze "$(CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_SOURCE_PHASE_FREEZE)" --source-candidate-config-freeze "$(CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_SOURCE_CANDIDATE_CONFIG_FREEZE)" --source-manual-approval-packet "$(CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_SOURCE_MANUAL_APPROVAL_PACKET)" --source-decision-packet "$(CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_SOURCE_DECISION_PACKET)" --source-sandbox-evaluation-report "$(CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_SOURCE_SANDBOX_EVALUATION_REPORT)" --source-sandbox-regression-verification "$(CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_SOURCE_SANDBOX_REGRESSION_VERIFICATION)" --source-gameplay-gate-regression-baseline "$(CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_SOURCE_GAMEPLAY_GATE_REGRESSION_BASELINE)" --source-calibration-sandbox-baseline "$(CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_SOURCE_CALIBRATION_SANDBOX_BASELINE)" --model-asset-path "$(GAMEPLAY_CLASSIFIER_ASSET_PATH)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_INPUTS_OUTPUT)" --skip-create-db
+
+tom-v1-validate-controlled-runtime-calibration-change-request-inputs:
+	$(PYTHON) -m apps.worker.cli validate-controlled-runtime-calibration-change-request-inputs --contract "$(CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_CONTRACT_OUTPUT)" --change-request-inputs "$(CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_INPUTS)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_INPUTS_VALIDATION_OUTPUT)" --skip-create-db
+
+tom-v1-build-controlled-runtime-calibration-change-request:
+	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-change-request --contract "$(CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_CONTRACT_OUTPUT)" --change-request-inputs "$(CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_INPUTS)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_OUTPUT)" --skip-create-db
+
+tom-v1-validate-controlled-runtime-calibration-change-request:
+	$(PYTHON) -m apps.worker.cli validate-controlled-runtime-calibration-change-request --contract "$(CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_CONTRACT_OUTPUT)" --change-request "$(CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_VALIDATION_OUTPUT)" --skip-create-db
+
+tom-v1-build-controlled-runtime-calibration-change-request-dry-run:
+	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-change-request-dry-run --contract "$(CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_CONTRACT_OUTPUT)" --change-request "$(CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_DRY_RUN_OUTPUT)" --skip-create-db
+
+tom-v1-validate-controlled-runtime-calibration-change-request-dry-run:
+	$(PYTHON) -m apps.worker.cli validate-controlled-runtime-calibration-change-request-dry-run --contract "$(CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_CONTRACT_OUTPUT)" --dry-run "$(CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_DRY_RUN)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_DRY_RUN_VALIDATION_OUTPUT)" --skip-create-db
+
+tom-v1-build-controlled-runtime-calibration-change-request-report:
+	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-change-request-report --contract "$(CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_CONTRACT_OUTPUT)" --change-request "$(CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST)" --dry-run "$(CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_DRY_RUN)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_REPORT_OUTPUT)" --skip-create-db
 
 tom-v1-post-codex-validate:
 	scripts/post_codex_validate.sh $(if $(EXPECTED_BRANCH),--branch "$(EXPECTED_BRANCH)",) $(if $(EXPECTED_TAG),--expected-tag "$(EXPECTED_TAG)",) --python "$(PYTHON)"

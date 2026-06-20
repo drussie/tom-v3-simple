@@ -72,6 +72,24 @@ from apps.worker.services.camera_geometry_calibration_provenance import (
     validate_camera_geometry_calibration_profile,
 )
 from apps.worker.services.completion_audit import run_completion_audit
+from apps.worker.services.controlled_runtime_calibration_change_request import (
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_CONTRACT_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_DRY_RUN_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_DRY_RUN_VALIDATION_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_INPUTS_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_INPUTS_VALIDATION_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_REPORT_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_VALIDATION_OUTPUT,
+    build_controlled_runtime_calibration_change_request,
+    build_controlled_runtime_calibration_change_request_dry_run,
+    build_controlled_runtime_calibration_change_request_inputs,
+    build_controlled_runtime_calibration_change_request_report,
+    export_controlled_runtime_calibration_change_request_contract,
+    validate_controlled_runtime_calibration_change_request,
+    validate_controlled_runtime_calibration_change_request_dry_run,
+    validate_controlled_runtime_calibration_change_request_inputs,
+)
 from apps.worker.services.court_adapter import run_fixture_court_adapter
 from apps.worker.services.court_review_export import export_court_review_dataset
 from apps.worker.services.coverage_driven_sampling_strategy import (
@@ -5415,6 +5433,273 @@ def main() -> None:
         skip_create_db=True,
     )
 
+    controlled_change_request_contract_parser = subcommands.add_parser(
+        "export-controlled-runtime-calibration-change-request-contract",
+        help="Export the Blueprint 55 controlled runtime calibration change request contract.",
+    )
+    controlled_change_request_contract_parser.add_argument(
+        "--output",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_CONTRACT_OUTPUT,
+        help="JSON Blueprint 55 controlled runtime calibration change request contract path.",
+    )
+    controlled_change_request_contract_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    controlled_change_request_contract_parser.set_defaults(
+        handler=_handle_export_controlled_runtime_calibration_change_request_contract,
+        skip_create_db=True,
+    )
+
+    controlled_change_request_inputs_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-change-request-inputs",
+        help="Build Blueprint 55 controlled runtime calibration change request inputs.",
+    )
+    controlled_change_request_inputs_parser.add_argument(
+        "--contract",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_CONTRACT_OUTPUT,
+        help="Blueprint 55 controlled runtime calibration change request contract path.",
+    )
+    controlled_change_request_inputs_parser.add_argument(
+        "--source-phase-freeze",
+        default=DEFAULT_REAL_BROADCAST_GAMEPLAY_CALIBRATION_DECISION_PHASE_FREEZE_OUTPUT,
+        help="Blueprint 54 decision phase freeze JSON path.",
+    )
+    controlled_change_request_inputs_parser.add_argument(
+        "--source-candidate-config-freeze",
+        default=DEFAULT_CALIBRATION_CANDIDATE_CONFIG_FREEZE_ARTIFACT_OUTPUT,
+        help="Blueprint 53 candidate config freeze JSON path.",
+    )
+    controlled_change_request_inputs_parser.add_argument(
+        "--source-manual-approval-packet",
+        default=DEFAULT_CALIBRATION_CANDIDATE_MANUAL_APPROVAL_PACKET_OUTPUT,
+        help="Optional Blueprint 53 manual approval packet JSON path.",
+    )
+    controlled_change_request_inputs_parser.add_argument(
+        "--source-decision-packet",
+        default=DEFAULT_CALIBRATION_CANDIDATE_DECISION_PACKET_OUTPUT,
+        help="Optional Blueprint 52 decision packet JSON path.",
+    )
+    controlled_change_request_inputs_parser.add_argument(
+        "--source-sandbox-evaluation-report",
+        default=DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_EVALUATION_REPORT_OUTPUT,
+        help="Optional Blueprint 50 sandbox evaluation report JSON path.",
+    )
+    controlled_change_request_inputs_parser.add_argument(
+        "--source-sandbox-regression-verification",
+        default=(
+            DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_VERIFICATION_OUTPUT
+        ),
+        help="Optional Blueprint 51 sandbox regression verification JSON path.",
+    )
+    controlled_change_request_inputs_parser.add_argument(
+        "--source-gameplay-gate-regression-baseline",
+        default=DEFAULT_GAMEPLAY_GATE_REGRESSION_BASELINE_OUTPUT,
+        help="Optional Blueprint 43 gameplay gate regression baseline path.",
+    )
+    controlled_change_request_inputs_parser.add_argument(
+        "--source-calibration-sandbox-baseline",
+        default=(
+            DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_BASELINE_OUTPUT
+        ),
+        help="Optional Blueprint 51 calibration sandbox baseline path.",
+    )
+    controlled_change_request_inputs_parser.add_argument(
+        "--model-asset-path",
+        default=DEFAULT_GAMEPLAY_CLASSIFIER_ASSET_PATH,
+        help="Read-only local TOM v1 gameplay classifier asset path.",
+    )
+    controlled_change_request_inputs_parser.add_argument(
+        "--output",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_INPUTS_OUTPUT,
+        help="JSON Blueprint 55 change request inputs output path.",
+    )
+    controlled_change_request_inputs_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    controlled_change_request_inputs_parser.set_defaults(
+        handler=_handle_build_controlled_runtime_calibration_change_request_inputs,
+        skip_create_db=True,
+    )
+
+    controlled_change_request_inputs_validate_parser = subcommands.add_parser(
+        "validate-controlled-runtime-calibration-change-request-inputs",
+        help="Validate Blueprint 55 controlled runtime calibration change request inputs.",
+    )
+    controlled_change_request_inputs_validate_parser.add_argument(
+        "--contract",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_CONTRACT_OUTPUT,
+        help="Blueprint 55 controlled runtime calibration change request contract path.",
+    )
+    controlled_change_request_inputs_validate_parser.add_argument(
+        "--change-request-inputs",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_INPUTS_OUTPUT,
+        help="Blueprint 55 change request inputs JSON path.",
+    )
+    controlled_change_request_inputs_validate_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_INPUTS_VALIDATION_OUTPUT
+        ),
+        help="Optional Blueprint 55 change request inputs validation output path.",
+    )
+    controlled_change_request_inputs_validate_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    controlled_change_request_inputs_validate_parser.set_defaults(
+        handler=_handle_validate_controlled_runtime_calibration_change_request_inputs,
+        skip_create_db=True,
+    )
+
+    controlled_change_request_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-change-request",
+        help="Build the Blueprint 55 controlled runtime calibration change request.",
+    )
+    controlled_change_request_parser.add_argument(
+        "--contract",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_CONTRACT_OUTPUT,
+        help="Blueprint 55 controlled runtime calibration change request contract path.",
+    )
+    controlled_change_request_parser.add_argument(
+        "--change-request-inputs",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_INPUTS_OUTPUT,
+        help="Blueprint 55 change request inputs JSON path.",
+    )
+    controlled_change_request_parser.add_argument(
+        "--output",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_OUTPUT,
+        help="JSON Blueprint 55 controlled runtime calibration change request path.",
+    )
+    controlled_change_request_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    controlled_change_request_parser.set_defaults(
+        handler=_handle_build_controlled_runtime_calibration_change_request,
+        skip_create_db=True,
+    )
+
+    controlled_change_request_validate_parser = subcommands.add_parser(
+        "validate-controlled-runtime-calibration-change-request",
+        help="Validate the Blueprint 55 controlled runtime calibration change request.",
+    )
+    controlled_change_request_validate_parser.add_argument(
+        "--contract",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_CONTRACT_OUTPUT,
+        help="Blueprint 55 controlled runtime calibration change request contract path.",
+    )
+    controlled_change_request_validate_parser.add_argument(
+        "--change-request",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_OUTPUT,
+        help="Blueprint 55 controlled runtime calibration change request JSON path.",
+    )
+    controlled_change_request_validate_parser.add_argument(
+        "--output",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_VALIDATION_OUTPUT,
+        help="Optional Blueprint 55 change request validation output path.",
+    )
+    controlled_change_request_validate_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    controlled_change_request_validate_parser.set_defaults(
+        handler=_handle_validate_controlled_runtime_calibration_change_request,
+        skip_create_db=True,
+    )
+
+    controlled_change_request_dry_run_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-change-request-dry-run",
+        help="Build the Blueprint 55 structural dry-run and rollback plan.",
+    )
+    controlled_change_request_dry_run_parser.add_argument(
+        "--contract",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_CONTRACT_OUTPUT,
+        help="Blueprint 55 controlled runtime calibration change request contract path.",
+    )
+    controlled_change_request_dry_run_parser.add_argument(
+        "--change-request",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_OUTPUT,
+        help="Blueprint 55 controlled runtime calibration change request JSON path.",
+    )
+    controlled_change_request_dry_run_parser.add_argument(
+        "--output",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_DRY_RUN_OUTPUT,
+        help="JSON Blueprint 55 structural dry-run output path.",
+    )
+    controlled_change_request_dry_run_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    controlled_change_request_dry_run_parser.set_defaults(
+        handler=_handle_build_controlled_runtime_calibration_change_request_dry_run,
+        skip_create_db=True,
+    )
+
+    controlled_change_request_dry_run_validate_parser = subcommands.add_parser(
+        "validate-controlled-runtime-calibration-change-request-dry-run",
+        help="Validate the Blueprint 55 structural dry-run and rollback plan.",
+    )
+    controlled_change_request_dry_run_validate_parser.add_argument(
+        "--contract",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_CONTRACT_OUTPUT,
+        help="Blueprint 55 controlled runtime calibration change request contract path.",
+    )
+    controlled_change_request_dry_run_validate_parser.add_argument(
+        "--dry-run",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_DRY_RUN_OUTPUT,
+        help="Blueprint 55 structural dry-run JSON path.",
+    )
+    controlled_change_request_dry_run_validate_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_DRY_RUN_VALIDATION_OUTPUT
+        ),
+        help="Optional Blueprint 55 dry-run validation output path.",
+    )
+    controlled_change_request_dry_run_validate_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    controlled_change_request_dry_run_validate_parser.set_defaults(
+        handler=_handle_validate_controlled_runtime_calibration_change_request_dry_run,
+        skip_create_db=True,
+    )
+
+    controlled_change_request_report_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-change-request-report",
+        help="Build the Blueprint 55 controlled runtime calibration change request report.",
+    )
+    controlled_change_request_report_parser.add_argument(
+        "--contract",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_CONTRACT_OUTPUT,
+        help="Blueprint 55 controlled runtime calibration change request contract path.",
+    )
+    controlled_change_request_report_parser.add_argument(
+        "--change-request",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_OUTPUT,
+        help="Blueprint 55 controlled runtime calibration change request JSON path.",
+    )
+    controlled_change_request_report_parser.add_argument(
+        "--dry-run",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_DRY_RUN_OUTPUT,
+        help="Blueprint 55 structural dry-run JSON path.",
+    )
+    controlled_change_request_report_parser.add_argument(
+        "--output",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_REPORT_OUTPUT,
+        help="JSON Blueprint 55 controlled runtime calibration change request report path.",
+    )
+    controlled_change_request_report_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    controlled_change_request_report_parser.set_defaults(
+        handler=_handle_build_controlled_runtime_calibration_change_request_report,
+        skip_create_db=True,
+    )
+
     point_evaluation_parser = subcommands.add_parser(
         "evaluate-point-candidates",
         help="Evaluate generated point candidate markers using operator review metadata.",
@@ -8358,6 +8643,115 @@ def _handle_build_real_broadcast_gameplay_calibration_next_phase_readiness_repor
     del session
     return build_real_broadcast_gameplay_calibration_next_phase_readiness_report(
         freeze_path=args.freeze,
+        output_path=args.output,
+    )
+
+
+def _handle_export_controlled_runtime_calibration_change_request_contract(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return export_controlled_runtime_calibration_change_request_contract(
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_change_request_inputs(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_change_request_inputs(
+        contract_path=args.contract,
+        source_phase_freeze_path=args.source_phase_freeze,
+        source_candidate_config_freeze_path=args.source_candidate_config_freeze,
+        source_manual_approval_packet_path=args.source_manual_approval_packet,
+        source_decision_packet_path=args.source_decision_packet,
+        source_sandbox_evaluation_report_path=args.source_sandbox_evaluation_report,
+        source_sandbox_regression_verification_path=(
+            args.source_sandbox_regression_verification
+        ),
+        source_gameplay_gate_regression_baseline_path=(
+            args.source_gameplay_gate_regression_baseline
+        ),
+        source_calibration_sandbox_baseline_path=(
+            args.source_calibration_sandbox_baseline
+        ),
+        model_asset_path=args.model_asset_path,
+        output_path=args.output,
+    )
+
+
+def _handle_validate_controlled_runtime_calibration_change_request_inputs(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_controlled_runtime_calibration_change_request_inputs(
+        contract_path=args.contract,
+        change_request_inputs_path=args.change_request_inputs,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_change_request(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_change_request(
+        contract_path=args.contract,
+        change_request_inputs_path=args.change_request_inputs,
+        output_path=args.output,
+    )
+
+
+def _handle_validate_controlled_runtime_calibration_change_request(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_controlled_runtime_calibration_change_request(
+        contract_path=args.contract,
+        change_request_path=args.change_request,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_change_request_dry_run(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_change_request_dry_run(
+        contract_path=args.contract,
+        change_request_path=args.change_request,
+        output_path=args.output,
+    )
+
+
+def _handle_validate_controlled_runtime_calibration_change_request_dry_run(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_controlled_runtime_calibration_change_request_dry_run(
+        contract_path=args.contract,
+        dry_run_path=args.dry_run,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_change_request_report(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_change_request_report(
+        contract_path=args.contract,
+        change_request_path=args.change_request,
+        dry_run_path=args.dry_run,
         output_path=args.output,
     )
 
