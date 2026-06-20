@@ -380,6 +380,8 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Real Broadcast Gameplay Calibration Decision Phase Freeze v1](reviews/real_broadcast_gameplay_calibration_decision_phase_freeze_v1.md)
 - [Blueprint 55 Controlled Runtime Calibration Change Request v1](blueprints/blueprint_55_controlled_runtime_calibration_change_request_v1.md)
 - [Controlled Runtime Calibration Change Request v1](reviews/controlled_runtime_calibration_change_request_v1.md)
+- [Blueprint 56 Controlled Runtime Calibration Dry-Run Execution v1](blueprints/blueprint_56_controlled_runtime_calibration_dry_run_execution_v1.md)
+- [Controlled Runtime Calibration Dry-Run Execution v1](reviews/controlled_runtime_calibration_dry_run_execution_v1.md)
 
 ## Development
 

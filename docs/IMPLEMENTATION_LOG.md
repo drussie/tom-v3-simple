@@ -4243,3 +4243,36 @@ This milestone adds:
 The committed request records `candidate_config_status: no_candidate_selected`, so its request
 status is `informational_only`. Blueprint 55 requires human approval, dry-run planning, rollback
 planning, and regression gates, while leaving runtime state `not_applied`.
+
+## Blueprint 56 Controlled Runtime Calibration Dry-Run Execution v1
+
+Status: complete
+
+### Goal
+
+Execute Blueprint 55 controlled runtime calibration change requests in dry-run mode only without
+applying runtime calibration.
+
+### Notes
+
+This milestone adds:
+
+- `apps.worker.services.controlled_runtime_calibration_dry_run_execution`
+- seven worker CLI commands for contract export, inputs, input validation, dry-run execution,
+  report validation, summary build, and rollback readiness report build
+- matching `tom-v1-*controlled-runtime-calibration-dry-run*` Make helpers
+- `.data/contracts/controlled_runtime_calibration_dry_run_execution_contract_v1.json` tracked
+  contract
+- generated inputs, validation, execution report, summary, and rollback readiness report paths
+  under `.data/exports/`
+- `docs/blueprints/blueprint_56_controlled_runtime_calibration_dry_run_execution_v1.md`
+- `docs/reviews/controlled_runtime_calibration_dry_run_execution_v1.md`
+- `docs/agent_reports/blueprint_56_controlled_runtime_calibration_dry_run_execution_v1_report.md`
+
+Blueprint 56 dry-run reports preserve `runtime_application_status: not_applied`, `mutation_status:
+no_runtime_mutation`, `production_config_status: not_created`, `baseline_update_status:
+not_replaced`, and `model_update_status: not_modified`. It does not apply threshold, smoothing, or
+hysteresis changes; does not update runtime config; does not mutate model weights; does not replace
+baselines; does not create production config; does not approve or reject candidates; and does not
+claim tennis truth, classifier correctness, classifier accuracy, production readiness, or
+generalization.

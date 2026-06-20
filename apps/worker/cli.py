@@ -90,6 +90,22 @@ from apps.worker.services.controlled_runtime_calibration_change_request import (
     validate_controlled_runtime_calibration_change_request_dry_run,
     validate_controlled_runtime_calibration_change_request_inputs,
 )
+from apps.worker.services.controlled_runtime_calibration_dry_run_execution import (
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_DRY_RUN_EXECUTION_CONTRACT_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_DRY_RUN_INPUTS_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_DRY_RUN_INPUTS_VALIDATION_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_DRY_RUN_REPORT_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_DRY_RUN_REPORT_VALIDATION_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_DRY_RUN_ROLLBACK_READINESS_REPORT_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_DRY_RUN_SUMMARY_OUTPUT,
+    build_controlled_runtime_calibration_dry_run_inputs,
+    build_controlled_runtime_calibration_dry_run_rollback_readiness_report,
+    build_controlled_runtime_calibration_dry_run_summary,
+    export_controlled_runtime_calibration_dry_run_execution_contract,
+    run_controlled_runtime_calibration_dry_run,
+    validate_controlled_runtime_calibration_dry_run_inputs,
+    validate_controlled_runtime_calibration_dry_run_report,
+)
 from apps.worker.services.court_adapter import run_fixture_court_adapter
 from apps.worker.services.court_review_export import export_court_review_dataset
 from apps.worker.services.coverage_driven_sampling_strategy import (
@@ -5700,6 +5716,250 @@ def main() -> None:
         skip_create_db=True,
     )
 
+    dry_run_execution_contract_parser = subcommands.add_parser(
+        "export-controlled-runtime-calibration-dry-run-execution-contract",
+        help="Export the Blueprint 56 controlled runtime calibration dry-run contract.",
+    )
+    dry_run_execution_contract_parser.add_argument(
+        "--output",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_DRY_RUN_EXECUTION_CONTRACT_OUTPUT,
+        help="JSON Blueprint 56 controlled runtime calibration dry-run contract path.",
+    )
+    dry_run_execution_contract_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    dry_run_execution_contract_parser.set_defaults(
+        handler=_handle_export_controlled_runtime_calibration_dry_run_execution_contract,
+        skip_create_db=True,
+    )
+
+    dry_run_inputs_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-dry-run-inputs",
+        help="Build Blueprint 56 controlled runtime calibration dry-run inputs.",
+    )
+    dry_run_inputs_parser.add_argument(
+        "--contract",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_DRY_RUN_EXECUTION_CONTRACT_OUTPUT,
+        help="Blueprint 56 controlled runtime calibration dry-run contract path.",
+    )
+    dry_run_inputs_parser.add_argument(
+        "--source-change-request",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_OUTPUT,
+        help="Blueprint 55 controlled runtime calibration change request JSON path.",
+    )
+    dry_run_inputs_parser.add_argument(
+        "--source-candidate-config-freeze",
+        default=DEFAULT_CALIBRATION_CANDIDATE_CONFIG_FREEZE_ARTIFACT_OUTPUT,
+        help="Blueprint 53 candidate config freeze JSON path.",
+    )
+    dry_run_inputs_parser.add_argument(
+        "--source-manual-approval-packet",
+        default=DEFAULT_CALIBRATION_CANDIDATE_MANUAL_APPROVAL_PACKET_OUTPUT,
+        help="Optional Blueprint 53 manual approval packet JSON path.",
+    )
+    dry_run_inputs_parser.add_argument(
+        "--source-decision-packet",
+        default=DEFAULT_CALIBRATION_CANDIDATE_DECISION_PACKET_OUTPUT,
+        help="Optional Blueprint 52 decision packet JSON path.",
+    )
+    dry_run_inputs_parser.add_argument(
+        "--source-phase-freeze",
+        default=DEFAULT_REAL_BROADCAST_GAMEPLAY_CALIBRATION_DECISION_PHASE_FREEZE_OUTPUT,
+        help="Optional Blueprint 54 decision phase freeze JSON path.",
+    )
+    dry_run_inputs_parser.add_argument(
+        "--source-gameplay-gate-regression-baseline",
+        default=DEFAULT_GAMEPLAY_GATE_REGRESSION_BASELINE_OUTPUT,
+        help="Optional Blueprint 43 gameplay gate regression baseline path.",
+    )
+    dry_run_inputs_parser.add_argument(
+        "--source-calibration-sandbox-baseline",
+        default=(
+            DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_BASELINE_OUTPUT
+        ),
+        help="Optional Blueprint 51 calibration sandbox baseline path.",
+    )
+    dry_run_inputs_parser.add_argument(
+        "--model-asset-path",
+        default=DEFAULT_GAMEPLAY_CLASSIFIER_ASSET_PATH,
+        help="Read-only local TOM v1 gameplay classifier asset path.",
+    )
+    dry_run_inputs_parser.add_argument(
+        "--dry-run-mode",
+        default="validate_only",
+        choices=[
+            "validate_only",
+            "fixture_only",
+            "structural_dry_run",
+            "explicit_local_media_dry_run",
+            "no_runtime_mutation",
+            "not_applicable",
+        ],
+        help="Blueprint 56 dry-run mode. Defaults to validate_only.",
+    )
+    dry_run_inputs_parser.add_argument(
+        "--dry-run-media-manifest",
+        help="Optional explicit media manifest used only as dry-run provenance.",
+    )
+    dry_run_inputs_parser.add_argument(
+        "--output",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_DRY_RUN_INPUTS_OUTPUT,
+        help="JSON Blueprint 56 dry-run inputs output path.",
+    )
+    dry_run_inputs_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    dry_run_inputs_parser.set_defaults(
+        handler=_handle_build_controlled_runtime_calibration_dry_run_inputs,
+        skip_create_db=True,
+    )
+
+    dry_run_inputs_validate_parser = subcommands.add_parser(
+        "validate-controlled-runtime-calibration-dry-run-inputs",
+        help="Validate Blueprint 56 controlled runtime calibration dry-run inputs.",
+    )
+    dry_run_inputs_validate_parser.add_argument(
+        "--contract",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_DRY_RUN_EXECUTION_CONTRACT_OUTPUT,
+        help="Blueprint 56 controlled runtime calibration dry-run contract path.",
+    )
+    dry_run_inputs_validate_parser.add_argument(
+        "--dry-run-inputs",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_DRY_RUN_INPUTS_OUTPUT,
+        help="Blueprint 56 dry-run inputs JSON path.",
+    )
+    dry_run_inputs_validate_parser.add_argument(
+        "--output",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_DRY_RUN_INPUTS_VALIDATION_OUTPUT,
+        help="Optional Blueprint 56 dry-run inputs validation output path.",
+    )
+    dry_run_inputs_validate_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    dry_run_inputs_validate_parser.set_defaults(
+        handler=_handle_validate_controlled_runtime_calibration_dry_run_inputs,
+        skip_create_db=True,
+    )
+
+    dry_run_execution_parser = subcommands.add_parser(
+        "run-controlled-runtime-calibration-dry-run",
+        help="Run the Blueprint 56 controlled runtime calibration dry-run.",
+    )
+    dry_run_execution_parser.add_argument(
+        "--contract",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_DRY_RUN_EXECUTION_CONTRACT_OUTPUT,
+        help="Blueprint 56 controlled runtime calibration dry-run contract path.",
+    )
+    dry_run_execution_parser.add_argument(
+        "--dry-run-inputs",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_DRY_RUN_INPUTS_OUTPUT,
+        help="Blueprint 56 dry-run inputs JSON path.",
+    )
+    dry_run_execution_parser.add_argument(
+        "--output",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_DRY_RUN_REPORT_OUTPUT,
+        help="JSON Blueprint 56 dry-run execution report path.",
+    )
+    dry_run_execution_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    dry_run_execution_parser.set_defaults(
+        handler=_handle_run_controlled_runtime_calibration_dry_run,
+        skip_create_db=True,
+    )
+
+    dry_run_report_validate_parser = subcommands.add_parser(
+        "validate-controlled-runtime-calibration-dry-run-report",
+        help="Validate the Blueprint 56 controlled runtime calibration dry-run report.",
+    )
+    dry_run_report_validate_parser.add_argument(
+        "--contract",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_DRY_RUN_EXECUTION_CONTRACT_OUTPUT,
+        help="Blueprint 56 controlled runtime calibration dry-run contract path.",
+    )
+    dry_run_report_validate_parser.add_argument(
+        "--dry-run-report",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_DRY_RUN_REPORT_OUTPUT,
+        help="Blueprint 56 dry-run execution report JSON path.",
+    )
+    dry_run_report_validate_parser.add_argument(
+        "--output",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_DRY_RUN_REPORT_VALIDATION_OUTPUT,
+        help="Optional Blueprint 56 dry-run report validation output path.",
+    )
+    dry_run_report_validate_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    dry_run_report_validate_parser.set_defaults(
+        handler=_handle_validate_controlled_runtime_calibration_dry_run_report,
+        skip_create_db=True,
+    )
+
+    dry_run_summary_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-dry-run-summary",
+        help="Build the Blueprint 56 controlled runtime calibration dry-run summary.",
+    )
+    dry_run_summary_parser.add_argument(
+        "--contract",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_DRY_RUN_EXECUTION_CONTRACT_OUTPUT,
+        help="Blueprint 56 controlled runtime calibration dry-run contract path.",
+    )
+    dry_run_summary_parser.add_argument(
+        "--dry-run-report",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_DRY_RUN_REPORT_OUTPUT,
+        help="Blueprint 56 dry-run execution report JSON path.",
+    )
+    dry_run_summary_parser.add_argument(
+        "--output",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_DRY_RUN_SUMMARY_OUTPUT,
+        help="JSON Blueprint 56 dry-run summary output path.",
+    )
+    dry_run_summary_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    dry_run_summary_parser.set_defaults(
+        handler=_handle_build_controlled_runtime_calibration_dry_run_summary,
+        skip_create_db=True,
+    )
+
+    dry_run_rollback_readiness_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-dry-run-rollback-readiness-report",
+        help="Build the Blueprint 56 rollback readiness report.",
+    )
+    dry_run_rollback_readiness_parser.add_argument(
+        "--contract",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_DRY_RUN_EXECUTION_CONTRACT_OUTPUT,
+        help="Blueprint 56 controlled runtime calibration dry-run contract path.",
+    )
+    dry_run_rollback_readiness_parser.add_argument(
+        "--dry-run-report",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_DRY_RUN_REPORT_OUTPUT,
+        help="Blueprint 56 dry-run execution report JSON path.",
+    )
+    dry_run_rollback_readiness_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_DRY_RUN_ROLLBACK_READINESS_REPORT_OUTPUT
+        ),
+        help="JSON Blueprint 56 rollback readiness report output path.",
+    )
+    dry_run_rollback_readiness_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    dry_run_rollback_readiness_parser.set_defaults(
+        handler=(
+            _handle_build_controlled_runtime_calibration_dry_run_rollback_readiness_report
+        ),
+        skip_create_db=True,
+    )
+
     point_evaluation_parser = subcommands.add_parser(
         "evaluate-point-candidates",
         help="Evaluate generated point candidate markers using operator review metadata.",
@@ -8752,6 +9012,101 @@ def _handle_build_controlled_runtime_calibration_change_request_report(
         contract_path=args.contract,
         change_request_path=args.change_request,
         dry_run_path=args.dry_run,
+        output_path=args.output,
+    )
+
+
+def _handle_export_controlled_runtime_calibration_dry_run_execution_contract(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return export_controlled_runtime_calibration_dry_run_execution_contract(
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_dry_run_inputs(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_dry_run_inputs(
+        contract_path=args.contract,
+        source_change_request_path=args.source_change_request,
+        source_candidate_config_freeze_path=args.source_candidate_config_freeze,
+        source_manual_approval_packet_path=args.source_manual_approval_packet,
+        source_decision_packet_path=args.source_decision_packet,
+        source_phase_freeze_path=args.source_phase_freeze,
+        source_gameplay_gate_regression_baseline_path=(
+            args.source_gameplay_gate_regression_baseline
+        ),
+        source_calibration_sandbox_baseline_path=(
+            args.source_calibration_sandbox_baseline
+        ),
+        model_asset_path=args.model_asset_path,
+        dry_run_mode=args.dry_run_mode,
+        dry_run_media_manifest_path=args.dry_run_media_manifest,
+        output_path=args.output,
+    )
+
+
+def _handle_validate_controlled_runtime_calibration_dry_run_inputs(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_controlled_runtime_calibration_dry_run_inputs(
+        contract_path=args.contract,
+        dry_run_inputs_path=args.dry_run_inputs,
+        output_path=args.output,
+    )
+
+
+def _handle_run_controlled_runtime_calibration_dry_run(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return run_controlled_runtime_calibration_dry_run(
+        contract_path=args.contract,
+        dry_run_inputs_path=args.dry_run_inputs,
+        output_path=args.output,
+    )
+
+
+def _handle_validate_controlled_runtime_calibration_dry_run_report(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_controlled_runtime_calibration_dry_run_report(
+        contract_path=args.contract,
+        dry_run_report_path=args.dry_run_report,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_dry_run_summary(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_dry_run_summary(
+        contract_path=args.contract,
+        dry_run_report_path=args.dry_run_report,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_dry_run_rollback_readiness_report(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_dry_run_rollback_readiness_report(
+        contract_path=args.contract,
+        dry_run_report_path=args.dry_run_report,
         output_path=args.output,
     )
 

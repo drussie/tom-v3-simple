@@ -1850,6 +1850,45 @@ Generated outputs under `.data/exports/` remain local. Expected safe-state field
 - `model_weights_not_modified`: true
 - `baseline_not_replaced`: true
 
+## Controlled Runtime Calibration Dry-Run Execution
+
+Use this after the Blueprint 55 controlled change request exists. The command chain creates a
+dry-run execution contract, input bundle, controlled dry-run execution report, summary, and
+rollback readiness report. It does not apply threshold, smoothing, or hysteresis changes, update
+runtime config, modify model weights, replace baselines, create production config, or approve or
+reject candidates.
+
+```bash
+make tom-v1-export-controlled-runtime-calibration-dry-run-execution-contract \
+  tom-v1-build-controlled-runtime-calibration-dry-run-inputs \
+  tom-v1-validate-controlled-runtime-calibration-dry-run-inputs \
+  tom-v1-run-controlled-runtime-calibration-dry-run \
+  tom-v1-validate-controlled-runtime-calibration-dry-run-report \
+  tom-v1-build-controlled-runtime-calibration-dry-run-summary \
+  tom-v1-build-controlled-runtime-calibration-dry-run-rollback-readiness-report \
+  PYTHON=.venv/bin/python
+```
+
+Tracked output:
+
+```text
+.data/contracts/controlled_runtime_calibration_dry_run_execution_contract_v1.json
+```
+
+Generated outputs under `.data/exports/` remain local. Expected safe-state fields include:
+
+- `runtime_application_status`: `not_applied`
+- `mutation_status`: `no_runtime_mutation`
+- `production_config_status`: `not_created`
+- `baseline_update_status`: `not_replaced`
+- `model_update_status`: `not_modified`
+- `threshold_changes_not_applied`: true
+- `smoothing_changes_not_applied`: true
+- `hysteresis_changes_not_applied`: true
+- `runtime_config_not_updated`: true
+- `model_weights_not_modified`: true
+- `baseline_not_replaced`: true
+
 ## Calibration Evaluation Sandbox Regression Gate
 
 Use this after Blueprint 50 evaluation inputs and reports have been built. The gate freezes and
