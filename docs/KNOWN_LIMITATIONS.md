@@ -445,6 +445,12 @@ TOM v3 Simple does not include:
   candidate option inventory but does not select from it, satisfy operator signoff, rerun the final
   gate, perform runtime application, write runtime config, create production config, modify model
   weights, replace baselines, claim production readiness, or decide tennis truth.
+- Controlled runtime calibration human resolution input packets remain pending until real operator
+  signoff material and real selected candidate material are supplied together. The BP69 packet and
+  template do not satisfy those requirements by themselves, infer a selection from the single
+  discovered candidate option, rerun the final gate, perform runtime application, write runtime
+  config, create production config, modify model weights, replace baselines, claim production
+  readiness, or decide tennis truth.
 
 ## Boundary
 

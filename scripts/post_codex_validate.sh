@@ -1670,4 +1670,62 @@ run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-select
   --output "$TMP_ROOT/controlled_runtime_calibration_selected_candidate_readiness_report.current.json" \
   --skip-create-db
 
+run "$PYTHON_BIN" -m apps.worker.cli export-controlled-runtime-calibration-human-resolution-input-packet-contract \
+  --output "$TMP_ROOT/controlled_runtime_calibration_human_resolution_input_packet_contract_v1.smoke.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-human-resolution-input-packet-inputs \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_human_resolution_input_packet_contract_v1.smoke.json" \
+  --source-explicit-selected-candidate-artifact "$TMP_ROOT/controlled_runtime_calibration_explicit_selected_candidate_artifact.current.json" \
+  --source-explicit-selected-candidate-artifact-contract "$TMP_ROOT/controlled_runtime_calibration_explicit_selected_candidate_artifact_contract_v1.smoke.json" \
+  --source-explicit-operator-signoff-artifact "$TMP_ROOT/controlled_runtime_calibration_explicit_operator_signoff_artifact.current.json" \
+  --source-explicit-operator-signoff-artifact-contract "$TMP_ROOT/controlled_runtime_calibration_explicit_operator_signoff_artifact_contract_v1.smoke.json" \
+  --source-operator-signoff-candidate-selection-packet "$TMP_ROOT/controlled_runtime_calibration_operator_signoff_candidate_selection_packet.current.json" \
+  --source-operator-signoff-candidate-selection-packet-contract "$TMP_ROOT/controlled_runtime_calibration_operator_signoff_candidate_selection_packet_contract_v1.smoke.json" \
+  --model-asset-path "model_assets/tom_v1/view_classifier_gameplay.pt" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_human_resolution_input_packet_inputs.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli validate-controlled-runtime-calibration-human-resolution-input-packet-inputs \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_human_resolution_input_packet_contract_v1.smoke.json" \
+  --human-resolution-inputs "$TMP_ROOT/controlled_runtime_calibration_human_resolution_input_packet_inputs.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_human_resolution_input_packet_inputs.validation.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-human-resolution-input-packet \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_human_resolution_input_packet_contract_v1.smoke.json" \
+  --human-resolution-inputs "$TMP_ROOT/controlled_runtime_calibration_human_resolution_input_packet_inputs.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_human_resolution_input_packet.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli validate-controlled-runtime-calibration-human-resolution-input-packet \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_human_resolution_input_packet_contract_v1.smoke.json" \
+  --human-resolution-packet "$TMP_ROOT/controlled_runtime_calibration_human_resolution_input_packet.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_human_resolution_input_packet.validation.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-human-resolution-requirements-report \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_human_resolution_input_packet_contract_v1.smoke.json" \
+  --human-resolution-packet "$TMP_ROOT/controlled_runtime_calibration_human_resolution_input_packet.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_human_resolution_requirements_report.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-human-resolution-input-template \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_human_resolution_input_packet_contract_v1.smoke.json" \
+  --human-resolution-packet "$TMP_ROOT/controlled_runtime_calibration_human_resolution_input_packet.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_human_resolution_input_template.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-human-resolution-readiness-report \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_human_resolution_input_packet_contract_v1.smoke.json" \
+  --human-resolution-packet "$TMP_ROOT/controlled_runtime_calibration_human_resolution_input_packet.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_human_resolution_readiness_report.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-final-gate-rerun-prerequisite-report \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_human_resolution_input_packet_contract_v1.smoke.json" \
+  --human-resolution-packet "$TMP_ROOT/controlled_runtime_calibration_human_resolution_input_packet.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_final_gate_rerun_prerequisite_report.current.json" \
+  --skip-create-db
+
 run git status --short

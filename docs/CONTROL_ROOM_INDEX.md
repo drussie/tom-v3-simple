@@ -404,6 +404,8 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Controlled Runtime Calibration Explicit Operator Signoff Artifact v1](reviews/controlled_runtime_calibration_explicit_operator_signoff_artifact_v1.md)
 - [Blueprint 68 Controlled Runtime Calibration Explicit Selected Candidate Artifact v1](blueprints/blueprint_68_controlled_runtime_calibration_explicit_selected_candidate_artifact_v1.md)
 - [Controlled Runtime Calibration Explicit Selected Candidate Artifact v1](reviews/controlled_runtime_calibration_explicit_selected_candidate_artifact_v1.md)
+- [Blueprint 69 Controlled Runtime Calibration Human Resolution Input Packet v1](blueprints/blueprint_69_controlled_runtime_calibration_human_resolution_input_packet_v1.md)
+- [Controlled Runtime Calibration Human Resolution Input Packet v1](reviews/controlled_runtime_calibration_human_resolution_input_packet_v1.md)
 
 ## Development
 

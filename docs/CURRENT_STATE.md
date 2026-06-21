@@ -812,3 +812,27 @@ Blueprint 68 preserves one discovered candidate option from BP66/BP67 for review
 create operator signoff, infer selected candidate status from candidate option discovery or
 validation success, rerun the final gate, perform runtime application, write runtime config,
 create production config, modify model weights, or replace baselines.
+
+## Blueprint 69 Result
+
+Status: complete.
+
+Blueprint 69 adds the combined human resolution input packet mechanism required after BP68/BP67. It
+creates tracked artifacts:
+
+```text
+.data/contracts/controlled_runtime_calibration_human_resolution_input_packet_contract_v1.json
+.data/contracts/controlled_runtime_calibration_human_resolution_input_packet_v1.json
+```
+
+The frozen packet records `human_resolution_input_required`, `operator_signoff_required`,
+`operator_attestation_required`, `operator_identity_required`, `operator_timestamp_required`,
+`selected_candidate_required`, `candidate_selection_pending_explicit_input`,
+`final_gate_rerun_required`, `reexecution_not_ready_blockers_unresolved`,
+`runtime_application_status: not_executed`, `runtime_config_changed: false`, and
+`no_runtime_mutation_due_to_blocker`.
+
+Blueprint 69 preserves one discovered candidate option from BP66/BP67/BP68 for review only. It does
+not create operator signoff, infer selected candidate status from candidate option discovery or
+validation success, infer human resolution, rerun the final gate, perform runtime application,
+write runtime config, create production config, modify model weights, or replace baselines.

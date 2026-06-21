@@ -4384,3 +4384,78 @@ The BP68 artifact preserves candidate option inventory for review only. It does 
 signoff, infer a selected candidate from discovery or validation success, rerun the final gate,
 execute runtime application, write runtime config, create production config, modify model weights,
 or replace baselines.
+
+## Controlled Runtime Calibration Human Resolution Input Packet
+
+Use this after the BP68 explicit selected candidate artifact, BP67 explicit operator signoff
+artifact, and BP66 packet exist. The BP69 packet records whether explicit human-resolution inputs
+exist together: operator identity, timestamp, attestation, scope acknowledgement, selected candidate
+ref, selected candidate source/provenance, selection reason, selection timestamp, and operator
+reference. With no explicit human-resolution input, the frozen packet remains pending.
+
+Build the frozen contract and packet:
+
+```bash
+make tom-v1-export-controlled-runtime-calibration-human-resolution-input-packet-contract \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-human-resolution-input-packet-inputs \
+  PYTHON=.venv/bin/python
+make tom-v1-validate-controlled-runtime-calibration-human-resolution-input-packet-inputs \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-human-resolution-input-packet \
+  PYTHON=.venv/bin/python
+make tom-v1-validate-controlled-runtime-calibration-human-resolution-input-packet \
+  PYTHON=.venv/bin/python
+```
+
+Build generated follow-up views:
+
+```bash
+make tom-v1-build-controlled-runtime-calibration-human-resolution-requirements-report \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-human-resolution-input-template \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-human-resolution-readiness-report \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-final-gate-rerun-prerequisite-report \
+  PYTHON=.venv/bin/python
+```
+
+Optional explicit human-resolution inputs:
+
+```bash
+make tom-v1-build-controlled-runtime-calibration-human-resolution-input-packet-inputs \
+  PYTHON=.venv/bin/python \
+  CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_IDENTITY_REF='<operator-ref>' \
+  CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_SIGNOFF_TIMESTAMP='<timestamp>' \
+  CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_ATTESTATION_TEXT='<attestation-text>' \
+  CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_SCOPE_ACKNOWLEDGEMENT='acknowledged' \
+  CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_REF='<candidate-ref>' \
+  CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ID='<candidate-id>' \
+  CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_VERSION='<candidate-version>' \
+  CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_SOURCE_PATH='<candidate-source-path>' \
+  CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_SELECTION_REASON='<operator-selection-reason>' \
+  CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_CANDIDATE_SELECTION_TIMESTAMP='<timestamp>' \
+  CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_REFERENCE_FOR_SELECTION='<operator-ref>'
+```
+
+Current expected frozen result:
+
+- `human_resolution_status`: `human_resolution_input_required`
+- `operator_signoff_status`: `operator_signoff_required`
+- `operator_attestation_status`: `operator_attestation_required`
+- `operator_identity_status`: `operator_identity_required`
+- `operator_timestamp_status`: `operator_timestamp_required`
+- `selected_candidate_status`: `selected_candidate_required`
+- `candidate_option_count`: 1
+- `candidate_selection_validation_status`: `candidate_selection_pending_explicit_input`
+- `final_gate_rerun_status`: `final_gate_rerun_required`
+- `reexecution_readiness_status`: `reexecution_not_ready_blockers_unresolved`
+- `runtime_application_status`: `not_executed`
+- `runtime_config_changed`: false
+- `mutation_status`: `no_runtime_mutation_due_to_blocker`
+
+The BP69 packet preserves candidate option inventory for review only. It does not create operator
+signoff, infer a selected candidate from discovery or validation success, rerun the final gate,
+execute runtime application, write runtime config, create production config, modify model weights,
+or replace baselines.

@@ -4683,3 +4683,37 @@ The committed artifact records
 `operator_signoff_required`, `final_gate_rerun_required`,
 `reexecution_not_ready_blockers_unresolved`, `runtime_application_status: not_executed`,
 `runtime_config_changed: false`, and `no_runtime_mutation_due_to_blocker`.
+
+## Blueprint 69 Controlled Runtime Calibration Human Resolution Input Packet v1
+
+Status: complete
+
+### Goal
+
+Create the combined human resolution input packet required after BP68/BP67 while leaving human
+resolution pending unless real operator signoff and selected candidate inputs are supplied.
+
+### Notes
+
+This milestone adds:
+
+- `apps.worker.services.controlled_runtime_calibration_human_resolution_input_packet`
+- worker CLI commands for contract export, inputs, input validation, packet build, packet
+  validation, human resolution requirements report, input template, readiness report, and
+  final-gate rerun prerequisite report
+- matching `tom-v1-*controlled-runtime-calibration-human-resolution*` Make helpers
+- `.data/contracts/controlled_runtime_calibration_human_resolution_input_packet_contract_v1.json`
+  tracked contract
+- `.data/contracts/controlled_runtime_calibration_human_resolution_input_packet_v1.json` tracked
+  packet
+- generated input, validation, requirements report, input template, readiness report, and
+  final-gate rerun prerequisite report paths under `.data/exports/`
+- focused tests for the pending default path, report/template generation, and invalid explicit
+  human-resolution input rejection
+
+The committed packet records `human_resolution_input_required`, `operator_signoff_required`,
+`operator_attestation_required`, `operator_identity_required`, `operator_timestamp_required`,
+`selected_candidate_required`, `candidate_selection_pending_explicit_input`,
+`final_gate_rerun_required`, `reexecution_not_ready_blockers_unresolved`,
+`runtime_application_status: not_executed`, `runtime_config_changed: false`, and
+`no_runtime_mutation_due_to_blocker`.

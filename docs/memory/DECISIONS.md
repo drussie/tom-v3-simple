@@ -57,3 +57,10 @@ Reason: BP68 may preserve candidate option inventory and create a pending select
 artifact, requirements report, and readiness report, but candidate option discovery, a single
 available option, validation success, branch state, commit state, and tags do not satisfy explicit
 candidate selection.
+
+## Decision 12: Human Resolution Input Packets Require Explicit Human Inputs
+
+Reason: BP69 may combine operator signoff requirements and selected candidate requirements into a
+single pending packet and template, but that packet does not resolve blockers without real operator
+identity, timestamp, attestation, scope acknowledgement, selected candidate ref, selected candidate
+provenance, selection reason, selection timestamp, and operator reference.
