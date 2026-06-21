@@ -1956,3 +1956,35 @@ Blueprint 64 does not perform runtime application, write runtime config, train o
 gameplay classifier, commit model weights, mutate baselines, create labels, perform automatic
 relabeling, create production config, auto approve or auto reject candidates, or decide tennis
 truth.
+
+## Blueprint 72 Controlled Runtime Calibration Human Resolution Completeness Gate v1
+
+Status: complete.
+
+### Goal
+
+Create the completeness gate over the BP71 explicit human resolution record while leaving the gate
+not ready unless real operator signoff and selected candidate inputs are supplied through the
+controlled chain.
+
+### Notes
+
+This milestone adds:
+
+- `apps.worker.services.controlled_runtime_calibration_human_resolution_completeness_gate`
+- worker CLI commands for contract export, inputs, input validation, gate build, gate validation,
+  missing-input matrix, operator input completeness report, candidate input completeness report,
+  final-gate rerun readiness report, and reexecution readiness report
+- matching Make helpers
+- tracked BP72 contract and gate artifacts under `.data/contracts/`
+- ignored generated report paths under `.data/exports/`
+- focused tests for the pending default path, missing-record blocking, and future explicit-input
+  readiness without runtime application
+
+The committed gate stores `human_resolution_completeness_gate_not_ready`,
+`human_resolution_record_pending_explicit_inputs`, `human_resolution_not_provided`,
+`human_resolution_incomplete`, `required_human_inputs_missing`, `operator_inputs_incomplete`,
+`candidate_inputs_incomplete`, `operator_signoff_required`, `selected_candidate_required`,
+`final_gate_rerun_not_ready_missing_human_resolution`,
+`reexecution_not_ready_blockers_unresolved`, `runtime_application_status: not_executed`,
+`runtime_config_changed: false`, and `no_runtime_mutation_due_to_blocker`.

@@ -1836,4 +1836,64 @@ run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-human-
   --output "$TMP_ROOT/controlled_runtime_calibration_human_resolution_record_reexecution_readiness_report.current.json" \
   --skip-create-db
 
+run "$PYTHON_BIN" -m apps.worker.cli export-controlled-runtime-calibration-human-resolution-completeness-gate-contract \
+  --output "$TMP_ROOT/controlled_runtime_calibration_human_resolution_completeness_gate_contract_v1.smoke.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-human-resolution-completeness-gate-inputs \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_human_resolution_completeness_gate_contract_v1.smoke.json" \
+  --source-explicit-human-resolution-record "$TMP_ROOT/controlled_runtime_calibration_explicit_human_resolution_record.current.json" \
+  --source-explicit-human-resolution-record-contract "$TMP_ROOT/controlled_runtime_calibration_explicit_human_resolution_record_contract_v1.smoke.json" \
+  --model-asset-path "model_assets/tom_v1/view_classifier_gameplay.pt" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_human_resolution_completeness_gate_inputs.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli validate-controlled-runtime-calibration-human-resolution-completeness-gate-inputs \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_human_resolution_completeness_gate_contract_v1.smoke.json" \
+  --completeness-gate-inputs "$TMP_ROOT/controlled_runtime_calibration_human_resolution_completeness_gate_inputs.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_human_resolution_completeness_gate_inputs.validation.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-human-resolution-completeness-gate \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_human_resolution_completeness_gate_contract_v1.smoke.json" \
+  --completeness-gate-inputs "$TMP_ROOT/controlled_runtime_calibration_human_resolution_completeness_gate_inputs.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_human_resolution_completeness_gate.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli validate-controlled-runtime-calibration-human-resolution-completeness-gate \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_human_resolution_completeness_gate_contract_v1.smoke.json" \
+  --human-resolution-completeness-gate "$TMP_ROOT/controlled_runtime_calibration_human_resolution_completeness_gate.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_human_resolution_completeness_gate.validation.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-human-resolution-missing-input-matrix \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_human_resolution_completeness_gate_contract_v1.smoke.json" \
+  --human-resolution-completeness-gate "$TMP_ROOT/controlled_runtime_calibration_human_resolution_completeness_gate.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_human_resolution_missing_input_matrix.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-operator-input-completeness-report \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_human_resolution_completeness_gate_contract_v1.smoke.json" \
+  --human-resolution-completeness-gate "$TMP_ROOT/controlled_runtime_calibration_human_resolution_completeness_gate.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_operator_input_completeness_report.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-candidate-input-completeness-report \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_human_resolution_completeness_gate_contract_v1.smoke.json" \
+  --human-resolution-completeness-gate "$TMP_ROOT/controlled_runtime_calibration_human_resolution_completeness_gate.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_candidate_input_completeness_report.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-final-gate-rerun-readiness-report \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_human_resolution_completeness_gate_contract_v1.smoke.json" \
+  --human-resolution-completeness-gate "$TMP_ROOT/controlled_runtime_calibration_human_resolution_completeness_gate.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_final_gate_rerun_readiness_report.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-reexecution-readiness-after-human-resolution-report \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_human_resolution_completeness_gate_contract_v1.smoke.json" \
+  --human-resolution-completeness-gate "$TMP_ROOT/controlled_runtime_calibration_human_resolution_completeness_gate.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_reexecution_readiness_after_human_resolution_report.current.json" \
+  --skip-create-db
+
 run git status --short

@@ -4612,3 +4612,61 @@ The BP71 record preserves candidate option inventory for review only. It does no
 signoff, infer a selected candidate from discovery or validation success, infer human resolution,
 rerun the final gate, execute runtime application, write runtime config, create production config,
 modify model weights, or replace baselines.
+
+## Controlled Runtime Calibration Human Resolution Completeness Gate
+
+Use this after the BP71 explicit human resolution record exists. The BP72 gate evaluates whether
+the record is complete enough for a future final-gate rerun. The default committed artifact remains
+not ready because no real operator or selected-candidate inputs have been supplied.
+
+Build and validate the frozen gate:
+
+```bash
+make tom-v1-export-controlled-runtime-calibration-human-resolution-completeness-gate-contract \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-human-resolution-completeness-gate-inputs \
+  PYTHON=.venv/bin/python
+make tom-v1-validate-controlled-runtime-calibration-human-resolution-completeness-gate-inputs \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-human-resolution-completeness-gate \
+  PYTHON=.venv/bin/python
+make tom-v1-validate-controlled-runtime-calibration-human-resolution-completeness-gate \
+  PYTHON=.venv/bin/python
+```
+
+Build generated follow-up views:
+
+```bash
+make tom-v1-build-controlled-runtime-calibration-human-resolution-missing-input-matrix \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-operator-input-completeness-report \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-candidate-input-completeness-report \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-final-gate-rerun-readiness-report \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-reexecution-readiness-after-human-resolution-report \
+  PYTHON=.venv/bin/python
+```
+
+Current expected frozen result:
+
+- `human_resolution_completeness_gate_status`: `human_resolution_completeness_gate_not_ready`
+- `human_resolution_record_status`: `human_resolution_record_pending_explicit_inputs`
+- `human_resolution_provided_status`: `human_resolution_not_provided`
+- `human_resolution_completeness_status`: `human_resolution_incomplete`
+- `missing_input_status`: `required_human_inputs_missing`
+- `operator_input_completeness_status`: `operator_inputs_incomplete`
+- `candidate_input_completeness_status`: `candidate_inputs_incomplete`
+- `operator_signoff_status`: `operator_signoff_required`
+- `selected_candidate_status`: `selected_candidate_required`
+- `final_gate_rerun_readiness_status`: `final_gate_rerun_not_ready_missing_human_resolution`
+- `reexecution_readiness_status`: `reexecution_not_ready_blockers_unresolved`
+- `runtime_application_status`: `not_executed`
+- `runtime_config_changed`: false
+- `mutation_status`: `no_runtime_mutation_due_to_blocker`
+
+The BP72 gate preserves candidate option inventory for review only. It does not create operator
+signoff, infer a selected candidate from discovery or validation success, infer human resolution,
+rerun the final gate, execute runtime application, write runtime config, create production config,
+modify model weights, or replace baselines.

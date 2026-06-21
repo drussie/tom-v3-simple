@@ -464,6 +464,12 @@ TOM v3 Simple does not include:
   option, rerun the final gate, perform runtime application, write runtime config, create
   production config, modify model weights, replace baselines, claim production readiness, or decide
   tennis truth.
+- Controlled runtime calibration human resolution completeness gates remain not ready until the
+  BP71 record contains real operator signoff material and real selected candidate material. The
+  BP72 gate evaluates completeness only; it does not satisfy those requirements by itself, infer a
+  selection from the single discovered candidate option, rerun the final gate, perform runtime
+  application, write runtime config, create production config, modify model weights, replace
+  baselines, claim production readiness, or decide tennis truth.
 
 ## Boundary
 

@@ -9,20 +9,21 @@
 
 ## Immediate Next Regular Blueprint
 
-After Blueprint 71:
+After Blueprint 72:
 
-- Resolve the BP71 next-action recommendations before any future runtime application retry:
-  `provide_human_resolution_inputs`, `provide_operator_inputs`,
-  `provide_selected_candidate_inputs`, `provide_operator_signoff_and_selected_candidate`, and
+- Resolve the BP72 next-action recommendations before any future runtime application retry:
+  `provide_operator_inputs`, `provide_selected_candidate_inputs`,
+  `provide_operator_signoff_and_selected_candidate`, and
   `rerun_final_gate_after_human_resolution`.
 - Provide real operator signoff with operator identity/reference, timestamp, attestation text, and
   explicit scope acknowledgement.
 - Provide explicit selected candidate context that references a frozen candidate config or
   controlled candidate artifact and includes selection provenance.
-- Rerun the BP61 final gate only after real operator signoff material and selected candidate
-  context exist.
-- Keep future runtime application blocked while BP61/BP62/BP64/BP65/BP66/BP67/BP68/BP69/BP70/BP71
-  report the current safe blocked state.
+- Rerun the BP72 human resolution completeness gate after real operator signoff material and
+  selected candidate context exist.
+- Rerun the BP61 final gate only after BP72 reports readiness for a future final-gate rerun.
+- Keep future runtime application blocked while the BP61/BP62/BP64/BP65/BP66/BP67/BP68/BP69/BP70/BP71/BP72
+  chain reports the current safe blocked state.
 
 ## Open Follow-Ups
 

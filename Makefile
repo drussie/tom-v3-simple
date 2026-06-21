@@ -627,6 +627,18 @@ CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_RECORD_COMPLETENESS_REPORT_OUTPU
 CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_RECORD_MISSING_INPUT_REPORT_OUTPUT ?= .data/exports/controlled_runtime_calibration_human_resolution_record_missing_input_report.current.json
 CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_RECORD_FINAL_GATE_READINESS_REPORT_OUTPUT ?= .data/exports/controlled_runtime_calibration_human_resolution_record_final_gate_readiness_report.current.json
 CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_RECORD_REEXECUTION_READINESS_REPORT_OUTPUT ?= .data/exports/controlled_runtime_calibration_human_resolution_record_reexecution_readiness_report.current.json
+CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_CONTRACT_OUTPUT ?= .data/contracts/controlled_runtime_calibration_human_resolution_completeness_gate_contract_v1.json
+CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_INPUTS_OUTPUT ?= .data/exports/controlled_runtime_calibration_human_resolution_completeness_gate_inputs.current.json
+CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_INPUTS ?= $(CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_INPUTS_OUTPUT)
+CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_INPUTS_VALIDATION_OUTPUT ?= .data/exports/controlled_runtime_calibration_human_resolution_completeness_gate_inputs.validation.json
+CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_OUTPUT ?= .data/contracts/controlled_runtime_calibration_human_resolution_completeness_gate_v1.json
+CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE ?= $(CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_OUTPUT)
+CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_VALIDATION_OUTPUT ?= .data/exports/controlled_runtime_calibration_human_resolution_completeness_gate.validation.json
+CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_MISSING_INPUT_MATRIX_OUTPUT ?= .data/exports/controlled_runtime_calibration_human_resolution_missing_input_matrix.current.json
+CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_INPUT_COMPLETENESS_REPORT_OUTPUT ?= .data/exports/controlled_runtime_calibration_operator_input_completeness_report.current.json
+CONTROLLED_RUNTIME_CALIBRATION_CANDIDATE_INPUT_COMPLETENESS_REPORT_OUTPUT ?= .data/exports/controlled_runtime_calibration_candidate_input_completeness_report.current.json
+CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_READINESS_REPORT_OUTPUT ?= .data/exports/controlled_runtime_calibration_final_gate_rerun_readiness_report.current.json
+CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_READINESS_AFTER_HUMAN_RESOLUTION_REPORT_OUTPUT ?= .data/exports/controlled_runtime_calibration_reexecution_readiness_after_human_resolution_report.current.json
 CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_SOURCE_RESOLUTION_PACKET ?= $(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_OUTPUT)
 CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_SOURCE_RESOLUTION_PACKET_CONTRACT ?= $(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_CONTRACT_OUTPUT)
 CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_SOURCE_CANDIDATE_CONFIG_FREEZE ?= $(CALIBRATION_CANDIDATE_CONFIG_FREEZE_ARTIFACT_OUTPUT)
@@ -646,6 +658,8 @@ CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_PROVIDED_SOURCE_INPUT_PACKET ?= 
 CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_PROVIDED_SOURCE_INPUT_PACKET_CONTRACT ?= $(CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_INPUT_PACKET_CONTRACT_OUTPUT)
 CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_HUMAN_RESOLUTION_RECORD_SOURCE_PROVIDED_PACKET ?= $(CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_PROVIDED_PACKET_OUTPUT)
 CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_HUMAN_RESOLUTION_RECORD_SOURCE_PROVIDED_PACKET_CONTRACT ?= $(CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_PROVIDED_PACKET_CONTRACT_OUTPUT)
+CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_SOURCE_RECORD ?= $(CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_HUMAN_RESOLUTION_RECORD_OUTPUT)
+CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_SOURCE_RECORD_CONTRACT ?= $(CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_HUMAN_RESOLUTION_RECORD_CONTRACT_OUTPUT)
 CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_REF ?=
 CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ID ?=
 CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_VERSION ?=
@@ -797,6 +811,7 @@ export TOM_V3_DATABASE_URL
 .PHONY: tom-v1-export-controlled-runtime-calibration-human-resolution-input-packet-contract tom-v1-build-controlled-runtime-calibration-human-resolution-input-packet-inputs tom-v1-validate-controlled-runtime-calibration-human-resolution-input-packet-inputs tom-v1-build-controlled-runtime-calibration-human-resolution-input-packet tom-v1-validate-controlled-runtime-calibration-human-resolution-input-packet tom-v1-build-controlled-runtime-calibration-human-resolution-requirements-report tom-v1-build-controlled-runtime-calibration-human-resolution-input-template tom-v1-build-controlled-runtime-calibration-human-resolution-readiness-report tom-v1-build-controlled-runtime-calibration-final-gate-rerun-prerequisite-report
 .PHONY: tom-v1-export-controlled-runtime-calibration-human-resolution-provided-packet-contract tom-v1-build-controlled-runtime-calibration-human-resolution-provided-packet-inputs tom-v1-validate-controlled-runtime-calibration-human-resolution-provided-packet-inputs tom-v1-build-controlled-runtime-calibration-human-resolution-provided-packet tom-v1-validate-controlled-runtime-calibration-human-resolution-provided-packet tom-v1-build-controlled-runtime-calibration-human-resolution-missing-input-report tom-v1-build-controlled-runtime-calibration-human-resolution-completeness-report tom-v1-build-controlled-runtime-calibration-human-resolution-final-gate-readiness-report tom-v1-build-controlled-runtime-calibration-human-resolution-reexecution-readiness-report
 .PHONY: tom-v1-export-controlled-runtime-calibration-explicit-human-resolution-record-contract tom-v1-build-controlled-runtime-calibration-explicit-human-resolution-record-inputs tom-v1-validate-controlled-runtime-calibration-explicit-human-resolution-record-inputs tom-v1-build-controlled-runtime-calibration-explicit-human-resolution-record tom-v1-validate-controlled-runtime-calibration-explicit-human-resolution-record tom-v1-build-controlled-runtime-calibration-human-resolution-record-completeness-report tom-v1-build-controlled-runtime-calibration-human-resolution-record-missing-input-report tom-v1-build-controlled-runtime-calibration-human-resolution-record-final-gate-readiness-report tom-v1-build-controlled-runtime-calibration-human-resolution-record-reexecution-readiness-report
+.PHONY: tom-v1-export-controlled-runtime-calibration-human-resolution-completeness-gate-contract tom-v1-build-controlled-runtime-calibration-human-resolution-completeness-gate-inputs tom-v1-validate-controlled-runtime-calibration-human-resolution-completeness-gate-inputs tom-v1-build-controlled-runtime-calibration-human-resolution-completeness-gate tom-v1-validate-controlled-runtime-calibration-human-resolution-completeness-gate tom-v1-build-controlled-runtime-calibration-human-resolution-missing-input-matrix tom-v1-build-controlled-runtime-calibration-operator-input-completeness-report tom-v1-build-controlled-runtime-calibration-candidate-input-completeness-report tom-v1-build-controlled-runtime-calibration-final-gate-rerun-readiness-report tom-v1-build-controlled-runtime-calibration-reexecution-readiness-after-human-resolution-report
 
 install:
 	$(PYTHON) -m pip install -e ".[dev]"
@@ -1909,6 +1924,36 @@ tom-v1-build-controlled-runtime-calibration-human-resolution-record-final-gate-r
 
 tom-v1-build-controlled-runtime-calibration-human-resolution-record-reexecution-readiness-report:
 	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-human-resolution-record-reexecution-readiness-report --contract "$(CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_HUMAN_RESOLUTION_RECORD_CONTRACT_OUTPUT)" --human-resolution-record "$(CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_HUMAN_RESOLUTION_RECORD)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_RECORD_REEXECUTION_READINESS_REPORT_OUTPUT)" --skip-create-db
+
+tom-v1-export-controlled-runtime-calibration-human-resolution-completeness-gate-contract:
+	$(PYTHON) -m apps.worker.cli export-controlled-runtime-calibration-human-resolution-completeness-gate-contract --output "$(CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_CONTRACT_OUTPUT)" --skip-create-db
+
+tom-v1-build-controlled-runtime-calibration-human-resolution-completeness-gate-inputs:
+	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-human-resolution-completeness-gate-inputs --contract "$(CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_CONTRACT_OUTPUT)" --source-explicit-human-resolution-record "$(CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_SOURCE_RECORD)" --source-explicit-human-resolution-record-contract "$(CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_SOURCE_RECORD_CONTRACT)" --model-asset-path "$(GAMEPLAY_CLASSIFIER_ASSET_PATH)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_INPUTS_OUTPUT)" --skip-create-db
+
+tom-v1-validate-controlled-runtime-calibration-human-resolution-completeness-gate-inputs:
+	$(PYTHON) -m apps.worker.cli validate-controlled-runtime-calibration-human-resolution-completeness-gate-inputs --contract "$(CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_CONTRACT_OUTPUT)" --completeness-gate-inputs "$(CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_INPUTS)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_INPUTS_VALIDATION_OUTPUT)" --skip-create-db
+
+tom-v1-build-controlled-runtime-calibration-human-resolution-completeness-gate:
+	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-human-resolution-completeness-gate --contract "$(CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_CONTRACT_OUTPUT)" --completeness-gate-inputs "$(CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_INPUTS)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_OUTPUT)" --skip-create-db
+
+tom-v1-validate-controlled-runtime-calibration-human-resolution-completeness-gate:
+	$(PYTHON) -m apps.worker.cli validate-controlled-runtime-calibration-human-resolution-completeness-gate --contract "$(CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_CONTRACT_OUTPUT)" --human-resolution-completeness-gate "$(CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_VALIDATION_OUTPUT)" --skip-create-db
+
+tom-v1-build-controlled-runtime-calibration-human-resolution-missing-input-matrix:
+	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-human-resolution-missing-input-matrix --contract "$(CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_CONTRACT_OUTPUT)" --human-resolution-completeness-gate "$(CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_MISSING_INPUT_MATRIX_OUTPUT)" --skip-create-db
+
+tom-v1-build-controlled-runtime-calibration-operator-input-completeness-report:
+	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-operator-input-completeness-report --contract "$(CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_CONTRACT_OUTPUT)" --human-resolution-completeness-gate "$(CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_INPUT_COMPLETENESS_REPORT_OUTPUT)" --skip-create-db
+
+tom-v1-build-controlled-runtime-calibration-candidate-input-completeness-report:
+	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-candidate-input-completeness-report --contract "$(CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_CONTRACT_OUTPUT)" --human-resolution-completeness-gate "$(CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_CANDIDATE_INPUT_COMPLETENESS_REPORT_OUTPUT)" --skip-create-db
+
+tom-v1-build-controlled-runtime-calibration-final-gate-rerun-readiness-report:
+	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-final-gate-rerun-readiness-report --contract "$(CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_CONTRACT_OUTPUT)" --human-resolution-completeness-gate "$(CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_READINESS_REPORT_OUTPUT)" --skip-create-db
+
+tom-v1-build-controlled-runtime-calibration-reexecution-readiness-after-human-resolution-report:
+	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-reexecution-readiness-after-human-resolution-report --contract "$(CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_CONTRACT_OUTPUT)" --human-resolution-completeness-gate "$(CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_READINESS_AFTER_HUMAN_RESOLUTION_REPORT_OUTPUT)" --skip-create-db
 
 tom-v1-post-codex-validate:
 	scripts/post_codex_validate.sh $(if $(EXPECTED_BRANCH),--branch "$(EXPECTED_BRANCH)",) $(if $(EXPECTED_TAG),--expected-tag "$(EXPECTED_TAG)",) --python "$(PYTHON)"

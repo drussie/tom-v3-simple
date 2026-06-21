@@ -4789,3 +4789,28 @@ The committed record stores `human_resolution_record_pending_explicit_inputs`,
 `final_gate_rerun_not_ready_missing_human_resolution`,
 `reexecution_not_ready_blockers_unresolved`, `runtime_application_status: not_executed`,
 `runtime_config_changed: false`, and `no_runtime_mutation_due_to_blocker`.
+
+## Blueprint 72 Controlled Runtime Calibration Human Resolution Completeness Gate v1
+
+Status: complete
+
+### Goal
+
+Create a completeness gate over the BP71 explicit human resolution record that determines whether a
+future final-gate rerun may be prepared.
+
+### Notes
+
+This milestone adds:
+
+- `apps.worker.services.controlled_runtime_calibration_human_resolution_completeness_gate`
+- CLI commands and Make targets for the BP72 contract/input/gate/report chain
+- post-Codex validator coverage
+- tracked BP72 contract and frozen gate artifacts
+- focused tests for default pending state, missing record blocking, and future explicit readiness
+
+The committed gate records `human_resolution_completeness_gate_not_ready`,
+`human_resolution_incomplete`, `required_human_inputs_missing`, `operator_inputs_incomplete`,
+`candidate_inputs_incomplete`, `final_gate_rerun_not_ready_missing_human_resolution`,
+`reexecution_not_ready_blockers_unresolved`, `runtime_application_status: not_executed`,
+`runtime_config_changed: false`, and `no_runtime_mutation_due_to_blocker`.

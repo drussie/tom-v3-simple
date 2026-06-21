@@ -276,6 +276,28 @@ from apps.worker.services.controlled_runtime_calibration_human_approval_gate imp
     validate_controlled_runtime_calibration_human_approval_gate,
     validate_controlled_runtime_calibration_human_approval_gate_inputs,
 )
+from apps.worker.services.controlled_runtime_calibration_human_resolution_completeness_gate import (  # noqa: E501
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_CANDIDATE_INPUT_COMPLETENESS_REPORT_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_READINESS_REPORT_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_CONTRACT_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_INPUTS_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_INPUTS_VALIDATION_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_VALIDATION_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_MISSING_INPUT_MATRIX_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_INPUT_COMPLETENESS_REPORT_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_READINESS_AFTER_HUMAN_RESOLUTION_REPORT_OUTPUT,
+    build_controlled_runtime_calibration_candidate_input_completeness_report,
+    build_controlled_runtime_calibration_final_gate_rerun_readiness_report,
+    build_controlled_runtime_calibration_human_resolution_completeness_gate,
+    build_controlled_runtime_calibration_human_resolution_completeness_gate_inputs,
+    build_controlled_runtime_calibration_human_resolution_missing_input_matrix,
+    build_controlled_runtime_calibration_operator_input_completeness_report,
+    build_controlled_runtime_calibration_reexecution_readiness_after_human_resolution_report,
+    export_controlled_runtime_calibration_human_resolution_completeness_gate_contract,
+    validate_controlled_runtime_calibration_human_resolution_completeness_gate,
+    validate_controlled_runtime_calibration_human_resolution_completeness_gate_inputs,
+)
 from apps.worker.services.controlled_runtime_calibration_human_resolution_input_packet import (  # noqa: E501
     DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_PREREQUISITE_REPORT_OUTPUT,
     DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_INPUT_PACKET_CONTRACT_OUTPUT,
@@ -10769,6 +10791,321 @@ def main() -> None:
         skip_create_db=True,
     )
 
+    human_resolution_completeness_gate_contract_parser = subcommands.add_parser(
+        "export-controlled-runtime-calibration-human-resolution-completeness-gate-contract",
+        help="Export the Blueprint 72 human resolution completeness gate contract.",
+    )
+    human_resolution_completeness_gate_contract_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_CONTRACT_OUTPUT
+        ),
+        help="JSON Blueprint 72 human resolution completeness gate contract path.",
+    )
+    human_resolution_completeness_gate_contract_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    human_resolution_completeness_gate_contract_parser.set_defaults(
+        handler=(
+            _handle_export_controlled_runtime_calibration_human_resolution_completeness_gate_contract
+        ),
+        skip_create_db=True,
+    )
+
+    human_resolution_completeness_gate_inputs_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-human-resolution-completeness-gate-inputs",
+        help="Build Blueprint 72 human resolution completeness gate inputs.",
+    )
+    human_resolution_completeness_gate_inputs_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 72 human resolution completeness gate contract path.",
+    )
+    human_resolution_completeness_gate_inputs_parser.add_argument(
+        "--source-explicit-human-resolution-record",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_HUMAN_RESOLUTION_RECORD_OUTPUT,
+        help="Blueprint 71 explicit human resolution record path.",
+    )
+    human_resolution_completeness_gate_inputs_parser.add_argument(
+        "--source-explicit-human-resolution-record-contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_HUMAN_RESOLUTION_RECORD_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 71 explicit human resolution record contract path.",
+    )
+    human_resolution_completeness_gate_inputs_parser.add_argument(
+        "--model-asset-path",
+        default=DEFAULT_GAMEPLAY_CLASSIFIER_ASSET_PATH,
+        help="Read-only local TOM v1 gameplay classifier asset path.",
+    )
+    human_resolution_completeness_gate_inputs_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_INPUTS_OUTPUT
+        ),
+        help="JSON Blueprint 72 human resolution completeness gate inputs path.",
+    )
+    human_resolution_completeness_gate_inputs_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    human_resolution_completeness_gate_inputs_parser.set_defaults(
+        handler=(
+            _handle_build_controlled_runtime_calibration_human_resolution_completeness_gate_inputs
+        ),
+        skip_create_db=True,
+    )
+
+    human_resolution_completeness_gate_inputs_validate_parser = subcommands.add_parser(
+        "validate-controlled-runtime-calibration-human-resolution-completeness-gate-inputs",
+        help="Validate Blueprint 72 human resolution completeness gate inputs.",
+    )
+    human_resolution_completeness_gate_inputs_validate_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 72 human resolution completeness gate contract path.",
+    )
+    human_resolution_completeness_gate_inputs_validate_parser.add_argument(
+        "--completeness-gate-inputs",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_INPUTS_OUTPUT
+        ),
+        help="Blueprint 72 human resolution completeness gate inputs path.",
+    )
+    human_resolution_completeness_gate_inputs_validate_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_INPUTS_VALIDATION_OUTPUT
+        ),
+        help="Optional Blueprint 72 inputs validation path.",
+    )
+    human_resolution_completeness_gate_inputs_validate_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    human_resolution_completeness_gate_inputs_validate_parser.set_defaults(
+        handler=(
+            _handle_validate_controlled_runtime_calibration_human_resolution_completeness_gate_inputs
+        ),
+        skip_create_db=True,
+    )
+
+    human_resolution_completeness_gate_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-human-resolution-completeness-gate",
+        help="Build the Blueprint 72 human resolution completeness gate artifact.",
+    )
+    human_resolution_completeness_gate_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 72 human resolution completeness gate contract path.",
+    )
+    human_resolution_completeness_gate_parser.add_argument(
+        "--completeness-gate-inputs",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_INPUTS_OUTPUT
+        ),
+        help="Blueprint 72 human resolution completeness gate inputs path.",
+    )
+    human_resolution_completeness_gate_parser.add_argument(
+        "--output",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_OUTPUT,
+        help="JSON Blueprint 72 human resolution completeness gate path.",
+    )
+    human_resolution_completeness_gate_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    human_resolution_completeness_gate_parser.set_defaults(
+        handler=_handle_build_controlled_runtime_calibration_human_resolution_completeness_gate,
+        skip_create_db=True,
+    )
+
+    human_resolution_completeness_gate_validate_parser = subcommands.add_parser(
+        "validate-controlled-runtime-calibration-human-resolution-completeness-gate",
+        help="Validate the Blueprint 72 human resolution completeness gate artifact.",
+    )
+    human_resolution_completeness_gate_validate_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 72 human resolution completeness gate contract path.",
+    )
+    human_resolution_completeness_gate_validate_parser.add_argument(
+        "--human-resolution-completeness-gate",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_OUTPUT,
+        help="Blueprint 72 human resolution completeness gate path.",
+    )
+    human_resolution_completeness_gate_validate_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_VALIDATION_OUTPUT
+        ),
+        help="Optional Blueprint 72 gate validation path.",
+    )
+    human_resolution_completeness_gate_validate_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    human_resolution_completeness_gate_validate_parser.set_defaults(
+        handler=_handle_validate_controlled_runtime_calibration_human_resolution_completeness_gate,
+        skip_create_db=True,
+    )
+
+    human_resolution_missing_input_matrix_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-human-resolution-missing-input-matrix",
+        help="Build the Blueprint 72 human resolution missing-input matrix.",
+    )
+    human_resolution_missing_input_matrix_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 72 human resolution completeness gate contract path.",
+    )
+    human_resolution_missing_input_matrix_parser.add_argument(
+        "--human-resolution-completeness-gate",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_OUTPUT,
+        help="Blueprint 72 human resolution completeness gate path.",
+    )
+    human_resolution_missing_input_matrix_parser.add_argument(
+        "--output",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_MISSING_INPUT_MATRIX_OUTPUT,
+        help="JSON Blueprint 72 missing-input matrix path.",
+    )
+    human_resolution_missing_input_matrix_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    human_resolution_missing_input_matrix_parser.set_defaults(
+        handler=(
+            _handle_build_controlled_runtime_calibration_human_resolution_missing_input_matrix
+        ),
+        skip_create_db=True,
+    )
+
+    operator_input_completeness_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-operator-input-completeness-report",
+        help="Build the Blueprint 72 operator input completeness report.",
+    )
+    operator_input_completeness_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 72 human resolution completeness gate contract path.",
+    )
+    operator_input_completeness_parser.add_argument(
+        "--human-resolution-completeness-gate",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_OUTPUT,
+        help="Blueprint 72 human resolution completeness gate path.",
+    )
+    operator_input_completeness_parser.add_argument(
+        "--output",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_INPUT_COMPLETENESS_REPORT_OUTPUT,
+        help="JSON Blueprint 72 operator input completeness report path.",
+    )
+    operator_input_completeness_parser.add_argument("--skip-create-db", action="store_true")
+    operator_input_completeness_parser.set_defaults(
+        handler=_handle_build_controlled_runtime_calibration_operator_input_completeness_report,
+        skip_create_db=True,
+    )
+
+    candidate_input_completeness_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-candidate-input-completeness-report",
+        help="Build the Blueprint 72 candidate input completeness report.",
+    )
+    candidate_input_completeness_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 72 human resolution completeness gate contract path.",
+    )
+    candidate_input_completeness_parser.add_argument(
+        "--human-resolution-completeness-gate",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_OUTPUT,
+        help="Blueprint 72 human resolution completeness gate path.",
+    )
+    candidate_input_completeness_parser.add_argument(
+        "--output",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_CANDIDATE_INPUT_COMPLETENESS_REPORT_OUTPUT,
+        help="JSON Blueprint 72 candidate input completeness report path.",
+    )
+    candidate_input_completeness_parser.add_argument("--skip-create-db", action="store_true")
+    candidate_input_completeness_parser.set_defaults(
+        handler=_handle_build_controlled_runtime_calibration_candidate_input_completeness_report,
+        skip_create_db=True,
+    )
+
+    final_gate_rerun_readiness_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-final-gate-rerun-readiness-report",
+        help="Build the Blueprint 72 final-gate rerun readiness report.",
+    )
+    final_gate_rerun_readiness_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 72 human resolution completeness gate contract path.",
+    )
+    final_gate_rerun_readiness_parser.add_argument(
+        "--human-resolution-completeness-gate",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_OUTPUT,
+        help="Blueprint 72 human resolution completeness gate path.",
+    )
+    final_gate_rerun_readiness_parser.add_argument(
+        "--output",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_READINESS_REPORT_OUTPUT,
+        help="JSON Blueprint 72 final-gate rerun readiness report path.",
+    )
+    final_gate_rerun_readiness_parser.add_argument("--skip-create-db", action="store_true")
+    final_gate_rerun_readiness_parser.set_defaults(
+        handler=_handle_build_controlled_runtime_calibration_final_gate_rerun_readiness_report,
+        skip_create_db=True,
+    )
+
+    reexecution_readiness_after_human_resolution_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-reexecution-readiness-after-human-resolution-report",
+        help="Build the Blueprint 72 reexecution readiness after human resolution report.",
+    )
+    reexecution_readiness_after_human_resolution_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 72 human resolution completeness gate contract path.",
+    )
+    reexecution_readiness_after_human_resolution_parser.add_argument(
+        "--human-resolution-completeness-gate",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_OUTPUT,
+        help="Blueprint 72 human resolution completeness gate path.",
+    )
+    reexecution_readiness_after_human_resolution_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_READINESS_AFTER_HUMAN_RESOLUTION_REPORT_OUTPUT
+        ),
+        help="JSON Blueprint 72 reexecution readiness report path.",
+    )
+    reexecution_readiness_after_human_resolution_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    reexecution_readiness_after_human_resolution_parser.set_defaults(
+        handler=(
+            _handle_build_controlled_runtime_calibration_reexecution_readiness_after_human_resolution_report
+        ),
+        skip_create_db=True,
+    )
+
     point_evaluation_parser = subcommands.add_parser(
         "evaluate-point-candidates",
         help="Evaluate generated point candidate markers using operator review metadata.",
@@ -15635,6 +15972,132 @@ def _handle_build_controlled_runtime_calibration_human_resolution_record_reexecu
         build_controlled_runtime_calibration_human_resolution_record_reexecution_readiness_report(
             contract_path=args.contract,
             human_resolution_record_path=args.human_resolution_record,
+            output_path=args.output,
+        )
+    )
+
+
+def _handle_export_controlled_runtime_calibration_human_resolution_completeness_gate_contract(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return export_controlled_runtime_calibration_human_resolution_completeness_gate_contract(
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_human_resolution_completeness_gate_inputs(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_human_resolution_completeness_gate_inputs(
+        contract_path=args.contract,
+        source_explicit_human_resolution_record_path=(
+            args.source_explicit_human_resolution_record
+        ),
+        source_explicit_human_resolution_record_contract_path=(
+            args.source_explicit_human_resolution_record_contract
+        ),
+        model_asset_path=args.model_asset_path,
+        output_path=args.output,
+    )
+
+
+def _handle_validate_controlled_runtime_calibration_human_resolution_completeness_gate_inputs(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_controlled_runtime_calibration_human_resolution_completeness_gate_inputs(
+        contract_path=args.contract,
+        completeness_gate_inputs_path=args.completeness_gate_inputs,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_human_resolution_completeness_gate(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_human_resolution_completeness_gate(
+        contract_path=args.contract,
+        completeness_gate_inputs_path=args.completeness_gate_inputs,
+        output_path=args.output,
+    )
+
+
+def _handle_validate_controlled_runtime_calibration_human_resolution_completeness_gate(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_controlled_runtime_calibration_human_resolution_completeness_gate(
+        contract_path=args.contract,
+        human_resolution_completeness_gate_path=args.human_resolution_completeness_gate,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_human_resolution_missing_input_matrix(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_human_resolution_missing_input_matrix(
+        contract_path=args.contract,
+        human_resolution_completeness_gate_path=args.human_resolution_completeness_gate,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_operator_input_completeness_report(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_operator_input_completeness_report(
+        contract_path=args.contract,
+        human_resolution_completeness_gate_path=args.human_resolution_completeness_gate,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_candidate_input_completeness_report(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_candidate_input_completeness_report(
+        contract_path=args.contract,
+        human_resolution_completeness_gate_path=args.human_resolution_completeness_gate,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_final_gate_rerun_readiness_report(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_final_gate_rerun_readiness_report(
+        contract_path=args.contract,
+        human_resolution_completeness_gate_path=args.human_resolution_completeness_gate,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_reexecution_readiness_after_human_resolution_report(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return (
+        build_controlled_runtime_calibration_reexecution_readiness_after_human_resolution_report(
+            contract_path=args.contract,
+            human_resolution_completeness_gate_path=args.human_resolution_completeness_gate,
             output_path=args.output,
         )
     )

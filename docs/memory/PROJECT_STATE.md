@@ -33,6 +33,7 @@ video/media
 -> controlled runtime calibration human resolution input packet state
 -> controlled runtime calibration human resolution provided packet state
 -> controlled runtime calibration explicit human resolution record state
+-> controlled runtime calibration human resolution completeness gate state
 ```
 
 The current principle is to expand safely from reviewed sample evidence toward broader replay,
@@ -47,44 +48,50 @@ mutation system. Runtime changes must remain explicitly governed.
 - BP1-37: TOM v3 evidence, replay, review, and 3D foundation.
 - BP38-45: Gameplay gate pathway.
 - BP46-54: Real broadcast gameplay review and calibration decision phase.
-- BP55-71: Controlled runtime calibration governance through explicit human resolution record
+- BP55-72: Controlled runtime calibration governance through human resolution completeness gate
   state.
 
 ## Latest Completed Milestone
 
-Blueprint 71 - Controlled Runtime Calibration Explicit Human Resolution Record v1
+Blueprint 72 - Controlled Runtime Calibration Human Resolution Completeness Gate v1
 
 Status: Complete.
 
-Commit: recorded by the Blueprint 71 commit.
+Commit: recorded by the Blueprint 72 commit.
 
 Tag:
-`tom-v3-blueprint-71-controlled-runtime-calibration-explicit-human-resolution-record-v1`
+`tom-v3-blueprint-72-controlled-runtime-calibration-human-resolution-completeness-gate-v1`
 
 Implemented:
 
-- Controlled runtime calibration explicit human resolution record service.
+- Controlled runtime calibration human resolution completeness gate service.
 - CLI commands and Make targets.
 - Focused tests.
 - Docs, runbook, status, and report updates.
 - Post-Codex validator updates.
-- Tracked BP71 contract artifacts:
-  - `.data/contracts/controlled_runtime_calibration_explicit_human_resolution_record_contract_v1.json`
-  - `.data/contracts/controlled_runtime_calibration_explicit_human_resolution_record_v1.json`
+- Tracked BP72 contract artifacts:
+  - `.data/contracts/controlled_runtime_calibration_human_resolution_completeness_gate_contract_v1.json`
+  - `.data/contracts/controlled_runtime_calibration_human_resolution_completeness_gate_v1.json`
 
 Runtime result:
 
-- The committed frozen BP71 record correctly represents the pending explicit human resolution state
-  after BP70, BP69, BP68, BP67, and BP66.
+- The committed frozen BP72 gate correctly represents the incomplete human resolution state after
+  BP71, BP70, BP69, BP68, BP67, and BP66.
 - There is still no real operator signoff or selected candidate in the frozen path.
-- BP71 preserves one discovered candidate option as inventory only and does not select from it.
-- BP71 records missing human inputs, human resolution completeness, final-gate readiness, and
-  reexecution readiness.
+- BP72 preserves one discovered candidate option as inventory only and does not select from it.
+- BP72 records missing human inputs, operator completeness, candidate completeness, final-gate
+  readiness, and reexecution readiness.
 - Runtime target stayed unchanged before and after.
 - Runtime target SHA before and after:
   `8052301c40dee448f858a3a7c64ae7805d3e7839fbbe35305044e1775f0f8fd0`
+- Human resolution completeness gate status:
+  `human_resolution_completeness_gate_not_ready`
 - Human resolution record status: `human_resolution_record_pending_explicit_inputs`
 - Human resolution provided status: `human_resolution_not_provided`
+- Human resolution completeness status: `human_resolution_incomplete`
+- Missing input status: `required_human_inputs_missing`
+- Operator input completeness status: `operator_inputs_incomplete`
+- Candidate input completeness status: `candidate_inputs_incomplete`
 - Operator signoff status: `operator_signoff_required`
 - Operator attestation status: `operator_attestation_required`
 - Operator identity status: `operator_identity_required`
@@ -92,22 +99,20 @@ Runtime result:
 - Selected candidate status: `selected_candidate_required`
 - Candidate selection validation status: `candidate_selection_pending_explicit_input`
 - Candidate option count: 1
-- Human resolution completeness status: `human_resolution_incomplete`
-- Missing input status: `required_human_inputs_missing`
 - Final gate rerun status: `final_gate_rerun_required`
 - Final gate rerun readiness status: `final_gate_rerun_not_ready_missing_human_resolution`
 - Reexecution readiness status: `reexecution_not_ready_blockers_unresolved`
 - Runtime application status: `not_executed`
 - Next action recommendations:
-  `provide_human_resolution_inputs`, `provide_operator_inputs`,
-  `provide_selected_candidate_inputs`, `provide_operator_signoff_and_selected_candidate`, and
-  `rerun_final_gate_after_human_resolution`
+  `provide_operator_inputs`, `provide_selected_candidate_inputs`,
+  `provide_operator_signoff_and_selected_candidate`, and `rerun_final_gate_after_human_resolution`
 
-Explicit human resolution record test coverage:
+Human resolution completeness gate test coverage:
 
-- Current BP70/BP69/BP68/BP67/BP66 pending human resolution record path.
-- Missing-input, completeness, final-gate readiness, and reexecution readiness report generation.
-- Invalid partial human-resolution input rejection.
+- Current BP71/BP70/BP69/BP68/BP67/BP66 pending completeness gate path.
+- Missing-input matrix, operator completeness, candidate completeness, final-gate readiness, and
+  reexecution readiness report generation.
+- Missing BP71 record blocking.
 - Future explicit-input readiness without runtime mutation.
 
 ## Controlled Calibration Chain
@@ -129,13 +134,14 @@ Explicit human resolution record test coverage:
 - BP69 - Controlled Runtime Calibration Human Resolution Input Packet
 - BP70 - Controlled Runtime Calibration Human Resolution Provided Packet
 - BP71 - Controlled Runtime Calibration Explicit Human Resolution Record
+- BP72 - Controlled Runtime Calibration Human Resolution Completeness Gate
 
 ## Next Regular Action
 
 Provide real operator signoff identity, timestamp, attestation, scope acknowledgement, and an
-explicit selected candidate ref with provenance, then rerun the BP61 final gate in a future
-blueprint. Do not attempt runtime application while the
-BP61/BP62/BP64/BP65/BP66/BP67/BP68/BP69/BP70/BP71 chain remains blocked.
+explicit selected candidate ref with provenance, then rerun the BP72 completeness gate and the BP61
+final gate in a future blueprint. Do not attempt runtime application while the
+BP61/BP62/BP64/BP65/BP66/BP67/BP68/BP69/BP70/BP71/BP72 chain remains blocked.
 
 ## Known Unrelated Working Tree Item
 

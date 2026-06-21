@@ -78,3 +78,10 @@ Reason: BP71 may define a durable record for explicit human resolution fields, b
 record pending until real operator identity, timestamp, attestation, scope acknowledgement, selected
 candidate ref, selected candidate provenance, selection reason, selection timestamp, and operator
 reference are supplied through controlled input fields.
+
+## Decision 15: Human Resolution Completeness Gates Do Not Resolve Missing Inputs
+
+Reason: BP72 may determine whether a BP71 explicit human resolution record is complete enough to
+prepare a future final-gate rerun, but it must keep the gate not ready until real operator signoff
+material and real selected candidate material are supplied. Candidate option discovery, validation
+success, branch state, commits, and tags do not satisfy the completeness gate.
