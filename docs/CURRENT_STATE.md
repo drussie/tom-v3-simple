@@ -836,3 +836,28 @@ Blueprint 69 preserves one discovered candidate option from BP66/BP67/BP68 for r
 not create operator signoff, infer selected candidate status from candidate option discovery or
 validation success, infer human resolution, rerun the final gate, perform runtime application,
 write runtime config, create production config, modify model weights, or replace baselines.
+
+## Blueprint 70 Result
+
+Status: complete.
+
+Blueprint 70 adds the human resolution provided packet mechanism required after BP69. It creates
+tracked artifacts:
+
+```text
+.data/contracts/controlled_runtime_calibration_human_resolution_provided_packet_contract_v1.json
+.data/contracts/controlled_runtime_calibration_human_resolution_provided_packet_v1.json
+```
+
+The frozen packet records `human_resolution_not_provided`, `operator_signoff_required`,
+`operator_attestation_required`, `operator_identity_required`, `operator_timestamp_required`,
+`selected_candidate_required`, `candidate_selection_pending_explicit_input`,
+`human_resolution_incomplete`, `required_human_inputs_missing`, `final_gate_rerun_required`,
+`final_gate_rerun_not_ready_missing_human_resolution`,
+`reexecution_not_ready_blockers_unresolved`, `runtime_application_status: not_executed`,
+`runtime_config_changed: false`, and `no_runtime_mutation_due_to_blocker`.
+
+Blueprint 70 preserves one discovered candidate option from BP66/BP67/BP68/BP69 for review only. It
+does not create operator signoff, infer selected candidate status from candidate option discovery or
+validation success, infer human resolution, rerun the final gate, perform runtime application,
+write runtime config, create production config, modify model weights, or replace baselines.

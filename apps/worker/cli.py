@@ -276,6 +276,26 @@ from apps.worker.services.controlled_runtime_calibration_human_resolution_input_
     validate_controlled_runtime_calibration_human_resolution_input_packet,
     validate_controlled_runtime_calibration_human_resolution_input_packet_inputs,
 )
+from apps.worker.services.controlled_runtime_calibration_human_resolution_provided_packet import (  # noqa: E501
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_REPORT_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_FINAL_GATE_READINESS_REPORT_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_MISSING_INPUT_REPORT_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_PROVIDED_INPUTS_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_PROVIDED_INPUTS_VALIDATION_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_PROVIDED_PACKET_CONTRACT_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_PROVIDED_PACKET_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_PROVIDED_PACKET_VALIDATION_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_REEXECUTION_READINESS_REPORT_OUTPUT,
+    build_controlled_runtime_calibration_human_resolution_completeness_report,
+    build_controlled_runtime_calibration_human_resolution_final_gate_readiness_report,
+    build_controlled_runtime_calibration_human_resolution_missing_input_report,
+    build_controlled_runtime_calibration_human_resolution_provided_packet,
+    build_controlled_runtime_calibration_human_resolution_provided_packet_inputs,
+    build_controlled_runtime_calibration_human_resolution_reexecution_readiness_report,
+    export_controlled_runtime_calibration_human_resolution_provided_packet_contract,
+    validate_controlled_runtime_calibration_human_resolution_provided_packet,
+    validate_controlled_runtime_calibration_human_resolution_provided_packet_inputs,
+)
 from apps.worker.services.controlled_runtime_calibration_operator_signoff_candidate_selection_packet import (  # noqa: E501
     DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_CANDIDATE_SELECTION_OPTIONS_OUTPUT,
     DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_CANDIDATE_SELECTION_VALIDATION_REPORT_OUTPUT,
@@ -10038,6 +10058,364 @@ def main() -> None:
         skip_create_db=True,
     )
 
+    human_resolution_provided_contract_parser = subcommands.add_parser(
+        "export-controlled-runtime-calibration-human-resolution-provided-packet-contract",
+        help="Export the Blueprint 70 human resolution provided packet contract.",
+    )
+    human_resolution_provided_contract_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_PROVIDED_PACKET_CONTRACT_OUTPUT
+        ),
+        help="JSON Blueprint 70 human resolution provided contract path.",
+    )
+    human_resolution_provided_contract_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    human_resolution_provided_contract_parser.set_defaults(
+        handler=(
+            _handle_export_controlled_runtime_calibration_human_resolution_provided_packet_contract
+        ),
+        skip_create_db=True,
+    )
+
+    human_resolution_provided_inputs_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-human-resolution-provided-packet-inputs",
+        help="Build Blueprint 70 human resolution provided input bundle.",
+    )
+    human_resolution_provided_inputs_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_PROVIDED_PACKET_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 70 human resolution provided contract path.",
+    )
+    human_resolution_provided_inputs_parser.add_argument(
+        "--source-human-resolution-input-packet",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_INPUT_PACKET_OUTPUT,
+        help="Blueprint 69 human resolution input packet path.",
+    )
+    human_resolution_provided_inputs_parser.add_argument(
+        "--source-human-resolution-input-packet-contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_INPUT_PACKET_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 69 human resolution input packet contract path.",
+    )
+    human_resolution_provided_inputs_parser.add_argument(
+        "--explicit-operator-identity-ref",
+        help="Optional explicit operator identity or operator reference.",
+    )
+    human_resolution_provided_inputs_parser.add_argument(
+        "--explicit-operator-signoff-timestamp",
+        help="Optional explicit operator signoff timestamp.",
+    )
+    human_resolution_provided_inputs_parser.add_argument(
+        "--explicit-operator-attestation-text",
+        help="Optional explicit operator attestation text.",
+    )
+    human_resolution_provided_inputs_parser.add_argument(
+        "--explicit-operator-scope-acknowledgement",
+        help='Optional explicit scope acknowledgement. Use "acknowledged" when present.',
+    )
+    human_resolution_provided_inputs_parser.add_argument(
+        "--explicit-selected-candidate-ref",
+        help="Optional explicit selected candidate ref. Omit to keep selection pending.",
+    )
+    human_resolution_provided_inputs_parser.add_argument(
+        "--explicit-selected-candidate-id",
+        help="Optional explicit selected candidate id.",
+    )
+    human_resolution_provided_inputs_parser.add_argument(
+        "--explicit-selected-candidate-version",
+        help="Optional explicit selected candidate version.",
+    )
+    human_resolution_provided_inputs_parser.add_argument(
+        "--explicit-selected-candidate-source-path",
+        help="Optional explicit selected candidate source artifact path.",
+    )
+    human_resolution_provided_inputs_parser.add_argument(
+        "--explicit-selected-candidate-selection-reason",
+        help="Optional explicit human selection reason.",
+    )
+    human_resolution_provided_inputs_parser.add_argument(
+        "--explicit-candidate-selection-timestamp",
+        help="Optional explicit candidate selection timestamp.",
+    )
+    human_resolution_provided_inputs_parser.add_argument(
+        "--explicit-operator-reference-for-selection",
+        help="Optional operator reference associated with the selection.",
+    )
+    human_resolution_provided_inputs_parser.add_argument(
+        "--model-asset-path",
+        default=DEFAULT_GAMEPLAY_CLASSIFIER_ASSET_PATH,
+        help="Read-only local TOM v1 gameplay classifier asset path.",
+    )
+    human_resolution_provided_inputs_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_PROVIDED_INPUTS_OUTPUT
+        ),
+        help="JSON Blueprint 70 human resolution provided inputs path.",
+    )
+    human_resolution_provided_inputs_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    human_resolution_provided_inputs_parser.set_defaults(
+        handler=(
+            _handle_build_controlled_runtime_calibration_human_resolution_provided_packet_inputs
+        ),
+        skip_create_db=True,
+    )
+
+    human_resolution_provided_inputs_validate_parser = subcommands.add_parser(
+        "validate-controlled-runtime-calibration-human-resolution-provided-packet-inputs",
+        help="Validate Blueprint 70 human resolution provided input bundle.",
+    )
+    human_resolution_provided_inputs_validate_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_PROVIDED_PACKET_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 70 human resolution provided contract path.",
+    )
+    human_resolution_provided_inputs_validate_parser.add_argument(
+        "--human-resolution-provided-inputs",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_PROVIDED_INPUTS_OUTPUT
+        ),
+        help="Blueprint 70 human resolution provided inputs path.",
+    )
+    human_resolution_provided_inputs_validate_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_PROVIDED_INPUTS_VALIDATION_OUTPUT
+        ),
+        help="Optional Blueprint 70 inputs validation path.",
+    )
+    human_resolution_provided_inputs_validate_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    human_resolution_provided_inputs_validate_parser.set_defaults(
+        handler=(
+            _handle_validate_controlled_runtime_calibration_human_resolution_provided_packet_inputs
+        ),
+        skip_create_db=True,
+    )
+
+    human_resolution_provided_packet_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-human-resolution-provided-packet",
+        help="Build the Blueprint 70 human resolution provided packet.",
+    )
+    human_resolution_provided_packet_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_PROVIDED_PACKET_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 70 human resolution provided contract path.",
+    )
+    human_resolution_provided_packet_parser.add_argument(
+        "--human-resolution-provided-inputs",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_PROVIDED_INPUTS_OUTPUT
+        ),
+        help="Blueprint 70 human resolution provided inputs path.",
+    )
+    human_resolution_provided_packet_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_PROVIDED_PACKET_OUTPUT
+        ),
+        help="JSON Blueprint 70 human resolution provided packet path.",
+    )
+    human_resolution_provided_packet_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    human_resolution_provided_packet_parser.set_defaults(
+        handler=(
+            _handle_build_controlled_runtime_calibration_human_resolution_provided_packet
+        ),
+        skip_create_db=True,
+    )
+
+    human_resolution_provided_packet_validate_parser = subcommands.add_parser(
+        "validate-controlled-runtime-calibration-human-resolution-provided-packet",
+        help="Validate the Blueprint 70 human resolution provided packet.",
+    )
+    human_resolution_provided_packet_validate_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_PROVIDED_PACKET_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 70 human resolution provided contract path.",
+    )
+    human_resolution_provided_packet_validate_parser.add_argument(
+        "--human-resolution-provided-packet",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_PROVIDED_PACKET_OUTPUT
+        ),
+        help="Blueprint 70 human resolution provided packet path.",
+    )
+    human_resolution_provided_packet_validate_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_PROVIDED_PACKET_VALIDATION_OUTPUT
+        ),
+        help="Optional Blueprint 70 packet validation path.",
+    )
+    human_resolution_provided_packet_validate_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    human_resolution_provided_packet_validate_parser.set_defaults(
+        handler=(
+            _handle_validate_controlled_runtime_calibration_human_resolution_provided_packet
+        ),
+        skip_create_db=True,
+    )
+
+    missing_input_report_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-human-resolution-missing-input-report",
+        help="Build the Blueprint 70 human resolution missing input report.",
+    )
+    missing_input_report_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_PROVIDED_PACKET_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 70 human resolution provided contract path.",
+    )
+    missing_input_report_parser.add_argument(
+        "--human-resolution-provided-packet",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_PROVIDED_PACKET_OUTPUT
+        ),
+        help="Blueprint 70 human resolution provided packet path.",
+    )
+    missing_input_report_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_MISSING_INPUT_REPORT_OUTPUT
+        ),
+        help="JSON Blueprint 70 missing input report path.",
+    )
+    missing_input_report_parser.add_argument("--skip-create-db", action="store_true")
+    missing_input_report_parser.set_defaults(
+        handler=(
+            _handle_build_controlled_runtime_calibration_human_resolution_missing_input_report
+        ),
+        skip_create_db=True,
+    )
+
+    completeness_report_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-human-resolution-completeness-report",
+        help="Build the Blueprint 70 human resolution completeness report.",
+    )
+    completeness_report_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_PROVIDED_PACKET_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 70 human resolution provided contract path.",
+    )
+    completeness_report_parser.add_argument(
+        "--human-resolution-provided-packet",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_PROVIDED_PACKET_OUTPUT
+        ),
+        help="Blueprint 70 human resolution provided packet path.",
+    )
+    completeness_report_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_REPORT_OUTPUT
+        ),
+        help="JSON Blueprint 70 completeness report path.",
+    )
+    completeness_report_parser.add_argument("--skip-create-db", action="store_true")
+    completeness_report_parser.set_defaults(
+        handler=(
+            _handle_build_controlled_runtime_calibration_human_resolution_completeness_report
+        ),
+        skip_create_db=True,
+    )
+
+    final_gate_readiness_report_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-human-resolution-final-gate-readiness-report",
+        help="Build the Blueprint 70 human resolution final-gate readiness report.",
+    )
+    final_gate_readiness_report_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_PROVIDED_PACKET_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 70 human resolution provided contract path.",
+    )
+    final_gate_readiness_report_parser.add_argument(
+        "--human-resolution-provided-packet",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_PROVIDED_PACKET_OUTPUT
+        ),
+        help="Blueprint 70 human resolution provided packet path.",
+    )
+    final_gate_readiness_report_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_FINAL_GATE_READINESS_REPORT_OUTPUT
+        ),
+        help="JSON Blueprint 70 final-gate readiness report path.",
+    )
+    final_gate_readiness_report_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    final_gate_readiness_report_parser.set_defaults(
+        handler=(
+            _handle_build_controlled_runtime_calibration_human_resolution_final_gate_readiness_report
+        ),
+        skip_create_db=True,
+    )
+
+    reexecution_readiness_report_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-human-resolution-reexecution-readiness-report",
+        help="Build the Blueprint 70 human resolution reexecution readiness report.",
+    )
+    reexecution_readiness_report_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_PROVIDED_PACKET_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 70 human resolution provided contract path.",
+    )
+    reexecution_readiness_report_parser.add_argument(
+        "--human-resolution-provided-packet",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_PROVIDED_PACKET_OUTPUT
+        ),
+        help="Blueprint 70 human resolution provided packet path.",
+    )
+    reexecution_readiness_report_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_REEXECUTION_READINESS_REPORT_OUTPUT
+        ),
+        help="JSON Blueprint 70 reexecution readiness report path.",
+    )
+    reexecution_readiness_report_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    reexecution_readiness_report_parser.set_defaults(
+        handler=(
+            _handle_build_controlled_runtime_calibration_human_resolution_reexecution_readiness_report
+        ),
+        skip_create_db=True,
+    )
+
     point_evaluation_parser = subcommands.add_parser(
         "evaluate-point-candidates",
         help="Evaluate generated point candidate markers using operator review metadata.",
@@ -14635,6 +15013,139 @@ def _handle_build_controlled_runtime_calibration_final_gate_rerun_prerequisite_r
     return build_controlled_runtime_calibration_final_gate_rerun_prerequisite_report(
         contract_path=args.contract,
         human_resolution_packet_path=args.human_resolution_packet,
+        output_path=args.output,
+    )
+
+
+def _handle_export_controlled_runtime_calibration_human_resolution_provided_packet_contract(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return export_controlled_runtime_calibration_human_resolution_provided_packet_contract(
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_human_resolution_provided_packet_inputs(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_human_resolution_provided_packet_inputs(
+        contract_path=args.contract,
+        source_human_resolution_input_packet_path=(
+            args.source_human_resolution_input_packet
+        ),
+        source_human_resolution_input_packet_contract_path=(
+            args.source_human_resolution_input_packet_contract
+        ),
+        explicit_operator_identity_ref=args.explicit_operator_identity_ref,
+        explicit_operator_signoff_timestamp=args.explicit_operator_signoff_timestamp,
+        explicit_operator_attestation_text=args.explicit_operator_attestation_text,
+        explicit_operator_scope_acknowledgement=(
+            args.explicit_operator_scope_acknowledgement
+        ),
+        explicit_selected_candidate_ref=args.explicit_selected_candidate_ref,
+        explicit_selected_candidate_id=args.explicit_selected_candidate_id,
+        explicit_selected_candidate_version=args.explicit_selected_candidate_version,
+        explicit_selected_candidate_source_path=(
+            args.explicit_selected_candidate_source_path
+        ),
+        explicit_selected_candidate_selection_reason=(
+            args.explicit_selected_candidate_selection_reason
+        ),
+        explicit_candidate_selection_timestamp=(
+            args.explicit_candidate_selection_timestamp
+        ),
+        explicit_operator_reference_for_selection=(
+            args.explicit_operator_reference_for_selection
+        ),
+        model_asset_path=args.model_asset_path,
+        output_path=args.output,
+    )
+
+
+def _handle_validate_controlled_runtime_calibration_human_resolution_provided_packet_inputs(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_controlled_runtime_calibration_human_resolution_provided_packet_inputs(
+        contract_path=args.contract,
+        human_resolution_provided_inputs_path=args.human_resolution_provided_inputs,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_human_resolution_provided_packet(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_human_resolution_provided_packet(
+        contract_path=args.contract,
+        human_resolution_provided_inputs_path=args.human_resolution_provided_inputs,
+        output_path=args.output,
+    )
+
+
+def _handle_validate_controlled_runtime_calibration_human_resolution_provided_packet(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_controlled_runtime_calibration_human_resolution_provided_packet(
+        contract_path=args.contract,
+        human_resolution_provided_packet_path=args.human_resolution_provided_packet,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_human_resolution_missing_input_report(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_human_resolution_missing_input_report(
+        contract_path=args.contract,
+        human_resolution_provided_packet_path=args.human_resolution_provided_packet,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_human_resolution_completeness_report(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_human_resolution_completeness_report(
+        contract_path=args.contract,
+        human_resolution_provided_packet_path=args.human_resolution_provided_packet,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_human_resolution_final_gate_readiness_report(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_human_resolution_final_gate_readiness_report(
+        contract_path=args.contract,
+        human_resolution_provided_packet_path=args.human_resolution_provided_packet,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_human_resolution_reexecution_readiness_report(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_human_resolution_reexecution_readiness_report(
+        contract_path=args.contract,
+        human_resolution_provided_packet_path=args.human_resolution_provided_packet,
         output_path=args.output,
     )
 

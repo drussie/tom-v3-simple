@@ -31,6 +31,7 @@ video/media
 -> controlled runtime calibration explicit operator signoff artifact state
 -> controlled runtime calibration explicit selected candidate artifact state
 -> controlled runtime calibration human resolution input packet state
+-> controlled runtime calibration human resolution provided packet state
 ```
 
 The current principle is to expand safely from reviewed sample evidence toward broader replay,
@@ -45,43 +46,43 @@ mutation system. Runtime changes must remain explicitly governed.
 - BP1-37: TOM v3 evidence, replay, review, and 3D foundation.
 - BP38-45: Gameplay gate pathway.
 - BP46-54: Real broadcast gameplay review and calibration decision phase.
-- BP55-69: Controlled runtime calibration governance through human resolution input packet
+- BP55-70: Controlled runtime calibration governance through human resolution provided packet
   state.
 
 ## Latest Completed Milestone
 
-Blueprint 69 - Controlled Runtime Calibration Human Resolution Input Packet v1
+Blueprint 70 - Controlled Runtime Calibration Human Resolution Provided Packet v1
 
 Status: Complete.
 
-Commit: recorded by the Blueprint 69 commit.
+Commit: recorded by the Blueprint 70 commit.
 
 Tag:
-`tom-v3-blueprint-69-controlled-runtime-calibration-human-resolution-input-packet-v1`
+`tom-v3-blueprint-70-controlled-runtime-calibration-human-resolution-provided-packet-v1`
 
 Implemented:
 
-- Controlled runtime calibration human resolution input packet service.
+- Controlled runtime calibration human resolution provided packet service.
 - CLI commands and Make targets.
 - Focused tests.
 - Docs, runbook, status, and report updates.
 - Post-Codex validator updates.
-- Tracked BP69 contract artifacts:
-  - `.data/contracts/controlled_runtime_calibration_human_resolution_input_packet_contract_v1.json`
-  - `.data/contracts/controlled_runtime_calibration_human_resolution_input_packet_v1.json`
+- Tracked BP70 contract artifacts:
+  - `.data/contracts/controlled_runtime_calibration_human_resolution_provided_packet_contract_v1.json`
+  - `.data/contracts/controlled_runtime_calibration_human_resolution_provided_packet_v1.json`
 
 Runtime result:
 
-- The committed frozen BP69 packet correctly represents the pending human resolution state after
-  BP68, BP67, and BP66.
+- The committed frozen BP70 packet correctly represents the not-provided human resolution state
+  after BP69, BP68, BP67, and BP66.
 - There is still no real operator signoff or selected candidate in the frozen path.
-- BP69 preserves one discovered candidate option as inventory only and does not select from it.
-- BP69 records human resolution requirements, input template, readiness, final-gate rerun
-  prerequisites, and reexecution readiness.
+- BP70 preserves one discovered candidate option as inventory only and does not select from it.
+- BP70 records missing human inputs, human resolution completeness, final-gate readiness, and
+  reexecution readiness.
 - Runtime target stayed unchanged before and after.
 - Runtime target SHA before and after:
   `8052301c40dee448f858a3a7c64ae7805d3e7839fbbe35305044e1775f0f8fd0`
-- Human resolution status: `human_resolution_input_required`
+- Human resolution provided status: `human_resolution_not_provided`
 - Operator signoff status: `operator_signoff_required`
 - Operator attestation status: `operator_attestation_required`
 - Operator identity status: `operator_identity_required`
@@ -89,18 +90,22 @@ Runtime result:
 - Selected candidate status: `selected_candidate_required`
 - Candidate selection validation status: `candidate_selection_pending_explicit_input`
 - Candidate option count: 1
+- Human resolution completeness status: `human_resolution_incomplete`
+- Missing input status: `required_human_inputs_missing`
 - Final gate rerun status: `final_gate_rerun_required`
+- Final gate rerun readiness status: `final_gate_rerun_not_ready_missing_human_resolution`
 - Reexecution readiness status: `reexecution_not_ready_blockers_unresolved`
 - Runtime application status: `not_executed`
 - Next action recommendations:
-  `provide_human_resolution_inputs`, `provide_operator_signoff_and_selected_candidate`, and
-  `rerun_final_gate_after_human_resolution`
+  `provide_operator_inputs`, `provide_selected_candidate_inputs`,
+  `provide_operator_signoff_and_selected_candidate`, and `rerun_final_gate_after_human_resolution`
 
-Human resolution input packet test coverage:
+Human resolution provided packet test coverage:
 
-- Current BP68/BP67/BP66 pending human resolution path.
-- Requirements, input template, readiness, and final-gate prerequisite report generation.
-- Invalid explicit human-resolution input rejection.
+- Current BP69/BP68/BP67/BP66 not-provided human resolution path.
+- Missing-input, completeness, final-gate readiness, and reexecution readiness report generation.
+- Invalid partial human-resolution input rejection.
+- Future explicit-input readiness without runtime mutation.
 
 ## Controlled Calibration Chain
 
@@ -119,12 +124,13 @@ Human resolution input packet test coverage:
 - BP67 - Controlled Runtime Calibration Explicit Operator Signoff Artifact
 - BP68 - Controlled Runtime Calibration Explicit Selected Candidate Artifact
 - BP69 - Controlled Runtime Calibration Human Resolution Input Packet
+- BP70 - Controlled Runtime Calibration Human Resolution Provided Packet
 
 ## Next Regular Action
 
 Provide real operator signoff identity, timestamp, attestation, scope acknowledgement, and an
 explicit selected candidate ref with provenance, then rerun the BP61 final gate in a future
-blueprint. Do not attempt runtime application while the BP61/BP62/BP64/BP65/BP66/BP67/BP68/BP69
+blueprint. Do not attempt runtime application while the BP61/BP62/BP64/BP65/BP66/BP67/BP68/BP69/BP70
 chain remains blocked.
 
 ## Known Unrelated Working Tree Item

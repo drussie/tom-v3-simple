@@ -4459,3 +4459,79 @@ The BP69 packet preserves candidate option inventory for review only. It does no
 signoff, infer a selected candidate from discovery or validation success, rerun the final gate,
 execute runtime application, write runtime config, create production config, modify model weights,
 or replace baselines.
+
+## Controlled Runtime Calibration Human Resolution Provided Packet
+
+Use this after the BP69 human resolution input packet exists. The BP70 packet records whether the
+explicit human-resolution inputs have actually been supplied. With no explicit operator and selected
+candidate inputs, the frozen packet remains not provided.
+
+Build the frozen contract and packet:
+
+```bash
+make tom-v1-export-controlled-runtime-calibration-human-resolution-provided-packet-contract \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-human-resolution-provided-packet-inputs \
+  PYTHON=.venv/bin/python
+make tom-v1-validate-controlled-runtime-calibration-human-resolution-provided-packet-inputs \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-human-resolution-provided-packet \
+  PYTHON=.venv/bin/python
+make tom-v1-validate-controlled-runtime-calibration-human-resolution-provided-packet \
+  PYTHON=.venv/bin/python
+```
+
+Build generated follow-up views:
+
+```bash
+make tom-v1-build-controlled-runtime-calibration-human-resolution-missing-input-report \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-human-resolution-completeness-report \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-human-resolution-final-gate-readiness-report \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-human-resolution-reexecution-readiness-report \
+  PYTHON=.venv/bin/python
+```
+
+Optional explicit human-resolution inputs:
+
+```bash
+make tom-v1-build-controlled-runtime-calibration-human-resolution-provided-packet-inputs \
+  PYTHON=.venv/bin/python \
+  CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_IDENTITY_REF='<operator-ref>' \
+  CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_SIGNOFF_TIMESTAMP='<timestamp>' \
+  CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_ATTESTATION_TEXT='<attestation-text>' \
+  CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_SCOPE_ACKNOWLEDGEMENT='acknowledged' \
+  CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_REF='<candidate-ref>' \
+  CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ID='<candidate-id>' \
+  CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_VERSION='<candidate-version>' \
+  CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_SOURCE_PATH='<candidate-source-path>' \
+  CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_SELECTION_REASON='<operator-selection-reason>' \
+  CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_CANDIDATE_SELECTION_TIMESTAMP='<timestamp>' \
+  CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_REFERENCE_FOR_SELECTION='<operator-ref>'
+```
+
+Current expected frozen result:
+
+- `human_resolution_provided_status`: `human_resolution_not_provided`
+- `operator_signoff_status`: `operator_signoff_required`
+- `operator_attestation_status`: `operator_attestation_required`
+- `operator_identity_status`: `operator_identity_required`
+- `operator_timestamp_status`: `operator_timestamp_required`
+- `selected_candidate_status`: `selected_candidate_required`
+- `candidate_option_count`: 1
+- `candidate_selection_validation_status`: `candidate_selection_pending_explicit_input`
+- `human_resolution_completeness_status`: `human_resolution_incomplete`
+- `missing_input_status`: `required_human_inputs_missing`
+- `final_gate_rerun_status`: `final_gate_rerun_required`
+- `final_gate_rerun_readiness_status`: `final_gate_rerun_not_ready_missing_human_resolution`
+- `reexecution_readiness_status`: `reexecution_not_ready_blockers_unresolved`
+- `runtime_application_status`: `not_executed`
+- `runtime_config_changed`: false
+- `mutation_status`: `no_runtime_mutation_due_to_blocker`
+
+The BP70 packet preserves candidate option inventory for review only. It does not create operator
+signoff, infer a selected candidate from discovery or validation success, infer human resolution,
+rerun the final gate, execute runtime application, write runtime config, create production config,
+modify model weights, or replace baselines.

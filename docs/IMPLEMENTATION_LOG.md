@@ -4717,3 +4717,38 @@ The committed packet records `human_resolution_input_required`, `operator_signof
 `final_gate_rerun_required`, `reexecution_not_ready_blockers_unresolved`,
 `runtime_application_status: not_executed`, `runtime_config_changed: false`, and
 `no_runtime_mutation_due_to_blocker`.
+
+## Blueprint 70 Controlled Runtime Calibration Human Resolution Provided Packet v1
+
+Status: complete
+
+### Goal
+
+Create the human resolution provided packet required after BP69 while leaving human resolution not
+provided unless real operator signoff and selected candidate inputs are supplied.
+
+### Notes
+
+This milestone adds:
+
+- `apps.worker.services.controlled_runtime_calibration_human_resolution_provided_packet`
+- worker CLI commands for contract export, inputs, input validation, packet build, packet
+  validation, missing-input report, completeness report, final-gate readiness report, and
+  reexecution readiness report
+- matching `tom-v1-*controlled-runtime-calibration-human-resolution-provided*` Make helpers
+- `.data/contracts/controlled_runtime_calibration_human_resolution_provided_packet_contract_v1.json`
+  tracked contract
+- `.data/contracts/controlled_runtime_calibration_human_resolution_provided_packet_v1.json`
+  tracked packet
+- generated input, validation, missing-input report, completeness report, final-gate readiness
+  report, and reexecution readiness report paths under `.data/exports/`
+- focused tests for the pending default path, report generation, invalid partial input rejection,
+  and future explicit-input readiness
+
+The committed packet records `human_resolution_not_provided`, `operator_signoff_required`,
+`operator_attestation_required`, `operator_identity_required`, `operator_timestamp_required`,
+`selected_candidate_required`, `candidate_selection_pending_explicit_input`,
+`human_resolution_incomplete`, `required_human_inputs_missing`, `final_gate_rerun_required`,
+`final_gate_rerun_not_ready_missing_human_resolution`,
+`reexecution_not_ready_blockers_unresolved`, `runtime_application_status: not_executed`,
+`runtime_config_changed: false`, and `no_runtime_mutation_due_to_blocker`.

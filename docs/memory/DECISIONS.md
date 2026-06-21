@@ -64,3 +64,10 @@ Reason: BP69 may combine operator signoff requirements and selected candidate re
 single pending packet and template, but that packet does not resolve blockers without real operator
 identity, timestamp, attestation, scope acknowledgement, selected candidate ref, selected candidate
 provenance, selection reason, selection timestamp, and operator reference.
+
+## Decision 13: Human Resolution Provided Packets Still Require Real Human Inputs
+
+Reason: BP70 may record whether the BP69 human-resolution inputs have been supplied, but it must
+keep human resolution not provided until real operator identity, timestamp, attestation, scope
+acknowledgement, selected candidate ref, selected candidate provenance, selection reason, selection
+timestamp, and operator reference are explicitly supplied through controlled input fields.

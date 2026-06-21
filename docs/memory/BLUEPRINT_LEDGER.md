@@ -16,12 +16,12 @@
 - BP1-37: TOM v3 evidence, replay, review, and 3D foundation.
 - BP38-45: Gameplay gate pathway.
 - BP46-54: Real broadcast gameplay review and calibration decision phase.
-- BP55-69: Controlled runtime calibration governance through human resolution input packet
+- BP55-70: Controlled runtime calibration governance through human resolution provided packet
   state.
 
 ## Current Chain
 
-BP55 -> BP56 -> BP57 -> BP58 -> BP59 -> BP60 -> BP61 -> BP62 -> BP63 memory insert -> BP64 -> BP65 -> BP66 -> BP67 -> BP68 -> BP69.
+BP55 -> BP56 -> BP57 -> BP58 -> BP59 -> BP60 -> BP61 -> BP62 -> BP63 memory insert -> BP64 -> BP65 -> BP66 -> BP67 -> BP68 -> BP69 -> BP70.
 
 ## Detailed Entries
 
@@ -298,6 +298,45 @@ Decision: BP68 records whether explicit selected candidate material exists, but 
 selection from candidate option discovery, Codex execution, validation success, branch state, or
 tags. It keeps selected candidate, operator signoff, final-gate rerun, and runtime application
 pending until explicit human-resolution input exists.
+
+Runtime result: blocked safely; runtime target unchanged before and after.
+
+Follow-up: Provide real operator signoff identity, timestamp, attestation, scope acknowledgement,
+and explicit selected candidate context, then rerun the final gate in a future blueprint before any
+future application attempt.
+
+### Blueprint 70 - Controlled Runtime Calibration Human Resolution Provided Packet v1
+
+Status: Complete after this blueprint commit.
+
+Branch:
+`codex/blueprint-70-controlled-runtime-calibration-human-resolution-provided-packet-v1`
+
+Commit: recorded by the blueprint commit and final report.
+
+Tag:
+`tom-v3-blueprint-70-controlled-runtime-calibration-human-resolution-provided-packet-v1`
+
+Classification: calibration-governance-facing, human-resolution-provided-facing,
+operator-resolution-facing, candidate-selection-state-facing, no-runtime-mutation.
+
+Files or areas changed:
+
+- Controlled runtime calibration human resolution provided packet service.
+- CLI commands and Make targets.
+- Tracked BP70 contract and frozen packet artifacts.
+- Generated `.data/exports/` inputs, validations, missing-input report, completeness report,
+  final-gate readiness report, and reexecution readiness report for local review only.
+- Focused tests.
+- Docs, runbook, agent report, status docs, and repo memory updates.
+- Post-Codex validation coverage.
+
+Validation: full Blueprint 70 validation recorded by final report.
+
+Decision: BP70 records whether explicit operator signoff material and explicit selected candidate
+material have actually been supplied, but it does not infer either one from BP69 pending artifacts,
+candidate option discovery, a single available option, Codex execution, validation success, branch
+state, commits, or tags.
 
 Runtime result: blocked safely; runtime target unchanged before and after.
 

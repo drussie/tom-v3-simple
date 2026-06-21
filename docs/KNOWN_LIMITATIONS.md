@@ -451,6 +451,12 @@ TOM v3 Simple does not include:
   discovered candidate option, rerun the final gate, perform runtime application, write runtime
   config, create production config, modify model weights, replace baselines, claim production
   readiness, or decide tennis truth.
+- Controlled runtime calibration human resolution provided packets remain not provided until real
+  operator signoff material and real selected candidate material are supplied together. The BP70
+  packet records missing human inputs and final-gate readiness only; it does not satisfy those
+  requirements by itself, infer a selection from the single discovered candidate option, rerun the
+  final gate, perform runtime application, write runtime config, create production config, modify
+  model weights, replace baselines, claim production readiness, or decide tennis truth.
 
 ## Boundary
 
