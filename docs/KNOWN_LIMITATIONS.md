@@ -412,6 +412,12 @@ TOM v3 Simple does not include:
   candidate context are missing. They do not perform runtime calibration, apply
   threshold/smoothing/hysteresis changes, create production config, update runtime config, modify
   model weights, replace baselines, or auto approve or auto reject candidates.
+- Controlled runtime calibration application execution artifacts can update only the explicit BP62
+  controlled runtime config target. The committed frozen execution is blocked because the BP61 final
+  gate is blocked, so no staged delta is applied in the frozen artifact. BP62 does not create
+  production config, modify model weights, replace baselines, auto approve or auto reject
+  candidates, prove classifier correctness or accuracy, claim production readiness, or decide
+  tennis truth.
 
 ## Boundary
 

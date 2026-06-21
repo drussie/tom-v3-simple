@@ -4458,3 +4458,33 @@ hysteresis changes; does not update runtime config; does not mutate model weight
 baselines; does not create production config; does not approve or reject candidates; and does not
 claim tennis truth, classifier correctness, classifier accuracy, production readiness, or
 generalization.
+
+## Blueprint 62 Controlled Runtime Calibration Application Execution v1
+
+Status: complete
+
+### Goal
+
+Create the first controlled runtime calibration application execution path, limited to an explicit
+local runtime config artifact and protected by BP61 final-gate, rollback, readback, and post-apply
+verification requirements.
+
+### Notes
+
+This milestone adds:
+
+- `apps.worker.services.controlled_runtime_calibration_application_execution`
+- worker CLI commands for contract export, input build/validation, controlled execution,
+  validation, runtime readback, audit reporting, rollback package build, post-apply verification,
+  and runtime config target creation
+- matching `tom-v1-*controlled-runtime-calibration-application*` Make helpers
+- tracked BP62 contract, execution artifact, explicit controlled runtime config target, and
+  rollback package
+- generated input, validation, runtime readback, audit, and post-apply verification outputs under
+  `.data/exports/`
+- focused tests for the blocked frozen path and successful passed-gate fixture path
+
+The current frozen execution is blocked because the BP61 final gate is blocked. No staged delta is
+applied to the committed runtime config target. The successful path is covered by tests and writes
+only the explicit controlled runtime config artifact using atomic replace plus readback
+verification.

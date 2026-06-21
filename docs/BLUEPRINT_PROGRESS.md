@@ -1875,3 +1875,40 @@ Blueprint 61 does not train or mutate the gameplay classifier, commit model weig
 baselines, create labels, perform automatic relabeling, change thresholds, smoothing, hysteresis,
 or runtime config, create production config, auto approve or auto reject candidates, or perform
 runtime application.
+
+## Blueprint 62 Status
+
+Status: complete.
+
+Blueprint 62 adds the controlled runtime calibration application execution layer:
+
+```text
+BP61 controlled pre-application final gate
+-> application execution input bundle
+-> explicit controlled runtime config target
+-> controlled application execution artifact
+-> rollback package
+-> runtime readback, audit, and post-apply verification reports
+```
+
+The tracked artifacts are
+`.data/contracts/controlled_runtime_calibration_application_execution_contract_v1.json`,
+`.data/contracts/controlled_runtime_calibration_application_execution_v1.json`,
+`.data/contracts/controlled_runtime_calibration_applied_runtime_config_v1.json`, and
+`.data/contracts/controlled_runtime_calibration_application_rollback_package_v1.json`. Generated
+local exports include inputs, validations, readback reports, audit reports, and post-apply
+verification reports under `.data/exports/`.
+
+The current frozen execution is `application_blocked_final_gate_not_passed` because the committed
+BP61 final gate is blocked. The controlled runtime config target is explicit and tracked, but the
+staged delta is not applied in the frozen artifact. It preserves
+`runtime_application_status: blocked_from_runtime_application`,
+`runtime_config_status: unchanged_due_to_blocker`,
+`mutation_status: no_runtime_mutation_due_to_blocker`,
+`production_config_status: not_created`, `baseline_update_status: not_replaced`, and
+`model_update_status: not_modified`.
+
+Blueprint 62 does not train or mutate the gameplay classifier, commit model weights, mutate
+baselines, create labels, perform automatic relabeling, create production config, auto approve or
+auto reject candidates, or decide tennis truth. A controlled runtime config update is allowed only
+through the BP62 execution service after a passed BP61 final gate.

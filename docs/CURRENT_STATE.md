@@ -658,3 +658,28 @@ The frozen final gate artifact is `final_gate_blocked_missing_operator_signoff` 
 Blueprint 61 does not apply threshold, smoothing, or hysteresis changes; does not update runtime
 config; does not mutate model weights; does not replace baselines; does not create production
 config; does not auto approve or auto reject candidates; and does not perform runtime application.
+
+## Blueprint 62 Result
+
+Status: complete.
+
+Blueprint 62 adds controlled runtime calibration application execution. It creates tracked
+artifacts:
+
+```text
+.data/contracts/controlled_runtime_calibration_application_execution_contract_v1.json
+.data/contracts/controlled_runtime_calibration_application_execution_v1.json
+.data/contracts/controlled_runtime_calibration_applied_runtime_config_v1.json
+.data/contracts/controlled_runtime_calibration_application_rollback_package_v1.json
+```
+
+The explicit runtime config target is a local controlled calibration artifact, not production
+config, not model weights, not a baseline, and not tennis truth.
+
+The frozen execution is `application_blocked_final_gate_not_passed` because the current BP61 final
+gate is blocked. It records matching before/after runtime config sha256 values, creates a rollback
+package, and preserves `production_config_status: not_created`,
+`baseline_update_status: not_replaced`, and `model_update_status: not_modified`.
+
+Blueprint 62 allows a controlled runtime config update only through the BP62 execution path when a
+BP61 final gate has passed. Focused tests cover that successful write/readback path with fixtures.

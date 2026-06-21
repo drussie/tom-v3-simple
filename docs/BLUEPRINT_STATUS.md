@@ -1922,3 +1922,50 @@ not train or mutate the gameplay classifier, commit model weights, create review
 classifier, apply threshold, smoothing, or hysteresis changes, update runtime config, replace
 baselines, create production config, perform runtime application, perform automatic approval, or
 perform automatic rejection.
+
+## Blueprint 62 - Controlled Runtime Calibration Application Execution
+
+Status: COMPLETE
+
+Blueprint 62 proves:
+
+```text
+BP61 controlled pre-application final gate
+-> application execution input bundle
+-> explicit controlled runtime config target
+-> controlled application execution artifact
+-> runtime readback verification
+-> rollback package
+-> post-apply verification report
+-> audit report
+```
+
+The tracked artifacts are
+`.data/contracts/controlled_runtime_calibration_application_execution_contract_v1.json`,
+`.data/contracts/controlled_runtime_calibration_application_execution_v1.json`,
+`.data/contracts/controlled_runtime_calibration_applied_runtime_config_v1.json`, and
+`.data/contracts/controlled_runtime_calibration_application_rollback_package_v1.json`. Generated
+inputs, validations, runtime readbacks, audit reports, and post-apply verification reports remain
+under `.data/exports/`.
+
+Blueprint 62 allows `runtime_config_status: updated_by_controlled_application` only when a BP61
+final gate has passed and the update is linked to the BP61/BP60/BP59/BP58/BP55 artifact chain.
+The committed frozen execution is blocked because the committed BP61 final gate is blocked:
+
+```text
+application_execution_status: application_blocked_final_gate_not_passed
+runtime_application_status: blocked_from_runtime_application
+runtime_config_status: unchanged_due_to_blocker
+mutation_status: no_runtime_mutation_due_to_blocker
+production_config_status: not_created
+baseline_update_status: not_replaced
+model_update_status: not_modified
+```
+
+Blueprint 62 does not decide tennis truth, in/out, score, point winner, player identity, rally
+state, server/receiver state, line-call truth, point truth, event truth, gameplay truth,
+classifier correctness, classifier accuracy, accepted/rejected lifecycle, automatic relabeling,
+reviewer ranking or quality scoring, coaching/tactical conclusions, betting/prediction outcomes,
+generalization, automatic correctness, training truth, production truth, or adjudication. It does
+not train or mutate the gameplay classifier, commit model weights, create review labels, create
+production config, replace baselines, perform automatic approval, or perform automatic rejection.

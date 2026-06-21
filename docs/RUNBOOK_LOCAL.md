@@ -1811,6 +1811,49 @@ Expected:
 - `breaking_drift_detected`: false
 - `baseline_is_not_truth`: true
 
+## Controlled Runtime Calibration Application Execution
+
+Blueprint 62 creates an explicit local runtime calibration config target and a controlled execution
+surface. The default committed BP61 final gate is blocked, so the default BP62 execution records a
+safe no-delta application blocker.
+
+Build the BP62 artifacts:
+
+```bash
+make tom-v1-export-controlled-runtime-calibration-application-execution-contract \
+  tom-v1-build-controlled-runtime-calibration-applied-runtime-config \
+  tom-v1-build-controlled-runtime-calibration-application-execution-inputs \
+  tom-v1-validate-controlled-runtime-calibration-application-execution-inputs \
+  tom-v1-execute-controlled-runtime-calibration-application \
+  tom-v1-validate-controlled-runtime-calibration-application-execution \
+  tom-v1-verify-controlled-runtime-calibration-runtime-readback \
+  tom-v1-build-controlled-runtime-calibration-application-audit-report \
+  tom-v1-build-controlled-runtime-calibration-rollback-package \
+  tom-v1-build-controlled-runtime-calibration-post-apply-verification-report \
+  PYTHON=.venv/bin/python
+```
+
+Expected for the committed frozen chain:
+
+- `application_execution_status`: `application_blocked_final_gate_not_passed`
+- `runtime_application_status`: `blocked_from_runtime_application`
+- `runtime_config_status`: `unchanged_due_to_blocker`
+- `mutation_status`: `no_runtime_mutation_due_to_blocker`
+- `production_config_status`: `not_created`
+- `baseline_update_status`: `not_replaced`
+- `model_update_status`: `not_modified`
+- before and after runtime config sha256 values match
+
+The explicit controlled runtime config target is:
+
+```text
+.data/contracts/controlled_runtime_calibration_applied_runtime_config_v1.json
+```
+
+It is not production config, not model weights, not a regression baseline, and not tennis truth.
+Only the BP62 execution service may apply a staged candidate delta to it, and only after a passed
+BP61 final gate.
+
 ## Controlled Runtime Calibration Pre-Application Final Gate
 
 Blueprint 61 builds the final pre-application gate over the Blueprint 60 staging artifact. It is a
