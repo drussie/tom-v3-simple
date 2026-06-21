@@ -16,12 +16,12 @@
 - BP1-37: TOM v3 evidence, replay, review, and 3D foundation.
 - BP38-45: Gameplay gate pathway.
 - BP46-54: Real broadcast gameplay review and calibration decision phase.
-- BP55-70: Controlled runtime calibration governance through human resolution provided packet
+- BP55-71: Controlled runtime calibration governance through explicit human resolution record
   state.
 
 ## Current Chain
 
-BP55 -> BP56 -> BP57 -> BP58 -> BP59 -> BP60 -> BP61 -> BP62 -> BP63 memory insert -> BP64 -> BP65 -> BP66 -> BP67 -> BP68 -> BP69 -> BP70.
+BP55 -> BP56 -> BP57 -> BP58 -> BP59 -> BP60 -> BP61 -> BP62 -> BP63 memory insert -> BP64 -> BP65 -> BP66 -> BP67 -> BP68 -> BP69 -> BP70 -> BP71.
 
 ## Detailed Entries
 
@@ -335,6 +335,45 @@ Validation: full Blueprint 70 validation recorded by final report.
 
 Decision: BP70 records whether explicit operator signoff material and explicit selected candidate
 material have actually been supplied, but it does not infer either one from BP69 pending artifacts,
+candidate option discovery, a single available option, Codex execution, validation success, branch
+state, commits, or tags.
+
+Runtime result: blocked safely; runtime target unchanged before and after.
+
+Follow-up: Provide real operator signoff identity, timestamp, attestation, scope acknowledgement,
+and explicit selected candidate context, then rerun the final gate in a future blueprint before any
+future application attempt.
+
+### Blueprint 71 - Controlled Runtime Calibration Explicit Human Resolution Record v1
+
+Status: Complete after this blueprint commit.
+
+Branch:
+`codex/blueprint-71-controlled-runtime-calibration-explicit-human-resolution-record-v1`
+
+Commit: recorded by the blueprint commit and final report.
+
+Tag:
+`tom-v3-blueprint-71-controlled-runtime-calibration-explicit-human-resolution-record-v1`
+
+Classification: calibration-governance-facing, explicit-human-resolution-record-facing,
+operator-resolution-facing, candidate-selection-state-facing, no-runtime-mutation.
+
+Files or areas changed:
+
+- Controlled runtime calibration explicit human resolution record service.
+- CLI commands and Make targets.
+- Tracked BP71 contract and frozen record artifacts.
+- Generated `.data/exports/` inputs, validations, missing-input report, completeness report,
+  final-gate readiness report, and reexecution readiness report for local review only.
+- Focused tests.
+- Docs, runbook, agent report, status docs, and repo memory updates.
+- Post-Codex validation coverage.
+
+Validation: full Blueprint 71 validation recorded by final report.
+
+Decision: BP71 records whether explicit human resolution fields exist in a durable record, but it
+does not infer operator signoff, selected candidate, or human resolution from BP70 pending state,
 candidate option discovery, a single available option, Codex execution, validation success, branch
 state, commits, or tags.
 

@@ -861,3 +861,42 @@ Blueprint 70 preserves one discovered candidate option from BP66/BP67/BP68/BP69 
 does not create operator signoff, infer selected candidate status from candidate option discovery or
 validation success, infer human resolution, rerun the final gate, perform runtime application,
 write runtime config, create production config, modify model weights, or replace baselines.
+
+## Blueprint 71 Result
+
+Status: complete.
+
+Blueprint 71 adds the explicit human resolution record mechanism required after BP70. It creates
+tracked artifacts:
+
+```text
+.data/contracts/controlled_runtime_calibration_explicit_human_resolution_record_contract_v1.json
+.data/contracts/controlled_runtime_calibration_explicit_human_resolution_record_v1.json
+```
+
+The frozen record stores the current pending state:
+
+```text
+human_resolution_record_status: human_resolution_record_pending_explicit_inputs
+human_resolution_provided_status: human_resolution_not_provided
+operator_signoff_status: operator_signoff_required
+operator_attestation_status: operator_attestation_required
+operator_identity_status: operator_identity_required
+operator_timestamp_status: operator_timestamp_required
+selected_candidate_status: selected_candidate_required
+candidate_selection_validation_status: candidate_selection_pending_explicit_input
+human_resolution_completeness_status: human_resolution_incomplete
+missing_input_status: required_human_inputs_missing
+final_gate_rerun_status: final_gate_rerun_required
+final_gate_rerun_readiness_status: final_gate_rerun_not_ready_missing_human_resolution
+reexecution_readiness_status: reexecution_not_ready_blockers_unresolved
+runtime_application_status: not_executed
+runtime_config_changed: false
+mutation_status: no_runtime_mutation_due_to_blocker
+```
+
+Blueprint 71 preserves one discovered candidate option from BP66/BP67/BP68/BP69/BP70 for review
+only. It does not create operator signoff, infer selected candidate status from candidate option
+discovery or validation success, infer human resolution, rerun the final gate, perform runtime
+application, write runtime config, create production config, modify model weights, or replace
+baselines.

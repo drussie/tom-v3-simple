@@ -408,6 +408,8 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Controlled Runtime Calibration Human Resolution Input Packet v1](reviews/controlled_runtime_calibration_human_resolution_input_packet_v1.md)
 - [Blueprint 70 Controlled Runtime Calibration Human Resolution Provided Packet v1](blueprints/blueprint_70_controlled_runtime_calibration_human_resolution_provided_packet_v1.md)
 - [Controlled Runtime Calibration Human Resolution Provided Packet v1](reviews/controlled_runtime_calibration_human_resolution_provided_packet_v1.md)
+- [Blueprint 71 Controlled Runtime Calibration Explicit Human Resolution Record v1](blueprints/blueprint_71_controlled_runtime_calibration_explicit_human_resolution_record_v1.md)
+- [Controlled Runtime Calibration Explicit Human Resolution Record v1](reviews/controlled_runtime_calibration_explicit_human_resolution_record_v1.md)
 
 ## Development
 

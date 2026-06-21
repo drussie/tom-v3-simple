@@ -71,3 +71,10 @@ Reason: BP70 may record whether the BP69 human-resolution inputs have been suppl
 keep human resolution not provided until real operator identity, timestamp, attestation, scope
 acknowledgement, selected candidate ref, selected candidate provenance, selection reason, selection
 timestamp, and operator reference are explicitly supplied through controlled input fields.
+
+## Decision 14: Explicit Human Resolution Records Require Real Controlled Inputs
+
+Reason: BP71 may define a durable record for explicit human resolution fields, but it must keep the
+record pending until real operator identity, timestamp, attestation, scope acknowledgement, selected
+candidate ref, selected candidate provenance, selection reason, selection timestamp, and operator
+reference are supplied through controlled input fields.

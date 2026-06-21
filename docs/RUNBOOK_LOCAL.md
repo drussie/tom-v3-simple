@@ -4535,3 +4535,80 @@ The BP70 packet preserves candidate option inventory for review only. It does no
 signoff, infer a selected candidate from discovery or validation success, infer human resolution,
 rerun the final gate, execute runtime application, write runtime config, create production config,
 modify model weights, or replace baselines.
+
+### Blueprint 71 - Explicit Human Resolution Record
+
+Use this after the BP70 human resolution provided packet exists. The BP71 record creates a durable
+schema for explicit human-resolution values while keeping the default committed artifact pending
+until real operator and selected-candidate inputs are supplied.
+
+Build and validate the frozen record:
+
+```bash
+make tom-v1-export-controlled-runtime-calibration-explicit-human-resolution-record-contract \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-explicit-human-resolution-record-inputs \
+  PYTHON=.venv/bin/python
+make tom-v1-validate-controlled-runtime-calibration-explicit-human-resolution-record-inputs \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-explicit-human-resolution-record \
+  PYTHON=.venv/bin/python
+make tom-v1-validate-controlled-runtime-calibration-explicit-human-resolution-record \
+  PYTHON=.venv/bin/python
+```
+
+Build generated follow-up views:
+
+```bash
+make tom-v1-build-controlled-runtime-calibration-human-resolution-record-completeness-report \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-human-resolution-record-missing-input-report \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-human-resolution-record-final-gate-readiness-report \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-human-resolution-record-reexecution-readiness-report \
+  PYTHON=.venv/bin/python
+```
+
+Optional explicit human-resolution record inputs:
+
+```bash
+make tom-v1-build-controlled-runtime-calibration-explicit-human-resolution-record-inputs \
+  PYTHON=.venv/bin/python \
+  CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_IDENTITY_REF='<operator-ref>' \
+  CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_SIGNOFF_TIMESTAMP='<timestamp>' \
+  CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_ATTESTATION_TEXT='<attestation-text>' \
+  CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_SCOPE_ACKNOWLEDGEMENT='acknowledged' \
+  CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_REF='<candidate-ref>' \
+  CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ID='<candidate-id>' \
+  CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_VERSION='<candidate-version>' \
+  CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_SOURCE_PATH='<candidate-source-path>' \
+  CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_SELECTION_REASON='<operator-selection-reason>' \
+  CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_CANDIDATE_SELECTION_TIMESTAMP='<timestamp>' \
+  CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_REFERENCE_FOR_SELECTION='<operator-ref>'
+```
+
+Current expected frozen result:
+
+- `human_resolution_record_status`: `human_resolution_record_pending_explicit_inputs`
+- `human_resolution_provided_status`: `human_resolution_not_provided`
+- `operator_signoff_status`: `operator_signoff_required`
+- `operator_attestation_status`: `operator_attestation_required`
+- `operator_identity_status`: `operator_identity_required`
+- `operator_timestamp_status`: `operator_timestamp_required`
+- `selected_candidate_status`: `selected_candidate_required`
+- `candidate_option_count`: 1
+- `candidate_selection_validation_status`: `candidate_selection_pending_explicit_input`
+- `human_resolution_completeness_status`: `human_resolution_incomplete`
+- `missing_input_status`: `required_human_inputs_missing`
+- `final_gate_rerun_status`: `final_gate_rerun_required`
+- `final_gate_rerun_readiness_status`: `final_gate_rerun_not_ready_missing_human_resolution`
+- `reexecution_readiness_status`: `reexecution_not_ready_blockers_unresolved`
+- `runtime_application_status`: `not_executed`
+- `runtime_config_changed`: false
+- `mutation_status`: `no_runtime_mutation_due_to_blocker`
+
+The BP71 record preserves candidate option inventory for review only. It does not create operator
+signoff, infer a selected candidate from discovery or validation success, infer human resolution,
+rerun the final gate, execute runtime application, write runtime config, create production config,
+modify model weights, or replace baselines.

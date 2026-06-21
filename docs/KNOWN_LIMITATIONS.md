@@ -457,6 +457,13 @@ TOM v3 Simple does not include:
   requirements by itself, infer a selection from the single discovered candidate option, rerun the
   final gate, perform runtime application, write runtime config, create production config, modify
   model weights, replace baselines, claim production readiness, or decide tennis truth.
+- Controlled runtime calibration explicit human resolution records remain pending until real
+  operator signoff material and real selected candidate material are supplied through controlled
+  input fields. The BP71 record preserves missing-input and readiness state only; it does not
+  satisfy those requirements by itself, infer a selection from the single discovered candidate
+  option, rerun the final gate, perform runtime application, write runtime config, create
+  production config, modify model weights, replace baselines, claim production readiness, or decide
+  tennis truth.
 
 ## Boundary
 
