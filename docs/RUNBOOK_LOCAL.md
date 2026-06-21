@@ -4319,3 +4319,68 @@ Current expected frozen result:
 The BP67 artifact does not create operator signoff, select a candidate, rerun the final gate,
 execute runtime application, write runtime config, create production config, modify model weights,
 or replace baselines.
+
+## Controlled Runtime Calibration Explicit Selected Candidate Artifact
+
+Use this after the BP67 explicit operator signoff artifact and BP66 packet exist. The BP68 artifact
+records whether an explicit selected candidate reference and provenance have been supplied. With no
+explicit selected candidate ref, selection reason, operator reference, or timestamp, the frozen
+artifact remains pending.
+
+Build the frozen contract and artifact:
+
+```bash
+make tom-v1-export-controlled-runtime-calibration-explicit-selected-candidate-artifact-contract \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-explicit-selected-candidate-artifact-inputs \
+  PYTHON=.venv/bin/python
+make tom-v1-validate-controlled-runtime-calibration-explicit-selected-candidate-artifact-inputs \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-explicit-selected-candidate-artifact \
+  PYTHON=.venv/bin/python
+make tom-v1-validate-controlled-runtime-calibration-explicit-selected-candidate-artifact \
+  PYTHON=.venv/bin/python
+```
+
+Build generated follow-up views:
+
+```bash
+make tom-v1-build-controlled-runtime-calibration-candidate-option-inventory-report \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-candidate-selection-requirements-report \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-selected-candidate-readiness-report \
+  PYTHON=.venv/bin/python
+```
+
+Optional explicit candidate inputs:
+
+```bash
+make tom-v1-build-controlled-runtime-calibration-explicit-selected-candidate-artifact-inputs \
+  PYTHON=.venv/bin/python \
+  CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_REF='<candidate-ref>' \
+  CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ID='<candidate-id>' \
+  CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_VERSION='<candidate-version>' \
+  CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_SOURCE_PATH='<candidate-source-path>' \
+  CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_SELECTION_REASON='<operator-selection-reason>' \
+  CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_CANDIDATE_SELECTION_TIMESTAMP='<timestamp>' \
+  CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_REFERENCE_FOR_SELECTION='<operator-ref>'
+```
+
+Current expected frozen result:
+
+- `selected_candidate_artifact_status`: `selected_candidate_artifact_created_pending_explicit_candidate_input`
+- `selected_candidate_status`: `selected_candidate_required`
+- `candidate_option_count`: 1
+- `candidate_selection_validation_status`: `candidate_selection_pending_explicit_input`
+- `operator_signoff_status`: `operator_signoff_required`
+- `final_gate_rerun_status`: `final_gate_rerun_required`
+- `reexecution_readiness_status`: `reexecution_not_ready_blockers_unresolved`
+- `runtime_application_status`: `not_executed`
+- `runtime_config_changed`: false
+- `mutation_status`: `no_runtime_mutation_due_to_blocker`
+
+The BP68 artifact preserves candidate option inventory for review only. It does not create operator
+signoff, infer a selected candidate from discovery or validation success, rerun the final gate,
+execute runtime application, write runtime config, create production config, modify model weights,
+or replace baselines.

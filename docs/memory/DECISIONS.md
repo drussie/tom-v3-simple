@@ -50,3 +50,10 @@ operator signoff.
 Reason: BP67 may create a pending signoff artifact, requirements report, attestation template, and
 readiness report, but those artifacts do not satisfy signoff without real operator identity,
 timestamp, attestation text, scope acknowledgement, and selected candidate context.
+
+## Decision 11: Explicit Selected Candidate Artifacts Require Human Selection Input
+
+Reason: BP68 may preserve candidate option inventory and create a pending selected candidate
+artifact, requirements report, and readiness report, but candidate option discovery, a single
+available option, validation success, branch state, commit state, and tags do not satisfy explicit
+candidate selection.

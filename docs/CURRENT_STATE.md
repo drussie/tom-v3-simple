@@ -788,3 +788,27 @@ Blueprint 67 creates a pending signoff artifact and attestation template only. I
 operator signoff, select a candidate, infer signoff from Codex execution or validation success,
 rerun the final gate, perform runtime application, write runtime config, create production config,
 modify model weights, or replace baselines.
+
+## Blueprint 68 Result
+
+Status: complete.
+
+Blueprint 68 adds the explicit selected candidate artifact mechanism required after BP67. It
+creates tracked artifacts:
+
+```text
+.data/contracts/controlled_runtime_calibration_explicit_selected_candidate_artifact_contract_v1.json
+.data/contracts/controlled_runtime_calibration_explicit_selected_candidate_artifact_v1.json
+```
+
+The frozen artifact records
+`selected_candidate_artifact_created_pending_explicit_candidate_input`,
+`selected_candidate_required`, `candidate_selection_pending_explicit_input`,
+`operator_signoff_required`, `final_gate_rerun_required`,
+`reexecution_not_ready_blockers_unresolved`, `runtime_application_status: not_executed`,
+`runtime_config_changed: false`, and `no_runtime_mutation_due_to_blocker`.
+
+Blueprint 68 preserves one discovered candidate option from BP66/BP67 for review only. It does not
+create operator signoff, infer selected candidate status from candidate option discovery or
+validation success, rerun the final gate, perform runtime application, write runtime config,
+create production config, modify model weights, or replace baselines.

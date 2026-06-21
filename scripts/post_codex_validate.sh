@@ -1620,4 +1620,54 @@ run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-operat
   --output "$TMP_ROOT/controlled_runtime_calibration_operator_signoff_readiness_report.current.json" \
   --skip-create-db
 
+run "$PYTHON_BIN" -m apps.worker.cli export-controlled-runtime-calibration-explicit-selected-candidate-artifact-contract \
+  --output "$TMP_ROOT/controlled_runtime_calibration_explicit_selected_candidate_artifact_contract_v1.smoke.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-explicit-selected-candidate-artifact-inputs \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_explicit_selected_candidate_artifact_contract_v1.smoke.json" \
+  --source-explicit-operator-signoff-artifact "$TMP_ROOT/controlled_runtime_calibration_explicit_operator_signoff_artifact.current.json" \
+  --source-explicit-operator-signoff-artifact-contract "$TMP_ROOT/controlled_runtime_calibration_explicit_operator_signoff_artifact_contract_v1.smoke.json" \
+  --source-operator-signoff-candidate-selection-packet "$TMP_ROOT/controlled_runtime_calibration_operator_signoff_candidate_selection_packet.current.json" \
+  --source-operator-signoff-candidate-selection-packet-contract "$TMP_ROOT/controlled_runtime_calibration_operator_signoff_candidate_selection_packet_contract_v1.smoke.json" \
+  --model-asset-path "model_assets/tom_v1/view_classifier_gameplay.pt" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_explicit_selected_candidate_artifact_inputs.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli validate-controlled-runtime-calibration-explicit-selected-candidate-artifact-inputs \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_explicit_selected_candidate_artifact_contract_v1.smoke.json" \
+  --selected-candidate-inputs "$TMP_ROOT/controlled_runtime_calibration_explicit_selected_candidate_artifact_inputs.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_explicit_selected_candidate_artifact_inputs.validation.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-explicit-selected-candidate-artifact \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_explicit_selected_candidate_artifact_contract_v1.smoke.json" \
+  --selected-candidate-inputs "$TMP_ROOT/controlled_runtime_calibration_explicit_selected_candidate_artifact_inputs.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_explicit_selected_candidate_artifact.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli validate-controlled-runtime-calibration-explicit-selected-candidate-artifact \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_explicit_selected_candidate_artifact_contract_v1.smoke.json" \
+  --selected-candidate-artifact "$TMP_ROOT/controlled_runtime_calibration_explicit_selected_candidate_artifact.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_explicit_selected_candidate_artifact.validation.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-candidate-option-inventory-report \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_explicit_selected_candidate_artifact_contract_v1.smoke.json" \
+  --selected-candidate-artifact "$TMP_ROOT/controlled_runtime_calibration_explicit_selected_candidate_artifact.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_candidate_option_inventory_report.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-candidate-selection-requirements-report \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_explicit_selected_candidate_artifact_contract_v1.smoke.json" \
+  --selected-candidate-artifact "$TMP_ROOT/controlled_runtime_calibration_explicit_selected_candidate_artifact.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_candidate_selection_requirements_report.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-selected-candidate-readiness-report \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_explicit_selected_candidate_artifact_contract_v1.smoke.json" \
+  --selected-candidate-artifact "$TMP_ROOT/controlled_runtime_calibration_explicit_selected_candidate_artifact.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_selected_candidate_readiness_report.current.json" \
+  --skip-create-db
+
 run git status --short

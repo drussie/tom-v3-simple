@@ -440,6 +440,11 @@ TOM v3 Simple does not include:
   candidate, rerun the final gate, perform runtime application, write runtime config, create
   production config, modify model weights, replace baselines, claim production readiness, or decide
   tennis truth.
+- Controlled runtime calibration explicit selected candidate artifacts remain pending until a real
+  selected candidate ref and provenance are supplied by an operator. The BP68 artifact preserves
+  candidate option inventory but does not select from it, satisfy operator signoff, rerun the final
+  gate, perform runtime application, write runtime config, create production config, modify model
+  weights, replace baselines, claim production readiness, or decide tennis truth.
 
 ## Boundary
 

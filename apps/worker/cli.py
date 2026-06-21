@@ -222,6 +222,24 @@ from apps.worker.services.controlled_runtime_calibration_explicit_operator_signo
     validate_controlled_runtime_calibration_explicit_operator_signoff_artifact,
     validate_controlled_runtime_calibration_explicit_operator_signoff_artifact_inputs,
 )
+from apps.worker.services.controlled_runtime_calibration_explicit_selected_candidate_artifact import (  # noqa: E501
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_CANDIDATE_OPTION_INVENTORY_REPORT_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_CANDIDATE_SELECTION_REQUIREMENTS_REPORT_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ARTIFACT_CONTRACT_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ARTIFACT_INPUTS_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ARTIFACT_INPUTS_VALIDATION_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ARTIFACT_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ARTIFACT_VALIDATION_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_SELECTED_CANDIDATE_READINESS_REPORT_OUTPUT,
+    build_controlled_runtime_calibration_candidate_option_inventory_report,
+    build_controlled_runtime_calibration_candidate_selection_requirements_report,
+    build_controlled_runtime_calibration_explicit_selected_candidate_artifact,
+    build_controlled_runtime_calibration_explicit_selected_candidate_artifact_inputs,
+    build_controlled_runtime_calibration_selected_candidate_readiness_report,
+    export_controlled_runtime_calibration_explicit_selected_candidate_artifact_contract,
+    validate_controlled_runtime_calibration_explicit_selected_candidate_artifact,
+    validate_controlled_runtime_calibration_explicit_selected_candidate_artifact_inputs,
+)
 from apps.worker.services.controlled_runtime_calibration_human_approval_gate import (
     DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FUTURE_APPLICATION_READINESS_REPORT_OUTPUT,
     DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_APPROVAL_GATE_CONTRACT_OUTPUT,
@@ -9299,6 +9317,332 @@ def main() -> None:
         skip_create_db=True,
     )
 
+    selected_candidate_contract_parser = subcommands.add_parser(
+        "export-controlled-runtime-calibration-explicit-selected-candidate-artifact-contract",
+        help="Export the Blueprint 68 explicit selected candidate artifact contract.",
+    )
+    selected_candidate_contract_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ARTIFACT_CONTRACT_OUTPUT
+        ),
+        help="JSON Blueprint 68 explicit selected candidate artifact contract path.",
+    )
+    selected_candidate_contract_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    selected_candidate_contract_parser.set_defaults(
+        handler=(
+            _handle_export_controlled_runtime_calibration_explicit_selected_candidate_artifact_contract
+        ),
+        skip_create_db=True,
+    )
+
+    selected_candidate_inputs_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-explicit-selected-candidate-artifact-inputs",
+        help="Build Blueprint 68 explicit selected candidate artifact inputs.",
+    )
+    selected_candidate_inputs_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ARTIFACT_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 68 explicit selected candidate artifact contract path.",
+    )
+    selected_candidate_inputs_parser.add_argument(
+        "--source-explicit-operator-signoff-artifact",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_SIGNOFF_ARTIFACT_OUTPUT
+        ),
+        help="Blueprint 67 explicit operator signoff artifact path.",
+    )
+    selected_candidate_inputs_parser.add_argument(
+        "--source-explicit-operator-signoff-artifact-contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_SIGNOFF_ARTIFACT_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 67 explicit operator signoff artifact contract path.",
+    )
+    selected_candidate_inputs_parser.add_argument(
+        "--source-operator-signoff-candidate-selection-packet",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET_OUTPUT
+        ),
+        help="Blueprint 66 operator signoff candidate selection packet path.",
+    )
+    selected_candidate_inputs_parser.add_argument(
+        "--source-operator-signoff-candidate-selection-packet-contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 66 operator signoff candidate selection contract path.",
+    )
+    selected_candidate_inputs_parser.add_argument(
+        "--explicit-selected-candidate-ref",
+        help="Optional explicit selected candidate ref. Omit to keep selection pending.",
+    )
+    selected_candidate_inputs_parser.add_argument(
+        "--explicit-selected-candidate-id",
+        help="Optional explicit selected candidate id.",
+    )
+    selected_candidate_inputs_parser.add_argument(
+        "--explicit-selected-candidate-version",
+        help="Optional explicit selected candidate version.",
+    )
+    selected_candidate_inputs_parser.add_argument(
+        "--explicit-selected-candidate-source-path",
+        help="Optional explicit selected candidate source artifact path.",
+    )
+    selected_candidate_inputs_parser.add_argument(
+        "--explicit-selected-candidate-selection-reason",
+        help="Optional operator-provided selection reason.",
+    )
+    selected_candidate_inputs_parser.add_argument(
+        "--explicit-candidate-selection-timestamp",
+        help="Optional explicit candidate selection timestamp.",
+    )
+    selected_candidate_inputs_parser.add_argument(
+        "--explicit-operator-reference-for-selection",
+        help="Optional operator reference associated with the selection.",
+    )
+    selected_candidate_inputs_parser.add_argument(
+        "--model-asset-path",
+        default=DEFAULT_GAMEPLAY_CLASSIFIER_ASSET_PATH,
+        help="Read-only local TOM v1 gameplay classifier asset path.",
+    )
+    selected_candidate_inputs_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ARTIFACT_INPUTS_OUTPUT
+        ),
+        help="JSON Blueprint 68 explicit selected candidate artifact inputs path.",
+    )
+    selected_candidate_inputs_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    selected_candidate_inputs_parser.set_defaults(
+        handler=(
+            _handle_build_controlled_runtime_calibration_explicit_selected_candidate_artifact_inputs
+        ),
+        skip_create_db=True,
+    )
+
+    selected_candidate_inputs_validate_parser = subcommands.add_parser(
+        "validate-controlled-runtime-calibration-explicit-selected-candidate-artifact-inputs",
+        help="Validate Blueprint 68 explicit selected candidate artifact inputs.",
+    )
+    selected_candidate_inputs_validate_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ARTIFACT_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 68 explicit selected candidate artifact contract path.",
+    )
+    selected_candidate_inputs_validate_parser.add_argument(
+        "--selected-candidate-inputs",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ARTIFACT_INPUTS_OUTPUT
+        ),
+        help="Blueprint 68 explicit selected candidate artifact inputs path.",
+    )
+    selected_candidate_inputs_validate_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ARTIFACT_INPUTS_VALIDATION_OUTPUT
+        ),
+        help="Optional Blueprint 68 inputs validation path.",
+    )
+    selected_candidate_inputs_validate_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    selected_candidate_inputs_validate_parser.set_defaults(
+        handler=(
+            _handle_validate_controlled_runtime_calibration_explicit_selected_candidate_artifact_inputs
+        ),
+        skip_create_db=True,
+    )
+
+    selected_candidate_artifact_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-explicit-selected-candidate-artifact",
+        help="Build the Blueprint 68 explicit selected candidate artifact.",
+    )
+    selected_candidate_artifact_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ARTIFACT_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 68 explicit selected candidate artifact contract path.",
+    )
+    selected_candidate_artifact_parser.add_argument(
+        "--selected-candidate-inputs",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ARTIFACT_INPUTS_OUTPUT
+        ),
+        help="Blueprint 68 explicit selected candidate artifact inputs path.",
+    )
+    selected_candidate_artifact_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ARTIFACT_OUTPUT
+        ),
+        help="JSON Blueprint 68 explicit selected candidate artifact path.",
+    )
+    selected_candidate_artifact_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    selected_candidate_artifact_parser.set_defaults(
+        handler=(
+            _handle_build_controlled_runtime_calibration_explicit_selected_candidate_artifact
+        ),
+        skip_create_db=True,
+    )
+
+    selected_candidate_artifact_validate_parser = subcommands.add_parser(
+        "validate-controlled-runtime-calibration-explicit-selected-candidate-artifact",
+        help="Validate the Blueprint 68 explicit selected candidate artifact.",
+    )
+    selected_candidate_artifact_validate_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ARTIFACT_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 68 explicit selected candidate artifact contract path.",
+    )
+    selected_candidate_artifact_validate_parser.add_argument(
+        "--selected-candidate-artifact",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ARTIFACT_OUTPUT
+        ),
+        help="Blueprint 68 explicit selected candidate artifact path.",
+    )
+    selected_candidate_artifact_validate_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ARTIFACT_VALIDATION_OUTPUT
+        ),
+        help="Optional Blueprint 68 artifact validation path.",
+    )
+    selected_candidate_artifact_validate_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    selected_candidate_artifact_validate_parser.set_defaults(
+        handler=(
+            _handle_validate_controlled_runtime_calibration_explicit_selected_candidate_artifact
+        ),
+        skip_create_db=True,
+    )
+
+    candidate_inventory_report_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-candidate-option-inventory-report",
+        help="Build the Blueprint 68 candidate option inventory report.",
+    )
+    candidate_inventory_report_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ARTIFACT_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 68 explicit selected candidate artifact contract path.",
+    )
+    candidate_inventory_report_parser.add_argument(
+        "--selected-candidate-artifact",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ARTIFACT_OUTPUT
+        ),
+        help="Blueprint 68 explicit selected candidate artifact path.",
+    )
+    candidate_inventory_report_parser.add_argument(
+        "--output",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_CANDIDATE_OPTION_INVENTORY_REPORT_OUTPUT,
+        help="JSON Blueprint 68 candidate option inventory report path.",
+    )
+    candidate_inventory_report_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    candidate_inventory_report_parser.set_defaults(
+        handler=(
+            _handle_build_controlled_runtime_calibration_candidate_option_inventory_report
+        ),
+        skip_create_db=True,
+    )
+
+    candidate_requirements_report_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-candidate-selection-requirements-report",
+        help="Build the Blueprint 68 candidate selection requirements report.",
+    )
+    candidate_requirements_report_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ARTIFACT_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 68 explicit selected candidate artifact contract path.",
+    )
+    candidate_requirements_report_parser.add_argument(
+        "--selected-candidate-artifact",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ARTIFACT_OUTPUT
+        ),
+        help="Blueprint 68 explicit selected candidate artifact path.",
+    )
+    candidate_requirements_report_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_CANDIDATE_SELECTION_REQUIREMENTS_REPORT_OUTPUT
+        ),
+        help="JSON Blueprint 68 candidate selection requirements report path.",
+    )
+    candidate_requirements_report_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    candidate_requirements_report_parser.set_defaults(
+        handler=(
+            _handle_build_controlled_runtime_calibration_candidate_selection_requirements_report
+        ),
+        skip_create_db=True,
+    )
+
+    selected_candidate_readiness_report_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-selected-candidate-readiness-report",
+        help="Build the Blueprint 68 selected candidate readiness report.",
+    )
+    selected_candidate_readiness_report_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ARTIFACT_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 68 explicit selected candidate artifact contract path.",
+    )
+    selected_candidate_readiness_report_parser.add_argument(
+        "--selected-candidate-artifact",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ARTIFACT_OUTPUT
+        ),
+        help="Blueprint 68 explicit selected candidate artifact path.",
+    )
+    selected_candidate_readiness_report_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_SELECTED_CANDIDATE_READINESS_REPORT_OUTPUT
+        ),
+        help="JSON Blueprint 68 selected candidate readiness report path.",
+    )
+    selected_candidate_readiness_report_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    selected_candidate_readiness_report_parser.set_defaults(
+        handler=(
+            _handle_build_controlled_runtime_calibration_selected_candidate_readiness_report
+        ),
+        skip_create_db=True,
+    )
+
     point_evaluation_parser = subcommands.add_parser(
         "evaluate-point-candidates",
         help="Evaluate generated point candidate markers using operator review metadata.",
@@ -13630,6 +13974,127 @@ def _handle_build_controlled_runtime_calibration_operator_signoff_readiness_repo
     return build_controlled_runtime_calibration_operator_signoff_readiness_report(
         contract_path=args.contract,
         signoff_artifact_path=args.signoff_artifact,
+        output_path=args.output,
+    )
+
+
+def _handle_export_controlled_runtime_calibration_explicit_selected_candidate_artifact_contract(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return export_controlled_runtime_calibration_explicit_selected_candidate_artifact_contract(  # noqa: E501
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_explicit_selected_candidate_artifact_inputs(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_explicit_selected_candidate_artifact_inputs(
+        contract_path=args.contract,
+        source_explicit_operator_signoff_artifact_path=(
+            args.source_explicit_operator_signoff_artifact
+        ),
+        source_explicit_operator_signoff_artifact_contract_path=(
+            args.source_explicit_operator_signoff_artifact_contract
+        ),
+        source_operator_signoff_candidate_selection_packet_path=(
+            args.source_operator_signoff_candidate_selection_packet
+        ),
+        source_operator_signoff_candidate_selection_packet_contract_path=(
+            args.source_operator_signoff_candidate_selection_packet_contract
+        ),
+        explicit_selected_candidate_ref=args.explicit_selected_candidate_ref,
+        explicit_selected_candidate_id=args.explicit_selected_candidate_id,
+        explicit_selected_candidate_version=args.explicit_selected_candidate_version,
+        explicit_selected_candidate_source_path=(
+            args.explicit_selected_candidate_source_path
+        ),
+        explicit_selected_candidate_selection_reason=(
+            args.explicit_selected_candidate_selection_reason
+        ),
+        explicit_candidate_selection_timestamp=(
+            args.explicit_candidate_selection_timestamp
+        ),
+        explicit_operator_reference_for_selection=(
+            args.explicit_operator_reference_for_selection
+        ),
+        model_asset_path=args.model_asset_path,
+        output_path=args.output,
+    )
+
+
+def _handle_validate_controlled_runtime_calibration_explicit_selected_candidate_artifact_inputs(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_controlled_runtime_calibration_explicit_selected_candidate_artifact_inputs(
+        contract_path=args.contract,
+        selected_candidate_inputs_path=args.selected_candidate_inputs,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_explicit_selected_candidate_artifact(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_explicit_selected_candidate_artifact(
+        contract_path=args.contract,
+        selected_candidate_inputs_path=args.selected_candidate_inputs,
+        output_path=args.output,
+    )
+
+
+def _handle_validate_controlled_runtime_calibration_explicit_selected_candidate_artifact(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_controlled_runtime_calibration_explicit_selected_candidate_artifact(
+        contract_path=args.contract,
+        selected_candidate_artifact_path=args.selected_candidate_artifact,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_candidate_option_inventory_report(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_candidate_option_inventory_report(
+        contract_path=args.contract,
+        selected_candidate_artifact_path=args.selected_candidate_artifact,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_candidate_selection_requirements_report(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_candidate_selection_requirements_report(
+        contract_path=args.contract,
+        selected_candidate_artifact_path=args.selected_candidate_artifact,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_selected_candidate_readiness_report(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_selected_candidate_readiness_report(
+        contract_path=args.contract,
+        selected_candidate_artifact_path=args.selected_candidate_artifact,
         output_path=args.output,
     )
 

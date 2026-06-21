@@ -584,12 +584,32 @@ CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_SIGNOFF_ARTIFACT_VALIDATION_OUT
 CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_REQUIREMENTS_REPORT_OUTPUT ?= .data/exports/controlled_runtime_calibration_operator_signoff_requirements_report.current.json
 CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_ATTESTATION_TEMPLATE_OUTPUT ?= .data/exports/controlled_runtime_calibration_operator_attestation_template.current.json
 CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_READINESS_REPORT_OUTPUT ?= .data/exports/controlled_runtime_calibration_operator_signoff_readiness_report.current.json
+CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ARTIFACT_CONTRACT_OUTPUT ?= .data/contracts/controlled_runtime_calibration_explicit_selected_candidate_artifact_contract_v1.json
+CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ARTIFACT_INPUTS_OUTPUT ?= .data/exports/controlled_runtime_calibration_explicit_selected_candidate_artifact_inputs.current.json
+CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ARTIFACT_INPUTS ?= $(CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ARTIFACT_INPUTS_OUTPUT)
+CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ARTIFACT_INPUTS_VALIDATION_OUTPUT ?= .data/exports/controlled_runtime_calibration_explicit_selected_candidate_artifact_inputs.validation.json
+CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ARTIFACT_OUTPUT ?= .data/contracts/controlled_runtime_calibration_explicit_selected_candidate_artifact_v1.json
+CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ARTIFACT ?= $(CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ARTIFACT_OUTPUT)
+CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ARTIFACT_VALIDATION_OUTPUT ?= .data/exports/controlled_runtime_calibration_explicit_selected_candidate_artifact.validation.json
+CONTROLLED_RUNTIME_CALIBRATION_CANDIDATE_OPTION_INVENTORY_REPORT_OUTPUT ?= .data/exports/controlled_runtime_calibration_candidate_option_inventory_report.current.json
+CONTROLLED_RUNTIME_CALIBRATION_CANDIDATE_SELECTION_REQUIREMENTS_REPORT_OUTPUT ?= .data/exports/controlled_runtime_calibration_candidate_selection_requirements_report.current.json
+CONTROLLED_RUNTIME_CALIBRATION_SELECTED_CANDIDATE_READINESS_REPORT_OUTPUT ?= .data/exports/controlled_runtime_calibration_selected_candidate_readiness_report.current.json
 CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_SOURCE_RESOLUTION_PACKET ?= $(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_OUTPUT)
 CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_SOURCE_RESOLUTION_PACKET_CONTRACT ?= $(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_CONTRACT_OUTPUT)
 CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_SOURCE_CANDIDATE_CONFIG_FREEZE ?= $(CALIBRATION_CANDIDATE_CONFIG_FREEZE_ARTIFACT_OUTPUT)
 CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_SIGNOFF_SOURCE_PACKET ?= $(CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET_OUTPUT)
 CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_SIGNOFF_SOURCE_PACKET_CONTRACT ?= $(CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET_CONTRACT_OUTPUT)
+CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_SOURCE_SIGNOFF_ARTIFACT ?= $(CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_SIGNOFF_ARTIFACT_OUTPUT)
+CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_SOURCE_SIGNOFF_ARTIFACT_CONTRACT ?= $(CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_SIGNOFF_ARTIFACT_CONTRACT_OUTPUT)
+CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_SOURCE_PACKET ?= $(CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET_OUTPUT)
+CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_SOURCE_PACKET_CONTRACT ?= $(CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET_CONTRACT_OUTPUT)
 CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_REF ?=
+CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ID ?=
+CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_VERSION ?=
+CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_SOURCE_PATH ?=
+CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_SELECTION_REASON ?=
+CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_CANDIDATE_SELECTION_TIMESTAMP ?=
+CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_REFERENCE_FOR_SELECTION ?=
 CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_SIGNOFF_REF ?=
 CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_IDENTITY_REF ?=
 CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_SIGNOFF_TIMESTAMP ?=
@@ -730,6 +750,7 @@ export TOM_V3_DATABASE_URL
 .PHONY: tom-v1-export-controlled-runtime-calibration-blocked-execution-resolution-packet-contract tom-v1-build-controlled-runtime-calibration-blocked-execution-resolution-packet-inputs tom-v1-validate-controlled-runtime-calibration-blocked-execution-resolution-packet-inputs tom-v1-build-controlled-runtime-calibration-blocked-execution-resolution-packet tom-v1-validate-controlled-runtime-calibration-blocked-execution-resolution-packet tom-v1-build-controlled-runtime-calibration-blocker-resolution-checklist tom-v1-build-controlled-runtime-calibration-operator-action-plan tom-v1-build-controlled-runtime-calibration-candidate-selection-requirements tom-v1-build-controlled-runtime-calibration-final-gate-rerun-plan tom-v1-build-controlled-runtime-calibration-reexecution-readiness-plan
 .PHONY: tom-v1-export-controlled-runtime-calibration-operator-signoff-candidate-selection-packet-contract tom-v1-build-controlled-runtime-calibration-operator-signoff-candidate-selection-packet-inputs tom-v1-validate-controlled-runtime-calibration-operator-signoff-candidate-selection-packet-inputs tom-v1-build-controlled-runtime-calibration-operator-signoff-candidate-selection-packet tom-v1-validate-controlled-runtime-calibration-operator-signoff-candidate-selection-packet tom-v1-build-controlled-runtime-calibration-operator-signoff-requirements tom-v1-build-controlled-runtime-calibration-candidate-selection-options tom-v1-build-controlled-runtime-calibration-candidate-selection-validation-report tom-v1-build-controlled-runtime-calibration-resolution-readiness-report
 .PHONY: tom-v1-export-controlled-runtime-calibration-explicit-operator-signoff-artifact-contract tom-v1-build-controlled-runtime-calibration-explicit-operator-signoff-artifact-inputs tom-v1-validate-controlled-runtime-calibration-explicit-operator-signoff-artifact-inputs tom-v1-build-controlled-runtime-calibration-explicit-operator-signoff-artifact tom-v1-validate-controlled-runtime-calibration-explicit-operator-signoff-artifact tom-v1-build-controlled-runtime-calibration-operator-signoff-requirements-report tom-v1-build-controlled-runtime-calibration-operator-attestation-template tom-v1-build-controlled-runtime-calibration-operator-signoff-readiness-report
+.PHONY: tom-v1-export-controlled-runtime-calibration-explicit-selected-candidate-artifact-contract tom-v1-build-controlled-runtime-calibration-explicit-selected-candidate-artifact-inputs tom-v1-validate-controlled-runtime-calibration-explicit-selected-candidate-artifact-inputs tom-v1-build-controlled-runtime-calibration-explicit-selected-candidate-artifact tom-v1-validate-controlled-runtime-calibration-explicit-selected-candidate-artifact tom-v1-build-controlled-runtime-calibration-candidate-option-inventory-report tom-v1-build-controlled-runtime-calibration-candidate-selection-requirements-report tom-v1-build-controlled-runtime-calibration-selected-candidate-readiness-report
 
 install:
 	$(PYTHON) -m pip install -e ".[dev]"
@@ -1737,6 +1758,30 @@ tom-v1-build-controlled-runtime-calibration-operator-attestation-template:
 
 tom-v1-build-controlled-runtime-calibration-operator-signoff-readiness-report:
 	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-operator-signoff-readiness-report --contract "$(CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_SIGNOFF_ARTIFACT_CONTRACT_OUTPUT)" --signoff-artifact "$(CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_SIGNOFF_ARTIFACT)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_READINESS_REPORT_OUTPUT)" --skip-create-db
+
+tom-v1-export-controlled-runtime-calibration-explicit-selected-candidate-artifact-contract:
+	$(PYTHON) -m apps.worker.cli export-controlled-runtime-calibration-explicit-selected-candidate-artifact-contract --output "$(CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ARTIFACT_CONTRACT_OUTPUT)" --skip-create-db
+
+tom-v1-build-controlled-runtime-calibration-explicit-selected-candidate-artifact-inputs:
+	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-explicit-selected-candidate-artifact-inputs --contract "$(CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ARTIFACT_CONTRACT_OUTPUT)" --source-explicit-operator-signoff-artifact "$(CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_SOURCE_SIGNOFF_ARTIFACT)" --source-explicit-operator-signoff-artifact-contract "$(CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_SOURCE_SIGNOFF_ARTIFACT_CONTRACT)" --source-operator-signoff-candidate-selection-packet "$(CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_SOURCE_PACKET)" --source-operator-signoff-candidate-selection-packet-contract "$(CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_SOURCE_PACKET_CONTRACT)" --model-asset-path "$(GAMEPLAY_CLASSIFIER_ASSET_PATH)" $(if $(CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_REF),--explicit-selected-candidate-ref "$(CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_REF)",) $(if $(CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ID),--explicit-selected-candidate-id "$(CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ID)",) $(if $(CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_VERSION),--explicit-selected-candidate-version "$(CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_VERSION)",) $(if $(CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_SOURCE_PATH),--explicit-selected-candidate-source-path "$(CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_SOURCE_PATH)",) $(if $(CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_SELECTION_REASON),--explicit-selected-candidate-selection-reason "$(CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_SELECTION_REASON)",) $(if $(CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_CANDIDATE_SELECTION_TIMESTAMP),--explicit-candidate-selection-timestamp "$(CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_CANDIDATE_SELECTION_TIMESTAMP)",) $(if $(CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_REFERENCE_FOR_SELECTION),--explicit-operator-reference-for-selection "$(CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_REFERENCE_FOR_SELECTION)",) --output "$(CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ARTIFACT_INPUTS_OUTPUT)" --skip-create-db
+
+tom-v1-validate-controlled-runtime-calibration-explicit-selected-candidate-artifact-inputs:
+	$(PYTHON) -m apps.worker.cli validate-controlled-runtime-calibration-explicit-selected-candidate-artifact-inputs --contract "$(CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ARTIFACT_CONTRACT_OUTPUT)" --selected-candidate-inputs "$(CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ARTIFACT_INPUTS)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ARTIFACT_INPUTS_VALIDATION_OUTPUT)" --skip-create-db
+
+tom-v1-build-controlled-runtime-calibration-explicit-selected-candidate-artifact:
+	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-explicit-selected-candidate-artifact --contract "$(CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ARTIFACT_CONTRACT_OUTPUT)" --selected-candidate-inputs "$(CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ARTIFACT_INPUTS)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ARTIFACT_OUTPUT)" --skip-create-db
+
+tom-v1-validate-controlled-runtime-calibration-explicit-selected-candidate-artifact:
+	$(PYTHON) -m apps.worker.cli validate-controlled-runtime-calibration-explicit-selected-candidate-artifact --contract "$(CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ARTIFACT_CONTRACT_OUTPUT)" --selected-candidate-artifact "$(CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ARTIFACT)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ARTIFACT_VALIDATION_OUTPUT)" --skip-create-db
+
+tom-v1-build-controlled-runtime-calibration-candidate-option-inventory-report:
+	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-candidate-option-inventory-report --contract "$(CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ARTIFACT_CONTRACT_OUTPUT)" --selected-candidate-artifact "$(CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ARTIFACT)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_CANDIDATE_OPTION_INVENTORY_REPORT_OUTPUT)" --skip-create-db
+
+tom-v1-build-controlled-runtime-calibration-candidate-selection-requirements-report:
+	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-candidate-selection-requirements-report --contract "$(CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ARTIFACT_CONTRACT_OUTPUT)" --selected-candidate-artifact "$(CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ARTIFACT)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_CANDIDATE_SELECTION_REQUIREMENTS_REPORT_OUTPUT)" --skip-create-db
+
+tom-v1-build-controlled-runtime-calibration-selected-candidate-readiness-report:
+	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-selected-candidate-readiness-report --contract "$(CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ARTIFACT_CONTRACT_OUTPUT)" --selected-candidate-artifact "$(CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ARTIFACT)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_SELECTED_CANDIDATE_READINESS_REPORT_OUTPUT)" --skip-create-db
 
 tom-v1-post-codex-validate:
 	scripts/post_codex_validate.sh $(if $(EXPECTED_BRANCH),--branch "$(EXPECTED_BRANCH)",) $(if $(EXPECTED_TAG),--expected-tag "$(EXPECTED_TAG)",) --python "$(PYTHON)"

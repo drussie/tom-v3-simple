@@ -4649,3 +4649,37 @@ The committed artifact records
 `selected_candidate_required`, `final_gate_rerun_required`,
 `reexecution_not_ready_blockers_unresolved`, `runtime_application_status: not_executed`,
 `runtime_config_changed: false`, and `no_runtime_mutation_due_to_blocker`.
+
+## Blueprint 68 Controlled Runtime Calibration Explicit Selected Candidate Artifact v1
+
+Status: complete
+
+### Goal
+
+Create the explicit selected candidate artifact mechanism required after BP67 while leaving the
+selected candidate pending unless real operator selection input is supplied.
+
+### Notes
+
+This milestone adds:
+
+- `apps.worker.services.controlled_runtime_calibration_explicit_selected_candidate_artifact`
+- worker CLI commands for contract export, inputs, input validation, artifact build, artifact
+  validation, candidate option inventory report, candidate selection requirements report, and
+  selected candidate readiness report
+- matching `tom-v1-*controlled-runtime-calibration-explicit-selected-candidate-artifact*` Make
+  helpers
+- `.data/contracts/controlled_runtime_calibration_explicit_selected_candidate_artifact_contract_v1.json`
+  tracked contract
+- `.data/contracts/controlled_runtime_calibration_explicit_selected_candidate_artifact_v1.json`
+  tracked artifact
+- generated input, validation, inventory report, requirements report, and readiness report paths
+  under `.data/exports/`
+- focused tests for the pending default path and invalid explicit selected candidate rejection
+
+The committed artifact records
+`selected_candidate_artifact_created_pending_explicit_candidate_input`,
+`selected_candidate_required`, `candidate_selection_pending_explicit_input`,
+`operator_signoff_required`, `final_gate_rerun_required`,
+`reexecution_not_ready_blockers_unresolved`, `runtime_application_status: not_executed`,
+`runtime_config_changed: false`, and `no_runtime_mutation_due_to_blocker`.
