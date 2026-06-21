@@ -38,3 +38,9 @@ change when final gate, operator signoff, or selected-candidate requirements are
 Reason: BP65 may package missing operator signoff, missing selected candidate context, final-gate
 rerun requirements, and future reexecution prerequisites, but it must not create those artifacts or
 retry runtime application.
+
+## Decision 9: Operator Signoff And Candidate Selection Must Be Explicit
+
+Reason: BP66 may discover candidate option refs and validate packet structure, but candidate option
+discovery is not selected candidate context, and validation success or Codex execution is not
+operator signoff.

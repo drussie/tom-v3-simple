@@ -398,6 +398,8 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Controlled Runtime Calibration Application Execution Review Packet v1](reviews/controlled_runtime_calibration_application_execution_review_packet_v1.md)
 - [Blueprint 65 Controlled Runtime Calibration Blocked Execution Resolution Packet v1](blueprints/blueprint_65_controlled_runtime_calibration_blocked_execution_resolution_packet_v1.md)
 - [Controlled Runtime Calibration Blocked Execution Resolution Packet v1](reviews/controlled_runtime_calibration_blocked_execution_resolution_packet_v1.md)
+- [Blueprint 66 Controlled Runtime Calibration Operator Signoff Candidate Selection Packet v1](blueprints/blueprint_66_controlled_runtime_calibration_operator_signoff_candidate_selection_packet_v1.md)
+- [Controlled Runtime Calibration Operator Signoff Candidate Selection Packet v1](reviews/controlled_runtime_calibration_operator_signoff_candidate_selection_packet_v1.md)
 
 ## Development
 

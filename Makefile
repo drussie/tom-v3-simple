@@ -563,6 +563,25 @@ CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_ACTION_PLAN_OUTPUT ?= .data/exports/cont
 CONTROLLED_RUNTIME_CALIBRATION_CANDIDATE_SELECTION_REQUIREMENTS_OUTPUT ?= .data/exports/controlled_runtime_calibration_candidate_selection_requirements.current.json
 CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_PLAN_OUTPUT ?= .data/exports/controlled_runtime_calibration_final_gate_rerun_plan.current.json
 CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_READINESS_PLAN_OUTPUT ?= .data/exports/controlled_runtime_calibration_reexecution_readiness_plan.current.json
+CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET_CONTRACT_OUTPUT ?= .data/contracts/controlled_runtime_calibration_operator_signoff_candidate_selection_packet_contract_v1.json
+CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET_INPUTS_OUTPUT ?= .data/exports/controlled_runtime_calibration_operator_signoff_candidate_selection_packet_inputs.current.json
+CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET_INPUTS ?= $(CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET_INPUTS_OUTPUT)
+CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET_INPUTS_VALIDATION_OUTPUT ?= .data/exports/controlled_runtime_calibration_operator_signoff_candidate_selection_packet_inputs.validation.json
+CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET_OUTPUT ?= .data/contracts/controlled_runtime_calibration_operator_signoff_candidate_selection_packet_v1.json
+CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET ?= $(CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET_OUTPUT)
+CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET_VALIDATION_OUTPUT ?= .data/exports/controlled_runtime_calibration_operator_signoff_candidate_selection_packet.validation.json
+CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_REQUIREMENTS_OUTPUT ?= .data/exports/controlled_runtime_calibration_operator_signoff_requirements.current.json
+CONTROLLED_RUNTIME_CALIBRATION_CANDIDATE_SELECTION_OPTIONS_OUTPUT ?= .data/exports/controlled_runtime_calibration_candidate_selection_options.current.json
+CONTROLLED_RUNTIME_CALIBRATION_CANDIDATE_SELECTION_VALIDATION_REPORT_OUTPUT ?= .data/exports/controlled_runtime_calibration_candidate_selection_validation_report.current.json
+CONTROLLED_RUNTIME_CALIBRATION_RESOLUTION_READINESS_REPORT_OUTPUT ?= .data/exports/controlled_runtime_calibration_resolution_readiness_report.current.json
+CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_SOURCE_RESOLUTION_PACKET ?= $(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_OUTPUT)
+CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_SOURCE_RESOLUTION_PACKET_CONTRACT ?= $(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_CONTRACT_OUTPUT)
+CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_SOURCE_CANDIDATE_CONFIG_FREEZE ?= $(CALIBRATION_CANDIDATE_CONFIG_FREEZE_ARTIFACT_OUTPUT)
+CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_REF ?=
+CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_SIGNOFF_REF ?=
+CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_IDENTITY_REF ?=
+CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_SIGNOFF_TIMESTAMP ?=
+CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_NOTES_REF ?=
 CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_SOURCE_REVIEW_PACKET ?= $(CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_EXECUTION_REVIEW_PACKET_OUTPUT)
 CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_SOURCE_REVIEW_PACKET_CONTRACT ?= $(CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_EXECUTION_REVIEW_PACKET_CONTRACT_OUTPUT)
 CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_EXECUTION_REVIEW_SOURCE_APPLICATION_EXECUTION ?= $(CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_EXECUTION_OUTPUT)
@@ -695,6 +714,7 @@ export TOM_V3_DATABASE_URL
 .PHONY: tom-v1-export-controlled-runtime-calibration-application-execution-contract tom-v1-build-controlled-runtime-calibration-applied-runtime-config tom-v1-build-controlled-runtime-calibration-application-execution-inputs tom-v1-validate-controlled-runtime-calibration-application-execution-inputs tom-v1-execute-controlled-runtime-calibration-application tom-v1-validate-controlled-runtime-calibration-application-execution tom-v1-verify-controlled-runtime-calibration-runtime-readback tom-v1-build-controlled-runtime-calibration-application-audit-report tom-v1-build-controlled-runtime-calibration-rollback-package tom-v1-build-controlled-runtime-calibration-post-apply-verification-report
 .PHONY: tom-v1-export-controlled-runtime-calibration-application-execution-review-packet-contract tom-v1-build-controlled-runtime-calibration-application-execution-review-packet-inputs tom-v1-validate-controlled-runtime-calibration-application-execution-review-packet-inputs tom-v1-build-controlled-runtime-calibration-application-execution-review-packet tom-v1-validate-controlled-runtime-calibration-application-execution-review-packet tom-v1-build-controlled-runtime-calibration-post-execution-summary tom-v1-build-controlled-runtime-calibration-post-execution-blocker-report tom-v1-build-controlled-runtime-calibration-post-execution-operator-checklist tom-v1-build-controlled-runtime-calibration-post-execution-next-action-report
 .PHONY: tom-v1-export-controlled-runtime-calibration-blocked-execution-resolution-packet-contract tom-v1-build-controlled-runtime-calibration-blocked-execution-resolution-packet-inputs tom-v1-validate-controlled-runtime-calibration-blocked-execution-resolution-packet-inputs tom-v1-build-controlled-runtime-calibration-blocked-execution-resolution-packet tom-v1-validate-controlled-runtime-calibration-blocked-execution-resolution-packet tom-v1-build-controlled-runtime-calibration-blocker-resolution-checklist tom-v1-build-controlled-runtime-calibration-operator-action-plan tom-v1-build-controlled-runtime-calibration-candidate-selection-requirements tom-v1-build-controlled-runtime-calibration-final-gate-rerun-plan tom-v1-build-controlled-runtime-calibration-reexecution-readiness-plan
+.PHONY: tom-v1-export-controlled-runtime-calibration-operator-signoff-candidate-selection-packet-contract tom-v1-build-controlled-runtime-calibration-operator-signoff-candidate-selection-packet-inputs tom-v1-validate-controlled-runtime-calibration-operator-signoff-candidate-selection-packet-inputs tom-v1-build-controlled-runtime-calibration-operator-signoff-candidate-selection-packet tom-v1-validate-controlled-runtime-calibration-operator-signoff-candidate-selection-packet tom-v1-build-controlled-runtime-calibration-operator-signoff-requirements tom-v1-build-controlled-runtime-calibration-candidate-selection-options tom-v1-build-controlled-runtime-calibration-candidate-selection-validation-report tom-v1-build-controlled-runtime-calibration-resolution-readiness-report
 
 install:
 	$(PYTHON) -m pip install -e ".[dev]"
@@ -1651,6 +1671,33 @@ tom-v1-build-controlled-runtime-calibration-final-gate-rerun-plan:
 
 tom-v1-build-controlled-runtime-calibration-reexecution-readiness-plan:
 	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-reexecution-readiness-plan --contract "$(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_CONTRACT_OUTPUT)" --resolution-packet "$(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_READINESS_PLAN_OUTPUT)" --skip-create-db
+
+tom-v1-export-controlled-runtime-calibration-operator-signoff-candidate-selection-packet-contract:
+	$(PYTHON) -m apps.worker.cli export-controlled-runtime-calibration-operator-signoff-candidate-selection-packet-contract --output "$(CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET_CONTRACT_OUTPUT)" --skip-create-db
+
+tom-v1-build-controlled-runtime-calibration-operator-signoff-candidate-selection-packet-inputs:
+	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-operator-signoff-candidate-selection-packet-inputs --contract "$(CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET_CONTRACT_OUTPUT)" --source-blocked-execution-resolution-packet "$(CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_SOURCE_RESOLUTION_PACKET)" --source-blocked-execution-resolution-packet-contract "$(CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_SOURCE_RESOLUTION_PACKET_CONTRACT)" --source-candidate-config-freeze "$(CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_SOURCE_CANDIDATE_CONFIG_FREEZE)" --model-asset-path "$(GAMEPLAY_CLASSIFIER_ASSET_PATH)" $(if $(CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_REF),--explicit-selected-candidate-ref "$(CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_REF)",) $(if $(CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_SIGNOFF_REF),--explicit-operator-signoff-ref "$(CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_SIGNOFF_REF)",) $(if $(CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_IDENTITY_REF),--explicit-operator-identity-ref "$(CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_IDENTITY_REF)",) $(if $(CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_SIGNOFF_TIMESTAMP),--explicit-operator-signoff-timestamp "$(CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_SIGNOFF_TIMESTAMP)",) $(if $(CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_NOTES_REF),--operator-notes-ref "$(CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_NOTES_REF)",) --output "$(CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET_INPUTS_OUTPUT)" --skip-create-db
+
+tom-v1-validate-controlled-runtime-calibration-operator-signoff-candidate-selection-packet-inputs:
+	$(PYTHON) -m apps.worker.cli validate-controlled-runtime-calibration-operator-signoff-candidate-selection-packet-inputs --contract "$(CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET_CONTRACT_OUTPUT)" --packet-inputs "$(CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET_INPUTS)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET_INPUTS_VALIDATION_OUTPUT)" --skip-create-db
+
+tom-v1-build-controlled-runtime-calibration-operator-signoff-candidate-selection-packet:
+	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-operator-signoff-candidate-selection-packet --contract "$(CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET_CONTRACT_OUTPUT)" --packet-inputs "$(CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET_INPUTS)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET_OUTPUT)" --skip-create-db
+
+tom-v1-validate-controlled-runtime-calibration-operator-signoff-candidate-selection-packet:
+	$(PYTHON) -m apps.worker.cli validate-controlled-runtime-calibration-operator-signoff-candidate-selection-packet --contract "$(CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET_CONTRACT_OUTPUT)" --packet "$(CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET_VALIDATION_OUTPUT)" --skip-create-db
+
+tom-v1-build-controlled-runtime-calibration-operator-signoff-requirements:
+	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-operator-signoff-requirements --contract "$(CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET_CONTRACT_OUTPUT)" --packet "$(CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_REQUIREMENTS_OUTPUT)" --skip-create-db
+
+tom-v1-build-controlled-runtime-calibration-candidate-selection-options:
+	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-candidate-selection-options --contract "$(CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET_CONTRACT_OUTPUT)" --packet "$(CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_CANDIDATE_SELECTION_OPTIONS_OUTPUT)" --skip-create-db
+
+tom-v1-build-controlled-runtime-calibration-candidate-selection-validation-report:
+	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-candidate-selection-validation-report --contract "$(CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET_CONTRACT_OUTPUT)" --packet "$(CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_CANDIDATE_SELECTION_VALIDATION_REPORT_OUTPUT)" --skip-create-db
+
+tom-v1-build-controlled-runtime-calibration-resolution-readiness-report:
+	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-resolution-readiness-report --contract "$(CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET_CONTRACT_OUTPUT)" --packet "$(CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_RESOLUTION_READINESS_REPORT_OUTPUT)" --skip-create-db
 
 tom-v1-post-codex-validate:
 	scripts/post_codex_validate.sh $(if $(EXPECTED_BRANCH),--branch "$(EXPECTED_BRANCH)",) $(if $(EXPECTED_TAG),--expected-tag "$(EXPECTED_TAG)",) --python "$(PYTHON)"

@@ -16,11 +16,12 @@
 - BP1-37: TOM v3 evidence, replay, review, and 3D foundation.
 - BP38-45: Gameplay gate pathway.
 - BP46-54: Real broadcast gameplay review and calibration decision phase.
-- BP55-65: Controlled runtime calibration governance through blocked execution resolution packet.
+- BP55-66: Controlled runtime calibration governance through operator signoff / candidate
+  selection packet state.
 
 ## Current Chain
 
-BP55 -> BP56 -> BP57 -> BP58 -> BP59 -> BP60 -> BP61 -> BP62 -> BP63 memory insert -> BP64 -> BP65.
+BP55 -> BP56 -> BP57 -> BP58 -> BP59 -> BP60 -> BP61 -> BP62 -> BP63 memory insert -> BP64 -> BP65 -> BP66.
 
 ## Detailed Entries
 
@@ -150,3 +151,40 @@ Runtime result: blocked safely; runtime target unchanged before and after.
 
 Follow-up: Collect real operator signoff and selected candidate context, then rerun the final gate
 in a future blueprint before any future application attempt.
+
+### Blueprint 66 - Controlled Runtime Calibration Operator Signoff Candidate Selection Packet v1
+
+Status: Complete after this blueprint commit.
+
+Branch:
+`codex/blueprint-66-controlled-runtime-calibration-operator-signoff-candidate-selection-packet-v1`
+
+Commit: recorded by the blueprint commit and final report.
+
+Tag:
+`tom-v3-blueprint-66-controlled-runtime-calibration-operator-signoff-candidate-selection-packet-v1`
+
+Classification: calibration-governance-facing, operator-resolution-facing, candidate-selection-state-facing,
+no-runtime-mutation.
+
+Files or areas changed:
+
+- Controlled runtime calibration operator signoff candidate selection packet service.
+- CLI commands and Make targets.
+- Tracked BP66 contract and frozen packet artifacts.
+- Generated `.data/exports/` signoff requirements, candidate option, candidate validation, and
+  readiness reports for local review only.
+- Focused tests.
+- Docs, runbook, agent report, status docs, and repo memory updates.
+- Post-Codex validation coverage.
+
+Validation: full Blueprint 66 validation recorded by final report.
+
+Decision: BP66 records whether explicit operator signoff and selected candidate refs exist, but it
+does not infer either one from available candidate options, Codex execution, validation success, or
+branch state.
+
+Runtime result: blocked safely; runtime target unchanged before and after.
+
+Follow-up: Provide real operator signoff and explicit selected candidate context, then rerun the
+final gate in a future blueprint before any future application attempt.

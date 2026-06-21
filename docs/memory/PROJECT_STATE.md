@@ -27,6 +27,7 @@ video/media
 -> controlled runtime calibration execution mechanism
 -> controlled runtime calibration post-execution review
 -> controlled runtime calibration blocked-execution resolution requirements
+-> controlled runtime calibration operator signoff / candidate selection packet state
 ```
 
 The current principle is to expand safely from reviewed sample evidence toward broader replay,
@@ -41,50 +42,57 @@ mutation system. Runtime changes must remain explicitly governed.
 - BP1-37: TOM v3 evidence, replay, review, and 3D foundation.
 - BP38-45: Gameplay gate pathway.
 - BP46-54: Real broadcast gameplay review and calibration decision phase.
-- BP55-65: Controlled runtime calibration governance through blocked execution resolution packet.
+- BP55-66: Controlled runtime calibration governance through operator signoff / candidate
+  selection packet state.
 
 ## Latest Completed Milestone
 
-Blueprint 65 - Controlled Runtime Calibration Blocked Execution Resolution Packet v1
+Blueprint 66 - Controlled Runtime Calibration Operator Signoff Candidate Selection Packet v1
 
 Status: Complete.
 
-Commit: recorded by the Blueprint 65 commit.
+Commit: recorded by the Blueprint 66 commit.
 
-Tag: `tom-v3-blueprint-65-controlled-runtime-calibration-blocked-execution-resolution-packet-v1`
+Tag:
+`tom-v3-blueprint-66-controlled-runtime-calibration-operator-signoff-candidate-selection-packet-v1`
 
 Implemented:
 
-- Controlled runtime calibration blocked execution resolution packet service.
+- Controlled runtime calibration operator signoff candidate selection packet service.
 - CLI commands and Make targets.
 - Focused tests.
 - Docs, runbook, status, and report updates.
 - Post-Codex validator updates.
-- Tracked BP65 contract artifacts:
-  - `.data/contracts/controlled_runtime_calibration_blocked_execution_resolution_packet_contract_v1.json`
-  - `.data/contracts/controlled_runtime_calibration_blocked_execution_resolution_packet_v1.json`
+- Tracked BP66 contract artifacts:
+  - `.data/contracts/controlled_runtime_calibration_operator_signoff_candidate_selection_packet_contract_v1.json`
+  - `.data/contracts/controlled_runtime_calibration_operator_signoff_candidate_selection_packet_v1.json`
 
 Runtime result:
 
-- The committed frozen BP65 packet correctly represents the blocked BP64/BP62 execution review.
+- The committed frozen BP66 packet correctly represents the pending operator signoff and selected
+  candidate state after BP65.
 - There is still no real operator signoff or selected candidate in the frozen path.
-- BP65 packages the required future operator signoff, selected candidate context, final-gate rerun,
-  and future reexecution prerequisites.
+- BP66 discovers frozen candidate option refs for review but does not select one.
+- BP66 records operator signoff requirements, candidate selection options, candidate validation,
+  final-gate rerun readiness, and reexecution readiness.
 - Runtime target stayed unchanged before and after.
 - Runtime target SHA before and after:
   `8052301c40dee448f858a3a7c64ae7805d3e7839fbbe35305044e1775f0f8fd0`
-- Resolution packet status: `resolution_packet_created_for_blocked_execution`
-- Application outcome status: `application_blocked_safely_before_runtime_mutation`
+- Packet status: `packet_created_pending_operator_signoff_and_candidate_selection`
+- Operator signoff status: `operator_signoff_required`
+- Candidate selection status: `selected_candidate_required`
+- Final gate rerun status: `final_gate_rerun_required`
+- Reexecution readiness status: `reexecution_not_ready_blockers_unresolved`
 - Next action recommendations:
-  `resolve_operator_signoff_before_reapplying`, `select_candidate_before_reapplying`, and
-  `rerun_final_gate_after_resolution`
+  `provide_operator_signoff_and_selected_candidate` and
+  `rerun_final_gate_after_signoff_and_candidate_selection`
 
-Resolution-packet test coverage:
+Operator signoff candidate selection packet test coverage:
 
-- Current BP64 blocked execution review path.
-- Blocker checklist, operator action plan, candidate requirements, final-gate rerun plan, and
-  reexecution readiness plan generation.
-- Forbidden token rejection.
+- Current BP65 pending operator signoff / selected candidate path.
+- Operator signoff requirements, candidate options, candidate validation, and resolution readiness
+  report generation.
+- Invalid explicit selected candidate rejection.
 
 ## Controlled Calibration Chain
 
@@ -99,12 +107,13 @@ Resolution-packet test coverage:
 - BP63 - TOM v3 Repo Memory Layer
 - BP64 - Controlled Runtime Calibration Application Execution Review Packet
 - BP65 - Controlled Runtime Calibration Blocked Execution Resolution Packet
+- BP66 - Controlled Runtime Calibration Operator Signoff Candidate Selection Packet
 
 ## Next Regular Action
 
-Use the BP65 resolution packet to collect real operator signoff, select an explicit candidate, and
-rerun the final gate before any future controlled runtime application retry. Do not attempt runtime
-application while the BP61/BP62/BP64/BP65 chain remains blocked.
+Use the BP66 packet to collect real operator signoff and an explicit selected candidate ref, then
+rerun the BP61 final gate in a future blueprint. Do not attempt runtime application while the
+BP61/BP62/BP64/BP65/BP66 chain remains blocked.
 
 ## Known Unrelated Working Tree Item
 

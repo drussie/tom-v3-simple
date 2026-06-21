@@ -220,6 +220,26 @@ from apps.worker.services.controlled_runtime_calibration_human_approval_gate imp
     validate_controlled_runtime_calibration_human_approval_gate,
     validate_controlled_runtime_calibration_human_approval_gate_inputs,
 )
+from apps.worker.services.controlled_runtime_calibration_operator_signoff_candidate_selection_packet import (  # noqa: E501
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_CANDIDATE_SELECTION_OPTIONS_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_CANDIDATE_SELECTION_VALIDATION_REPORT_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET_CONTRACT_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET_INPUTS_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET_INPUTS_VALIDATION_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET_VALIDATION_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_REQUIREMENTS_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_RESOLUTION_READINESS_REPORT_OUTPUT,
+    build_controlled_runtime_calibration_candidate_selection_options,
+    build_controlled_runtime_calibration_candidate_selection_validation_report,
+    build_controlled_runtime_calibration_operator_signoff_candidate_selection_packet,
+    build_controlled_runtime_calibration_operator_signoff_candidate_selection_packet_inputs,
+    build_controlled_runtime_calibration_operator_signoff_requirements,
+    build_controlled_runtime_calibration_resolution_readiness_report,
+    export_controlled_runtime_calibration_operator_signoff_candidate_selection_packet_contract,
+    validate_controlled_runtime_calibration_operator_signoff_candidate_selection_packet,
+    validate_controlled_runtime_calibration_operator_signoff_candidate_selection_packet_inputs,
+)
 from apps.worker.services.controlled_runtime_calibration_pre_application_final_gate import (
     DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_ARTIFACT_CHECKLIST_OUTPUT,
     DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_BLOCKER_REPORT_OUTPUT,
@@ -8642,6 +8662,326 @@ def main() -> None:
         skip_create_db=True,
     )
 
+    signoff_candidate_contract_parser = subcommands.add_parser(
+        "export-controlled-runtime-calibration-operator-signoff-candidate-selection-packet-contract",
+        help="Export the Blueprint 66 operator signoff and candidate selection packet contract.",
+    )
+    signoff_candidate_contract_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET_CONTRACT_OUTPUT
+        ),
+        help="JSON Blueprint 66 operator signoff candidate selection contract path.",
+    )
+    signoff_candidate_contract_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    signoff_candidate_contract_parser.set_defaults(
+        handler=(
+            _handle_export_controlled_runtime_calibration_operator_signoff_candidate_selection_packet_contract
+        ),
+        skip_create_db=True,
+    )
+
+    signoff_candidate_inputs_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-operator-signoff-candidate-selection-packet-inputs",
+        help="Build Blueprint 66 operator signoff and candidate selection packet inputs.",
+    )
+    signoff_candidate_inputs_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 66 operator signoff candidate selection contract path.",
+    )
+    signoff_candidate_inputs_parser.add_argument(
+        "--source-blocked-execution-resolution-packet",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_OUTPUT
+        ),
+        help="Blueprint 65 blocked execution resolution packet path.",
+    )
+    signoff_candidate_inputs_parser.add_argument(
+        "--source-blocked-execution-resolution-packet-contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 65 blocked execution resolution packet contract path.",
+    )
+    signoff_candidate_inputs_parser.add_argument(
+        "--source-candidate-config-freeze",
+        default=DEFAULT_CALIBRATION_CANDIDATE_CONFIG_FREEZE_ARTIFACT_OUTPUT,
+        help="Frozen candidate config artifact path.",
+    )
+    signoff_candidate_inputs_parser.add_argument(
+        "--explicit-selected-candidate-ref",
+        help="Optional explicit selected candidate ref. Omit to keep selection pending.",
+    )
+    signoff_candidate_inputs_parser.add_argument(
+        "--explicit-operator-signoff-ref",
+        help="Optional explicit operator signoff ref. Omit to keep signoff pending.",
+    )
+    signoff_candidate_inputs_parser.add_argument(
+        "--explicit-operator-identity-ref",
+        help="Optional explicit operator identity or operator reference.",
+    )
+    signoff_candidate_inputs_parser.add_argument(
+        "--explicit-operator-signoff-timestamp",
+        help="Optional explicit operator signoff timestamp.",
+    )
+    signoff_candidate_inputs_parser.add_argument(
+        "--operator-notes-ref",
+        help="Optional operator notes reference.",
+    )
+    signoff_candidate_inputs_parser.add_argument(
+        "--model-asset-path",
+        default=DEFAULT_GAMEPLAY_CLASSIFIER_ASSET_PATH,
+        help="Read-only local TOM v1 gameplay classifier asset path.",
+    )
+    signoff_candidate_inputs_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET_INPUTS_OUTPUT
+        ),
+        help="JSON Blueprint 66 operator signoff candidate selection inputs path.",
+    )
+    signoff_candidate_inputs_parser.add_argument("--skip-create-db", action="store_true")
+    signoff_candidate_inputs_parser.set_defaults(
+        handler=(
+            _handle_build_controlled_runtime_calibration_operator_signoff_candidate_selection_packet_inputs
+        ),
+        skip_create_db=True,
+    )
+
+    signoff_candidate_inputs_validate_parser = subcommands.add_parser(
+        "validate-controlled-runtime-calibration-operator-signoff-candidate-selection-packet-inputs",
+        help="Validate Blueprint 66 operator signoff and candidate selection packet inputs.",
+    )
+    signoff_candidate_inputs_validate_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 66 operator signoff candidate selection contract path.",
+    )
+    signoff_candidate_inputs_validate_parser.add_argument(
+        "--packet-inputs",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET_INPUTS_OUTPUT
+        ),
+        help="Blueprint 66 operator signoff candidate selection packet inputs path.",
+    )
+    signoff_candidate_inputs_validate_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET_INPUTS_VALIDATION_OUTPUT
+        ),
+        help="Optional Blueprint 66 packet inputs validation path.",
+    )
+    signoff_candidate_inputs_validate_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    signoff_candidate_inputs_validate_parser.set_defaults(
+        handler=(
+            _handle_validate_controlled_runtime_calibration_operator_signoff_candidate_selection_packet_inputs
+        ),
+        skip_create_db=True,
+    )
+
+    signoff_candidate_packet_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-operator-signoff-candidate-selection-packet",
+        help="Build the Blueprint 66 operator signoff and candidate selection packet.",
+    )
+    signoff_candidate_packet_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 66 operator signoff candidate selection contract path.",
+    )
+    signoff_candidate_packet_parser.add_argument(
+        "--packet-inputs",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET_INPUTS_OUTPUT
+        ),
+        help="Blueprint 66 operator signoff candidate selection packet inputs path.",
+    )
+    signoff_candidate_packet_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET_OUTPUT
+        ),
+        help="JSON Blueprint 66 operator signoff candidate selection packet path.",
+    )
+    signoff_candidate_packet_parser.add_argument("--skip-create-db", action="store_true")
+    signoff_candidate_packet_parser.set_defaults(
+        handler=(
+            _handle_build_controlled_runtime_calibration_operator_signoff_candidate_selection_packet
+        ),
+        skip_create_db=True,
+    )
+
+    signoff_candidate_packet_validate_parser = subcommands.add_parser(
+        "validate-controlled-runtime-calibration-operator-signoff-candidate-selection-packet",
+        help="Validate the Blueprint 66 operator signoff and candidate selection packet.",
+    )
+    signoff_candidate_packet_validate_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 66 operator signoff candidate selection contract path.",
+    )
+    signoff_candidate_packet_validate_parser.add_argument(
+        "--packet",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET_OUTPUT
+        ),
+        help="Blueprint 66 operator signoff candidate selection packet path.",
+    )
+    signoff_candidate_packet_validate_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET_VALIDATION_OUTPUT
+        ),
+        help="Optional Blueprint 66 packet validation path.",
+    )
+    signoff_candidate_packet_validate_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    signoff_candidate_packet_validate_parser.set_defaults(
+        handler=(
+            _handle_validate_controlled_runtime_calibration_operator_signoff_candidate_selection_packet
+        ),
+        skip_create_db=True,
+    )
+
+    operator_signoff_requirements_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-operator-signoff-requirements",
+        help="Build the Blueprint 66 operator signoff requirements export.",
+    )
+    operator_signoff_requirements_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 66 operator signoff candidate selection contract path.",
+    )
+    operator_signoff_requirements_parser.add_argument(
+        "--packet",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET_OUTPUT
+        ),
+        help="Blueprint 66 operator signoff candidate selection packet path.",
+    )
+    operator_signoff_requirements_parser.add_argument(
+        "--output",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_REQUIREMENTS_OUTPUT,
+        help="JSON Blueprint 66 operator signoff requirements path.",
+    )
+    operator_signoff_requirements_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    operator_signoff_requirements_parser.set_defaults(
+        handler=_handle_build_controlled_runtime_calibration_operator_signoff_requirements,
+        skip_create_db=True,
+    )
+
+    candidate_options_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-candidate-selection-options",
+        help="Build the Blueprint 66 candidate selection options export.",
+    )
+    candidate_options_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 66 operator signoff candidate selection contract path.",
+    )
+    candidate_options_parser.add_argument(
+        "--packet",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET_OUTPUT
+        ),
+        help="Blueprint 66 operator signoff candidate selection packet path.",
+    )
+    candidate_options_parser.add_argument(
+        "--output",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_CANDIDATE_SELECTION_OPTIONS_OUTPUT,
+        help="JSON Blueprint 66 candidate selection options path.",
+    )
+    candidate_options_parser.add_argument("--skip-create-db", action="store_true")
+    candidate_options_parser.set_defaults(
+        handler=_handle_build_controlled_runtime_calibration_candidate_selection_options,
+        skip_create_db=True,
+    )
+
+    candidate_validation_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-candidate-selection-validation-report",
+        help="Build the Blueprint 66 candidate selection validation report.",
+    )
+    candidate_validation_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 66 operator signoff candidate selection contract path.",
+    )
+    candidate_validation_parser.add_argument(
+        "--packet",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET_OUTPUT
+        ),
+        help="Blueprint 66 operator signoff candidate selection packet path.",
+    )
+    candidate_validation_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_CANDIDATE_SELECTION_VALIDATION_REPORT_OUTPUT
+        ),
+        help="JSON Blueprint 66 candidate selection validation report path.",
+    )
+    candidate_validation_parser.add_argument("--skip-create-db", action="store_true")
+    candidate_validation_parser.set_defaults(
+        handler=(
+            _handle_build_controlled_runtime_calibration_candidate_selection_validation_report
+        ),
+        skip_create_db=True,
+    )
+
+    resolution_readiness_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-resolution-readiness-report",
+        help="Build the Blueprint 66 resolution readiness report.",
+    )
+    resolution_readiness_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 66 operator signoff candidate selection contract path.",
+    )
+    resolution_readiness_parser.add_argument(
+        "--packet",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET_OUTPUT
+        ),
+        help="Blueprint 66 operator signoff candidate selection packet path.",
+    )
+    resolution_readiness_parser.add_argument(
+        "--output",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_RESOLUTION_READINESS_REPORT_OUTPUT,
+        help="JSON Blueprint 66 resolution readiness report path.",
+    )
+    resolution_readiness_parser.add_argument("--skip-create-db", action="store_true")
+    resolution_readiness_parser.set_defaults(
+        handler=_handle_build_controlled_runtime_calibration_resolution_readiness_report,
+        skip_create_db=True,
+    )
+
     point_evaluation_parser = subcommands.add_parser(
         "evaluate-point-candidates",
         help="Evaluate generated point candidate markers using operator review metadata.",
@@ -12745,6 +13085,126 @@ def _handle_build_controlled_runtime_calibration_reexecution_readiness_plan(
     return build_controlled_runtime_calibration_reexecution_readiness_plan(
         contract_path=args.contract,
         resolution_packet_path=args.resolution_packet,
+        output_path=args.output,
+    )
+
+
+def _handle_export_controlled_runtime_calibration_operator_signoff_candidate_selection_packet_contract(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return export_controlled_runtime_calibration_operator_signoff_candidate_selection_packet_contract(  # noqa: E501
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_operator_signoff_candidate_selection_packet_inputs(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_operator_signoff_candidate_selection_packet_inputs(  # noqa: E501
+        contract_path=args.contract,
+        source_blocked_execution_resolution_packet_path=(
+            args.source_blocked_execution_resolution_packet
+        ),
+        source_blocked_execution_resolution_packet_contract_path=(
+            args.source_blocked_execution_resolution_packet_contract
+        ),
+        source_candidate_config_freeze_path=args.source_candidate_config_freeze,
+        explicit_selected_candidate_ref=args.explicit_selected_candidate_ref,
+        explicit_operator_signoff_ref=args.explicit_operator_signoff_ref,
+        explicit_operator_identity_ref=args.explicit_operator_identity_ref,
+        explicit_operator_signoff_timestamp=(
+            args.explicit_operator_signoff_timestamp
+        ),
+        operator_notes_ref=args.operator_notes_ref,
+        model_asset_path=args.model_asset_path,
+        output_path=args.output,
+    )
+
+
+def _handle_validate_controlled_runtime_calibration_operator_signoff_candidate_selection_packet_inputs(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_controlled_runtime_calibration_operator_signoff_candidate_selection_packet_inputs(  # noqa: E501
+        contract_path=args.contract,
+        packet_inputs_path=args.packet_inputs,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_operator_signoff_candidate_selection_packet(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_operator_signoff_candidate_selection_packet(
+        contract_path=args.contract,
+        packet_inputs_path=args.packet_inputs,
+        output_path=args.output,
+    )
+
+
+def _handle_validate_controlled_runtime_calibration_operator_signoff_candidate_selection_packet(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_controlled_runtime_calibration_operator_signoff_candidate_selection_packet(  # noqa: E501
+        contract_path=args.contract,
+        packet_path=args.packet,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_operator_signoff_requirements(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_operator_signoff_requirements(
+        contract_path=args.contract,
+        packet_path=args.packet,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_candidate_selection_options(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_candidate_selection_options(
+        contract_path=args.contract,
+        packet_path=args.packet,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_candidate_selection_validation_report(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_candidate_selection_validation_report(
+        contract_path=args.contract,
+        packet_path=args.packet,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_resolution_readiness_report(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_resolution_readiness_report(
+        contract_path=args.contract,
+        packet_path=args.packet,
         output_path=args.output,
     )
 

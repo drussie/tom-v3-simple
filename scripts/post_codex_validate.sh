@@ -1517,4 +1517,59 @@ run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-reexec
   --output "$TMP_ROOT/controlled_runtime_calibration_reexecution_readiness_plan.current.json" \
   --skip-create-db
 
+run "$PYTHON_BIN" -m apps.worker.cli export-controlled-runtime-calibration-operator-signoff-candidate-selection-packet-contract \
+  --output "$TMP_ROOT/controlled_runtime_calibration_operator_signoff_candidate_selection_packet_contract_v1.smoke.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-operator-signoff-candidate-selection-packet-inputs \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_operator_signoff_candidate_selection_packet_contract_v1.smoke.json" \
+  --source-blocked-execution-resolution-packet "$TMP_ROOT/controlled_runtime_calibration_blocked_execution_resolution_packet.current.json" \
+  --source-blocked-execution-resolution-packet-contract "$TMP_ROOT/controlled_runtime_calibration_blocked_execution_resolution_packet_contract_v1.smoke.json" \
+  --source-candidate-config-freeze ".data/contracts/calibration_candidate_config_freeze_v1.json" \
+  --model-asset-path "model_assets/tom_v1/view_classifier_gameplay.pt" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_operator_signoff_candidate_selection_packet_inputs.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli validate-controlled-runtime-calibration-operator-signoff-candidate-selection-packet-inputs \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_operator_signoff_candidate_selection_packet_contract_v1.smoke.json" \
+  --packet-inputs "$TMP_ROOT/controlled_runtime_calibration_operator_signoff_candidate_selection_packet_inputs.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_operator_signoff_candidate_selection_packet_inputs.validation.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-operator-signoff-candidate-selection-packet \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_operator_signoff_candidate_selection_packet_contract_v1.smoke.json" \
+  --packet-inputs "$TMP_ROOT/controlled_runtime_calibration_operator_signoff_candidate_selection_packet_inputs.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_operator_signoff_candidate_selection_packet.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli validate-controlled-runtime-calibration-operator-signoff-candidate-selection-packet \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_operator_signoff_candidate_selection_packet_contract_v1.smoke.json" \
+  --packet "$TMP_ROOT/controlled_runtime_calibration_operator_signoff_candidate_selection_packet.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_operator_signoff_candidate_selection_packet.validation.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-operator-signoff-requirements \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_operator_signoff_candidate_selection_packet_contract_v1.smoke.json" \
+  --packet "$TMP_ROOT/controlled_runtime_calibration_operator_signoff_candidate_selection_packet.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_operator_signoff_requirements.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-candidate-selection-options \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_operator_signoff_candidate_selection_packet_contract_v1.smoke.json" \
+  --packet "$TMP_ROOT/controlled_runtime_calibration_operator_signoff_candidate_selection_packet.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_candidate_selection_options.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-candidate-selection-validation-report \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_operator_signoff_candidate_selection_packet_contract_v1.smoke.json" \
+  --packet "$TMP_ROOT/controlled_runtime_calibration_operator_signoff_candidate_selection_packet.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_candidate_selection_validation_report.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-resolution-readiness-report \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_operator_signoff_candidate_selection_packet_contract_v1.smoke.json" \
+  --packet "$TMP_ROOT/controlled_runtime_calibration_operator_signoff_candidate_selection_packet.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_resolution_readiness_report.current.json" \
+  --skip-create-db
+
 run git status --short

@@ -4552,3 +4552,66 @@ The committed review packet records the BP62 blocked execution as safe and uncha
 `review_packet_created_for_blocked_execution`,
 `application_blocked_safely_before_runtime_mutation`, matching runtime config target sha256 values,
 and `resolve_operator_signoff_before_reapplying`.
+
+## Blueprint 65 Controlled Runtime Calibration Blocked Execution Resolution Packet v1
+
+Status: complete
+
+### Goal
+
+Package the BP64/BP62 blocked execution state into explicit resolution requirements without
+creating operator signoff, selecting a candidate, rerunning the final gate, or performing runtime
+application.
+
+### Notes
+
+This milestone adds:
+
+- `apps.worker.services.controlled_runtime_calibration_blocked_execution_resolution_packet`
+- worker CLI commands for contract export, inputs, input validation, packet build, packet
+  validation, blocker checklist, operator action plan, candidate requirements, final-gate rerun
+  plan, and reexecution readiness plan
+- matching `tom-v1-*controlled-runtime-calibration-blocked-execution-resolution*` Make helpers
+- `.data/contracts/controlled_runtime_calibration_blocked_execution_resolution_packet_contract_v1.json`
+  tracked contract
+- `.data/contracts/controlled_runtime_calibration_blocked_execution_resolution_packet_v1.json`
+  tracked resolution packet
+- generated input, validation, checklist, plan, and readiness paths under `.data/exports/`
+
+The committed resolution packet records
+`resolution_packet_created_for_blocked_execution`, `operator_signoff_required`,
+`selected_candidate_required`, `final_gate_rerun_required`, and
+`reexecution_not_ready_blockers_unresolved`.
+
+## Blueprint 66 Controlled Runtime Calibration Operator Signoff Candidate Selection Packet v1
+
+Status: complete
+
+### Goal
+
+Create the operator signoff and candidate selection packet mechanism required after BP65 while
+leaving both requirements pending unless explicit refs are supplied.
+
+### Notes
+
+This milestone adds:
+
+- `apps.worker.services.controlled_runtime_calibration_operator_signoff_candidate_selection_packet`
+- worker CLI commands for contract export, inputs, input validation, packet build, packet
+  validation, operator signoff requirements, candidate options, candidate validation, and
+  resolution readiness
+- matching `tom-v1-*controlled-runtime-calibration-operator-signoff-candidate-selection*` Make
+  helpers
+- `.data/contracts/controlled_runtime_calibration_operator_signoff_candidate_selection_packet_contract_v1.json`
+  tracked contract
+- `.data/contracts/controlled_runtime_calibration_operator_signoff_candidate_selection_packet_v1.json`
+  tracked packet
+- generated input, validation, signoff requirements, candidate option, candidate validation, and
+  readiness paths under `.data/exports/`
+- focused tests for the pending default path and invalid explicit candidate rejection
+
+The committed packet records
+`packet_created_pending_operator_signoff_and_candidate_selection`, `operator_signoff_required`,
+`selected_candidate_required`, `final_gate_rerun_required`,
+`reexecution_not_ready_blockers_unresolved`, `runtime_config_changed: false`, and
+`no_runtime_mutation_due_to_blocker`.

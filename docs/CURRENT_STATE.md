@@ -720,3 +720,47 @@ Blueprint 64 is a review and verification packet only. It does not apply thresho
 hysteresis changes; does not update runtime config; does not mutate model weights; does not replace
 baselines; does not create production config; does not auto approve or auto reject candidates; and
 does not perform runtime application.
+
+## Blueprint 65 Result
+
+Status: complete.
+
+Blueprint 65 packages the BP64/BP62 blocked execution state into resolution requirements. It
+creates tracked artifacts:
+
+```text
+.data/contracts/controlled_runtime_calibration_blocked_execution_resolution_packet_contract_v1.json
+.data/contracts/controlled_runtime_calibration_blocked_execution_resolution_packet_v1.json
+```
+
+The frozen resolution packet records `resolution_packet_created_for_blocked_execution`,
+`application_blocked_safely_before_runtime_mutation`, `runtime_config_changed: false`,
+`operator_signoff_required`, `selected_candidate_required`, `final_gate_rerun_required`, and
+`reexecution_not_ready_blockers_unresolved`.
+
+Blueprint 65 does not create operator signoff, select a candidate, rerun the final gate, perform
+runtime application, write runtime config, create production config, modify model weights, or
+replace baselines.
+
+## Blueprint 66 Result
+
+Status: complete.
+
+Blueprint 66 adds the operator signoff and candidate selection packet mechanism required after
+BP65. It creates tracked artifacts:
+
+```text
+.data/contracts/controlled_runtime_calibration_operator_signoff_candidate_selection_packet_contract_v1.json
+.data/contracts/controlled_runtime_calibration_operator_signoff_candidate_selection_packet_v1.json
+```
+
+The frozen packet records
+`packet_created_pending_operator_signoff_and_candidate_selection`,
+`operator_signoff_required`, `selected_candidate_required`, `final_gate_rerun_required`,
+`reexecution_not_ready_blockers_unresolved`, `runtime_config_changed: false`, and
+`no_runtime_mutation_due_to_blocker`.
+
+Blueprint 66 discovers frozen candidate option refs for review only. It does not create operator
+signoff, select a candidate, infer either from Codex execution or validation success, rerun the
+final gate, perform runtime application, write runtime config, create production config, modify
+model weights, or replace baselines.

@@ -4221,3 +4221,51 @@ Current expected frozen result:
 - `candidate_selection_status`: `selected_candidate_required`
 - `final_gate_rerun_status`: `final_gate_rerun_required`
 - `reexecution_readiness_status`: `reexecution_not_ready_blockers_unresolved`
+
+## Controlled Runtime Calibration Operator Signoff Candidate Selection Packet
+
+Use this after the BP65 resolution packet exists. The BP66 packet records whether explicit
+operator signoff and explicit selected candidate context have been supplied. With no explicit refs,
+the frozen packet remains pending.
+
+Build the frozen contract and packet:
+
+```bash
+make tom-v1-export-controlled-runtime-calibration-operator-signoff-candidate-selection-packet-contract \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-operator-signoff-candidate-selection-packet-inputs \
+  PYTHON=.venv/bin/python
+make tom-v1-validate-controlled-runtime-calibration-operator-signoff-candidate-selection-packet-inputs \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-operator-signoff-candidate-selection-packet \
+  PYTHON=.venv/bin/python
+make tom-v1-validate-controlled-runtime-calibration-operator-signoff-candidate-selection-packet \
+  PYTHON=.venv/bin/python
+```
+
+Build generated follow-up views:
+
+```bash
+make tom-v1-build-controlled-runtime-calibration-operator-signoff-requirements \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-candidate-selection-options \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-candidate-selection-validation-report \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-resolution-readiness-report \
+  PYTHON=.venv/bin/python
+```
+
+Current expected frozen result:
+
+- `packet_status`: `packet_created_pending_operator_signoff_and_candidate_selection`
+- `operator_signoff_status`: `operator_signoff_required`
+- `candidate_selection_status`: `selected_candidate_required`
+- `final_gate_rerun_status`: `final_gate_rerun_required`
+- `reexecution_readiness_status`: `reexecution_not_ready_blockers_unresolved`
+- `runtime_config_changed`: false
+- `mutation_status`: `no_runtime_mutation_due_to_blocker`
+
+The BP66 packet discovers frozen candidate option refs for review only. It does not create operator
+signoff, select a candidate, rerun the final gate, execute runtime application, write runtime
+config, create production config, modify model weights, or replace baselines.

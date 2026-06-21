@@ -427,6 +427,13 @@ TOM v3 Simple does not include:
   blocked state and does not perform runtime application, write runtime config, create production
   config, modify model weights, replace baselines, auto approve or auto reject candidates, prove
   classifier correctness or accuracy, claim production readiness, or decide tennis truth.
+- Controlled runtime calibration blocked execution resolution and operator signoff candidate
+  selection packet artifacts record required next steps only. The current BP66 packet remains
+  pending because no explicit operator signoff or selected candidate ref exists. Candidate option
+  discovery is not candidate selection, and validation success is not operator signoff. These
+  artifacts do not rerun the final gate, perform runtime application, write runtime config, create
+  production config, modify model weights, replace baselines, prove classifier correctness or
+  accuracy, claim production readiness, or decide tennis truth.
 
 ## Boundary
 
