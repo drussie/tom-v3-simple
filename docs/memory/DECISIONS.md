@@ -44,3 +44,9 @@ retry runtime application.
 Reason: BP66 may discover candidate option refs and validate packet structure, but candidate option
 discovery is not selected candidate context, and validation success or Codex execution is not
 operator signoff.
+
+## Decision 10: Explicit Operator Signoff Artifacts Require Real Operator Input
+
+Reason: BP67 may create a pending signoff artifact, requirements report, attestation template, and
+readiness report, but those artifacts do not satisfy signoff without real operator identity,
+timestamp, attestation text, scope acknowledgement, and selected candidate context.

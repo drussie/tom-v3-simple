@@ -4269,3 +4269,53 @@ Current expected frozen result:
 The BP66 packet discovers frozen candidate option refs for review only. It does not create operator
 signoff, select a candidate, rerun the final gate, execute runtime application, write runtime
 config, create production config, modify model weights, or replace baselines.
+
+## Controlled Runtime Calibration Explicit Operator Signoff Artifact
+
+Use this after the BP66 packet exists. The BP67 artifact records whether explicit operator signoff
+material has been supplied. With no explicit operator signoff ref, identity, timestamp,
+attestation text, or selected candidate ref, the frozen artifact remains pending.
+
+Build the frozen contract and artifact:
+
+```bash
+make tom-v1-export-controlled-runtime-calibration-explicit-operator-signoff-artifact-contract \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-explicit-operator-signoff-artifact-inputs \
+  PYTHON=.venv/bin/python
+make tom-v1-validate-controlled-runtime-calibration-explicit-operator-signoff-artifact-inputs \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-explicit-operator-signoff-artifact \
+  PYTHON=.venv/bin/python
+make tom-v1-validate-controlled-runtime-calibration-explicit-operator-signoff-artifact \
+  PYTHON=.venv/bin/python
+```
+
+Build generated follow-up views:
+
+```bash
+make tom-v1-build-controlled-runtime-calibration-operator-signoff-requirements-report \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-operator-attestation-template \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-operator-signoff-readiness-report \
+  PYTHON=.venv/bin/python
+```
+
+Current expected frozen result:
+
+- `signoff_artifact_status`: `signoff_artifact_created_pending_explicit_operator_input`
+- `operator_signoff_status`: `operator_signoff_required`
+- `operator_attestation_status`: `operator_attestation_required`
+- `operator_identity_status`: `operator_identity_required`
+- `operator_timestamp_status`: `operator_timestamp_required`
+- `selected_candidate_status`: `selected_candidate_required`
+- `final_gate_rerun_status`: `final_gate_rerun_required`
+- `reexecution_readiness_status`: `reexecution_not_ready_blockers_unresolved`
+- `runtime_application_status`: `not_executed`
+- `runtime_config_changed`: false
+- `mutation_status`: `no_runtime_mutation_due_to_blocker`
+
+The BP67 artifact does not create operator signoff, select a candidate, rerun the final gate,
+execute runtime application, write runtime config, create production config, modify model weights,
+or replace baselines.

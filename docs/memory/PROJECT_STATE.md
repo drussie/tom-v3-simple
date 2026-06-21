@@ -28,6 +28,7 @@ video/media
 -> controlled runtime calibration post-execution review
 -> controlled runtime calibration blocked-execution resolution requirements
 -> controlled runtime calibration operator signoff / candidate selection packet state
+-> controlled runtime calibration explicit operator signoff artifact state
 ```
 
 The current principle is to expand safely from reviewed sample evidence toward broader replay,
@@ -42,57 +43,62 @@ mutation system. Runtime changes must remain explicitly governed.
 - BP1-37: TOM v3 evidence, replay, review, and 3D foundation.
 - BP38-45: Gameplay gate pathway.
 - BP46-54: Real broadcast gameplay review and calibration decision phase.
-- BP55-66: Controlled runtime calibration governance through operator signoff / candidate
-  selection packet state.
+- BP55-67: Controlled runtime calibration governance through explicit operator signoff artifact
+  state.
 
 ## Latest Completed Milestone
 
-Blueprint 66 - Controlled Runtime Calibration Operator Signoff Candidate Selection Packet v1
+Blueprint 67 - Controlled Runtime Calibration Explicit Operator Signoff Artifact v1
 
 Status: Complete.
 
-Commit: recorded by the Blueprint 66 commit.
+Commit: recorded by the Blueprint 67 commit.
 
 Tag:
-`tom-v3-blueprint-66-controlled-runtime-calibration-operator-signoff-candidate-selection-packet-v1`
+`tom-v3-blueprint-67-controlled-runtime-calibration-explicit-operator-signoff-artifact-v1`
 
 Implemented:
 
-- Controlled runtime calibration operator signoff candidate selection packet service.
+- Controlled runtime calibration explicit operator signoff artifact service.
 - CLI commands and Make targets.
 - Focused tests.
 - Docs, runbook, status, and report updates.
 - Post-Codex validator updates.
-- Tracked BP66 contract artifacts:
-  - `.data/contracts/controlled_runtime_calibration_operator_signoff_candidate_selection_packet_contract_v1.json`
-  - `.data/contracts/controlled_runtime_calibration_operator_signoff_candidate_selection_packet_v1.json`
+- Tracked BP67 contract artifacts:
+  - `.data/contracts/controlled_runtime_calibration_explicit_operator_signoff_artifact_contract_v1.json`
+  - `.data/contracts/controlled_runtime_calibration_explicit_operator_signoff_artifact_v1.json`
 
 Runtime result:
 
-- The committed frozen BP66 packet correctly represents the pending operator signoff and selected
-  candidate state after BP65.
+- The committed frozen BP67 artifact correctly represents the pending explicit operator signoff,
+  operator identity, operator timestamp, operator attestation, and selected candidate state after
+  BP66.
 - There is still no real operator signoff or selected candidate in the frozen path.
-- BP66 discovers frozen candidate option refs for review but does not select one.
-- BP66 records operator signoff requirements, candidate selection options, candidate validation,
+- BP67 creates a pending artifact and attestation template but does not satisfy signoff.
+- BP67 records operator signoff requirements, attestation requirements, signoff readiness,
   final-gate rerun readiness, and reexecution readiness.
 - Runtime target stayed unchanged before and after.
 - Runtime target SHA before and after:
   `8052301c40dee448f858a3a7c64ae7805d3e7839fbbe35305044e1775f0f8fd0`
-- Packet status: `packet_created_pending_operator_signoff_and_candidate_selection`
+- Signoff artifact status: `signoff_artifact_created_pending_explicit_operator_input`
 - Operator signoff status: `operator_signoff_required`
+- Operator attestation status: `operator_attestation_required`
+- Operator identity status: `operator_identity_required`
+- Operator timestamp status: `operator_timestamp_required`
 - Candidate selection status: `selected_candidate_required`
 - Final gate rerun status: `final_gate_rerun_required`
 - Reexecution readiness status: `reexecution_not_ready_blockers_unresolved`
+- Runtime application status: `not_executed`
 - Next action recommendations:
-  `provide_operator_signoff_and_selected_candidate` and
+  `provide_explicit_operator_signoff`, `provide_operator_identity_and_attestation`,
+  `provide_selected_candidate`, and
   `rerun_final_gate_after_signoff_and_candidate_selection`
 
-Operator signoff candidate selection packet test coverage:
+Explicit operator signoff artifact test coverage:
 
-- Current BP65 pending operator signoff / selected candidate path.
-- Operator signoff requirements, candidate options, candidate validation, and resolution readiness
-  report generation.
-- Invalid explicit selected candidate rejection.
+- Current BP66 pending operator signoff / selected candidate path.
+- Operator signoff requirements, attestation template, and readiness report generation.
+- Incomplete explicit operator signoff rejection.
 
 ## Controlled Calibration Chain
 
@@ -108,12 +114,14 @@ Operator signoff candidate selection packet test coverage:
 - BP64 - Controlled Runtime Calibration Application Execution Review Packet
 - BP65 - Controlled Runtime Calibration Blocked Execution Resolution Packet
 - BP66 - Controlled Runtime Calibration Operator Signoff Candidate Selection Packet
+- BP67 - Controlled Runtime Calibration Explicit Operator Signoff Artifact
 
 ## Next Regular Action
 
-Use the BP66 packet to collect real operator signoff and an explicit selected candidate ref, then
-rerun the BP61 final gate in a future blueprint. Do not attempt runtime application while the
-BP61/BP62/BP64/BP65/BP66 chain remains blocked.
+Use the BP67 artifact/template to collect real operator signoff identity, timestamp, attestation,
+scope acknowledgement, and an explicit selected candidate ref, then rerun the BP61 final gate in a
+future blueprint. Do not attempt runtime application while the BP61/BP62/BP64/BP65/BP66/BP67 chain
+remains blocked.
 
 ## Known Unrelated Working Tree Item
 

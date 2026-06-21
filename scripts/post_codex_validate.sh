@@ -1572,4 +1572,52 @@ run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-resolu
   --output "$TMP_ROOT/controlled_runtime_calibration_resolution_readiness_report.current.json" \
   --skip-create-db
 
+run "$PYTHON_BIN" -m apps.worker.cli export-controlled-runtime-calibration-explicit-operator-signoff-artifact-contract \
+  --output "$TMP_ROOT/controlled_runtime_calibration_explicit_operator_signoff_artifact_contract_v1.smoke.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-explicit-operator-signoff-artifact-inputs \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_explicit_operator_signoff_artifact_contract_v1.smoke.json" \
+  --source-operator-signoff-candidate-selection-packet "$TMP_ROOT/controlled_runtime_calibration_operator_signoff_candidate_selection_packet.current.json" \
+  --source-operator-signoff-candidate-selection-packet-contract "$TMP_ROOT/controlled_runtime_calibration_operator_signoff_candidate_selection_packet_contract_v1.smoke.json" \
+  --model-asset-path "model_assets/tom_v1/view_classifier_gameplay.pt" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_explicit_operator_signoff_artifact_inputs.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli validate-controlled-runtime-calibration-explicit-operator-signoff-artifact-inputs \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_explicit_operator_signoff_artifact_contract_v1.smoke.json" \
+  --signoff-inputs "$TMP_ROOT/controlled_runtime_calibration_explicit_operator_signoff_artifact_inputs.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_explicit_operator_signoff_artifact_inputs.validation.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-explicit-operator-signoff-artifact \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_explicit_operator_signoff_artifact_contract_v1.smoke.json" \
+  --signoff-inputs "$TMP_ROOT/controlled_runtime_calibration_explicit_operator_signoff_artifact_inputs.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_explicit_operator_signoff_artifact.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli validate-controlled-runtime-calibration-explicit-operator-signoff-artifact \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_explicit_operator_signoff_artifact_contract_v1.smoke.json" \
+  --signoff-artifact "$TMP_ROOT/controlled_runtime_calibration_explicit_operator_signoff_artifact.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_explicit_operator_signoff_artifact.validation.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-operator-signoff-requirements-report \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_explicit_operator_signoff_artifact_contract_v1.smoke.json" \
+  --signoff-artifact "$TMP_ROOT/controlled_runtime_calibration_explicit_operator_signoff_artifact.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_operator_signoff_requirements_report.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-operator-attestation-template \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_explicit_operator_signoff_artifact_contract_v1.smoke.json" \
+  --signoff-artifact "$TMP_ROOT/controlled_runtime_calibration_explicit_operator_signoff_artifact.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_operator_attestation_template.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-operator-signoff-readiness-report \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_explicit_operator_signoff_artifact_contract_v1.smoke.json" \
+  --signoff-artifact "$TMP_ROOT/controlled_runtime_calibration_explicit_operator_signoff_artifact.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_operator_signoff_readiness_report.current.json" \
+  --skip-create-db
+
 run git status --short

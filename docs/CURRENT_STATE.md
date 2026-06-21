@@ -764,3 +764,27 @@ Blueprint 66 discovers frozen candidate option refs for review only. It does not
 signoff, select a candidate, infer either from Codex execution or validation success, rerun the
 final gate, perform runtime application, write runtime config, create production config, modify
 model weights, or replace baselines.
+
+## Blueprint 67 Result
+
+Status: complete.
+
+Blueprint 67 adds the explicit operator signoff artifact mechanism required after BP66. It creates
+tracked artifacts:
+
+```text
+.data/contracts/controlled_runtime_calibration_explicit_operator_signoff_artifact_contract_v1.json
+.data/contracts/controlled_runtime_calibration_explicit_operator_signoff_artifact_v1.json
+```
+
+The frozen artifact records
+`signoff_artifact_created_pending_explicit_operator_input`, `operator_signoff_required`,
+`operator_attestation_required`, `operator_identity_required`, `operator_timestamp_required`,
+`selected_candidate_required`, `final_gate_rerun_required`,
+`reexecution_not_ready_blockers_unresolved`, `runtime_application_status: not_executed`,
+`runtime_config_changed: false`, and `no_runtime_mutation_due_to_blocker`.
+
+Blueprint 67 creates a pending signoff artifact and attestation template only. It does not create
+operator signoff, select a candidate, infer signoff from Codex execution or validation success,
+rerun the final gate, perform runtime application, write runtime config, create production config,
+modify model weights, or replace baselines.

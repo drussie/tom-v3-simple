@@ -16,12 +16,12 @@
 - BP1-37: TOM v3 evidence, replay, review, and 3D foundation.
 - BP38-45: Gameplay gate pathway.
 - BP46-54: Real broadcast gameplay review and calibration decision phase.
-- BP55-66: Controlled runtime calibration governance through operator signoff / candidate
-  selection packet state.
+- BP55-67: Controlled runtime calibration governance through explicit operator signoff artifact
+  state.
 
 ## Current Chain
 
-BP55 -> BP56 -> BP57 -> BP58 -> BP59 -> BP60 -> BP61 -> BP62 -> BP63 memory insert -> BP64 -> BP65 -> BP66.
+BP55 -> BP56 -> BP57 -> BP58 -> BP59 -> BP60 -> BP61 -> BP62 -> BP63 memory insert -> BP64 -> BP65 -> BP66 -> BP67.
 
 ## Detailed Entries
 
@@ -188,3 +188,42 @@ Runtime result: blocked safely; runtime target unchanged before and after.
 
 Follow-up: Provide real operator signoff and explicit selected candidate context, then rerun the
 final gate in a future blueprint before any future application attempt.
+
+### Blueprint 67 - Controlled Runtime Calibration Explicit Operator Signoff Artifact v1
+
+Status: Complete after this blueprint commit.
+
+Branch:
+`codex/blueprint-67-controlled-runtime-calibration-explicit-operator-signoff-artifact-v1`
+
+Commit: recorded by the blueprint commit and final report.
+
+Tag:
+`tom-v3-blueprint-67-controlled-runtime-calibration-explicit-operator-signoff-artifact-v1`
+
+Classification: calibration-governance-facing, operator-resolution-facing,
+explicit-signoff-artifact-facing, no-runtime-mutation.
+
+Files or areas changed:
+
+- Controlled runtime calibration explicit operator signoff artifact service.
+- CLI commands and Make targets.
+- Tracked BP67 contract and frozen signoff artifact.
+- Generated `.data/exports/` inputs, validations, requirements report, attestation template, and
+  readiness report for local review only.
+- Focused tests.
+- Docs, runbook, agent report, status docs, and repo memory updates.
+- Post-Codex validation coverage.
+
+Validation: full Blueprint 67 validation recorded by final report.
+
+Decision: BP67 records whether explicit operator signoff material exists, but it does not create
+signoff from Codex execution, validation success, branch state, or tags. It keeps operator identity,
+operator timestamp, attestation, selected candidate, final-gate rerun, and runtime application
+pending until explicit human-resolution input exists.
+
+Runtime result: blocked safely; runtime target unchanged before and after.
+
+Follow-up: Provide real operator signoff identity, timestamp, attestation, scope acknowledgement,
+and explicit selected candidate context, then rerun the final gate in a future blueprint before any
+future application attempt.

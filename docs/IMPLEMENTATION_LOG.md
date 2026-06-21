@@ -4615,3 +4615,37 @@ The committed packet records
 `selected_candidate_required`, `final_gate_rerun_required`,
 `reexecution_not_ready_blockers_unresolved`, `runtime_config_changed: false`, and
 `no_runtime_mutation_due_to_blocker`.
+
+## Blueprint 67 Controlled Runtime Calibration Explicit Operator Signoff Artifact v1
+
+Status: complete
+
+### Goal
+
+Create the explicit operator signoff artifact mechanism required after BP66 while leaving signoff
+pending unless real operator input is supplied.
+
+### Notes
+
+This milestone adds:
+
+- `apps.worker.services.controlled_runtime_calibration_explicit_operator_signoff_artifact`
+- worker CLI commands for contract export, inputs, input validation, artifact build, artifact
+  validation, operator signoff requirements report, operator attestation template, and operator
+  signoff readiness report
+- matching `tom-v1-*controlled-runtime-calibration-explicit-operator-signoff-artifact*` Make
+  helpers
+- `.data/contracts/controlled_runtime_calibration_explicit_operator_signoff_artifact_contract_v1.json`
+  tracked contract
+- `.data/contracts/controlled_runtime_calibration_explicit_operator_signoff_artifact_v1.json`
+  tracked artifact
+- generated input, validation, requirements report, attestation template, and readiness report
+  paths under `.data/exports/`
+- focused tests for the pending default path and incomplete explicit signoff rejection
+
+The committed artifact records
+`signoff_artifact_created_pending_explicit_operator_input`, `operator_signoff_required`,
+`operator_attestation_required`, `operator_identity_required`, `operator_timestamp_required`,
+`selected_candidate_required`, `final_gate_rerun_required`,
+`reexecution_not_ready_blockers_unresolved`, `runtime_application_status: not_executed`,
+`runtime_config_changed: false`, and `no_runtime_mutation_due_to_blocker`.

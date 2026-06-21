@@ -204,6 +204,24 @@ from apps.worker.services.controlled_runtime_calibration_dry_run_review_packet i
     validate_controlled_runtime_calibration_dry_run_review_packet,
     validate_controlled_runtime_calibration_dry_run_review_packet_inputs,
 )
+from apps.worker.services.controlled_runtime_calibration_explicit_operator_signoff_artifact import (  # noqa: E501
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_SIGNOFF_ARTIFACT_CONTRACT_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_SIGNOFF_ARTIFACT_INPUTS_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_SIGNOFF_ARTIFACT_INPUTS_VALIDATION_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_SIGNOFF_ARTIFACT_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_SIGNOFF_ARTIFACT_VALIDATION_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_ATTESTATION_TEMPLATE_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_READINESS_REPORT_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_REQUIREMENTS_REPORT_OUTPUT,
+    build_controlled_runtime_calibration_explicit_operator_signoff_artifact,
+    build_controlled_runtime_calibration_explicit_operator_signoff_artifact_inputs,
+    build_controlled_runtime_calibration_operator_attestation_template,
+    build_controlled_runtime_calibration_operator_signoff_readiness_report,
+    build_controlled_runtime_calibration_operator_signoff_requirements_report,
+    export_controlled_runtime_calibration_explicit_operator_signoff_artifact_contract,
+    validate_controlled_runtime_calibration_explicit_operator_signoff_artifact,
+    validate_controlled_runtime_calibration_explicit_operator_signoff_artifact_inputs,
+)
 from apps.worker.services.controlled_runtime_calibration_human_approval_gate import (
     DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FUTURE_APPLICATION_READINESS_REPORT_OUTPUT,
     DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_APPROVAL_GATE_CONTRACT_OUTPUT,
@@ -8982,6 +9000,305 @@ def main() -> None:
         skip_create_db=True,
     )
 
+    explicit_signoff_contract_parser = subcommands.add_parser(
+        "export-controlled-runtime-calibration-explicit-operator-signoff-artifact-contract",
+        help="Export the Blueprint 67 explicit operator signoff artifact contract.",
+    )
+    explicit_signoff_contract_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_SIGNOFF_ARTIFACT_CONTRACT_OUTPUT
+        ),
+        help="JSON Blueprint 67 explicit operator signoff artifact contract path.",
+    )
+    explicit_signoff_contract_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    explicit_signoff_contract_parser.set_defaults(
+        handler=(
+            _handle_export_controlled_runtime_calibration_explicit_operator_signoff_artifact_contract
+        ),
+        skip_create_db=True,
+    )
+
+    explicit_signoff_inputs_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-explicit-operator-signoff-artifact-inputs",
+        help="Build Blueprint 67 explicit operator signoff artifact inputs.",
+    )
+    explicit_signoff_inputs_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_SIGNOFF_ARTIFACT_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 67 explicit operator signoff artifact contract path.",
+    )
+    explicit_signoff_inputs_parser.add_argument(
+        "--source-operator-signoff-candidate-selection-packet",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET_OUTPUT
+        ),
+        help="Blueprint 66 operator signoff candidate selection packet path.",
+    )
+    explicit_signoff_inputs_parser.add_argument(
+        "--source-operator-signoff-candidate-selection-packet-contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_PACKET_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 66 operator signoff candidate selection contract path.",
+    )
+    explicit_signoff_inputs_parser.add_argument(
+        "--explicit-operator-signoff-ref",
+        help="Optional explicit operator signoff ref. Omit to keep signoff pending.",
+    )
+    explicit_signoff_inputs_parser.add_argument(
+        "--explicit-operator-identity-ref",
+        help="Optional explicit operator identity or operator reference.",
+    )
+    explicit_signoff_inputs_parser.add_argument(
+        "--explicit-operator-signoff-timestamp",
+        help="Optional explicit operator signoff timestamp.",
+    )
+    explicit_signoff_inputs_parser.add_argument(
+        "--explicit-operator-attestation-text",
+        help="Optional explicit operator attestation text.",
+    )
+    explicit_signoff_inputs_parser.add_argument(
+        "--explicit-operator-scope-acknowledgement",
+        help='Optional explicit scope acknowledgement. Use "acknowledged" when present.',
+    )
+    explicit_signoff_inputs_parser.add_argument(
+        "--operator-notes-ref",
+        help="Optional operator notes reference.",
+    )
+    explicit_signoff_inputs_parser.add_argument(
+        "--model-asset-path",
+        default=DEFAULT_GAMEPLAY_CLASSIFIER_ASSET_PATH,
+        help="Read-only local TOM v1 gameplay classifier asset path.",
+    )
+    explicit_signoff_inputs_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_SIGNOFF_ARTIFACT_INPUTS_OUTPUT
+        ),
+        help="JSON Blueprint 67 explicit operator signoff artifact inputs path.",
+    )
+    explicit_signoff_inputs_parser.add_argument("--skip-create-db", action="store_true")
+    explicit_signoff_inputs_parser.set_defaults(
+        handler=(
+            _handle_build_controlled_runtime_calibration_explicit_operator_signoff_artifact_inputs
+        ),
+        skip_create_db=True,
+    )
+
+    explicit_signoff_inputs_validate_parser = subcommands.add_parser(
+        "validate-controlled-runtime-calibration-explicit-operator-signoff-artifact-inputs",
+        help="Validate Blueprint 67 explicit operator signoff artifact inputs.",
+    )
+    explicit_signoff_inputs_validate_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_SIGNOFF_ARTIFACT_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 67 explicit operator signoff artifact contract path.",
+    )
+    explicit_signoff_inputs_validate_parser.add_argument(
+        "--signoff-inputs",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_SIGNOFF_ARTIFACT_INPUTS_OUTPUT
+        ),
+        help="Blueprint 67 explicit operator signoff artifact inputs path.",
+    )
+    explicit_signoff_inputs_validate_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_SIGNOFF_ARTIFACT_INPUTS_VALIDATION_OUTPUT
+        ),
+        help="Optional Blueprint 67 inputs validation path.",
+    )
+    explicit_signoff_inputs_validate_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    explicit_signoff_inputs_validate_parser.set_defaults(
+        handler=(
+            _handle_validate_controlled_runtime_calibration_explicit_operator_signoff_artifact_inputs
+        ),
+        skip_create_db=True,
+    )
+
+    explicit_signoff_artifact_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-explicit-operator-signoff-artifact",
+        help="Build the Blueprint 67 explicit operator signoff artifact.",
+    )
+    explicit_signoff_artifact_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_SIGNOFF_ARTIFACT_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 67 explicit operator signoff artifact contract path.",
+    )
+    explicit_signoff_artifact_parser.add_argument(
+        "--signoff-inputs",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_SIGNOFF_ARTIFACT_INPUTS_OUTPUT
+        ),
+        help="Blueprint 67 explicit operator signoff artifact inputs path.",
+    )
+    explicit_signoff_artifact_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_SIGNOFF_ARTIFACT_OUTPUT
+        ),
+        help="JSON Blueprint 67 explicit operator signoff artifact path.",
+    )
+    explicit_signoff_artifact_parser.add_argument("--skip-create-db", action="store_true")
+    explicit_signoff_artifact_parser.set_defaults(
+        handler=(
+            _handle_build_controlled_runtime_calibration_explicit_operator_signoff_artifact
+        ),
+        skip_create_db=True,
+    )
+
+    explicit_signoff_artifact_validate_parser = subcommands.add_parser(
+        "validate-controlled-runtime-calibration-explicit-operator-signoff-artifact",
+        help="Validate the Blueprint 67 explicit operator signoff artifact.",
+    )
+    explicit_signoff_artifact_validate_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_SIGNOFF_ARTIFACT_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 67 explicit operator signoff artifact contract path.",
+    )
+    explicit_signoff_artifact_validate_parser.add_argument(
+        "--signoff-artifact",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_SIGNOFF_ARTIFACT_OUTPUT
+        ),
+        help="Blueprint 67 explicit operator signoff artifact path.",
+    )
+    explicit_signoff_artifact_validate_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_SIGNOFF_ARTIFACT_VALIDATION_OUTPUT
+        ),
+        help="Optional Blueprint 67 artifact validation path.",
+    )
+    explicit_signoff_artifact_validate_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    explicit_signoff_artifact_validate_parser.set_defaults(
+        handler=(
+            _handle_validate_controlled_runtime_calibration_explicit_operator_signoff_artifact
+        ),
+        skip_create_db=True,
+    )
+
+    signoff_requirements_report_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-operator-signoff-requirements-report",
+        help="Build the Blueprint 67 operator signoff requirements report.",
+    )
+    signoff_requirements_report_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_SIGNOFF_ARTIFACT_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 67 explicit operator signoff artifact contract path.",
+    )
+    signoff_requirements_report_parser.add_argument(
+        "--signoff-artifact",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_SIGNOFF_ARTIFACT_OUTPUT
+        ),
+        help="Blueprint 67 explicit operator signoff artifact path.",
+    )
+    signoff_requirements_report_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_REQUIREMENTS_REPORT_OUTPUT
+        ),
+        help="JSON Blueprint 67 operator signoff requirements report path.",
+    )
+    signoff_requirements_report_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    signoff_requirements_report_parser.set_defaults(
+        handler=(
+            _handle_build_controlled_runtime_calibration_operator_signoff_requirements_report
+        ),
+        skip_create_db=True,
+    )
+
+    operator_attestation_template_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-operator-attestation-template",
+        help="Build the Blueprint 67 operator attestation template export.",
+    )
+    operator_attestation_template_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_SIGNOFF_ARTIFACT_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 67 explicit operator signoff artifact contract path.",
+    )
+    operator_attestation_template_parser.add_argument(
+        "--signoff-artifact",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_SIGNOFF_ARTIFACT_OUTPUT
+        ),
+        help="Blueprint 67 explicit operator signoff artifact path.",
+    )
+    operator_attestation_template_parser.add_argument(
+        "--output",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_ATTESTATION_TEMPLATE_OUTPUT,
+        help="JSON Blueprint 67 operator attestation template path.",
+    )
+    operator_attestation_template_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    operator_attestation_template_parser.set_defaults(
+        handler=(
+            _handle_build_controlled_runtime_calibration_operator_attestation_template
+        ),
+        skip_create_db=True,
+    )
+
+    signoff_readiness_report_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-operator-signoff-readiness-report",
+        help="Build the Blueprint 67 operator signoff readiness report.",
+    )
+    signoff_readiness_report_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_SIGNOFF_ARTIFACT_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 67 explicit operator signoff artifact contract path.",
+    )
+    signoff_readiness_report_parser.add_argument(
+        "--signoff-artifact",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_OPERATOR_SIGNOFF_ARTIFACT_OUTPUT
+        ),
+        help="Blueprint 67 explicit operator signoff artifact path.",
+    )
+    signoff_readiness_report_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_READINESS_REPORT_OUTPUT
+        ),
+        help="JSON Blueprint 67 operator signoff readiness report path.",
+    )
+    signoff_readiness_report_parser.add_argument("--skip-create-db", action="store_true")
+    signoff_readiness_report_parser.set_defaults(
+        handler=(
+            _handle_build_controlled_runtime_calibration_operator_signoff_readiness_report
+        ),
+        skip_create_db=True,
+    )
+
     point_evaluation_parser = subcommands.add_parser(
         "evaluate-point-candidates",
         help="Evaluate generated point candidate markers using operator review metadata.",
@@ -13205,6 +13522,114 @@ def _handle_build_controlled_runtime_calibration_resolution_readiness_report(
     return build_controlled_runtime_calibration_resolution_readiness_report(
         contract_path=args.contract,
         packet_path=args.packet,
+        output_path=args.output,
+    )
+
+
+def _handle_export_controlled_runtime_calibration_explicit_operator_signoff_artifact_contract(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return export_controlled_runtime_calibration_explicit_operator_signoff_artifact_contract(
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_explicit_operator_signoff_artifact_inputs(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_explicit_operator_signoff_artifact_inputs(
+        contract_path=args.contract,
+        source_operator_signoff_candidate_selection_packet_path=(
+            args.source_operator_signoff_candidate_selection_packet
+        ),
+        source_operator_signoff_candidate_selection_packet_contract_path=(
+            args.source_operator_signoff_candidate_selection_packet_contract
+        ),
+        explicit_operator_signoff_ref=args.explicit_operator_signoff_ref,
+        explicit_operator_identity_ref=args.explicit_operator_identity_ref,
+        explicit_operator_signoff_timestamp=args.explicit_operator_signoff_timestamp,
+        explicit_operator_attestation_text=args.explicit_operator_attestation_text,
+        explicit_operator_scope_acknowledgement=(
+            args.explicit_operator_scope_acknowledgement
+        ),
+        operator_notes_ref=args.operator_notes_ref,
+        model_asset_path=args.model_asset_path,
+        output_path=args.output,
+    )
+
+
+def _handle_validate_controlled_runtime_calibration_explicit_operator_signoff_artifact_inputs(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_controlled_runtime_calibration_explicit_operator_signoff_artifact_inputs(  # noqa: E501
+        contract_path=args.contract,
+        signoff_inputs_path=args.signoff_inputs,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_explicit_operator_signoff_artifact(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_explicit_operator_signoff_artifact(
+        contract_path=args.contract,
+        signoff_inputs_path=args.signoff_inputs,
+        output_path=args.output,
+    )
+
+
+def _handle_validate_controlled_runtime_calibration_explicit_operator_signoff_artifact(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_controlled_runtime_calibration_explicit_operator_signoff_artifact(
+        contract_path=args.contract,
+        signoff_artifact_path=args.signoff_artifact,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_operator_signoff_requirements_report(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_operator_signoff_requirements_report(
+        contract_path=args.contract,
+        signoff_artifact_path=args.signoff_artifact,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_operator_attestation_template(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_operator_attestation_template(
+        contract_path=args.contract,
+        signoff_artifact_path=args.signoff_artifact,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_operator_signoff_readiness_report(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_operator_signoff_readiness_report(
+        contract_path=args.contract,
+        signoff_artifact_path=args.signoff_artifact,
         output_path=args.output,
     )
 

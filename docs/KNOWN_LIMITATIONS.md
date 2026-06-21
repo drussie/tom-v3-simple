@@ -434,6 +434,12 @@ TOM v3 Simple does not include:
   artifacts do not rerun the final gate, perform runtime application, write runtime config, create
   production config, modify model weights, replace baselines, prove classifier correctness or
   accuracy, claim production readiness, or decide tennis truth.
+- Controlled runtime calibration explicit operator signoff artifacts remain pending until real
+  operator signoff input is supplied with identity/reference, timestamp, attestation, and scope
+  acknowledgement. The BP67 artifact and template do not satisfy signoff by themselves, select a
+  candidate, rerun the final gate, perform runtime application, write runtime config, create
+  production config, modify model weights, replace baselines, claim production readiness, or decide
+  tennis truth.
 
 ## Boundary
 
