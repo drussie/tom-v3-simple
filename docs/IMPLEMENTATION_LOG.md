@@ -1,5 +1,38 @@
 # TOM v3 Simple - Implementation Log
 
+## Blueprint 65 Controlled Runtime Calibration Blocked Execution Resolution Packet v1
+
+Status: complete
+
+### Goal
+
+Package the unresolved BP64/BP62 blocked execution state into a durable resolution packet without
+creating operator signoff, selecting a candidate, rerunning the final gate, executing application,
+or writing runtime config.
+
+### Notes
+
+This milestone adds:
+
+- `apps.worker.services.controlled_runtime_calibration_blocked_execution_resolution_packet`
+- worker CLI commands for contract export, input build/validation, packet build/validation,
+  blocker checklist, operator action plan, candidate requirements, final-gate rerun plan, and
+  reexecution readiness plan
+- matching `tom-v1-*controlled-runtime-calibration-blocked-execution-resolution*` Make helpers
+- `.data/contracts/controlled_runtime_calibration_blocked_execution_resolution_packet_contract_v1.json`
+  tracked contract
+- `.data/contracts/controlled_runtime_calibration_blocked_execution_resolution_packet_v1.json`
+  tracked frozen packet
+- generated inputs, validations, checklists, plans, requirements, and readiness plans under
+  `.data/exports/`
+- focused tests for contract stability, BP64 blocked execution resolution, plan builders, and
+  forbidden token rejection
+
+Blueprint 65 preserves the current blocked state: `operator_signoff_required`,
+`selected_candidate_required`, `final_gate_rerun_required`, and
+`reexecution_not_ready_blockers_unresolved`. It does not modify model weights, replace baselines,
+create production config, or mutate runtime config.
+
 ## Blueprint 61 Controlled Runtime Calibration Pre-Application Final Gate v1
 
 Status: complete

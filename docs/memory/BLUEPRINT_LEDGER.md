@@ -16,11 +16,11 @@
 - BP1-37: TOM v3 evidence, replay, review, and 3D foundation.
 - BP38-45: Gameplay gate pathway.
 - BP46-54: Real broadcast gameplay review and calibration decision phase.
-- BP55-64: Controlled runtime calibration governance through post-execution review packet.
+- BP55-65: Controlled runtime calibration governance through blocked execution resolution packet.
 
 ## Current Chain
 
-BP55 -> BP56 -> BP57 -> BP58 -> BP59 -> BP60 -> BP61 -> BP62 -> BP63 memory insert -> BP64.
+BP55 -> BP56 -> BP57 -> BP58 -> BP59 -> BP60 -> BP61 -> BP62 -> BP63 memory insert -> BP64 -> BP65.
 
 ## Detailed Entries
 
@@ -114,3 +114,39 @@ Runtime result: blocked safely; runtime target unchanged before and after.
 
 Follow-up: Resolve real operator signoff and selected candidate context before any future
 controlled runtime application retry.
+
+### Blueprint 65 - Controlled Runtime Calibration Blocked Execution Resolution Packet v1
+
+Status: Complete after this blueprint commit.
+
+Branch:
+`codex/blueprint-65-controlled-runtime-calibration-blocked-execution-resolution-packet-v1`
+
+Commit: recorded by the blueprint commit and final report.
+
+Tag:
+`tom-v3-blueprint-65-controlled-runtime-calibration-blocked-execution-resolution-packet-v1`
+
+Classification: calibration-governance-facing, blocked-execution-resolution-facing,
+no-runtime-mutation.
+
+Files or areas changed:
+
+- Controlled runtime calibration blocked execution resolution packet service.
+- CLI commands and Make targets.
+- Tracked BP65 contract and frozen resolution packet artifacts.
+- Generated `.data/exports/` checklists and plans for local review only.
+- Focused tests.
+- Docs, runbook, agent report, status docs, and repo memory updates.
+- Post-Codex validation coverage.
+
+Validation: full Blueprint 65 validation recorded by final report.
+
+Decision: BP65 packages the current blocked BP64/BP62 execution state into resolution requirements
+only. It does not create operator signoff, select a candidate, rerun the final gate, or retry
+application execution.
+
+Runtime result: blocked safely; runtime target unchanged before and after.
+
+Follow-up: Collect real operator signoff and selected candidate context, then rerun the final gate
+in a future blueprint before any future application attempt.

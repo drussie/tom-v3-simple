@@ -132,6 +132,28 @@ from apps.worker.services.controlled_runtime_calibration_application_plan import
     validate_controlled_runtime_calibration_application_plan,
     validate_controlled_runtime_calibration_application_plan_inputs,
 )
+from apps.worker.services.controlled_runtime_calibration_blocked_execution_resolution_packet import (  # noqa: E501
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_CONTRACT_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_INPUTS_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_INPUTS_VALIDATION_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_VALIDATION_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_BLOCKER_RESOLUTION_CHECKLIST_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_CANDIDATE_SELECTION_REQUIREMENTS_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_PLAN_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_ACTION_PLAN_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_READINESS_PLAN_OUTPUT,
+    build_controlled_runtime_calibration_blocked_execution_resolution_packet,
+    build_controlled_runtime_calibration_blocked_execution_resolution_packet_inputs,
+    build_controlled_runtime_calibration_blocker_resolution_checklist,
+    build_controlled_runtime_calibration_candidate_selection_requirements,
+    build_controlled_runtime_calibration_final_gate_rerun_plan,
+    build_controlled_runtime_calibration_operator_action_plan,
+    build_controlled_runtime_calibration_reexecution_readiness_plan,
+    export_controlled_runtime_calibration_blocked_execution_resolution_packet_contract,
+    validate_controlled_runtime_calibration_blocked_execution_resolution_packet,
+    validate_controlled_runtime_calibration_blocked_execution_resolution_packet_inputs,
+)
 from apps.worker.services.controlled_runtime_calibration_change_request import (
     DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_CONTRACT_OUTPUT,
     DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_DRY_RUN_OUTPUT,
@@ -8296,6 +8318,330 @@ def main() -> None:
         skip_create_db=True,
     )
 
+    blocked_resolution_contract_parser = subcommands.add_parser(
+        "export-controlled-runtime-calibration-blocked-execution-resolution-packet-contract",
+        help="Export the Blueprint 65 blocked execution resolution packet contract.",
+    )
+    blocked_resolution_contract_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_CONTRACT_OUTPUT
+        ),
+        help="JSON Blueprint 65 blocked execution resolution packet contract path.",
+    )
+    blocked_resolution_contract_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    blocked_resolution_contract_parser.set_defaults(
+        handler=(
+            _handle_export_controlled_runtime_calibration_blocked_execution_resolution_packet_contract
+        ),
+        skip_create_db=True,
+    )
+
+    blocked_resolution_inputs_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-blocked-execution-resolution-packet-inputs",
+        help="Build Blueprint 65 blocked execution resolution packet inputs.",
+    )
+    blocked_resolution_inputs_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 65 blocked execution resolution packet contract path.",
+    )
+    blocked_resolution_inputs_parser.add_argument(
+        "--source-application-execution-review-packet",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_EXECUTION_REVIEW_PACKET_OUTPUT
+        ),
+        help="Blueprint 64 application execution review packet path.",
+    )
+    blocked_resolution_inputs_parser.add_argument(
+        "--source-application-execution-review-packet-contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_EXECUTION_REVIEW_PACKET_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 64 application execution review packet contract path.",
+    )
+    blocked_resolution_inputs_parser.add_argument(
+        "--model-asset-path",
+        default=DEFAULT_GAMEPLAY_CLASSIFIER_ASSET_PATH,
+        help="Read-only local TOM v1 gameplay classifier asset path.",
+    )
+    blocked_resolution_inputs_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_INPUTS_OUTPUT
+        ),
+        help="JSON Blueprint 65 blocked execution resolution packet inputs path.",
+    )
+    blocked_resolution_inputs_parser.add_argument("--skip-create-db", action="store_true")
+    blocked_resolution_inputs_parser.set_defaults(
+        handler=(
+            _handle_build_controlled_runtime_calibration_blocked_execution_resolution_packet_inputs
+        ),
+        skip_create_db=True,
+    )
+
+    blocked_resolution_inputs_validate_parser = subcommands.add_parser(
+        "validate-controlled-runtime-calibration-blocked-execution-resolution-packet-inputs",
+        help="Validate Blueprint 65 blocked execution resolution packet inputs.",
+    )
+    blocked_resolution_inputs_validate_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 65 blocked execution resolution packet contract path.",
+    )
+    blocked_resolution_inputs_validate_parser.add_argument(
+        "--resolution-packet-inputs",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_INPUTS_OUTPUT
+        ),
+        help="Blueprint 65 blocked execution resolution packet inputs path.",
+    )
+    blocked_resolution_inputs_validate_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_INPUTS_VALIDATION_OUTPUT
+        ),
+        help="Optional Blueprint 65 blocked execution inputs validation path.",
+    )
+    blocked_resolution_inputs_validate_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    blocked_resolution_inputs_validate_parser.set_defaults(
+        handler=(
+            _handle_validate_controlled_runtime_calibration_blocked_execution_resolution_packet_inputs
+        ),
+        skip_create_db=True,
+    )
+
+    blocked_resolution_packet_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-blocked-execution-resolution-packet",
+        help="Build the Blueprint 65 blocked execution resolution packet.",
+    )
+    blocked_resolution_packet_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 65 blocked execution resolution packet contract path.",
+    )
+    blocked_resolution_packet_parser.add_argument(
+        "--resolution-packet-inputs",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_INPUTS_OUTPUT
+        ),
+        help="Blueprint 65 blocked execution resolution packet inputs path.",
+    )
+    blocked_resolution_packet_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_OUTPUT
+        ),
+        help="JSON Blueprint 65 blocked execution resolution packet path.",
+    )
+    blocked_resolution_packet_parser.add_argument("--skip-create-db", action="store_true")
+    blocked_resolution_packet_parser.set_defaults(
+        handler=(
+            _handle_build_controlled_runtime_calibration_blocked_execution_resolution_packet
+        ),
+        skip_create_db=True,
+    )
+
+    blocked_resolution_packet_validate_parser = subcommands.add_parser(
+        "validate-controlled-runtime-calibration-blocked-execution-resolution-packet",
+        help="Validate the Blueprint 65 blocked execution resolution packet.",
+    )
+    blocked_resolution_packet_validate_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 65 blocked execution resolution packet contract path.",
+    )
+    blocked_resolution_packet_validate_parser.add_argument(
+        "--resolution-packet",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_OUTPUT
+        ),
+        help="Blueprint 65 blocked execution resolution packet path.",
+    )
+    blocked_resolution_packet_validate_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_VALIDATION_OUTPUT
+        ),
+        help="Optional Blueprint 65 blocked execution packet validation path.",
+    )
+    blocked_resolution_packet_validate_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    blocked_resolution_packet_validate_parser.set_defaults(
+        handler=(
+            _handle_validate_controlled_runtime_calibration_blocked_execution_resolution_packet
+        ),
+        skip_create_db=True,
+    )
+
+    blocker_resolution_checklist_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-blocker-resolution-checklist",
+        help="Build the Blueprint 65 blocker resolution checklist export.",
+    )
+    blocker_resolution_checklist_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 65 blocked execution resolution packet contract path.",
+    )
+    blocker_resolution_checklist_parser.add_argument(
+        "--resolution-packet",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_OUTPUT
+        ),
+        help="Blueprint 65 blocked execution resolution packet path.",
+    )
+    blocker_resolution_checklist_parser.add_argument(
+        "--output",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_BLOCKER_RESOLUTION_CHECKLIST_OUTPUT,
+        help="JSON Blueprint 65 blocker resolution checklist path.",
+    )
+    blocker_resolution_checklist_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    blocker_resolution_checklist_parser.set_defaults(
+        handler=_handle_build_controlled_runtime_calibration_blocker_resolution_checklist,
+        skip_create_db=True,
+    )
+
+    operator_action_plan_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-operator-action-plan",
+        help="Build the Blueprint 65 operator action plan export.",
+    )
+    operator_action_plan_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 65 blocked execution resolution packet contract path.",
+    )
+    operator_action_plan_parser.add_argument(
+        "--resolution-packet",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_OUTPUT
+        ),
+        help="Blueprint 65 blocked execution resolution packet path.",
+    )
+    operator_action_plan_parser.add_argument(
+        "--output",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_ACTION_PLAN_OUTPUT,
+        help="JSON Blueprint 65 operator action plan path.",
+    )
+    operator_action_plan_parser.add_argument("--skip-create-db", action="store_true")
+    operator_action_plan_parser.set_defaults(
+        handler=_handle_build_controlled_runtime_calibration_operator_action_plan,
+        skip_create_db=True,
+    )
+
+    candidate_requirements_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-candidate-selection-requirements",
+        help="Build the Blueprint 65 candidate selection requirements export.",
+    )
+    candidate_requirements_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 65 blocked execution resolution packet contract path.",
+    )
+    candidate_requirements_parser.add_argument(
+        "--resolution-packet",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_OUTPUT
+        ),
+        help="Blueprint 65 blocked execution resolution packet path.",
+    )
+    candidate_requirements_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_CANDIDATE_SELECTION_REQUIREMENTS_OUTPUT
+        ),
+        help="JSON Blueprint 65 candidate selection requirements path.",
+    )
+    candidate_requirements_parser.add_argument("--skip-create-db", action="store_true")
+    candidate_requirements_parser.set_defaults(
+        handler=(
+            _handle_build_controlled_runtime_calibration_candidate_selection_requirements
+        ),
+        skip_create_db=True,
+    )
+
+    final_gate_rerun_plan_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-final-gate-rerun-plan",
+        help="Build the Blueprint 65 final gate rerun plan export.",
+    )
+    final_gate_rerun_plan_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 65 blocked execution resolution packet contract path.",
+    )
+    final_gate_rerun_plan_parser.add_argument(
+        "--resolution-packet",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_OUTPUT
+        ),
+        help="Blueprint 65 blocked execution resolution packet path.",
+    )
+    final_gate_rerun_plan_parser.add_argument(
+        "--output",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_PLAN_OUTPUT,
+        help="JSON Blueprint 65 final gate rerun plan path.",
+    )
+    final_gate_rerun_plan_parser.add_argument("--skip-create-db", action="store_true")
+    final_gate_rerun_plan_parser.set_defaults(
+        handler=_handle_build_controlled_runtime_calibration_final_gate_rerun_plan,
+        skip_create_db=True,
+    )
+
+    reexecution_readiness_plan_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-reexecution-readiness-plan",
+        help="Build the Blueprint 65 reexecution readiness plan export.",
+    )
+    reexecution_readiness_plan_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 65 blocked execution resolution packet contract path.",
+    )
+    reexecution_readiness_plan_parser.add_argument(
+        "--resolution-packet",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_OUTPUT
+        ),
+        help="Blueprint 65 blocked execution resolution packet path.",
+    )
+    reexecution_readiness_plan_parser.add_argument(
+        "--output",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_READINESS_PLAN_OUTPUT,
+        help="JSON Blueprint 65 reexecution readiness plan path.",
+    )
+    reexecution_readiness_plan_parser.add_argument("--skip-create-db", action="store_true")
+    reexecution_readiness_plan_parser.set_defaults(
+        handler=_handle_build_controlled_runtime_calibration_reexecution_readiness_plan,
+        skip_create_db=True,
+    )
+
     point_evaluation_parser = subcommands.add_parser(
         "evaluate-point-candidates",
         help="Evaluate generated point candidate markers using operator review metadata.",
@@ -12275,6 +12621,130 @@ def _handle_build_controlled_runtime_calibration_post_execution_next_action_repo
     return build_controlled_runtime_calibration_post_execution_next_action_report(
         contract_path=args.contract,
         review_packet_path=args.review_packet,
+        output_path=args.output,
+    )
+
+
+def _handle_export_controlled_runtime_calibration_blocked_execution_resolution_packet_contract(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return export_controlled_runtime_calibration_blocked_execution_resolution_packet_contract(
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_blocked_execution_resolution_packet_inputs(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_blocked_execution_resolution_packet_inputs(
+        contract_path=args.contract,
+        source_application_execution_review_packet_path=(
+            args.source_application_execution_review_packet
+        ),
+        source_application_execution_review_packet_contract_path=(
+            args.source_application_execution_review_packet_contract
+        ),
+        model_asset_path=args.model_asset_path,
+        output_path=args.output,
+    )
+
+
+def _handle_validate_controlled_runtime_calibration_blocked_execution_resolution_packet_inputs(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_controlled_runtime_calibration_blocked_execution_resolution_packet_inputs(
+        contract_path=args.contract,
+        resolution_packet_inputs_path=args.resolution_packet_inputs,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_blocked_execution_resolution_packet(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_blocked_execution_resolution_packet(
+        contract_path=args.contract,
+        resolution_packet_inputs_path=args.resolution_packet_inputs,
+        output_path=args.output,
+    )
+
+
+def _handle_validate_controlled_runtime_calibration_blocked_execution_resolution_packet(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_controlled_runtime_calibration_blocked_execution_resolution_packet(
+        contract_path=args.contract,
+        resolution_packet_path=args.resolution_packet,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_blocker_resolution_checklist(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_blocker_resolution_checklist(
+        contract_path=args.contract,
+        resolution_packet_path=args.resolution_packet,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_operator_action_plan(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_operator_action_plan(
+        contract_path=args.contract,
+        resolution_packet_path=args.resolution_packet,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_candidate_selection_requirements(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_candidate_selection_requirements(
+        contract_path=args.contract,
+        resolution_packet_path=args.resolution_packet,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_final_gate_rerun_plan(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_final_gate_rerun_plan(
+        contract_path=args.contract,
+        resolution_packet_path=args.resolution_packet,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_reexecution_readiness_plan(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_reexecution_readiness_plan(
+        contract_path=args.contract,
+        resolution_packet_path=args.resolution_packet,
         output_path=args.output,
     )
 

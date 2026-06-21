@@ -4175,3 +4175,49 @@ Current expected frozen result:
 The runtime config target is
 `.data/contracts/controlled_runtime_calibration_applied_runtime_config_v1.json`; the current BP62
 blocked artifact records matching before/after sha256 values.
+
+## Controlled Runtime Calibration Blocked Execution Resolution Packet
+
+Use this after the BP64 review packet exists. The BP65 packet packages what must be resolved before
+any future application attempt; it does not create operator signoff, select a candidate, rerun the
+final gate, execute application, or write runtime config.
+
+Build the frozen contract and packet:
+
+```bash
+make tom-v1-export-controlled-runtime-calibration-blocked-execution-resolution-packet-contract \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-blocked-execution-resolution-packet-inputs \
+  PYTHON=.venv/bin/python
+make tom-v1-validate-controlled-runtime-calibration-blocked-execution-resolution-packet-inputs \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-blocked-execution-resolution-packet \
+  PYTHON=.venv/bin/python
+make tom-v1-validate-controlled-runtime-calibration-blocked-execution-resolution-packet \
+  PYTHON=.venv/bin/python
+```
+
+Build generated follow-up views:
+
+```bash
+make tom-v1-build-controlled-runtime-calibration-blocker-resolution-checklist \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-operator-action-plan \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-candidate-selection-requirements \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-final-gate-rerun-plan \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-reexecution-readiness-plan \
+  PYTHON=.venv/bin/python
+```
+
+Current expected frozen result:
+
+- `resolution_packet_status`: `resolution_packet_created_for_blocked_execution`
+- `application_outcome_status`: `application_blocked_safely_before_runtime_mutation`
+- `runtime_config_changed`: false
+- `operator_action_status`: `operator_signoff_required`
+- `candidate_selection_status`: `selected_candidate_required`
+- `final_gate_rerun_status`: `final_gate_rerun_required`
+- `reexecution_readiness_status`: `reexecution_not_ready_blockers_unresolved`

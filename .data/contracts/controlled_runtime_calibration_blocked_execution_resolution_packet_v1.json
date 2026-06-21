@@ -1,0 +1,687 @@
+{
+  "application_execution_status": "application_blocked_final_gate_not_passed",
+  "application_outcome_status": "application_blocked_safely_before_runtime_mutation",
+  "baseline_update_status": "not_replaced",
+  "blocker_resolution_checklist": {
+    "blocker_types": [
+      "human_operator_approval_required",
+      "no_candidate_selected",
+      "no_unresolved_blockers",
+      "not_applicable",
+      "missing_artifact:operator_signoff_artifact_present",
+      "missing_artifact:no_unresolved_blockers",
+      "application_blocked_final_gate_not_passed",
+      "missing_operator_signoff",
+      "no_selected_candidate",
+      "final_gate_not_passed"
+    ],
+    "checklist_id": "controlled_runtime_calibration_blocker_resolution_checklist_v1_d395835d970af973a10a6e25",
+    "checklist_type": "controlled_runtime_calibration_blocker_resolution_checklist",
+    "checklist_version": "v1",
+    "confirm_application_blocked_safely": {
+      "required": true,
+      "status": "confirmed_from_bp64_review_packet"
+    },
+    "confirm_baselines_not_replaced": {
+      "required": true,
+      "status": "confirmed_from_bp64_review_packet"
+    },
+    "confirm_model_weights_not_modified": {
+      "required": true,
+      "status": "confirmed_from_bp64_review_packet"
+    },
+    "confirm_no_runtime_mutation": {
+      "required": true,
+      "status": "confirmed_from_bp64_review_packet"
+    },
+    "confirm_runtime_config_unchanged": {
+      "required": true,
+      "status": "confirmed_from_bp64_review_packet"
+    },
+    "generated_at": "2026-06-21T11:47:30.155344+00:00",
+    "identify_final_gate_not_passed": {
+      "required": true,
+      "status": "required_for_future_resolution"
+    },
+    "identify_missing_operator_signoff": {
+      "required": true,
+      "status": "required_for_future_resolution"
+    },
+    "identify_missing_selected_candidate": {
+      "required": true,
+      "status": "required_for_future_resolution"
+    },
+    "inspect_bp62_execution_artifact": {
+      "required": true,
+      "status": "inspection_required"
+    },
+    "inspect_bp64_review_packet": {
+      "required": true,
+      "status": "inspection_required"
+    },
+    "non_claims": {
+      "automatic_approval_not_performed": true,
+      "automatic_rejection_not_performed": true,
+      "automatic_relabeling_not_performed": true,
+      "baseline_not_replaced": true,
+      "blocked_execution_resolution_packet_is_not_accuracy_scoring": true,
+      "blocked_execution_resolution_packet_is_not_model_training": true,
+      "blocked_execution_resolution_packet_is_not_runtime_application": true,
+      "blocked_execution_resolution_packet_is_not_truth": true,
+      "classifier_correctness_not_assessed": true,
+      "classifier_not_modified": true,
+      "controlled_runtime_config_update_not_performed": true,
+      "generalization_not_claimed": true,
+      "human_resolution_required": true,
+      "model_weights_not_modified": true,
+      "production_config_not_created": true,
+      "production_readiness_not_claimed": true,
+      "resolution_packet_does_not_create_operator_signoff": true,
+      "resolution_packet_does_not_execute_application": true,
+      "resolution_packet_does_not_rerun_final_gate": true,
+      "resolution_packet_does_not_select_candidate": true,
+      "runtime_config_unchanged_due_to_blocker": true
+    },
+    "require_final_gate_rerun": {
+      "required": true,
+      "status": "required_for_future_resolution"
+    },
+    "require_operator_signoff_artifact": {
+      "required": true,
+      "status": "required_for_future_resolution"
+    },
+    "require_reexecution_only_after_final_gate_passes": {
+      "required": true,
+      "status": "required_for_future_resolution"
+    },
+    "require_selected_candidate_artifact": {
+      "required": true,
+      "status": "required_for_future_resolution"
+    },
+    "source_resolution_packet_id": "controlled_runtime_calibration_blocked_execution_resolution_packet_v1_6d6cf8c2e426709dec600477",
+    "warnings": {
+      "application_blocked_safely_before_runtime_mutation": true,
+      "automatic_approval_not_performed": true,
+      "automatic_rejection_not_performed": true,
+      "automatic_relabeling_not_performed": true,
+      "baseline_not_replaced": true,
+      "blocked_execution_resolution_packet_is_not_accuracy_scoring": true,
+      "blocked_execution_resolution_packet_is_not_model_training": true,
+      "blocked_execution_resolution_packet_is_not_runtime_application": true,
+      "blocked_execution_resolution_packet_is_not_truth": true,
+      "classifier_correctness_not_assessed": true,
+      "classifier_not_modified": true,
+      "controlled_blocked_execution_resolution_packet": true,
+      "controlled_runtime_config_update_not_performed": true,
+      "final_gate_rerun_required": true,
+      "generalization_not_claimed": true,
+      "human_resolution_required": true,
+      "model_weights_not_modified": true,
+      "no_runtime_mutation_due_to_blocker": true,
+      "operator_signoff_required": true,
+      "production_config_not_created": true,
+      "production_readiness_not_claimed": true,
+      "reexecution_not_ready_blockers_unresolved": true,
+      "resolution_packet_does_not_create_operator_signoff": true,
+      "resolution_packet_does_not_execute_application": true,
+      "resolution_packet_does_not_rerun_final_gate": true,
+      "resolution_packet_does_not_select_candidate": true,
+      "runtime_config_unchanged_due_to_blocker": true,
+      "selected_candidate_required": true
+    }
+  },
+  "blocker_resolution_status": "blockers_identified_resolution_required",
+  "candidate_selection_requirements": {
+    "candidate_selection_constraints": [
+      "candidate must reference an existing frozen candidate config or explicit controlled candidate artifact",
+      "candidate must not be inferred from model output",
+      "candidate must not be invented by Codex",
+      "candidate must preserve source path, candidate id, version, and provenance",
+      "candidate must be reviewed by human operator before final gate rerun"
+    ],
+    "candidate_selection_requirements_id": "controlled_runtime_calibration_candidate_selection_requirements_v1_d395835d970af973a10a6e25",
+    "candidate_selection_requirements_version": "v1",
+    "candidate_selection_status": "selected_candidate_required",
+    "generated_at": "2026-06-21T11:47:30.155344+00:00",
+    "non_claims": {
+      "automatic_approval_not_performed": true,
+      "automatic_rejection_not_performed": true,
+      "automatic_relabeling_not_performed": true,
+      "baseline_not_replaced": true,
+      "blocked_execution_resolution_packet_is_not_accuracy_scoring": true,
+      "blocked_execution_resolution_packet_is_not_model_training": true,
+      "blocked_execution_resolution_packet_is_not_runtime_application": true,
+      "blocked_execution_resolution_packet_is_not_truth": true,
+      "classifier_correctness_not_assessed": true,
+      "classifier_not_modified": true,
+      "controlled_runtime_config_update_not_performed": true,
+      "generalization_not_claimed": true,
+      "human_resolution_required": true,
+      "model_weights_not_modified": true,
+      "production_config_not_created": true,
+      "production_readiness_not_claimed": true,
+      "resolution_packet_does_not_create_operator_signoff": true,
+      "resolution_packet_does_not_execute_application": true,
+      "resolution_packet_does_not_rerun_final_gate": true,
+      "resolution_packet_does_not_select_candidate": true,
+      "runtime_config_unchanged_due_to_blocker": true
+    },
+    "required_candidate_refs": {
+      "selected_candidate_config_ref": {
+        "current_value": {
+          "candidate_packet_id": null,
+          "candidate_setting_id": null,
+          "source_proposal_item_id": null
+        },
+        "required": true,
+        "status": "selected_candidate_required"
+      },
+      "source_candidate_config_freeze_path": {
+        "path": ".data/contracts/calibration_candidate_config_freeze_v1.json",
+        "required": true
+      }
+    },
+    "source_resolution_packet_id": "controlled_runtime_calibration_blocked_execution_resolution_packet_v1_6d6cf8c2e426709dec600477",
+    "warnings": {
+      "application_blocked_safely_before_runtime_mutation": true,
+      "automatic_approval_not_performed": true,
+      "automatic_rejection_not_performed": true,
+      "automatic_relabeling_not_performed": true,
+      "baseline_not_replaced": true,
+      "blocked_execution_resolution_packet_is_not_accuracy_scoring": true,
+      "blocked_execution_resolution_packet_is_not_model_training": true,
+      "blocked_execution_resolution_packet_is_not_runtime_application": true,
+      "blocked_execution_resolution_packet_is_not_truth": true,
+      "classifier_correctness_not_assessed": true,
+      "classifier_not_modified": true,
+      "controlled_blocked_execution_resolution_packet": true,
+      "controlled_runtime_config_update_not_performed": true,
+      "final_gate_rerun_required": true,
+      "generalization_not_claimed": true,
+      "human_resolution_required": true,
+      "model_weights_not_modified": true,
+      "no_runtime_mutation_due_to_blocker": true,
+      "operator_signoff_required": true,
+      "production_config_not_created": true,
+      "production_readiness_not_claimed": true,
+      "reexecution_not_ready_blockers_unresolved": true,
+      "resolution_packet_does_not_create_operator_signoff": true,
+      "resolution_packet_does_not_execute_application": true,
+      "resolution_packet_does_not_rerun_final_gate": true,
+      "resolution_packet_does_not_select_candidate": true,
+      "runtime_config_unchanged_due_to_blocker": true,
+      "selected_candidate_required": true
+    }
+  },
+  "candidate_selection_status": "selected_candidate_required",
+  "final_gate_rerun_plan": {
+    "final_gate_rerun_plan_id": "controlled_runtime_calibration_final_gate_rerun_plan_v1_d395835d970af973a10a6e25",
+    "final_gate_rerun_plan_version": "v1",
+    "final_gate_rerun_status": "final_gate_rerun_required",
+    "generated_at": "2026-06-21T11:47:30.155344+00:00",
+    "non_claims": {
+      "automatic_approval_not_performed": true,
+      "automatic_rejection_not_performed": true,
+      "automatic_relabeling_not_performed": true,
+      "baseline_not_replaced": true,
+      "blocked_execution_resolution_packet_is_not_accuracy_scoring": true,
+      "blocked_execution_resolution_packet_is_not_model_training": true,
+      "blocked_execution_resolution_packet_is_not_runtime_application": true,
+      "blocked_execution_resolution_packet_is_not_truth": true,
+      "classifier_correctness_not_assessed": true,
+      "classifier_not_modified": true,
+      "controlled_runtime_config_update_not_performed": true,
+      "generalization_not_claimed": true,
+      "human_resolution_required": true,
+      "model_weights_not_modified": true,
+      "production_config_not_created": true,
+      "production_readiness_not_claimed": true,
+      "resolution_packet_does_not_create_operator_signoff": true,
+      "resolution_packet_does_not_execute_application": true,
+      "resolution_packet_does_not_rerun_final_gate": true,
+      "resolution_packet_does_not_select_candidate": true,
+      "runtime_config_unchanged_due_to_blocker": true
+    },
+    "required_inputs": {
+      "operator_signoff_ref": "required_external_artifact",
+      "selected_candidate_config_ref": "required_external_artifact",
+      "source_application_plan_path": ".data/contracts/controlled_runtime_calibration_application_plan_v1.json",
+      "source_pre_application_final_gate_path": ".data/contracts/controlled_runtime_calibration_pre_application_final_gate_v1.json",
+      "source_runtime_application_staging_path": ".data/contracts/controlled_runtime_calibration_runtime_application_staging_v1.json"
+    },
+    "required_preconditions": [
+      "operator signoff artifact exists",
+      "selected candidate artifact exists",
+      "runtime config target hash still matches blocked execution hash",
+      "model asset hash still matches recorded hash",
+      "protected baselines remain unchanged"
+    ],
+    "required_regression_gates": [
+      {
+        "expected_drift_detected": false,
+        "gate": "multi_point_regression_matrix",
+        "required": true
+      },
+      {
+        "expected_drift_detected": false,
+        "gate": "protected_sample_point_reviewed_3d_debug",
+        "required": true
+      },
+      {
+        "expected_drift_detected": false,
+        "gate": "gameplay_gate_regression_baseline",
+        "required": true
+      },
+      {
+        "expected_drift_detected": false,
+        "gate": "review_guided_gameplay_calibration_sandbox_regression",
+        "required": true
+      }
+    ],
+    "source_resolution_packet_id": "controlled_runtime_calibration_blocked_execution_resolution_packet_v1_6d6cf8c2e426709dec600477",
+    "warnings": {
+      "application_blocked_safely_before_runtime_mutation": true,
+      "automatic_approval_not_performed": true,
+      "automatic_rejection_not_performed": true,
+      "automatic_relabeling_not_performed": true,
+      "baseline_not_replaced": true,
+      "blocked_execution_resolution_packet_is_not_accuracy_scoring": true,
+      "blocked_execution_resolution_packet_is_not_model_training": true,
+      "blocked_execution_resolution_packet_is_not_runtime_application": true,
+      "blocked_execution_resolution_packet_is_not_truth": true,
+      "classifier_correctness_not_assessed": true,
+      "classifier_not_modified": true,
+      "controlled_blocked_execution_resolution_packet": true,
+      "controlled_runtime_config_update_not_performed": true,
+      "final_gate_rerun_required": true,
+      "generalization_not_claimed": true,
+      "human_resolution_required": true,
+      "model_weights_not_modified": true,
+      "no_runtime_mutation_due_to_blocker": true,
+      "operator_signoff_required": true,
+      "production_config_not_created": true,
+      "production_readiness_not_claimed": true,
+      "reexecution_not_ready_blockers_unresolved": true,
+      "resolution_packet_does_not_create_operator_signoff": true,
+      "resolution_packet_does_not_execute_application": true,
+      "resolution_packet_does_not_rerun_final_gate": true,
+      "resolution_packet_does_not_select_candidate": true,
+      "runtime_config_unchanged_due_to_blocker": true,
+      "selected_candidate_required": true
+    }
+  },
+  "final_gate_rerun_status": "final_gate_rerun_required",
+  "generated_at": "2026-06-21T11:47:30.155344+00:00",
+  "model_asset_ref": "model_assets/tom_v1/view_classifier_gameplay.pt",
+  "model_asset_sha256": "8282e03787c43b4ea75312a2ff2b8bda69535d2a40af2ba91f067e69c93b144b",
+  "model_update_status": "not_modified",
+  "mutation_status": "no_runtime_mutation_due_to_blocker",
+  "next_action_recommendation": [
+    "resolve_operator_signoff_before_reapplying",
+    "select_candidate_before_reapplying",
+    "rerun_final_gate_after_resolution"
+  ],
+  "non_claims": {
+    "automatic_approval_not_performed": true,
+    "automatic_rejection_not_performed": true,
+    "automatic_relabeling_not_performed": true,
+    "baseline_not_replaced": true,
+    "blocked_execution_resolution_packet_is_not_accuracy_scoring": true,
+    "blocked_execution_resolution_packet_is_not_model_training": true,
+    "blocked_execution_resolution_packet_is_not_runtime_application": true,
+    "blocked_execution_resolution_packet_is_not_truth": true,
+    "classifier_correctness_not_assessed": true,
+    "classifier_not_modified": true,
+    "controlled_runtime_config_update_not_performed": true,
+    "generalization_not_claimed": true,
+    "human_resolution_required": true,
+    "model_weights_not_modified": true,
+    "production_config_not_created": true,
+    "production_readiness_not_claimed": true,
+    "resolution_packet_does_not_create_operator_signoff": true,
+    "resolution_packet_does_not_execute_application": true,
+    "resolution_packet_does_not_rerun_final_gate": true,
+    "resolution_packet_does_not_select_candidate": true,
+    "runtime_config_unchanged_due_to_blocker": true
+  },
+  "operator_action_plan": {
+    "generated_at": "2026-06-21T11:47:30.155344+00:00",
+    "non_claims": {
+      "automatic_approval_not_performed": true,
+      "automatic_rejection_not_performed": true,
+      "automatic_relabeling_not_performed": true,
+      "baseline_not_replaced": true,
+      "blocked_execution_resolution_packet_is_not_accuracy_scoring": true,
+      "blocked_execution_resolution_packet_is_not_model_training": true,
+      "blocked_execution_resolution_packet_is_not_runtime_application": true,
+      "blocked_execution_resolution_packet_is_not_truth": true,
+      "classifier_correctness_not_assessed": true,
+      "classifier_not_modified": true,
+      "controlled_runtime_config_update_not_performed": true,
+      "generalization_not_claimed": true,
+      "human_resolution_required": true,
+      "model_weights_not_modified": true,
+      "production_config_not_created": true,
+      "production_readiness_not_claimed": true,
+      "resolution_packet_does_not_create_operator_signoff": true,
+      "resolution_packet_does_not_execute_application": true,
+      "resolution_packet_does_not_rerun_final_gate": true,
+      "resolution_packet_does_not_select_candidate": true,
+      "runtime_config_unchanged_due_to_blocker": true
+    },
+    "operator_action_plan_id": "controlled_runtime_calibration_operator_action_plan_v1_d395835d970af973a10a6e25",
+    "operator_action_plan_version": "v1",
+    "operator_action_status": "operator_signoff_required",
+    "operator_review_checklist": [
+      "review BP64 packet and BP62 execution status",
+      "verify runtime config target hashes match",
+      "verify model asset hash remains unchanged",
+      "verify baselines remain unchanged",
+      "verify no production config exists"
+    ],
+    "required_operator_artifacts": {
+      "final_gate_rerun_request_ref": {
+        "created_by_blueprint_65": false,
+        "required": true,
+        "status": "final_gate_rerun_required"
+      },
+      "operator_signoff_ref": {
+        "created_by_blueprint_65": false,
+        "required": true,
+        "status": "operator_signoff_required"
+      },
+      "reexecution_request_ref_for_future_blueprint": {
+        "created_by_blueprint_65": false,
+        "required": true,
+        "status": "reexecution_not_ready_blockers_unresolved"
+      },
+      "selected_candidate_config_ref": {
+        "created_by_blueprint_65": false,
+        "required": true,
+        "status": "selected_candidate_required"
+      }
+    },
+    "required_operator_decisions": [
+      "provide real operator signoff artifact before any future application attempt",
+      "provide selected candidate config artifact before final gate rerun",
+      "request final gate rerun only after required artifacts exist",
+      "request application execution only after final gate allows it"
+    ],
+    "source_resolution_packet_id": "controlled_runtime_calibration_blocked_execution_resolution_packet_v1_6d6cf8c2e426709dec600477",
+    "warnings": {
+      "application_blocked_safely_before_runtime_mutation": true,
+      "automatic_approval_not_performed": true,
+      "automatic_rejection_not_performed": true,
+      "automatic_relabeling_not_performed": true,
+      "baseline_not_replaced": true,
+      "blocked_execution_resolution_packet_is_not_accuracy_scoring": true,
+      "blocked_execution_resolution_packet_is_not_model_training": true,
+      "blocked_execution_resolution_packet_is_not_runtime_application": true,
+      "blocked_execution_resolution_packet_is_not_truth": true,
+      "classifier_correctness_not_assessed": true,
+      "classifier_not_modified": true,
+      "controlled_blocked_execution_resolution_packet": true,
+      "controlled_runtime_config_update_not_performed": true,
+      "final_gate_rerun_required": true,
+      "generalization_not_claimed": true,
+      "human_resolution_required": true,
+      "model_weights_not_modified": true,
+      "no_runtime_mutation_due_to_blocker": true,
+      "operator_signoff_required": true,
+      "production_config_not_created": true,
+      "production_readiness_not_claimed": true,
+      "reexecution_not_ready_blockers_unresolved": true,
+      "resolution_packet_does_not_create_operator_signoff": true,
+      "resolution_packet_does_not_execute_application": true,
+      "resolution_packet_does_not_rerun_final_gate": true,
+      "resolution_packet_does_not_select_candidate": true,
+      "runtime_config_unchanged_due_to_blocker": true,
+      "selected_candidate_required": true
+    }
+  },
+  "operator_action_status": "operator_signoff_required",
+  "production_config_status": "not_created",
+  "reexecution_readiness_plan": {
+    "generated_at": "2026-06-21T11:47:30.155344+00:00",
+    "non_claims": {
+      "automatic_approval_not_performed": true,
+      "automatic_rejection_not_performed": true,
+      "automatic_relabeling_not_performed": true,
+      "baseline_not_replaced": true,
+      "blocked_execution_resolution_packet_is_not_accuracy_scoring": true,
+      "blocked_execution_resolution_packet_is_not_model_training": true,
+      "blocked_execution_resolution_packet_is_not_runtime_application": true,
+      "blocked_execution_resolution_packet_is_not_truth": true,
+      "classifier_correctness_not_assessed": true,
+      "classifier_not_modified": true,
+      "controlled_runtime_config_update_not_performed": true,
+      "generalization_not_claimed": true,
+      "human_resolution_required": true,
+      "model_weights_not_modified": true,
+      "production_config_not_created": true,
+      "production_readiness_not_claimed": true,
+      "resolution_packet_does_not_create_operator_signoff": true,
+      "resolution_packet_does_not_execute_application": true,
+      "resolution_packet_does_not_rerun_final_gate": true,
+      "resolution_packet_does_not_select_candidate": true,
+      "runtime_config_unchanged_due_to_blocker": true
+    },
+    "reexecution_readiness_plan_id": "controlled_runtime_calibration_reexecution_readiness_plan_v1_d395835d970af973a10a6e25",
+    "reexecution_readiness_plan_version": "v1",
+    "reexecution_readiness_status": "reexecution_not_ready_blockers_unresolved",
+    "required_inputs": {
+      "final_gate_rerun_result": "required_future_artifact",
+      "operator_signoff_ref": "required_external_artifact",
+      "runtime_config_target_ref": {
+        "exists": true,
+        "not_baseline": true,
+        "not_model_weights": true,
+        "not_production_config": true,
+        "not_truth": true,
+        "path": ".data/contracts/controlled_runtime_calibration_applied_runtime_config_v1.json",
+        "runtime_config_status": "controlled_runtime_config_target_initialized",
+        "runtime_config_type": "controlled_runtime_calibration_applied_runtime_config",
+        "runtime_config_version": "v1"
+      },
+      "selected_candidate_config_ref": "required_external_artifact"
+    },
+    "required_post_execution_review": {
+      "operator_review_required": true,
+      "post_execution_review_packet_required": true
+    },
+    "required_preconditions": [
+      "final gate permits future application execution",
+      "runtime config target remains unchanged until reexecution",
+      "rollback package exists",
+      "post execution review packet path is prepared",
+      "no model asset mutation is present",
+      "no baseline replacement is present",
+      "no production config is present"
+    ],
+    "required_regression_gates": [
+      {
+        "expected_drift_detected": false,
+        "gate": "multi_point_regression_matrix",
+        "required": true
+      },
+      {
+        "expected_drift_detected": false,
+        "gate": "protected_sample_point_reviewed_3d_debug",
+        "required": true
+      },
+      {
+        "expected_drift_detected": false,
+        "gate": "gameplay_gate_regression_baseline",
+        "required": true
+      },
+      {
+        "expected_drift_detected": false,
+        "gate": "review_guided_gameplay_calibration_sandbox_regression",
+        "required": true
+      }
+    ],
+    "required_rollback_artifacts": {
+      "rollback_package_ref": ".data/contracts/controlled_runtime_calibration_application_rollback_package_v1.json",
+      "rollback_ready_before_reexecution": true
+    },
+    "source_resolution_packet_id": "controlled_runtime_calibration_blocked_execution_resolution_packet_v1_6d6cf8c2e426709dec600477",
+    "warnings": {
+      "application_blocked_safely_before_runtime_mutation": true,
+      "automatic_approval_not_performed": true,
+      "automatic_rejection_not_performed": true,
+      "automatic_relabeling_not_performed": true,
+      "baseline_not_replaced": true,
+      "blocked_execution_resolution_packet_is_not_accuracy_scoring": true,
+      "blocked_execution_resolution_packet_is_not_model_training": true,
+      "blocked_execution_resolution_packet_is_not_runtime_application": true,
+      "blocked_execution_resolution_packet_is_not_truth": true,
+      "classifier_correctness_not_assessed": true,
+      "classifier_not_modified": true,
+      "controlled_blocked_execution_resolution_packet": true,
+      "controlled_runtime_config_update_not_performed": true,
+      "final_gate_rerun_required": true,
+      "generalization_not_claimed": true,
+      "human_resolution_required": true,
+      "model_weights_not_modified": true,
+      "no_runtime_mutation_due_to_blocker": true,
+      "operator_signoff_required": true,
+      "production_config_not_created": true,
+      "production_readiness_not_claimed": true,
+      "reexecution_not_ready_blockers_unresolved": true,
+      "resolution_packet_does_not_create_operator_signoff": true,
+      "resolution_packet_does_not_execute_application": true,
+      "resolution_packet_does_not_rerun_final_gate": true,
+      "resolution_packet_does_not_select_candidate": true,
+      "runtime_config_unchanged_due_to_blocker": true,
+      "selected_candidate_required": true
+    }
+  },
+  "reexecution_readiness_status": "reexecution_not_ready_blockers_unresolved",
+  "resolution_packet_id": "controlled_runtime_calibration_blocked_execution_resolution_packet_v1_6d6cf8c2e426709dec600477",
+  "resolution_packet_status": "resolution_packet_created_for_blocked_execution",
+  "resolution_packet_type": "controlled_runtime_calibration_blocked_execution_resolution_packet",
+  "resolution_packet_version": "v1",
+  "runtime_application_status": "blocked_from_runtime_application",
+  "runtime_config_changed": false,
+  "runtime_config_status": "unchanged_due_to_blocker",
+  "runtime_config_target_ref": {
+    "exists": true,
+    "not_baseline": true,
+    "not_model_weights": true,
+    "not_production_config": true,
+    "not_truth": true,
+    "path": ".data/contracts/controlled_runtime_calibration_applied_runtime_config_v1.json",
+    "runtime_config_status": "controlled_runtime_config_target_initialized",
+    "runtime_config_type": "controlled_runtime_calibration_applied_runtime_config",
+    "runtime_config_version": "v1"
+  },
+  "runtime_config_target_sha256_after": "8052301c40dee448f858a3a7c64ae7805d3e7839fbbe35305044e1775f0f8fd0",
+  "runtime_config_target_sha256_before": "8052301c40dee448f858a3a7c64ae7805d3e7839fbbe35305044e1775f0f8fd0",
+  "selected_candidate_config_ref": {
+    "candidate_packet_id": null,
+    "candidate_setting_id": null,
+    "source_proposal_item_id": null
+  },
+  "source_application_execution_path": ".data/contracts/controlled_runtime_calibration_application_execution_v1.json",
+  "source_application_execution_review_packet_path": ".data/contracts/controlled_runtime_calibration_application_execution_review_packet_v1.json",
+  "source_application_plan_path": ".data/contracts/controlled_runtime_calibration_application_plan_v1.json",
+  "source_artifact_refs": {
+    "application_execution_review_packet": {
+      "artifact_type": "controlled_runtime_calibration_application_execution_review_packet",
+      "artifact_version": "v1",
+      "exists": true,
+      "path": ".data/contracts/controlled_runtime_calibration_application_execution_review_packet_v1.json"
+    },
+    "application_execution_review_packet_contract": {
+      "artifact_type": "controlled_runtime_calibration_application_execution_review_packet_contract",
+      "artifact_version": "v1",
+      "exists": true,
+      "path": ".data/contracts/controlled_runtime_calibration_application_execution_review_packet_contract_v1.json"
+    }
+  },
+  "source_change_request_path": ".data/contracts/controlled_runtime_calibration_change_request_v1.json",
+  "source_contract_refs": {
+    "calibration_candidate_config_freeze_contract_version": "v1",
+    "calibration_candidate_decision_packet_contract_version": "v1",
+    "camera_geometry_calibration_provenance_contract_version": "v1",
+    "controlled_runtime_calibration_application_execution_contract_version": "v1",
+    "controlled_runtime_calibration_application_execution_review_packet_contract_version": "v1",
+    "controlled_runtime_calibration_application_plan_contract_version": "v1",
+    "controlled_runtime_calibration_change_request_contract_version": "v1",
+    "controlled_runtime_calibration_dry_run_execution_contract_version": "v1",
+    "controlled_runtime_calibration_dry_run_review_packet_contract_version": "v1",
+    "controlled_runtime_calibration_human_approval_gate_contract_version": "v1",
+    "controlled_runtime_calibration_pre_application_final_gate_contract_version": "v1",
+    "controlled_runtime_calibration_runtime_application_staging_contract_version": "v1",
+    "coverage_sampling_strategy_contract_version": "v1",
+    "gameplay_gate_pathway_completion_freeze_version": "v1",
+    "gameplay_gate_regression_baseline_contract_version": "v1",
+    "gameplay_gate_review_dataset_export_contract_version": "v1",
+    "gameplay_gated_many_point_smoke_contract_version": "v1",
+    "gameplay_gated_perception_execution_contract_version": "v1",
+    "gameplay_gated_pipeline_routing_contract_version": "v1",
+    "gameplay_segment_gate_contract_version": "v1",
+    "gameplay_segment_replay_review_contract_version": "v1",
+    "intennse_label_alignment_contract_version": "v1",
+    "label_feedback_evaluation_contract_version": "v1",
+    "many_point_ingestion_gate_contract_version": "v1",
+    "multi_point_regression_matrix_version": "v0",
+    "multi_reviewer_disagreement_schema_version": "v1",
+    "observation_quality_taxonomy_version": "v1",
+    "point_manifest_version": "v0",
+    "real_broadcast_gameplay_calibration_decision_phase_freeze_version": "v1",
+    "real_broadcast_gameplay_corpus_run_contract_version": "v1",
+    "real_broadcast_gameplay_review_loop_contract_version": "v1",
+    "real_broadcast_gameplay_review_metrics_contract_version": "v1",
+    "review_guided_gameplay_calibration_evaluation_sandbox_contract_version": "v1",
+    "review_guided_gameplay_calibration_proposal_contract_version": "v1",
+    "review_guided_gameplay_calibration_sandbox_regression_contract_version": "v1",
+    "review_label_schema_version": "v1",
+    "review_ops_metrics_contract_version": "v1",
+    "reviewer_confidence_schema_version": "v1",
+    "tom_v3_expansion_completion_freeze_version": "v1",
+    "versioned_dataset_corpus_contract_version": "v1"
+  },
+  "source_dry_run_execution_report_path": ".data/exports/controlled_runtime_calibration_dry_run_execution.current.json",
+  "source_dry_run_review_packet_path": ".data/contracts/controlled_runtime_calibration_dry_run_review_packet_v1.json",
+  "source_human_approval_gate_path": ".data/contracts/controlled_runtime_calibration_human_approval_gate_v1.json",
+  "source_pre_application_final_gate_path": ".data/contracts/controlled_runtime_calibration_pre_application_final_gate_v1.json",
+  "source_resolution_packet_input_path": ".data/exports/controlled_runtime_calibration_blocked_execution_resolution_packet_inputs.current.json",
+  "source_runtime_application_staging_path": ".data/contracts/controlled_runtime_calibration_runtime_application_staging_v1.json",
+  "tom_provenance": {
+    "blueprint": "blueprint_65",
+    "blueprint_name": "controlled_runtime_calibration_blocked_execution_resolution_packet_v1",
+    "project": "tom-v3-simple",
+    "project_version": "0.0.0"
+  },
+  "warnings": {
+    "application_blocked_safely_before_runtime_mutation": true,
+    "automatic_approval_not_performed": true,
+    "automatic_rejection_not_performed": true,
+    "automatic_relabeling_not_performed": true,
+    "baseline_not_replaced": true,
+    "blocked_execution_resolution_packet_is_not_accuracy_scoring": true,
+    "blocked_execution_resolution_packet_is_not_model_training": true,
+    "blocked_execution_resolution_packet_is_not_runtime_application": true,
+    "blocked_execution_resolution_packet_is_not_truth": true,
+    "classifier_correctness_not_assessed": true,
+    "classifier_not_modified": true,
+    "controlled_blocked_execution_resolution_packet": true,
+    "controlled_runtime_config_update_not_performed": true,
+    "final_gate_rerun_required": true,
+    "generalization_not_claimed": true,
+    "human_resolution_required": true,
+    "model_weights_not_modified": true,
+    "no_runtime_mutation_due_to_blocker": true,
+    "operator_signoff_required": true,
+    "production_config_not_created": true,
+    "production_readiness_not_claimed": true,
+    "reexecution_not_ready_blockers_unresolved": true,
+    "resolution_packet_does_not_create_operator_signoff": true,
+    "resolution_packet_does_not_execute_application": true,
+    "resolution_packet_does_not_rerun_final_gate": true,
+    "resolution_packet_does_not_select_candidate": true,
+    "runtime_config_unchanged_due_to_blocker": true,
+    "selected_candidate_required": true
+  }
+}

@@ -551,6 +551,20 @@ CONTROLLED_RUNTIME_CALIBRATION_POST_EXECUTION_SUMMARY_OUTPUT ?= .data/exports/co
 CONTROLLED_RUNTIME_CALIBRATION_POST_EXECUTION_BLOCKER_REPORT_OUTPUT ?= .data/exports/controlled_runtime_calibration_post_execution_blocker_report.current.json
 CONTROLLED_RUNTIME_CALIBRATION_POST_EXECUTION_OPERATOR_CHECKLIST_OUTPUT ?= .data/exports/controlled_runtime_calibration_post_execution_operator_checklist.current.json
 CONTROLLED_RUNTIME_CALIBRATION_POST_EXECUTION_NEXT_ACTION_REPORT_OUTPUT ?= .data/exports/controlled_runtime_calibration_post_execution_next_action_report.current.json
+CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_CONTRACT_OUTPUT ?= .data/contracts/controlled_runtime_calibration_blocked_execution_resolution_packet_contract_v1.json
+CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_INPUTS_OUTPUT ?= .data/exports/controlled_runtime_calibration_blocked_execution_resolution_packet_inputs.current.json
+CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_INPUTS ?= $(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_INPUTS_OUTPUT)
+CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_INPUTS_VALIDATION_OUTPUT ?= .data/exports/controlled_runtime_calibration_blocked_execution_resolution_packet_inputs.validation.json
+CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_OUTPUT ?= .data/contracts/controlled_runtime_calibration_blocked_execution_resolution_packet_v1.json
+CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET ?= $(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_OUTPUT)
+CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_VALIDATION_OUTPUT ?= .data/exports/controlled_runtime_calibration_blocked_execution_resolution_packet.validation.json
+CONTROLLED_RUNTIME_CALIBRATION_BLOCKER_RESOLUTION_CHECKLIST_OUTPUT ?= .data/exports/controlled_runtime_calibration_blocker_resolution_checklist.current.json
+CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_ACTION_PLAN_OUTPUT ?= .data/exports/controlled_runtime_calibration_operator_action_plan.current.json
+CONTROLLED_RUNTIME_CALIBRATION_CANDIDATE_SELECTION_REQUIREMENTS_OUTPUT ?= .data/exports/controlled_runtime_calibration_candidate_selection_requirements.current.json
+CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_PLAN_OUTPUT ?= .data/exports/controlled_runtime_calibration_final_gate_rerun_plan.current.json
+CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_READINESS_PLAN_OUTPUT ?= .data/exports/controlled_runtime_calibration_reexecution_readiness_plan.current.json
+CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_SOURCE_REVIEW_PACKET ?= $(CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_EXECUTION_REVIEW_PACKET_OUTPUT)
+CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_SOURCE_REVIEW_PACKET_CONTRACT ?= $(CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_EXECUTION_REVIEW_PACKET_CONTRACT_OUTPUT)
 CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_EXECUTION_REVIEW_SOURCE_APPLICATION_EXECUTION ?= $(CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_EXECUTION_OUTPUT)
 CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_EXECUTION_REVIEW_SOURCE_APPLICATION_EXECUTION_CONTRACT ?= $(CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_EXECUTION_CONTRACT_OUTPUT)
 CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_EXECUTION_REVIEW_SOURCE_RUNTIME_CONFIG_ARTIFACT ?= $(CONTROLLED_RUNTIME_CALIBRATION_APPLIED_RUNTIME_CONFIG_OUTPUT)
@@ -680,6 +694,7 @@ export TOM_V3_DATABASE_URL
 .PHONY: tom-v1-export-controlled-runtime-calibration-pre-application-final-gate-contract tom-v1-build-controlled-runtime-calibration-pre-application-final-gate-inputs tom-v1-validate-controlled-runtime-calibration-pre-application-final-gate-inputs tom-v1-build-controlled-runtime-calibration-pre-application-final-gate tom-v1-validate-controlled-runtime-calibration-pre-application-final-gate tom-v1-build-controlled-runtime-calibration-final-gate-readiness-report tom-v1-build-controlled-runtime-calibration-final-gate-blocker-report tom-v1-build-controlled-runtime-calibration-final-gate-artifact-checklist tom-v1-build-controlled-runtime-calibration-final-gate-regression-checklist
 .PHONY: tom-v1-export-controlled-runtime-calibration-application-execution-contract tom-v1-build-controlled-runtime-calibration-applied-runtime-config tom-v1-build-controlled-runtime-calibration-application-execution-inputs tom-v1-validate-controlled-runtime-calibration-application-execution-inputs tom-v1-execute-controlled-runtime-calibration-application tom-v1-validate-controlled-runtime-calibration-application-execution tom-v1-verify-controlled-runtime-calibration-runtime-readback tom-v1-build-controlled-runtime-calibration-application-audit-report tom-v1-build-controlled-runtime-calibration-rollback-package tom-v1-build-controlled-runtime-calibration-post-apply-verification-report
 .PHONY: tom-v1-export-controlled-runtime-calibration-application-execution-review-packet-contract tom-v1-build-controlled-runtime-calibration-application-execution-review-packet-inputs tom-v1-validate-controlled-runtime-calibration-application-execution-review-packet-inputs tom-v1-build-controlled-runtime-calibration-application-execution-review-packet tom-v1-validate-controlled-runtime-calibration-application-execution-review-packet tom-v1-build-controlled-runtime-calibration-post-execution-summary tom-v1-build-controlled-runtime-calibration-post-execution-blocker-report tom-v1-build-controlled-runtime-calibration-post-execution-operator-checklist tom-v1-build-controlled-runtime-calibration-post-execution-next-action-report
+.PHONY: tom-v1-export-controlled-runtime-calibration-blocked-execution-resolution-packet-contract tom-v1-build-controlled-runtime-calibration-blocked-execution-resolution-packet-inputs tom-v1-validate-controlled-runtime-calibration-blocked-execution-resolution-packet-inputs tom-v1-build-controlled-runtime-calibration-blocked-execution-resolution-packet tom-v1-validate-controlled-runtime-calibration-blocked-execution-resolution-packet tom-v1-build-controlled-runtime-calibration-blocker-resolution-checklist tom-v1-build-controlled-runtime-calibration-operator-action-plan tom-v1-build-controlled-runtime-calibration-candidate-selection-requirements tom-v1-build-controlled-runtime-calibration-final-gate-rerun-plan tom-v1-build-controlled-runtime-calibration-reexecution-readiness-plan
 
 install:
 	$(PYTHON) -m pip install -e ".[dev]"
@@ -1606,6 +1621,36 @@ tom-v1-build-controlled-runtime-calibration-post-execution-operator-checklist:
 
 tom-v1-build-controlled-runtime-calibration-post-execution-next-action-report:
 	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-post-execution-next-action-report --contract "$(CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_EXECUTION_REVIEW_PACKET_CONTRACT_OUTPUT)" --review-packet "$(CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_EXECUTION_REVIEW_PACKET)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_POST_EXECUTION_NEXT_ACTION_REPORT_OUTPUT)" --skip-create-db
+
+tom-v1-export-controlled-runtime-calibration-blocked-execution-resolution-packet-contract:
+	$(PYTHON) -m apps.worker.cli export-controlled-runtime-calibration-blocked-execution-resolution-packet-contract --output "$(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_CONTRACT_OUTPUT)" --skip-create-db
+
+tom-v1-build-controlled-runtime-calibration-blocked-execution-resolution-packet-inputs:
+	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-blocked-execution-resolution-packet-inputs --contract "$(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_CONTRACT_OUTPUT)" --source-application-execution-review-packet "$(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_SOURCE_REVIEW_PACKET)" --source-application-execution-review-packet-contract "$(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_SOURCE_REVIEW_PACKET_CONTRACT)" --model-asset-path "$(GAMEPLAY_CLASSIFIER_ASSET_PATH)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_INPUTS_OUTPUT)" --skip-create-db
+
+tom-v1-validate-controlled-runtime-calibration-blocked-execution-resolution-packet-inputs:
+	$(PYTHON) -m apps.worker.cli validate-controlled-runtime-calibration-blocked-execution-resolution-packet-inputs --contract "$(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_CONTRACT_OUTPUT)" --resolution-packet-inputs "$(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_INPUTS)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_INPUTS_VALIDATION_OUTPUT)" --skip-create-db
+
+tom-v1-build-controlled-runtime-calibration-blocked-execution-resolution-packet:
+	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-blocked-execution-resolution-packet --contract "$(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_CONTRACT_OUTPUT)" --resolution-packet-inputs "$(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_INPUTS)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_OUTPUT)" --skip-create-db
+
+tom-v1-validate-controlled-runtime-calibration-blocked-execution-resolution-packet:
+	$(PYTHON) -m apps.worker.cli validate-controlled-runtime-calibration-blocked-execution-resolution-packet --contract "$(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_CONTRACT_OUTPUT)" --resolution-packet "$(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_VALIDATION_OUTPUT)" --skip-create-db
+
+tom-v1-build-controlled-runtime-calibration-blocker-resolution-checklist:
+	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-blocker-resolution-checklist --contract "$(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_CONTRACT_OUTPUT)" --resolution-packet "$(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_BLOCKER_RESOLUTION_CHECKLIST_OUTPUT)" --skip-create-db
+
+tom-v1-build-controlled-runtime-calibration-operator-action-plan:
+	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-operator-action-plan --contract "$(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_CONTRACT_OUTPUT)" --resolution-packet "$(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_ACTION_PLAN_OUTPUT)" --skip-create-db
+
+tom-v1-build-controlled-runtime-calibration-candidate-selection-requirements:
+	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-candidate-selection-requirements --contract "$(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_CONTRACT_OUTPUT)" --resolution-packet "$(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_CANDIDATE_SELECTION_REQUIREMENTS_OUTPUT)" --skip-create-db
+
+tom-v1-build-controlled-runtime-calibration-final-gate-rerun-plan:
+	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-final-gate-rerun-plan --contract "$(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_CONTRACT_OUTPUT)" --resolution-packet "$(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_PLAN_OUTPUT)" --skip-create-db
+
+tom-v1-build-controlled-runtime-calibration-reexecution-readiness-plan:
+	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-reexecution-readiness-plan --contract "$(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_CONTRACT_OUTPUT)" --resolution-packet "$(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_READINESS_PLAN_OUTPUT)" --skip-create-db
 
 tom-v1-post-codex-validate:
 	scripts/post_codex_validate.sh $(if $(EXPECTED_BRANCH),--branch "$(EXPECTED_BRANCH)",) $(if $(EXPECTED_TAG),--expected-tag "$(EXPECTED_TAG)",) --python "$(PYTHON)"

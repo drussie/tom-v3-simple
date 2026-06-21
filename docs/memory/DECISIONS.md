@@ -32,3 +32,9 @@ must not mutate the underlying classifier weights.
 
 Reason: BP62 can prove the execution mechanism exists while still refusing to apply a runtime config
 change when final gate, operator signoff, or selected-candidate requirements are not met.
+
+## Decision 8: Blocked Execution Resolution Packets Do Not Satisfy Blockers
+
+Reason: BP65 may package missing operator signoff, missing selected candidate context, final-gate
+rerun requirements, and future reexecution prerequisites, but it must not create those artifacts or
+retry runtime application.

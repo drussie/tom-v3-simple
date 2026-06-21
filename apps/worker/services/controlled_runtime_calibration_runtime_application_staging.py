@@ -1616,7 +1616,7 @@ def _staged_candidate_value_present(value: Any) -> bool:
         return False
     if isinstance(value, str):
         return bool(value.strip())
-    if isinstance(value, (dict, list, tuple, set)):
+    if isinstance(value, dict | list | tuple | set):
         return bool(value)
     return True
 

@@ -1457,4 +1457,64 @@ run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-post-e
   --output "$TMP_ROOT/controlled_runtime_calibration_post_execution_next_action_report.current.json" \
   --skip-create-db
 
+run "$PYTHON_BIN" -m apps.worker.cli export-controlled-runtime-calibration-blocked-execution-resolution-packet-contract \
+  --output "$TMP_ROOT/controlled_runtime_calibration_blocked_execution_resolution_packet_contract_v1.smoke.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-blocked-execution-resolution-packet-inputs \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_blocked_execution_resolution_packet_contract_v1.smoke.json" \
+  --source-application-execution-review-packet "$TMP_ROOT/controlled_runtime_calibration_application_execution_review_packet.current.json" \
+  --source-application-execution-review-packet-contract "$TMP_ROOT/controlled_runtime_calibration_application_execution_review_packet_contract_v1.smoke.json" \
+  --model-asset-path "model_assets/tom_v1/view_classifier_gameplay.pt" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_blocked_execution_resolution_packet_inputs.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli validate-controlled-runtime-calibration-blocked-execution-resolution-packet-inputs \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_blocked_execution_resolution_packet_contract_v1.smoke.json" \
+  --resolution-packet-inputs "$TMP_ROOT/controlled_runtime_calibration_blocked_execution_resolution_packet_inputs.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_blocked_execution_resolution_packet_inputs.validation.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-blocked-execution-resolution-packet \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_blocked_execution_resolution_packet_contract_v1.smoke.json" \
+  --resolution-packet-inputs "$TMP_ROOT/controlled_runtime_calibration_blocked_execution_resolution_packet_inputs.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_blocked_execution_resolution_packet.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli validate-controlled-runtime-calibration-blocked-execution-resolution-packet \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_blocked_execution_resolution_packet_contract_v1.smoke.json" \
+  --resolution-packet "$TMP_ROOT/controlled_runtime_calibration_blocked_execution_resolution_packet.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_blocked_execution_resolution_packet.validation.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-blocker-resolution-checklist \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_blocked_execution_resolution_packet_contract_v1.smoke.json" \
+  --resolution-packet "$TMP_ROOT/controlled_runtime_calibration_blocked_execution_resolution_packet.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_blocker_resolution_checklist.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-operator-action-plan \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_blocked_execution_resolution_packet_contract_v1.smoke.json" \
+  --resolution-packet "$TMP_ROOT/controlled_runtime_calibration_blocked_execution_resolution_packet.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_operator_action_plan.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-candidate-selection-requirements \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_blocked_execution_resolution_packet_contract_v1.smoke.json" \
+  --resolution-packet "$TMP_ROOT/controlled_runtime_calibration_blocked_execution_resolution_packet.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_candidate_selection_requirements.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-final-gate-rerun-plan \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_blocked_execution_resolution_packet_contract_v1.smoke.json" \
+  --resolution-packet "$TMP_ROOT/controlled_runtime_calibration_blocked_execution_resolution_packet.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_final_gate_rerun_plan.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-reexecution-readiness-plan \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_blocked_execution_resolution_packet_contract_v1.smoke.json" \
+  --resolution-packet "$TMP_ROOT/controlled_runtime_calibration_blocked_execution_resolution_packet.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_reexecution_readiness_plan.current.json" \
+  --skip-create-db
+
 run git status --short

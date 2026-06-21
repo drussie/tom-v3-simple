@@ -9,14 +9,14 @@
 
 ## Immediate Next Regular Blueprint
 
-After Blueprint 64:
+After Blueprint 65:
 
-- Resolve the BP64 next-action recommendation before any future runtime application retry:
+- Resolve the BP65 next-action recommendations before any future runtime application retry:
   `resolve_operator_signoff_before_reapplying`.
-- Add real selected candidate context before rerunning the final gate.
+- Select explicit candidate context before rerunning the final gate.
 - Rerun the BP61 final gate only after real operator signoff and selected candidate context exist.
-- Keep future runtime application blocked while BP61/BP62/BP64 report the current safe blocked
-  state.
+- Keep future runtime application blocked while BP61/BP62/BP64/BP65 report the current safe
+  blocked state.
 
 ## Open Follow-Ups
 
