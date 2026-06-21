@@ -9,10 +9,14 @@
 
 ## Immediate Next Regular Blueprint
 
-After this docs-only memory insert:
+After Blueprint 64:
 
-- Blueprint 64 - Controlled Runtime Calibration Application Execution Review / Post-Application
-  Verification Packet v1
+- Resolve the BP64 next-action recommendation before any future runtime application retry:
+  `resolve_operator_signoff_before_reapplying`.
+- Add real selected candidate context before rerunning the final gate.
+- Rerun the BP61 final gate only after real operator signoff and selected candidate context exist.
+- Keep future runtime application blocked while BP61/BP62/BP64 report the current safe blocked
+  state.
 
 ## Open Follow-Ups
 
@@ -23,5 +27,5 @@ After this docs-only memory insert:
 - Consider adding a lightweight memory update checklist to `docs/codex-workflow`.
 - Consider using `docs/codex-workflow/handoffs` and `docs/codex-workflow/retros` for future handoff
   and retro records.
-- Consider whether BP64 should package BP62's blocked execution state as the expected safe result
-  before any real operator signoff exists.
+- Consider adding a future phase-freeze/readiness blueprint after the BP64 blocked execution review
+  packet if no operator signoff is ready yet.

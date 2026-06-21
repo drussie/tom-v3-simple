@@ -418,6 +418,11 @@ TOM v3 Simple does not include:
   production config, modify model weights, replace baselines, auto approve or auto reject
   candidates, prove classifier correctness or accuracy, claim production readiness, or decide
   tennis truth.
+- Controlled runtime calibration application execution review packet artifacts package BP62
+  execution results for post-execution human review only. The committed packet represents the safe
+  blocked state and does not perform runtime application, write runtime config, create production
+  config, modify model weights, replace baselines, auto approve or auto reject candidates, prove
+  classifier correctness or accuracy, claim production readiness, or decide tennis truth.
 
 ## Boundary
 

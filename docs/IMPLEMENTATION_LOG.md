@@ -4488,3 +4488,34 @@ The current frozen execution is blocked because the BP61 final gate is blocked. 
 applied to the committed runtime config target. The successful path is covered by tests and writes
 only the explicit controlled runtime config artifact using atomic replace plus readback
 verification.
+
+## Blueprint 64 Controlled Runtime Calibration Application Execution Review Packet v1
+
+Status: complete
+
+### Goal
+
+Package Blueprint 62 application execution results into a post-execution review packet without
+performing runtime application.
+
+### Notes
+
+This milestone adds:
+
+- `apps.worker.services.controlled_runtime_calibration_application_execution_review_packet`
+- worker CLI commands for contract export, inputs, input validation, packet build, packet
+  validation, summary, blocker report, operator checklist, and next-action report
+- matching `tom-v1-*controlled-runtime-calibration-application-execution-review*` Make helpers
+- `.data/contracts/controlled_runtime_calibration_application_execution_review_packet_contract_v1.json`
+  tracked contract
+- `.data/contracts/controlled_runtime_calibration_application_execution_review_packet_v1.json`
+  tracked review packet
+- generated input, validation, summary, blocker, checklist, and next-action paths under
+  `.data/exports/`
+- focused tests for blocked execution review, controlled-application-shaped review, report
+  generation, and forbidden runtime application terms
+
+The committed review packet records the BP62 blocked execution as safe and unchanged:
+`review_packet_created_for_blocked_execution`,
+`application_blocked_safely_before_runtime_mutation`, matching runtime config target sha256 values,
+and `resolve_operator_signoff_before_reapplying`.

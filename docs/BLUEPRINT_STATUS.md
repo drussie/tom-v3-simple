@@ -1969,3 +1969,48 @@ reviewer ranking or quality scoring, coaching/tactical conclusions, betting/pred
 generalization, automatic correctness, training truth, production truth, or adjudication. It does
 not train or mutate the gameplay classifier, commit model weights, create review labels, create
 production config, replace baselines, perform automatic approval, or perform automatic rejection.
+
+## Blueprint 64 - Controlled Runtime Calibration Application Execution Review Packet
+
+Status: COMPLETE
+
+Blueprint 64 proves:
+
+```text
+BP62 controlled application execution artifact
+-> review packet input bundle
+-> controlled application execution review packet
+-> post-execution summary
+-> post-execution blocker report
+-> post-execution operator checklist
+-> post-execution next-action report
+```
+
+The tracked artifacts are
+`.data/contracts/controlled_runtime_calibration_application_execution_review_packet_contract_v1.json`
+and
+`.data/contracts/controlled_runtime_calibration_application_execution_review_packet_v1.json`.
+Generated inputs, validations, summaries, blocker reports, operator checklists, and next-action
+reports remain under `.data/exports/`.
+
+The committed frozen review packet records the BP62 blocked execution:
+
+```text
+review_packet_status: review_packet_created_for_blocked_execution
+application_outcome_status: application_blocked_safely_before_runtime_mutation
+runtime_application_status: blocked_from_runtime_application
+runtime_config_status: unchanged_due_to_blocker
+mutation_status: no_runtime_mutation_due_to_blocker
+production_config_status: not_created
+baseline_update_status: not_replaced
+model_update_status: not_modified
+```
+
+Blueprint 64 does not decide tennis truth, in/out, score, point winner, player identity, rally
+state, server/receiver state, line-call truth, point truth, event truth, gameplay truth,
+classifier correctness, classifier accuracy, accepted/rejected lifecycle, automatic relabeling,
+reviewer ranking or quality scoring, coaching/tactical conclusions, betting/prediction outcomes,
+generalization, automatic correctness, training truth, production truth, or adjudication. It does
+not perform runtime application, write runtime config, train or mutate the gameplay classifier,
+commit model weights, create review labels, create production config, replace baselines, perform
+automatic approval, or perform automatic rejection.

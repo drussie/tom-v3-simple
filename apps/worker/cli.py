@@ -94,6 +94,26 @@ from apps.worker.services.controlled_runtime_calibration_application_execution i
     validate_controlled_runtime_calibration_application_execution_inputs,
     verify_controlled_runtime_calibration_runtime_readback,
 )
+from apps.worker.services.controlled_runtime_calibration_application_execution_review_packet import (  # noqa: E501
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_EXECUTION_REVIEW_PACKET_CONTRACT_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_EXECUTION_REVIEW_PACKET_INPUTS_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_EXECUTION_REVIEW_PACKET_INPUTS_VALIDATION_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_EXECUTION_REVIEW_PACKET_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_EXECUTION_REVIEW_PACKET_VALIDATION_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_POST_EXECUTION_BLOCKER_REPORT_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_POST_EXECUTION_NEXT_ACTION_REPORT_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_POST_EXECUTION_OPERATOR_CHECKLIST_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_POST_EXECUTION_SUMMARY_OUTPUT,
+    build_controlled_runtime_calibration_application_execution_review_packet,
+    build_controlled_runtime_calibration_application_execution_review_packet_inputs,
+    build_controlled_runtime_calibration_post_execution_blocker_report,
+    build_controlled_runtime_calibration_post_execution_next_action_report,
+    build_controlled_runtime_calibration_post_execution_operator_checklist,
+    build_controlled_runtime_calibration_post_execution_summary,
+    export_controlled_runtime_calibration_application_execution_review_packet_contract,
+    validate_controlled_runtime_calibration_application_execution_review_packet,
+    validate_controlled_runtime_calibration_application_execution_review_packet_inputs,
+)
 from apps.worker.services.controlled_runtime_calibration_application_plan import (
     DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_CONTRACT_OUTPUT,
     DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_INPUTS_OUTPUT,
@@ -7902,6 +7922,380 @@ def main() -> None:
         skip_create_db=True,
     )
 
+    execution_review_contract_parser = subcommands.add_parser(
+        "export-controlled-runtime-calibration-application-execution-review-packet-contract",
+        help="Export the Blueprint 64 application execution review packet contract.",
+    )
+    execution_review_contract_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_EXECUTION_REVIEW_PACKET_CONTRACT_OUTPUT
+        ),
+        help="JSON Blueprint 64 execution review packet contract path.",
+    )
+    execution_review_contract_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    execution_review_contract_parser.set_defaults(
+        handler=(
+            _handle_export_controlled_runtime_calibration_application_execution_review_packet_contract
+        ),
+        skip_create_db=True,
+    )
+
+    execution_review_inputs_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-application-execution-review-packet-inputs",
+        help="Build Blueprint 64 application execution review packet inputs.",
+    )
+    execution_review_inputs_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_EXECUTION_REVIEW_PACKET_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 64 execution review packet contract path.",
+    )
+    execution_review_inputs_parser.add_argument(
+        "--source-application-execution",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_EXECUTION_OUTPUT,
+        help="Blueprint 62 controlled application execution artifact path.",
+    )
+    execution_review_inputs_parser.add_argument(
+        "--source-application-execution-contract",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_EXECUTION_CONTRACT_OUTPUT,
+        help="Blueprint 62 controlled application execution contract path.",
+    )
+    execution_review_inputs_parser.add_argument(
+        "--source-runtime-config-artifact",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_APPLIED_RUNTIME_CONFIG_OUTPUT,
+        help="Blueprint 62 applied runtime config artifact path.",
+    )
+    execution_review_inputs_parser.add_argument(
+        "--source-rollback-package",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_ROLLBACK_PACKAGE_OUTPUT,
+        help="Blueprint 62 rollback package artifact path.",
+    )
+    execution_review_inputs_parser.add_argument(
+        "--source-pre-application-final-gate",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_PRE_APPLICATION_FINAL_GATE_OUTPUT,
+        help="Blueprint 61 pre-application final gate artifact path.",
+    )
+    execution_review_inputs_parser.add_argument(
+        "--source-runtime-application-staging",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_RUNTIME_APPLICATION_STAGING_OUTPUT,
+        help="Blueprint 60 runtime application staging artifact path.",
+    )
+    execution_review_inputs_parser.add_argument(
+        "--source-application-plan",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_PLAN_OUTPUT,
+        help="Blueprint 59 application plan artifact path.",
+    )
+    execution_review_inputs_parser.add_argument(
+        "--source-human-approval-gate",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_APPROVAL_GATE_OUTPUT,
+        help="Blueprint 58 human approval gate artifact path.",
+    )
+    execution_review_inputs_parser.add_argument(
+        "--source-dry-run-review-packet",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_DRY_RUN_REVIEW_PACKET_OUTPUT,
+        help="Blueprint 57 dry-run review packet artifact path.",
+    )
+    execution_review_inputs_parser.add_argument(
+        "--source-dry-run-execution-report",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_DRY_RUN_REPORT_OUTPUT,
+        help="Blueprint 56 dry-run execution report path.",
+    )
+    execution_review_inputs_parser.add_argument(
+        "--source-change-request",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_CHANGE_REQUEST_OUTPUT,
+        help="Blueprint 55 change request artifact path.",
+    )
+    execution_review_inputs_parser.add_argument(
+        "--source-candidate-config-freeze",
+        default=DEFAULT_CALIBRATION_CANDIDATE_CONFIG_FREEZE_ARTIFACT_OUTPUT,
+        help="Blueprint 53 candidate config freeze artifact path.",
+    )
+    execution_review_inputs_parser.add_argument(
+        "--source-manual-approval-packet",
+        default=DEFAULT_CALIBRATION_CANDIDATE_MANUAL_APPROVAL_PACKET_OUTPUT,
+        help="Optional Blueprint 53 manual approval packet path.",
+    )
+    execution_review_inputs_parser.add_argument(
+        "--source-decision-packet",
+        default=DEFAULT_CALIBRATION_CANDIDATE_DECISION_PACKET_OUTPUT,
+        help="Optional Blueprint 52 decision packet path.",
+    )
+    execution_review_inputs_parser.add_argument(
+        "--source-phase-freeze",
+        default=DEFAULT_REAL_BROADCAST_GAMEPLAY_CALIBRATION_DECISION_PHASE_FREEZE_OUTPUT,
+        help="Optional Blueprint 54 decision phase freeze artifact path.",
+    )
+    execution_review_inputs_parser.add_argument(
+        "--source-gameplay-gate-regression-baseline",
+        default=DEFAULT_GAMEPLAY_GATE_REGRESSION_BASELINE_OUTPUT,
+        help="Blueprint 43 gameplay gate regression baseline path.",
+    )
+    execution_review_inputs_parser.add_argument(
+        "--source-calibration-sandbox-baseline",
+        default=(
+            DEFAULT_REVIEW_GUIDED_GAMEPLAY_CALIBRATION_SANDBOX_REGRESSION_BASELINE_OUTPUT
+        ),
+        help="Blueprint 51 calibration sandbox baseline path.",
+    )
+    execution_review_inputs_parser.add_argument(
+        "--model-asset-path",
+        default=DEFAULT_GAMEPLAY_CLASSIFIER_ASSET_PATH,
+        help="Read-only local TOM v1 gameplay classifier asset path.",
+    )
+    execution_review_inputs_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_EXECUTION_REVIEW_PACKET_INPUTS_OUTPUT
+        ),
+        help="JSON Blueprint 64 execution review packet inputs path.",
+    )
+    execution_review_inputs_parser.add_argument("--skip-create-db", action="store_true")
+    execution_review_inputs_parser.set_defaults(
+        handler=(
+            _handle_build_controlled_runtime_calibration_application_execution_review_packet_inputs
+        ),
+        skip_create_db=True,
+    )
+
+    execution_review_inputs_validate_parser = subcommands.add_parser(
+        "validate-controlled-runtime-calibration-application-execution-review-packet-inputs",
+        help="Validate Blueprint 64 application execution review packet inputs.",
+    )
+    execution_review_inputs_validate_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_EXECUTION_REVIEW_PACKET_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 64 execution review packet contract path.",
+    )
+    execution_review_inputs_validate_parser.add_argument(
+        "--review-packet-inputs",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_EXECUTION_REVIEW_PACKET_INPUTS_OUTPUT
+        ),
+        help="Blueprint 64 execution review packet inputs path.",
+    )
+    execution_review_inputs_validate_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_EXECUTION_REVIEW_PACKET_INPUTS_VALIDATION_OUTPUT
+        ),
+        help="Optional Blueprint 64 execution review packet inputs validation path.",
+    )
+    execution_review_inputs_validate_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    execution_review_inputs_validate_parser.set_defaults(
+        handler=(
+            _handle_validate_controlled_runtime_calibration_application_execution_review_packet_inputs
+        ),
+        skip_create_db=True,
+    )
+
+    execution_review_packet_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-application-execution-review-packet",
+        help="Build the Blueprint 64 application execution review packet.",
+    )
+    execution_review_packet_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_EXECUTION_REVIEW_PACKET_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 64 execution review packet contract path.",
+    )
+    execution_review_packet_parser.add_argument(
+        "--review-packet-inputs",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_EXECUTION_REVIEW_PACKET_INPUTS_OUTPUT
+        ),
+        help="Blueprint 64 execution review packet inputs path.",
+    )
+    execution_review_packet_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_EXECUTION_REVIEW_PACKET_OUTPUT
+        ),
+        help="JSON Blueprint 64 execution review packet path.",
+    )
+    execution_review_packet_parser.add_argument("--skip-create-db", action="store_true")
+    execution_review_packet_parser.set_defaults(
+        handler=(
+            _handle_build_controlled_runtime_calibration_application_execution_review_packet
+        ),
+        skip_create_db=True,
+    )
+
+    execution_review_packet_validate_parser = subcommands.add_parser(
+        "validate-controlled-runtime-calibration-application-execution-review-packet",
+        help="Validate the Blueprint 64 application execution review packet.",
+    )
+    execution_review_packet_validate_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_EXECUTION_REVIEW_PACKET_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 64 execution review packet contract path.",
+    )
+    execution_review_packet_validate_parser.add_argument(
+        "--review-packet",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_EXECUTION_REVIEW_PACKET_OUTPUT
+        ),
+        help="Blueprint 64 execution review packet path.",
+    )
+    execution_review_packet_validate_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_EXECUTION_REVIEW_PACKET_VALIDATION_OUTPUT
+        ),
+        help="Optional Blueprint 64 execution review packet validation path.",
+    )
+    execution_review_packet_validate_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    execution_review_packet_validate_parser.set_defaults(
+        handler=(
+            _handle_validate_controlled_runtime_calibration_application_execution_review_packet
+        ),
+        skip_create_db=True,
+    )
+
+    post_execution_summary_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-post-execution-summary",
+        help="Build the Blueprint 64 post-execution summary.",
+    )
+    post_execution_summary_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_EXECUTION_REVIEW_PACKET_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 64 execution review packet contract path.",
+    )
+    post_execution_summary_parser.add_argument(
+        "--review-packet",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_EXECUTION_REVIEW_PACKET_OUTPUT
+        ),
+        help="Blueprint 64 execution review packet path.",
+    )
+    post_execution_summary_parser.add_argument(
+        "--output",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_POST_EXECUTION_SUMMARY_OUTPUT,
+        help="JSON Blueprint 64 post-execution summary path.",
+    )
+    post_execution_summary_parser.add_argument("--skip-create-db", action="store_true")
+    post_execution_summary_parser.set_defaults(
+        handler=_handle_build_controlled_runtime_calibration_post_execution_summary,
+        skip_create_db=True,
+    )
+
+    post_execution_blocker_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-post-execution-blocker-report",
+        help="Build the Blueprint 64 post-execution blocker report.",
+    )
+    post_execution_blocker_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_EXECUTION_REVIEW_PACKET_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 64 execution review packet contract path.",
+    )
+    post_execution_blocker_parser.add_argument(
+        "--review-packet",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_EXECUTION_REVIEW_PACKET_OUTPUT
+        ),
+        help="Blueprint 64 execution review packet path.",
+    )
+    post_execution_blocker_parser.add_argument(
+        "--output",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_POST_EXECUTION_BLOCKER_REPORT_OUTPUT,
+        help="JSON Blueprint 64 post-execution blocker report path.",
+    )
+    post_execution_blocker_parser.add_argument("--skip-create-db", action="store_true")
+    post_execution_blocker_parser.set_defaults(
+        handler=(
+            _handle_build_controlled_runtime_calibration_post_execution_blocker_report
+        ),
+        skip_create_db=True,
+    )
+
+    post_execution_checklist_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-post-execution-operator-checklist",
+        help="Build the Blueprint 64 post-execution operator checklist.",
+    )
+    post_execution_checklist_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_EXECUTION_REVIEW_PACKET_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 64 execution review packet contract path.",
+    )
+    post_execution_checklist_parser.add_argument(
+        "--review-packet",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_EXECUTION_REVIEW_PACKET_OUTPUT
+        ),
+        help="Blueprint 64 execution review packet path.",
+    )
+    post_execution_checklist_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_POST_EXECUTION_OPERATOR_CHECKLIST_OUTPUT
+        ),
+        help="JSON Blueprint 64 post-execution operator checklist path.",
+    )
+    post_execution_checklist_parser.add_argument("--skip-create-db", action="store_true")
+    post_execution_checklist_parser.set_defaults(
+        handler=(
+            _handle_build_controlled_runtime_calibration_post_execution_operator_checklist
+        ),
+        skip_create_db=True,
+    )
+
+    post_execution_next_action_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-post-execution-next-action-report",
+        help="Build the Blueprint 64 post-execution next action report.",
+    )
+    post_execution_next_action_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_EXECUTION_REVIEW_PACKET_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 64 execution review packet contract path.",
+    )
+    post_execution_next_action_parser.add_argument(
+        "--review-packet",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_APPLICATION_EXECUTION_REVIEW_PACKET_OUTPUT
+        ),
+        help="Blueprint 64 execution review packet path.",
+    )
+    post_execution_next_action_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_POST_EXECUTION_NEXT_ACTION_REPORT_OUTPUT
+        ),
+        help="JSON Blueprint 64 post-execution next action report path.",
+    )
+    post_execution_next_action_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    post_execution_next_action_parser.set_defaults(
+        handler=(
+            _handle_build_controlled_runtime_calibration_post_execution_next_action_report
+        ),
+        skip_create_db=True,
+    )
+
     point_evaluation_parser = subcommands.add_parser(
         "evaluate-point-candidates",
         help="Evaluate generated point candidate markers using operator review metadata.",
@@ -11750,6 +12144,137 @@ def _handle_build_controlled_runtime_calibration_post_apply_verification_report(
     return build_controlled_runtime_calibration_post_apply_verification_report(
         contract_path=args.contract,
         application_execution_path=args.application_execution,
+        output_path=args.output,
+    )
+
+
+def _handle_export_controlled_runtime_calibration_application_execution_review_packet_contract(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return export_controlled_runtime_calibration_application_execution_review_packet_contract(
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_application_execution_review_packet_inputs(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_application_execution_review_packet_inputs(
+        contract_path=args.contract,
+        source_application_execution_path=args.source_application_execution,
+        source_application_execution_contract_path=(
+            args.source_application_execution_contract
+        ),
+        source_runtime_config_artifact_path=args.source_runtime_config_artifact,
+        source_rollback_package_path=args.source_rollback_package,
+        source_pre_application_final_gate_path=args.source_pre_application_final_gate,
+        source_runtime_application_staging_path=(
+            args.source_runtime_application_staging
+        ),
+        source_application_plan_path=args.source_application_plan,
+        source_human_approval_gate_path=args.source_human_approval_gate,
+        source_dry_run_review_packet_path=args.source_dry_run_review_packet,
+        source_dry_run_execution_report_path=args.source_dry_run_execution_report,
+        source_change_request_path=args.source_change_request,
+        source_candidate_config_freeze_path=args.source_candidate_config_freeze,
+        source_manual_approval_packet_path=args.source_manual_approval_packet,
+        source_decision_packet_path=args.source_decision_packet,
+        source_phase_freeze_path=args.source_phase_freeze,
+        source_gameplay_gate_regression_baseline_path=(
+            args.source_gameplay_gate_regression_baseline
+        ),
+        source_calibration_sandbox_baseline_path=(
+            args.source_calibration_sandbox_baseline
+        ),
+        model_asset_path=args.model_asset_path,
+        output_path=args.output,
+    )
+
+
+def _handle_validate_controlled_runtime_calibration_application_execution_review_packet_inputs(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_controlled_runtime_calibration_application_execution_review_packet_inputs(
+        contract_path=args.contract,
+        review_packet_inputs_path=args.review_packet_inputs,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_application_execution_review_packet(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_application_execution_review_packet(
+        contract_path=args.contract,
+        review_packet_inputs_path=args.review_packet_inputs,
+        output_path=args.output,
+    )
+
+
+def _handle_validate_controlled_runtime_calibration_application_execution_review_packet(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_controlled_runtime_calibration_application_execution_review_packet(
+        contract_path=args.contract,
+        review_packet_path=args.review_packet,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_post_execution_summary(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_post_execution_summary(
+        contract_path=args.contract,
+        review_packet_path=args.review_packet,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_post_execution_blocker_report(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_post_execution_blocker_report(
+        contract_path=args.contract,
+        review_packet_path=args.review_packet,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_post_execution_operator_checklist(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_post_execution_operator_checklist(
+        contract_path=args.contract,
+        review_packet_path=args.review_packet,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_post_execution_next_action_report(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_post_execution_next_action_report(
+        contract_path=args.contract,
+        review_packet_path=args.review_packet,
         output_path=args.output,
     )
 

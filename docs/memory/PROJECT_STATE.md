@@ -25,6 +25,7 @@ video/media
 -> calibration decision support
 -> controlled runtime calibration governance
 -> controlled runtime calibration execution mechanism
+-> controlled runtime calibration post-execution review
 ```
 
 The current principle is to expand safely from reviewed sample evidence toward broader replay,
@@ -39,48 +40,47 @@ mutation system. Runtime changes must remain explicitly governed.
 - BP1-37: TOM v3 evidence, replay, review, and 3D foundation.
 - BP38-45: Gameplay gate pathway.
 - BP46-54: Real broadcast gameplay review and calibration decision phase.
-- BP55-62: Controlled runtime calibration governance through application execution mechanism.
+- BP55-64: Controlled runtime calibration governance through application execution review packet.
 
 ## Latest Completed Milestone
 
-Blueprint 62 - Controlled Runtime Calibration Application Execution v1
+Blueprint 64 - Controlled Runtime Calibration Application Execution Review / Post-Application
+Verification Packet v1
 
 Status: Complete.
 
-Commit: `33467c308b501b59784dc2da8b2ea5153723c33c`
+Commit: recorded by the Blueprint 64 commit.
 
-Tag: `tom-v3-blueprint-62-controlled-runtime-calibration-application-execution-v1`
+Tag: `tom-v3-blueprint-64-controlled-runtime-calibration-application-execution-review-packet-v1`
 
 Implemented:
 
-- Controlled runtime calibration application execution service.
+- Controlled runtime calibration application execution review packet service.
 - CLI commands and Make targets.
 - Focused tests.
 - Docs, runbook, status, and report updates.
 - Post-Codex validator updates.
-- Tracked BP62 contract artifacts:
-  - `.data/contracts/controlled_runtime_calibration_application_execution_contract_v1.json`
-  - `.data/contracts/controlled_runtime_calibration_application_execution_v1.json`
-  - `.data/contracts/controlled_runtime_calibration_application_rollback_package_v1.json`
-  - `.data/contracts/controlled_runtime_calibration_applied_runtime_config_v1.json`
+- Tracked BP64 contract artifacts:
+  - `.data/contracts/controlled_runtime_calibration_application_execution_review_packet_contract_v1.json`
+  - `.data/contracts/controlled_runtime_calibration_application_execution_review_packet_v1.json`
 
 Runtime result:
 
-- The committed frozen BP62 path correctly blocks application because BP61 final gate is still
-  blocked.
+- The committed frozen BP64 packet correctly represents the blocked BP62 application execution.
 - There is no real operator signoff or selected candidate in the frozen path yet.
 - Runtime target stayed unchanged before and after.
 - Runtime target SHA before and after:
   `8052301c40dee448f858a3a7c64ae7805d3e7839fbbe35305044e1775f0f8fd0`
+- Review packet status: `review_packet_created_for_blocked_execution`
+- Application outcome status: `application_blocked_safely_before_runtime_mutation`
+- Next action recommendation: `resolve_operator_signoff_before_reapplying`
 
-Success-path test coverage:
+Review-packet test coverage:
 
-- The success-path test verifies controlled application only through BP62 execution.
-- It includes atomic write, readback, and rollback coverage.
-- Tested delta:
-  - threshold `0.55 -> 0.62`
-  - smoothing `3 -> 5`
-  - hysteresis `0.6/0.45 -> 0.67/0.5`
+- Current BP62 blocked execution review.
+- Controlled-application-shaped input fixture.
+- Post-execution summary, blocker report, operator checklist, and next-action report generation.
+- Forbidden runtime application term rejection.
 
 ## Controlled Calibration Chain
 
@@ -92,13 +92,14 @@ Success-path test coverage:
 - BP60 - Controlled Runtime Calibration Runtime Application Staging
 - BP61 - Controlled Runtime Calibration Pre-Application Final Gate
 - BP62 - Controlled Runtime Calibration Application Execution
+- BP63 - TOM v3 Repo Memory Layer
+- BP64 - Controlled Runtime Calibration Application Execution Review Packet
 
 ## Next Regular Action
 
-After this documentation-only memory insert, resume with:
-
-Blueprint 64 - Controlled Runtime Calibration Application Execution Review / Post-Application
-Verification Packet v1
+Use the BP64 next-action report to resolve real operator signoff and selected candidate context
+before any future controlled runtime application retry. Do not attempt runtime application while the
+BP61/BP62/BP64 chain remains blocked.
 
 ## Known Unrelated Working Tree Item
 

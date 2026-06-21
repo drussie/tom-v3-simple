@@ -4130,3 +4130,48 @@ Expected:
 - `drift_detected`: false
 - `breaking_drift_detected`: false
 - `baseline_is_not_truth`: true
+
+## Controlled Runtime Calibration Execution Review Packet
+
+Use this after the BP62 controlled application execution artifact exists. The BP64 packet reviews
+the BP62 result only; it does not perform runtime application or write runtime config.
+
+Build the frozen contract and packet:
+
+```bash
+make tom-v1-export-controlled-runtime-calibration-application-execution-review-packet-contract \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-application-execution-review-packet-inputs \
+  PYTHON=.venv/bin/python
+make tom-v1-validate-controlled-runtime-calibration-application-execution-review-packet-inputs \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-application-execution-review-packet \
+  PYTHON=.venv/bin/python
+make tom-v1-validate-controlled-runtime-calibration-application-execution-review-packet \
+  PYTHON=.venv/bin/python
+```
+
+Build operator review helpers:
+
+```bash
+make tom-v1-build-controlled-runtime-calibration-post-execution-summary \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-post-execution-blocker-report \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-post-execution-operator-checklist \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-post-execution-next-action-report \
+  PYTHON=.venv/bin/python
+```
+
+Current expected frozen result:
+
+- `review_packet_status`: `review_packet_created_for_blocked_execution`
+- `application_outcome_status`: `application_blocked_safely_before_runtime_mutation`
+- `runtime_config_changed`: false
+- `verification_summary_status`: `verification_passed_for_blocked_execution`
+- `next_action_recommendation`: `resolve_operator_signoff_before_reapplying`
+
+The runtime config target is
+`.data/contracts/controlled_runtime_calibration_applied_runtime_config_v1.json`; the current BP62
+blocked artifact records matching before/after sha256 values.

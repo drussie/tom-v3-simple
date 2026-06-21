@@ -394,6 +394,8 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Controlled Runtime Calibration Pre-Application Final Gate v1](reviews/controlled_runtime_calibration_pre_application_final_gate_v1.md)
 - [Blueprint 62 Controlled Runtime Calibration Application Execution v1](blueprints/blueprint_62_controlled_runtime_calibration_application_execution_v1.md)
 - [Controlled Runtime Calibration Application Execution v1](reviews/controlled_runtime_calibration_application_execution_v1.md)
+- [Blueprint 64 Controlled Runtime Calibration Application Execution Review Packet v1](blueprints/blueprint_64_controlled_runtime_calibration_application_execution_review_packet_v1.md)
+- [Controlled Runtime Calibration Application Execution Review Packet v1](reviews/controlled_runtime_calibration_application_execution_review_packet_v1.md)
 
 ## Development
 

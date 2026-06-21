@@ -16,12 +16,11 @@
 - BP1-37: TOM v3 evidence, replay, review, and 3D foundation.
 - BP38-45: Gameplay gate pathway.
 - BP46-54: Real broadcast gameplay review and calibration decision phase.
-- BP55-62: Controlled runtime calibration governance and execution mechanism.
+- BP55-64: Controlled runtime calibration governance through post-execution review packet.
 
 ## Current Chain
 
-BP55 -> BP56 -> BP57 -> BP58 -> BP59 -> BP60 -> BP61 -> BP62 -> BP63 memory insert -> BP64
-next.
+BP55 -> BP56 -> BP57 -> BP58 -> BP59 -> BP60 -> BP61 -> BP62 -> BP63 memory insert -> BP64.
 
 ## Detailed Entries
 
@@ -54,8 +53,7 @@ operator signoff or selected candidate is present yet.
 
 Runtime result: blocked safely; runtime target unchanged.
 
-Follow-up: Resume with Blueprint 64 - Controlled Runtime Calibration Application Execution Review /
-Post-Application Verification Packet v1.
+Follow-up: Completed by Blueprint 64.
 
 ### Blueprint 63 - TOM v3 Repo Memory Layer v0
 
@@ -79,5 +77,40 @@ Validation: docs-only validation with `git diff --check`, `ls docs/memory`, and 
 
 Decision: Repo-local Markdown memory is the first operational memory layer for TOM v3.
 
-Follow-up: Resume with Blueprint 64 - Controlled Runtime Calibration Application Execution Review /
-Post-Application Verification Packet v1.
+Follow-up: Completed by Blueprint 64.
+
+### Blueprint 64 - Controlled Runtime Calibration Application Execution Review Packet v1
+
+Status: Complete after this blueprint commit.
+
+Branch:
+`codex/blueprint-64-controlled-runtime-calibration-application-execution-review-packet-v1`
+
+Commit: recorded by the blueprint commit and final report.
+
+Tag:
+`tom-v3-blueprint-64-controlled-runtime-calibration-application-execution-review-packet-v1`
+
+Classification: calibration-governance-facing, review-facing, post-execution-verification-facing,
+no-runtime-mutation.
+
+Files or areas changed:
+
+- Controlled runtime calibration application execution review packet service.
+- CLI commands and Make targets.
+- Tracked BP64 contract and frozen review packet artifacts.
+- Generated `.data/exports/` reports for local review only.
+- Focused tests.
+- Docs, runbook, agent report, status docs, and repo memory updates.
+- Post-Codex validation coverage.
+
+Validation: full Blueprint 64 validation recorded by final report.
+
+Decision: BP64 packages BP62 execution results for post-execution human review only. The committed
+packet represents the safe blocked path because BP61/BP62 still lack real operator signoff and a
+selected candidate.
+
+Runtime result: blocked safely; runtime target unchanged before and after.
+
+Follow-up: Resolve real operator signoff and selected candidate context before any future
+controlled runtime application retry.

@@ -683,3 +683,29 @@ package, and preserves `production_config_status: not_created`,
 
 Blueprint 62 allows a controlled runtime config update only through the BP62 execution path when a
 BP61 final gate has passed. Focused tests cover that successful write/readback path with fixtures.
+
+## Blueprint 64 Result
+
+Status: complete.
+
+Blueprint 64 adds a controlled runtime calibration application execution review packet. It creates
+tracked artifacts:
+
+```text
+.data/contracts/controlled_runtime_calibration_application_execution_review_packet_contract_v1.json
+.data/contracts/controlled_runtime_calibration_application_execution_review_packet_v1.json
+```
+
+Generated review packet inputs, validations, post-execution summaries, blocker reports, operator
+checklists, and next-action reports remain local under `.data/exports/`.
+
+The frozen review packet accurately represents the BP62 blocked execution. It records
+`application_blocked_safely_before_runtime_mutation`, `runtime_config_changed: false`, matching
+before/after runtime config target sha256 values, `verification_passed_for_blocked_execution`,
+`rollback_needed: false`, `rollback_ready: true`, and
+`next_action_recommendation: resolve_operator_signoff_before_reapplying`.
+
+Blueprint 64 is a review and verification packet only. It does not apply threshold, smoothing, or
+hysteresis changes; does not update runtime config; does not mutate model weights; does not replace
+baselines; does not create production config; does not auto approve or auto reject candidates; and
+does not perform runtime application.

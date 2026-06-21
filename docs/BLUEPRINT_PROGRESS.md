@@ -1912,3 +1912,38 @@ Blueprint 62 does not train or mutate the gameplay classifier, commit model weig
 baselines, create labels, perform automatic relabeling, create production config, auto approve or
 auto reject candidates, or decide tennis truth. A controlled runtime config update is allowed only
 through the BP62 execution service after a passed BP61 final gate.
+
+## Blueprint 64 Status
+
+Status: complete.
+
+Blueprint 64 adds the controlled runtime calibration application execution review packet:
+
+```text
+BP62 controlled application execution artifact
+-> review packet input bundle
+-> post-execution review packet
+-> post-execution summary
+-> blocker report
+-> operator checklist
+-> next-action report
+```
+
+The tracked artifacts are
+`.data/contracts/controlled_runtime_calibration_application_execution_review_packet_contract_v1.json`
+and
+`.data/contracts/controlled_runtime_calibration_application_execution_review_packet_v1.json`.
+Generated local exports include inputs, validations, summaries, blocker reports, operator
+checklists, and next-action reports under `.data/exports/`.
+
+The current frozen review packet is `review_packet_created_for_blocked_execution` with
+`application_outcome_status: application_blocked_safely_before_runtime_mutation`,
+`runtime_config_status: unchanged_due_to_blocker`,
+`mutation_status: no_runtime_mutation_due_to_blocker`, matching before/after runtime config target
+sha256 values, and `next_action_recommendation:
+resolve_operator_signoff_before_reapplying`.
+
+Blueprint 64 does not perform runtime application, write runtime config, train or mutate the
+gameplay classifier, commit model weights, mutate baselines, create labels, perform automatic
+relabeling, create production config, auto approve or auto reject candidates, or decide tennis
+truth.
