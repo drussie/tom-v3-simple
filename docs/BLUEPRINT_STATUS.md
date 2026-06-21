@@ -2393,3 +2393,40 @@ final gate, perform runtime application, write runtime config, train or mutate t
 classifier, commit model weights, create production config, replace baselines, perform automatic
 approval, perform automatic rejection, claim classifier correctness, claim generalization, or decide
 tennis truth.
+
+## Blueprint 73 - Controlled Runtime Calibration Final Gate Rerun Request Packet
+
+Status: COMPLETE
+
+Blueprint 73 creates a request packet for a future final-gate rerun from the BP72 human resolution
+completeness gate. The tracked artifacts are
+`.data/contracts/controlled_runtime_calibration_final_gate_rerun_request_packet_contract_v1.json`
+and
+`.data/contracts/controlled_runtime_calibration_final_gate_rerun_request_packet_v1.json`.
+
+The committed frozen request packet preserves the unresolved human-resolution state:
+
+```text
+final_gate_rerun_request_status: final_gate_rerun_request_blocked_missing_human_resolution
+human_resolution_completeness_gate_status: human_resolution_completeness_gate_not_ready
+human_resolution_record_status: human_resolution_record_pending_explicit_inputs
+human_resolution_provided_status: human_resolution_not_provided
+human_resolution_completeness_status: human_resolution_incomplete
+missing_input_status: required_human_inputs_missing
+operator_input_completeness_status: operator_inputs_incomplete
+candidate_input_completeness_status: candidate_inputs_incomplete
+operator_signoff_status: operator_signoff_required
+selected_candidate_status: selected_candidate_required
+final_gate_rerun_readiness_status: final_gate_rerun_not_ready_missing_human_resolution
+final_gate_rerun_execution_status: final_gate_rerun_not_executed
+reexecution_readiness_status: reexecution_not_ready_blockers_unresolved
+runtime_application_status: not_executed
+runtime_config_changed: false
+mutation_status: no_runtime_mutation_due_to_blocker
+```
+
+Blueprint 73 does not fabricate human resolution, infer operator signoff, infer a selected
+candidate from candidate option discovery, rerun the final gate, perform runtime application, write
+runtime config, train or mutate the gameplay classifier, commit model weights, create production
+config, replace baselines, perform automatic approval, perform automatic rejection, claim
+classifier correctness, claim generalization, or decide tennis truth.

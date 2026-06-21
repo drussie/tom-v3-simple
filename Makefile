@@ -639,6 +639,17 @@ CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_INPUT_COMPLETENESS_REPORT_OUTPUT ?= .dat
 CONTROLLED_RUNTIME_CALIBRATION_CANDIDATE_INPUT_COMPLETENESS_REPORT_OUTPUT ?= .data/exports/controlled_runtime_calibration_candidate_input_completeness_report.current.json
 CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_READINESS_REPORT_OUTPUT ?= .data/exports/controlled_runtime_calibration_final_gate_rerun_readiness_report.current.json
 CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_READINESS_AFTER_HUMAN_RESOLUTION_REPORT_OUTPUT ?= .data/exports/controlled_runtime_calibration_reexecution_readiness_after_human_resolution_report.current.json
+CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_PACKET_CONTRACT_OUTPUT ?= .data/contracts/controlled_runtime_calibration_final_gate_rerun_request_packet_contract_v1.json
+CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_PACKET_INPUTS_OUTPUT ?= .data/exports/controlled_runtime_calibration_final_gate_rerun_request_packet_inputs.current.json
+CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_PACKET_INPUTS ?= $(CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_PACKET_INPUTS_OUTPUT)
+CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_PACKET_INPUTS_VALIDATION_OUTPUT ?= .data/exports/controlled_runtime_calibration_final_gate_rerun_request_packet_inputs.validation.json
+CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_PACKET_OUTPUT ?= .data/contracts/controlled_runtime_calibration_final_gate_rerun_request_packet_v1.json
+CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_PACKET ?= $(CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_PACKET_OUTPUT)
+CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_PACKET_VALIDATION_OUTPUT ?= .data/exports/controlled_runtime_calibration_final_gate_rerun_request_packet.validation.json
+CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_BLOCKER_REPORT_OUTPUT ?= .data/exports/controlled_runtime_calibration_final_gate_rerun_request_blocker_report.current.json
+CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_PREREQUISITE_REPORT_OUTPUT ?= .data/exports/controlled_runtime_calibration_final_gate_rerun_request_prerequisite_report.current.json
+CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_EXECUTION_PLAN_OUTPUT ?= .data/exports/controlled_runtime_calibration_final_gate_rerun_execution_plan.current.json
+CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REEXECUTION_DEPENDENCY_REPORT_OUTPUT ?= .data/exports/controlled_runtime_calibration_final_gate_rerun_reexecution_dependency_report.current.json
 CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_SOURCE_RESOLUTION_PACKET ?= $(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_OUTPUT)
 CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_SOURCE_RESOLUTION_PACKET_CONTRACT ?= $(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_CONTRACT_OUTPUT)
 CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_SOURCE_CANDIDATE_CONFIG_FREEZE ?= $(CALIBRATION_CANDIDATE_CONFIG_FREEZE_ARTIFACT_OUTPUT)
@@ -660,6 +671,8 @@ CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_HUMAN_RESOLUTION_RECORD_SOURCE_PROVIDED_
 CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_HUMAN_RESOLUTION_RECORD_SOURCE_PROVIDED_PACKET_CONTRACT ?= $(CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_PROVIDED_PACKET_CONTRACT_OUTPUT)
 CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_SOURCE_RECORD ?= $(CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_HUMAN_RESOLUTION_RECORD_OUTPUT)
 CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_SOURCE_RECORD_CONTRACT ?= $(CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_HUMAN_RESOLUTION_RECORD_CONTRACT_OUTPUT)
+CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_SOURCE_COMPLETENESS_GATE ?= $(CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_OUTPUT)
+CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_SOURCE_COMPLETENESS_GATE_CONTRACT ?= $(CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_CONTRACT_OUTPUT)
 CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_REF ?=
 CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ID ?=
 CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_VERSION ?=
@@ -812,6 +825,7 @@ export TOM_V3_DATABASE_URL
 .PHONY: tom-v1-export-controlled-runtime-calibration-human-resolution-provided-packet-contract tom-v1-build-controlled-runtime-calibration-human-resolution-provided-packet-inputs tom-v1-validate-controlled-runtime-calibration-human-resolution-provided-packet-inputs tom-v1-build-controlled-runtime-calibration-human-resolution-provided-packet tom-v1-validate-controlled-runtime-calibration-human-resolution-provided-packet tom-v1-build-controlled-runtime-calibration-human-resolution-missing-input-report tom-v1-build-controlled-runtime-calibration-human-resolution-completeness-report tom-v1-build-controlled-runtime-calibration-human-resolution-final-gate-readiness-report tom-v1-build-controlled-runtime-calibration-human-resolution-reexecution-readiness-report
 .PHONY: tom-v1-export-controlled-runtime-calibration-explicit-human-resolution-record-contract tom-v1-build-controlled-runtime-calibration-explicit-human-resolution-record-inputs tom-v1-validate-controlled-runtime-calibration-explicit-human-resolution-record-inputs tom-v1-build-controlled-runtime-calibration-explicit-human-resolution-record tom-v1-validate-controlled-runtime-calibration-explicit-human-resolution-record tom-v1-build-controlled-runtime-calibration-human-resolution-record-completeness-report tom-v1-build-controlled-runtime-calibration-human-resolution-record-missing-input-report tom-v1-build-controlled-runtime-calibration-human-resolution-record-final-gate-readiness-report tom-v1-build-controlled-runtime-calibration-human-resolution-record-reexecution-readiness-report
 .PHONY: tom-v1-export-controlled-runtime-calibration-human-resolution-completeness-gate-contract tom-v1-build-controlled-runtime-calibration-human-resolution-completeness-gate-inputs tom-v1-validate-controlled-runtime-calibration-human-resolution-completeness-gate-inputs tom-v1-build-controlled-runtime-calibration-human-resolution-completeness-gate tom-v1-validate-controlled-runtime-calibration-human-resolution-completeness-gate tom-v1-build-controlled-runtime-calibration-human-resolution-missing-input-matrix tom-v1-build-controlled-runtime-calibration-operator-input-completeness-report tom-v1-build-controlled-runtime-calibration-candidate-input-completeness-report tom-v1-build-controlled-runtime-calibration-final-gate-rerun-readiness-report tom-v1-build-controlled-runtime-calibration-reexecution-readiness-after-human-resolution-report
+.PHONY: tom-v1-export-controlled-runtime-calibration-final-gate-rerun-request-packet-contract tom-v1-build-controlled-runtime-calibration-final-gate-rerun-request-packet-inputs tom-v1-validate-controlled-runtime-calibration-final-gate-rerun-request-packet-inputs tom-v1-build-controlled-runtime-calibration-final-gate-rerun-request-packet tom-v1-validate-controlled-runtime-calibration-final-gate-rerun-request-packet tom-v1-build-controlled-runtime-calibration-final-gate-rerun-request-blocker-report tom-v1-build-controlled-runtime-calibration-final-gate-rerun-request-prerequisite-report tom-v1-build-controlled-runtime-calibration-final-gate-rerun-execution-plan tom-v1-build-controlled-runtime-calibration-final-gate-rerun-reexecution-dependency-report
 
 install:
 	$(PYTHON) -m pip install -e ".[dev]"
@@ -1954,6 +1968,33 @@ tom-v1-build-controlled-runtime-calibration-final-gate-rerun-readiness-report:
 
 tom-v1-build-controlled-runtime-calibration-reexecution-readiness-after-human-resolution-report:
 	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-reexecution-readiness-after-human-resolution-report --contract "$(CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_CONTRACT_OUTPUT)" --human-resolution-completeness-gate "$(CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_READINESS_AFTER_HUMAN_RESOLUTION_REPORT_OUTPUT)" --skip-create-db
+
+tom-v1-export-controlled-runtime-calibration-final-gate-rerun-request-packet-contract:
+	$(PYTHON) -m apps.worker.cli export-controlled-runtime-calibration-final-gate-rerun-request-packet-contract --output "$(CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_PACKET_CONTRACT_OUTPUT)" --skip-create-db
+
+tom-v1-build-controlled-runtime-calibration-final-gate-rerun-request-packet-inputs:
+	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-final-gate-rerun-request-packet-inputs --contract "$(CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_PACKET_CONTRACT_OUTPUT)" --source-human-resolution-completeness-gate "$(CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_SOURCE_COMPLETENESS_GATE)" --source-human-resolution-completeness-gate-contract "$(CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_SOURCE_COMPLETENESS_GATE_CONTRACT)" --model-asset-path "$(GAMEPLAY_CLASSIFIER_ASSET_PATH)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_PACKET_INPUTS_OUTPUT)" --skip-create-db
+
+tom-v1-validate-controlled-runtime-calibration-final-gate-rerun-request-packet-inputs:
+	$(PYTHON) -m apps.worker.cli validate-controlled-runtime-calibration-final-gate-rerun-request-packet-inputs --contract "$(CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_PACKET_CONTRACT_OUTPUT)" --final-gate-rerun-request-packet-inputs "$(CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_PACKET_INPUTS)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_PACKET_INPUTS_VALIDATION_OUTPUT)" --skip-create-db
+
+tom-v1-build-controlled-runtime-calibration-final-gate-rerun-request-packet:
+	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-final-gate-rerun-request-packet --contract "$(CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_PACKET_CONTRACT_OUTPUT)" --final-gate-rerun-request-packet-inputs "$(CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_PACKET_INPUTS)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_PACKET_OUTPUT)" --skip-create-db
+
+tom-v1-validate-controlled-runtime-calibration-final-gate-rerun-request-packet:
+	$(PYTHON) -m apps.worker.cli validate-controlled-runtime-calibration-final-gate-rerun-request-packet --contract "$(CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_PACKET_CONTRACT_OUTPUT)" --final-gate-rerun-request-packet "$(CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_PACKET)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_PACKET_VALIDATION_OUTPUT)" --skip-create-db
+
+tom-v1-build-controlled-runtime-calibration-final-gate-rerun-request-blocker-report:
+	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-final-gate-rerun-request-blocker-report --contract "$(CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_PACKET_CONTRACT_OUTPUT)" --final-gate-rerun-request-packet "$(CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_PACKET)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_BLOCKER_REPORT_OUTPUT)" --skip-create-db
+
+tom-v1-build-controlled-runtime-calibration-final-gate-rerun-request-prerequisite-report:
+	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-final-gate-rerun-request-prerequisite-report --contract "$(CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_PACKET_CONTRACT_OUTPUT)" --final-gate-rerun-request-packet "$(CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_PACKET)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_PREREQUISITE_REPORT_OUTPUT)" --skip-create-db
+
+tom-v1-build-controlled-runtime-calibration-final-gate-rerun-execution-plan:
+	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-final-gate-rerun-execution-plan --contract "$(CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_PACKET_CONTRACT_OUTPUT)" --final-gate-rerun-request-packet "$(CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_PACKET)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_EXECUTION_PLAN_OUTPUT)" --skip-create-db
+
+tom-v1-build-controlled-runtime-calibration-final-gate-rerun-reexecution-dependency-report:
+	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-final-gate-rerun-reexecution-dependency-report --contract "$(CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_PACKET_CONTRACT_OUTPUT)" --final-gate-rerun-request-packet "$(CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_PACKET)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REEXECUTION_DEPENDENCY_REPORT_OUTPUT)" --skip-create-db
 
 tom-v1-post-codex-validate:
 	scripts/post_codex_validate.sh $(if $(EXPECTED_BRANCH),--branch "$(EXPECTED_BRANCH)",) $(if $(EXPECTED_TAG),--expected-tag "$(EXPECTED_TAG)",) --python "$(PYTHON)"

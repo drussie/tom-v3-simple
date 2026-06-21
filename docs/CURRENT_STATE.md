@@ -937,3 +937,41 @@ review only. It does not create operator signoff, infer selected candidate statu
 option discovery or validation success, infer human resolution, rerun the final gate, perform
 runtime application, write runtime config, create production config, modify model weights, or
 replace baselines.
+
+## Blueprint 73 Result
+
+Status: complete.
+
+Blueprint 73 adds the final-gate rerun request packet required after BP72. It creates tracked
+artifacts:
+
+```text
+.data/contracts/controlled_runtime_calibration_final_gate_rerun_request_packet_contract_v1.json
+.data/contracts/controlled_runtime_calibration_final_gate_rerun_request_packet_v1.json
+```
+
+The frozen request packet stores the current incomplete state:
+
+```text
+final_gate_rerun_request_status: final_gate_rerun_request_blocked_missing_human_resolution
+human_resolution_completeness_gate_status: human_resolution_completeness_gate_not_ready
+human_resolution_record_status: human_resolution_record_pending_explicit_inputs
+human_resolution_provided_status: human_resolution_not_provided
+human_resolution_completeness_status: human_resolution_incomplete
+missing_input_status: required_human_inputs_missing
+operator_input_completeness_status: operator_inputs_incomplete
+candidate_input_completeness_status: candidate_inputs_incomplete
+operator_signoff_status: operator_signoff_required
+selected_candidate_status: selected_candidate_required
+final_gate_rerun_readiness_status: final_gate_rerun_not_ready_missing_human_resolution
+final_gate_rerun_execution_status: final_gate_rerun_not_executed
+reexecution_readiness_status: reexecution_not_ready_blockers_unresolved
+runtime_application_status: not_executed
+runtime_config_changed: false
+mutation_status: no_runtime_mutation_due_to_blocker
+```
+
+Blueprint 73 does not create operator signoff, infer selected candidate status from candidate option
+discovery or validation success, infer human resolution, rerun the final gate, perform runtime
+application, write runtime config, create production config, modify model weights, or replace
+baselines.

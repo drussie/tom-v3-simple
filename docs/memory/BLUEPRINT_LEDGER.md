@@ -16,12 +16,11 @@
 - BP1-37: TOM v3 evidence, replay, review, and 3D foundation.
 - BP38-45: Gameplay gate pathway.
 - BP46-54: Real broadcast gameplay review and calibration decision phase.
-- BP55-72: Controlled runtime calibration governance through human resolution completeness gate
-  state.
+- BP55-73: Controlled runtime calibration governance through final-gate rerun request packet state.
 
 ## Current Chain
 
-BP55 -> BP56 -> BP57 -> BP58 -> BP59 -> BP60 -> BP61 -> BP62 -> BP63 memory insert -> BP64 -> BP65 -> BP66 -> BP67 -> BP68 -> BP69 -> BP70 -> BP71 -> BP72.
+BP55 -> BP56 -> BP57 -> BP58 -> BP59 -> BP60 -> BP61 -> BP62 -> BP63 memory insert -> BP64 -> BP65 -> BP66 -> BP67 -> BP68 -> BP69 -> BP70 -> BP71 -> BP72 -> BP73.
 
 ## Detailed Entries
 
@@ -227,6 +226,45 @@ Runtime result: blocked safely; runtime target unchanged before and after.
 Follow-up: Provide real operator signoff identity, timestamp, attestation, scope acknowledgement,
 and explicit selected candidate context, then rerun the final gate in a future blueprint before any
 future application attempt.
+
+### Blueprint 73 - Controlled Runtime Calibration Final Gate Rerun Request Packet v1
+
+Status: Complete after this blueprint commit.
+
+Branch:
+`codex/blueprint-73-controlled-runtime-calibration-final-gate-rerun-request-packet-v1`
+
+Commit: recorded by the blueprint commit and final report.
+
+Tag:
+`tom-v3-blueprint-73-controlled-runtime-calibration-final-gate-rerun-request-packet-v1`
+
+Classification: calibration-governance-facing, final-gate-rerun-request-facing,
+human-resolution-dependent, no-runtime-mutation.
+
+Files or areas changed:
+
+- Controlled runtime calibration final-gate rerun request packet service.
+- CLI commands and Make targets.
+- Tracked BP73 contract and frozen request packet artifacts.
+- Generated `.data/exports/` blocker, prerequisite, execution-plan, and reexecution-dependency
+  reports for local review only.
+- Focused tests.
+- Docs, runbook, agent report, status docs, and repo memory updates.
+- Post-Codex validation coverage.
+
+Validation: full Blueprint 73 validation recorded by final report.
+
+Decision: BP73 creates a request packet for a future final-gate rerun, but it does not infer
+operator signoff, selected candidate, or human resolution from BP72 pending state, candidate option
+discovery, a single available option, Codex execution, validation success, branch state, commits,
+or tags.
+
+Runtime result: blocked safely; runtime target unchanged before and after.
+
+Follow-up: Provide real operator signoff identity, timestamp, attestation, scope acknowledgement,
+and explicit selected candidate context, rerun the BP72 completeness gate, then create a ready BP73
+request packet before rerunning the final gate in a future blueprint.
 
 ### Blueprint 72 - Controlled Runtime Calibration Human Resolution Completeness Gate v1
 

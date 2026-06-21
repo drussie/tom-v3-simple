@@ -260,6 +260,28 @@ from apps.worker.services.controlled_runtime_calibration_explicit_selected_candi
     validate_controlled_runtime_calibration_explicit_selected_candidate_artifact,
     validate_controlled_runtime_calibration_explicit_selected_candidate_artifact_inputs,
 )
+from apps.worker.services.controlled_runtime_calibration_final_gate_rerun_request_packet import (  # noqa: E501
+    DEFAULT_BP73_FINAL_GATE_RERUN_PREREQUISITE_REPORT_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_EXECUTION_PLAN_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REEXECUTION_DEPENDENCY_REPORT_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_BLOCKER_REPORT_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_PACKET_CONTRACT_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_PACKET_INPUTS_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_PACKET_INPUTS_VALIDATION_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_PACKET_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_PACKET_VALIDATION_OUTPUT,
+    build_controlled_runtime_calibration_final_gate_rerun_execution_plan,
+    build_controlled_runtime_calibration_final_gate_rerun_reexecution_dependency_report,
+    build_controlled_runtime_calibration_final_gate_rerun_request_blocker_report,
+    build_controlled_runtime_calibration_final_gate_rerun_request_packet,
+    build_controlled_runtime_calibration_final_gate_rerun_request_packet_inputs,
+    export_controlled_runtime_calibration_final_gate_rerun_request_packet_contract,
+    validate_controlled_runtime_calibration_final_gate_rerun_request_packet,
+    validate_controlled_runtime_calibration_final_gate_rerun_request_packet_inputs,
+)
+from apps.worker.services.controlled_runtime_calibration_final_gate_rerun_request_packet import (
+    build_controlled_runtime_calibration_final_gate_rerun_prerequisite_report as build_bp73_final_gate_rerun_prerequisite_report,  # noqa: E501
+)
 from apps.worker.services.controlled_runtime_calibration_human_approval_gate import (
     DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FUTURE_APPLICATION_READINESS_REPORT_OUTPUT,
     DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_APPROVAL_GATE_CONTRACT_OUTPUT,
@@ -11106,6 +11128,290 @@ def main() -> None:
         skip_create_db=True,
     )
 
+    final_gate_rerun_request_contract_parser = subcommands.add_parser(
+        "export-controlled-runtime-calibration-final-gate-rerun-request-packet-contract",
+        help="Export the Blueprint 73 final-gate rerun request packet contract.",
+    )
+    final_gate_rerun_request_contract_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_PACKET_CONTRACT_OUTPUT
+        ),
+        help="JSON Blueprint 73 final-gate rerun request packet contract path.",
+    )
+    final_gate_rerun_request_contract_parser.add_argument("--skip-create-db", action="store_true")
+    final_gate_rerun_request_contract_parser.set_defaults(
+        handler=(
+            _handle_export_controlled_runtime_calibration_final_gate_rerun_request_packet_contract
+        ),
+        skip_create_db=True,
+    )
+
+    final_gate_rerun_request_inputs_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-final-gate-rerun-request-packet-inputs",
+        help="Build Blueprint 73 final-gate rerun request packet inputs.",
+    )
+    final_gate_rerun_request_inputs_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_PACKET_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 73 final-gate rerun request packet contract path.",
+    )
+    final_gate_rerun_request_inputs_parser.add_argument(
+        "--source-human-resolution-completeness-gate",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_OUTPUT,
+        help="Blueprint 72 human resolution completeness gate path.",
+    )
+    final_gate_rerun_request_inputs_parser.add_argument(
+        "--source-human-resolution-completeness-gate-contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_HUMAN_RESOLUTION_COMPLETENESS_GATE_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 72 human resolution completeness gate contract path.",
+    )
+    final_gate_rerun_request_inputs_parser.add_argument(
+        "--model-asset-path",
+        default=DEFAULT_GAMEPLAY_CLASSIFIER_ASSET_PATH,
+        help="Read-only local TOM v1 gameplay classifier asset path.",
+    )
+    final_gate_rerun_request_inputs_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_PACKET_INPUTS_OUTPUT
+        ),
+        help="JSON Blueprint 73 final-gate rerun request packet inputs path.",
+    )
+    final_gate_rerun_request_inputs_parser.add_argument("--skip-create-db", action="store_true")
+    final_gate_rerun_request_inputs_parser.set_defaults(
+        handler=(
+            _handle_build_controlled_runtime_calibration_final_gate_rerun_request_packet_inputs
+        ),
+        skip_create_db=True,
+    )
+
+    final_gate_rerun_request_inputs_validate_parser = subcommands.add_parser(
+        "validate-controlled-runtime-calibration-final-gate-rerun-request-packet-inputs",
+        help="Validate Blueprint 73 final-gate rerun request packet inputs.",
+    )
+    final_gate_rerun_request_inputs_validate_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_PACKET_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 73 final-gate rerun request packet contract path.",
+    )
+    final_gate_rerun_request_inputs_validate_parser.add_argument(
+        "--final-gate-rerun-request-packet-inputs",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_PACKET_INPUTS_OUTPUT
+        ),
+        help="Blueprint 73 final-gate rerun request packet inputs path.",
+    )
+    final_gate_rerun_request_inputs_validate_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_PACKET_INPUTS_VALIDATION_OUTPUT
+        ),
+        help="Optional Blueprint 73 inputs validation path.",
+    )
+    final_gate_rerun_request_inputs_validate_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    final_gate_rerun_request_inputs_validate_parser.set_defaults(
+        handler=(
+            _handle_validate_controlled_runtime_calibration_final_gate_rerun_request_packet_inputs
+        ),
+        skip_create_db=True,
+    )
+
+    final_gate_rerun_request_packet_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-final-gate-rerun-request-packet",
+        help="Build the Blueprint 73 final-gate rerun request packet.",
+    )
+    final_gate_rerun_request_packet_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_PACKET_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 73 final-gate rerun request packet contract path.",
+    )
+    final_gate_rerun_request_packet_parser.add_argument(
+        "--final-gate-rerun-request-packet-inputs",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_PACKET_INPUTS_OUTPUT
+        ),
+        help="Blueprint 73 final-gate rerun request packet inputs path.",
+    )
+    final_gate_rerun_request_packet_parser.add_argument(
+        "--output",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_PACKET_OUTPUT,
+        help="JSON Blueprint 73 final-gate rerun request packet path.",
+    )
+    final_gate_rerun_request_packet_parser.add_argument("--skip-create-db", action="store_true")
+    final_gate_rerun_request_packet_parser.set_defaults(
+        handler=_handle_build_controlled_runtime_calibration_final_gate_rerun_request_packet,
+        skip_create_db=True,
+    )
+
+    final_gate_rerun_request_packet_validate_parser = subcommands.add_parser(
+        "validate-controlled-runtime-calibration-final-gate-rerun-request-packet",
+        help="Validate the Blueprint 73 final-gate rerun request packet.",
+    )
+    final_gate_rerun_request_packet_validate_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_PACKET_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 73 final-gate rerun request packet contract path.",
+    )
+    final_gate_rerun_request_packet_validate_parser.add_argument(
+        "--final-gate-rerun-request-packet",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_PACKET_OUTPUT,
+        help="Blueprint 73 final-gate rerun request packet path.",
+    )
+    final_gate_rerun_request_packet_validate_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_PACKET_VALIDATION_OUTPUT
+        ),
+        help="Optional Blueprint 73 packet validation path.",
+    )
+    final_gate_rerun_request_packet_validate_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    final_gate_rerun_request_packet_validate_parser.set_defaults(
+        handler=_handle_validate_controlled_runtime_calibration_final_gate_rerun_request_packet,
+        skip_create_db=True,
+    )
+
+    final_gate_rerun_request_blocker_report_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-final-gate-rerun-request-blocker-report",
+        help="Build the Blueprint 73 final-gate rerun request blocker report.",
+    )
+    final_gate_rerun_request_blocker_report_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_PACKET_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 73 final-gate rerun request packet contract path.",
+    )
+    final_gate_rerun_request_blocker_report_parser.add_argument(
+        "--final-gate-rerun-request-packet",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_PACKET_OUTPUT,
+        help="Blueprint 73 final-gate rerun request packet path.",
+    )
+    final_gate_rerun_request_blocker_report_parser.add_argument(
+        "--output",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_BLOCKER_REPORT_OUTPUT,
+        help="JSON Blueprint 73 final-gate rerun request blocker report path.",
+    )
+    final_gate_rerun_request_blocker_report_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    final_gate_rerun_request_blocker_report_parser.set_defaults(
+        handler=(
+            _handle_build_controlled_runtime_calibration_final_gate_rerun_request_blocker_report
+        ),
+        skip_create_db=True,
+    )
+
+    final_gate_rerun_prerequisite_report_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-final-gate-rerun-request-prerequisite-report",
+        help="Build the Blueprint 73 final-gate rerun prerequisite report.",
+    )
+    final_gate_rerun_prerequisite_report_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_PACKET_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 73 final-gate rerun request packet contract path.",
+    )
+    final_gate_rerun_prerequisite_report_parser.add_argument(
+        "--final-gate-rerun-request-packet",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_PACKET_OUTPUT,
+        help="Blueprint 73 final-gate rerun request packet path.",
+    )
+    final_gate_rerun_prerequisite_report_parser.add_argument(
+        "--output",
+        default=DEFAULT_BP73_FINAL_GATE_RERUN_PREREQUISITE_REPORT_OUTPUT,
+        help="JSON Blueprint 73 final-gate rerun prerequisite report path.",
+    )
+    final_gate_rerun_prerequisite_report_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    final_gate_rerun_prerequisite_report_parser.set_defaults(
+        handler=(
+            _handle_build_controlled_runtime_calibration_final_gate_rerun_request_prerequisite_report
+        ),
+        skip_create_db=True,
+    )
+
+    final_gate_rerun_execution_plan_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-final-gate-rerun-execution-plan",
+        help="Build the Blueprint 73 future final-gate rerun execution plan.",
+    )
+    final_gate_rerun_execution_plan_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_PACKET_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 73 final-gate rerun request packet contract path.",
+    )
+    final_gate_rerun_execution_plan_parser.add_argument(
+        "--final-gate-rerun-request-packet",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_PACKET_OUTPUT,
+        help="Blueprint 73 final-gate rerun request packet path.",
+    )
+    final_gate_rerun_execution_plan_parser.add_argument(
+        "--output",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_EXECUTION_PLAN_OUTPUT,
+        help="JSON Blueprint 73 future final-gate rerun execution plan path.",
+    )
+    final_gate_rerun_execution_plan_parser.add_argument("--skip-create-db", action="store_true")
+    final_gate_rerun_execution_plan_parser.set_defaults(
+        handler=_handle_build_controlled_runtime_calibration_final_gate_rerun_execution_plan,
+        skip_create_db=True,
+    )
+
+    final_gate_rerun_reexecution_dependency_report_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-final-gate-rerun-reexecution-dependency-report",
+        help="Build the Blueprint 73 final-gate rerun reexecution dependency report.",
+    )
+    final_gate_rerun_reexecution_dependency_report_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_PACKET_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 73 final-gate rerun request packet contract path.",
+    )
+    final_gate_rerun_reexecution_dependency_report_parser.add_argument(
+        "--final-gate-rerun-request-packet",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_PACKET_OUTPUT,
+        help="Blueprint 73 final-gate rerun request packet path.",
+    )
+    final_gate_rerun_reexecution_dependency_report_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REEXECUTION_DEPENDENCY_REPORT_OUTPUT
+        ),
+        help="JSON Blueprint 73 final-gate rerun reexecution dependency report path.",
+    )
+    final_gate_rerun_reexecution_dependency_report_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    final_gate_rerun_reexecution_dependency_report_parser.set_defaults(
+        handler=(
+            _handle_build_controlled_runtime_calibration_final_gate_rerun_reexecution_dependency_report
+        ),
+        skip_create_db=True,
+    )
+
     point_evaluation_parser = subcommands.add_parser(
         "evaluate-point-candidates",
         help="Evaluate generated point candidate markers using operator review metadata.",
@@ -16100,6 +16406,122 @@ def _handle_build_controlled_runtime_calibration_reexecution_readiness_after_hum
             human_resolution_completeness_gate_path=args.human_resolution_completeness_gate,
             output_path=args.output,
         )
+    )
+
+
+def _handle_export_controlled_runtime_calibration_final_gate_rerun_request_packet_contract(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return export_controlled_runtime_calibration_final_gate_rerun_request_packet_contract(
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_final_gate_rerun_request_packet_inputs(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_final_gate_rerun_request_packet_inputs(
+        contract_path=args.contract,
+        source_human_resolution_completeness_gate_path=(
+            args.source_human_resolution_completeness_gate
+        ),
+        source_human_resolution_completeness_gate_contract_path=(
+            args.source_human_resolution_completeness_gate_contract
+        ),
+        model_asset_path=args.model_asset_path,
+        output_path=args.output,
+    )
+
+
+def _handle_validate_controlled_runtime_calibration_final_gate_rerun_request_packet_inputs(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_controlled_runtime_calibration_final_gate_rerun_request_packet_inputs(
+        contract_path=args.contract,
+        final_gate_rerun_request_packet_inputs_path=(
+            args.final_gate_rerun_request_packet_inputs
+        ),
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_final_gate_rerun_request_packet(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_final_gate_rerun_request_packet(
+        contract_path=args.contract,
+        final_gate_rerun_request_packet_inputs_path=(
+            args.final_gate_rerun_request_packet_inputs
+        ),
+        output_path=args.output,
+    )
+
+
+def _handle_validate_controlled_runtime_calibration_final_gate_rerun_request_packet(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_controlled_runtime_calibration_final_gate_rerun_request_packet(
+        contract_path=args.contract,
+        final_gate_rerun_request_packet_path=args.final_gate_rerun_request_packet,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_final_gate_rerun_request_blocker_report(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_final_gate_rerun_request_blocker_report(
+        contract_path=args.contract,
+        final_gate_rerun_request_packet_path=args.final_gate_rerun_request_packet,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_final_gate_rerun_request_prerequisite_report(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_bp73_final_gate_rerun_prerequisite_report(
+        contract_path=args.contract,
+        final_gate_rerun_request_packet_path=args.final_gate_rerun_request_packet,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_final_gate_rerun_execution_plan(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_final_gate_rerun_execution_plan(
+        contract_path=args.contract,
+        final_gate_rerun_request_packet_path=args.final_gate_rerun_request_packet,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_final_gate_rerun_reexecution_dependency_report(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_final_gate_rerun_reexecution_dependency_report(
+        contract_path=args.contract,
+        final_gate_rerun_request_packet_path=args.final_gate_rerun_request_packet,
+        output_path=args.output,
     )
 
 

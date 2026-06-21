@@ -85,3 +85,10 @@ Reason: BP72 may determine whether a BP71 explicit human resolution record is co
 prepare a future final-gate rerun, but it must keep the gate not ready until real operator signoff
 material and real selected candidate material are supplied. Candidate option discovery, validation
 success, branch state, commits, and tags do not satisfy the completeness gate.
+
+## Decision 16: Final Gate Rerun Request Packets Do Not Execute Final Gates
+
+Reason: BP73 may create a formal request packet for a future final-gate rerun, but it must keep the
+request blocked until BP72 reports complete human resolution. The request packet does not infer
+operator signoff, selected candidate, or human resolution; it does not rerun the final gate, mutate
+runtime config, create production config, modify model weights, or replace baselines.

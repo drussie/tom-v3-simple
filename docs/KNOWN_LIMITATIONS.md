@@ -470,6 +470,12 @@ TOM v3 Simple does not include:
   selection from the single discovered candidate option, rerun the final gate, perform runtime
   application, write runtime config, create production config, modify model weights, replace
   baselines, claim production readiness, or decide tennis truth.
+- Controlled runtime calibration final-gate rerun request packets remain blocked until BP72 reports
+  complete human resolution. The BP73 packet requests a future final-gate rerun only; it does not
+  satisfy missing human inputs by itself, infer a selection from the single discovered candidate
+  option, rerun the final gate, perform runtime application, write runtime config, create
+  production config, modify model weights, replace baselines, claim production readiness, or decide
+  tennis truth.
 
 ## Boundary
 

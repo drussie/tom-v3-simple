@@ -412,6 +412,8 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Controlled Runtime Calibration Explicit Human Resolution Record v1](reviews/controlled_runtime_calibration_explicit_human_resolution_record_v1.md)
 - [Blueprint 72 Controlled Runtime Calibration Human Resolution Completeness Gate v1](blueprints/blueprint_72_controlled_runtime_calibration_human_resolution_completeness_gate_v1.md)
 - [Controlled Runtime Calibration Human Resolution Completeness Gate v1](reviews/controlled_runtime_calibration_human_resolution_completeness_gate_v1.md)
+- [Blueprint 73 Controlled Runtime Calibration Final Gate Rerun Request Packet v1](blueprints/blueprint_73_controlled_runtime_calibration_final_gate_rerun_request_packet_v1.md)
+- [Controlled Runtime Calibration Final Gate Rerun Request Packet v1](reviews/controlled_runtime_calibration_final_gate_rerun_request_packet_v1.md)
 
 ## Development
 

@@ -1988,3 +1988,33 @@ The committed gate stores `human_resolution_completeness_gate_not_ready`,
 `final_gate_rerun_not_ready_missing_human_resolution`,
 `reexecution_not_ready_blockers_unresolved`, `runtime_application_status: not_executed`,
 `runtime_config_changed: false`, and `no_runtime_mutation_due_to_blocker`.
+
+## Blueprint 73 Controlled Runtime Calibration Final Gate Rerun Request Packet v1
+
+Status: complete.
+
+### Goal
+
+Create a request packet for a future final-gate rerun while preserving the current BP72 blocked
+human-resolution state.
+
+### Notes
+
+This milestone adds:
+
+- `apps.worker.services.controlled_runtime_calibration_final_gate_rerun_request_packet`
+- worker CLI commands for contract export, inputs, input validation, packet build, packet
+  validation, blocker report, request prerequisite report, execution plan, and reexecution
+  dependency report
+- matching Make helpers
+- tracked BP73 contract and request packet artifacts under `.data/contracts/`
+- ignored generated report paths under `.data/exports/`
+- focused tests for the blocked default path and a future complete-human-resolution request-only
+  path without runtime application
+
+The committed packet stores `final_gate_rerun_request_blocked_missing_human_resolution`,
+`human_resolution_completeness_gate_not_ready`, `human_resolution_incomplete`,
+`required_human_inputs_missing`, `operator_inputs_incomplete`, `candidate_inputs_incomplete`,
+`final_gate_rerun_not_ready_missing_human_resolution`, `final_gate_rerun_not_executed`,
+`reexecution_not_ready_blockers_unresolved`, `runtime_application_status: not_executed`,
+`runtime_config_changed: false`, and `no_runtime_mutation_due_to_blocker`.
