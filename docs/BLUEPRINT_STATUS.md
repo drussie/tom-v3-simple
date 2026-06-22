@@ -2498,3 +2498,48 @@ candidate from candidate option discovery, infer a final-gate rerun result, exec
 rerun command, perform runtime application, write runtime config, train or mutate the gameplay
 classifier, commit model weights, create production config, replace baselines, claim classifier
 correctness, claim generalization, or decide tennis truth.
+
+## Blueprint 76 - Controlled Runtime Calibration Reexecution Execution Blocked Result
+
+Status: COMPLETE
+
+Blueprint 76 consumes the BP75 reexecution request packet and emits a controlled runtime
+calibration reexecution execution blocked result. The tracked artifacts are
+`.data/contracts/controlled_runtime_calibration_reexecution_execution_blocked_result_contract_v1.json`
+and
+`.data/contracts/controlled_runtime_calibration_reexecution_execution_blocked_result_v1.json`.
+
+The committed frozen result preserves the unresolved BP75/BP74 state:
+
+```text
+reexecution_execution_status: reexecution_execution_blocked_final_gate_not_rerun
+reexecution_result_status: reexecution_result_not_available
+reexecution_outcome_status: reexecution_not_performed
+reexecution_request_status: reexecution_request_blocked_final_gate_not_rerun
+reexecution_readiness_status: reexecution_blocked_final_gate_not_rerun
+final_gate_rerun_execution_status: final_gate_rerun_execution_blocked_missing_human_resolution
+final_gate_rerun_result_status: final_gate_rerun_result_not_available
+final_gate_rerun_outcome_status: final_gate_rerun_not_performed
+final_gate_rerun_request_status: final_gate_rerun_request_blocked_missing_human_resolution
+human_resolution_completeness_gate_status: human_resolution_completeness_gate_not_ready
+human_resolution_record_status: human_resolution_record_pending_explicit_inputs
+human_resolution_provided_status: human_resolution_not_provided
+human_resolution_completeness_status: human_resolution_incomplete
+missing_input_status: required_human_inputs_missing
+operator_input_completeness_status: operator_inputs_incomplete
+candidate_input_completeness_status: candidate_inputs_incomplete
+operator_signoff_status: operator_signoff_required
+selected_candidate_status: selected_candidate_required
+runtime_application_status: not_executed
+runtime_config_changed: false
+mutation_status: no_runtime_mutation_due_to_blocker
+production_config_status: not_created
+baseline_update_status: not_replaced
+model_update_status: not_modified
+```
+
+Blueprint 76 does not execute runtime reexecution, perform runtime application, write runtime
+config, create production config, replace baselines, modify model weights, fabricate human
+resolution, infer operator signoff, infer selected candidate status, infer final-gate result,
+infer reexecution approval, claim classifier correctness, claim generalization, or decide tennis
+truth.

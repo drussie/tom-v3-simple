@@ -4897,3 +4897,35 @@ The committed request packet records `reexecution_request_blocked_final_gate_not
 `required_human_inputs_missing`, `operator_inputs_incomplete`, `candidate_inputs_incomplete`,
 `runtime_application_status: not_executed`, `runtime_config_changed: false`, and
 `no_runtime_mutation_due_to_blocker`.
+
+## Blueprint 76 - Controlled Runtime Calibration Reexecution Execution Blocked Result v1
+
+Status: complete
+
+### Goal
+
+Create the reexecution execution blocked-result artifact after BP75 without executing runtime
+reexecution or resolving the current missing final-gate rerun result.
+
+### Notes
+
+This milestone adds:
+
+- `apps.worker.services.controlled_runtime_calibration_reexecution_execution_blocked_result`
+- CLI commands and Make targets for the BP76 contract/input/blocked-result/report chain
+- post-Codex validator coverage
+- tracked BP76 contract and frozen blocked-result artifacts
+- focused tests for default blocked state and future ready/deferred reexecution state without
+  runtime application
+
+The committed result records `reexecution_execution_blocked_final_gate_not_rerun`,
+`reexecution_result_not_available`, `reexecution_not_performed`,
+`reexecution_request_blocked_final_gate_not_rerun`,
+`reexecution_blocked_final_gate_not_rerun`,
+`final_gate_rerun_execution_blocked_missing_human_resolution`,
+`final_gate_rerun_result_not_available`, `final_gate_rerun_not_performed`,
+`final_gate_rerun_request_blocked_missing_human_resolution`,
+`human_resolution_completeness_gate_not_ready`, `human_resolution_incomplete`,
+`required_human_inputs_missing`, `operator_inputs_incomplete`, `candidate_inputs_incomplete`,
+`runtime_application_status: not_executed`, `runtime_config_changed: false`, and
+`no_runtime_mutation_due_to_blocker`.

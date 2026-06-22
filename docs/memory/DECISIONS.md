@@ -107,3 +107,11 @@ blocked until an explicit final-gate rerun result exists after complete human re
 not infer operator signoff, selected candidate, human resolution, or final-gate result; it does not
 execute runtime application, mutate runtime config, create production config, modify model weights,
 or replace baselines.
+
+## Decision 19: Reexecution Execution Results Do Not Force Runtime Execution
+
+Reason: BP76 may create a reexecution execution blocked-result artifact from BP75, but it must keep
+execution blocked while BP75 is blocked by the missing final-gate rerun result. It does not infer
+operator signoff, selected candidate, human resolution, final-gate result, or reexecution approval;
+it does not execute runtime reexecution or runtime application, mutate runtime config, create
+production config, modify model weights, or replace baselines.

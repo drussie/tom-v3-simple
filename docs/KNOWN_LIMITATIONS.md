@@ -489,6 +489,13 @@ TOM v3 Simple does not include:
   final-gate rerun command, perform runtime application, write runtime config, create production
   config, modify model weights, replace baselines, claim production readiness, or decide tennis
   truth.
+- Controlled runtime calibration reexecution execution blocked-result artifacts remain blocked
+  until BP75 records a ready reexecution request after an explicit final-gate rerun result. The
+  BP76 artifact is a non-execution record only; it does not satisfy missing human inputs by itself,
+  infer a selection from the single discovered candidate option, infer a final-gate result, infer
+  reexecution approval, execute runtime reexecution, perform runtime application, write runtime
+  config, create production config, modify model weights, replace baselines, claim production
+  readiness, or decide tennis truth.
 
 ## Boundary
 

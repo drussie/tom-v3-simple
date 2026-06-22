@@ -2077,3 +2077,37 @@ The committed packet stores `reexecution_request_blocked_final_gate_not_rerun`,
 `required_human_inputs_missing`, `operator_inputs_incomplete`, `candidate_inputs_incomplete`,
 `runtime_application_status: not_executed`, `runtime_config_changed: false`, and
 `no_runtime_mutation_due_to_blocker`.
+
+## Blueprint 76 Controlled Runtime Calibration Reexecution Execution Blocked Result v1
+
+Status: complete.
+
+### Goal
+
+Create the reexecution execution result layer after BP75 while preserving the current blocked
+final-gate-rerun and reexecution request state.
+
+### Notes
+
+This milestone adds:
+
+- `apps.worker.services.controlled_runtime_calibration_reexecution_execution_blocked_result`
+- worker CLI commands for contract export, inputs, input validation, blocked-result build,
+  blocked-result validation, execution precheck, blocked reason, final-gate dependency,
+  non-execution evidence, runtime-mutation prevention, and post-execution readiness reports
+- matching Make helpers
+- tracked BP76 contract and blocked-result artifacts under `.data/contracts/`
+- ignored generated report paths under `.data/exports/`
+- focused tests for the blocked default path and a future ready/deferred path without runtime
+  application or mutation
+
+The committed result stores `reexecution_execution_blocked_final_gate_not_rerun`,
+`reexecution_result_not_available`, `reexecution_not_performed`,
+`reexecution_request_blocked_final_gate_not_rerun`,
+`reexecution_blocked_final_gate_not_rerun`,
+`final_gate_rerun_execution_blocked_missing_human_resolution`,
+`final_gate_rerun_result_not_available`, `final_gate_rerun_not_performed`,
+`human_resolution_completeness_gate_not_ready`, `human_resolution_incomplete`,
+`required_human_inputs_missing`, `operator_inputs_incomplete`, `candidate_inputs_incomplete`,
+`runtime_application_status: not_executed`, `runtime_config_changed: false`, and
+`no_runtime_mutation_due_to_blocker`.

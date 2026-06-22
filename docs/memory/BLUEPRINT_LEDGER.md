@@ -16,13 +16,57 @@
 - BP1-37: TOM v3 evidence, replay, review, and 3D foundation.
 - BP38-45: Gameplay gate pathway.
 - BP46-54: Real broadcast gameplay review and calibration decision phase.
-- BP55-75: Controlled runtime calibration governance through reexecution request packet state.
+- BP55-76: Controlled runtime calibration governance through reexecution execution blocked-result
+  state.
 
 ## Current Chain
 
-BP55 -> BP56 -> BP57 -> BP58 -> BP59 -> BP60 -> BP61 -> BP62 -> BP63 memory insert -> BP64 -> BP65 -> BP66 -> BP67 -> BP68 -> BP69 -> BP70 -> BP71 -> BP72 -> BP73 -> BP74 -> BP75.
+BP55 -> BP56 -> BP57 -> BP58 -> BP59 -> BP60 -> BP61 -> BP62 -> BP63 memory insert -> BP64 -> BP65 -> BP66 -> BP67 -> BP68 -> BP69 -> BP70 -> BP71 -> BP72 -> BP73 -> BP74 -> BP75 -> BP76.
 
 ## Detailed Entries
+
+### Blueprint 76 - Controlled Runtime Calibration Reexecution Execution Blocked Result v1
+
+Status: Complete after this blueprint commit.
+
+Branch:
+`codex/blueprint-76-controlled-runtime-calibration-reexecution-execution-blocked-result-v1`
+
+Commit: recorded by the blueprint commit and final report.
+
+Tag:
+`tom-v3-blueprint-76-controlled-runtime-calibration-reexecution-execution-blocked-result-v1`
+
+Classification: calibration-governance-facing, reexecution-execution-result-facing,
+final-gate-result-dependent, no-runtime-mutation.
+
+Files or areas changed:
+
+- Controlled runtime calibration reexecution execution blocked-result service.
+- CLI commands and Make targets.
+- Tracked BP76 contract and frozen blocked-result artifacts.
+- Generated `.data/exports/` inputs, validations, execution precheck, blocked reason, final-gate
+  dependency, non-execution evidence, runtime-mutation prevention, and post-execution readiness
+  reports for local review only.
+- Focused tests.
+- Docs, runbook, agent report, status docs, and repo memory updates.
+- Post-Codex validation coverage.
+
+Validation: full Blueprint 76 validation recorded by final report.
+
+Decision: BP76 creates a reexecution execution blocked-result artifact from the BP75 reexecution
+request packet, but it keeps execution blocked until BP75 becomes ready after an explicit
+final-gate rerun result. It does not infer operator signoff, selected candidate, human resolution,
+final-gate result, or reexecution approval from a single available candidate option, validation
+success, branch state, commits, or tags.
+
+Runtime result: blocked safely; runtime target unchanged before and after.
+
+Follow-up: Provide real operator signoff identity, timestamp, attestation, scope acknowledgement,
+and explicit selected candidate context, rerun the BP72 completeness gate, rebuild a ready BP73
+request packet, produce a non-blocked BP74/future final-gate rerun result, rebuild a non-blocked
+BP75/future reexecution request, and then rebuild a non-blocked BP76/future reexecution execution
+result before any runtime application attempt.
 
 ### Blueprint 75 - Controlled Runtime Calibration Reexecution Request Packet v1
 

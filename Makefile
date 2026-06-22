@@ -674,6 +674,19 @@ CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_PREREQUISITE_REPORT_OUTPUT ?= .data/e
 CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_DEPENDENCY_REPORT_OUTPUT ?= .data/exports/controlled_runtime_calibration_final_gate_dependency_report.current.json
 CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_PLAN_OUTPUT ?= .data/exports/controlled_runtime_calibration_reexecution_execution_plan.current.json
 CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_RUNTIME_MUTATION_PREVENTION_REPORT_OUTPUT ?= .data/exports/controlled_runtime_calibration_reexecution_runtime_mutation_prevention_report.current.json
+CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_BLOCKED_RESULT_CONTRACT_OUTPUT ?= .data/contracts/controlled_runtime_calibration_reexecution_execution_blocked_result_contract_v1.json
+CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_INPUTS_OUTPUT ?= .data/exports/controlled_runtime_calibration_reexecution_execution_inputs.current.json
+CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_INPUTS ?= $(CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_INPUTS_OUTPUT)
+CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_INPUTS_VALIDATION_OUTPUT ?= .data/exports/controlled_runtime_calibration_reexecution_execution_inputs.validation.json
+CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_BLOCKED_RESULT_OUTPUT ?= .data/contracts/controlled_runtime_calibration_reexecution_execution_blocked_result_v1.json
+CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_BLOCKED_RESULT ?= $(CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_BLOCKED_RESULT_OUTPUT)
+CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_BLOCKED_RESULT_VALIDATION_OUTPUT ?= .data/exports/controlled_runtime_calibration_reexecution_execution_blocked_result.validation.json
+CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_PRECHECK_REPORT_OUTPUT ?= .data/exports/controlled_runtime_calibration_reexecution_execution_precheck_report.current.json
+CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_BLOCKED_REASON_REPORT_OUTPUT ?= .data/exports/controlled_runtime_calibration_reexecution_blocked_reason_report.current.json
+CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_FINAL_GATE_DEPENDENCY_REPORT_OUTPUT ?= .data/exports/controlled_runtime_calibration_reexecution_final_gate_dependency_report.current.json
+CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_NON_EXECUTION_EVIDENCE_REPORT_OUTPUT ?= .data/exports/controlled_runtime_calibration_reexecution_non_execution_evidence_report.current.json
+CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_RUNTIME_MUTATION_PREVENTION_REPORT_OUTPUT ?= .data/exports/controlled_runtime_calibration_reexecution_runtime_mutation_prevention_report.current.json
+CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_POST_EXECUTION_READINESS_REPORT_OUTPUT ?= .data/exports/controlled_runtime_calibration_reexecution_post_execution_readiness_report.current.json
 CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_SOURCE_RESOLUTION_PACKET ?= $(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_OUTPUT)
 CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_SOURCE_RESOLUTION_PACKET_CONTRACT ?= $(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_CONTRACT_OUTPUT)
 CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_SOURCE_CANDIDATE_CONFIG_FREEZE ?= $(CALIBRATION_CANDIDATE_CONFIG_FREEZE_ARTIFACT_OUTPUT)
@@ -701,6 +714,8 @@ CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_EXECUTION_SOURCE_REQUEST_PACKET 
 CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_EXECUTION_SOURCE_REQUEST_PACKET_CONTRACT ?= $(CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_PACKET_CONTRACT_OUTPUT)
 CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_REQUEST_SOURCE_FINAL_GATE_RERUN_EXECUTION_BLOCKED_RESULT ?= $(CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_EXECUTION_BLOCKED_RESULT_OUTPUT)
 CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_REQUEST_SOURCE_FINAL_GATE_RERUN_EXECUTION_BLOCKED_RESULT_CONTRACT ?= $(CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_EXECUTION_BLOCKED_RESULT_CONTRACT_OUTPUT)
+CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_SOURCE_REQUEST_PACKET ?= $(CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_REQUEST_PACKET_OUTPUT)
+CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_SOURCE_REQUEST_PACKET_CONTRACT ?= $(CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_REQUEST_PACKET_CONTRACT_OUTPUT)
 CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_REF ?=
 CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_ID ?=
 CONTROLLED_RUNTIME_CALIBRATION_EXPLICIT_SELECTED_CANDIDATE_VERSION ?=
@@ -856,6 +871,7 @@ export TOM_V3_DATABASE_URL
 .PHONY: tom-v1-export-controlled-runtime-calibration-final-gate-rerun-request-packet-contract tom-v1-build-controlled-runtime-calibration-final-gate-rerun-request-packet-inputs tom-v1-validate-controlled-runtime-calibration-final-gate-rerun-request-packet-inputs tom-v1-build-controlled-runtime-calibration-final-gate-rerun-request-packet tom-v1-validate-controlled-runtime-calibration-final-gate-rerun-request-packet tom-v1-build-controlled-runtime-calibration-final-gate-rerun-request-blocker-report tom-v1-build-controlled-runtime-calibration-final-gate-rerun-request-prerequisite-report tom-v1-build-controlled-runtime-calibration-final-gate-rerun-execution-plan tom-v1-build-controlled-runtime-calibration-final-gate-rerun-reexecution-dependency-report
 .PHONY: tom-v1-export-controlled-runtime-calibration-final-gate-rerun-execution-blocked-result-contract tom-v1-build-controlled-runtime-calibration-final-gate-rerun-execution-inputs tom-v1-validate-controlled-runtime-calibration-final-gate-rerun-execution-inputs tom-v1-build-controlled-runtime-calibration-final-gate-rerun-execution-blocked-result tom-v1-validate-controlled-runtime-calibration-final-gate-rerun-execution-blocked-result tom-v1-build-controlled-runtime-calibration-final-gate-rerun-execution-precheck-report tom-v1-build-controlled-runtime-calibration-final-gate-rerun-blocked-reason-report tom-v1-build-controlled-runtime-calibration-final-gate-rerun-non-execution-evidence-report tom-v1-build-controlled-runtime-calibration-final-gate-rerun-reexecution-blocker-report tom-v1-build-controlled-runtime-calibration-runtime-mutation-prevention-report
 .PHONY: tom-v1-export-controlled-runtime-calibration-reexecution-request-packet-contract tom-v1-build-controlled-runtime-calibration-reexecution-request-packet-inputs tom-v1-validate-controlled-runtime-calibration-reexecution-request-packet-inputs tom-v1-build-controlled-runtime-calibration-reexecution-request-packet tom-v1-validate-controlled-runtime-calibration-reexecution-request-packet tom-v1-build-controlled-runtime-calibration-reexecution-request-blocker-report tom-v1-build-controlled-runtime-calibration-reexecution-prerequisite-report tom-v1-build-controlled-runtime-calibration-final-gate-dependency-report tom-v1-build-controlled-runtime-calibration-reexecution-execution-plan tom-v1-build-controlled-runtime-calibration-reexecution-runtime-mutation-prevention-report
+.PHONY: tom-v1-export-controlled-runtime-calibration-reexecution-execution-blocked-result-contract tom-v1-build-controlled-runtime-calibration-reexecution-execution-inputs tom-v1-validate-controlled-runtime-calibration-reexecution-execution-inputs tom-v1-build-controlled-runtime-calibration-reexecution-execution-blocked-result tom-v1-validate-controlled-runtime-calibration-reexecution-execution-blocked-result tom-v1-build-controlled-runtime-calibration-reexecution-execution-precheck-report tom-v1-build-controlled-runtime-calibration-reexecution-blocked-reason-report tom-v1-build-controlled-runtime-calibration-reexecution-final-gate-dependency-report tom-v1-build-controlled-runtime-calibration-reexecution-non-execution-evidence-report tom-v1-build-controlled-runtime-calibration-reexecution-execution-runtime-mutation-prevention-report tom-v1-build-controlled-runtime-calibration-reexecution-post-execution-readiness-report
 
 install:
 	$(PYTHON) -m pip install -e ".[dev]"
@@ -2085,6 +2101,39 @@ tom-v1-build-controlled-runtime-calibration-reexecution-execution-plan:
 
 tom-v1-build-controlled-runtime-calibration-reexecution-runtime-mutation-prevention-report:
 	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-reexecution-runtime-mutation-prevention-report --contract "$(CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_REQUEST_PACKET_CONTRACT_OUTPUT)" --reexecution-request-packet "$(CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_REQUEST_PACKET)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_RUNTIME_MUTATION_PREVENTION_REPORT_OUTPUT)" --skip-create-db
+
+tom-v1-export-controlled-runtime-calibration-reexecution-execution-blocked-result-contract:
+	$(PYTHON) -m apps.worker.cli export-controlled-runtime-calibration-reexecution-execution-blocked-result-contract --output "$(CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_BLOCKED_RESULT_CONTRACT_OUTPUT)" --skip-create-db
+
+tom-v1-build-controlled-runtime-calibration-reexecution-execution-inputs:
+	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-reexecution-execution-inputs --contract "$(CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_BLOCKED_RESULT_CONTRACT_OUTPUT)" --source-reexecution-request-packet "$(CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_SOURCE_REQUEST_PACKET)" --source-reexecution-request-packet-contract "$(CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_SOURCE_REQUEST_PACKET_CONTRACT)" --model-asset-path "$(GAMEPLAY_CLASSIFIER_ASSET_PATH)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_INPUTS_OUTPUT)" --skip-create-db
+
+tom-v1-validate-controlled-runtime-calibration-reexecution-execution-inputs:
+	$(PYTHON) -m apps.worker.cli validate-controlled-runtime-calibration-reexecution-execution-inputs --contract "$(CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_BLOCKED_RESULT_CONTRACT_OUTPUT)" --reexecution-execution-inputs "$(CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_INPUTS)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_INPUTS_VALIDATION_OUTPUT)" --skip-create-db
+
+tom-v1-build-controlled-runtime-calibration-reexecution-execution-blocked-result:
+	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-reexecution-execution-blocked-result --contract "$(CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_BLOCKED_RESULT_CONTRACT_OUTPUT)" --reexecution-execution-inputs "$(CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_INPUTS)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_BLOCKED_RESULT_OUTPUT)" --skip-create-db
+
+tom-v1-validate-controlled-runtime-calibration-reexecution-execution-blocked-result:
+	$(PYTHON) -m apps.worker.cli validate-controlled-runtime-calibration-reexecution-execution-blocked-result --contract "$(CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_BLOCKED_RESULT_CONTRACT_OUTPUT)" --reexecution-execution-blocked-result "$(CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_BLOCKED_RESULT)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_BLOCKED_RESULT_VALIDATION_OUTPUT)" --skip-create-db
+
+tom-v1-build-controlled-runtime-calibration-reexecution-execution-precheck-report:
+	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-reexecution-execution-precheck-report --contract "$(CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_BLOCKED_RESULT_CONTRACT_OUTPUT)" --reexecution-execution-blocked-result "$(CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_BLOCKED_RESULT)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_PRECHECK_REPORT_OUTPUT)" --skip-create-db
+
+tom-v1-build-controlled-runtime-calibration-reexecution-blocked-reason-report:
+	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-reexecution-blocked-reason-report --contract "$(CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_BLOCKED_RESULT_CONTRACT_OUTPUT)" --reexecution-execution-blocked-result "$(CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_BLOCKED_RESULT)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_BLOCKED_REASON_REPORT_OUTPUT)" --skip-create-db
+
+tom-v1-build-controlled-runtime-calibration-reexecution-final-gate-dependency-report:
+	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-reexecution-final-gate-dependency-report --contract "$(CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_BLOCKED_RESULT_CONTRACT_OUTPUT)" --reexecution-execution-blocked-result "$(CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_BLOCKED_RESULT)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_FINAL_GATE_DEPENDENCY_REPORT_OUTPUT)" --skip-create-db
+
+tom-v1-build-controlled-runtime-calibration-reexecution-non-execution-evidence-report:
+	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-reexecution-non-execution-evidence-report --contract "$(CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_BLOCKED_RESULT_CONTRACT_OUTPUT)" --reexecution-execution-blocked-result "$(CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_BLOCKED_RESULT)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_NON_EXECUTION_EVIDENCE_REPORT_OUTPUT)" --skip-create-db
+
+tom-v1-build-controlled-runtime-calibration-reexecution-execution-runtime-mutation-prevention-report:
+	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-reexecution-execution-runtime-mutation-prevention-report --contract "$(CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_BLOCKED_RESULT_CONTRACT_OUTPUT)" --reexecution-execution-blocked-result "$(CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_BLOCKED_RESULT)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_RUNTIME_MUTATION_PREVENTION_REPORT_OUTPUT)" --skip-create-db
+
+tom-v1-build-controlled-runtime-calibration-reexecution-post-execution-readiness-report:
+	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-reexecution-post-execution-readiness-report --contract "$(CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_BLOCKED_RESULT_CONTRACT_OUTPUT)" --reexecution-execution-blocked-result "$(CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_BLOCKED_RESULT)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_POST_EXECUTION_READINESS_REPORT_OUTPUT)" --skip-create-db
 
 tom-v1-post-codex-validate:
 	scripts/post_codex_validate.sh $(if $(EXPECTED_BRANCH),--branch "$(EXPECTED_BRANCH)",) $(if $(EXPECTED_TAG),--expected-tag "$(EXPECTED_TAG)",) --python "$(PYTHON)"

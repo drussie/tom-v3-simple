@@ -25,6 +25,9 @@ from apps.api.services.pose_review_export import export_pose_review_dataset
 from apps.api.services.tracklet_review_export import export_tracklet_review_dataset
 from apps.worker.config import settings
 from apps.worker.pipelines.synthetic_seed import seed_synthetic_run
+from apps.worker.services import (
+    controlled_runtime_calibration_reexecution_execution_blocked_result as bp76rex,
+)
 from apps.worker.services.ball_court_trajectory import build_ball_court_trajectory
 from apps.worker.services.ball_trajectory_3d import build_3d_ball_trajectory_candidates
 from apps.worker.services.calibration_candidate_config_freeze import (
@@ -422,6 +425,28 @@ from apps.worker.services.controlled_runtime_calibration_pre_application_final_g
     validate_controlled_runtime_calibration_pre_application_final_gate,
     validate_controlled_runtime_calibration_pre_application_final_gate_inputs,
 )
+from apps.worker.services.controlled_runtime_calibration_reexecution_execution_blocked_result import (  # noqa: E501
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_BLOCKED_REASON_REPORT_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_BLOCKED_RESULT_CONTRACT_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_BLOCKED_RESULT_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_BLOCKED_RESULT_VALIDATION_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_INPUTS_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_INPUTS_VALIDATION_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_PRECHECK_REPORT_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_FINAL_GATE_DEPENDENCY_REPORT_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_NON_EXECUTION_EVIDENCE_REPORT_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_POST_EXECUTION_READINESS_REPORT_OUTPUT,
+    build_controlled_runtime_calibration_reexecution_blocked_reason_report,
+    build_controlled_runtime_calibration_reexecution_execution_blocked_result,
+    build_controlled_runtime_calibration_reexecution_execution_inputs,
+    build_controlled_runtime_calibration_reexecution_execution_precheck_report,
+    build_controlled_runtime_calibration_reexecution_final_gate_dependency_report,
+    build_controlled_runtime_calibration_reexecution_non_execution_evidence_report,
+    build_controlled_runtime_calibration_reexecution_post_execution_readiness_report,
+    export_controlled_runtime_calibration_reexecution_execution_blocked_result_contract,
+    validate_controlled_runtime_calibration_reexecution_execution_blocked_result,
+    validate_controlled_runtime_calibration_reexecution_execution_inputs,
+)
 from apps.worker.services.controlled_runtime_calibration_reexecution_request_packet import (  # noqa: E501
     DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_DEPENDENCY_REPORT_OUTPUT,
     DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_PLAN_OUTPUT,
@@ -801,6 +826,15 @@ from apps.worker.services.versioned_dataset_corpus import (
     validate_versioned_dataset_corpus_manifest,
 )
 from apps.worker.services.yolo_model_registry import register_yolo_model
+
+BP76_RUNTIME_MUTATION_PREVENTION_OUTPUT = (
+    bp76rex
+    .DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_RUNTIME_MUTATION_PREVENTION_REPORT_OUTPUT
+)
+build_bp76_runtime_mutation_prevention_report = (
+    bp76rex
+    .build_controlled_runtime_calibration_reexecution_runtime_mutation_prevention_report
+)
 
 
 def main() -> None:
@@ -11869,15 +11903,268 @@ def main() -> None:
 
     reexecution_runtime_mutation_prevention_report_parser = subcommands.add_parser(
         "build-controlled-runtime-calibration-reexecution-runtime-mutation-prevention-report",
-        help="Build the Blueprint 75 reexecution runtime mutation prevention report.",
+        help=(
+            "Build the Blueprint 75 request-packet or Blueprint 76 execution-result "
+            "runtime mutation prevention report."
+        ),
     )
     _add_bp75_reexecution_request_report_args(
         reexecution_runtime_mutation_prevention_report_parser,
         DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_RUNTIME_MUTATION_PREVENTION_REPORT_OUTPUT,
     )
+    reexecution_runtime_mutation_prevention_report_parser.add_argument(
+        "--reexecution-execution-blocked-result",
+        default=None,
+        help=(
+            "Optional Blueprint 76 reexecution execution blocked-result path. "
+            "When supplied, --contract must point at the Blueprint 76 contract."
+        ),
+    )
     reexecution_runtime_mutation_prevention_report_parser.set_defaults(
         handler=(
             _handle_build_controlled_runtime_calibration_reexecution_runtime_mutation_prevention_report
+        ),
+        skip_create_db=True,
+    )
+
+    reexecution_execution_contract_parser = subcommands.add_parser(
+        "export-controlled-runtime-calibration-reexecution-execution-blocked-result-contract",
+        help="Export the Blueprint 76 reexecution execution blocked-result contract.",
+    )
+    reexecution_execution_contract_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_BLOCKED_RESULT_CONTRACT_OUTPUT
+        ),
+        help="JSON Blueprint 76 reexecution execution blocked-result contract path.",
+    )
+    reexecution_execution_contract_parser.add_argument("--skip-create-db", action="store_true")
+    reexecution_execution_contract_parser.set_defaults(
+        handler=(
+            _handle_export_controlled_runtime_calibration_reexecution_execution_blocked_result_contract
+        ),
+        skip_create_db=True,
+    )
+
+    reexecution_execution_inputs_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-reexecution-execution-inputs",
+        help="Build Blueprint 76 reexecution execution inputs.",
+    )
+    reexecution_execution_inputs_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_BLOCKED_RESULT_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 76 reexecution execution blocked-result contract path.",
+    )
+    reexecution_execution_inputs_parser.add_argument(
+        "--source-reexecution-request-packet",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_REQUEST_PACKET_OUTPUT,
+        help="Blueprint 75 reexecution request packet path.",
+    )
+    reexecution_execution_inputs_parser.add_argument(
+        "--source-reexecution-request-packet-contract",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_REQUEST_PACKET_CONTRACT_OUTPUT,
+        help="Blueprint 75 reexecution request packet contract path.",
+    )
+    reexecution_execution_inputs_parser.add_argument(
+        "--model-asset-path",
+        default=DEFAULT_GAMEPLAY_CLASSIFIER_ASSET_PATH,
+        help="Read-only local TOM v1 gameplay classifier asset path.",
+    )
+    reexecution_execution_inputs_parser.add_argument(
+        "--output",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_INPUTS_OUTPUT,
+        help="JSON Blueprint 76 reexecution execution inputs path.",
+    )
+    reexecution_execution_inputs_parser.add_argument("--skip-create-db", action="store_true")
+    reexecution_execution_inputs_parser.set_defaults(
+        handler=_handle_build_controlled_runtime_calibration_reexecution_execution_inputs,
+        skip_create_db=True,
+    )
+
+    reexecution_execution_inputs_validate_parser = subcommands.add_parser(
+        "validate-controlled-runtime-calibration-reexecution-execution-inputs",
+        help="Validate Blueprint 76 reexecution execution inputs.",
+    )
+    reexecution_execution_inputs_validate_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_BLOCKED_RESULT_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 76 reexecution execution blocked-result contract path.",
+    )
+    reexecution_execution_inputs_validate_parser.add_argument(
+        "--reexecution-execution-inputs",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_INPUTS_OUTPUT,
+        help="Blueprint 76 reexecution execution inputs path.",
+    )
+    reexecution_execution_inputs_validate_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_INPUTS_VALIDATION_OUTPUT
+        ),
+        help="Optional Blueprint 76 reexecution execution inputs validation path.",
+    )
+    reexecution_execution_inputs_validate_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    reexecution_execution_inputs_validate_parser.set_defaults(
+        handler=_handle_validate_controlled_runtime_calibration_reexecution_execution_inputs,
+        skip_create_db=True,
+    )
+
+    reexecution_execution_blocked_result_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-reexecution-execution-blocked-result",
+        help="Build the Blueprint 76 reexecution execution blocked result.",
+    )
+    reexecution_execution_blocked_result_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_BLOCKED_RESULT_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 76 reexecution execution blocked-result contract path.",
+    )
+    reexecution_execution_blocked_result_parser.add_argument(
+        "--reexecution-execution-inputs",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_INPUTS_OUTPUT,
+        help="Blueprint 76 reexecution execution inputs path.",
+    )
+    reexecution_execution_blocked_result_parser.add_argument(
+        "--output",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_BLOCKED_RESULT_OUTPUT,
+        help="JSON Blueprint 76 reexecution execution blocked-result path.",
+    )
+    reexecution_execution_blocked_result_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    reexecution_execution_blocked_result_parser.set_defaults(
+        handler=(
+            _handle_build_controlled_runtime_calibration_reexecution_execution_blocked_result
+        ),
+        skip_create_db=True,
+    )
+
+    reexecution_execution_blocked_result_validate_parser = subcommands.add_parser(
+        "validate-controlled-runtime-calibration-reexecution-execution-blocked-result",
+        help="Validate the Blueprint 76 reexecution execution blocked result.",
+    )
+    reexecution_execution_blocked_result_validate_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_BLOCKED_RESULT_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 76 reexecution execution blocked-result contract path.",
+    )
+    reexecution_execution_blocked_result_validate_parser.add_argument(
+        "--reexecution-execution-blocked-result",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_BLOCKED_RESULT_OUTPUT,
+        help="Blueprint 76 reexecution execution blocked-result path.",
+    )
+    reexecution_execution_blocked_result_validate_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_BLOCKED_RESULT_VALIDATION_OUTPUT
+        ),
+        help="Optional Blueprint 76 reexecution execution blocked-result validation path.",
+    )
+    reexecution_execution_blocked_result_validate_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    reexecution_execution_blocked_result_validate_parser.set_defaults(
+        handler=(
+            _handle_validate_controlled_runtime_calibration_reexecution_execution_blocked_result
+        ),
+        skip_create_db=True,
+    )
+
+    reexecution_execution_precheck_report_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-reexecution-execution-precheck-report",
+        help="Build the Blueprint 76 reexecution execution precheck report.",
+    )
+    _add_bp76_reexecution_execution_blocked_result_report_args(
+        reexecution_execution_precheck_report_parser,
+        DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_PRECHECK_REPORT_OUTPUT,
+    )
+    reexecution_execution_precheck_report_parser.set_defaults(
+        handler=(
+            _handle_build_controlled_runtime_calibration_reexecution_execution_precheck_report
+        ),
+        skip_create_db=True,
+    )
+
+    reexecution_blocked_reason_report_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-reexecution-blocked-reason-report",
+        help="Build the Blueprint 76 reexecution blocked reason report.",
+    )
+    _add_bp76_reexecution_execution_blocked_result_report_args(
+        reexecution_blocked_reason_report_parser,
+        DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_BLOCKED_REASON_REPORT_OUTPUT,
+    )
+    reexecution_blocked_reason_report_parser.set_defaults(
+        handler=_handle_build_controlled_runtime_calibration_reexecution_blocked_reason_report,
+        skip_create_db=True,
+    )
+
+    reexecution_final_gate_dependency_report_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-reexecution-final-gate-dependency-report",
+        help="Build the Blueprint 76 reexecution final-gate dependency report.",
+    )
+    _add_bp76_reexecution_execution_blocked_result_report_args(
+        reexecution_final_gate_dependency_report_parser,
+        DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_FINAL_GATE_DEPENDENCY_REPORT_OUTPUT,
+    )
+    reexecution_final_gate_dependency_report_parser.set_defaults(
+        handler=(
+            _handle_build_controlled_runtime_calibration_reexecution_final_gate_dependency_report
+        ),
+        skip_create_db=True,
+    )
+
+    reexecution_non_execution_evidence_report_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-reexecution-non-execution-evidence-report",
+        help="Build the Blueprint 76 reexecution non-execution evidence report.",
+    )
+    _add_bp76_reexecution_execution_blocked_result_report_args(
+        reexecution_non_execution_evidence_report_parser,
+        DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_NON_EXECUTION_EVIDENCE_REPORT_OUTPUT,
+    )
+    reexecution_non_execution_evidence_report_parser.set_defaults(
+        handler=(
+            _handle_build_controlled_runtime_calibration_reexecution_non_execution_evidence_report
+        ),
+        skip_create_db=True,
+    )
+
+    reexecution_execution_runtime_mutation_prevention_report_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-reexecution-execution-runtime-mutation-prevention-report",
+        help="Build the Blueprint 76 reexecution execution runtime mutation prevention report.",
+    )
+    _add_bp76_reexecution_execution_blocked_result_report_args(
+        reexecution_execution_runtime_mutation_prevention_report_parser,
+        BP76_RUNTIME_MUTATION_PREVENTION_OUTPUT,
+    )
+    reexecution_execution_runtime_mutation_prevention_report_parser.set_defaults(
+        handler=(
+            _handle_build_controlled_runtime_calibration_reexecution_execution_runtime_mutation_prevention_report
+        ),
+        skip_create_db=True,
+    )
+
+    reexecution_post_execution_readiness_report_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-reexecution-post-execution-readiness-report",
+        help="Build the Blueprint 76 reexecution post-execution readiness report.",
+    )
+    _add_bp76_reexecution_execution_blocked_result_report_args(
+        reexecution_post_execution_readiness_report_parser,
+        DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_POST_EXECUTION_READINESS_REPORT_OUTPUT,
+    )
+    reexecution_post_execution_readiness_report_parser.set_defaults(
+        handler=(
+            _handle_build_controlled_runtime_calibration_reexecution_post_execution_readiness_report
         ),
         skip_create_db=True,
     )
@@ -12320,6 +12607,30 @@ def _add_bp75_reexecution_request_report_args(
         "--output",
         default=default_output,
         help="JSON Blueprint 75 report path.",
+    )
+    parser.add_argument("--skip-create-db", action="store_true")
+
+
+def _add_bp76_reexecution_execution_blocked_result_report_args(
+    parser: argparse.ArgumentParser,
+    default_output: str,
+) -> None:
+    parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_BLOCKED_RESULT_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 76 reexecution execution blocked-result contract path.",
+    )
+    parser.add_argument(
+        "--reexecution-execution-blocked-result",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_BLOCKED_RESULT_OUTPUT,
+        help="Blueprint 76 reexecution execution blocked-result path.",
+    )
+    parser.add_argument(
+        "--output",
+        default=default_output,
+        help="JSON Blueprint 76 report path.",
     )
     parser.add_argument("--skip-create-db", action="store_true")
 
@@ -17296,9 +17607,155 @@ def _handle_build_controlled_runtime_calibration_reexecution_runtime_mutation_pr
     args: argparse.Namespace,
 ) -> dict[str, object]:
     del session
+    if getattr(args, "reexecution_execution_blocked_result", None):
+        return (
+            build_bp76_runtime_mutation_prevention_report(
+                contract_path=args.contract,
+                reexecution_execution_blocked_result_path=(
+                    args.reexecution_execution_blocked_result
+                ),
+                output_path=args.output,
+            )
+        )
     return build_controlled_runtime_calibration_reexecution_runtime_mutation_prevention_report(
         contract_path=args.contract,
         reexecution_request_packet_path=args.reexecution_request_packet,
+        output_path=args.output,
+    )
+
+
+def _handle_export_controlled_runtime_calibration_reexecution_execution_blocked_result_contract(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return export_controlled_runtime_calibration_reexecution_execution_blocked_result_contract(
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_reexecution_execution_inputs(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_reexecution_execution_inputs(
+        contract_path=args.contract,
+        source_reexecution_request_packet_path=args.source_reexecution_request_packet,
+        source_reexecution_request_packet_contract_path=(
+            args.source_reexecution_request_packet_contract
+        ),
+        model_asset_path=args.model_asset_path,
+        output_path=args.output,
+    )
+
+
+def _handle_validate_controlled_runtime_calibration_reexecution_execution_inputs(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_controlled_runtime_calibration_reexecution_execution_inputs(
+        contract_path=args.contract,
+        reexecution_execution_inputs_path=args.reexecution_execution_inputs,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_reexecution_execution_blocked_result(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_reexecution_execution_blocked_result(
+        contract_path=args.contract,
+        reexecution_execution_inputs_path=args.reexecution_execution_inputs,
+        output_path=args.output,
+    )
+
+
+def _handle_validate_controlled_runtime_calibration_reexecution_execution_blocked_result(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_controlled_runtime_calibration_reexecution_execution_blocked_result(
+        contract_path=args.contract,
+        reexecution_execution_blocked_result_path=args.reexecution_execution_blocked_result,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_reexecution_execution_precheck_report(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_reexecution_execution_precheck_report(
+        contract_path=args.contract,
+        reexecution_execution_blocked_result_path=args.reexecution_execution_blocked_result,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_reexecution_blocked_reason_report(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_reexecution_blocked_reason_report(
+        contract_path=args.contract,
+        reexecution_execution_blocked_result_path=args.reexecution_execution_blocked_result,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_reexecution_final_gate_dependency_report(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_reexecution_final_gate_dependency_report(
+        contract_path=args.contract,
+        reexecution_execution_blocked_result_path=args.reexecution_execution_blocked_result,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_reexecution_non_execution_evidence_report(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_reexecution_non_execution_evidence_report(
+        contract_path=args.contract,
+        reexecution_execution_blocked_result_path=args.reexecution_execution_blocked_result,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_reexecution_execution_runtime_mutation_prevention_report(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return (
+        build_bp76_runtime_mutation_prevention_report(
+            contract_path=args.contract,
+            reexecution_execution_blocked_result_path=args.reexecution_execution_blocked_result,
+            output_path=args.output,
+        )
+    )
+
+
+def _handle_build_controlled_runtime_calibration_reexecution_post_execution_readiness_report(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_reexecution_post_execution_readiness_report(
+        contract_path=args.contract,
+        reexecution_execution_blocked_result_path=args.reexecution_execution_blocked_result,
         output_path=args.output,
     )
 

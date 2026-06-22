@@ -37,6 +37,7 @@ video/media
 -> controlled runtime calibration final-gate rerun request packet state
 -> controlled runtime calibration final-gate rerun execution blocked-result state
 -> controlled runtime calibration reexecution request packet state
+-> controlled runtime calibration reexecution execution blocked-result state
 ```
 
 The current principle is to expand safely from reviewed sample evidence toward broader replay,
@@ -51,42 +52,49 @@ mutation system. Runtime changes must remain explicitly governed.
 - BP1-37: TOM v3 evidence, replay, review, and 3D foundation.
 - BP38-45: Gameplay gate pathway.
 - BP46-54: Real broadcast gameplay review and calibration decision phase.
-- BP55-75: Controlled runtime calibration governance through reexecution request packet state.
+- BP55-76: Controlled runtime calibration governance through reexecution execution blocked-result
+  state.
 
 ## Latest Completed Milestone
 
-Blueprint 75 - Controlled Runtime Calibration Reexecution Request Packet v1
+Blueprint 76 - Controlled Runtime Calibration Reexecution Execution Blocked Result v1
 
 Status: Complete.
 
-Commit: recorded by the Blueprint 75 commit.
+Commit: recorded by the Blueprint 76 commit.
 
 Tag:
-`tom-v3-blueprint-75-controlled-runtime-calibration-reexecution-request-packet-v1`
+`tom-v3-blueprint-76-controlled-runtime-calibration-reexecution-execution-blocked-result-v1`
 
 Implemented:
 
-- Controlled runtime calibration reexecution request packet service.
+- Controlled runtime calibration reexecution execution blocked-result service.
 - CLI commands and Make targets.
 - Focused tests.
 - Docs, runbook, status, and report updates.
 - Post-Codex validator updates.
-- Tracked BP75 contract artifacts:
-  - `.data/contracts/controlled_runtime_calibration_reexecution_request_packet_contract_v1.json`
-  - `.data/contracts/controlled_runtime_calibration_reexecution_request_packet_v1.json`
+- Tracked BP76 contract artifacts:
+  - `.data/contracts/controlled_runtime_calibration_reexecution_execution_blocked_result_contract_v1.json`
+  - `.data/contracts/controlled_runtime_calibration_reexecution_execution_blocked_result_v1.json`
 
 Runtime result:
 
-- The committed frozen BP75 reexecution request packet correctly represents the blocked BP74, BP73,
-  and BP72 human resolution and final-gate rerun state after BP71, BP70, BP69, BP68, BP67, and BP66.
+- The committed frozen BP76 reexecution execution blocked result correctly represents the blocked
+  BP75, BP74, BP73, and BP72 human resolution and final-gate rerun state after BP71, BP70, BP69,
+  BP68, BP67, and BP66.
 - There is still no real operator signoff or selected candidate in the frozen path.
-- BP75 preserves the one discovered candidate option from upstream inventory only and does not
+- BP76 preserves the one discovered candidate option from upstream inventory only and does not
   select from it.
-- BP75 records missing human inputs, reexecution request blockers, prerequisite status, final-gate
-  dependency status, future execution plan placeholders, and runtime-mutation prevention evidence.
+- BP76 records missing human inputs, execution blockers, final-gate dependency status,
+  non-execution evidence, runtime-mutation prevention evidence, and post-execution readiness
+  blockers.
 - Runtime target stayed unchanged before and after.
 - Runtime target SHA before and after:
   `8052301c40dee448f858a3a7c64ae7805d3e7839fbbe35305044e1775f0f8fd0`
+- Reexecution execution status:
+  `reexecution_execution_blocked_final_gate_not_rerun`
+- Reexecution result status: `reexecution_result_not_available`
+- Reexecution outcome status: `reexecution_not_performed`
 - Reexecution request status:
   `reexecution_request_blocked_final_gate_not_rerun`
 - Reexecution readiness status:
@@ -114,7 +122,6 @@ Runtime result:
 - Candidate option count: 1
 - Final gate rerun status: `final_gate_rerun_required`
 - Final gate rerun readiness status: `final_gate_rerun_not_ready_missing_human_resolution`
-- Reexecution readiness status: `reexecution_not_ready_blockers_unresolved`
 - Runtime application status: `not_executed`
 - Runtime config changed: `false`
 - Mutation status: `no_runtime_mutation_due_to_blocker`
@@ -123,13 +130,13 @@ Runtime result:
   `provide_selected_candidate_inputs`, `provide_operator_signoff_and_selected_candidate`, and
   `rerun_final_gate_after_human_resolution`
 
-Reexecution request packet test coverage:
+Reexecution execution blocked-result test coverage:
 
-- Current BP74/BP73/BP72/BP71/BP70/BP69/BP68/BP67/BP66 pending blocked request path.
-- Blocker, prerequisite, final-gate dependency, reexecution execution plan, and
-  runtime-mutation prevention report generation.
-- Future structural final-gate-result path becomes request-ready while runtime application remains
-  deferred to a future blueprint.
+- Current BP75/BP74/BP73/BP72/BP71/BP70/BP69/BP68/BP67/BP66 pending blocked execution path.
+- Execution precheck, blocked reason, final-gate dependency, non-execution evidence,
+  runtime-mutation prevention, and post-execution readiness report generation.
+- Future request-ready path becomes execution-deferred while runtime application remains blocked
+  from mutation.
 
 ## Controlled Calibration Chain
 
@@ -154,15 +161,17 @@ Reexecution request packet test coverage:
 - BP73 - Controlled Runtime Calibration Final Gate Rerun Request Packet
 - BP74 - Controlled Runtime Calibration Final Gate Rerun Execution Blocked Result
 - BP75 - Controlled Runtime Calibration Reexecution Request Packet
+- BP76 - Controlled Runtime Calibration Reexecution Execution Blocked Result
 
 ## Next Regular Action
 
 Provide real operator signoff identity, timestamp, attestation, scope acknowledgement, and an
 explicit selected candidate ref with provenance, then rerun the BP72 completeness gate, create a new
 BP73 request packet that becomes ready, produce a non-blocked BP74/future final-gate rerun
-execution result, and rebuild a non-blocked BP75/future reexecution request before any runtime
-application attempt. Do not attempt runtime application while the
-BP61/BP62/BP64/BP65/BP66/BP67/BP68/BP69/BP70/BP71/BP72/BP73/BP74/BP75 chain remains blocked.
+execution result, rebuild a non-blocked BP75/future reexecution request, and only then rebuild a
+non-blocked BP76/future reexecution execution result before any runtime application attempt. Do not
+attempt runtime application while the
+BP61/BP62/BP64/BP65/BP66/BP67/BP68/BP69/BP70/BP71/BP72/BP73/BP74/BP75/BP76 chain remains blocked.
 
 ## Known Unrelated Working Tree Item
 
