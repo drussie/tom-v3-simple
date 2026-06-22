@@ -16,14 +16,56 @@
 - BP1-37: TOM v3 evidence, replay, review, and 3D foundation.
 - BP38-45: Gameplay gate pathway.
 - BP46-54: Real broadcast gameplay review and calibration decision phase.
-- BP55-76: Controlled runtime calibration governance through reexecution execution blocked-result
-  state.
+- BP55-77: Controlled runtime calibration governance through post-reexecution verification
+  not-available packet state.
 
 ## Current Chain
 
-BP55 -> BP56 -> BP57 -> BP58 -> BP59 -> BP60 -> BP61 -> BP62 -> BP63 memory insert -> BP64 -> BP65 -> BP66 -> BP67 -> BP68 -> BP69 -> BP70 -> BP71 -> BP72 -> BP73 -> BP74 -> BP75 -> BP76.
+BP55 -> BP56 -> BP57 -> BP58 -> BP59 -> BP60 -> BP61 -> BP62 -> BP63 memory insert -> BP64 -> BP65 -> BP66 -> BP67 -> BP68 -> BP69 -> BP70 -> BP71 -> BP72 -> BP73 -> BP74 -> BP75 -> BP76 -> BP77.
 
 ## Detailed Entries
+
+### Blueprint 77 - Controlled Runtime Calibration Post-Reexecution Verification Not Available Packet v1
+
+Status: Complete after this blueprint commit.
+
+Branch:
+`codex/blueprint-77-controlled-runtime-calibration-post-reexecution-verification-not-available-packet-v1`
+
+Commit: recorded by the blueprint commit and final report.
+
+Tag:
+`tom-v3-blueprint-77-controlled-runtime-calibration-post-reexecution-verification-not-available-packet-v1`
+
+Classification: calibration-governance-facing, post-reexecution-verification-facing,
+verification-availability-facing, no-runtime-mutation.
+
+Files or areas changed:
+
+- Controlled runtime calibration post-reexecution verification not-available packet service.
+- CLI commands and Make targets.
+- Tracked BP77 contract and frozen not-available packet artifacts.
+- Generated `.data/exports/` inputs, validations, verification availability, missing execution
+  evidence, runtime non-mutation evidence, final-gate dependency, and phase-freeze readiness
+  reports for local review only.
+- Focused tests.
+- Docs, runbook, agent report, status docs, and repo memory updates.
+- Post-Codex validation coverage.
+
+Validation: full Blueprint 77 validation recorded by final report.
+
+Decision: BP77 creates a post-reexecution verification not-available packet from the BP76
+reexecution execution blocked result. It keeps verification unavailable until runtime reexecution
+actually occurs. It does not infer operator signoff, selected candidate, human resolution,
+final-gate result, reexecution approval, runtime reexecution output, or post-reexecution
+verification from a single available candidate option, validation success, branch state, commits,
+or tags.
+
+Runtime result: blocked safely; runtime target unchanged before and after.
+
+Follow-up: Choose whether to freeze the blocked pathway after BP77, or provide real operator
+signoff and selected candidate context, rerun the BP72 completeness gate, rebuild ready/non-blocked
+BP73/BP74/BP75/BP76 outputs, and then rebuild BP77 only after runtime reexecution output exists.
 
 ### Blueprint 76 - Controlled Runtime Calibration Reexecution Execution Blocked Result v1
 

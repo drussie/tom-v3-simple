@@ -4929,3 +4929,31 @@ The committed result records `reexecution_execution_blocked_final_gate_not_rerun
 `required_human_inputs_missing`, `operator_inputs_incomplete`, `candidate_inputs_incomplete`,
 `runtime_application_status: not_executed`, `runtime_config_changed: false`, and
 `no_runtime_mutation_due_to_blocker`.
+
+## Blueprint 77 - Controlled Runtime Calibration Post-Reexecution Verification Not Available Packet v1
+
+Status: complete
+
+### Goal
+
+Create the post-reexecution verification not-available packet after BP76 without fabricating
+runtime reexecution output or verification evidence.
+
+### Notes
+
+This milestone adds:
+
+- `apps.worker.services.controlled_runtime_calibration_post_reexecution_verification_not_available_packet`
+- CLI commands and Make targets for the BP77 contract/input/not-available-packet/report chain
+- post-Codex validator coverage
+- tracked BP77 contract and frozen not-available packet artifacts
+- focused tests for default not-available state and fabricated availability rejection
+
+The committed packet records `post_reexecution_verification_not_available`,
+`runtime_reexecution_not_performed`, `post_reexecution_result_not_available`,
+`post_reexecution_not_verified`, `reexecution_execution_blocked_final_gate_not_rerun`,
+`reexecution_result_not_available`, `reexecution_not_performed`,
+`final_gate_rerun_result_not_available`, `final_gate_rerun_not_performed`,
+`human_resolution_completeness_gate_not_ready`, `required_human_inputs_missing`,
+`runtime_application_status: not_executed`, `runtime_config_changed: false`,
+`no_runtime_mutation_due_to_blocker`, and `blocked_pathway_freeze_ready`.

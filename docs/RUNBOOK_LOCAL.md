@@ -4883,3 +4883,54 @@ The BP76 execution blocked result does not create operator signoff, infer a sele
 discovery or validation success, infer human resolution, infer a final-gate rerun result, infer
 reexecution approval, execute runtime reexecution, execute runtime application, write runtime
 config, create production config, modify model weights, or replace baselines.
+
+## Blueprint 77 - Post-Reexecution Verification Not Available Packet
+
+Build the Blueprint 77 post-reexecution verification not-available packet from the frozen Blueprint
+76 reexecution execution blocked result:
+
+```bash
+make tom-v1-export-controlled-runtime-calibration-post-reexecution-verification-not-available-packet-contract \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-post-reexecution-verification-inputs \
+  PYTHON=.venv/bin/python
+make tom-v1-validate-controlled-runtime-calibration-post-reexecution-verification-inputs \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-post-reexecution-verification-not-available-packet \
+  PYTHON=.venv/bin/python
+make tom-v1-validate-controlled-runtime-calibration-post-reexecution-verification-not-available-packet \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-post-reexecution-verification-availability-report \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-post-reexecution-missing-execution-evidence-report \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-post-reexecution-runtime-non-mutation-evidence-report \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-post-reexecution-final-gate-dependency-report \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-post-reexecution-phase-freeze-readiness-report \
+  PYTHON=.venv/bin/python
+```
+
+Current expected frozen packet:
+
+- `post_reexecution_verification_status`: `post_reexecution_verification_not_available`
+- `post_reexecution_verification_reason`: `runtime_reexecution_not_performed`
+- `post_reexecution_result_status`: `post_reexecution_result_not_available`
+- `post_reexecution_outcome_status`: `post_reexecution_not_verified`
+- `reexecution_execution_status`: `reexecution_execution_blocked_final_gate_not_rerun`
+- `reexecution_result_status`: `reexecution_result_not_available`
+- `reexecution_outcome_status`: `reexecution_not_performed`
+- `final_gate_rerun_result_status`: `final_gate_rerun_result_not_available`
+- `final_gate_rerun_outcome_status`: `final_gate_rerun_not_performed`
+- `human_resolution_completeness_gate_status`: `human_resolution_completeness_gate_not_ready`
+- `missing_input_status`: `required_human_inputs_missing`
+- `runtime_application_status`: `not_executed`
+- `runtime_config_changed`: false
+- `mutation_status`: `no_runtime_mutation_due_to_blocker`
+- `phase_freeze_recommended_status`: `blocked_pathway_freeze_ready`
+
+The BP77 not-available packet does not create post-reexecution verification, runtime reexecution
+output, final-gate rerun result, human resolution, selected candidate, operator signoff, or
+reexecution approval. It does not execute runtime reexecution or runtime application, write runtime
+config, create production config, modify model weights, or replace baselines.

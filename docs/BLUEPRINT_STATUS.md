@@ -2543,3 +2543,39 @@ config, create production config, replace baselines, modify model weights, fabri
 resolution, infer operator signoff, infer selected candidate status, infer final-gate result,
 infer reexecution approval, claim classifier correctness, claim generalization, or decide tennis
 truth.
+
+## Blueprint 77 - Controlled Runtime Calibration Post-Reexecution Verification Not Available Packet
+
+Status: COMPLETE
+
+Blueprint 77 consumes the BP76 reexecution execution blocked result and emits a controlled runtime
+calibration post-reexecution verification not-available packet. The tracked artifacts are
+`.data/contracts/controlled_runtime_calibration_post_reexecution_verification_not_available_packet_contract_v1.json`
+and
+`.data/contracts/controlled_runtime_calibration_post_reexecution_verification_not_available_packet_v1.json`.
+
+The committed frozen packet preserves the BP76 non-execution state:
+
+```text
+post_reexecution_verification_status: post_reexecution_verification_not_available
+post_reexecution_verification_reason: runtime_reexecution_not_performed
+post_reexecution_result_status: post_reexecution_result_not_available
+post_reexecution_outcome_status: post_reexecution_not_verified
+reexecution_execution_status: reexecution_execution_blocked_final_gate_not_rerun
+reexecution_result_status: reexecution_result_not_available
+reexecution_outcome_status: reexecution_not_performed
+final_gate_rerun_result_status: final_gate_rerun_result_not_available
+final_gate_rerun_outcome_status: final_gate_rerun_not_performed
+human_resolution_completeness_gate_status: human_resolution_completeness_gate_not_ready
+missing_input_status: required_human_inputs_missing
+runtime_application_status: not_executed
+runtime_config_changed: false
+mutation_status: no_runtime_mutation_due_to_blocker
+phase_freeze_recommended_status: blocked_pathway_freeze_ready
+```
+
+Blueprint 77 does not fabricate human resolution, operator signoff, selected candidate, final-gate
+rerun result, reexecution approval, runtime reexecution output, or post-reexecution verification.
+It does not execute runtime reexecution or runtime application, write runtime config, create
+production config, replace baselines, modify model weights, claim classifier correctness, claim
+generalization, or decide tennis truth.

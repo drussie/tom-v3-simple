@@ -2136,4 +2136,63 @@ run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-reexec
   --output "$TMP_ROOT/controlled_runtime_calibration_reexecution_post_execution_readiness_report.current.json" \
   --skip-create-db
 
+run "$PYTHON_BIN" -m apps.worker.cli export-controlled-runtime-calibration-post-reexecution-verification-not-available-packet-contract \
+  --output "$TMP_ROOT/controlled_runtime_calibration_post_reexecution_verification_not_available_packet_contract_v1.smoke.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-post-reexecution-verification-inputs \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_post_reexecution_verification_not_available_packet_contract_v1.smoke.json" \
+  --source-reexecution-execution-blocked-result "$TMP_ROOT/controlled_runtime_calibration_reexecution_execution_blocked_result.current.json" \
+  --source-reexecution-execution-blocked-result-contract "$TMP_ROOT/controlled_runtime_calibration_reexecution_execution_blocked_result_contract_v1.smoke.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_post_reexecution_verification_inputs.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli validate-controlled-runtime-calibration-post-reexecution-verification-inputs \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_post_reexecution_verification_not_available_packet_contract_v1.smoke.json" \
+  --post-reexecution-verification-inputs "$TMP_ROOT/controlled_runtime_calibration_post_reexecution_verification_inputs.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_post_reexecution_verification_inputs.validation.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-post-reexecution-verification-not-available-packet \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_post_reexecution_verification_not_available_packet_contract_v1.smoke.json" \
+  --post-reexecution-verification-inputs "$TMP_ROOT/controlled_runtime_calibration_post_reexecution_verification_inputs.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_post_reexecution_verification_not_available_packet.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli validate-controlled-runtime-calibration-post-reexecution-verification-not-available-packet \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_post_reexecution_verification_not_available_packet_contract_v1.smoke.json" \
+  --post-reexecution-verification-not-available-packet "$TMP_ROOT/controlled_runtime_calibration_post_reexecution_verification_not_available_packet.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_post_reexecution_verification_not_available_packet.validation.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-post-reexecution-verification-availability-report \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_post_reexecution_verification_not_available_packet_contract_v1.smoke.json" \
+  --post-reexecution-verification-not-available-packet "$TMP_ROOT/controlled_runtime_calibration_post_reexecution_verification_not_available_packet.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_post_reexecution_verification_availability_report.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-post-reexecution-missing-execution-evidence-report \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_post_reexecution_verification_not_available_packet_contract_v1.smoke.json" \
+  --post-reexecution-verification-not-available-packet "$TMP_ROOT/controlled_runtime_calibration_post_reexecution_verification_not_available_packet.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_post_reexecution_missing_execution_evidence_report.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-post-reexecution-runtime-non-mutation-evidence-report \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_post_reexecution_verification_not_available_packet_contract_v1.smoke.json" \
+  --post-reexecution-verification-not-available-packet "$TMP_ROOT/controlled_runtime_calibration_post_reexecution_verification_not_available_packet.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_post_reexecution_runtime_non_mutation_evidence_report.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-post-reexecution-final-gate-dependency-report \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_post_reexecution_verification_not_available_packet_contract_v1.smoke.json" \
+  --post-reexecution-verification-not-available-packet "$TMP_ROOT/controlled_runtime_calibration_post_reexecution_verification_not_available_packet.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_post_reexecution_final_gate_dependency_report.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-post-reexecution-phase-freeze-readiness-report \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_post_reexecution_verification_not_available_packet_contract_v1.smoke.json" \
+  --post-reexecution-verification-not-available-packet "$TMP_ROOT/controlled_runtime_calibration_post_reexecution_verification_not_available_packet.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_post_reexecution_phase_freeze_readiness_report.current.json" \
+  --skip-create-db
+
 run git status --short

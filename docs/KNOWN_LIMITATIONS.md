@@ -496,6 +496,12 @@ TOM v3 Simple does not include:
   reexecution approval, execute runtime reexecution, perform runtime application, write runtime
   config, create production config, modify model weights, replace baselines, claim production
   readiness, or decide tennis truth.
+- Controlled runtime calibration post-reexecution verification not-available packets remain
+  unavailable until runtime reexecution actually occurs after the upstream final-gate rerun path is
+  unblocked. The BP77 artifact is a verification-availability record only; it does not fabricate
+  post-reexecution verification, runtime reexecution output, final-gate result, human resolution,
+  selected candidate, operator signoff, or reexecution approval, and it does not perform runtime
+  application or mutate runtime config.
 
 ## Boundary
 

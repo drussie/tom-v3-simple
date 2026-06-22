@@ -26,6 +26,9 @@ from apps.api.services.tracklet_review_export import export_tracklet_review_data
 from apps.worker.config import settings
 from apps.worker.pipelines.synthetic_seed import seed_synthetic_run
 from apps.worker.services import (
+    controlled_runtime_calibration_post_reexecution_verification_not_available_packet as bp77post,
+)
+from apps.worker.services import (
     controlled_runtime_calibration_reexecution_execution_blocked_result as bp76rex,
 )
 from apps.worker.services.ball_court_trajectory import build_ball_court_trajectory
@@ -404,6 +407,27 @@ from apps.worker.services.controlled_runtime_calibration_operator_signoff_candid
     export_controlled_runtime_calibration_operator_signoff_candidate_selection_packet_contract,
     validate_controlled_runtime_calibration_operator_signoff_candidate_selection_packet,
     validate_controlled_runtime_calibration_operator_signoff_candidate_selection_packet_inputs,
+)
+from apps.worker.services.controlled_runtime_calibration_post_reexecution_verification_not_available_packet import (  # noqa: E501
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_POST_REEXECUTION_FINAL_GATE_DEPENDENCY_REPORT_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_POST_REEXECUTION_MISSING_EXECUTION_EVIDENCE_REPORT_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_POST_REEXECUTION_PHASE_FREEZE_READINESS_REPORT_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_POST_REEXECUTION_VERIFICATION_AVAILABILITY_REPORT_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_POST_REEXECUTION_VERIFICATION_INPUTS_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_POST_REEXECUTION_VERIFICATION_INPUTS_VALIDATION_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_POST_REEXECUTION_VERIFICATION_NOT_AVAILABLE_PACKET_CONTRACT_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_POST_REEXECUTION_VERIFICATION_NOT_AVAILABLE_PACKET_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_POST_REEXECUTION_VERIFICATION_NOT_AVAILABLE_PACKET_VALIDATION_OUTPUT,
+    build_controlled_runtime_calibration_post_reexecution_final_gate_dependency_report,
+    build_controlled_runtime_calibration_post_reexecution_missing_execution_evidence_report,
+    build_controlled_runtime_calibration_post_reexecution_phase_freeze_readiness_report,
+    build_controlled_runtime_calibration_post_reexecution_runtime_non_mutation_evidence_report,
+    build_controlled_runtime_calibration_post_reexecution_verification_availability_report,
+    build_controlled_runtime_calibration_post_reexecution_verification_inputs,
+    build_controlled_runtime_calibration_post_reexecution_verification_not_available_packet,
+    export_controlled_runtime_calibration_post_reexecution_verification_not_available_packet_contract,
+    validate_controlled_runtime_calibration_post_reexecution_verification_inputs,
+    validate_controlled_runtime_calibration_post_reexecution_verification_not_available_packet,
 )
 from apps.worker.services.controlled_runtime_calibration_pre_application_final_gate import (
     DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_ARTIFACT_CHECKLIST_OUTPUT,
@@ -834,6 +858,10 @@ BP76_RUNTIME_MUTATION_PREVENTION_OUTPUT = (
 build_bp76_runtime_mutation_prevention_report = (
     bp76rex
     .build_controlled_runtime_calibration_reexecution_runtime_mutation_prevention_report
+)
+BP77_RUNTIME_NON_MUTATION_EVIDENCE_OUTPUT = (
+    bp77post
+    .DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_POST_REEXECUTION_RUNTIME_NON_MUTATION_EVIDENCE_REPORT_OUTPUT
 )
 
 
@@ -12169,6 +12197,242 @@ def main() -> None:
         skip_create_db=True,
     )
 
+    post_reexecution_contract_parser = subcommands.add_parser(
+        "export-controlled-runtime-calibration-post-reexecution-verification-not-available-packet-contract",
+        help="Export the Blueprint 77 post-reexecution verification not-available packet contract.",
+    )
+    post_reexecution_contract_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_POST_REEXECUTION_VERIFICATION_NOT_AVAILABLE_PACKET_CONTRACT_OUTPUT
+        ),
+        help="JSON Blueprint 77 post-reexecution verification contract path.",
+    )
+    post_reexecution_contract_parser.add_argument("--skip-create-db", action="store_true")
+    post_reexecution_contract_parser.set_defaults(
+        handler=(
+            _handle_export_controlled_runtime_calibration_post_reexecution_verification_not_available_packet_contract
+        ),
+        skip_create_db=True,
+    )
+
+    post_reexecution_inputs_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-post-reexecution-verification-inputs",
+        help="Build Blueprint 77 post-reexecution verification inputs.",
+    )
+    post_reexecution_inputs_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_POST_REEXECUTION_VERIFICATION_NOT_AVAILABLE_PACKET_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 77 post-reexecution verification contract path.",
+    )
+    post_reexecution_inputs_parser.add_argument(
+        "--source-reexecution-execution-blocked-result",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_BLOCKED_RESULT_OUTPUT,
+        help="Blueprint 76 reexecution execution blocked-result path.",
+    )
+    post_reexecution_inputs_parser.add_argument(
+        "--source-reexecution-execution-blocked-result-contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_REEXECUTION_EXECUTION_BLOCKED_RESULT_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 76 reexecution execution blocked-result contract path.",
+    )
+    post_reexecution_inputs_parser.add_argument(
+        "--model-asset-path",
+        default=DEFAULT_GAMEPLAY_CLASSIFIER_ASSET_PATH,
+        help="Read-only local TOM v1 gameplay classifier asset path.",
+    )
+    post_reexecution_inputs_parser.add_argument(
+        "--output",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_POST_REEXECUTION_VERIFICATION_INPUTS_OUTPUT,
+        help="JSON Blueprint 77 post-reexecution verification inputs path.",
+    )
+    post_reexecution_inputs_parser.add_argument("--skip-create-db", action="store_true")
+    post_reexecution_inputs_parser.set_defaults(
+        handler=(
+            _handle_build_controlled_runtime_calibration_post_reexecution_verification_inputs
+        ),
+        skip_create_db=True,
+    )
+
+    post_reexecution_inputs_validate_parser = subcommands.add_parser(
+        "validate-controlled-runtime-calibration-post-reexecution-verification-inputs",
+        help="Validate Blueprint 77 post-reexecution verification inputs.",
+    )
+    post_reexecution_inputs_validate_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_POST_REEXECUTION_VERIFICATION_NOT_AVAILABLE_PACKET_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 77 post-reexecution verification contract path.",
+    )
+    post_reexecution_inputs_validate_parser.add_argument(
+        "--post-reexecution-verification-inputs",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_POST_REEXECUTION_VERIFICATION_INPUTS_OUTPUT,
+        help="Blueprint 77 post-reexecution verification inputs path.",
+    )
+    post_reexecution_inputs_validate_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_POST_REEXECUTION_VERIFICATION_INPUTS_VALIDATION_OUTPUT
+        ),
+        help="Optional Blueprint 77 post-reexecution verification inputs validation path.",
+    )
+    post_reexecution_inputs_validate_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    post_reexecution_inputs_validate_parser.set_defaults(
+        handler=(
+            _handle_validate_controlled_runtime_calibration_post_reexecution_verification_inputs
+        ),
+        skip_create_db=True,
+    )
+
+    post_reexecution_packet_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-post-reexecution-verification-not-available-packet",
+        help="Build the Blueprint 77 post-reexecution verification not-available packet.",
+    )
+    post_reexecution_packet_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_POST_REEXECUTION_VERIFICATION_NOT_AVAILABLE_PACKET_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 77 post-reexecution verification contract path.",
+    )
+    post_reexecution_packet_parser.add_argument(
+        "--post-reexecution-verification-inputs",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_POST_REEXECUTION_VERIFICATION_INPUTS_OUTPUT,
+        help="Blueprint 77 post-reexecution verification inputs path.",
+    )
+    post_reexecution_packet_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_POST_REEXECUTION_VERIFICATION_NOT_AVAILABLE_PACKET_OUTPUT
+        ),
+        help="JSON Blueprint 77 post-reexecution verification not-available packet path.",
+    )
+    post_reexecution_packet_parser.add_argument("--skip-create-db", action="store_true")
+    post_reexecution_packet_parser.set_defaults(
+        handler=(
+            _handle_build_controlled_runtime_calibration_post_reexecution_verification_not_available_packet
+        ),
+        skip_create_db=True,
+    )
+
+    post_reexecution_packet_validate_parser = subcommands.add_parser(
+        "validate-controlled-runtime-calibration-post-reexecution-verification-not-available-packet",
+        help="Validate the Blueprint 77 post-reexecution verification not-available packet.",
+    )
+    post_reexecution_packet_validate_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_POST_REEXECUTION_VERIFICATION_NOT_AVAILABLE_PACKET_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 77 post-reexecution verification contract path.",
+    )
+    post_reexecution_packet_validate_parser.add_argument(
+        "--post-reexecution-verification-not-available-packet",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_POST_REEXECUTION_VERIFICATION_NOT_AVAILABLE_PACKET_OUTPUT
+        ),
+        help="Blueprint 77 post-reexecution verification not-available packet path.",
+    )
+    post_reexecution_packet_validate_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_POST_REEXECUTION_VERIFICATION_NOT_AVAILABLE_PACKET_VALIDATION_OUTPUT
+        ),
+        help="Optional Blueprint 77 post-reexecution verification packet validation path.",
+    )
+    post_reexecution_packet_validate_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    post_reexecution_packet_validate_parser.set_defaults(
+        handler=(
+            _handle_validate_controlled_runtime_calibration_post_reexecution_verification_not_available_packet
+        ),
+        skip_create_db=True,
+    )
+
+    post_reexecution_availability_report_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-post-reexecution-verification-availability-report",
+        help="Build the Blueprint 77 post-reexecution verification availability report.",
+    )
+    _add_bp77_post_reexecution_verification_packet_report_args(
+        post_reexecution_availability_report_parser,
+        DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_POST_REEXECUTION_VERIFICATION_AVAILABILITY_REPORT_OUTPUT,
+    )
+    post_reexecution_availability_report_parser.set_defaults(
+        handler=(
+            _handle_build_controlled_runtime_calibration_post_reexecution_verification_availability_report
+        ),
+        skip_create_db=True,
+    )
+
+    post_reexecution_missing_evidence_report_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-post-reexecution-missing-execution-evidence-report",
+        help="Build the Blueprint 77 post-reexecution missing execution evidence report.",
+    )
+    _add_bp77_post_reexecution_verification_packet_report_args(
+        post_reexecution_missing_evidence_report_parser,
+        DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_POST_REEXECUTION_MISSING_EXECUTION_EVIDENCE_REPORT_OUTPUT,
+    )
+    post_reexecution_missing_evidence_report_parser.set_defaults(
+        handler=(
+            _handle_build_controlled_runtime_calibration_post_reexecution_missing_execution_evidence_report
+        ),
+        skip_create_db=True,
+    )
+
+    post_reexecution_runtime_non_mutation_report_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-post-reexecution-runtime-non-mutation-evidence-report",
+        help="Build the Blueprint 77 post-reexecution runtime non-mutation evidence report.",
+    )
+    _add_bp77_post_reexecution_verification_packet_report_args(
+        post_reexecution_runtime_non_mutation_report_parser,
+        BP77_RUNTIME_NON_MUTATION_EVIDENCE_OUTPUT,
+    )
+    post_reexecution_runtime_non_mutation_report_parser.set_defaults(
+        handler=(
+            _handle_build_controlled_runtime_calibration_post_reexecution_runtime_non_mutation_evidence_report
+        ),
+        skip_create_db=True,
+    )
+
+    post_reexecution_final_gate_dependency_report_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-post-reexecution-final-gate-dependency-report",
+        help="Build the Blueprint 77 post-reexecution final-gate dependency report.",
+    )
+    _add_bp77_post_reexecution_verification_packet_report_args(
+        post_reexecution_final_gate_dependency_report_parser,
+        DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_POST_REEXECUTION_FINAL_GATE_DEPENDENCY_REPORT_OUTPUT,
+    )
+    post_reexecution_final_gate_dependency_report_parser.set_defaults(
+        handler=(
+            _handle_build_controlled_runtime_calibration_post_reexecution_final_gate_dependency_report
+        ),
+        skip_create_db=True,
+    )
+
+    post_reexecution_phase_freeze_readiness_report_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-post-reexecution-phase-freeze-readiness-report",
+        help="Build the Blueprint 77 post-reexecution phase-freeze readiness report.",
+    )
+    _add_bp77_post_reexecution_verification_packet_report_args(
+        post_reexecution_phase_freeze_readiness_report_parser,
+        DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_POST_REEXECUTION_PHASE_FREEZE_READINESS_REPORT_OUTPUT,
+    )
+    post_reexecution_phase_freeze_readiness_report_parser.set_defaults(
+        handler=(
+            _handle_build_controlled_runtime_calibration_post_reexecution_phase_freeze_readiness_report
+        ),
+        skip_create_db=True,
+    )
+
     point_evaluation_parser = subcommands.add_parser(
         "evaluate-point-candidates",
         help="Evaluate generated point candidate markers using operator review metadata.",
@@ -12631,6 +12895,32 @@ def _add_bp76_reexecution_execution_blocked_result_report_args(
         "--output",
         default=default_output,
         help="JSON Blueprint 76 report path.",
+    )
+    parser.add_argument("--skip-create-db", action="store_true")
+
+
+def _add_bp77_post_reexecution_verification_packet_report_args(
+    parser: argparse.ArgumentParser,
+    default_output: str,
+) -> None:
+    parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_POST_REEXECUTION_VERIFICATION_NOT_AVAILABLE_PACKET_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 77 post-reexecution verification contract path.",
+    )
+    parser.add_argument(
+        "--post-reexecution-verification-not-available-packet",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_POST_REEXECUTION_VERIFICATION_NOT_AVAILABLE_PACKET_OUTPUT
+        ),
+        help="Blueprint 77 post-reexecution verification not-available packet path.",
+    )
+    parser.add_argument(
+        "--output",
+        default=default_output,
+        help="JSON Blueprint 77 report path.",
     )
     parser.add_argument("--skip-create-db", action="store_true")
 
@@ -17757,6 +18047,158 @@ def _handle_build_controlled_runtime_calibration_reexecution_post_execution_read
         contract_path=args.contract,
         reexecution_execution_blocked_result_path=args.reexecution_execution_blocked_result,
         output_path=args.output,
+    )
+
+
+def _handle_export_controlled_runtime_calibration_post_reexecution_verification_not_available_packet_contract(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return (
+        export_controlled_runtime_calibration_post_reexecution_verification_not_available_packet_contract(
+            output_path=args.output,
+        )
+    )
+
+
+def _handle_build_controlled_runtime_calibration_post_reexecution_verification_inputs(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_post_reexecution_verification_inputs(
+        contract_path=args.contract,
+        source_reexecution_execution_blocked_result_path=(
+            args.source_reexecution_execution_blocked_result
+        ),
+        source_reexecution_execution_blocked_result_contract_path=(
+            args.source_reexecution_execution_blocked_result_contract
+        ),
+        model_asset_path=args.model_asset_path,
+        output_path=args.output,
+    )
+
+
+def _handle_validate_controlled_runtime_calibration_post_reexecution_verification_inputs(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_controlled_runtime_calibration_post_reexecution_verification_inputs(
+        contract_path=args.contract,
+        post_reexecution_verification_inputs_path=args.post_reexecution_verification_inputs,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_post_reexecution_verification_not_available_packet(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return (
+        build_controlled_runtime_calibration_post_reexecution_verification_not_available_packet(
+            contract_path=args.contract,
+            post_reexecution_verification_inputs_path=(
+                args.post_reexecution_verification_inputs
+            ),
+            output_path=args.output,
+        )
+    )
+
+
+def _handle_validate_controlled_runtime_calibration_post_reexecution_verification_not_available_packet(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return (
+        validate_controlled_runtime_calibration_post_reexecution_verification_not_available_packet(
+            contract_path=args.contract,
+            post_reexecution_verification_not_available_packet_path=(
+                args.post_reexecution_verification_not_available_packet
+            ),
+            output_path=args.output,
+        )
+    )
+
+
+def _handle_build_controlled_runtime_calibration_post_reexecution_verification_availability_report(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return (
+        build_controlled_runtime_calibration_post_reexecution_verification_availability_report(
+            contract_path=args.contract,
+            post_reexecution_verification_not_available_packet_path=(
+                args.post_reexecution_verification_not_available_packet
+            ),
+            output_path=args.output,
+        )
+    )
+
+
+def _handle_build_controlled_runtime_calibration_post_reexecution_missing_execution_evidence_report(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return (
+        build_controlled_runtime_calibration_post_reexecution_missing_execution_evidence_report(
+            contract_path=args.contract,
+            post_reexecution_verification_not_available_packet_path=(
+                args.post_reexecution_verification_not_available_packet
+            ),
+            output_path=args.output,
+        )
+    )
+
+
+def _handle_build_controlled_runtime_calibration_post_reexecution_runtime_non_mutation_evidence_report(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return (
+        build_controlled_runtime_calibration_post_reexecution_runtime_non_mutation_evidence_report(
+            contract_path=args.contract,
+            post_reexecution_verification_not_available_packet_path=(
+                args.post_reexecution_verification_not_available_packet
+            ),
+            output_path=args.output,
+        )
+    )
+
+
+def _handle_build_controlled_runtime_calibration_post_reexecution_final_gate_dependency_report(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_post_reexecution_final_gate_dependency_report(
+        contract_path=args.contract,
+        post_reexecution_verification_not_available_packet_path=(
+            args.post_reexecution_verification_not_available_packet
+        ),
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_post_reexecution_phase_freeze_readiness_report(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return (
+        build_controlled_runtime_calibration_post_reexecution_phase_freeze_readiness_report(
+            contract_path=args.contract,
+            post_reexecution_verification_not_available_packet_path=(
+                args.post_reexecution_verification_not_available_packet
+            ),
+            output_path=args.output,
+        )
     )
 
 

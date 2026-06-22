@@ -420,6 +420,8 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Controlled Runtime Calibration Reexecution Request Packet v1](reviews/controlled_runtime_calibration_reexecution_request_packet_v1.md)
 - [Blueprint 76 Controlled Runtime Calibration Reexecution Execution Blocked Result v1](blueprints/blueprint_76_controlled_runtime_calibration_reexecution_execution_blocked_result_v1.md)
 - [Controlled Runtime Calibration Reexecution Execution Blocked Result v1](reviews/controlled_runtime_calibration_reexecution_execution_blocked_result_v1.md)
+- [Blueprint 77 Controlled Runtime Calibration Post-Reexecution Verification Not Available Packet v1](blueprints/blueprint_77_controlled_runtime_calibration_post_reexecution_verification_not_available_packet_v1.md)
+- [Controlled Runtime Calibration Post-Reexecution Verification Not Available Packet v1](reviews/controlled_runtime_calibration_post_reexecution_verification_not_available_packet_v1.md)
 
 ## Development
 

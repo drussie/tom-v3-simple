@@ -9,9 +9,10 @@
 
 ## Immediate Next Regular Blueprint
 
-After Blueprint 76:
+After Blueprint 77:
 
-- Resolve the BP76/BP75/BP74/BP73/BP72 next-action recommendations before any future runtime
+- Decide whether to freeze the current blocked pathway after the BP77 not-available packet.
+- Resolve the BP77/BP76/BP75/BP74/BP73/BP72 next-action recommendations before any future runtime
   application retry:
   `provide_human_resolution_inputs`, `provide_operator_inputs`, `provide_selected_candidate_inputs`,
   `provide_operator_signoff_and_selected_candidate`, and
@@ -29,11 +30,12 @@ After Blueprint 76:
   includes an explicit final-gate rerun result.
 - Rebuild a non-blocked BP76/future reexecution execution result only after BP75/future output
   records a ready reexecution request after the final-gate rerun result.
+- Rebuild BP77 only after a future BP76 output includes explicit runtime reexecution output.
 - Rerun the BP61 final gate only after human resolution is complete and the controlled rerun request
   execution-result path, reexecution request path, and reexecution execution-result path are ready.
 - Keep future runtime application blocked while the
-  BP61/BP62/BP64/BP65/BP66/BP67/BP68/BP69/BP70/BP71/BP72/BP73/BP74/BP75/BP76 chain reports the
-  current safe blocked state.
+  BP61/BP62/BP64/BP65/BP66/BP67/BP68/BP69/BP70/BP71/BP72/BP73/BP74/BP75/BP76/BP77 chain reports
+  the current safe blocked state.
 
 ## Open Follow-Ups
 

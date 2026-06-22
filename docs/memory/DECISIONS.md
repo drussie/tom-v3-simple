@@ -115,3 +115,12 @@ execution blocked while BP75 is blocked by the missing final-gate rerun result. 
 operator signoff, selected candidate, human resolution, final-gate result, or reexecution approval;
 it does not execute runtime reexecution or runtime application, mutate runtime config, create
 production config, modify model weights, or replace baselines.
+
+## Decision 20: Post-Reexecution Verification Requires Runtime Reexecution Output
+
+Reason: BP77 may create a post-reexecution verification not-available packet from BP76, but it must
+keep verification unavailable while BP76 records that runtime reexecution was not performed. It
+does not infer post-reexecution verification, runtime reexecution output, final-gate result, human
+resolution, selected candidate, operator signoff, or reexecution approval; it does not execute
+runtime reexecution or runtime application, mutate runtime config, create production config, modify
+model weights, or replace baselines.
