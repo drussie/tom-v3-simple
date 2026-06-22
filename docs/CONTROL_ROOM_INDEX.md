@@ -414,6 +414,8 @@ Use this index as the durable navigation point for project memory, architecture 
 - [Controlled Runtime Calibration Human Resolution Completeness Gate v1](reviews/controlled_runtime_calibration_human_resolution_completeness_gate_v1.md)
 - [Blueprint 73 Controlled Runtime Calibration Final Gate Rerun Request Packet v1](blueprints/blueprint_73_controlled_runtime_calibration_final_gate_rerun_request_packet_v1.md)
 - [Controlled Runtime Calibration Final Gate Rerun Request Packet v1](reviews/controlled_runtime_calibration_final_gate_rerun_request_packet_v1.md)
+- [Blueprint 74 Controlled Runtime Calibration Final Gate Rerun Execution Blocked Result v1](blueprints/blueprint_74_controlled_runtime_calibration_final_gate_rerun_execution_blocked_result_v1.md)
+- [Controlled Runtime Calibration Final Gate Rerun Execution Blocked Result v1](reviews/controlled_runtime_calibration_final_gate_rerun_execution_blocked_result_v1.md)
 
 ## Development
 

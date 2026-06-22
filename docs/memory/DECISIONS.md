@@ -92,3 +92,10 @@ Reason: BP73 may create a formal request packet for a future final-gate rerun, b
 request blocked until BP72 reports complete human resolution. The request packet does not infer
 operator signoff, selected candidate, or human resolution; it does not rerun the final gate, mutate
 runtime config, create production config, modify model weights, or replace baselines.
+
+## Decision 17: Final Gate Rerun Execution Results Do Not Force Reruns
+
+Reason: BP74 may create an execution-result artifact from BP73, but when BP73 remains blocked by
+incomplete human resolution it must record a blocked, non-executed result. It does not infer
+operator signoff, selected candidate, or human resolution; it does not execute a final-gate rerun,
+mutate runtime config, create production config, modify model weights, or replace baselines.

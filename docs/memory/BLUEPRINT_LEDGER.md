@@ -16,13 +16,52 @@
 - BP1-37: TOM v3 evidence, replay, review, and 3D foundation.
 - BP38-45: Gameplay gate pathway.
 - BP46-54: Real broadcast gameplay review and calibration decision phase.
-- BP55-73: Controlled runtime calibration governance through final-gate rerun request packet state.
+- BP55-74: Controlled runtime calibration governance through final-gate rerun execution blocked-result state.
 
 ## Current Chain
 
-BP55 -> BP56 -> BP57 -> BP58 -> BP59 -> BP60 -> BP61 -> BP62 -> BP63 memory insert -> BP64 -> BP65 -> BP66 -> BP67 -> BP68 -> BP69 -> BP70 -> BP71 -> BP72 -> BP73.
+BP55 -> BP56 -> BP57 -> BP58 -> BP59 -> BP60 -> BP61 -> BP62 -> BP63 memory insert -> BP64 -> BP65 -> BP66 -> BP67 -> BP68 -> BP69 -> BP70 -> BP71 -> BP72 -> BP73 -> BP74.
 
 ## Detailed Entries
+
+### Blueprint 74 - Controlled Runtime Calibration Final Gate Rerun Execution Blocked Result v1
+
+Status: Complete after this blueprint commit.
+
+Branch:
+`codex/blueprint-74-controlled-runtime-calibration-final-gate-rerun-execution-blocked-result-v1`
+
+Commit: recorded by the blueprint commit and final report.
+
+Tag:
+`tom-v3-blueprint-74-controlled-runtime-calibration-final-gate-rerun-execution-blocked-result-v1`
+
+Classification: calibration-governance-facing, final-gate-rerun-execution-result-facing,
+human-resolution-dependent, no-runtime-mutation.
+
+Files or areas changed:
+
+- Controlled runtime calibration final-gate rerun execution blocked-result service.
+- CLI commands and Make targets.
+- Tracked BP74 contract and frozen blocked-result artifacts.
+- Generated `.data/exports/` precheck, blocked-reason, non-execution evidence, reexecution blocker,
+  and runtime-mutation prevention reports for local review only.
+- Focused tests.
+- Docs, runbook, agent report, status docs, and repo memory updates.
+- Post-Codex validation coverage.
+
+Validation: full Blueprint 74 validation recorded by final report.
+
+Decision: BP74 creates an execution-result layer for the BP73 request packet, but it keeps the
+result blocked and not performed while BP73/BP72 remain blocked by incomplete human resolution. It
+does not infer operator signoff, selected candidate, or human resolution from a single available
+candidate option, validation success, branch state, commits, or tags.
+
+Runtime result: blocked safely; runtime target unchanged before and after.
+
+Follow-up: Provide real operator signoff identity, timestamp, attestation, scope acknowledgement,
+and explicit selected candidate context, rerun the BP72 completeness gate, rebuild a ready BP73
+request packet, then produce a non-blocked final-gate rerun execution result in a future blueprint.
 
 ### Blueprint 62 - Controlled Runtime Calibration Application Execution v1
 

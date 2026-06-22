@@ -260,6 +260,28 @@ from apps.worker.services.controlled_runtime_calibration_explicit_selected_candi
     validate_controlled_runtime_calibration_explicit_selected_candidate_artifact,
     validate_controlled_runtime_calibration_explicit_selected_candidate_artifact_inputs,
 )
+from apps.worker.services.controlled_runtime_calibration_final_gate_rerun_execution_blocked_result import (  # noqa: E501
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_BLOCKED_REASON_REPORT_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_EXECUTION_BLOCKED_RESULT_CONTRACT_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_EXECUTION_BLOCKED_RESULT_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_EXECUTION_BLOCKED_RESULT_VALIDATION_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_EXECUTION_INPUTS_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_EXECUTION_INPUTS_VALIDATION_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_EXECUTION_PRECHECK_REPORT_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_NON_EXECUTION_EVIDENCE_REPORT_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REEXECUTION_BLOCKER_REPORT_OUTPUT,
+    DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_RUNTIME_MUTATION_PREVENTION_REPORT_OUTPUT,
+    build_controlled_runtime_calibration_final_gate_rerun_blocked_reason_report,
+    build_controlled_runtime_calibration_final_gate_rerun_execution_blocked_result,
+    build_controlled_runtime_calibration_final_gate_rerun_execution_inputs,
+    build_controlled_runtime_calibration_final_gate_rerun_execution_precheck_report,
+    build_controlled_runtime_calibration_final_gate_rerun_non_execution_evidence_report,
+    build_controlled_runtime_calibration_final_gate_rerun_reexecution_blocker_report,
+    build_controlled_runtime_calibration_runtime_mutation_prevention_report,
+    export_controlled_runtime_calibration_final_gate_rerun_execution_blocked_result_contract,
+    validate_controlled_runtime_calibration_final_gate_rerun_execution_blocked_result,
+    validate_controlled_runtime_calibration_final_gate_rerun_execution_inputs,
+)
 from apps.worker.services.controlled_runtime_calibration_final_gate_rerun_request_packet import (  # noqa: E501
     DEFAULT_BP73_FINAL_GATE_RERUN_PREREQUISITE_REPORT_OUTPUT,
     DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_EXECUTION_PLAN_OUTPUT,
@@ -11412,6 +11434,236 @@ def main() -> None:
         skip_create_db=True,
     )
 
+    final_gate_rerun_execution_blocked_contract_parser = subcommands.add_parser(
+        "export-controlled-runtime-calibration-final-gate-rerun-execution-blocked-result-contract",
+        help="Export the Blueprint 74 final-gate rerun execution blocked-result contract.",
+    )
+    final_gate_rerun_execution_blocked_contract_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_EXECUTION_BLOCKED_RESULT_CONTRACT_OUTPUT
+        ),
+        help="JSON Blueprint 74 final-gate rerun execution blocked-result contract path.",
+    )
+    final_gate_rerun_execution_blocked_contract_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    final_gate_rerun_execution_blocked_contract_parser.set_defaults(
+        handler=(
+            _handle_export_controlled_runtime_calibration_final_gate_rerun_execution_blocked_result_contract
+        ),
+        skip_create_db=True,
+    )
+
+    final_gate_rerun_execution_inputs_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-final-gate-rerun-execution-inputs",
+        help="Build Blueprint 74 final-gate rerun execution inputs.",
+    )
+    final_gate_rerun_execution_inputs_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_EXECUTION_BLOCKED_RESULT_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 74 final-gate rerun execution blocked-result contract path.",
+    )
+    final_gate_rerun_execution_inputs_parser.add_argument(
+        "--source-final-gate-rerun-request-packet",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_PACKET_OUTPUT,
+        help="Blueprint 73 final-gate rerun request packet path.",
+    )
+    final_gate_rerun_execution_inputs_parser.add_argument(
+        "--source-final-gate-rerun-request-packet-contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REQUEST_PACKET_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 73 final-gate rerun request packet contract path.",
+    )
+    final_gate_rerun_execution_inputs_parser.add_argument(
+        "--model-asset-path",
+        default=DEFAULT_GAMEPLAY_CLASSIFIER_ASSET_PATH,
+        help="Read-only local TOM v1 gameplay classifier asset path.",
+    )
+    final_gate_rerun_execution_inputs_parser.add_argument(
+        "--output",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_EXECUTION_INPUTS_OUTPUT,
+        help="JSON Blueprint 74 final-gate rerun execution inputs path.",
+    )
+    final_gate_rerun_execution_inputs_parser.add_argument("--skip-create-db", action="store_true")
+    final_gate_rerun_execution_inputs_parser.set_defaults(
+        handler=_handle_build_controlled_runtime_calibration_final_gate_rerun_execution_inputs,
+        skip_create_db=True,
+    )
+
+    final_gate_rerun_execution_inputs_validate_parser = subcommands.add_parser(
+        "validate-controlled-runtime-calibration-final-gate-rerun-execution-inputs",
+        help="Validate Blueprint 74 final-gate rerun execution inputs.",
+    )
+    final_gate_rerun_execution_inputs_validate_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_EXECUTION_BLOCKED_RESULT_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 74 final-gate rerun execution blocked-result contract path.",
+    )
+    final_gate_rerun_execution_inputs_validate_parser.add_argument(
+        "--final-gate-rerun-execution-inputs",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_EXECUTION_INPUTS_OUTPUT,
+        help="Blueprint 74 final-gate rerun execution inputs path.",
+    )
+    final_gate_rerun_execution_inputs_validate_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_EXECUTION_INPUTS_VALIDATION_OUTPUT
+        ),
+        help="Optional Blueprint 74 execution inputs validation path.",
+    )
+    final_gate_rerun_execution_inputs_validate_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    final_gate_rerun_execution_inputs_validate_parser.set_defaults(
+        handler=_handle_validate_controlled_runtime_calibration_final_gate_rerun_execution_inputs,
+        skip_create_db=True,
+    )
+
+    final_gate_rerun_execution_blocked_result_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-final-gate-rerun-execution-blocked-result",
+        help="Build the Blueprint 74 final-gate rerun execution blocked result.",
+    )
+    final_gate_rerun_execution_blocked_result_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_EXECUTION_BLOCKED_RESULT_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 74 final-gate rerun execution blocked-result contract path.",
+    )
+    final_gate_rerun_execution_blocked_result_parser.add_argument(
+        "--final-gate-rerun-execution-inputs",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_EXECUTION_INPUTS_OUTPUT,
+        help="Blueprint 74 final-gate rerun execution inputs path.",
+    )
+    final_gate_rerun_execution_blocked_result_parser.add_argument(
+        "--output",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_EXECUTION_BLOCKED_RESULT_OUTPUT,
+        help="JSON Blueprint 74 final-gate rerun execution blocked-result path.",
+    )
+    final_gate_rerun_execution_blocked_result_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    final_gate_rerun_execution_blocked_result_parser.set_defaults(
+        handler=(
+            _handle_build_controlled_runtime_calibration_final_gate_rerun_execution_blocked_result
+        ),
+        skip_create_db=True,
+    )
+
+    final_gate_rerun_execution_blocked_result_validate_parser = subcommands.add_parser(
+        "validate-controlled-runtime-calibration-final-gate-rerun-execution-blocked-result",
+        help="Validate the Blueprint 74 final-gate rerun execution blocked result.",
+    )
+    final_gate_rerun_execution_blocked_result_validate_parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_EXECUTION_BLOCKED_RESULT_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 74 final-gate rerun execution blocked-result contract path.",
+    )
+    final_gate_rerun_execution_blocked_result_validate_parser.add_argument(
+        "--final-gate-rerun-execution-blocked-result",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_EXECUTION_BLOCKED_RESULT_OUTPUT,
+        help="Blueprint 74 final-gate rerun execution blocked-result path.",
+    )
+    final_gate_rerun_execution_blocked_result_validate_parser.add_argument(
+        "--output",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_EXECUTION_BLOCKED_RESULT_VALIDATION_OUTPUT
+        ),
+        help="Optional Blueprint 74 blocked-result validation path.",
+    )
+    final_gate_rerun_execution_blocked_result_validate_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    final_gate_rerun_execution_blocked_result_validate_parser.set_defaults(
+        handler=(
+            _handle_validate_controlled_runtime_calibration_final_gate_rerun_execution_blocked_result
+        ),
+        skip_create_db=True,
+    )
+
+    final_gate_rerun_execution_precheck_report_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-final-gate-rerun-execution-precheck-report",
+        help="Build the Blueprint 74 final-gate rerun execution precheck report.",
+    )
+    _add_bp74_blocked_result_report_args(
+        final_gate_rerun_execution_precheck_report_parser,
+        DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_EXECUTION_PRECHECK_REPORT_OUTPUT,
+    )
+    final_gate_rerun_execution_precheck_report_parser.set_defaults(
+        handler=(
+            _handle_build_controlled_runtime_calibration_final_gate_rerun_execution_precheck_report
+        ),
+        skip_create_db=True,
+    )
+
+    final_gate_rerun_blocked_reason_report_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-final-gate-rerun-blocked-reason-report",
+        help="Build the Blueprint 74 final-gate rerun blocked reason report.",
+    )
+    _add_bp74_blocked_result_report_args(
+        final_gate_rerun_blocked_reason_report_parser,
+        DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_BLOCKED_REASON_REPORT_OUTPUT,
+    )
+    final_gate_rerun_blocked_reason_report_parser.set_defaults(
+        handler=_handle_build_controlled_runtime_calibration_final_gate_rerun_blocked_reason_report,
+        skip_create_db=True,
+    )
+
+    final_gate_rerun_non_execution_evidence_report_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-final-gate-rerun-non-execution-evidence-report",
+        help="Build the Blueprint 74 final-gate rerun non-execution evidence report.",
+    )
+    _add_bp74_blocked_result_report_args(
+        final_gate_rerun_non_execution_evidence_report_parser,
+        DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_NON_EXECUTION_EVIDENCE_REPORT_OUTPUT,
+    )
+    final_gate_rerun_non_execution_evidence_report_parser.set_defaults(
+        handler=(
+            _handle_build_controlled_runtime_calibration_final_gate_rerun_non_execution_evidence_report
+        ),
+        skip_create_db=True,
+    )
+
+    final_gate_rerun_reexecution_blocker_report_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-final-gate-rerun-reexecution-blocker-report",
+        help="Build the Blueprint 74 final-gate rerun reexecution blocker report.",
+    )
+    _add_bp74_blocked_result_report_args(
+        final_gate_rerun_reexecution_blocker_report_parser,
+        DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_REEXECUTION_BLOCKER_REPORT_OUTPUT,
+    )
+    final_gate_rerun_reexecution_blocker_report_parser.set_defaults(
+        handler=(
+            _handle_build_controlled_runtime_calibration_final_gate_rerun_reexecution_blocker_report
+        ),
+        skip_create_db=True,
+    )
+
+    runtime_mutation_prevention_report_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-runtime-mutation-prevention-report",
+        help="Build the Blueprint 74 runtime mutation prevention report.",
+    )
+    _add_bp74_blocked_result_report_args(
+        runtime_mutation_prevention_report_parser,
+        DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_RUNTIME_MUTATION_PREVENTION_REPORT_OUTPUT,
+    )
+    runtime_mutation_prevention_report_parser.set_defaults(
+        handler=_handle_build_controlled_runtime_calibration_runtime_mutation_prevention_report,
+        skip_create_db=True,
+    )
+
     point_evaluation_parser = subcommands.add_parser(
         "evaluate-point-candidates",
         help="Evaluate generated point candidate markers using operator review metadata.",
@@ -11806,6 +12058,30 @@ def main() -> None:
     print(json.dumps(result, indent=2, sort_keys=True))
     if result.get("ok") is False:
         raise SystemExit(1)
+
+
+def _add_bp74_blocked_result_report_args(
+    parser: argparse.ArgumentParser,
+    default_output: str,
+) -> None:
+    parser.add_argument(
+        "--contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_EXECUTION_BLOCKED_RESULT_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 74 final-gate rerun execution blocked-result contract path.",
+    )
+    parser.add_argument(
+        "--final-gate-rerun-execution-blocked-result",
+        default=DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FINAL_GATE_RERUN_EXECUTION_BLOCKED_RESULT_OUTPUT,
+        help="Blueprint 74 final-gate rerun execution blocked-result path.",
+    )
+    parser.add_argument(
+        "--output",
+        default=default_output,
+        help="JSON Blueprint 74 report path.",
+    )
+    parser.add_argument("--skip-create-db", action="store_true")
 
 
 def _session_factory(create_db: bool) -> Callable[[], Session]:
@@ -16521,6 +16797,144 @@ def _handle_build_controlled_runtime_calibration_final_gate_rerun_reexecution_de
     return build_controlled_runtime_calibration_final_gate_rerun_reexecution_dependency_report(
         contract_path=args.contract,
         final_gate_rerun_request_packet_path=args.final_gate_rerun_request_packet,
+        output_path=args.output,
+    )
+
+
+def _handle_export_controlled_runtime_calibration_final_gate_rerun_execution_blocked_result_contract(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return export_controlled_runtime_calibration_final_gate_rerun_execution_blocked_result_contract(
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_final_gate_rerun_execution_inputs(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_final_gate_rerun_execution_inputs(
+        contract_path=args.contract,
+        source_final_gate_rerun_request_packet_path=(
+            args.source_final_gate_rerun_request_packet
+        ),
+        source_final_gate_rerun_request_packet_contract_path=(
+            args.source_final_gate_rerun_request_packet_contract
+        ),
+        model_asset_path=args.model_asset_path,
+        output_path=args.output,
+    )
+
+
+def _handle_validate_controlled_runtime_calibration_final_gate_rerun_execution_inputs(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_controlled_runtime_calibration_final_gate_rerun_execution_inputs(
+        contract_path=args.contract,
+        final_gate_rerun_execution_inputs_path=args.final_gate_rerun_execution_inputs,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_final_gate_rerun_execution_blocked_result(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_final_gate_rerun_execution_blocked_result(
+        contract_path=args.contract,
+        final_gate_rerun_execution_inputs_path=args.final_gate_rerun_execution_inputs,
+        output_path=args.output,
+    )
+
+
+def _handle_validate_controlled_runtime_calibration_final_gate_rerun_execution_blocked_result(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return validate_controlled_runtime_calibration_final_gate_rerun_execution_blocked_result(
+        contract_path=args.contract,
+        final_gate_rerun_execution_blocked_result_path=(
+            args.final_gate_rerun_execution_blocked_result
+        ),
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_final_gate_rerun_execution_precheck_report(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_final_gate_rerun_execution_precheck_report(
+        contract_path=args.contract,
+        final_gate_rerun_execution_blocked_result_path=(
+            args.final_gate_rerun_execution_blocked_result
+        ),
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_final_gate_rerun_blocked_reason_report(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_final_gate_rerun_blocked_reason_report(
+        contract_path=args.contract,
+        final_gate_rerun_execution_blocked_result_path=(
+            args.final_gate_rerun_execution_blocked_result
+        ),
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_final_gate_rerun_non_execution_evidence_report(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return (
+        build_controlled_runtime_calibration_final_gate_rerun_non_execution_evidence_report(
+            contract_path=args.contract,
+            final_gate_rerun_execution_blocked_result_path=(
+                args.final_gate_rerun_execution_blocked_result
+            ),
+            output_path=args.output,
+        )
+    )
+
+
+def _handle_build_controlled_runtime_calibration_final_gate_rerun_reexecution_blocker_report(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_final_gate_rerun_reexecution_blocker_report(
+        contract_path=args.contract,
+        final_gate_rerun_execution_blocked_result_path=(
+            args.final_gate_rerun_execution_blocked_result
+        ),
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_runtime_mutation_prevention_report(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return build_controlled_runtime_calibration_runtime_mutation_prevention_report(
+        contract_path=args.contract,
+        final_gate_rerun_execution_blocked_result_path=(
+            args.final_gate_rerun_execution_blocked_result
+        ),
         output_path=args.output,
     )
 

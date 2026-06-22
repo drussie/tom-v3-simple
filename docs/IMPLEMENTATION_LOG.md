@@ -4840,3 +4840,30 @@ The committed request packet records `final_gate_rerun_request_blocked_missing_h
 `final_gate_rerun_not_ready_missing_human_resolution`, `final_gate_rerun_not_executed`,
 `reexecution_not_ready_blockers_unresolved`, `runtime_application_status: not_executed`,
 `runtime_config_changed: false`, and `no_runtime_mutation_due_to_blocker`.
+
+## Blueprint 74 - Controlled Runtime Calibration Final Gate Rerun Execution Blocked Result v1
+
+Status: complete
+
+### Goal
+
+Create the final-gate rerun execution-result artifact required after BP73 while leaving execution
+blocked until real human resolution exists.
+
+### Notes
+
+This milestone adds:
+
+- `apps.worker.services.controlled_runtime_calibration_final_gate_rerun_execution_blocked_result`
+- CLI commands and Make targets for the BP74 contract/input/blocked-result/report chain
+- post-Codex validator coverage
+- tracked BP74 contract and frozen blocked-result artifacts
+- focused tests for default blocked state and future ready-request non-execution
+
+The committed result records `final_gate_rerun_execution_blocked_missing_human_resolution`,
+`final_gate_rerun_result_not_available`, `final_gate_rerun_not_performed`,
+`final_gate_rerun_request_blocked_missing_human_resolution`,
+`human_resolution_completeness_gate_not_ready`, `human_resolution_incomplete`,
+`required_human_inputs_missing`, `operator_inputs_incomplete`, `candidate_inputs_incomplete`,
+`reexecution_not_ready_blockers_unresolved`, `runtime_application_status: not_executed`,
+`runtime_config_changed: false`, and `no_runtime_mutation_due_to_blocker`.
