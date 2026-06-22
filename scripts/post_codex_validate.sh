@@ -2010,4 +2010,64 @@ run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-runtim
   --output "$TMP_ROOT/controlled_runtime_calibration_runtime_mutation_prevention_report.current.json" \
   --skip-create-db
 
+run "$PYTHON_BIN" -m apps.worker.cli export-controlled-runtime-calibration-reexecution-request-packet-contract \
+  --output "$TMP_ROOT/controlled_runtime_calibration_reexecution_request_packet_contract_v1.smoke.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-reexecution-request-packet-inputs \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_reexecution_request_packet_contract_v1.smoke.json" \
+  --source-final-gate-rerun-execution-blocked-result "$TMP_ROOT/controlled_runtime_calibration_final_gate_rerun_execution_blocked_result.current.json" \
+  --source-final-gate-rerun-execution-blocked-result-contract "$TMP_ROOT/controlled_runtime_calibration_final_gate_rerun_execution_blocked_result_contract_v1.smoke.json" \
+  --model-asset-path "model_assets/tom_v1/view_classifier_gameplay.pt" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_reexecution_request_packet_inputs.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli validate-controlled-runtime-calibration-reexecution-request-packet-inputs \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_reexecution_request_packet_contract_v1.smoke.json" \
+  --reexecution-request-packet-inputs "$TMP_ROOT/controlled_runtime_calibration_reexecution_request_packet_inputs.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_reexecution_request_packet_inputs.validation.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-reexecution-request-packet \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_reexecution_request_packet_contract_v1.smoke.json" \
+  --reexecution-request-packet-inputs "$TMP_ROOT/controlled_runtime_calibration_reexecution_request_packet_inputs.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_reexecution_request_packet.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli validate-controlled-runtime-calibration-reexecution-request-packet \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_reexecution_request_packet_contract_v1.smoke.json" \
+  --reexecution-request-packet "$TMP_ROOT/controlled_runtime_calibration_reexecution_request_packet.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_reexecution_request_packet.validation.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-reexecution-request-blocker-report \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_reexecution_request_packet_contract_v1.smoke.json" \
+  --reexecution-request-packet "$TMP_ROOT/controlled_runtime_calibration_reexecution_request_packet.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_reexecution_request_blocker_report.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-reexecution-prerequisite-report \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_reexecution_request_packet_contract_v1.smoke.json" \
+  --reexecution-request-packet "$TMP_ROOT/controlled_runtime_calibration_reexecution_request_packet.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_reexecution_prerequisite_report.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-final-gate-dependency-report \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_reexecution_request_packet_contract_v1.smoke.json" \
+  --reexecution-request-packet "$TMP_ROOT/controlled_runtime_calibration_reexecution_request_packet.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_final_gate_dependency_report.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-reexecution-execution-plan \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_reexecution_request_packet_contract_v1.smoke.json" \
+  --reexecution-request-packet "$TMP_ROOT/controlled_runtime_calibration_reexecution_request_packet.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_reexecution_execution_plan.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-reexecution-runtime-mutation-prevention-report \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_reexecution_request_packet_contract_v1.smoke.json" \
+  --reexecution-request-packet "$TMP_ROOT/controlled_runtime_calibration_reexecution_request_packet.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_reexecution_runtime_mutation_prevention_report.current.json" \
+  --skip-create-db
+
 run git status --short

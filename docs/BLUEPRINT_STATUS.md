@@ -2464,3 +2464,37 @@ candidate from candidate option discovery, execute a final-gate rerun command, p
 application, write runtime config, train or mutate the gameplay classifier, commit model weights,
 create production config, replace baselines, claim classifier correctness, claim generalization, or
 decide tennis truth.
+
+## Blueprint 75 - Controlled Runtime Calibration Reexecution Request Packet
+
+Status: COMPLETE
+
+Blueprint 75 creates a reexecution request packet from the BP74 final-gate rerun execution blocked
+result. The tracked artifacts are
+`.data/contracts/controlled_runtime_calibration_reexecution_request_packet_contract_v1.json` and
+`.data/contracts/controlled_runtime_calibration_reexecution_request_packet_v1.json`.
+
+The committed frozen request packet preserves the unresolved final-gate rerun state:
+
+```text
+reexecution_request_status: reexecution_request_blocked_final_gate_not_rerun
+reexecution_readiness_status: reexecution_blocked_final_gate_not_rerun
+final_gate_rerun_execution_status: final_gate_rerun_execution_blocked_missing_human_resolution
+final_gate_rerun_result_status: final_gate_rerun_result_not_available
+final_gate_rerun_outcome_status: final_gate_rerun_not_performed
+final_gate_rerun_request_status: final_gate_rerun_request_blocked_missing_human_resolution
+human_resolution_completeness_gate_status: human_resolution_completeness_gate_not_ready
+human_resolution_completeness_status: human_resolution_incomplete
+missing_input_status: required_human_inputs_missing
+operator_input_completeness_status: operator_inputs_incomplete
+candidate_input_completeness_status: candidate_inputs_incomplete
+runtime_application_status: not_executed
+runtime_config_changed: false
+mutation_status: no_runtime_mutation_due_to_blocker
+```
+
+Blueprint 75 does not fabricate human resolution, infer operator signoff, infer a selected
+candidate from candidate option discovery, infer a final-gate rerun result, execute a final-gate
+rerun command, perform runtime application, write runtime config, train or mutate the gameplay
+classifier, commit model weights, create production config, replace baselines, claim classifier
+correctness, claim generalization, or decide tennis truth.

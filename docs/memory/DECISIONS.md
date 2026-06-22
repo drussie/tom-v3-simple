@@ -99,3 +99,11 @@ Reason: BP74 may create an execution-result artifact from BP73, but when BP73 re
 incomplete human resolution it must record a blocked, non-executed result. It does not infer
 operator signoff, selected candidate, or human resolution; it does not execute a final-gate rerun,
 mutate runtime config, create production config, modify model weights, or replace baselines.
+
+## Decision 18: Reexecution Request Packets Do Not Execute Runtime Application
+
+Reason: BP75 may create a reexecution request packet from BP74, but it must keep the request
+blocked until an explicit final-gate rerun result exists after complete human resolution. It does
+not infer operator signoff, selected candidate, human resolution, or final-gate result; it does not
+execute runtime application, mutate runtime config, create production config, modify model weights,
+or replace baselines.

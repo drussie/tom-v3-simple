@@ -9,11 +9,11 @@
 
 ## Immediate Next Regular Blueprint
 
-After Blueprint 74:
+After Blueprint 75:
 
-- Resolve the BP74/BP73/BP72 next-action recommendations before any future runtime application
+- Resolve the BP75/BP74/BP73/BP72 next-action recommendations before any future runtime application
   retry:
-  `provide_operator_inputs`, `provide_selected_candidate_inputs`,
+  `provide_human_resolution_inputs`, `provide_operator_inputs`, `provide_selected_candidate_inputs`,
   `provide_operator_signoff_and_selected_candidate`, and
   `rerun_final_gate_after_human_resolution`.
 - Provide real operator signoff with operator identity/reference, timestamp, attestation text, and
@@ -25,11 +25,13 @@ After Blueprint 74:
 - Rebuild the BP73 final-gate rerun request packet after BP72 reports readiness.
 - Produce a non-blocked BP74/future final-gate rerun execution result only after BP72 reports
   readiness and BP73 records a ready request for a future final-gate rerun.
+- Rebuild a non-blocked BP75/future reexecution request packet only after BP74/future output
+  includes an explicit final-gate rerun result.
 - Rerun the BP61 final gate only after human resolution is complete and the controlled rerun request
-  and execution-result path are ready.
+  execution-result path, and reexecution request path are ready.
 - Keep future runtime application blocked while the
-  BP61/BP62/BP64/BP65/BP66/BP67/BP68/BP69/BP70/BP71/BP72/BP73/BP74 chain reports the current safe
-  blocked state.
+  BP61/BP62/BP64/BP65/BP66/BP67/BP68/BP69/BP70/BP71/BP72/BP73/BP74/BP75 chain reports the current
+  safe blocked state.
 
 ## Open Follow-Ups
 

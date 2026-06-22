@@ -4769,3 +4769,55 @@ The BP74 blocked result does not create operator signoff, infer a selected candi
 or validation success, infer human resolution, execute a final-gate rerun command, execute runtime
 application, write runtime config, create production config, modify model weights, or replace
 baselines.
+
+## Blueprint 75 - Reexecution Request Packet
+
+Build the Blueprint 75 reexecution request packet from the frozen Blueprint 74 final-gate rerun
+execution blocked result:
+
+```bash
+make tom-v1-export-controlled-runtime-calibration-reexecution-request-packet-contract \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-reexecution-request-packet-inputs \
+  PYTHON=.venv/bin/python
+make tom-v1-validate-controlled-runtime-calibration-reexecution-request-packet-inputs \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-reexecution-request-packet \
+  PYTHON=.venv/bin/python
+make tom-v1-validate-controlled-runtime-calibration-reexecution-request-packet \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-reexecution-request-blocker-report \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-reexecution-prerequisite-report \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-final-gate-dependency-report \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-reexecution-execution-plan \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-reexecution-runtime-mutation-prevention-report \
+  PYTHON=.venv/bin/python
+```
+
+Current expected frozen result:
+
+- `reexecution_request_status`: `reexecution_request_blocked_final_gate_not_rerun`
+- `reexecution_readiness_status`: `reexecution_blocked_final_gate_not_rerun`
+- `final_gate_rerun_execution_status`: `final_gate_rerun_execution_blocked_missing_human_resolution`
+- `final_gate_rerun_result_status`: `final_gate_rerun_result_not_available`
+- `final_gate_rerun_outcome_status`: `final_gate_rerun_not_performed`
+- `final_gate_rerun_request_status`: `final_gate_rerun_request_blocked_missing_human_resolution`
+- `human_resolution_completeness_gate_status`: `human_resolution_completeness_gate_not_ready`
+- `human_resolution_completeness_status`: `human_resolution_incomplete`
+- `missing_input_status`: `required_human_inputs_missing`
+- `operator_input_completeness_status`: `operator_inputs_incomplete`
+- `candidate_input_completeness_status`: `candidate_inputs_incomplete`
+- `operator_signoff_status`: `operator_signoff_required`
+- `selected_candidate_status`: `selected_candidate_required`
+- `runtime_application_status`: `not_executed`
+- `runtime_config_changed`: false
+- `mutation_status`: `no_runtime_mutation_due_to_blocker`
+
+The BP75 request packet does not create operator signoff, infer a selected candidate from
+discovery or validation success, infer human resolution, infer a final-gate rerun result, execute
+a final-gate rerun command, execute runtime application, write runtime config, create production
+config, modify model weights, or replace baselines.
