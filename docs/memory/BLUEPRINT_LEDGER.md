@@ -16,14 +16,53 @@
 - BP1-37: TOM v3 evidence, replay, review, and 3D foundation.
 - BP38-45: Gameplay gate pathway.
 - BP46-54: Real broadcast gameplay review and calibration decision phase.
-- BP55-77: Controlled runtime calibration governance through post-reexecution verification
-  not-available packet state.
+- BP55-78: Controlled runtime calibration governance through blocked pathway phase-freeze state.
 
 ## Current Chain
 
-BP55 -> BP56 -> BP57 -> BP58 -> BP59 -> BP60 -> BP61 -> BP62 -> BP63 memory insert -> BP64 -> BP65 -> BP66 -> BP67 -> BP68 -> BP69 -> BP70 -> BP71 -> BP72 -> BP73 -> BP74 -> BP75 -> BP76 -> BP77.
+BP55 -> BP56 -> BP57 -> BP58 -> BP59 -> BP60 -> BP61 -> BP62 -> BP63 memory insert -> BP64 -> BP65 -> BP66 -> BP67 -> BP68 -> BP69 -> BP70 -> BP71 -> BP72 -> BP73 -> BP74 -> BP75 -> BP76 -> BP77 -> BP78.
 
 ## Detailed Entries
+
+### Blueprint 78 - Controlled Runtime Calibration Blocked Pathway Phase Freeze v1
+
+Status: Complete after this blueprint commit.
+
+Branch:
+`codex/blueprint-78-controlled-runtime-calibration-blocked-pathway-phase-freeze-v1`
+
+Commit: recorded by the blueprint commit and final report.
+
+Tag:
+`tom-v3-blueprint-78-controlled-runtime-calibration-blocked-pathway-phase-freeze-v1`
+
+Classification: calibration-governance-facing, blocked-pathway-freeze-facing,
+no-runtime-mutation.
+
+Files or areas changed:
+
+- Controlled runtime calibration blocked pathway phase-freeze service.
+- CLI commands and Make targets.
+- Tracked BP78 contract and frozen phase-freeze artifacts.
+- Generated `.data/exports/` inputs, validations, blocked pathway completion, unresolved human
+  inputs, runtime non-mutation evidence, successful-pathway remaining work, and future-unblock
+  readiness reports for local review only.
+- Focused tests.
+- Docs, runbook, agent report, status docs, and repo memory updates.
+- Post-Codex validation coverage.
+
+Validation: full Blueprint 78 validation recorded by final report.
+
+Decision: BP78 freezes the BP55-BP77 controlled runtime calibration pathway as complete for the
+blocked/no-human-resolution path only. It does not mark successful runtime calibration complete
+and does not infer operator signoff, selected candidate context, human resolution, final-gate
+result, runtime reexecution output, or post-reexecution verification from the BP77 blocked state.
+
+Runtime result: blocked safely; runtime target unchanged before and after.
+
+Follow-up: Stop this blocked pathway, or start a new explicit human-resolution cycle with real
+operator signoff and selected candidate context before rebuilding ready/non-blocked BP72-BP77
+outputs.
 
 ### Blueprint 77 - Controlled Runtime Calibration Post-Reexecution Verification Not Available Packet v1
 

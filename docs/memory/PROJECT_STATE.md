@@ -39,6 +39,7 @@ video/media
 -> controlled runtime calibration reexecution request packet state
 -> controlled runtime calibration reexecution execution blocked-result state
 -> controlled runtime calibration post-reexecution verification not-available packet state
+-> controlled runtime calibration blocked pathway phase-freeze state
 ```
 
 The current principle is to expand safely from reviewed sample evidence toward broader replay,
@@ -53,96 +54,73 @@ mutation system. Runtime changes must remain explicitly governed.
 - BP1-37: TOM v3 evidence, replay, review, and 3D foundation.
 - BP38-45: Gameplay gate pathway.
 - BP46-54: Real broadcast gameplay review and calibration decision phase.
-- BP55-77: Controlled runtime calibration governance through post-reexecution verification
-  not-available packet state.
+- BP55-78: Controlled runtime calibration governance through blocked pathway phase-freeze state.
 
 ## Latest Completed Milestone
 
-Blueprint 77 - Controlled Runtime Calibration Post-Reexecution Verification Not Available Packet v1
+Blueprint 78 - Controlled Runtime Calibration Blocked Pathway Phase Freeze v1
 
 Status: Complete.
 
-Commit: recorded by the Blueprint 77 commit.
+Commit: recorded by the Blueprint 78 commit.
 
 Tag:
-`tom-v3-blueprint-77-controlled-runtime-calibration-post-reexecution-verification-not-available-packet-v1`
+`tom-v3-blueprint-78-controlled-runtime-calibration-blocked-pathway-phase-freeze-v1`
 
 Implemented:
 
-- Controlled runtime calibration post-reexecution verification not-available packet service.
+- Controlled runtime calibration blocked pathway phase-freeze service.
 - CLI commands and Make targets.
 - Focused tests.
 - Docs, runbook, status, and report updates.
 - Post-Codex validator updates.
-- Tracked BP77 contract artifacts:
-  - `.data/contracts/controlled_runtime_calibration_post_reexecution_verification_not_available_packet_contract_v1.json`
-  - `.data/contracts/controlled_runtime_calibration_post_reexecution_verification_not_available_packet_v1.json`
+- Tracked BP78 contract artifacts:
+  - `.data/contracts/controlled_runtime_calibration_blocked_pathway_phase_freeze_contract_v1.json`
+  - `.data/contracts/controlled_runtime_calibration_blocked_pathway_phase_freeze_v1.json`
 
 Runtime result:
 
-- The committed frozen BP77 post-reexecution verification not-available packet correctly records
-  that BP76 did not perform runtime reexecution, so post-reexecution verification is not available.
+- The committed frozen BP78 blocked pathway phase-freeze correctly records that the current
+  controlled calibration pathway is complete for the blocked/no-human-resolution path only.
+- Successful runtime calibration remains incomplete.
 - There is still no real operator signoff or selected candidate in the frozen path.
-- BP77 preserves the one discovered candidate option from upstream inventory only and does not
+- BP78 preserves the one discovered candidate option from upstream inventory only and does not
   select from it.
-- BP77 records verification availability, missing execution evidence, runtime non-mutation
-  evidence, final-gate dependency status, and blocked-pathway phase-freeze readiness.
+- BP78 records blocked pathway completion, unresolved human inputs, runtime non-mutation evidence,
+  successful-pathway remaining work, and future-unblock readiness.
 - Runtime target stayed unchanged before and after.
 - Runtime target SHA before and after:
   `8052301c40dee448f858a3a7c64ae7805d3e7839fbbe35305044e1775f0f8fd0`
+- Blocked pathway phase-freeze status:
+  `blocked_pathway_phase_freeze_completed`
+- Blocked pathway completion status: `complete_for_blocked_pathway`
+- Successful pathway completion status:
+  `incomplete_pending_explicit_human_resolution`
+- Successful calibration application status: `not_completed`
+- Human resolution status: `human_resolution_missing`
+- Operator signoff status: `operator_signoff_required`
+- Selected candidate status: `selected_candidate_required`
+- Final gate rerun status: `final_gate_rerun_not_performed`
+- Reexecution status: `reexecution_not_performed`
 - Post-reexecution verification status:
   `post_reexecution_verification_not_available`
-- Post-reexecution verification reason: `runtime_reexecution_not_performed`
-- Post-reexecution result status: `post_reexecution_result_not_available`
-- Post-reexecution outcome status: `post_reexecution_not_verified`
-- Reexecution execution status:
-  `reexecution_execution_blocked_final_gate_not_rerun`
-- Reexecution result status: `reexecution_result_not_available`
-- Reexecution outcome status: `reexecution_not_performed`
-- Reexecution request status:
-  `reexecution_request_blocked_final_gate_not_rerun`
-- Reexecution readiness status:
-  `reexecution_blocked_final_gate_not_rerun`
-- Final gate rerun execution status:
-  `final_gate_rerun_execution_blocked_missing_human_resolution`
 - Final gate rerun result status: `final_gate_rerun_result_not_available`
-- Final gate rerun outcome status: `final_gate_rerun_not_performed`
-- Final gate rerun request status:
-  `final_gate_rerun_request_blocked_missing_human_resolution`
-- Human resolution completeness gate status:
-  `human_resolution_completeness_gate_not_ready`
-- Human resolution record status: `human_resolution_record_pending_explicit_inputs`
-- Human resolution provided status: `human_resolution_not_provided`
-- Human resolution completeness status: `human_resolution_incomplete`
-- Missing input status: `required_human_inputs_missing`
-- Operator input completeness status: `operator_inputs_incomplete`
-- Candidate input completeness status: `candidate_inputs_incomplete`
-- Operator signoff status: `operator_signoff_required`
-- Operator attestation status: `operator_attestation_required`
-- Operator identity status: `operator_identity_required`
-- Operator timestamp status: `operator_timestamp_required`
-- Selected candidate status: `selected_candidate_required`
-- Candidate selection validation status: `candidate_selection_pending_explicit_input`
 - Candidate option count: 1
-- Final gate rerun status: `final_gate_rerun_required`
-- Final gate rerun readiness status: `final_gate_rerun_not_ready_missing_human_resolution`
 - Runtime application status: `not_executed`
 - Runtime config changed: `false`
 - Mutation status: `no_runtime_mutation_due_to_blocker`
-- Phase-freeze recommended status: `blocked_pathway_freeze_ready`
 - Next action recommendations:
-  `provide_human_resolution_inputs`, `provide_operator_inputs`,
-  `provide_selected_candidate_inputs`, `provide_operator_signoff_and_selected_candidate`, and
-  `rerun_final_gate_after_human_resolution`; BP77 also records
-  `prepare_controlled_calibration_phase_freeze_blocked` as the blocked-pathway packaging option.
+  `stop_blocked_calibration_pathway`, `provide_operator_signoff_and_selected_candidate`,
+  `successful_pathway_requires_new_human_resolution_cycle`,
+  `rerun_final_gate_after_human_resolution`, and `no_runtime_action_recommended`.
 
-Post-reexecution verification not-available packet test coverage:
+Blocked pathway phase-freeze test coverage:
 
-- Current BP76/BP75/BP74/BP73/BP72/BP71/BP70/BP69/BP68/BP67/BP66 pending blocked path.
-- Verification availability, missing execution evidence, runtime non-mutation evidence,
-  final-gate dependency, and phase-freeze readiness report generation.
-- Rejection of fabricated post-reexecution verification availability when runtime reexecution did
-  not occur.
+- Current BP77/BP76/BP75/BP74/BP73/BP72/BP71/BP70/BP69/BP68/BP67/BP66 pending blocked path.
+- Blocked pathway completion, unresolved human inputs, runtime non-mutation evidence,
+  successful-pathway remaining work, and future-unblock readiness report generation.
+- Rejection of fabricated successful runtime calibration completion while human resolution is
+  missing.
 
 ## Controlled Calibration Chain
 
@@ -169,18 +147,15 @@ Post-reexecution verification not-available packet test coverage:
 - BP75 - Controlled Runtime Calibration Reexecution Request Packet
 - BP76 - Controlled Runtime Calibration Reexecution Execution Blocked Result
 - BP77 - Controlled Runtime Calibration Post-Reexecution Verification Not Available Packet
+- BP78 - Controlled Runtime Calibration Blocked Pathway Phase Freeze
 
 ## Next Regular Action
 
-Choose whether to freeze the current blocked pathway after BP77, or provide real operator signoff
-identity, timestamp, attestation, scope acknowledgement, and an explicit selected candidate ref
-with provenance, then rerun the BP72 completeness gate, create a new BP73 request packet that
-becomes ready, produce a non-blocked BP74/future final-gate rerun execution result, rebuild a
-non-blocked BP75/future reexecution request, rebuild a non-blocked BP76/future reexecution
-execution result, and only then rebuild BP77 after runtime reexecution output exists. Do not
-attempt runtime application while the
-BP61/BP62/BP64/BP65/BP66/BP67/BP68/BP69/BP70/BP71/BP72/BP73/BP74/BP75/BP76/BP77 chain remains
-blocked.
+The blocked calibration pathway is frozen. Either stop this blocked pathway, or start a new
+explicit human-resolution cycle with real operator signoff identity, timestamp, attestation, scope
+acknowledgement, and an explicit selected candidate ref with provenance. Only after that cycle can
+the project rerun BP72 and rebuild ready/non-blocked BP73/BP74/BP75/BP76/BP77 outputs. Do not
+attempt runtime application while the current BP61-BP78 chain remains blocked.
 
 ## Known Unrelated Working Tree Item
 

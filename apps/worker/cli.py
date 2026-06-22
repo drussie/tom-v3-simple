@@ -26,6 +26,9 @@ from apps.api.services.tracklet_review_export import export_tracklet_review_data
 from apps.worker.config import settings
 from apps.worker.pipelines.synthetic_seed import seed_synthetic_run
 from apps.worker.services import (
+    controlled_runtime_calibration_blocked_pathway_phase_freeze as bp78freeze,
+)
+from apps.worker.services import (
     controlled_runtime_calibration_post_reexecution_verification_not_available_packet as bp77post,
 )
 from apps.worker.services import (
@@ -862,6 +865,10 @@ build_bp76_runtime_mutation_prevention_report = (
 BP77_RUNTIME_NON_MUTATION_EVIDENCE_OUTPUT = (
     bp77post
     .DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_POST_REEXECUTION_RUNTIME_NON_MUTATION_EVIDENCE_REPORT_OUTPUT
+)
+BP78_RUNTIME_NON_MUTATION_EVIDENCE_OUTPUT = (
+    bp78freeze
+    .DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_PATHWAY_RUNTIME_NON_MUTATION_EVIDENCE_REPORT_OUTPUT
 )
 
 
@@ -12433,6 +12440,272 @@ def main() -> None:
         skip_create_db=True,
     )
 
+    blocked_pathway_phase_freeze_contract_parser = subcommands.add_parser(
+        "export-controlled-runtime-calibration-blocked-pathway-phase-freeze-contract",
+        help="Export the Blueprint 78 blocked pathway phase-freeze contract.",
+    )
+    blocked_pathway_phase_freeze_contract_parser.add_argument(
+        "--output",
+        default=(
+            bp78freeze
+            .DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_PATHWAY_PHASE_FREEZE_CONTRACT_OUTPUT
+        ),
+        help="JSON Blueprint 78 blocked pathway phase-freeze contract path.",
+    )
+    blocked_pathway_phase_freeze_contract_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    blocked_pathway_phase_freeze_contract_parser.set_defaults(
+        handler=(
+            _handle_export_controlled_runtime_calibration_blocked_pathway_phase_freeze_contract
+        ),
+        skip_create_db=True,
+    )
+
+    blocked_pathway_phase_freeze_inputs_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-blocked-pathway-phase-freeze-inputs",
+        help="Build Blueprint 78 blocked pathway phase-freeze inputs.",
+    )
+    blocked_pathway_phase_freeze_inputs_parser.add_argument(
+        "--contract",
+        default=(
+            bp78freeze
+            .DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_PATHWAY_PHASE_FREEZE_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 78 blocked pathway phase-freeze contract path.",
+    )
+    blocked_pathway_phase_freeze_inputs_parser.add_argument(
+        "--source-post-reexecution-verification-not-available-packet",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_POST_REEXECUTION_VERIFICATION_NOT_AVAILABLE_PACKET_OUTPUT
+        ),
+        help="Blueprint 77 post-reexecution verification not-available packet path.",
+    )
+    blocked_pathway_phase_freeze_inputs_parser.add_argument(
+        "--source-post-reexecution-verification-not-available-packet-contract",
+        default=(
+            DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_POST_REEXECUTION_VERIFICATION_NOT_AVAILABLE_PACKET_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 77 post-reexecution verification not-available contract path.",
+    )
+    blocked_pathway_phase_freeze_inputs_parser.add_argument(
+        "--model-asset-path",
+        default=DEFAULT_GAMEPLAY_CLASSIFIER_ASSET_PATH,
+        help="Read-only local TOM v1 gameplay classifier asset path.",
+    )
+    blocked_pathway_phase_freeze_inputs_parser.add_argument(
+        "--output",
+        default=(
+            bp78freeze
+            .DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_PATHWAY_PHASE_FREEZE_INPUTS_OUTPUT
+        ),
+        help="JSON Blueprint 78 blocked pathway phase-freeze inputs path.",
+    )
+    blocked_pathway_phase_freeze_inputs_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    blocked_pathway_phase_freeze_inputs_parser.set_defaults(
+        handler=_handle_build_controlled_runtime_calibration_blocked_pathway_phase_freeze_inputs,
+        skip_create_db=True,
+    )
+
+    blocked_pathway_phase_freeze_inputs_validate_parser = subcommands.add_parser(
+        "validate-controlled-runtime-calibration-blocked-pathway-phase-freeze-inputs",
+        help="Validate Blueprint 78 blocked pathway phase-freeze inputs.",
+    )
+    blocked_pathway_phase_freeze_inputs_validate_parser.add_argument(
+        "--contract",
+        default=(
+            bp78freeze
+            .DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_PATHWAY_PHASE_FREEZE_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 78 blocked pathway phase-freeze contract path.",
+    )
+    blocked_pathway_phase_freeze_inputs_validate_parser.add_argument(
+        "--blocked-pathway-phase-freeze-inputs",
+        default=(
+            bp78freeze
+            .DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_PATHWAY_PHASE_FREEZE_INPUTS_OUTPUT
+        ),
+        help="Blueprint 78 blocked pathway phase-freeze inputs path.",
+    )
+    blocked_pathway_phase_freeze_inputs_validate_parser.add_argument(
+        "--output",
+        default=(
+            bp78freeze
+            .DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_PATHWAY_PHASE_FREEZE_INPUTS_VALIDATION_OUTPUT
+        ),
+        help="Optional Blueprint 78 blocked pathway phase-freeze inputs validation path.",
+    )
+    blocked_pathway_phase_freeze_inputs_validate_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    blocked_pathway_phase_freeze_inputs_validate_parser.set_defaults(
+        handler=(
+            _handle_validate_controlled_runtime_calibration_blocked_pathway_phase_freeze_inputs
+        ),
+        skip_create_db=True,
+    )
+
+    blocked_pathway_phase_freeze_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-blocked-pathway-phase-freeze",
+        help="Build the Blueprint 78 blocked pathway phase-freeze artifact.",
+    )
+    blocked_pathway_phase_freeze_parser.add_argument(
+        "--contract",
+        default=(
+            bp78freeze
+            .DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_PATHWAY_PHASE_FREEZE_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 78 blocked pathway phase-freeze contract path.",
+    )
+    blocked_pathway_phase_freeze_parser.add_argument(
+        "--blocked-pathway-phase-freeze-inputs",
+        default=(
+            bp78freeze
+            .DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_PATHWAY_PHASE_FREEZE_INPUTS_OUTPUT
+        ),
+        help="Blueprint 78 blocked pathway phase-freeze inputs path.",
+    )
+    blocked_pathway_phase_freeze_parser.add_argument(
+        "--output",
+        default=(
+            bp78freeze
+            .DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_PATHWAY_PHASE_FREEZE_OUTPUT
+        ),
+        help="JSON Blueprint 78 blocked pathway phase-freeze artifact path.",
+    )
+    blocked_pathway_phase_freeze_parser.add_argument("--skip-create-db", action="store_true")
+    blocked_pathway_phase_freeze_parser.set_defaults(
+        handler=_handle_build_controlled_runtime_calibration_blocked_pathway_phase_freeze,
+        skip_create_db=True,
+    )
+
+    blocked_pathway_phase_freeze_validate_parser = subcommands.add_parser(
+        "validate-controlled-runtime-calibration-blocked-pathway-phase-freeze",
+        help="Validate the Blueprint 78 blocked pathway phase-freeze artifact.",
+    )
+    blocked_pathway_phase_freeze_validate_parser.add_argument(
+        "--contract",
+        default=(
+            bp78freeze
+            .DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_PATHWAY_PHASE_FREEZE_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 78 blocked pathway phase-freeze contract path.",
+    )
+    blocked_pathway_phase_freeze_validate_parser.add_argument(
+        "--blocked-pathway-phase-freeze",
+        default=(
+            bp78freeze
+            .DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_PATHWAY_PHASE_FREEZE_OUTPUT
+        ),
+        help="Blueprint 78 blocked pathway phase-freeze artifact path.",
+    )
+    blocked_pathway_phase_freeze_validate_parser.add_argument(
+        "--output",
+        default=(
+            bp78freeze
+            .DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_PATHWAY_PHASE_FREEZE_VALIDATION_OUTPUT
+        ),
+        help="Optional Blueprint 78 blocked pathway phase-freeze validation path.",
+    )
+    blocked_pathway_phase_freeze_validate_parser.add_argument(
+        "--skip-create-db",
+        action="store_true",
+    )
+    blocked_pathway_phase_freeze_validate_parser.set_defaults(
+        handler=_handle_validate_controlled_runtime_calibration_blocked_pathway_phase_freeze,
+        skip_create_db=True,
+    )
+
+    blocked_pathway_completion_summary_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-blocked-pathway-completion-summary",
+        help="Build the Blueprint 78 blocked pathway completion summary.",
+    )
+    _add_bp78_blocked_pathway_phase_freeze_report_args(
+        blocked_pathway_completion_summary_parser,
+        (
+            bp78freeze
+            .DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_PATHWAY_COMPLETION_SUMMARY_OUTPUT
+        ),
+    )
+    blocked_pathway_completion_summary_parser.set_defaults(
+        handler=(
+            _handle_build_controlled_runtime_calibration_blocked_pathway_completion_summary
+        ),
+        skip_create_db=True,
+    )
+
+    unresolved_human_inputs_report_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-unresolved-human-inputs-report",
+        help="Build the Blueprint 78 unresolved human inputs report.",
+    )
+    _add_bp78_blocked_pathway_phase_freeze_report_args(
+        unresolved_human_inputs_report_parser,
+        (
+            bp78freeze
+            .DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_UNRESOLVED_HUMAN_INPUTS_REPORT_OUTPUT
+        ),
+    )
+    unresolved_human_inputs_report_parser.set_defaults(
+        handler=_handle_build_controlled_runtime_calibration_unresolved_human_inputs_report,
+        skip_create_db=True,
+    )
+
+    runtime_non_mutation_evidence_report_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-runtime-non-mutation-evidence-report",
+        help="Build the Blueprint 78 runtime non-mutation evidence report.",
+    )
+    _add_bp78_blocked_pathway_phase_freeze_report_args(
+        runtime_non_mutation_evidence_report_parser,
+        BP78_RUNTIME_NON_MUTATION_EVIDENCE_OUTPUT,
+    )
+    runtime_non_mutation_evidence_report_parser.set_defaults(
+        handler=(
+            _handle_build_controlled_runtime_calibration_runtime_non_mutation_evidence_report
+        ),
+        skip_create_db=True,
+    )
+
+    successful_pathway_remaining_work_report_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-successful-pathway-remaining-work-report",
+        help="Build the Blueprint 78 successful pathway remaining-work report.",
+    )
+    _add_bp78_blocked_pathway_phase_freeze_report_args(
+        successful_pathway_remaining_work_report_parser,
+        (
+            bp78freeze
+            .DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_SUCCESSFUL_PATHWAY_REMAINING_WORK_REPORT_OUTPUT
+        ),
+    )
+    successful_pathway_remaining_work_report_parser.set_defaults(
+        handler=(
+            _handle_build_controlled_runtime_calibration_successful_pathway_remaining_work_report
+        ),
+        skip_create_db=True,
+    )
+
+    future_unblock_readiness_report_parser = subcommands.add_parser(
+        "build-controlled-runtime-calibration-future-unblock-readiness-report",
+        help="Build the Blueprint 78 future unblock readiness report.",
+    )
+    _add_bp78_blocked_pathway_phase_freeze_report_args(
+        future_unblock_readiness_report_parser,
+        (
+            bp78freeze
+            .DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_FUTURE_UNBLOCK_READINESS_REPORT_OUTPUT
+        ),
+    )
+    future_unblock_readiness_report_parser.set_defaults(
+        handler=(
+            _handle_build_controlled_runtime_calibration_future_unblock_readiness_report
+        ),
+        skip_create_db=True,
+    )
+
     point_evaluation_parser = subcommands.add_parser(
         "evaluate-point-candidates",
         help="Evaluate generated point candidate markers using operator review metadata.",
@@ -12921,6 +13194,34 @@ def _add_bp77_post_reexecution_verification_packet_report_args(
         "--output",
         default=default_output,
         help="JSON Blueprint 77 report path.",
+    )
+    parser.add_argument("--skip-create-db", action="store_true")
+
+
+def _add_bp78_blocked_pathway_phase_freeze_report_args(
+    parser: argparse.ArgumentParser,
+    default_output: str,
+) -> None:
+    parser.add_argument(
+        "--contract",
+        default=(
+            bp78freeze
+            .DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_PATHWAY_PHASE_FREEZE_CONTRACT_OUTPUT
+        ),
+        help="Blueprint 78 blocked pathway phase-freeze contract path.",
+    )
+    parser.add_argument(
+        "--blocked-pathway-phase-freeze",
+        default=(
+            bp78freeze
+            .DEFAULT_CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_PATHWAY_PHASE_FREEZE_OUTPUT
+        ),
+        help="Blueprint 78 blocked pathway phase-freeze artifact path.",
+    )
+    parser.add_argument(
+        "--output",
+        default=default_output,
+        help="JSON Blueprint 78 report path.",
     )
     parser.add_argument("--skip-create-db", action="store_true")
 
@@ -18199,6 +18500,144 @@ def _handle_build_controlled_runtime_calibration_post_reexecution_phase_freeze_r
             ),
             output_path=args.output,
         )
+    )
+
+
+def _handle_export_controlled_runtime_calibration_blocked_pathway_phase_freeze_contract(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return bp78freeze.export_controlled_runtime_calibration_blocked_pathway_phase_freeze_contract(
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_blocked_pathway_phase_freeze_inputs(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return (
+        bp78freeze.build_controlled_runtime_calibration_blocked_pathway_phase_freeze_inputs(
+            contract_path=args.contract,
+            source_post_reexecution_verification_not_available_packet_path=(
+                args.source_post_reexecution_verification_not_available_packet
+            ),
+            source_post_reexecution_verification_not_available_packet_contract_path=(
+                args.source_post_reexecution_verification_not_available_packet_contract
+            ),
+            model_asset_path=args.model_asset_path,
+            output_path=args.output,
+        )
+    )
+
+
+def _handle_validate_controlled_runtime_calibration_blocked_pathway_phase_freeze_inputs(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return (
+        bp78freeze.validate_controlled_runtime_calibration_blocked_pathway_phase_freeze_inputs(
+            contract_path=args.contract,
+            blocked_pathway_phase_freeze_inputs_path=(
+                args.blocked_pathway_phase_freeze_inputs
+            ),
+            output_path=args.output,
+        )
+    )
+
+
+def _handle_build_controlled_runtime_calibration_blocked_pathway_phase_freeze(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return bp78freeze.build_controlled_runtime_calibration_blocked_pathway_phase_freeze(
+        contract_path=args.contract,
+        blocked_pathway_phase_freeze_inputs_path=args.blocked_pathway_phase_freeze_inputs,
+        output_path=args.output,
+    )
+
+
+def _handle_validate_controlled_runtime_calibration_blocked_pathway_phase_freeze(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return bp78freeze.validate_controlled_runtime_calibration_blocked_pathway_phase_freeze(
+        contract_path=args.contract,
+        blocked_pathway_phase_freeze_path=args.blocked_pathway_phase_freeze,
+        output_path=args.output,
+    )
+
+
+def _handle_build_controlled_runtime_calibration_blocked_pathway_completion_summary(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return (
+        bp78freeze.build_controlled_runtime_calibration_blocked_pathway_completion_summary(
+            contract_path=args.contract,
+            blocked_pathway_phase_freeze_path=args.blocked_pathway_phase_freeze,
+            output_path=args.output,
+        )
+    )
+
+
+def _handle_build_controlled_runtime_calibration_unresolved_human_inputs_report(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return (
+        bp78freeze.build_controlled_runtime_calibration_unresolved_human_inputs_report(
+            contract_path=args.contract,
+            blocked_pathway_phase_freeze_path=args.blocked_pathway_phase_freeze,
+            output_path=args.output,
+        )
+    )
+
+
+def _handle_build_controlled_runtime_calibration_runtime_non_mutation_evidence_report(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return (
+        bp78freeze.build_controlled_runtime_calibration_runtime_non_mutation_evidence_report(
+            contract_path=args.contract,
+            blocked_pathway_phase_freeze_path=args.blocked_pathway_phase_freeze,
+            output_path=args.output,
+        )
+    )
+
+
+def _handle_build_controlled_runtime_calibration_successful_pathway_remaining_work_report(  # noqa: E501
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return (
+        bp78freeze.build_controlled_runtime_calibration_successful_pathway_remaining_work_report(
+            contract_path=args.contract,
+            blocked_pathway_phase_freeze_path=args.blocked_pathway_phase_freeze,
+            output_path=args.output,
+        )
+    )
+
+
+def _handle_build_controlled_runtime_calibration_future_unblock_readiness_report(
+    session: Session,
+    args: argparse.Namespace,
+) -> dict[str, object]:
+    del session
+    return bp78freeze.build_controlled_runtime_calibration_future_unblock_readiness_report(
+        contract_path=args.contract,
+        blocked_pathway_phase_freeze_path=args.blocked_pathway_phase_freeze,
+        output_path=args.output,
     )
 
 

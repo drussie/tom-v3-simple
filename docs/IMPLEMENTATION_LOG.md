@@ -4957,3 +4957,31 @@ The committed packet records `post_reexecution_verification_not_available`,
 `human_resolution_completeness_gate_not_ready`, `required_human_inputs_missing`,
 `runtime_application_status: not_executed`, `runtime_config_changed: false`,
 `no_runtime_mutation_due_to_blocker`, and `blocked_pathway_freeze_ready`.
+
+## Blueprint 78 - Controlled Runtime Calibration Blocked Pathway Phase Freeze v1
+
+Status: complete
+
+### Goal
+
+Freeze the blocked/no-human-resolution controlled calibration pathway after BP77 while preserving
+that successful runtime calibration remains incomplete.
+
+### Notes
+
+This milestone adds:
+
+- `apps.worker.services.controlled_runtime_calibration_blocked_pathway_phase_freeze`
+- CLI commands and Make targets for the BP78 contract/input/phase-freeze/report chain
+- post-Codex validator coverage
+- tracked BP78 contract and frozen blocked pathway phase-freeze artifacts
+- focused tests for default blocked-pathway completion and fabricated successful-completion
+  rejection
+
+The committed freeze records `blocked_pathway_phase_freeze_completed`,
+`complete_for_blocked_pathway`, `incomplete_pending_explicit_human_resolution`,
+`successful_calibration_application_status: not_completed`,
+`human_resolution_status: human_resolution_missing`, `final_gate_rerun_not_performed`,
+`reexecution_not_performed`, `post_reexecution_verification_not_available`,
+`runtime_application_status: not_executed`, `runtime_config_changed: false`, and
+`no_runtime_mutation_due_to_blocker`.

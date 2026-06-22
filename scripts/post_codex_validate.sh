@@ -2195,4 +2195,63 @@ run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-post-r
   --output "$TMP_ROOT/controlled_runtime_calibration_post_reexecution_phase_freeze_readiness_report.current.json" \
   --skip-create-db
 
+run "$PYTHON_BIN" -m apps.worker.cli export-controlled-runtime-calibration-blocked-pathway-phase-freeze-contract \
+  --output "$TMP_ROOT/controlled_runtime_calibration_blocked_pathway_phase_freeze_contract_v1.smoke.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-blocked-pathway-phase-freeze-inputs \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_blocked_pathway_phase_freeze_contract_v1.smoke.json" \
+  --source-post-reexecution-verification-not-available-packet "$TMP_ROOT/controlled_runtime_calibration_post_reexecution_verification_not_available_packet.current.json" \
+  --source-post-reexecution-verification-not-available-packet-contract "$TMP_ROOT/controlled_runtime_calibration_post_reexecution_verification_not_available_packet_contract_v1.smoke.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_blocked_pathway_phase_freeze_inputs.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli validate-controlled-runtime-calibration-blocked-pathway-phase-freeze-inputs \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_blocked_pathway_phase_freeze_contract_v1.smoke.json" \
+  --blocked-pathway-phase-freeze-inputs "$TMP_ROOT/controlled_runtime_calibration_blocked_pathway_phase_freeze_inputs.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_blocked_pathway_phase_freeze_inputs.validation.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-blocked-pathway-phase-freeze \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_blocked_pathway_phase_freeze_contract_v1.smoke.json" \
+  --blocked-pathway-phase-freeze-inputs "$TMP_ROOT/controlled_runtime_calibration_blocked_pathway_phase_freeze_inputs.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_blocked_pathway_phase_freeze.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli validate-controlled-runtime-calibration-blocked-pathway-phase-freeze \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_blocked_pathway_phase_freeze_contract_v1.smoke.json" \
+  --blocked-pathway-phase-freeze "$TMP_ROOT/controlled_runtime_calibration_blocked_pathway_phase_freeze.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_blocked_pathway_phase_freeze.validation.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-blocked-pathway-completion-summary \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_blocked_pathway_phase_freeze_contract_v1.smoke.json" \
+  --blocked-pathway-phase-freeze "$TMP_ROOT/controlled_runtime_calibration_blocked_pathway_phase_freeze.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_blocked_pathway_completion_summary.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-unresolved-human-inputs-report \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_blocked_pathway_phase_freeze_contract_v1.smoke.json" \
+  --blocked-pathway-phase-freeze "$TMP_ROOT/controlled_runtime_calibration_blocked_pathway_phase_freeze.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_unresolved_human_inputs_report.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-runtime-non-mutation-evidence-report \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_blocked_pathway_phase_freeze_contract_v1.smoke.json" \
+  --blocked-pathway-phase-freeze "$TMP_ROOT/controlled_runtime_calibration_blocked_pathway_phase_freeze.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_blocked_pathway_runtime_non_mutation_evidence_report.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-successful-pathway-remaining-work-report \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_blocked_pathway_phase_freeze_contract_v1.smoke.json" \
+  --blocked-pathway-phase-freeze "$TMP_ROOT/controlled_runtime_calibration_blocked_pathway_phase_freeze.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_successful_pathway_remaining_work_report.current.json" \
+  --skip-create-db
+
+run "$PYTHON_BIN" -m apps.worker.cli build-controlled-runtime-calibration-future-unblock-readiness-report \
+  --contract "$TMP_ROOT/controlled_runtime_calibration_blocked_pathway_phase_freeze_contract_v1.smoke.json" \
+  --blocked-pathway-phase-freeze "$TMP_ROOT/controlled_runtime_calibration_blocked_pathway_phase_freeze.current.json" \
+  --output "$TMP_ROOT/controlled_runtime_calibration_future_unblock_readiness_report.current.json" \
+  --skip-create-db
+
 run git status --short

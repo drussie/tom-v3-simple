@@ -502,6 +502,10 @@ TOM v3 Simple does not include:
   post-reexecution verification, runtime reexecution output, final-gate result, human resolution,
   selected candidate, operator signoff, or reexecution approval, and it does not perform runtime
   application or mutate runtime config.
+- Controlled runtime calibration blocked pathway phase-freeze artifacts complete only the
+  blocked/no-human-resolution pathway. The BP78 artifact does not complete successful runtime
+  calibration, satisfy missing human inputs, execute runtime application, create production config,
+  replace baselines, modify model weights, or mutate runtime config.
 
 ## Boundary
 

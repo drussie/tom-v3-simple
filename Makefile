@@ -699,6 +699,18 @@ CONTROLLED_RUNTIME_CALIBRATION_POST_REEXECUTION_MISSING_EXECUTION_EVIDENCE_REPOR
 CONTROLLED_RUNTIME_CALIBRATION_POST_REEXECUTION_RUNTIME_NON_MUTATION_EVIDENCE_REPORT_OUTPUT ?= .data/exports/controlled_runtime_calibration_post_reexecution_runtime_non_mutation_evidence_report.current.json
 CONTROLLED_RUNTIME_CALIBRATION_POST_REEXECUTION_FINAL_GATE_DEPENDENCY_REPORT_OUTPUT ?= .data/exports/controlled_runtime_calibration_post_reexecution_final_gate_dependency_report.current.json
 CONTROLLED_RUNTIME_CALIBRATION_POST_REEXECUTION_PHASE_FREEZE_READINESS_REPORT_OUTPUT ?= .data/exports/controlled_runtime_calibration_post_reexecution_phase_freeze_readiness_report.current.json
+CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_PATHWAY_PHASE_FREEZE_CONTRACT_OUTPUT ?= .data/contracts/controlled_runtime_calibration_blocked_pathway_phase_freeze_contract_v1.json
+CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_PATHWAY_PHASE_FREEZE_INPUTS_OUTPUT ?= .data/exports/controlled_runtime_calibration_blocked_pathway_phase_freeze_inputs.current.json
+CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_PATHWAY_PHASE_FREEZE_INPUTS ?= $(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_PATHWAY_PHASE_FREEZE_INPUTS_OUTPUT)
+CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_PATHWAY_PHASE_FREEZE_INPUTS_VALIDATION_OUTPUT ?= .data/exports/controlled_runtime_calibration_blocked_pathway_phase_freeze_inputs.validation.json
+CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_PATHWAY_PHASE_FREEZE_OUTPUT ?= .data/contracts/controlled_runtime_calibration_blocked_pathway_phase_freeze_v1.json
+CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_PATHWAY_PHASE_FREEZE ?= $(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_PATHWAY_PHASE_FREEZE_OUTPUT)
+CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_PATHWAY_PHASE_FREEZE_VALIDATION_OUTPUT ?= .data/exports/controlled_runtime_calibration_blocked_pathway_phase_freeze.validation.json
+CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_PATHWAY_COMPLETION_SUMMARY_OUTPUT ?= .data/exports/controlled_runtime_calibration_blocked_pathway_completion_summary.current.json
+CONTROLLED_RUNTIME_CALIBRATION_UNRESOLVED_HUMAN_INPUTS_REPORT_OUTPUT ?= .data/exports/controlled_runtime_calibration_unresolved_human_inputs_report.current.json
+CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_PATHWAY_RUNTIME_NON_MUTATION_EVIDENCE_REPORT_OUTPUT ?= .data/exports/controlled_runtime_calibration_blocked_pathway_runtime_non_mutation_evidence_report.current.json
+CONTROLLED_RUNTIME_CALIBRATION_SUCCESSFUL_PATHWAY_REMAINING_WORK_REPORT_OUTPUT ?= .data/exports/controlled_runtime_calibration_successful_pathway_remaining_work_report.current.json
+CONTROLLED_RUNTIME_CALIBRATION_FUTURE_UNBLOCK_READINESS_REPORT_OUTPUT ?= .data/exports/controlled_runtime_calibration_future_unblock_readiness_report.current.json
 CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_SOURCE_RESOLUTION_PACKET ?= $(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_OUTPUT)
 CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_SOURCE_RESOLUTION_PACKET_CONTRACT ?= $(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_EXECUTION_RESOLUTION_PACKET_CONTRACT_OUTPUT)
 CONTROLLED_RUNTIME_CALIBRATION_OPERATOR_SIGNOFF_CANDIDATE_SELECTION_SOURCE_CANDIDATE_CONFIG_FREEZE ?= $(CALIBRATION_CANDIDATE_CONFIG_FREEZE_ARTIFACT_OUTPUT)
@@ -887,6 +899,7 @@ export TOM_V3_DATABASE_URL
 .PHONY: tom-v1-export-controlled-runtime-calibration-reexecution-request-packet-contract tom-v1-build-controlled-runtime-calibration-reexecution-request-packet-inputs tom-v1-validate-controlled-runtime-calibration-reexecution-request-packet-inputs tom-v1-build-controlled-runtime-calibration-reexecution-request-packet tom-v1-validate-controlled-runtime-calibration-reexecution-request-packet tom-v1-build-controlled-runtime-calibration-reexecution-request-blocker-report tom-v1-build-controlled-runtime-calibration-reexecution-prerequisite-report tom-v1-build-controlled-runtime-calibration-final-gate-dependency-report tom-v1-build-controlled-runtime-calibration-reexecution-execution-plan tom-v1-build-controlled-runtime-calibration-reexecution-runtime-mutation-prevention-report
 .PHONY: tom-v1-export-controlled-runtime-calibration-reexecution-execution-blocked-result-contract tom-v1-build-controlled-runtime-calibration-reexecution-execution-inputs tom-v1-validate-controlled-runtime-calibration-reexecution-execution-inputs tom-v1-build-controlled-runtime-calibration-reexecution-execution-blocked-result tom-v1-validate-controlled-runtime-calibration-reexecution-execution-blocked-result tom-v1-build-controlled-runtime-calibration-reexecution-execution-precheck-report tom-v1-build-controlled-runtime-calibration-reexecution-blocked-reason-report tom-v1-build-controlled-runtime-calibration-reexecution-final-gate-dependency-report tom-v1-build-controlled-runtime-calibration-reexecution-non-execution-evidence-report tom-v1-build-controlled-runtime-calibration-reexecution-execution-runtime-mutation-prevention-report tom-v1-build-controlled-runtime-calibration-reexecution-post-execution-readiness-report
 .PHONY: tom-v1-export-controlled-runtime-calibration-post-reexecution-verification-not-available-packet-contract tom-v1-build-controlled-runtime-calibration-post-reexecution-verification-inputs tom-v1-validate-controlled-runtime-calibration-post-reexecution-verification-inputs tom-v1-build-controlled-runtime-calibration-post-reexecution-verification-not-available-packet tom-v1-validate-controlled-runtime-calibration-post-reexecution-verification-not-available-packet tom-v1-build-controlled-runtime-calibration-post-reexecution-verification-availability-report tom-v1-build-controlled-runtime-calibration-post-reexecution-missing-execution-evidence-report tom-v1-build-controlled-runtime-calibration-post-reexecution-runtime-non-mutation-evidence-report tom-v1-build-controlled-runtime-calibration-post-reexecution-final-gate-dependency-report tom-v1-build-controlled-runtime-calibration-post-reexecution-phase-freeze-readiness-report
+.PHONY: tom-v1-export-controlled-runtime-calibration-blocked-pathway-phase-freeze-contract tom-v1-build-controlled-runtime-calibration-blocked-pathway-phase-freeze-inputs tom-v1-validate-controlled-runtime-calibration-blocked-pathway-phase-freeze-inputs tom-v1-build-controlled-runtime-calibration-blocked-pathway-phase-freeze tom-v1-validate-controlled-runtime-calibration-blocked-pathway-phase-freeze tom-v1-build-controlled-runtime-calibration-blocked-pathway-completion-summary tom-v1-build-controlled-runtime-calibration-unresolved-human-inputs-report tom-v1-build-controlled-runtime-calibration-runtime-non-mutation-evidence-report tom-v1-build-controlled-runtime-calibration-successful-pathway-remaining-work-report tom-v1-build-controlled-runtime-calibration-future-unblock-readiness-report
 
 install:
 	$(PYTHON) -m pip install -e ".[dev]"
@@ -2179,6 +2192,36 @@ tom-v1-build-controlled-runtime-calibration-post-reexecution-final-gate-dependen
 
 tom-v1-build-controlled-runtime-calibration-post-reexecution-phase-freeze-readiness-report:
 	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-post-reexecution-phase-freeze-readiness-report --contract "$(CONTROLLED_RUNTIME_CALIBRATION_POST_REEXECUTION_VERIFICATION_NOT_AVAILABLE_PACKET_CONTRACT_OUTPUT)" --post-reexecution-verification-not-available-packet "$(CONTROLLED_RUNTIME_CALIBRATION_POST_REEXECUTION_VERIFICATION_NOT_AVAILABLE_PACKET)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_POST_REEXECUTION_PHASE_FREEZE_READINESS_REPORT_OUTPUT)" --skip-create-db
+
+tom-v1-export-controlled-runtime-calibration-blocked-pathway-phase-freeze-contract:
+	$(PYTHON) -m apps.worker.cli export-controlled-runtime-calibration-blocked-pathway-phase-freeze-contract --output "$(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_PATHWAY_PHASE_FREEZE_CONTRACT_OUTPUT)" --skip-create-db
+
+tom-v1-build-controlled-runtime-calibration-blocked-pathway-phase-freeze-inputs:
+	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-blocked-pathway-phase-freeze-inputs --contract "$(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_PATHWAY_PHASE_FREEZE_CONTRACT_OUTPUT)" --source-post-reexecution-verification-not-available-packet "$(CONTROLLED_RUNTIME_CALIBRATION_POST_REEXECUTION_VERIFICATION_NOT_AVAILABLE_PACKET)" --source-post-reexecution-verification-not-available-packet-contract "$(CONTROLLED_RUNTIME_CALIBRATION_POST_REEXECUTION_VERIFICATION_NOT_AVAILABLE_PACKET_CONTRACT_OUTPUT)" --model-asset-path "$(GAMEPLAY_CLASSIFIER_ASSET_PATH)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_PATHWAY_PHASE_FREEZE_INPUTS_OUTPUT)" --skip-create-db
+
+tom-v1-validate-controlled-runtime-calibration-blocked-pathway-phase-freeze-inputs:
+	$(PYTHON) -m apps.worker.cli validate-controlled-runtime-calibration-blocked-pathway-phase-freeze-inputs --contract "$(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_PATHWAY_PHASE_FREEZE_CONTRACT_OUTPUT)" --blocked-pathway-phase-freeze-inputs "$(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_PATHWAY_PHASE_FREEZE_INPUTS)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_PATHWAY_PHASE_FREEZE_INPUTS_VALIDATION_OUTPUT)" --skip-create-db
+
+tom-v1-build-controlled-runtime-calibration-blocked-pathway-phase-freeze:
+	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-blocked-pathway-phase-freeze --contract "$(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_PATHWAY_PHASE_FREEZE_CONTRACT_OUTPUT)" --blocked-pathway-phase-freeze-inputs "$(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_PATHWAY_PHASE_FREEZE_INPUTS)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_PATHWAY_PHASE_FREEZE_OUTPUT)" --skip-create-db
+
+tom-v1-validate-controlled-runtime-calibration-blocked-pathway-phase-freeze:
+	$(PYTHON) -m apps.worker.cli validate-controlled-runtime-calibration-blocked-pathway-phase-freeze --contract "$(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_PATHWAY_PHASE_FREEZE_CONTRACT_OUTPUT)" --blocked-pathway-phase-freeze "$(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_PATHWAY_PHASE_FREEZE)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_PATHWAY_PHASE_FREEZE_VALIDATION_OUTPUT)" --skip-create-db
+
+tom-v1-build-controlled-runtime-calibration-blocked-pathway-completion-summary:
+	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-blocked-pathway-completion-summary --contract "$(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_PATHWAY_PHASE_FREEZE_CONTRACT_OUTPUT)" --blocked-pathway-phase-freeze "$(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_PATHWAY_PHASE_FREEZE)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_PATHWAY_COMPLETION_SUMMARY_OUTPUT)" --skip-create-db
+
+tom-v1-build-controlled-runtime-calibration-unresolved-human-inputs-report:
+	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-unresolved-human-inputs-report --contract "$(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_PATHWAY_PHASE_FREEZE_CONTRACT_OUTPUT)" --blocked-pathway-phase-freeze "$(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_PATHWAY_PHASE_FREEZE)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_UNRESOLVED_HUMAN_INPUTS_REPORT_OUTPUT)" --skip-create-db
+
+tom-v1-build-controlled-runtime-calibration-runtime-non-mutation-evidence-report:
+	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-runtime-non-mutation-evidence-report --contract "$(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_PATHWAY_PHASE_FREEZE_CONTRACT_OUTPUT)" --blocked-pathway-phase-freeze "$(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_PATHWAY_PHASE_FREEZE)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_PATHWAY_RUNTIME_NON_MUTATION_EVIDENCE_REPORT_OUTPUT)" --skip-create-db
+
+tom-v1-build-controlled-runtime-calibration-successful-pathway-remaining-work-report:
+	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-successful-pathway-remaining-work-report --contract "$(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_PATHWAY_PHASE_FREEZE_CONTRACT_OUTPUT)" --blocked-pathway-phase-freeze "$(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_PATHWAY_PHASE_FREEZE)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_SUCCESSFUL_PATHWAY_REMAINING_WORK_REPORT_OUTPUT)" --skip-create-db
+
+tom-v1-build-controlled-runtime-calibration-future-unblock-readiness-report:
+	$(PYTHON) -m apps.worker.cli build-controlled-runtime-calibration-future-unblock-readiness-report --contract "$(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_PATHWAY_PHASE_FREEZE_CONTRACT_OUTPUT)" --blocked-pathway-phase-freeze "$(CONTROLLED_RUNTIME_CALIBRATION_BLOCKED_PATHWAY_PHASE_FREEZE)" --output "$(CONTROLLED_RUNTIME_CALIBRATION_FUTURE_UNBLOCK_READINESS_REPORT_OUTPUT)" --skip-create-db
 
 tom-v1-post-codex-validate:
 	scripts/post_codex_validate.sh $(if $(EXPECTED_BRANCH),--branch "$(EXPECTED_BRANCH)",) $(if $(EXPECTED_TAG),--expected-tag "$(EXPECTED_TAG)",) --python "$(PYTHON)"

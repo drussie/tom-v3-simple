@@ -124,3 +124,11 @@ does not infer post-reexecution verification, runtime reexecution output, final-
 resolution, selected candidate, operator signoff, or reexecution approval; it does not execute
 runtime reexecution or runtime application, mutate runtime config, create production config, modify
 model weights, or replace baselines.
+
+## Decision 21: Blocked Pathway Freeze Is Not Successful Calibration
+
+Reason: BP78 may freeze the BP55-BP77 controlled calibration pathway as complete for the current
+blocked/no-human-resolution path, but that does not complete successful runtime calibration. A
+successful path still requires explicit human resolution, real operator signoff, explicit selected
+candidate context, final-gate rerun, runtime reexecution output, and post-reexecution verification
+before any runtime application can be considered.

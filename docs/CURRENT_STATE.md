@@ -4,11 +4,11 @@
 
 - Project name: TOM v3 Simple
 - Repo: drussie/tom-v3-simple
-- Current phase: Blueprint 65 complete; blocked controlled runtime calibration execution resolution
-  packet v1 added
-- Current goal: Preserve the BP22-BP36 structural expansion freeze, keep protected regression
-  gates intact, and keep the controlled runtime calibration chain blocked until real operator
-  signoff, selected candidate context, and a future final-gate rerun exist.
+- Current phase: Blueprint 78 complete; blocked controlled runtime calibration pathway
+  phase-freeze v1 added
+- Current goal: Preserve protected regression gates, keep the blocked controlled runtime
+  calibration pathway frozen, and require a new explicit human-resolution cycle before any future
+  successful runtime calibration path.
 
 ## Mission
 
@@ -1131,3 +1131,45 @@ not fabricate post-reexecution verification, runtime reexecution output, final-g
 resolution, selected candidate, operator signoff, or reexecution approval; it does not execute
 runtime application, write runtime config, create production config, modify model weights, or
 replace baselines.
+
+## Blueprint 78 Result
+
+Status: complete.
+
+Blueprint 78 adds the blocked pathway phase-freeze required after BP77. It creates tracked
+artifacts:
+
+```text
+.data/contracts/controlled_runtime_calibration_blocked_pathway_phase_freeze_contract_v1.json
+.data/contracts/controlled_runtime_calibration_blocked_pathway_phase_freeze_v1.json
+```
+
+The frozen artifact stores the current blocked-pathway freeze state:
+
+```text
+blocked_pathway_phase_freeze_status: blocked_pathway_phase_freeze_completed
+blocked_pathway_freeze_reason: controlled_pathway_blocked_missing_human_resolution
+blocked_pathway_completion_status: complete_for_blocked_pathway
+successful_pathway_completion_status: incomplete_pending_explicit_human_resolution
+successful_calibration_application_status: not_completed
+human_resolution_status: human_resolution_missing
+operator_signoff_status: operator_signoff_required
+selected_candidate_status: selected_candidate_required
+final_gate_rerun_status: final_gate_rerun_not_performed
+final_gate_rerun_result_status: final_gate_rerun_result_not_available
+reexecution_status: reexecution_not_performed
+reexecution_result_status: reexecution_result_not_available
+post_reexecution_verification_status: post_reexecution_verification_not_available
+runtime_application_status: not_executed
+runtime_config_changed: false
+mutation_status: no_runtime_mutation_due_to_blocker
+production_config_status: not_created
+baseline_update_status: not_replaced
+model_update_status: not_modified
+```
+
+Blueprint 78 freezes the blocked pathway as complete for its blocked-state purpose only. It does
+not complete successful runtime calibration, fabricate human resolution, infer a selected
+candidate, infer operator signoff, infer final-gate success, infer runtime reexecution output,
+execute runtime application, write runtime config, create production config, modify model weights,
+or replace baselines.

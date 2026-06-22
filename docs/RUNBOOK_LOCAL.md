@@ -4934,3 +4934,49 @@ The BP77 not-available packet does not create post-reexecution verification, run
 output, final-gate rerun result, human resolution, selected candidate, operator signoff, or
 reexecution approval. It does not execute runtime reexecution or runtime application, write runtime
 config, create production config, modify model weights, or replace baselines.
+
+## Blueprint 78 - Blocked Pathway Phase Freeze
+
+Build the Blueprint 78 blocked pathway phase-freeze from the frozen Blueprint 77 not-available
+packet:
+
+```bash
+make tom-v1-export-controlled-runtime-calibration-blocked-pathway-phase-freeze-contract \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-blocked-pathway-phase-freeze-inputs \
+  PYTHON=.venv/bin/python
+make tom-v1-validate-controlled-runtime-calibration-blocked-pathway-phase-freeze-inputs \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-blocked-pathway-phase-freeze \
+  PYTHON=.venv/bin/python
+make tom-v1-validate-controlled-runtime-calibration-blocked-pathway-phase-freeze \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-blocked-pathway-completion-summary \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-unresolved-human-inputs-report \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-runtime-non-mutation-evidence-report \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-successful-pathway-remaining-work-report \
+  PYTHON=.venv/bin/python
+make tom-v1-build-controlled-runtime-calibration-future-unblock-readiness-report \
+  PYTHON=.venv/bin/python
+```
+
+Current expected frozen artifact:
+
+- `blocked_pathway_phase_freeze_status`: `blocked_pathway_phase_freeze_completed`
+- `blocked_pathway_completion_status`: `complete_for_blocked_pathway`
+- `successful_pathway_completion_status`: `incomplete_pending_explicit_human_resolution`
+- `successful_calibration_application_status`: `not_completed`
+- `human_resolution_status`: `human_resolution_missing`
+- `final_gate_rerun_status`: `final_gate_rerun_not_performed`
+- `reexecution_status`: `reexecution_not_performed`
+- `post_reexecution_verification_status`: `post_reexecution_verification_not_available`
+- `runtime_application_status`: `not_executed`
+- `runtime_config_changed`: false
+- `mutation_status`: `no_runtime_mutation_due_to_blocker`
+
+The BP78 freeze completes only the blocked pathway. It does not complete successful runtime
+calibration, execute runtime application, write runtime config, create production config, modify
+model weights, replace baselines, or satisfy missing human inputs.
